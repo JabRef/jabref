@@ -18,7 +18,7 @@ public class PrepRelease {
 	//System.out.println(f.getPath());
 	File[] fs = f.listFiles();
 	for (int i=0; i<fs.length; i++) {
-	    if (fs[i].getName().equals("CVS")) {
+	    if (fs[i].getName().equals("CVS") || fs[i].getName().equals(".svn")) {
 		delete(fs[i]);
 		fs[i].delete();
 		System.out.println("Deleting dir: "+fs[i].getPath());

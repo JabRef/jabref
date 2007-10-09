@@ -197,6 +197,15 @@ est utilis&eacute; avec <code>HTMLChars</code> ou <code>XMLChars</code>, ce form
     ci-dessous).</p>
 >>>>>>> .merge-right.r2290
 
+  <p>
+    Certains formateurs prennent un argument suppl&eacute;mentaire, donn&eacute; entre parenth&egrave;ses
+    imm&eacute;diatement apr&egrave;s le nom du formateur. L'argument peut-&ecirc;tre mis
+    entre guillemets, ce qui est n&eacute;cessaire s'il inclut des caract&egrave;res parenth&egrave;ses.
+    Par exemple, <code>\format[Replace("\s,_")]{\journal}</code> lance
+    le formateur <b>Replace</b> avec l'argument <b>\s,_</b> (cela retourne
+    le champ "journal" avec les espaces remplac&eacute;es par des soulignements).
+    </p>
+
     <p>JabRef fournit les formateurs suivants, certains d'entre eux
     d&eacute;pendant d'autres formateurs&nbsp;:</p>
 
@@ -325,6 +334,11 @@ Certaines informations dans les sorties ne prennent de sens que si un certain ch
         &agrave; leurs initiales. Ce formateur n&eacute;cessite
         d'avoir pr&eacute;alablement utilis&eacute;
         AuthorLastFirst.</li>
+        
+        <li><code>AuthorAbbreviator</code> ou <code>AuthorLastFirstAbbreviator</code>&nbsp;:
+        abr&egrave;ge les pr&eacute;noms de tous les auteurs. Ce formateur renvoie les noms avec
+        le nom propre en premier. Faire suivre ce formateur d'AuthorFirstFirst pour
+        avoir les noms abr&eacute;g&eacute;s avec les initiales en premier.
 
         <li><code>AuthorLastFirstCommas</code>&nbsp;: &agrave;
         documenter.</li>
@@ -364,7 +378,7 @@ Certaines informations dans les sorties ne prennent de sens que si un certain ch
         entre les initiales des pr&eacute;noms sont
         supprim&eacute;s.</li>
 
-        <li><code>FileLink</code> : sans argument, ce formateur renvoie
+        <li><code>FileLink(TypeDeFichier)</code> : sans argument, ce formateur renvoie
         le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
         &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).
         <p>Ce formateur prend comme argument optionnel l'extension du type de fichier externe
@@ -379,6 +393,28 @@ Certaines informations dans les sorties ne prennent de sens que si un certain ch
 
         <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par
         un tiret XML.</li>
+
+        <li><code>Replace(ExpReg,RemplaceAvec)</code>&nbsp;: effectue le remplacement d'une expression r&eacute;guli&egrave;re.
+        Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni. Les parties sont
+        s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
+        d'&eacute;chappement&nbsp;: \,<br>&nbsp;<br>
+        La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. L'expression r&eacute;guli&egrave;re
+        s'&eacute;crit normalement, sans s&eacute;quence d'&eacute;chappement suppl&eacute;mentaire pour les anti-slash ("backslashes"). Une description
+        des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+         <br>&nbsp;<br>
+        La seconde partie est le texte qui remplace tous les correspondances.</li>
+
+       <li><code>Replace(regexp,replacewith)</code>&nbsp;: effectue le remplacement d'une expression r&eacute;guli&egrave;re.
+        Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni.  Les parties sont
+        s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
+        d'&eacute;chappement&nbsp;: \,<br>&nbsp;<br>
+        La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. L'expression r&eacute;guli&egrave;re
+        s'&eacute;crit normalement, sans s&eacute;quence d'&eacute;chappement suppl&eacute;mentaire pour les anti-slash ("backslashes"). Une description
+        des expressions r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+         <br>&nbsp;<br>
+        La seconde partie est le texte qui remplace tous les correspondances.</li>
 
         <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les
         accolades "{" ou "}".</li>
@@ -414,6 +450,8 @@ Certaines informations dans les sorties ne prennent de sens que si un certain ch
 
         <li><code>ResolvePDF</code>&nbsp;: &agrave;
         documenter.</li>
+
+    <li></li>
     </ul>
 
     <p>Si aucun des formateurs disponibles ne peut faire ce que

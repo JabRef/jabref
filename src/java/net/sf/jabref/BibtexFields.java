@@ -111,7 +111,7 @@ public class BibtexFields
     add( new BibtexSingleField( "key", true ) ) ;
     add( new BibtexSingleField( "month", true, GUIGlobals.SMALL_W ) ) ;
     add( new BibtexSingleField( "note", true, GUIGlobals.MEDIUM_W  ) ) ;
-    add( new BibtexSingleField( "number", true, GUIGlobals.SMALL_W, 60  ) ) ;
+    add( new BibtexSingleField( "number", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
     add( new BibtexSingleField( "organization", true, GUIGlobals.MEDIUM_W  ) ) ;
     add( new BibtexSingleField( "pages", true, GUIGlobals.SMALL_W ) ) ;
     add( new BibtexSingleField( "publisher", true, GUIGlobals.MEDIUM_W  ) ) ;
@@ -119,8 +119,8 @@ public class BibtexFields
     add( new BibtexSingleField( "series", true, GUIGlobals.SMALL_W  ) ) ;
     add( new BibtexSingleField( "title", true, 400 ) ) ;
     add( new BibtexSingleField( "type", true, GUIGlobals.SMALL_W  ) ) ;
-    add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ) ) ;
-    add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ) ) ;
+    add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
+    add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ).setNumeric(true) ) ;
 
     // some semi-standard fields
     dummy = new BibtexSingleField( KEY_FIELD, true ) ;
@@ -136,10 +136,12 @@ public class BibtexFields
     dummy.setPrivate();
     add( dummy ) ;
 
+    add(new BibtexSingleField("pmid", false, GUIGlobals.SMALL_W, 60).setNumeric(true));
 
     // additional fields ------------------------------------------------------
     dummy =  new BibtexSingleField( "citeseercitationcount", false,
                                                  GUIGlobals.SMALL_W, 75) ;
+    dummy.setNumeric(true);
     dummy.setAlternativeDisplayName("Popularity") ;
     add(dummy) ;
     add( new BibtexSingleField( "location", false ) ) ;
@@ -377,6 +379,15 @@ public class BibtexFields
     return false ;
   }
 
+    public static boolean isNumeric( String field ) {
+        BibtexSingleField sField = getField( field ) ;
+        if (sField != null)
+        {
+            return sField.isNumeric() ;
+        }
+        return false ;
+    }
+
   /** returns an string-array with all fieldnames */
   public static String[] getAllFieldNames()
   {
@@ -437,7 +448,11 @@ public class BibtexFields
     // function to this field, for instance a "browse" button for the "pdf" field.
     private String extras = null ;
 
-    // a comma separated list of alternative bibtex-fieldnames, e.g.
+    // This value defines whether contents of this field are expected to be
+    // numeric values. This can be used to sort e.g. volume numbers correctly:
+    private boolean numeric = false;
+
+      // a comma separated list of alternative bibtex-fieldnames, e.g.
     // "LCCN" is the same like "lib-congress"
     // private String otherNames = null ;
 
@@ -529,6 +544,8 @@ public class BibtexFields
 
     // -----------------------------------------------------------------------
     // -----------------------------------------------------------------------
+
+
 
     private void setFlag( boolean onOff, int flagID)
     {
@@ -652,6 +669,22 @@ public class BibtexFields
     {
       return name ;
     }
+
+
+      /**
+       * Set this field's numeric propery
+       * @param numeric true to indicate that this is a numeric field.
+       * @return this BibtexSingleField instance. Makes it easier to call this
+       *   method on the fly while initializing without using a local variable.
+       */
+      public BibtexSingleField setNumeric(boolean numeric) {
+          this.numeric = numeric;
+          return this;
+      }
+
+      public boolean isNumeric() {
+          return numeric;
+      }
 
   }
 }

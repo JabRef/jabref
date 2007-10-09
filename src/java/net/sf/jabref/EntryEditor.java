@@ -47,10 +47,11 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
+import net.sf.jabref.external.WriteXMPEntryEditorAction;
+import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.gui.AutoCompleter;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
@@ -99,6 +100,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     // The action which generates a bibtexkey for this entry.
     public GenerateKeyAction generateKeyAction;
+
+    public AbstractAction writeXmp;
 
     SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
@@ -177,6 +180,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         copyKeyAction = new CopyKeyAction();
         generateKeyAction = new GenerateKeyAction(frame);
         storeFieldAction = new StoreFieldAction();
+        writeXmp = new WriteXMPEntryEditorAction(panel_, this);
 
         BorderLayout bl = new BorderLayout();
         setLayout(bl);
@@ -282,7 +286,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         tlb.addSeparator();
         
         tlb.add(generateKeyAction);
-        
+
+        tlb.add(writeXmp);
+
         tlb.addSeparator();
 
         tlb.add(deleteAction);
@@ -608,7 +614,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      */
     public void storeCurrentEdit() {
         Component comp = Globals.focusListener.getFocused();
-        if ((comp instanceof FieldEditor) && this.isAncestorOf(comp)) {
+        if ((comp == source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
             storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
         }
     }
@@ -659,8 +665,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if (entry == be)
             return;
 
-        // Util.pr("EntryEditor.switchTo(BibtexEntry): "+entry.getCiteKey());
-        // Util.pr("::EntryEditor.switchTo(BibtexEntry): "+this.type.getName());
         storeCurrentEdit();
 
         // Remove this instance as property listener for the entry:
@@ -1245,6 +1249,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // 1. get Bitexentry for selected index (already have)
             // 2. run the LabelMaker by it
             try {
+                // Store the current edit in case this action is called during the
+                // editing of a field:
+                storeCurrentEdit();
+
                 // this updates the table automatically, on close, but not
                 // within the tab
                 Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
@@ -1389,5 +1397,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 prefs.putBoolean("dialogWarningForEmptyKey", false);
         }
     }
+
 
 }

@@ -47,7 +47,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.3b" />
+	<property name="jabref.version" value="2.3b3" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
@@ -108,7 +108,7 @@
 		<include name="antlr.jar" />
 		<include name="antlr-3.0b5.jar" />
 		<include name="looks-2.0.4.jar" />
-		<include name="forms-1.0.4.jar" />
+		<include name="forms-1.1.0.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.7.0_java15.jar" />
 		<include name="microba.jar" />

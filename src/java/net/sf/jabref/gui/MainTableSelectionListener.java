@@ -264,8 +264,10 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                         panel.metaData(), flEntry.getType());
                                 item.actionPerformed(null);
                             }
-                        } else
+                        } else {
                             Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                        }
+
                     }
                     catch (IOException ex) {
                         panel.output(Globals.lang("Error") + ": " + ex.getMessage());

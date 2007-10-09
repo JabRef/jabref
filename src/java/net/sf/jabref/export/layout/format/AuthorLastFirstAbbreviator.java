@@ -22,14 +22,15 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
 	public String format(String fieldText) {
-		
-		// return AuthorList.fixAuthor_lastNameFirst(fieldText, true);
-		
-		try {
-		  return getAbbreviations(fieldText.split(" and "));
-		} catch(Exception e){
-            return fieldText;
-		}
+
+        /**
+         * This formatter is a duplicate of AuthorAbbreviator, so we simply
+         * call that one.
+         *
+         * TODO: Note that this makes the remaining methods in this formatter obsolete. 
+         */
+        return (new AuthorAbbreviator()).format(fieldText);
+
 	}
 
 	/**

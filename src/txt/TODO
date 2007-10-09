@@ -8,11 +8,15 @@ Chris:
   * Plugin-System may crash...
   
 Morten:
-* Look into "DOS short path" bug report.
-* Exporting and "file" field:
-  - Endnote and MODS export "url", not "file".
-  - BibteXML exports both "url", "pdf" and url/pdf from "file". May give doubles.
-  
+* [POSTPONE] Strange bug: when editing a field in entry editor, then clicking an entry of different type
+   in the table, current entry is stored, but the selection drops back to the first entry.
+* [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.
+  - workaround is to autodisable native file dialog for dir selection.
+
+* [DONE?] Usability of FileListEditor. Paste functionality.
+* [OK? Extension fields only] MODS exports "file" in raw form.
+
+* [POSTPONE] Look into "DOS short path" bug report.
 * [POSTPONE] Problem setting today with Microba calendar.
 * [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
 * Improve Help information for external file links

@@ -26,7 +26,8 @@
 %*
 %L
 %M
-%1 \pdf
+\format[ResolvePDF,WrapContent(%1 ,)]{\pdf}
+\format[FileLink(pdf),WrapContent(%1 ,)]{\file}
 %2 \comment
 %3 mastersthesis
 %4 \crossref
@@ -36,7 +37,8 @@
 %K \keywords
 %X \abstract
 %Z \note
-%U \url
+\format[WrapContent(%U ,)]{\url}
+\format[FileLink(url),WrapContent(%U ,)]{\file}
 %+
 %^
 

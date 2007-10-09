@@ -439,10 +439,10 @@ settings.add(select);
     }
 
     public void clearSearch() {
-        if (startedFloatSearch) {
+        if (panel.isShowingFloatSearch()) {
             startedFloatSearch = false;
             panel.mainTable.stopShowingFloatSearch();
-        } else if (startedFilterSearch) {
+        } else if (panel.isShowingFilterSearch()) {
             startedFilterSearch = false;
             panel.stopShowingSearchResults();
         }
@@ -581,5 +581,15 @@ settings.add(select);
      */
     public void reportError(String errorMessage, Exception exception) {
         reportError(errorMessage);
+    }
+
+
+    public void setActiveBasePanel(BasePanel panel) {
+        super.setActiveBasePanel(panel);
+        if (panel != null)
+            escape.setEnabled(panel.isShowingFloatSearch()
+                    || panel.isShowingFilterSearch());
+        else
+            escape.setEnabled(false);
     }
 }

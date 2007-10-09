@@ -28,8 +28,6 @@ class ModsExportFormat extends ExportFormat {
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
 
-        // TODO: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
-
         try {
             DOMSource source = new DOMSource(md.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);

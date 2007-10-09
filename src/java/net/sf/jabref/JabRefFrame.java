@@ -2203,6 +2203,24 @@ class FetchCiteSeerAction
 
     }
 
+
+    /**
+     * Sets the indeterminate status of the progress bar.
+     *
+     * If not called on the event dispatch thread, this method uses
+     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
+     */
+    public void setProgressBarIndeterminate(final boolean value) {
+        if (SwingUtilities.isEventDispatchThread())
+            progressBar.setIndeterminate(value);
+        else SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setIndeterminate(value);
+            }
+        });
+
+    }
+
     /**
      * Sets the maximum value of the progress bar. Always call this method
      * before using the progress bar, to set a maximum value appropriate to

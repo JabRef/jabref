@@ -3,7 +3,7 @@ package net.sf.jabref.gui;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
@@ -89,11 +89,16 @@ public class FileListTableModel extends AbstractTableModel {
      * @param value The string representation
      */
     public void setContent(String value) {
+        setContent(value, false);
+    }
+
+    private FileListEntry setContent(String value, boolean firstOnly) {
         if (value == null)
             value = "";
         ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
         StringBuilder sb = new StringBuilder();
         ArrayList<String> thisEntry = new ArrayList<String>();
+        boolean inXmlChar = false;
         boolean escaped = false;
         for (int i=0; i<value.length(); i++) {
             char c = value.charAt(i);
@@ -101,30 +106,52 @@ public class FileListTableModel extends AbstractTableModel {
                 escaped = true;
                 continue;
             }
+            // Check if we are entering an XML special character construct such
+            // as "&#44;", because we need to know in order to ignore the semicolon.
+            else if (!escaped && (c == '&') && !inXmlChar) {
+                sb.append(c);
+                if ((value.length() > i+1) && (value.charAt(i+1) == '#'))
+                    inXmlChar = true;
+            }
+            // Check if we are exiting an XML special character construct:
+            else if (!escaped && inXmlChar && (c == ';')) {
+                sb.append(c);
+                inXmlChar = false;
+            }
             else if (!escaped && (c == ':')) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
             }
-            else if (!escaped && (c == ';')) {
+            else if (!escaped && (c == ';') && !inXmlChar) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
-                newList.add(decodeEntry(thisEntry));
-                thisEntry.clear();
+                if (firstOnly)
+                    return decodeEntry(thisEntry);
+                else {
+                    newList.add(decodeEntry(thisEntry));
+                    thisEntry.clear();
+                }
             }
             else sb.append(c);
             escaped = false;
         }
         if (sb.length() > 0)
             thisEntry.add(sb.toString());
-        if (thisEntry.size() > 0)
-            newList.add(decodeEntry(thisEntry));
-
+        if (thisEntry.size() > 0) {
+            if (firstOnly)
+                return decodeEntry(thisEntry);
+            else
+                newList.add(decodeEntry(thisEntry));
+        }
+          
         synchronized (list) {
             list.clear();
             list.addAll(newList);
         }
         fireTableChanged(new TableModelEvent(this));
+        return null;
     }
+
 
     private FileListEntry decodeEntry(ArrayList<String> contents) {
         return new FileListEntry(getElementIfAvailable(contents, 0),
@@ -132,6 +159,28 @@ public class FileListTableModel extends AbstractTableModel {
                 Globals.prefs.getExternalFileTypeByName
                         (getElementIfAvailable(contents, 2)));
     }
+
+
+
+    /**
+     * Convenience method for finding a label corresponding to the type of the
+     * first file link in the given field content. The difference between using
+     * this method and using setContent() on an instance of FileListTableModel
+     * is a slight optimization: with this method, parsing is discontinued after
+     * the first entry has been found.
+     * @param content The file field content, as fed to this class' setContent() method.
+     * @return A JLabel set up with no text and the icon of the first entry's file type,
+     *  or null if no entry was found.
+     */
+    public static JLabel getFirstLabel(String content) {
+        FileListTableModel tm = new FileListTableModel();
+        FileListEntry entry = tm.setContent(content, true);
+        return entry != null ? entry.getType().getIconLabel() : null;
+    }
+
+    
+
+
 
     private String getElementIfAvailable(ArrayList<String> contents, int index) {
         if (index < contents.size())

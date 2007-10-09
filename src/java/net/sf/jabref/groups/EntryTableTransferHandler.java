@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -235,7 +237,55 @@ public class EntryTableTransferHandler extends TransferHandler {
 		return true;
 	}
 
-	/**
+    /**
+	 * Translate a String describing a set of files or URLs dragged into JabRef
+     * into a List of File objects, taking care of URL special characters.
+	 *
+	 * @param s
+	 *            String describing a set of files or URLs dragged into JabRef
+     * @return a List<File> containing the individual file objects.
+     *
+	 */
+    public static List<File> getFilesFromDraggedFilesString(String s) {
+		// Split into lines:
+		String[] lines = s.replaceAll("\r", "").split("\n");
+		List<File> files = new ArrayList<File>();
+		for (int i = 0; i < lines.length; i++) {
+			String line = lines[i];
+
+            // Try to use url.toURI() to translate URL specific sequences like %20 into
+            // standard characters:
+            File fl = null;
+            try {
+                URL url = new URL(line);
+                fl = new File(url.toURI());
+            } catch(URISyntaxException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            // Unless an exception was thrown, we should have the sanitized path:
+            if (fl != null)
+                line = fl.getPath();
+            else if (line.startsWith("file:"))
+				line = line.substring(5);
+			else
+				continue;
+            // Under Gnome, the link is given as file:///...., so we
+			// need to strip the extra slashes:
+			if (line.startsWith("//"))
+				line = line.substring(2);
+
+            File f = new File(line);
+            if (f.exists()) {
+				files.add(f);
+			}
+		}
+        return files;
+    }
+
+    /**
 	 * Handle a String describing a set of files or URLs dragged into JabRef.
 	 * 
 	 * @param s
@@ -245,25 +295,8 @@ public class EntryTableTransferHandler extends TransferHandler {
      *
 	 */
 	private boolean handleDraggedFilenames(String s, final int dropRow) {
-		// Split into lines:
-		String[] lines = s.replaceAll("\r", "").split("\n");
-		List<File> files = new ArrayList<File>();
-		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];
-			if (line.startsWith("file:"))
-				line = line.substring(5);
-			else
-				continue;
-			// Under Gnome, the link is given as file:///...., so we
-			// need to strip the extra slashes:
-			if (line.startsWith("//"))
-				line = line.substring(2);
-			File f = new File(line);
-			if (f.exists()) {
-				files.add(f);
-			}
-		}
-		return handleDraggedFiles(files, dropRow);
+
+		return handleDraggedFiles(getFilesFromDraggedFilesString(s), dropRow);
 
 	}
 
@@ -311,12 +344,11 @@ public class EntryTableTransferHandler extends TransferHandler {
 		String encoding = Globals.prefs.get("defaultEncoding");
 		for (int i = 0; i < fileNames.length; i++) {
 			// Find the file's extension, if any:
-			String extension = "";
+            String extension = "";
 			ExternalFileType fileType = null;
 			int index = fileNames[i].lastIndexOf('.');
 			if ((index >= 0) && (index < fileNames[i].length())) {
 				extension = fileNames[i].substring(index + 1).toLowerCase();
-				// System.out.println(extension);
 				fileType = Globals.prefs.getExternalFileTypeByExt(extension);
 			}
 			if (extension.equals("bib")) {

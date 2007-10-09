@@ -17,9 +17,16 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
-
+import net.sf.jabref.external.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.util.List;
+import java.net.URL;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -39,6 +46,10 @@ public class FileListEditor extends JTable implements FieldEditor,
     private FileListTableModel tableModel;
     private JScrollPane sPane;
     private JButton add, remove, up, down, auto, download;
+    private JPopupMenu menu = new JPopupMenu();
+    private JMenuItem item = new JMenuItem(Globals.lang("Open"));
+
+
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -55,8 +66,11 @@ public class FileListEditor extends JTable implements FieldEditor,
         addMouseListener(new TableClickListener());
 
         add = new JButton(GUIGlobals.getImage("add"));
+        add.setToolTipText(Globals.lang("New file link (INSERT)"));
         remove = new JButton(GUIGlobals.getImage("remove"));
+        remove.setToolTipText(Globals.lang("Remove file link (DELETE)"));
         up = new JButton(GUIGlobals.getImage("up"));
+
         down = new JButton(GUIGlobals.getImage("down"));
         auto = new JButton(Globals.lang("Auto"));
         download = new JButton(Globals.lang("Download"));
@@ -107,6 +121,10 @@ public class FileListEditor extends JTable implements FieldEditor,
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
 
+	TransferHandler th = new FileListEditorTransferHandler();
+	setTransferHandler(th);
+        panel.setTransferHandler(th);
+
         // Add an input/action pair for deleting entries:
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
         getActionMap().put("delete", new AbstractAction() {
@@ -127,8 +145,26 @@ public class FileListEditor extends JTable implements FieldEditor,
                 addEntry();
             }
         });
+
+        menu.add(item);
+        item.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                openSelectedFile();
+            }
+        });
     }
 
+    private void openSelectedFile() {
+        int row = getSelectedRow();
+        if (row >= 0) {
+            FileListEntry entry = tableModel.getEntry(row);
+            try {
+                Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
     public String getFieldName() {
@@ -183,13 +219,32 @@ public class FileListEditor extends JTable implements FieldEditor,
         return null;
     }
 
-    private void addEntry() {
+    private void addEntry(String initialLink) {
         int row = getSelectedRow();
         if (row == -1)
             row = 0;
-        FileListEntry entry = new FileListEntry("", "", null);
+        FileListEntry entry = new FileListEntry("", initialLink, null);
         if (editListEntry(entry))
             tableModel.addEntry(row, entry);
+        entryEditor.updateField(this);
+    }
+
+    private void addEntry() {
+        addEntry("");
+    }
+
+    /**
+     * Add the listed files, prompting the user with the entry editor in each case.
+     * @param files A list of File objects.
+     */
+    private void addAll(List files) {
+        for (Iterator i = files.iterator(); i.hasNext();) {
+            File file = (File)i.next();
+            String fileName = file.getAbsolutePath();
+            FileListEntry entry = new FileListEntry("", fileName, null);
+            if (editListEntry(entry))
+                    tableModel.addEntry(tableModel.getRowCount(), entry);
+        }
         entryEditor.updateField(this);
     }
 
@@ -265,15 +320,13 @@ public class FileListEditor extends JTable implements FieldEditor,
      * @return the thread performing the autosetting
      */
     public static Thread autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce,
-                                      final Set<BibtexEntry> changedEntries) {
+                                      final Set<BibtexEntry> changedEntries,
+                                      final ArrayList<File> dirs) {
 
         Runnable r = new Runnable() {
 
             public void run() {
                 ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-                ArrayList<File> dirs = new ArrayList<File>();
-                if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
-                    dirs.add(new File(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")));
                 Collection<String> extensions = new ArrayList<String>();
                 for (int i = 0; i < types.length; i++) {
                     final ExternalFileType type = types[i];
@@ -501,8 +554,152 @@ public class FileListEditor extends JTable implements FieldEditor,
                     editListEntry(entry);
                 }
             }
+            else if (e.isPopupTrigger())
+                processPopupTrigger(e);
+        }
+
+
+        public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger())
+                processPopupTrigger(e);
+        }
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger())
+                processPopupTrigger(e);
+        }
+
+
+        private void processPopupTrigger(MouseEvent e) {
+            int row = rowAtPoint(e.getPoint());
+            if (row >= 0) {
+                setRowSelectionInterval(row, row);
+                menu.show(FileListEditor.this, e.getX(), e.getY());
+            }
         }
     }
 
 
+    class FileListEditorTransferHandler extends TransferHandler {
+
+        protected DataFlavor urlFlavor;
+        protected DataFlavor stringFlavor;
+
+        public FileListEditorTransferHandler() {
+            stringFlavor = DataFlavor.stringFlavor;
+            try {
+                urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
+            } catch (ClassNotFoundException e) {
+                Globals.logger("Unable to configure drag and drop for file link table");
+                e.printStackTrace();
+            }
+        }
+        /**
+         * Overriden to indicate which types of drags are supported (only LINK).
+         *
+         * @override
+         */
+        public int getSourceActions(JComponent c) {
+            return DnDConstants.ACTION_LINK;
+        }
+
+        /*public boolean importData(TransferSupport transferSupport) {
+
+            return importData(FileListEditor.this, transferSupport.getTransferable());
+        }*/
+
+        public boolean importData(JComponent comp, Transferable t) {
+            // If the drop target is the main table, we want to record which
+            // row the item was dropped on, to identify the entry if needed:
+            int dropRow = -1;
+            if (comp instanceof JTable) {
+                dropRow = ((JTable) comp).getSelectedRow();
+            }
+
+            try {
+		
+                List files = null;
+                // This flavor is used for dragged file links in Windows:
+                if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    // JOptionPane.showMessageDialog(null, "Received
+                    // javaFileListFlavor");
+                    files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                }
+
+                if (t.isDataFlavorSupported(urlFlavor)) {
+                    URL dropLink = (URL) t.getTransferData(urlFlavor);
+                    System.out.println("URL: "+dropLink);
+                    //return handleDropTransfer(dropLink, dropRow);
+                }
+
+                // This is used when one or more files are pasted from the file manager
+                // under Gnome. The data consists of the file paths, one file per line:
+                if (t.isDataFlavorSupported(stringFlavor)) {
+                    String dropStr = (String)t.getTransferData(stringFlavor);
+                    files = EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr);
+                }
+
+		        if (files != null) {
+		            final List theFiles = files;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            //addAll(files);
+                            for (Iterator i=theFiles.iterator(); i.hasNext();) {
+			                    File f = (File)i.next();
+                                // Find the file's extension, if any:
+                                String name = f.getAbsolutePath();
+                                String extension = "";
+                                ExternalFileType fileType = null;
+                                int index = name.lastIndexOf('.');
+                                if ((index >= 0) && (index < name.length())) {
+                                    extension = name.substring(index + 1).toLowerCase();
+                                    fileType = Globals.prefs.getExternalFileTypeByExt(extension);
+                                }
+                                if (fileType != null) {
+                                    DroppedFileHandler dfh = new DroppedFileHandler(frame, frame.basePanel());
+                                    dfh.handleDroppedfile(name, fileType, true, entryEditor.getEntry());
+                                }
+                            }
+                        }
+                    });
+                    return true;
+                }
+
+            } catch (IOException ioe) {
+                System.err.println("failed to read dropped data: " + ioe.toString());
+            } catch (UnsupportedFlavorException ufe) {
+                System.err.println("drop type error: " + ufe.toString());
+            }
+
+            // all supported flavors failed
+            System.err.println("can't transfer input: ");
+            DataFlavor inflavs[] = t.getTransferDataFlavors();
+            for (int i = 0; i < inflavs.length; i++) {
+                System.out.println("  " + inflavs[i].toString());
+            }
+
+            return false;
+        }
+
+        /**
+         * This method is called to query whether the transfer can be imported.
+         *
+         * Will return true for urls, strings, javaFileLists
+         *
+         * @override
+         */
+        public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+
+            // accept this if any input flavor matches any of our supported flavors
+            for (int i = 0; i < transferFlavors.length; i++) {
+                DataFlavor inflav = transferFlavors[i];
+                if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
+                    || inflav.match(DataFlavor.javaFileListFlavor))
+                    return true;
+            }
+
+            // nope, never heard of this type
+            return false;
+        }
+
+    }
 }

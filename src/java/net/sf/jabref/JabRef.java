@@ -326,6 +326,13 @@ public class JabRef {
                     // This signals that the latest import should be stored in the given
                     // format to the given file.
                     ParserResult pr = loaded.elementAt(loaded.size() - 1);
+
+                    // Set the global variable for this database's file directory before exporting,
+                    // so formatters can resolve linked files correctly.
+                    // (This is an ugly hack!)
+                    MetaData metaData = new MetaData(pr.getMetaData(), pr.getDatabase());
+                    metaData.setFile(pr.getFile());
+                    Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                     System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format != null) {

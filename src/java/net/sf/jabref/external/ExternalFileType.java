@@ -1,6 +1,6 @@
 package net.sf.jabref.external;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.GUIGlobals;
 
@@ -13,14 +13,16 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     protected String name, extension, openWith, iconName;
     protected ImageIcon icon;
+    protected JLabel label = new JLabel();
 
     public ExternalFileType(String name, String extension, String openWith,
                             String iconName) {
+        label.setText(null);
         this.name = name;
+        label.setToolTipText(this.name);
         this.extension = extension;
         this.openWith = openWith;
-        this.iconName = iconName;
-        this.icon = GUIGlobals.getImage(iconName);
+        setIconName(iconName);
     }
 
     /**
@@ -40,10 +42,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         if ((val == null) || (val.length < 4))
             throw new IllegalArgumentException("Cannot contruct ExternalFileType without four elements in String[] argument.");
         this.name = val[0];
+        label.setToolTipText(this.name);
         this.extension = val[1];
         this.openWith = val[2];
-        this.iconName = val[3];
-        this.icon = GUIGlobals.getImage(val[3]);
+        label.setText(null);
+        setIconName(val[3]);
     }
 
     /**
@@ -63,6 +66,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     public void setName(String name) {
         this.name = name;
+        label.setToolTipText(this.name);
     }
 
     public String getExtension() {
@@ -97,7 +101,25 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     public void setIconName(String name) {
         this.iconName = name;
-        this.icon = GUIGlobals.getImage(iconName);
+        try {
+            this.icon = GUIGlobals.getImage(iconName);
+        } catch (NullPointerException ex) {
+            // Loading the icon failed. This could be because the icons have not been
+            // initialized, which will be the case if we are operating from the command
+            // line and the graphical interface hasn't been initialized. In that case
+            // we will do without the icon:
+            this.icon = null;
+        }
+        label.setIcon(this.icon);
+    }
+
+    /**
+     * Obtain a JLabel instance set with this file type's icon. The same JLabel
+     * is returned from each call of this method.
+     * @return the label.
+     */
+    public JLabel getIconLabel() {
+        return label;
     }
 
     /**

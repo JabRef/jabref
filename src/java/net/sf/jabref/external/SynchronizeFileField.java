@@ -49,12 +49,13 @@ public class SynchronizeFileField extends AbstractWorker {
 
     public void init() {
         Collection<BibtexEntry> col = panel.database().getEntries();
+        goOn = true;
         sel = new BibtexEntry[col.size()];
         sel = col.toArray(sel);
 
         // Ask about rules for the operation:
         if (optDiag == null)
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), fieldName);
+            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
         Util.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
@@ -63,7 +64,7 @@ public class SynchronizeFileField extends AbstractWorker {
         }
         autoSet = !optDiag.autoSetNone.isSelected();
         checkExisting = optDiag.checkLinks.isSelected();
-
+        
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
@@ -97,9 +98,15 @@ public class SynchronizeFileField extends AbstractWorker {
             for (int i = 0; i < sel.length; i++) {
                 entries.add(sel[i]);
             }
-            // Start the autosetting process:
 
-            Thread t = FileListEditor.autoSetLinks(entries, ce, changedEntries);
+            // We need to specify which directories to search in:
+            ArrayList<File> dirs = new ArrayList<File>();
+            String dr = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            if (dr != null)
+                dirs.add(new File(dr));
+
+            // Start the autosetting process:                
+            Thread t = FileListEditor.autoSetLinks(entries, ce, changedEntries, dirs);
             // Wait for the autosetting to finish:
             try {
                 t.join();
@@ -226,9 +233,11 @@ public class SynchronizeFileField extends AbstractWorker {
         JLabel description;
         private boolean canceled = true;
         private String fieldName;
+        private MetaData metaData;
 
-        public OptionsDialog(JFrame parent, String fieldName) {
+        public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
+            this.metaData = metaData;
             final String fn = Globals.lang("file");
             this.fieldName = fieldName;
             ok.addActionListener(new ActionListener() {
@@ -308,7 +317,7 @@ public class SynchronizeFileField extends AbstractWorker {
             if (visible)
                 canceled = true;
 
-            String dir = Globals.prefs.get(fieldName + "Directory");
+            String dir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
             if ((dir == null) || (dir.trim().length() == 0)) {
 
                 autoSetNone.setSelected(true);

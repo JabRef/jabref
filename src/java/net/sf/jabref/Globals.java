@@ -100,12 +100,13 @@ public class Globals {
 		// Charset.availableCharsets().keySet().toArray(new
 		// String[]{});
 		new String[] { "ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
-			"Cp1253", "Cp1254", "Cp1257", "JIS", "SJIS",
+			"Cp1253", "Cp1254", "Cp1257", "SJIS",
 			"EUC_JP", // Added Japanese encodings.
 			"Big5", "Big5_HKSCS", "GBK", "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5",
 			"ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15" };
+    public static Map<String,String> ENCODING_NAMES_LOOKUP;
 
-	// String array that maps from month number to month string label:
+    // String array that maps from month number to month string label:
 	public static String[] MONTHS = new String[] { "jan", "feb", "mar", "apr", "may", "jun", "jul",
 		"aug", "sep", "oct", "nov", "dec" };
 
@@ -134,7 +135,35 @@ public class Globals {
 			}
 		}
 		ENCODINGS = encodings.toArray(new String[0]);
-	}
+        // Build a map for translating Java encoding names into common encoding names:
+        ENCODING_NAMES_LOOKUP = new HashMap<String,String>();
+        ENCODING_NAMES_LOOKUP.put("Cp1250", "windows-1250");
+        ENCODING_NAMES_LOOKUP.put("Cp1251", "windows-1251");
+        ENCODING_NAMES_LOOKUP.put("Cp1252", "windows-1252");
+        ENCODING_NAMES_LOOKUP.put("Cp1253", "windows-1253");
+        ENCODING_NAMES_LOOKUP.put("Cp1254", "windows-1254");
+        ENCODING_NAMES_LOOKUP.put("Cp1257", "windows-1257");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_1", "ISO-8859-1");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_2", "ISO-8859-2");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_3", "ISO-8859-3");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_4", "ISO-8859-4");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_5", "ISO-8859-5");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_6", "ISO-8859-6");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_7", "ISO-8859-7");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_8", "ISO-8859-8");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_9", "ISO-8859-9");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_13", "ISO-8859-13");
+        ENCODING_NAMES_LOOKUP.put("ISO8859_15", "ISO-8859-15");
+        ENCODING_NAMES_LOOKUP.put("KOI8_R", "KOI8-R");
+        ENCODING_NAMES_LOOKUP.put("UTF8", "UTF-8");
+        ENCODING_NAMES_LOOKUP.put("UTF-16", "UTF-16");
+        ENCODING_NAMES_LOOKUP.put("SJIS", "Shift_JIS");
+        ENCODING_NAMES_LOOKUP.put("GBK", "GBK");
+        ENCODING_NAMES_LOOKUP.put("Big5_HKSCS", "Big5-HKSCS");
+        ENCODING_NAMES_LOOKUP.put("Big5", "Big5");
+        ENCODING_NAMES_LOOKUP.put("EUC_JP", "EUC-JP");
+        ENCODING_NAMES_LOOKUP.put("ASCII", "US-ASCII");
+    }
 
 	public static GlobalFocusListener focusListener = new GlobalFocusListener();
 
@@ -154,7 +183,9 @@ public class Globals {
     public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
 
     // Instantiate logger:
-    private static Logger logger = Logger.getLogger(Globals.class.getName());
+    // TODO: Doesn't work in Java 5:
+    // private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static Logger logger = Logger.global;
 
     /**
 	 * true if we have unix newlines
@@ -420,7 +451,9 @@ public class Globals {
 		String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
 		boolean dirOnly, boolean multipleSelection, JComponent accessory) {
 
-		if (/*ON_MAC && */prefs.getBoolean("useNativeFileDialogOnMac")) {
+        // Added the !dirOnly condition below as a workaround to the native file dialog
+        // not supporting directory selection:
+        if (!dirOnly && prefs.getBoolean("useNativeFileDialogOnMac")) {
 
 			return getNewFileForMac(owner, directory, extension, dialogType,
 				updateWorkingDirectory, dirOnly, off);
@@ -511,7 +544,7 @@ public class Globals {
 		}
 
 		fc.setVisible(true); // fc.show(); -> deprecated since 1.5
-
+        
 		if (fc.getFile() != null) {
 			Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
 			return fc.getDirectory() + fc.getFile();

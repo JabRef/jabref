@@ -105,13 +105,19 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             }
         });
 
-        cancel.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent e) {
-                cancelled = true;
-                diag.dispose();
-            }
-        });
+        AbstractAction cancelAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    cancelled = true;
+                    diag.dispose();
+                }
+            };
+        cancel.addActionListener(cancelAction);
 
+        // Key bindings:
+        ActionMap am = builder.getPanel().getActionMap();
+        InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", cancelAction);
     }
 
     private void prepareDialog(boolean selection) {

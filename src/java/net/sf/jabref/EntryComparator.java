@@ -41,7 +41,7 @@ import java.util.Comparator;
 public class EntryComparator implements Comparator<BibtexEntry> {
 
     String sortField;
-    boolean descending, binary=false;
+    boolean descending, binary=false, numeric;
     Comparator<BibtexEntry> next;
 
     public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {
@@ -49,6 +49,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = next;
+        this.numeric = BibtexFields.isNumeric(sortField);
     }
 
     public EntryComparator(boolean binary, boolean desc, String field) {
@@ -56,6 +57,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = null;
+        this.numeric = BibtexFields.isNumeric(sortField);
     }
 
 
@@ -93,7 +95,18 @@ public class EntryComparator implements Comparator<BibtexEntry> {
           f1 = e1.getType().getName();
           f2 = e2.getType().getName();
         }
-
+    else if (numeric) {
+        try {
+            Integer i1 = Integer.parseInt((String)f1);
+            Integer i2 = Integer.parseInt((String)f2);
+            // Ok, parsing was successful. Update f1 and f2:
+            f1 = i1;
+            f2 = i2;
+        } catch (NumberFormatException ex) {
+            // Parsing failed. Give up treating these as numbers.
+            // TODO: should we check which of them failed, and sort based on that?
+        }
+    }
 
     if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
 	if ((f1 != null) && (f2 == null)) return -1;

@@ -228,9 +228,9 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         bibItems = handler.getItems();
 
     }
-    catch(javax.xml.parsers.ParserConfigurationException e1){}
-    catch(org.xml.sax.SAXException e2){}
-    catch(java.io.IOException e3){}
+    catch(javax.xml.parsers.ParserConfigurationException e1){ e1.printStackTrace(); }
+    catch(org.xml.sax.SAXException e2){ e2.printStackTrace(); }
+    catch(java.io.IOException e3){ e3.printStackTrace(); }
     return bibItems;
 }
 

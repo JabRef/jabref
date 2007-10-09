@@ -84,8 +84,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         sb.append("</html>");
 
         JPanel message = new JPanel();
-        DefaultFormBuilder b = new DefaultFormBuilder(message,
-                new FormLayout("left:pref", ""));
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
         b.append(new JLabel(sb.toString()));
         b.nextLine();
         if (offerChangeSettings) {

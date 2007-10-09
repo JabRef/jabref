@@ -33,8 +33,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // function : set of animated lines
 //
-// todo     :
-//
 // modified :
 
 package net.sf.jabref.about ;

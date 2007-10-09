@@ -8,6 +8,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.export.layout.ParamLayoutFormatter;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import java.io.IOException;
 
 /**
  * Export formatter that handles the file link list of JabRef 2.3 and later, by
@@ -44,12 +45,19 @@ public class FileLink implements ParamLayoutFormatter {
         
         if (link == null)
             return "";
-        // Search in the standard file directory:
-        /* TODO: oops, this part is not sufficient. We need access to the
-         database's metadata in order to check if the database overrides
-         the standard file directory */
-        String dir = Globals.prefs.get(GUIGlobals.FILE_FIELD+"Directory");
-		File f = Util.expandFilename(link, new String[] { dir, "." });
+
+
+        String dir;
+        // We need to resolve the file directory from the database's metadata,
+        // but that is not available from a formatter. Therefore, as an
+        // ugly hack, the export routine has set a global variable before
+        // starting the export, which contains the database's file directory:
+        if (Globals.prefs.fileDirForDatabase != null)
+            dir = Globals.prefs.fileDirForDatabase;
+        else
+            dir = Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory");
+        
+		File f = Util.expandFilename(link, new String[] { dir });
 
         /*
 		 * Stumbled over this while investigating
@@ -57,8 +65,13 @@ public class FileLink implements ParamLayoutFormatter {
 		 * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
 		 */
 		if (f != null) {
-			return f.getPath();//f.toURI().toString();
-		} else {
+            try {
+                return f.getCanonicalPath();//f.toURI().toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return f.getPath();
+            }
+        } else {
 			return link;
 		}
 

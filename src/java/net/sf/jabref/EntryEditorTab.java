@@ -124,7 +124,7 @@ public class EntryEditorTab {
         String rowSpec = sb.toString();
 
         DefaultFormBuilder builder = new DefaultFormBuilder
-                (panel, new FormLayout(colSpec, rowSpec));
+                (new FormLayout(colSpec, rowSpec), panel);
 
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:

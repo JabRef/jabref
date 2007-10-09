@@ -8,6 +8,8 @@ import net.sf.jabref.*;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
 
+import javax.swing.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: alver
@@ -101,7 +103,10 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 return null;
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
-            o = GUIGlobals.getTableIcon(iconType[hasField]);
+            if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
+                o = FileListTableModel.getFirstLabel((String)be.getField(GUIGlobals.FILE_FIELD));
+            } else
+                o = GUIGlobals.getTableIcon(iconType[hasField]);
         } else if (columns[col - padleft].equals(GUIGlobals.TYPE_HEADER)) {
             o = be.getType().getName();
         } else {

@@ -23,7 +23,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
 	String field;
 
-	boolean isNameField, isTypeHeader, isYearField, isMonthField;
+	boolean isNameField, isTypeHeader, isYearField, isMonthField, isNumeric;
 
 	int multiplier;
 
@@ -39,7 +39,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 		isNameField = (field.equals("author") || field.equals("editor"));
 		isYearField = field.equals("year");
 		isMonthField = field.equals("month");
-	}
+        isNumeric = BibtexFields.isNumeric(field);
+    }
 
 	public int compare(BibtexEntry e1, BibtexEntry e2) {
 		Object f1, f2;
@@ -96,9 +97,44 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 			f2 = new Integer(Util.getMonthNumber((String)f2));
 		}
 
-		int result = 0;
+        if (isNumeric) {
+            boolean numeric1 = false, numeric2 = false;
+            Integer i1 = null, i2 = null;
+            try {
+                i1 = Integer.parseInt((String)f1);
+                numeric1 = true;
+            } catch (NumberFormatException ex) {
+                // Parsing failed.
+            }
+
+            try {
+                i2 = Integer.parseInt((String)f2);
+                numeric2 = true;
+            } catch (NumberFormatException ex) {
+                // Parsing failed.
+            }
+
+            if (numeric1 && numeric2) {
+                // Ok, parsing was successful. Update f1 and f2:
+                f1 = i1;
+                f2 = i2;
+            } else if (numeric1) {
+                // The first one was parseable, but not the second one.
+                // This means we consider one < two
+                f1 = i1;
+                f2 = new Integer(i1.intValue()+1);
+            } else if (numeric2) {
+                // The second one was parseable, but not the first one.
+                // This means we consider one > two
+                f2 = i2;
+                f1 = new Integer(i2.intValue()+1);
+            }
+            // Else none of them were parseable, and we can fall back on comparing strings.    
+        }
+
+        int result = 0;
 		if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-			result = -(((Integer) f1).compareTo((Integer) f2));
+			result = (((Integer) f1).compareTo((Integer) f2));
 		} else if (f2 instanceof Integer) {
 			Integer f1AsInteger = new Integer(f1.toString());
 			result = -((f1AsInteger).compareTo((Integer) f2));

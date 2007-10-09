@@ -128,6 +128,14 @@
     some fomatters, e.g. the CurrentDate formatter (described
     below).</p>
 
+    <p>Some formatters take an extra argument, given in parentheses
+    immediately after the formatter name. The argument can be enclosed
+    in quotes, which is necessary if it includes the parenthesis characters.
+    For instance, <code>\format[Replace("\s,_")]{\journal}</code> calls
+    the <b>Replace</b> formatter with the argument <b>\s,_</b> (which results
+    in the "journal" field after replacing all whitespace by underscores).
+    </p>
+
     <p>JabRef provides the following set of formatters, some of
     which depend on the others:</p>
 
@@ -201,9 +209,10 @@
         <li><code>AuthorLastFirst</code> : formats author/editor
         fields with the last names first.</li>
 
-        <li><code>AuthorLastFirstAbbreviator</code> : abbreviates
-        first and middle names of all authors. This formatter
-        requires AuthorLastFirst to have been run earlier.</li>
+        <li><code>AuthorAbbreviator</code> or <code>AuthorLastFirstAbbreviator</code>
+            : abbreviates first and middle names of all authors. This formatter
+        returns names with the last name first. Follow this formatter with
+        AuthorFirstFirst to get abbreviated names with the initials first.</li>
 
         <li><code>AuthorLastFirstCommas</code> : to be
         documented.</li>
@@ -229,8 +238,6 @@
         first" all others in "first last". First names are
         abbreviated.</li>
 
-        <li><code>AuthorAbbreviator</code> : to be documented.</li>
-
         <li><code>AuthorNatBib</code> : formats author names in
         NatBib style, with last names only, separating names by
         "and" if there are two authors, and giving the first author
@@ -240,7 +247,7 @@
         <li><code>NoSpaceBetweenAbbreviations</code> : spaces
         between multiple abbreviated first names are removed.</li>
 
-        <li><code>FileLink</code> : if no argument is given, this formatter outputs
+        <li><code>FileLink(filetype)</code> : if no argument is given, this formatter outputs
             the first external file link encoded in the field. To work, the formatter must
             be supplied with the contents of the "file" field.
             <p>This formatter takes the name of an external file type as an optional argument,
@@ -256,6 +263,16 @@
         <li><code>FormatPagesForXML</code> : replaces "--" with an
         XML en-dash.</li>
 
+    <li><code>Replace(regexp,replacewith)</code> : does a regular expression replacement.
+        To use this formatter, a two-part argument must be given. The parts are
+        separated by a comma. To indicate the comma character, use an escape
+        sequence: \,<br>&nbsp;<br>
+        The first part is the regular expression to search for. The regular expression
+        is written normally, without extra escape sequences for backslashes. A description
+        of Java regular expressions can be found at:<br>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+         <br>&nbsp;<br>
+        The second part is the text to replace all matches with.</li>
 
         <li><code>RemoveBrackets</code> : removes all curly
         brackets "{" or "}".</li>
@@ -300,6 +317,8 @@ extensive documentation, yet.</p>
         <li><code>RTFChars</code> : to be documented.</li>
 
         <li><code>ResolvePDF</code> : to be documented.</li>
+
+    <li></li>
     </ul>
 
     <p>If none of the available formatters can do what you want to

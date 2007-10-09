@@ -219,6 +219,12 @@ public class ExportFormats {
                         }
                     }
 
+                    // Set the global variable for this database's file directory before exporting,
+                    // so formatters can resolve linked files correctly.
+                    // (This is an ugly hack!)
+                    Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+                            .getFileDirectory(GUIGlobals.FILE_FIELD);                    
+
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
                     Globals.prefs.put("lastUsedExport", format.getConsoleName());

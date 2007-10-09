@@ -152,6 +152,11 @@ public class MainTable extends JTable {
         refreshSorting();
     }
 
+
+    public boolean isShowingFloatSearch() {
+        return showingFloatSearch;
+    }
+
     /**
      * Removes sorting by group, and graying out of non-hits.
      */

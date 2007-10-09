@@ -30,8 +30,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 // created by : r.nagel 05.05.2005
 //
-// todo     :
-//
 // modified :
 
 

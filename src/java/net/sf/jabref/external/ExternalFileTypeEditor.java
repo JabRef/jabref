@@ -80,11 +80,12 @@ public class ExternalFileTypeEditor extends JDialog {
                 dispose();
             }
         });
-        cancel.addActionListener(new ActionListener() {
+        AbstractAction cancelAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
-        });
+        };
+        cancel.addActionListener(cancelAction);
         // The toDefaults resets the entire list to its default values.
         toDefaults.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -103,6 +104,7 @@ public class ExternalFileTypeEditor extends JDialog {
                 //}
             }
         });
+
 
         add.addActionListener(new AddListener());
         remove.addActionListener(new RemoveListener());
@@ -147,6 +149,16 @@ public class ExternalFileTypeEditor extends JDialog {
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
+
+        // Key bindings:
+        ActionMap am = upper.getActionMap();
+        InputMap im = upper.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", cancelAction);
+        am = bb.getPanel().getActionMap();
+        im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", cancelAction);
 
         if (frame != null)
             setLocationRelativeTo(frame);

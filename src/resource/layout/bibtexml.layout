@@ -24,7 +24,6 @@
 \begin{doi}    <bibtex:doi>\format[XMLChars]{\doi}</bibtex:doi>\end{doi}
 \begin{eid}    <bibtex:eid>\format[XMLChars]{\eid}</bibtex:eid>\end{eid}
 \begin{pdf}    <bibtex:pdf>\format[ResolvePDF,XMLChars]{\pdf}</bibtex:pdf>\end{pdf}
-\begin{file}    <bibtex:pdf>\format[FileLink(pdf)]{\file}</bibtex:pdf>\end{file}
 \begin{type}    <bibtex:type>\format[XMLChars]{\type}</bibtex:type>\end{type}
 \begin{crossref}    <bibtex:crossref>\format[XMLChars]{\crossref}</bibtex:crossref>\end{crossref}
 \begin{annote}    <bibtex:annote>\format[XMLChars]{\annote}</bibtex:annote>\end{annote}
@@ -32,5 +31,6 @@
 \begin{comment}    <bibtex:comment>\format[XMLChars]{\comment}</bibtex:comment>\end{comment}
 \begin{note}    <bibtex:note>\format[XMLChars]{\note}</bibtex:note>\end{note}
 \begin{key}    <bibtex:key>\format[XMLChars]{\key}</bibtex:key>\end{key}
+\begin{file}\format[XMLChars,WrapFileLinks(    <bibtex:nstandard name="file" type="\x" description="\d">\p</bibtex:nstandard>\n)]{\file}\end{file}
   </bibtex:\format[ToLowerCase]{\bibtextype}>
 </bibtex:entry>

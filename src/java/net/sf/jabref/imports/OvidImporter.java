@@ -85,44 +85,21 @@ public class OvidImporter extends ImportFormat {
             int linebreak = fields[j].indexOf('\n');
             String fieldName = fields[j].substring(0, linebreak).trim();
             String content = fields[j].substring(linebreak).trim();
-            // Remove unnecessary dots at the end of lines:
-            if (content.endsWith("."))
+
+            // Check if this is the author field (due to a minor special treatment for this field):
+            boolean isAuthor = fieldName.indexOf("Author") == 0
+                && fieldName.indexOf("Author Keywords") == -1
+                && fieldName.indexOf("Author e-mail") == -1;
+
+            // Remove unnecessary dots at the end of lines, unless this is the author field,
+            // in which case a dot at the end could be significant:
+            if (!isAuthor && content.endsWith("."))
                     content = content.substring(0, content.length()-1);
             //fields[j] = fields[j].trim();
-            if (fieldName.indexOf("Author") == 0
-                && fieldName.indexOf("Author Keywords") == -1
-                && fieldName.indexOf("Author e-mail") == -1){
+            if (isAuthor) {
 
                 h.put("author", content);
-                /*if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
-                    names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
-                }else{// LN FN. [LN FN.]*
-                    //author = content.replaceAll("\\.", " and").replaceAll(" and$", "");
-                    names = content;
-                }
 
-                StringBuffer buf = new StringBuffer();
-                for (int ii=0; ii<names.length; ii++) {
-                    names[ii] = names[ii].trim();
-                    int space = names[ii].indexOf(' ');
-                    if (space >= 0) {
-                        buf.append(names[ii].substring(0, space));
-                        buf.append(',');
-                        buf.append(names[ii].substring(space));
-                    } else {
-                        buf.append(names[ii]);
-                    }
-
-                    buf.append()
-                    if (ii < names.length-1)
-                        buf.append(" and ");
-                }
-                h.put("author", AuthorList.fixAuthor_lastNameFirst(names));  */
-
-                //    author = content.replaceAll("  ", " and ").replaceAll(" and $", "");
-
-
-            //h.put("author", ImportFormatReader.fixAuthor_lastNameFirst(author));
 
         }else if (fieldName.indexOf("Title") == 0) {
                 content = content.replaceAll("\\[.+\\]", "").trim();
@@ -179,7 +156,6 @@ public class OvidImporter extends ImportFormat {
             }
 
         } else if (fieldName.equals("Abstract")) {
-                //System.out.println("'"+content+"'");
                 h.put("abstract", content);
 
         } else if (fieldName.equals("Publication Type")) {
@@ -187,6 +163,8 @@ public class OvidImporter extends ImportFormat {
                 h.put("entrytype", "book");
              else if (content.indexOf("Journal") >= 0)
                 h.put("entrytype", "article");
+             else if (content.indexOf("Conference Paper") >= 0)
+                h.put("entrytype", "inproceedings");
         }
         }
 
@@ -229,10 +207,23 @@ public class OvidImporter extends ImportFormat {
     return bibitems;
     }
 
+    /**
+     * Convert a string of author names into a BibTeX-compatible format.
+     * @param content The name string.
+     * @return The formatted names.
+     */
     private String fixNames(String content) {
         String names;
         if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
+        } else if (content.indexOf("  ") > 0) {
+            String[] sNames = content.split("  ");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < sNames.length; i++) {
+                if (i > 0) sb.append(" and ");
+                sb.append(sNames[i].replaceFirst(" ", ", "));
+            }
+            names = sb.toString();
         } else
             names = content;
         return AuthorList.fixAuthor_lastNameFirst(names);

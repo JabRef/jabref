@@ -152,12 +152,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     //GroupSelector groupSelector;
 
-    public boolean sortingBySearchResults = false,
-        coloringBySearchResults = false,
-    hidingNonHits = false,
-        sortingByGroup = false,
-        sortingByCiteSeerResults = false,
-        coloringByGroup = false;
+    public boolean
+            showingSearch = false,
+            showingGroup = false,
+            sortingBySearchResults = false,
+            coloringBySearchResults = false,
+            hidingNonHits = false,
+            sortingByGroup = false,
+            sortingByCiteSeerResults = false,
+            coloringByGroup = false;
 
     int lastSearchHits = -1; // The number of hits in the latest search.
     // Potential use in hiding non-hits completely.
@@ -1839,15 +1842,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public EntryEditor getEntryEditor(BibtexEntry entry) {
         EntryEditor form;
         if (entryEditors.containsKey(entry.getType().getName())) {
+            EntryEditor visibleNow = currentEditor;
+            
             // We already have an editor for this entry type.
             form = entryEditors.get
                 ((entry.getType().getName()));
 
+            // If the cached editor is not the same as the currently shown one,
+            // make sure the current one stores its current edit:
+            if ((visibleNow != null) && (form != visibleNow)) {
+                visibleNow.storeCurrentEdit();
+            }
+            
             form.switchTo(entry);
             //if (visName != null)
             //    form.setVisiblePanel(visName);
         } else {
-            // We must instantiate a new editor for this type.
+            // We must instantiate a new editor for this type. First make sure the old one
+            // stores its last edit:
+            storeCurrentEdit();
+            // Then start the new one:
             form = new EntryEditor(frame, BasePanel.this, entry);
             //if (visName != null)
             //    form.setVisiblePanel(visName);
@@ -2100,20 +2114,39 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setSearchMatcher(SearchMatcher matcher) {
         searchFilterList.setMatcher(matcher);
+        showingSearch = true;
     }
 
     public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
         groupFilterList.setMatcher(matcher);
+        showingGroup = true;
     }
 
     public void stopShowingSearchResults() {
         searchFilterList.setMatcher(NoSearchMatcher.INSTANCE);
+        showingSearch = false;
     }
 
     public void stopShowingGroup() {
         groupFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-
+        showingGroup = false;
      }
+
+    /**
+     * Query whether this BasePanel is in the mode where a float search result is shown.
+     * @return true if showing float search, false otherwise.
+     */
+    public boolean isShowingFloatSearch() {
+        return mainTable.isShowingFloatSearch();
+    }
+
+    /**
+     * Query whether this BasePanel is in the mode where a filter search result is shown.
+     * @return true if showing filter search, false otherwise.
+     */
+    public boolean isShowingFilterSearch() {
+        return showingSearch;
+    }
 
      public BibtexDatabase getDatabase(){
         return database ;

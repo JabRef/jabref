@@ -91,8 +91,12 @@ public class DownloadExternalFile {
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix = getSuffix(res);
         String suggestedName = bibtexKey != null ? getSuggestedFileName(res, suffix) : "";
-        final String directory = getFileDirectory(res);
-        File file = new File(new File(directory), suggestedName);
+        String fDirectory = getFileDirectory(res);
+        if (fDirectory.trim().equals(""))
+            fDirectory = null;
+        final String directory = fDirectory;
+        final String suggestDir = directory != null ? directory : System.getProperty("user.home");
+        File file = new File(new File(suggestDir), suggestedName);
         FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getPath() : "",
                 Globals.prefs.getExternalFileTypeByExt(suffix));
         editor = new FileListEntryEditor(frame, entry, true, metaData);
@@ -100,7 +104,8 @@ public class DownloadExternalFile {
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
             public boolean confirmClose(FileListEntry entry) {
-                File f = expandFilename(directory, entry.getLink());
+                File f = directory != null ? expandFilename(directory, entry.getLink())
+                        : new File(entry.getLink());
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame,
                             Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
@@ -119,8 +124,17 @@ public class DownloadExternalFile {
         editor.setVisible(true);
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            String dirPrefix = directory+System.getProperty("file.separator");
-            File toFile = expandFilename(directory, entry.getLink());
+            File toFile = directory != null ? expandFilename(directory, entry.getLink())
+                    : new File(entry.getLink());
+            String dirPrefix;
+            if (directory != null) {
+                if (!directory.endsWith(System.getProperty("file.separator")))
+                    dirPrefix = directory+System.getProperty("file.separator");
+                else
+                    dirPrefix = directory;
+            } else
+                dirPrefix = null;
+
             try {
                 boolean success = Util.copyFile(tmp, toFile, true);
                 if (!success) {
@@ -130,7 +144,7 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if (entry.getLink().startsWith(directory) &&
+                if ((directory != null) && entry.getLink().startsWith(directory) &&
                         (entry.getLink().length() > dirPrefix.length())) {
                     entry.setLink(entry.getLink().substring(dirPrefix.length()));
                 }
@@ -216,7 +230,6 @@ public class DownloadExternalFile {
     }
 
     public String getFileDirectory(String link) {
-        // TODO: getFileDirectory()
         return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
     }
 

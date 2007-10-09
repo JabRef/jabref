@@ -67,6 +67,12 @@ public class ExportToClipboardAction extends AbstractWorker {
 
         IExportFormat format = formats[list.getSelectedIndex()];
 
+        // Set the global variable for this database's file directory before exporting,
+        // so formatters can resolve linked files correctly.
+        // (This is an ugly hack!)
+        Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
+                .getFileDirectory(GUIGlobals.FILE_FIELD);
+        
         /*final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
         String dir = null;
         if (custom) {

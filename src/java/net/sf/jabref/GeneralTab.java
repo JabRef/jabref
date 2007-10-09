@@ -153,10 +153,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.nextLine();
         
         builder2.append(useTimeStamp);
-        builder2.append(timeStampField);
+        builder2.append(timeStampFormat);
         builder2.append(overwriteTimeStamp);
         builder2.append(Globals.lang("Field name")+":");
-        builder2.append(timeStampFormat);
+        builder2.append(timeStampField);
         hlp = new JButton(timeStampHelp);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));

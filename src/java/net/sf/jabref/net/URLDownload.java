@@ -7,6 +7,7 @@ package net.sf.jabref.net;
 import java.awt.Component;
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.swing.ProgressMonitorInputStream;
 
@@ -27,7 +28,9 @@ public class URLDownload {
     }
     
     public void download() throws IOException {
-        InputStream input = new BufferedInputStream(source.openStream());
+        URLConnection con = source.openConnection();
+        con.setRequestProperty("User-Agent", "Jabref");
+    	InputStream input = new BufferedInputStream(con.getInputStream());
         OutputStream output =  new BufferedOutputStream(new FileOutputStream(dest));
      
         try

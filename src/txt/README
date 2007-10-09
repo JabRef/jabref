@@ -1,6 +1,6 @@
 
-JabRef 2.3b
------------
+JabRef 2.3b3
+------------
 
 
 Introduction:
@@ -102,7 +102,36 @@ Change log:
 	- [ 1717849 ] Fixed: Bug in aux import (patch contributed by Kai Eckert)
     - [ 1749613 ] Fixed: About translation
     - [ 1709449 ] Fixed: Clicking a DOI from context menu fails
-
+2.3b3
+    - Export formats that output the character encoding now use common names for encodings
+      instead of Java-specific names.
+    - Added "Open" button in external link dialog box to test or use the link.
+    - Added formatter WrapFileLinks which iterates over file links, producing a formatted
+      string for each containing any desired information about the file link.
+    - Applied Fedor Bezrukov patch (setting User-Agent in URLDownload to solve ArXiv problem).
+    - Applied Aaron Chen's patch for fixing bugs in IEEExplore fetcher.
+    - Applied Edward Valeev's patch for handling article numbers replacing pages in Refer/Endnote
+      import.
+    - Added toolbar button to entry editor for writing XMP-metadata.
+    - Added paste and drag & drop support to file list editor.
+    - Added "authorLast" and "editorLast" markers for using last author's last name in BibTeX keys.
+    - Added support for file field in Write XMP action.
+    - Numeric fields (year, volume, number, pmid, citeseercitationcount) are now sorted as numbers
+      when possible.
+    - Improvements to the Ovid import filter.
+    - Modified AuthorLastFirstAbbreviator and AuthorAbbreviator to accept names in both last-first
+      and first-first format, but always return in last-first format. These two formatters are
+      identical.
+    - [ 1648789 ] Fixed: Problem on writing XMP when option to leave out some fields was active.
+    - [ 1561990 ] Fixed: Exporting to WinEdt - apostrophe.
+    - Fixed bug in entry editor: source panel edits were not properly stored when clicking a
+      different entry in the main table.
+    - Fixed problem with "Synchronize file links" not honouring database specific file directory.
+    - Fixed problem with file type selection in external file link editor not being up-to-date.
+    - Fixed problem with wrong enable/disable behaviour of Clear search button when switching
+      between tabs.
+    - Fixed argument parsing in AbstractParamLayoutFormatter so \t and \n can be used for
+      tabs and newlines.
 2.3b2
 	- Added % at start of signature text in BibTeX output. Parser now reads both
 	  old and new style.
@@ -125,6 +154,9 @@ Change log:
       and URL icons in the table clickable.
     - Removed PDF and PS columns and operations in import inspection window (replaced by
       operations on the "file" field).
+    - File field column in main table now shows file type icon instead of generic icon. 
+    - Modified Endnote export to take "file" field into account, and to resolve full
+      paths to PDF files.
     - Added "Auto" button to automatically set "owner" field to the default username. 
     - Added \encoding tag for begin/end layouts in export filters to print the name of the
       character encoding used for the export. The tag is not available in entry layouts.

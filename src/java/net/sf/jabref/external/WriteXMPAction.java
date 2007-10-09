@@ -6,10 +6,14 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -92,39 +96,65 @@ public class WriteXMPAction extends AbstractWorker {
 
 			BibtexEntry entry = entries[i];
 
-			String pdf = (String) entry.getField("pdf");
+            // Make a list of all PDFs linked from this entry:
+            List<File> files = new ArrayList<File>();
 
-			String dir = panel.metaData().getFileDirectory("pdf");
+            // First check the (legacy) "pdf" field:
+            String pdf = (String) entry.getField("pdf");
+            String dir = panel.metaData().getFileDirectory("pdf");
+            File f = Util.expandFilename(pdf, new String[]{dir,"."});
+            if (f != null)
+                files.add(f);
 
-			File file = Util.expandFilename(pdf, new String[]{dir,"."});
+            // Then check the "file" field:
+            dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            String field = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            if (field != null) {
+                FileListTableModel tm = new FileListTableModel();
+                tm.setContent(field);
+                for (int j=0; j<tm.getRowCount(); j++) {
+                    FileListEntry flEntry = tm.getEntry(j);
+                    if ((flEntry.getType()!=null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
+                        f = Util.expandFilename(flEntry.getLink(), new String[]{dir,"."});
+                        if (f != null)
+                            files.add(f);
+                    }
+                }
+            }
 
-			optDiag.progressArea.append(entry.getCiteKey() + "\n");
+            optDiag.progressArea.append(entry.getCiteKey() + "\n");
 
-			if (file == null) {
+			if (files.size() == 0) {
 				skipped++;
 				optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
-			} else if (!file.exists()) {
-				skipped++;
-				optDiag.progressArea.append("  " + Globals.lang("Skipped - PDF does not exist")
-					+ ":\n");
-				optDiag.progressArea.append("    " + file.getPath() + "\n");
-			} else {
-				try {
-					XMPUtil.writeXMP(file, entry, database);
-					optDiag.progressArea.append("  " + Globals.lang("Ok") + ".\n");
-					entriesChanged++;
-				} catch (Exception e) {
-					optDiag.progressArea.append("  " + Globals.lang("Error while writing") + " '"
-						+ file.getPath() + "':\n");
-					optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
-					errors++;
-				}
 			}
-			if (optDiag.canceled){
-				optDiag.progressArea.append("\n"
-					+ Globals.lang("Operation canceled.\n"));
-				break;		
-			}
+            else for (File file : files) {
+                if (!file.exists()) {
+                    skipped++;
+				    optDiag.progressArea.append("  " + Globals.lang("Skipped - PDF does not exist")
+					    + ":\n");
+				    optDiag.progressArea.append("    " + file.getPath() + "\n");
+
+
+                } else {
+                    try {
+                        XMPUtil.writeXMP(file, entry, database);
+                        optDiag.progressArea.append("  " + Globals.lang("Ok") + ".\n");
+                        entriesChanged++;
+                    } catch (Exception e) {
+                        optDiag.progressArea.append("  " + Globals.lang("Error while writing") + " '"
+                            + file.getPath() + "':\n");
+                        optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
+                        errors++;
+                    }
+                }
+            }
+
+            if (optDiag.canceled){
+                optDiag.progressArea.append("\n"
+                    + Globals.lang("Operation canceled.\n"));
+                break;
+            }
 		}
 		optDiag.progressArea.append("\n"
 			+ Globals.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String

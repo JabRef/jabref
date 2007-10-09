@@ -268,6 +268,10 @@ public class LabelPatternUtil {
                     return firstAuthor(authString);
                 } else if (val.equals("authors")) {
                     return allAuthors(authString);
+                }
+                // Last author's last name
+                else if (val.equals("authorLast")) {
+                   return lastAuthor(authString);
                 } else if (val.equals("authorIni")) {
                     return oneAuthorPlusIni(authString);
                 } else if (val.matches("authIni[\\d]+")) {
@@ -307,6 +311,9 @@ public class LabelPatternUtil {
                     return firstAuthor(_entry.getField("editor").toString());
                 } else if (val.equals("editors")) {
                     return allAuthors(_entry.getField("editor").toString());
+                // Last author's last name
+                } else if (val.equals("editorLast")) {
+                   return lastAuthor(_entry.getField("editor").toString());
                 } else if (val.equals("editorIni")) {
                     return oneAuthorPlusIni(_entry.getField("editor")
                         .toString());
@@ -474,6 +481,22 @@ public class LabelPatternUtil {
         if (al.size() == 0)
             return "";
         return al.getAuthor(0).getLast();
+    }
+
+
+    /**
+     * Gets the last name of the last author/editor
+     * @param authorField a <code>String</code>
+     * @return the sur name of an author/editor
+     */
+    private static String lastAuthor(String authorField) {
+        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+        if (tokens.length > 0) { // if author is empty
+            String[] lastAuthor = tokens[tokens.length-1].replaceAll("\\s+", " ").trim().split(" ");
+            return lastAuthor[0];
+
+        }
+        else return "";
     }
 
     /**

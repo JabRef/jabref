@@ -463,7 +463,7 @@ public class Util {
 
 		if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
-			// Find the default directory for this field type:
+            // Find the default directory for this field type:
 			String dir = metaData.getFileDirectory(fieldName);
 
 			File file = expandFilename(link, new String[] { dir, "." });
@@ -484,7 +484,11 @@ public class Util {
 					|| (split.length >= 3 && split[split.length - 2].equalsIgnoreCase("ps")))
 					fieldName = "ps";
 			}
-		} else if (fieldName.equals("doi")) {
+
+            // Find the file type descriptor:
+            ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(fieldName);
+
+        } else if (fieldName.equals("doi")) {
 			fieldName = "url";
 			
 			link = sanitizeUrl(link);
@@ -528,7 +532,9 @@ public class Util {
 		} else if (fieldName.equals("ps")) {
 			try {
 				if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("psviewer"), link };
+                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String[] cmd = { "/usr/bin/open", "-a", viewer, link };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
 					openFileOnWindows(link, true);
@@ -538,7 +544,9 @@ public class Util {
 					 * cmdArray[0] + " " + cmdArray[1]);
 					 */
 				} else {
-					cmdArray[0] = Globals.prefs.get("psviewer");
+                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    cmdArray[0] = viewer;
 					cmdArray[1] = link;
 					Runtime.getRuntime().exec(cmdArray);
 				}
@@ -549,7 +557,9 @@ public class Util {
 		} else if (fieldName.equals("pdf")) {
 			try {
 				if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("pdfviewer"), link };
+                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String[] cmd = { "/usr/bin/open", "-a", viewer, link };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
 					openFileOnWindows(link, true);
@@ -565,7 +575,9 @@ public class Util {
 					 * Process child = Runtime.getRuntime().exec(cmd);
 					 */
 				} else {
-					cmdArray[0] = Globals.prefs.get("pdfviewer");
+                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
+                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    cmdArray[0] = viewer;
 					cmdArray[1] = link;
 					// Process child = Runtime.getRuntime().exec(cmdArray[0]+"
 					// "+cmdArray[1]);
@@ -1085,10 +1097,17 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		
 							int startParam = i;
 							i++;
-		
-							while (i + 1 < c.length && !(c[i] == '"' && c[i + 1] == ')')) {
-								i++;
-							}
+		                    boolean escaped = false;
+							while (i + 1 < c.length &&
+                                    !(!escaped && c[i] == '"' && c[i + 1] == ')')) {
+                                if (c[i] == '\\') {
+                                    escaped = !escaped;
+                                }
+                                else
+                                    escaped = false;
+                                i++;
+
+                            }
 		
 							String param = calls.substring(startParam, i);
 		

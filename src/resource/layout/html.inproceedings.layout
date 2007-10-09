@@ -19,7 +19,7 @@
 
 		\begin{file}
 		<div class="bibtex_pdf">
-			<a href="\format[FileLink(pdf)]{\file}">pdf</a>
+			\format[FileLink(pdf),WrapContent(<a href=",">pdf</a>)]{\file}
 		</div>
 		\end{file}
 

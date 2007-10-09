@@ -33,10 +33,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // function : new about dialog
 //
-// todo     :
-//
-// modified :
-
 
 package net.sf.jabref.about ;
 

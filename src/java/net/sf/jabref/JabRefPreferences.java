@@ -92,6 +92,13 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
+    // The following field is used as a global variable during the export of a database.
+    // By setting this field to the path of the database's default file directory, formatters
+    // that should resolve external file paths can access this field. This is an ugly hack
+    // to solve the problem of formatters not having access to any context except for the
+    // string to be formatted and possible formatter arguments.
+    public String fileDirForDatabase = null;
+
     // The only instance of this class:
     private static JabRefPreferences singleton = null;
 
@@ -126,7 +133,7 @@ public class JabRefPreferences {
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         } else {
-			defaults.put("pdfviewer", "acroread");
+			defaults.put("pdfviewer", "evince");
 			defaults.put("psviewer", "gv");
 			defaults.put("htmlviewer", "mozilla");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
@@ -280,8 +287,8 @@ public class JabRefPreferences {
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
-                     +"\\begin{author} \\format[AuthorLastFirst,HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
-                     +"\\begin{editor} \\format[AuthorLastFirst,HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
+                     +"\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
+                     +"\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
                      +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
                      +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
                      +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
@@ -297,8 +304,8 @@ public class JabRefPreferences {
         defaults.put("preview1", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
-                     +"\\begin{author} \\format[AuthorLastFirst,HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
-                     +"\\begin{editor} \\format[AuthorLastFirst,HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
+                     +"\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
+                     +"\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
                      +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
                      +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
                      +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
@@ -811,10 +818,10 @@ public class JabRefPreferences {
         defKeyBinds.put("Synchronize PS", "ctrl F4");
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
-        defKeyBinds.put("Search IEEXplore", "F8");
+        defKeyBinds.put("Search IEEEXplore", "F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Write XMP", "ctrl F4");
-
+        defKeyBinds.put("New file link", "ctrl N");
         //defKeyBinds.put("Select value", "ctrl B");
     }
 
@@ -917,11 +924,15 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("PostScript", "ps", get("psviewer"), "psSmall"));
         list.add(new ExternalFileType("Word file", "doc", "oowriter", "openoffice"));
         list.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("Excel file", "xls", "oocalc", "openoffice"));
+        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "oocalc", "openoffice"));
         list.add(new ExternalFileType("PowerPoint file", "ppt", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("Rich Text Format", "rtf", "oowriter", "openoffice"));
         list.add(new ExternalFileType("PNG image", "png", "gimp", "picture"));
         list.add(new ExternalFileType("GIF image", "gif", "gimp", "picture"));
         list.add(new ExternalFileType("JPG image", "jpg", "gimp", "picture"));
+
         list.add(new ExternalFileType("Text file", "txt", "emacs", "emacs"));
         ExternalFileType tp = new ExternalFileType("URL", "html", "firefox", "www");
         list.add(tp);

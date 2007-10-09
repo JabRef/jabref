@@ -282,7 +282,9 @@ public class LayoutEntry {
 
 			return field;
 		} else if (type == LayoutHelper.IS_ENCODING_NAME) {
-            return encoding;
+            // Try to translate from Java encoding name to common name:
+            String commonName = Globals.ENCODING_NAMES_LOOKUP.get(encoding);
+            return commonName != null ? commonName : encoding;
         }
 		return "";
 	}
@@ -360,7 +362,7 @@ public class LayoutEntry {
                 // set it if so:
                 if (f instanceof ParamLayoutFormatter) {
                     if (strings.length >= 2)
-                        ((ParamLayoutFormatter)f).setArgument(strings[1].trim());
+                        ((ParamLayoutFormatter)f).setArgument(strings[1]);
                 }
                 results.add(f);
 				continue;

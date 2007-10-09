@@ -11,8 +11,11 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -55,8 +58,8 @@ public class DroppedFileHandler {
         grp.add(moveRadioButton);
         copyRadioButton.setSelected(true);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(optionsPanel, new FormLayout(
-            "left:pref", ""));
+        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref", ""),
+			optionsPanel);
         builder.append(linkInPlace);
         builder.append(destDirLabel);
         builder.append(copyRadioButton);
@@ -83,14 +86,31 @@ public class DroppedFileHandler {
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
         MainTable mainTable, int dropRow) {
 
+        BibtexEntry entry = mainTable.getEntryAt(dropRow);
+        handleDroppedfile(fileName, fileType, localFile, entry);
+    }
+
+    /**
+     *
+     * @param fileName
+     *        The name of the dragged file.
+     * @param fileType
+     *        The FileType associated with the file.
+     * @param localFile
+ *            Indicate whether this is a local file, or a remote file copied
+ *            to a local temporary file.
+     * @param entry
+     *        The target entry for the drop.
+     */
+    public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
+        BibtexEntry entry) {
         NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
 
-        if (tryXmpImport(fileName, fileType, localFile, mainTable, edits)) {
+        if (tryXmpImport(fileName, fileType, localFile, edits)) {
+            edits.end();
             panel.undoManager.addEdit(edits);
             return;
         }
-
-        BibtexEntry entry = mainTable.getEntryAt(dropRow);
 
         // Show dialog
         boolean newEntry = false;
@@ -112,7 +132,8 @@ public class DroppedFileHandler {
         if (linkInPlace.isSelected()) {
             destFilename = fileName;
         } else {
-            destFilename = (renameCheckBox.isSelected() ? entry.getCiteKey() + "." + fileType.extension : fileName);
+            destFilename = (renameCheckBox.isSelected() ? entry.getCiteKey() + "." + fileType.extension
+                    : new File(fileName).getName());
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, fileType, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
@@ -121,16 +142,16 @@ public class DroppedFileHandler {
         }
 
         if (success) {
-            doLink(entry, fileType, destFilename, edits);
+            doLink(entry, fileType, destFilename, false, edits);
             panel.markBaseChanged();
         }
-
+        edits.end();
         panel.undoManager.addEdit(edits);
 
     }
 
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
-        MainTable mainTable, NamedCompound edits) {
+        NamedCompound edits) {
 
         if (!fileType.extension.equals("pdf")) {
             return false;
@@ -177,9 +198,9 @@ public class DroppedFileHandler {
         boolean isSingle = xmpEntriesInFile.size() == 1;
         BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
 
-        reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
+        /*reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
             isSingle, (isSingle ? single.getCiteKey() : Globals.lang("Cannot rename for several entries.")),
-            false, !isSingle);
+            false, !isSingle);*/
 
         boolean success = true;
 
@@ -208,8 +229,9 @@ public class DroppedFileHandler {
                 try {
                     BibtexEntry entry = it.next();
                     entry.setId(Util.createNeutralId());
+                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
-                    doLink(entry, fileType, destFilename, edits);
+                    doLink(entry, fileType, destFilename, true, edits);
                 } catch (KeyCollisionException ex) {
 
                 }
@@ -224,14 +246,15 @@ public class DroppedFileHandler {
         final boolean allowRename, String citekeyOrReason, boolean newEntry,
         final boolean multipleEntries) {
         
-        String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
+        //String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
+        String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         if ((dir == null) || !(new File(dir)).exists()) {
-            destDirLabel.setText(Globals.lang("%0 directory is not set or does not exist!", fileType.getName()));
+            destDirLabel.setText(Globals.lang("File directory is not set or does not exist!"));
             copyRadioButton.setEnabled(false);
             moveRadioButton.setEnabled(false);
             linkInPlace.setSelected(true);
         } else {
-            destDirLabel.setText(Globals.lang("%0 directory is '%1':", fileType.getName(), dir));
+            destDirLabel.setText(Globals.lang("File directory is '%0':", dir));
             copyRadioButton.setEnabled(true);
             moveRadioButton.setEnabled(true);
         }
@@ -246,18 +269,14 @@ public class DroppedFileHandler {
 		if (multipleEntries) {
 			linkInPlace.setText(Globals
 					.lang("Leave files in their current directory."));
-			copyRadioButton.setText(Globals.lang("Copy files to %0.", fileType
-					.getName()));
+			copyRadioButton.setText(Globals.lang("Copy files to file directory."));
 
-			moveRadioButton.setText(Globals.lang("Move files to %0.", fileType
-					.getName()));
+			moveRadioButton.setText(Globals.lang("Move files to file directory."));
 		} else {
 			linkInPlace.setText(Globals
 					.lang("Leave file in its current directory."));
-			copyRadioButton.setText(Globals.lang("Copy file to %0.", fileType
-					.getName()));
-			moveRadioButton.setText(Globals.lang("Move file to %0.", fileType
-					.getName()));
+			copyRadioButton.setText(Globals.lang("Copy file to file directory."));
+			moveRadioButton.setText(Globals.lang("Move file to file directory"));
 		}
 		
         renameCheckBox.setText(Globals.lang("Rename to match citekey") + ": " + citekeyOrReason);
@@ -286,11 +305,39 @@ public class DroppedFileHandler {
      *            is given, the edit is added to the panel's undoManager.
      */
     private void doLink(BibtexEntry entry, ExternalFileType fileType, String filename,
-        NamedCompound edits) {
+        boolean avoidDuplicate, NamedCompound edits) {
 
-        UndoableFieldChange edit = new UndoableFieldChange(entry, fileType.getFieldName(), entry
-            .getField(fileType.getFieldName()), filename);
-        entry.setField(fileType.getFieldName(), filename);
+
+        String oldValue = (String)entry.getField(GUIGlobals.FILE_FIELD);
+        FileListTableModel tm = new FileListTableModel();
+        if (oldValue != null)
+            tm.setContent(oldValue);
+
+        // If avoidDuplicate==true, we should check if this file is already linked:
+        if (avoidDuplicate) {
+            // For comparison, find the absolute filename:
+            String fileDir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            String absFilename = (!(new File(filename).isAbsolute()) && (fileDir != null)) ?
+                    new File(fileDir, filename).getAbsolutePath() : filename;
+            System.out.println("absFilename: "+absFilename);
+            
+            for (int i=0; i<tm.getRowCount(); i++) {
+                FileListEntry flEntry = tm.getEntry(i);
+                // Find the absolute filename for this existing link:
+                String absName = (!(new File(flEntry.getLink()).isAbsolute()) && (fileDir != null)) ?
+                        new File(fileDir, flEntry.getLink()).getAbsolutePath() : flEntry.getLink();
+                System.out.println("absName: "+absName);
+                // If the filenames are equal, we don't need to link, so we simply return:
+                if (absFilename.equals(absName))
+                    return;
+            }
+        }
+
+        tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
+        String newValue = tm.getStringRepresentation();
+        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
+                oldValue, newValue);
+        entry.setField(GUIGlobals.FILE_FIELD, newValue);
 
         if (edits == null) {
             panel.undoManager.addEdit(edit);
@@ -315,7 +362,7 @@ public class DroppedFileHandler {
      */
     private boolean doRename(String fileName, ExternalFileType fileType, String destFilename,
         NamedCompound edits) {
-        String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
+        String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         if ((dir == null) || !(new File(dir)).exists()) {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
@@ -347,7 +394,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
         NamedCompound edits) {
 
-        String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
+        String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         if ((dir == null) || !(new File(dir)).exists()) {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....

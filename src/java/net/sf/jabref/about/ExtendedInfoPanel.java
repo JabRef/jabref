@@ -34,8 +34,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // function : content for the about dialog
 //
-// todo     :
-//
 // modified :
 //            28.07.2005
 //            - hide license button

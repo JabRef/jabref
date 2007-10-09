@@ -165,8 +165,6 @@ public class MetaData implements Iterable<String> {
         else
             dir = Globals.prefs.get(key);
 
-
-        //System.out.println("MetaData: dir: '"+dir+"' relative: "+(new File(dir)).isAbsolute());
         return dir;
     }
 

@@ -12,6 +12,8 @@ import net.sf.jabref.*;
 
 /**
  * Importer for the Refer/Endnote format.
+ * modified to use article number for pages if pages are missing (some
+ * journals, e.g., Physical Review Letters, don't use pages anymore)
  *
  * check here for details on the format
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
@@ -78,12 +80,13 @@ public class EndnoteImporter extends ImportFormat {
 
     String[] entries = sb.toString().split(ENDOFRECORD);
     HashMap<String, String> hm = new HashMap<String, String>();
-    String author = "", Type = "", editor = "";
+    String author = "", Type = "", editor = "", artnum = "";
     for (int i = 0; i < entries.length; i++){
         hm.clear();
         author = "";
         Type = "";
         editor = "";
+        artnum = "";
         boolean IsEditedBook = false;
         String[] fields = entries[i].trim().substring(1).split("\n%");
         //String lastPrefix = "";
@@ -158,7 +161,16 @@ public class EndnoteImporter extends ImportFormat {
         else if (prefix.equals("V")) hm.put("volume", val);
         else if (prefix.equals("N")) hm.put("number", val);
         else if (prefix.equals("U")) hm.put("url", val);
-        else if (prefix.equals("O")) hm.put("note", val);
+        else if (prefix.equals("O")) {
+	    // Notes may contain Article number
+	    if (val.startsWith("Artn")) {
+		String[] tokens = val.split("\\s");
+		artnum = tokens[1];
+	    }
+	    else {
+		hm.put("note", val);
+	    }
+	}
         else if (prefix.equals("K")) hm.put("keywords", val);
         else if (prefix.equals("X")) hm.put("abstract", val);
         else if (prefix.equals("9")){
@@ -179,6 +191,10 @@ public class EndnoteImporter extends ImportFormat {
         //fixauthorscomma
         if (!author.equals("")) hm.put("author", fixAuthor(author));
         if (!editor.equals("")) hm.put("editor", fixAuthor(editor));
+        //if pages missing and article number given, use the article number
+        if (hm.get("pages").equals("-") && !artnum.equals(""))
+            hm.put("pages", artnum);
+
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here

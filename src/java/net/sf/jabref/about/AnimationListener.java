@@ -32,8 +32,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // function : listener for animation actions
 //
-// todo     :
-//
 // modified :
 
 package net.sf.jabref.about ;

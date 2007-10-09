@@ -180,11 +180,13 @@ public class ManageJournalsPanel extends JPanel{
             }
         });
         help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.journalAbbrHelp));
-        cancel.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                    }
-                });
+
+        AbstractAction cancelAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        };
+        cancel.addActionListener(cancelAction);
 
         add.addActionListener(tableModel);
         remove.addActionListener(tableModel);
@@ -194,6 +196,12 @@ public class ManageJournalsPanel extends JPanel{
                 buildExternalsPanel();
             }
         });
+
+        // Key bindings:
+        ActionMap am = getActionMap();
+        InputMap im = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", cancelAction);
 
         //dialog.pack();
         int xSize = getPreferredSize().width;

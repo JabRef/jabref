@@ -25,6 +25,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.AuthorList;
 
 /**
  * Duplicate of AuthorLastFirstAbbreviator.
@@ -41,9 +42,9 @@ public class AuthorAbbreviator implements LayoutFormatter {
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
 	public String format(String fieldText) {
-		// It seems to me that this formatter and AuthorLastFirstAbbreviator
-		// are duplicates. Since the latter was patched to improve handling of
-		// some names, we refer the operation there:
-		return (new AuthorLastFirstAbbreviator()).format(fieldText);
+
+        AuthorList list = AuthorList.getAuthorList(fieldText);
+        return list.getAuthorsLastFirstAnds(true);
+        
 	}
 }

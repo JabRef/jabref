@@ -33,9 +33,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // function : a animated line for about dialog
 //
-// todo     :
-//
-// modified :
+
 
 package net.sf.jabref.about ;
 

@@ -165,7 +165,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		entry
 			.setField(
 				"author",
-				"L. E. C. Conceic{\\~a}o and T. van der Meeren and J. A. J. Verreth and M. S. Evjen and D. F. Houlihan and H. J. Fyhn");
+				"Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
 		entry
 			.setField(
 				"title",

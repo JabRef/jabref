@@ -190,7 +190,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         }
     }
 
-    static class OptionsDialog extends JDialog {
+    class OptionsDialog extends JDialog {
         JRadioButton autoSetUnset, autoSetAll, autoSetNone;
         JCheckBox checkLinks;
         JButton ok = new JButton(Globals.lang("Ok")),
@@ -281,7 +281,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             if (visible)
                 canceled = true;
 
-            String dir = Globals.prefs.get(fieldName + "Directory");
+            String dir = panel.metaData().getFileDirectory(fieldName);
+
             if ((dir == null) || (dir.trim().length() == 0)) {
 
                 autoSetNone.setSelected(true);

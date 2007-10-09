@@ -206,8 +206,10 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 		}
 
 		// Now we need to make sense of the contents the user has made to the
-		// table setup table.
-		if (tableChanged) {
+		// table setup table. This needs to be done either if changes were made, or
+        // if the checkbox is checked and no field values have been stored previously: 
+        if (tableChanged ||
+                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey("xmpPrivacyFilters"))) {
 
 			// First we remove all rows with empty names.
 			for (int i = tableRows.size() - 1; i >= 0; i--) {
