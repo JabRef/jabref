@@ -49,12 +49,12 @@ public class MedlineHandler extends DefaultHandler
 		inIssue = false,			inPubDate = false,
 		inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
 		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,
-        inAffiliation=false;
+        inAffiliation=false, inMeshHeader=false, inQualifierName=false;
     String title="", journal="", keywords ="",author="",
 		lastName="",year="",forename="", abstractText="", affiliation="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
-		pubmedid="",doi="",pii="";
+		pubmedid="",doi="",pii="", majorTopic = "", minorTopics = "";
     ArrayList<String> authors=new ArrayList<String>();
     TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum=0;
@@ -82,11 +82,17 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("AuthorList")){
 			inAuthorList=true;
 			authors.clear();}
-		else if(localName.equals("DescriptorName")){
-			//keyword="";
+        else if (localName.equals("MeshHeading")) {
+            inMeshHeader = true;
+            majorTopic = "";
+            minorTopics = "";
+        }
+        else if(localName.equals("DescriptorName")){
 			inDescriptorName=true;
-			//descriptorName="";
 		}
+        else if (localName.equals("QualifierName")) {
+            inQualifierName=true;
+        }
                 else if(localName.equals("Author")){inAuthor=true;author="";}
                 else if(localName.equals("CollectiveName")){inForename=true;forename="";} // Morten A. 20040513.
 		else if(localName.equals("PMID")){
@@ -211,7 +217,9 @@ public class MedlineHandler extends DefaultHandler
 			abstractText="";
             affiliation="";
             pubmedid="";
-			month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
+            majorTopic = "";
+            minorTopics = "";
+            month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
 			MedlineDate="";
             descriptors.clear();
         }
@@ -243,7 +251,15 @@ public class MedlineHandler extends DefaultHandler
 			lastname = "";
 		}
 		else if(localName.equals("DescriptorName")) inDescriptorName=false;
-		else if(localName.equals("LastName")){inLastName=false;}
+        else if(localName.equals("QualifierName")) inQualifierName=false;
+        else if(localName.equals("MeshHeading")) {
+            inMeshHeader = false;
+            if (minorTopics.equals(""))
+                descriptors.add(majorTopic);
+            else
+                descriptors.add(majorTopic+", "+minorTopics);
+        }
+        else if(localName.equals("LastName")){inLastName=false;}
 		else if(localName.equals("ForeName")||localName.equals("FirstName")){ inForename=false;}
 		else if(localName.equals("Issue")){ inIssue = false;}
 		else if(localName.equals("MedlinePgn")){inMedlinePgn=false;}//pagenumber
@@ -276,8 +292,15 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineID){medlineID += new String(data,start,length);}
 		else if(inURL){url += new String(data,start,length);}
 		else if(inPubMedID){pubmedid = new String(data,start,length);}
-		else if(inDescriptorName)
-            descriptors.add(new String(data,start,length));
+        else if(inQualifierName) {
+            if (!minorTopics.equals(""))
+                minorTopics = minorTopics+"/";
+            minorTopics = minorTopics + new String(data,start,length);
+        }
+        else if(inDescriptorName) {
+            majorTopic = new String(data,start,length);
+        }
+
             //keywords += new String(data,start,length) + ", ";
 		else if(inForename){
 			forename += new String(data,start,length);
