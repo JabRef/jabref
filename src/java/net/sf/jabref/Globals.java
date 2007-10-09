@@ -1326,7 +1326,7 @@ public class Globals {
 	}
 
 	public static void initializeJournalNames() {
-		journalAbbrev = new JournalAbbreviations();// "/resource/journalList.txt");
+		journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
 
 		// Read external lists, if any (in reverse order, so the upper lists
 		// override the lower):

@@ -3,17 +3,16 @@ Quick instructions, compiling JabRef from source
 
 To compile JabRef from source, you need:
 
-* A Java compiler, supporting Java 1.4 or higher.
+* A Java compiler, supporting Java 1.5 or higher.
 * Jakarta Ant (http://ant.apache.org). Don't know what version is
   needed; the latest stable version should work fine.
 
-To compile, use the command "ant compile unjarlib jars".
+To compile, use the command "ant jars".
 After the build is finished, you can find the executable jar file
-named "jabref.jar" in the "build/lib" directory. Enjoy!
+named "JabRef-$VERSION.jar" (where $VERSION is the current version of the
+source tree) in the "build/lib" directory. Enjoy!
 
 You can also build and run JabRef directly with the command "ant run".
-Note that this will not run the "unjarlib" target that bundles 3rd party
-libraries inside the jar file.
 
 On Mac OS X you should include the targets osx and osxjar,
 making the correct command "ant compile unjarlib osx jars osxjar".
@@ -28,4 +27,4 @@ avoid these libraries being bundled inside the JabRef jar.
 
 
 Morten Alver
-Revised June 11, 2005.
+Revised October 9, 2007.

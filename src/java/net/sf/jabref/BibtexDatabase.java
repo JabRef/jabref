@@ -596,6 +596,8 @@ public class BibtexDatabase {
 	 * 
 	 * If a database is given, this function will try to resolve any string
 	 * references in the field-value.
+     * Also, if a database is given, this function will try to find values for
+     * unset fields in the entry linked by the "crossref" field, if any.
 	 * 
 	 * @param field
 	 *            The field to return the value of.
@@ -610,8 +612,24 @@ public class BibtexDatabase {
 	
 		if (field.equals("bibtextype"))
 			return bibtex.getType().getName();
-	
-		return getText((String)bibtex.getField(field), database);
+
+        Object o = bibtex.getField(field);
+
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry:
+        if ((o == null) && (database != null)) {
+            Object crossRef = bibtex.getField("crossref");
+            if (crossRef != null) {
+                BibtexEntry referred = database.getEntryByKey((String)crossRef);
+                if (referred != null) {
+                    // Ok, we found the referred entry. Get the field value from that
+                    // entry. If it is unset there, too, stop looking:
+                    o = referred.getField(field);
+                }
+            }
+        }
+
+        return getText((String)o, database);
 	}
 
 	/**
