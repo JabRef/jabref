@@ -169,8 +169,7 @@ public class BibtexDatabase {
       if (keySet != null)
       {
           Iterator<String> it = keySet.iterator();
-          boolean loop = it.hasNext() ;
-          while(loop)
+          while(it.hasNext())
           {
             String entrieID = it.next() ;
             BibtexEntry entry = getEntryById(entrieID) ;
@@ -181,11 +180,9 @@ public class BibtexDatabase {
               {
                 if (keyHash == citeKey.hashCode() )
                 {
-                  loop = false ;
                   back = entry ;
                 }
-                else loop = it.hasNext() ;
-              } else loop = it.hasNext() ;
+              }
             }
           }
       }

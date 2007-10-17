@@ -430,7 +430,9 @@ public class BibtexParser {
 		BibtexEntry result = new BibtexEntry(id, tp);
 		skipWhitespace();
 		consume('{', '(');
-		skipWhitespace();
+        int c = peek();
+        if ((c != '\n') && (c != '\r'))
+            skipWhitespace();
 		String key = null;
 		boolean doAgain = true;
 		while (doAgain) {
@@ -444,7 +446,7 @@ public class BibtexParser {
 				// This exception will be thrown if the entry lacks a key
 				// altogether, like in "@article{ author = { ...".
 				// It will also be thrown if a key contains =.
-				char c = (char) peek();
+				c = (char) peek();
 				if (Character.isWhitespace(c) || (c == '{') || (c == '\"')) {
 					String fieldName = ex.getMessage().trim().toLowerCase();
 					String cont = parseFieldContent();
@@ -467,7 +469,7 @@ public class BibtexParser {
 		skipWhitespace();
 
 		while (true) {
-			int c = peek();
+			c = peek();
 			if ((c == '}') || (c == ')')) {
 				break;
 			}
