@@ -170,12 +170,14 @@ public class FileListTableModel extends AbstractTableModel {
      * the first entry has been found.
      * @param content The file field content, as fed to this class' setContent() method.
      * @return A JLabel set up with no text and the icon of the first entry's file type,
-     *  or null if no entry was found.
+     *  or null if no entry was found or the entry had no icon.
      */
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true);
-        return entry != null ? entry.getType().getIconLabel() : null;
+        if (entry == null || entry.getType()==null )
+            return null;
+        return entry.getType().getIconLabel();
     }
 
     
