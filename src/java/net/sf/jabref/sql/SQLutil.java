@@ -285,7 +285,8 @@ public class SQLutil {
      *          The necessary database connection information
      */
     public static void exportDatabase(final BibtexDatabase database,
-        final MetaData metaData, Set<String> keySet, DBStrings dbStrings ) throws Exception {
+        final MetaData metaData, Set<String> keySet, DBStrings dbStrings)
+        throws Exception {
 
         DBTYPE dbtype = getDBType(dbStrings);
 
@@ -293,9 +294,9 @@ public class SQLutil {
 
         try {
 
-            conn = SQLutil.connectToDB( dbStrings);
+            conn = SQLutil.connectToDB(dbStrings);
 
-            //conn.setAutoCommit(false);
+            // conn.setAutoCommit(false);
 
             exportDatabase_worker(dbtype, database, metaData, keySet, conn);
 
@@ -306,21 +307,16 @@ public class SQLutil {
 
             conn.close();
 
+        } catch (SQLException ex) {
 
-         } catch (SQLException ex) {
-
-             ex.printStackTrace();
-
-             if (conn!=null) {
-                 if (!conn.getAutoCommit()) {
+            if (conn != null) {
+                if (!conn.getAutoCommit()) {
                     conn.rollback();
-                 }
-             }
+                }
+            }
 
-            throw (Exception) ex.getCause();
-
-         }
-
+            throw ex;
+        }
     }
 
 

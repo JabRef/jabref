@@ -670,8 +670,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             // run first, in EDT:
             public void init() {
-
-
                 DBStrings dbs = metaData.getDBStrings();
 
                 // init DB strings if necessary
