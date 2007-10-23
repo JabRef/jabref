@@ -2,10 +2,12 @@ package net.sf.jabref.export;
 
 
 
-import net.sf.jabref.*;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.sql.SQLutil;
 import java.util.Set;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.sql.SQLutil;
 
 /**
  * MySQLExport contributed by Lee Patton.

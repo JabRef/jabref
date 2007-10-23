@@ -2,9 +2,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * This formatter outputs the input value after adding a prefix and a postfix,
  * as long as the input value is non-empty. If the input value is empty, an

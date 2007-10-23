@@ -1,22 +1,42 @@
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.*;
-import javax.swing.event.DocumentListener;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-import net.sf.jabref.*;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import java.io.IOException;
 
 
 /**
@@ -41,14 +61,12 @@ public class FileListEntryEditor {
     ConfirmCloseFileListEntryEditor externalConfirm = null;
 
     private AbstractAction okAction;
-    private JabRefFrame frame;
     private FileListEntry entry;
     private MetaData metaData;
     private boolean okPressed = false;
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
                                MetaData metaData) {
-        this.frame = frame;
         this.entry = entry;
         this.metaData = metaData;
 

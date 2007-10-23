@@ -9,9 +9,30 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
-import net.sf.jabref.*;
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEditor;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
@@ -232,14 +253,12 @@ public class SynchronizeFileField extends AbstractWorker {
                 cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
-        private String fieldName;
         private MetaData metaData;
 
         public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Globals.lang("file");
-            this.fieldName = fieldName;
             ok.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;

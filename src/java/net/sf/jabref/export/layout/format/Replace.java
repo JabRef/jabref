@@ -2,9 +2,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * Formatter that does regexp replacement.
  *

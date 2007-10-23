@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import net.sf.jabref.*;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.Util;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
-
-import javax.swing.*;
 
 /**
  * Created by IntelliJ IDEA.

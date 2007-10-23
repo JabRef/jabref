@@ -9,23 +9,27 @@
 
 package net.sf.jabref.sql;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Dimension;
-import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import javax.swing.*;
-import javax.swing.SwingConstants.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
-import com.jgoodies.forms.builder.*;
-import com.jgoodies.forms.layout.*;
+import net.sf.jabref.Globals;
 
-import net.sf.jabref.*;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 
 /**
@@ -88,11 +92,9 @@ public class DBConnectDialog extends JDialog {
         lblPassword.setText(Globals.lang("Password :"));
 
         // set label text alignment
-        for (Iterator it = lhs.iterator(); it.hasNext(); ) {
-            JLabel lbl = (JLabel) it.next();
-            lbl.setHorizontalAlignment(JLabel.RIGHT);
+        for (JLabel label : lhs){
+            label.setHorizontalAlignment(JLabel.RIGHT);
         }
-
         
         // set button text
         btnConnect.setText(Globals.lang("Connect"));

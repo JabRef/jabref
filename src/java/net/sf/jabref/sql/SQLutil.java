@@ -10,38 +10,26 @@
 package net.sf.jabref.sql;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.Exception;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
-/*
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
- */
-
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.lang.System;
-import java.io.PrintStream;
-import java.lang.Exception;
-
-import net.sf.jabref.Util;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.GroupTreeNode;
 
 /**
  *
@@ -393,7 +381,7 @@ public class SQLutil {
         }
 
         // build the DML tables specification
-        String dml = "", dml1 = "", dml2 = "";
+        String dml1 = "", dml2 = "";
         switch (dbtype) {
             case MYSQL:
 
@@ -782,10 +770,8 @@ public class SQLutil {
 
 			// build INSERT statement for each entry belonging to this group
 			ExplicitGroup grp = (ExplicitGroup)cursor.getGroup();
-			Iterator it = grp.getEntries().iterator();
-			while (it.hasNext()) {
-
-				BibtexEntry be = (BibtexEntry) it.next();
+			
+			for (BibtexEntry be : grp.getEntries()){
 
                 // handle DML according to output type
                 processDML(out, "INSERT INTO entry_group (entries_id, groups_id) " 

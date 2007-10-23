@@ -1,9 +1,7 @@
 package net.sf.jabref.export.layout;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is an abstract implementation of ParamLayoutFormatter, which provides some

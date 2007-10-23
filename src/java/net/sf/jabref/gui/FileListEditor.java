@@ -3,30 +3,58 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldEditor;
+import net.sf.jabref.FieldNameLabel;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.external.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.util.List;
-import java.net.URL;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -231,21 +259,6 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private void addEntry() {
         addEntry("");
-    }
-
-    /**
-     * Add the listed files, prompting the user with the entry editor in each case.
-     * @param files A list of File objects.
-     */
-    private void addAll(List files) {
-        for (Iterator i = files.iterator(); i.hasNext();) {
-            File file = (File)i.next();
-            String fileName = file.getAbsolutePath();
-            FileListEntry entry = new FileListEntry("", fileName, null);
-            if (editListEntry(entry))
-                    tableModel.addEntry(tableModel.getRowCount(), entry);
-        }
-        entryEditor.updateField(this);
     }
 
     private void removeEntries() {
@@ -607,22 +620,19 @@ public class FileListEditor extends JTable implements FieldEditor,
             return importData(FileListEditor.this, transferSupport.getTransferable());
         }*/
 
+        @SuppressWarnings("unchecked")
         public boolean importData(JComponent comp, Transferable t) {
             // If the drop target is the main table, we want to record which
             // row the item was dropped on, to identify the entry if needed:
-            int dropRow = -1;
-            if (comp instanceof JTable) {
-                dropRow = ((JTable) comp).getSelectedRow();
-            }
 
             try {
 		
-                List files = null;
+                List<File> files = null;
                 // This flavor is used for dragged file links in Windows:
                 if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     // JOptionPane.showMessageDialog(null, "Received
                     // javaFileListFlavor");
-                    files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                    files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 }
 
                 if (t.isDataFlavorSupported(urlFlavor)) {
@@ -639,12 +649,11 @@ public class FileListEditor extends JTable implements FieldEditor,
                 }
 
 		        if (files != null) {
-		            final List theFiles = files;
+		            final List<File> theFiles = files;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             //addAll(files);
-                            for (Iterator i=theFiles.iterator(); i.hasNext();) {
-			                    File f = (File)i.next();
+                            for (File f : theFiles){
                                 // Find the file's extension, if any:
                                 String name = f.getAbsolutePath();
                                 String extension = "";
