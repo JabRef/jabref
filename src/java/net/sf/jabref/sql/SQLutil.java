@@ -27,6 +27,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
+import net.sf.jabref.Globals;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -788,5 +789,110 @@ public class SQLutil {
 
 	    return ID;
 	}
+
+    /**
+     * Processes a SQLException, and returns a more user-friendly message
+     * 
+     * @param ex
+     *            The SQLException raised
+     * @param dbtype
+     *            DBTYPE specifying the type of database that raised the exception
+     */
+
+    public static String getExceptionMessage (Exception ex, DBTYPE dbtype) {
+        
+        String errorMessage = null;
+
+        switch (dbtype) {
+            case MYSQL:
+                errorMessage = getExceptionMessage_MySQL(ex);
+                break;
+            case DERBY:
+                errorMessage = getExceptionMessage_MySQL(ex);
+                break;
+            default:
+                errorMessage = Globals.lang("Could not determine exception message.");
+                break;
+        }
+
+        return errorMessage;
+
+    }
+
+    /**
+     * Handles work for getExceptionMessage when dbtype is MYSQL
+     * 
+     * @param ex
+     *            The SQLException raised
+     */
+    public static String getExceptionMessage_MySQL (Exception ex) {
+      
+        String msg = null;
+
+        // handle case where exception is SQL related
+        if (ex instanceof SQLException) {
+
+            SQLException sqlex = (SQLException) ex;
+
+            // desc  : Unkown DB
+            // code  : 1049
+            // state : 42000
+            // msg   : Unkown database 'database_name'
+            // type  : SQLException
+            // tested with MySQL
+
+            if (sqlex.getSQLState() == "42000") {
+                msg = Globals.lang(sqlex.getMessage());
+            }
+
+
+            // desc  : Invalid username and/or password
+            // code  : 1045
+            // state : 28000
+            // msg   : Access denied for user 'username'@'hostname' (using password: ...) 
+            // type  : SQLException
+            // tested with MySQL
+
+            if (sqlex.getSQLState() == "28000") {
+                msg = Globals.lang(sqlex.getMessage());
+            }
+
+
+            // desc  : Cannot connect to SQL server
+            // code  : 0
+            // state : 08S01
+            // msg   : Communications link failure due to underlying exception
+            // type  : java.net.UnknownHostException
+            // tested with MySQL
+            if (sqlex.getSQLState() == "08S01") {
+                msg = Globals.lang("Cannot connect to SQL server at the specified host.");
+            } 
+
+            // for debugging...
+            if (false) {
+                System.out.println("-------------------------------------");
+                System.out.println(sqlex.getErrorCode());
+                System.out.println(sqlex.getSQLState());
+                System.out.println(sqlex.getMessage());
+                System.out.println("-------------------------------------");
+            }
+
+        } 
+        
+        // handle case where exception is non-SQL related
+        if (msg == null) {
+
+            if (ex.getMessage()==null) {
+                msg = ex.toString();
+            } else {
+                msg = ex.getMessage();
+            }
+
+        }
+
+
+        return msg;
+
+    }
 
 }

@@ -45,6 +45,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -670,6 +671,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             // run first, in EDT:
             public void init() {
+
                 DBStrings dbs = metaData.getDBStrings();
 
                 // init DB strings if necessary
@@ -704,13 +706,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 DBStrings dbs = metaData.getDBStrings();
 
                 try {
+
                    SQLutil.exportDatabase(database, metaData, null, dbs);
+
                 } catch (Exception ex) {
-                    if (ex.getMessage()==null) {
-                        errorMessage = ex.toString();
-                    } else {
-                        errorMessage = ex.getMessage();
-                    }
+
+                    errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+
                 }
 
             }
