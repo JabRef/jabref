@@ -60,6 +60,7 @@ public class DBConnectDialog extends JDialog {
 
     DBStrings dbStrings = new DBStrings();
 
+    private boolean connectToDB = false;
 
     /** Creates a new instance of DBConnectDialog */
     public DBConnectDialog( JFrame parent, DBStrings dbs) {
@@ -154,6 +155,7 @@ public class DBConnectDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 storeSettings();
                 setVisible(false);
+                setConnectToDB(true);
             }
         });
 
@@ -161,6 +163,7 @@ public class DBConnectDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();
+                setConnectToDB(false);
             }
         });
 
@@ -189,6 +192,14 @@ public class DBConnectDialog extends JDialog {
 
     public void setDBStrings(DBStrings dbStrings) { 
         this.dbStrings = dbStrings;
+    }
+
+    public boolean getConnectToDB() {
+        return connectToDB;
+    }
+
+    public void setConnectToDB(boolean connectToDB) {
+        this.connectToDB = connectToDB;
     }
 
 }

@@ -668,6 +668,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("dbConnect", new AbstractWorker () {
            
             String errorMessage = null;
+            boolean connectToDB = false;
 
             // run first, in EDT:
             public void init() {
@@ -693,25 +694,33 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 Util.placeDialog(dbd, BasePanel.this );
                 dbd.setVisible(true);
 
+                connectToDB = dbd.getConnectToDB();
+
                 // store database strings
-                dbs = dbd.getDBStrings();
-                metaData.setDBStrings(dbs);
-                dbd.dispose();
+                if (connectToDB) {
+                    dbs = dbd.getDBStrings();
+                    metaData.setDBStrings(dbs);
+                    dbd.dispose();
+                }
 
             }
 
             // run second, on a different thread:
             public void run() {
 
-                DBStrings dbs = metaData.getDBStrings();
+                if (connectToDB) {
 
-                try {
+                    DBStrings dbs = metaData.getDBStrings();
 
-                   SQLutil.exportDatabase(database, metaData, null, dbs);
+                    try {
 
-                } catch (Exception ex) {
+                       SQLutil.exportDatabase(database, metaData, null, dbs);
 
-                    errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+                    } catch (Exception ex) {
+
+                        errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+
+                    }
 
                 }
 
@@ -724,7 +733,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // if no error, report success
                 if (errorMessage == null) {
-                    frame.output(Globals.lang("%0 export successful", url));
+                    if (connectToDB) {
+                        frame.output(Globals.lang("%0 export successful", url));
+                    }
                 }
 
                 // show an error dialog if an error occurred
