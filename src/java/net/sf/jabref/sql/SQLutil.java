@@ -841,8 +841,20 @@ public class SQLutil {
             // type  : SQLException
             // tested with MySQL
 
-            if (sqlex.getSQLState() == "42000") {
+            if (sqlex.getSQLState().equals("42000")) {
                 msg = Globals.lang(sqlex.getMessage());
+            }
+
+
+            // desc  : command denied
+            // code  : 1142
+            // state : 42000
+            // msg   : * command denied to user 'username'@'hostname' for table 'table_name'
+            // tested with MySQL
+
+            if (sqlex.getSQLState().equals("42000")) {
+                msg = Globals.lang("User does not have sufficient privileges.\n");
+                msg = msg + Globals.lang("(" + sqlex.getMessage() + ")");
             }
 
 
@@ -853,7 +865,7 @@ public class SQLutil {
             // type  : SQLException
             // tested with MySQL
 
-            if (sqlex.getSQLState() == "28000") {
+            if (sqlex.getSQLState().equals("28000")) {
                 msg = Globals.lang(sqlex.getMessage());
             }
 
@@ -864,7 +876,8 @@ public class SQLutil {
             // msg   : Communications link failure due to underlying exception
             // type  : java.net.UnknownHostException
             // tested with MySQL
-            if (sqlex.getSQLState() == "08S01") {
+
+            if (sqlex.getSQLState().equals("08S01")) {
                 msg = Globals.lang("Cannot connect to SQL server at the specified host.");
             } 
 
