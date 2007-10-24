@@ -9,6 +9,8 @@
 
 package net.sf.jabref.sql;
 
+import net.sf.jabref.Globals;
+
 /**
  *
  * @author pattonlk
@@ -34,6 +36,18 @@ public class DBStrings {
         this.setPassword(null);
         this.isInitialized(false);
         this.isConfigValid(false);
+    }
+
+    public void initialize() {
+        //String [] servers = {Globals.lang("MySQL"), Globals.lang("Derby")};
+        String [] servers = {Globals.lang("MySQL")};
+        setServerTypes(servers);
+        setServerType(Globals.lang("MySQL"));
+        setServerHostname(Globals.lang("localhost"));
+        setDatabase(Globals.lang("jabref"));
+        setUsername(Globals.lang("root"));
+        setPassword("");
+        isInitialized(true);
     }
 
     public void setServerType(String serverType) {

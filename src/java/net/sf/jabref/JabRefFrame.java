@@ -356,9 +356,13 @@ public class JabRefFrame extends JFrame {
       errorConsole = Globals.errorConsole.getAction(this),
     test = new GeneralAction("test", "Test"),
 
-    dbConnect = new GeneralAction("dbConnect", "Export to external SQL database",
+    dbConnect = new GeneralAction("dbConnect", "Connect to external SQL database",
+         Globals.lang("Connect to external SQL database"), 
+          GUIGlobals.getIconUrl("dbConnect") ),
+
+    dbExport = new GeneralAction("dbExport", "Export to external SQL database",
          Globals.lang("Export to external SQL database"), 
-          GUIGlobals.getIconUrl("dbConnect") );
+          GUIGlobals.getIconUrl("dbExport") );
 
     PushToApplicationButton pushExternalButton;
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -1149,6 +1153,7 @@ public JabRefPreferences prefs() {
       file.add(exportAll);
       file.add(exportSelected);
       file.add(dbConnect);
+      file.add(dbExport);
 
       file.addSeparator();
       file.add(databaseProperties);
@@ -1343,6 +1348,7 @@ public JabRefPreferences prefs() {
     tlb.addAction(save);
     tlb.addAction(saveAll);
     tlb.addAction(dbConnect);
+    tlb.addAction(dbExport);
     
     tlb.addSeparator();
     tlb.addAction(cut);

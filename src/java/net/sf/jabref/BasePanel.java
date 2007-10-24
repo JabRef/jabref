@@ -45,6 +45,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -664,8 +665,65 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
 
-        // action for dumping database to external SQL database
-        actions.put("dbConnect", new AbstractWorker () {
+        // action for collecting database strings from user
+        actions.put("dbConnect", new BaseAction() {
+
+            public void action () {
+
+                DBStrings dbs = metaData.getDBStrings();
+
+                // init DB strings if necessary
+                if (! dbs.isInitialized()) {
+                    dbs.initialize();
+                }
+
+                // show connection dialog
+                DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
+                Util.placeDialog(dbd, BasePanel.this );
+                dbd.setVisible(true);
+
+                // connnect to database to test DBStrings
+                if (dbd.getConnectToDB()) {
+
+                    dbs = dbd.getDBStrings();
+
+                    try {
+
+                        frame.output(Globals.lang("Establishing SQL connection..."));
+                        Connection conn = SQLutil.connectToDB(dbs);
+                        conn.close();
+                        dbs.isConfigValid(true);
+                        frame.output(Globals.lang("SQL connection established."));
+
+                    } catch (Exception ex) {
+
+                        String errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+                        dbs.isConfigValid(false);
+
+                        String preamble = "Could not connect to SQL database for the following reason:";
+                        frame.output(Globals.lang(preamble)
+                                + "  " +  errorMessage);
+
+                        JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
+                            + "\n" + errorMessage, Globals.lang("Connect to SQL database"),
+                            JOptionPane.ERROR_MESSAGE);
+                       
+                    } finally {
+
+                        metaData.setDBStrings(dbs);
+                        dbd.dispose();
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        // action for exporting database to external SQL database
+        actions.put("dbExport", new AbstractWorker () {
            
             String errorMessage = null;
             boolean connectToDB = false;
@@ -675,32 +733,32 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 DBStrings dbs = metaData.getDBStrings();
 
-                // init DB strings if necessary
-                if (! dbs.isInitialized()) {
-                    //String [] servers = {Globals.lang("MySQL"), Globals.lang("Derby")};
-                    String [] servers = {Globals.lang("MySQL")};
-                    dbs.setServerTypes(servers);
-                    dbs.setServerType(Globals.lang("MySQL"));
-                    dbs.setServerHostname(Globals.lang("localhost"));
-                    dbs.setDatabase(Globals.lang("jabref"));
-                    dbs.setUsername(Globals.lang("root"));
-                    dbs.setPassword("");
-                    dbs.isInitialized(true);
-                }
+                // get DBStrings from user if necessary
+                if (!dbs.isConfigValid()) {
 
+                    // init DB strings if necessary
+                    if (! dbs.isInitialized()) {
+                        dbs.initialize();
+                    }
 
-                // show connection dialog
-                DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                Util.placeDialog(dbd, BasePanel.this );
-                dbd.setVisible(true);
+                    // show connection dialog
+                    DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
+                    Util.placeDialog(dbd, BasePanel.this );
+                    dbd.setVisible(true);
 
-                connectToDB = dbd.getConnectToDB();
+                    connectToDB = dbd.getConnectToDB();
 
-                // store database strings
-                if (connectToDB) {
-                    dbs = dbd.getDBStrings();
-                    metaData.setDBStrings(dbs);
-                    dbd.dispose();
+                    // store database strings
+                    if (connectToDB) {
+                        dbs = dbd.getDBStrings();
+                        metaData.setDBStrings(dbs);
+                        dbd.dispose();
+                    }
+
+                } else {
+
+                    connectToDB  = true;
+
                 }
 
             }
@@ -714,13 +772,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     try {
 
-                       SQLutil.exportDatabase(database, metaData, null, dbs);
+                        frame.output(Globals.lang("Attempting SQL export..."));
+                        SQLutil.exportDatabase(database, metaData, null, dbs);
+                        dbs.isConfigValid(true);
 
                     } catch (Exception ex) {
 
                         errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+                        dbs.isConfigValid(false);
 
                     }
+
+                    metaData.setDBStrings(dbs);
 
                 }
 
@@ -741,12 +804,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // show an error dialog if an error occurred
                 else {
 
-                    String preamble = "Could not export to SQL database";
+                    String preamble = "Could not export to SQL database for the following reason:";
                     frame.output(Globals.lang(preamble)
-                            + " - " + errorMessage);
+                            + "  " + errorMessage);
 
                     JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
-                        + ".\n" + errorMessage, Globals.lang("Export to SQL database"),
+                        + "\n" + errorMessage, Globals.lang("Export to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
                    
                     errorMessage = null;
