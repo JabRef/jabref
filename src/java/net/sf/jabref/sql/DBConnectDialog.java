@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 
@@ -33,6 +34,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 
 /**
+ * Dialog box for collecting database connection strings from the user
  *
  * @author pattonlk
  */
@@ -153,9 +155,18 @@ public class DBConnectDialog extends JDialog {
 
         btnConnect.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                storeSettings();
-                setVisible(false);
-                setConnectToDB(true);
+
+                String errorMessage = checkInput();
+
+                if ( errorMessage==null) {
+                    storeSettings();
+                    setVisible(false);
+                    setConnectToDB(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, errorMessage, 
+                            "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
+
             }
         });
 
@@ -169,6 +180,59 @@ public class DBConnectDialog extends JDialog {
 
     }
 
+    /**
+     * Checks the user input, and ensures that required fields have entries
+     *
+     * @return 
+     *      Appropriate error message to be displayed to user
+     */
+    private String checkInput () {
+
+        String[] fields = {"Server Hostname", "Database", "Username"};
+        String[] errors = new String[fields.length];
+        int cnt = 0;
+
+        if (txtServerHostname.getText().trim().equals("")) {
+            errors[cnt] = fields[0];
+            cnt++;
+        }
+
+        if (txtDatabase.getText().trim().equals("")) {
+            errors[cnt] = fields[1];
+            cnt++;
+        }
+
+        if (txtUsername.getText().trim().equals("")) {
+            errors[cnt] = fields[2];
+            cnt++;
+        }
+
+        String errMsg = Globals.lang("Please specify the ");
+
+        switch (cnt) {
+            case 0:
+                errMsg = null;
+                break;
+            case 1:
+                errMsg = errMsg + errors[0] + ".";
+                break;
+            case 2:
+                errMsg = errMsg + errors[0] + " and " + errors[1] + "."; 
+                break;
+            case 3:
+                errMsg = errMsg + errors[0] + ", " +  errors[1] 
+                      + ", and " + errors[2] + ".";
+                break;
+            default:
+                errMsg = errMsg + errors.toString() + ".";
+        }
+
+        return errMsg;
+    }
+
+    /**
+     * Save user input.
+     */
     private void storeSettings () {
         dbStrings.setServerType(cmbServerType.getSelectedItem().toString());
         dbStrings.setServerHostname(txtServerHostname.getText());
