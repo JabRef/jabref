@@ -251,18 +251,16 @@ public class FileActions
 			} catch (IOException e) {
 				// Argh, another error? Can we do anything?
 				e.printStackTrace();
-				throw new SaveException(
-					ex.getMessage()
-						+ "\n"
-						+ Globals
-							.lang("Warning: could not complete file repair; your file may "
-								+ "have been corrupted. Error message: ")
-						+ e.getMessage());
+                throw new SaveException(ex.getMessage()+"\n"+
+                        Globals.lang("Warning: could not complete file repair; your file may "
+                        +"have been corrupted. Error message")+": "+e.getMessage());
+
 			}
 			throw new SaveException(ex.getMessage(), exceptionCause);
 		}
 
 		return session;
+
 
 	}
 

@@ -718,22 +718,30 @@ public class Util {
                 file = tmp;
         }
 
-		// Check if we have arrived at a file type, and either an http link or an existing file:
+        // Check if we have arrived at a file type, and either an http link or an existing file:
 		if ((httpLink || file.exists()) && (fileType != null)) {
 			// Open the file:
-            String filePath = httpLink ? link : file.getPath();
-            if (Globals.ON_MAC) {
-				String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
-				Runtime.getRuntime().exec(cmd);
-			} else if (Globals.ON_WIN) {
-                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                    // Application is specified. Use it:
-                    openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-                } else
-                    openFileOnWindows(filePath, true);
-			} else {
-				String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
-				Runtime.getRuntime().exec(cmdArray);
+			try {
+                String filePath = httpLink ? link : file.getPath();
+                if (Globals.ON_MAC) {
+					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
+					Runtime.getRuntime().exec(cmd);
+				} else if (Globals.ON_WIN) {
+                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                        // Application is specified. Use it:
+                        openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+                    } else
+                        openFileOnWindows(filePath, true);
+				} else {
+                    String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
+					Runtime.getRuntime().exec(cmdArray);
+				}
+			} catch (IOException e) {
+                throw e;
+                /*e.printStackTrace();
+				System.err.println("An error occured on the command: " + fileType.getOpenWith()
+					+ " #" + link);
+				System.err.println(e.getMessage());*/
 			}
 
 		} else {
@@ -813,7 +821,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             throw new RuntimeException("Could not find the file list entry "+link+" in "+entry.toString());
         }
 
-        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, metaData);
+        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
         editor.setVisible(true);
         if (editor.okPressed()) {
             // Store the changes and add an undo edit:
@@ -921,18 +929,39 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		for (BibtexEntry entry : entries){
 			result.put(entry, new ArrayList<File>());
 		}
-		
-		// Now look for keys
+
+        boolean exactOnly = Globals.prefs.getBoolean("autolinkExactKeyOnly");
+        // Now look for keys
 		nextFile:
 		for (File file : filesWithExtension){
 			
 			String name = file.getName();
-			for (BibtexEntry entry : entries){
-				if (name.contains(entry.getCiteKey())){
-					result.get(entry).add(file);
-					continue nextFile;
-				}
-			}			
+            int dot = name.lastIndexOf('.');
+            // First, look for exact matches:
+            for (BibtexEntry entry : entries){
+                String citeKey = entry.getCiteKey();
+                if ((citeKey != null) && (citeKey.length() > 0)) {
+                    if (dot > 0) {
+                        if (name.substring(0, dot).equals(citeKey)) {
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
+            // If we get here, we didn't find any exact matches. If non-exact
+            // matches are allowed, try to find one:
+            if (!exactOnly) {
+                for (BibtexEntry entry : entries){
+                    String citeKey = entry.getCiteKey();
+                    if ((citeKey != null) && (citeKey.length() > 0)) {
+                        if (name.startsWith(citeKey)){
+                            result.get(entry).add(file);
+                            continue nextFile;
+                        }
+                    }
+                }
+            }
 		}
 		
 		return result;
@@ -1038,17 +1067,17 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
     /**
 	 * Searches the given directory and file name pattern for a file for the
 	 * bibtexentry.
-	 * 
+	 *
 	 * Used to fix:
-	 * 
+	 *
 	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
-	 * 
+	 *
 	 * Requirements:
 	 *  - Be able to find the associated PDF in a set of given directories.
 	 *  - Be able to return a relative path or absolute path.
 	 *  - Be fast.
 	 *  - Allow for flexible naming schemes in the PDFs.
-	 * 
+	 *
 	 * Syntax scheme for file:
 	 * <ul>
 	 * <li>* Any subDir</li>
@@ -1056,7 +1085,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * <li>[key] Key from bibtex file and database</li>
 	 * <li>.* Anything else is taken to be a Regular expression.</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param entry
 	 *            non-null
 	 * @param database
@@ -1068,10 +1097,10 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 *            the file attribute for this.
 	 * @param file
 	 *            non-null
-	 * 
+	 *
 	 * @param relative
 	 *            whether to return relative file paths or absolute ones
-	 * 
+	 *
 	 * @return Will return the first file found to match the given criteria or
 	 *         null if none was found.
 	 */
@@ -1089,7 +1118,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 
 	/**
 	 * Removes optional square brackets from the string s
-	 * 
+	 *
 	 * @param s
 	 * @return
 	 */
@@ -1125,10 +1154,10 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 					if (i < c.length){
 						if (c[i] == '"'){
 							// Parameter is in format "xxx"
-							
+
 							// Skip "
 							i++;
-		
+
 							int startParam = i;
 							i++;
 		                    boolean escaped = false;
@@ -1142,24 +1171,24 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
                                 i++;
 
                             }
-		
+
 							String param = calls.substring(startParam, i);
 		
 							result.add(new String[] { method, param });
 						} else {
 							// Parameter is in format xxx
-							
+
 							int startParam = i;
-	
+
 							while (i < c.length && c[i] != ')') {
 								i++;
 							}
-		
+
 							String param = calls.substring(startParam, i);
-		
+
 							result.add(new String[] { method, param });
-							
-							
+
+
 						}
 					} else {
 						// Incorrecly terminated open brace
@@ -1180,7 +1209,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * Accepts a string like [author:toLowerCase("escapedstring"),toUpperCase],
 	 * whereas the first string signifies the bibtex-field to get while the
 	 * others are the names of layouters that will be applied.
-	 * 
+	 *
 	 * @param fieldAndFormat
 	 * @param entry
 	 * @param database
@@ -1229,7 +1258,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 
 	/**
 	 * Convenience function for absolute search.
-	 * 
+	 *
 	 * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
 	 */
 	public static String findFile(BibtexEntry entry, BibtexDatabase database, String file) {
@@ -1239,7 +1268,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	/**
 	 * Internal Version of findFile, which also accepts a current directory to
 	 * base the search on.
-	 * 
+	 *
 	 */
 	public static String findFile(BibtexEntry entry, BibtexDatabase database, String directory,
 		String file, boolean relative) {
@@ -1254,16 +1283,16 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 			return null;
 
 		String found = findFile(entry, database, root, file);
-                
+
 		if (directory == null || !relative) {
 			return found;
 		}
-                
+
 		if (found != null) {
 			try {
 				/**
 				 * [ 1601651 ] PDF subdirectory - missing first character
-				 * 
+				 *
 				 * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
 				 */
                 // Changed by M. Alver 2007.01.04:
@@ -1420,9 +1449,9 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	/**
 	 * Takes a string that contains bracketed expression and expands each of
 	 * these using getFieldAndFormat.
-	 * 
+	 *
 	 * Unknown Bracket expressions are silently dropped.
-	 * 
+	 *
 	 * @param bracketString
 	 * @param entry
 	 * @param database
@@ -2670,8 +2699,9 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             newList.add(thisEntry);
 
         // Convert to String[][]:
-        String[][] res = new String[newList.size()][newList.get(0).size()];
+        String[][] res = new String[newList.size()][];
         for (int i = 0; i < res.length; i++) {
+            res[i] = new String[newList.get(i).size()];
             for (int j = 0; j < res[i].length; j++) {
                 res[i][j] = newList.get(i).get(j);
             }

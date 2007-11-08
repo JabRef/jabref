@@ -23,6 +23,17 @@
 	- [ 1717849 ] Fixed: Bug in aux import (patch contributed by Kai Eckert)
     - [ 1749613 ] Fixed: About translation
     - [ 1709449 ] Fixed: Clicking a DOI from context menu fails
+2.3
+    - Added handling of unknown file types when synchronizing the file field.
+    - Changed the way customized external file types are stored. Types are now stored in a
+      way analogous to a diff from the default types. This allows default types added in later
+      versions to appear immediately, even if the user has customized the list.
+    - Moved file preferences from General tab to new File tab.
+    - Reduced horizontal size of preferences dialog.
+    - Fixed handling of quotes when using the "abbr" modifier for key generator (Debian bug
+      #448917).
+    - Download file procedure now strips query string in order to find correct file extension
+      (Debian bug #448027).    
 2.3b3
     - Export formats that output the character encoding now use common names for encodings
       instead of Java-specific names.

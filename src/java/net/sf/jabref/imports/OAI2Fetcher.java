@@ -324,7 +324,7 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
             dialog.entryListComplete();
             frame.output("");
         } catch (Exception e) {
-            frame.output(Globals.lang("Error while fetching from OIA2: ") + e.getMessage());
+            frame.output(Globals.lang("Error while fetching from OIA2")+ ": " + e.getMessage());
             e.printStackTrace();
         }
     }

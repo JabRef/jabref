@@ -797,7 +797,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 Object[] options = { Globals.lang("Edit"),
                     Globals.lang("Revert to original source") };
 
-                int answer = JOptionPane.showOptionDialog(frame, Globals.lang("Error: ") + ex.getMessage(),
+                int answer = JOptionPane.showOptionDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(),
                     Globals.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
                     JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
@@ -1130,7 +1130,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         });
 
                     } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Error: ") + ex.getMessage(), Globals
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
                             .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                         fe.setBackground(GUIGlobals.invalidFieldBackground);
                     }

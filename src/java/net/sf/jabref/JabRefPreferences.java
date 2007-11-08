@@ -68,6 +68,10 @@ public class JabRefPreferences {
         CUSTOM_TAB_NAME = "customTabName_",
         CUSTOM_TAB_FIELDS = "customTabFields_";
 
+    // This String is used in the encoded list in prefs of external file type
+    // modifications, in order to indicate a removed default file type:
+    public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
+
     public String WRAPPED_USERNAME;
 
     Preferences prefs;
@@ -355,6 +359,7 @@ public class JabRefPreferences {
 
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
 
+        defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
@@ -813,9 +818,10 @@ public class JabRefPreferences {
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
-        defKeyBinds.put("Synchronize files", "ctrl shift F4");
+        defKeyBinds.put("Synchronize files", "ctrl F4");
         defKeyBinds.put("Synchronize PDF", "shift F4");
-        defKeyBinds.put("Synchronize PS", "ctrl F4");
+        defKeyBinds.put("Synchronize PS", "ctrl shift F4");
+
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
         defKeyBinds.put("Search IEEEXplore", "F8");
@@ -898,42 +904,27 @@ public class JabRefPreferences {
 
     }
 
-    /**
-     * Set up the list of external file types, either from default values, or from values
-     * recorded in Preferences.
-     */
-    public void updateExternalFileTypes() {
-        if (prefs.get("externalFileTypes", null) == null) {
-            externalFileTypes.clear();
-            List<ExternalFileType> list = getDefaultExternalFileTypes();
-            externalFileTypes.addAll(list);
-        }
-        else {
-            String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
-            for (int i = 0; i < vals.length; i++) {
-                ExternalFileType type = new ExternalFileType(vals[i]);
-                externalFileTypes.add(type);
-            }
-        }
-    }
 
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<ExternalFileType>();
-        list.add(new ExternalFileType("PDF", "pdf", get("pdfviewer"), "pdfSmall"));
-        list.add(new ExternalFileType("PostScript", "ps", get("psviewer"), "psSmall"));
-        list.add(new ExternalFileType("Word file", "doc", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("PDF", "pdf", "evince", "pdfSmall"));
+        list.add(new ExternalFileType("PostScript", "ps", "evince", "psSmall"));
+        list.add(new ExternalFileType("Word", "doc", "oowriter", "openoffice"));
         list.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("Excel file", "xls", "oocalc", "openoffice"));
+        list.add(new ExternalFileType("Excel", "xls", "oocalc", "openoffice"));
         list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("PowerPoint file", "ppt", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("PowerPoint", "ppt", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "oowriter", "openoffice"));
         list.add(new ExternalFileType("PNG image", "png", "gimp", "picture"));
         list.add(new ExternalFileType("GIF image", "gif", "gimp", "picture"));
         list.add(new ExternalFileType("JPG image", "jpg", "gimp", "picture"));
-
-        list.add(new ExternalFileType("Text file", "txt", "emacs", "emacs"));
+        list.add(new ExternalFileType("Djvu", "djvu", "evince", "psSmall"));
+        list.add(new ExternalFileType("Text", "txt", "emacs", "emacs"));
+        list.add(new ExternalFileType("LaTeX", "tex", "emacs", "emacs"));
+        list.add(new ExternalFileType("CHM", "chm", "gnochm", "www"));
+        list.add(new ExternalFileType("TIFF image", "tiff", "gimp", "picture"));
         ExternalFileType tp = new ExternalFileType("URL", "html", "firefox", "www");
         list.add(tp);
 
@@ -990,15 +981,54 @@ public class JabRefPreferences {
      *  just new entries.
      */
     public void setExternalFileTypes(List<ExternalFileType> types) {
+
+        // First find a list of the default types:
+        List<ExternalFileType> defTypes = getDefaultExternalFileTypes();
+        // Make a list of types that are unchanged:
+        List<ExternalFileType> unchanged = new ArrayList<ExternalFileType>();
+
         externalFileTypes.clear();
         for (Iterator<ExternalFileType> iterator = types.iterator(); iterator.hasNext();) {
-            externalFileTypes.add(iterator.next());
-        }
-        String[][] array = new String[externalFileTypes.size()][];
-        int i=0;
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
             ExternalFileType type = iterator.next();
+            externalFileTypes.add(type);
+
+            // See if we can find a type with matching name in the default type list:
+            ExternalFileType found = null;
+            for (ExternalFileType defType : defTypes) {
+                if (defType.getName().equals(type.getName())) {
+                    found = defType;
+                    break;
+                }
+            }
+            if (found != null) {
+                // Found it! Check if it is an exact match, or if it has been customized:
+                if (found.equals(type))
+                    unchanged.add(type);
+                else {
+                    // It was modified. Remove its entry from the defaults list, since
+                    // the type hasn't been removed:
+                    defTypes.remove(found);
+                }
+            }
+        }
+
+        // Go through unchanged types. Remove them from the ones that should be stored,
+        // and from the list of defaults, since we don't need to mention these in prefs:
+        for (ExternalFileType type : unchanged) {
+            defTypes.remove(type);
+            types.remove(type);
+        }
+
+        // Now set up the array to write to prefs, containing all new types, all modified
+        // types, and a flag denoting each default type that has been removed:
+        String[][] array = new String[types.size()+defTypes.size()][];
+        int i=0;
+        for (ExternalFileType type : types) {
             array[i] = type.getStringArrayRepresentation();
+            i++;
+        }
+        for (ExternalFileType type : defTypes) {
+            array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
         //System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
@@ -1006,6 +1036,63 @@ public class JabRefPreferences {
     }
 
     
+    /**
+     * Set up the list of external file types, either from default values, or from values
+     * recorded in Preferences.
+     */
+    public void updateExternalFileTypes() {
+        // First get a list of the default file types as a starting point:
+        List<ExternalFileType> types = getDefaultExternalFileTypes();
+        // If no changes have been stored, simply use the defaults:
+        if (prefs.get("externalFileTypes", null) == null) {
+            externalFileTypes.clear();
+            externalFileTypes.addAll(types);
+            return;
+        }
+        // Read the prefs information for file types:
+        String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
+        for (int i = 0; i < vals.length; i++) {
+            if ((vals[i].length == 2) && (vals[i][1].equals(FILE_TYPE_REMOVED_FLAG))) {
+                // This entry indicates that a default entry type should be removed:
+                ExternalFileType toRemove = null;
+                for (ExternalFileType type : types) {
+                    if (type.getName().equals(vals[i][0])) {
+                        toRemove = type;
+                        break;
+                    }
+                }
+                // If we found it, remove it from the type list:
+                if (toRemove != null)
+                    types.remove(toRemove);
+            }
+            else {
+                // A new or modified entry type. Construct it from the string array:
+                ExternalFileType type = new ExternalFileType(vals[i]);
+                // Check if there is a default type with the same name. If so, this is a
+                // modification of that type, so remove the default one:
+                ExternalFileType toRemove = null;
+                for (ExternalFileType defType : types) {
+                    if (type.getName().equals(defType.getName())) {
+                        toRemove = defType;
+                        break;
+                    }
+                }
+                // If we found it, remove it from the type list:
+                if (toRemove != null) {
+                    types.remove(toRemove);
+                }
+                
+                // Then add the new one:
+                types.add(type);
+            }
+        }
+
+        // Finally, build the list of types based on the modified defaults list:
+        for (ExternalFileType type : types) {
+            externalFileTypes.add(type);
+        }
+    }
+
 
     /**
      * Removes all information about custom entry types with tags of

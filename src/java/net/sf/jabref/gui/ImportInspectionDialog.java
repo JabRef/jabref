@@ -1097,7 +1097,7 @@ public class ImportInspectionDialog extends JDialog {
                 return;
             entry = selectionModel.getSelected().get(0);
             FileListEntry flEntry = new FileListEntry("", "", null);
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, metaData);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
             editor.setVisible(true);                                                 
             if (editor.okPressed()) {
                 FileListTableModel model = new FileListTableModel();

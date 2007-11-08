@@ -198,10 +198,7 @@ public class DroppedFileHandler {
         boolean isSingle = xmpEntriesInFile.size() == 1;
         BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
 
-        /*reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
-            isSingle, (isSingle ? single.getCiteKey() : Globals.lang("Cannot rename for several entries.")),
-            false, !isSingle);*/
-
+       
         boolean success = true;
 
         String destFilename;

@@ -288,7 +288,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private boolean editListEntry(FileListEntry entry) {
         if (editor == null) {
-            editor = new FileListEntryEditor(frame, entry, false, metaData);
+            editor = new FileListEntryEditor(frame, entry, false, true, metaData);
         }
         else
             editor.setEntry(entry);

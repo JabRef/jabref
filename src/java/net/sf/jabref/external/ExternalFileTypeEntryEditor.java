@@ -98,9 +98,10 @@ public class ExternalFileTypeEntryEditor {
 
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                diag.dispose();
-                storeSettings(ExternalFileTypeEntryEditor.this.entry);
                 okPressed = true;
+                storeSettings(ExternalFileTypeEntryEditor.this.entry);
+                diag.dispose();
+                                
             }
         });
         cancel.addActionListener(new ActionListener() {

@@ -150,4 +150,26 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     public ExternalFileType copy() {
         return new ExternalFileType(name, extension, openWith, iconName);
     }
+
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    /**
+     * We define two file type objects as equal if their name, extension, openWith and
+     * iconName are equal.
+     *
+     * @param object The file type to compare with.
+     * @return true if the file types are equal.
+     */
+    public boolean equals(Object object) {
+        ExternalFileType other = (ExternalFileType)object;
+        if (other == null)
+            return false;
+        return (name == null ? other.name == null : name.equals(other.name))
+                && (extension == null ? other.extension == null : extension.equals(other.extension))
+                && (openWith== null ? other.openWith == null : openWith.equals(other.openWith))
+                && (iconName== null ? other.iconName == null : iconName.equals(other.iconName));
+    }
 }

@@ -315,11 +315,11 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
-        private JFrame frame = null;
+        private JabRefFrame frame = null;
         private JDialog dialog = null;
         ExternalFileTypeEditor editor = null;
 
-        public EditExternalFileTypesAction(JFrame frame) {
+        public EditExternalFileTypesAction(JabRefFrame frame) {
             super();
             putValue(NAME, "Manage external file types");
             this.frame = frame;
@@ -340,6 +340,10 @@ public class ExternalFileTypeEditor extends JDialog {
             }
             editor.setValues();
             editor.setVisible(true);
+            if (frame != null) {
+                if (frame.basePanel() != null)
+                    frame.basePanel().mainTable.repaint();
+            }
         }
     }
 

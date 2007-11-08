@@ -87,6 +87,7 @@ public class PrefsDialog3 extends JDialog {
 		// ----------------------------------------------------------------
 		ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
 		tabs.add(new GeneralTab(frame, prefs));
+        tabs.add(new FileTab(frame, prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
 		tabs.add(new AppearancePrefsTab(prefs));
@@ -102,11 +103,13 @@ public class PrefsDialog3 extends JDialog {
 		Iterator<PrefsTab> it = tabs.iterator();
 		String[] names = new String[tabs.size()];
 		int i = 0;
-		while (it.hasNext()) {
+        //ArrayList<Component> comps = new ArrayList<Component>();
+        while (it.hasNext()) {
 			PrefsTab tab = (PrefsTab) it.next();
 			names[i++] = tab.getTabName(); 
 			main.add((Component) tab, tab.getTabName());
-		}
+            //comps.add((Component)tab); // for debug only
+        }
 
 		upper.setBorder(BorderFactory.createEtchedBorder());
 
@@ -214,7 +217,13 @@ public class PrefsDialog3 extends JDialog {
 		setValues();
 
 		pack(); // setSize(440, 500);
-	}
+
+        /** Look through component sizes to find which tab is to blame
+         *  when the dialog grows too large:
+        for (Component co : comps) {
+            System.out.println(co.getPreferredSize());
+        }*/
+    }
 
 	class OkAction extends AbstractAction {
 		public OkAction() {

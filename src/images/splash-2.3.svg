@@ -14,13 +14,12 @@
    inkscape:export-filename="/home/alver/jabref_head/jabref/src/images/jabref_splash-2.2.png"
    sodipodi:docname="splash-2.3.svg"
    sodipodi:docbase="/home/alver/jabref/src/images"
-   inkscape:version="0.45"
+   inkscape:version="0.45.1"
    sodipodi:version="0.32"
    id="svg2138"
    height="1052.3622047"
    width="744.09448819"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   sodipodi:modified="TRUE">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2140">
     <linearGradient
@@ -273,22 +272,5 @@
          x="462.20135"
          y="426.2529"
          style="font-size:119.00263214px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#727888;stroke-width:1.80000031;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;font-family:Bitstream Vera Sans">2.3</tspan></text>
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot2272"
-       style="font-size:64px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ef2421;fill-opacity:0.68208092;font-family:Bitstream Vera Sans"
-       transform="matrix(0.9738368,-0.2272485,0.2272485,0.9738368,-57.970505,148.42613)"
-       inkscape:transform-center-x="30.526535"
-       inkscape:transform-center-y="-9.9731132"
-       inkscape:export-filename="/home/alver/jabref/src/images/splash.png"
-       inkscape:export-xdpi="75"
-       inkscape:export-ydpi="75"><flowRegion
-         id="flowRegion2274"><rect
-           id="rect2276"
-           width="244"
-           height="120"
-           x="446"
-           y="418.36218"
-           style="font-size:64px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ef2421;fill-opacity:0.68208092;font-family:Bitstream Vera Sans" /></flowRegion><flowPara
-         id="flowPara2278">beta</flowPara></flowRoot>  </g>
+  </g>
 </svg>

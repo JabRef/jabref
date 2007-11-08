@@ -172,9 +172,9 @@ public class ExternalFilePanel extends JPanel {
 					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
 						"Error writing XMP to file: %0", e.getLocalizedMessage()), Globals
 						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-					Globals.logger(Globals.lang("Error while writing XMP %0", finalFile
+					Globals.logger(Globals.lang("Error writing XMP to file: %0", finalFile
 						.getAbsolutePath()));
-					output(Globals.lang("Error writing XMP to '%0'...", finalFile.getName()));
+					output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
 					
 				} catch (TransformerException e) {
 					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
@@ -312,8 +312,8 @@ public class ExternalFilePanel extends JPanel {
 					try {
 						udl.download();
 					} catch (IOException e2) {
-						JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL: "
-							+ e2.getMessage()), Globals.lang("Download file"),
+						JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL")+": "
+							+ e2.getMessage(), Globals.lang("Download file"),
 							JOptionPane.ERROR_MESSAGE);
 						Globals.logger("Error while downloading " + url.toString());
 						return;

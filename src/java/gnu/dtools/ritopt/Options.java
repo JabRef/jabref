@@ -247,7 +247,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
     /**
      * Returns the program name displayed in the usage.
      *
-     * @param The program name.
+     * @returns The program name.
      */
 
     public String getUsageProgram() {
@@ -257,7 +257,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
     /**
      * Returns the version of the program.
      *
-     * @param The version.
+     * @returns The version.
      */
 
     public String getVersion() {
@@ -357,14 +357,6 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
         defaultOptionFilename = fn;
     }
 
-    /**
-     * Sets the debugging flag.
-     *
-     * @param flag    The value to set the debugging flag.
-
-    public void setDebugFlag( boolean flag ) {
-        debugFlag = flag;
-    }
 
     /**
      * Displays the program's help which includes a description of each
@@ -561,7 +553,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      * Splits a string representing command line arguments into several
      * strings.
      *
-     * @param split   The string to split.
+     * @param str   The string to split.
      *
      * @return  The splitted string.
      */
@@ -667,7 +659,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
     /**
      * Processes an array of strings representing command line arguments.
      *
-     * @param  The arguments to process.
+     * @param args arguments to process.
      *
      * @return The leftover arguments.
      */

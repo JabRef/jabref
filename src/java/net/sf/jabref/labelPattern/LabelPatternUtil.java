@@ -148,13 +148,13 @@ public class LabelPatternUtil {
                                 // Abbreviate - that is,
                                 // System.out.println(_sbvalue.toString());
                                 StringBuffer abbr = new StringBuffer();
-                                String[] words = label.toString()
-                                    .replaceAll("[\\{\\}]", "")
-                                    .split("[ \r\n]");// split("\\b");
+                                String[] words = label.toString().replaceAll("[\\{\\}']","")
+                                        .split("[ \r\n\"]");
                                 for (int word = 0; word < words.length; word++)
                                     if (words[word].length() > 0)
                                         abbr.append(words[word].charAt(0));
                                 label = abbr.toString();
+  
                             } else {
                                 Globals
                                     .logger("Key generator warning: unknown modifier '"
@@ -172,11 +172,6 @@ public class LabelPatternUtil {
             System.err.println(e);
         }
 
-        /**
-         * Edited by Morten Alver 2004.02.04. We now have a system for easing
-         * key duplicate prevention, so I am changing this method to conform to
-         * it
-         */
 
         // Remove all illegal characters from the key.
         _label = Util.checkLegalKey(_sb.toString());

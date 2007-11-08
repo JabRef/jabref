@@ -40,8 +40,18 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
+<<<<<<< .working
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+=======
+import javax.swing.*;
+import java.util.*;
+import java.io.File;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.*;
+
+>>>>>>> .merge-right.r2471
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -57,7 +67,7 @@ public class SynchronizeFileField extends AbstractWorker {
     private SynchronizeFileField.OptionsDialog optDiag = null;
 
     Object[] brokenLinkOptions =
-            {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
+            {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
                     Globals.lang("Quit synchronization")};
 
     private boolean goOn = true, autoSet = true, checkExisting = true;
@@ -167,7 +177,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
-                    tableModel.setContent(old);
+                    tableModel.setContentDontGuessTypes((String)old);
                     for (int j=0; j<tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
@@ -175,7 +185,10 @@ public class SynchronizeFileField extends AbstractWorker {
                         if (httpLink)
                             continue; // Don't check the remote file.
                         // TODO: should there be an option to check remote links?
-                        
+
+                        // A variable to keep track of whether this link gets deleted:
+                        boolean deleted = false;
+
                         // Get an absolute path representation:
                         File file = Util.expandFilename(flEntry.getLink(), new String[]{dir, "."});
                         if ((file == null) || !file.exists()) {
@@ -189,12 +202,13 @@ public class SynchronizeFileField extends AbstractWorker {
                                 case 1:
                                     // Assign new file.
                                     FileListEntryEditor flEditor = new FileListEntryEditor
-                                            (panel.frame(), flEntry, false, panel.metaData());
+                                            (panel.frame(), flEntry, false, true, panel.metaData());
                                     flEditor.setVisible(true);
                                     break;
                                 case 2:
                                     // Clear field
                                     tableModel.removeEntry(j);
+                                    deleted = true; // Make sure we don't investigate this link further.
                                     j--; // Step back in the iteration, because we removed an entry.
                                     break;
                                 case 3:
@@ -204,7 +218,47 @@ public class SynchronizeFileField extends AbstractWorker {
                             brokenLinks++;
                         }
 
+                        // Unless we deleted this link, see if its file type is recognized:
+                        if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
+                            String[] options = new String[]
+                                    {Globals.lang("Define '%0'", flEntry.getType().getName()),
+                                    Globals.lang("Change file type"), Globals.lang("Cancel")};
+                            String defOption = options[0];
+                            int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
+                                    flEntry.getType().getName()),
+                                    Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE, null, options, defOption);
+                            if (answer == JOptionPane.CANCEL_OPTION) {
+                                // User doesn't want to handle this unknown link type.
+                            }
+                            else if (answer == JOptionPane.YES_OPTION) {
+                                // User wants to define the new file type. Show the dialog:
+                                ExternalFileType newType = new ExternalFileType(flEntry.getType().getName(), "", "", "new");
+                                ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
+                                editor.setVisible(true);
+                                if (editor.okPressed()) {
+                                    // Get the old list of types, add this one, and update the list in prefs:
+                                    java.util.List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+                                    ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+                                    for (int k = 0; k < oldTypes.length; k++) {
+                                        fileTypes.add(oldTypes[k]);
+                                    }
+                                    fileTypes.add(newType);
+                                    Collections.sort(fileTypes);
+                                    Globals.prefs.setExternalFileTypes(fileTypes);
+                                    panel.mainTable.repaint();
+                                }
+                            }
+                            else {
+                                // User wants to change the type of this link.
+                                // First get a model of all file links for this entry:
+                                FileListEntryEditor editor = new FileListEntryEditor
+                                        (panel.frame(), flEntry, false, true, panel.metaData());
+                                editor.setVisible(true);
+                            }
+                        }
                     }
+
                     if (!tableModel.getStringRepresentation().equals(old)) {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();

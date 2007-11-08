@@ -1,5 +1,12 @@
 package net.sf.jabref.gui;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
+
+import javax.swing.table.AbstractTableModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -89,10 +96,14 @@ public class FileListTableModel extends AbstractTableModel {
      * @param value The string representation
      */
     public void setContent(String value) {
-        setContent(value, false);
+        setContent(value, false, true);
     }
 
-    private FileListEntry setContent(String value, boolean firstOnly) {
+    public void setContentDontGuessTypes(String value) {
+        setContent(value, false, false);
+    }
+
+    private FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
         if (value == null)
             value = "";
         ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
@@ -126,9 +137,9 @@ public class FileListTableModel extends AbstractTableModel {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
                 if (firstOnly)
-                    return decodeEntry(thisEntry);
+                    return decodeEntry(thisEntry, deduceUnknownTypes);
                 else {
-                    newList.add(decodeEntry(thisEntry));
+                    newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
                     thisEntry.clear();
                 }
             }
@@ -139,9 +150,9 @@ public class FileListTableModel extends AbstractTableModel {
             thisEntry.add(sb.toString());
         if (thisEntry.size() > 0) {
             if (firstOnly)
-                return decodeEntry(thisEntry);
+                return decodeEntry(thisEntry, deduceUnknownTypes);
             else
-                newList.add(decodeEntry(thisEntry));
+                newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
         }
           
         synchronized (list) {
@@ -174,14 +185,34 @@ public class FileListTableModel extends AbstractTableModel {
      */
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
-        FileListEntry entry = tm.setContent(content, true);
+        FileListEntry entry = tm.setContent(content, true, true);
         if (entry == null || entry.getType()==null )
             return null;
         return entry.getType().getIconLabel();
     }
 
     
+    private FileListEntry decodeEntry(ArrayList contents, boolean deduceUnknownType) {
+        ExternalFileType type = Globals.prefs.getExternalFileTypeByName
+                        (getElementIfAvailable(contents, 2));
+        if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
+            // No file type was recognized. Try to find a usable file type based
+            // on the extension:
+            ExternalFileType typeGuess = null;
+            String link = getElementIfAvailable(contents, 1);
+            int index = link.lastIndexOf('.');
+            if ((index >= 0) && (index < link.length()-1)) {
+                String extension = link.substring(index+1);
+                typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
+            }
+            if (typeGuess != null)
+                type = typeGuess;
 
+        }
+        return new FileListEntry(getElementIfAvailable(contents, 0),
+                getElementIfAvailable(contents, 1),
+                type);
+    }
 
 
     private String getElementIfAvailable(ArrayList<String> contents, int index) {

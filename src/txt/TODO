@@ -9,14 +9,6 @@ Chris:
   
 Morten:
 
-* First table column now takes crossrefs into account for completeness. But can we ensure
-  that the first column is updated when modification of a different entry makes an entry
-  complete (without sacrificing performance)?                                                                                        
-* Look into "DOS short path" bug report.
-* Exporting and "file" field:
-  - Endnote and MODS export "url", not "file".
-  - BibteXML exports both "url", "pdf" and url/pdf from "file". May give doubles.
-
 * [POSTPONE] Strange bug: when editing a field in entry editor, then clicking an entry of different type
    in the table, current entry is stored, but the selection drops back to the first entry.
 * [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.

@@ -24,8 +24,10 @@ public class ExternalTab extends JPanel implements PrefsTab {
     ItemListener regExpListener;
 
 	JCheckBox useRegExpComboBox;
+    JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key")),
+        matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
-	public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs, 
+    public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs,
                        HelpDialog helpDialog) {
 		_prefs = prefs;
 		_frame = frame;
@@ -46,8 +48,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         editFileTypes = new JButton(Globals.lang("Manage external file types"));
 
         regExpTextField = new JTextField(30);
-
-		useRegExpComboBox = new JCheckBox(Globals.lang("Use Regular Expression Search"));
+        useRegExpComboBox = new JCheckBox(Globals.lang("Use Regular Expression Search"));
 		regExpListener = new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				regExpTextField.setEditable(useRegExpComboBox.isSelected());
@@ -66,13 +67,14 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
         editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
 
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(matchExactKeyOnly);
+        bg.add(matchStartsWithKey);
+
         BrowseAction browse;
 
 		FormLayout layout = new FormLayout(
-			"1dlu, 8dlu, left:pref, 4dlu, fill:200dlu, 4dlu, fill:pref",// 4dlu,
-																		// left:pref,
-																		// 4dlu",
-			"");
+			"1dlu, 8dlu, left:pref, 4dlu, fill:170dlu, 4dlu, fill:pref","");
 
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
@@ -112,11 +114,15 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.nextLine();
 
 		builder.append(new JPanel());
-		builder.append(useRegExpComboBox);
-		builder.append(regExpTextField);
-		HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
+        builder.append(matchStartsWithKey, 3);
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(matchExactKeyOnly, 3);
+        //builder.append(useRegExpComboBox);
+		//builder.append(regExpTextField);
+		/*HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
 			Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
-		builder.append(helpAction.getIconButton());
+		builder.append(helpAction.getIconButton());*/
 		builder.nextLine();
 
 		builder.appendSeparator(Globals.lang("External programs"));
@@ -228,7 +234,12 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
 		useRegExpComboBox.setSelected(_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY));
 		regExpListener.itemStateChanged(null);
-	}
+
+        if (_prefs.getBoolean("autolinkExactKeyOnly"))
+            matchExactKeyOnly.setSelected(true);
+        else
+            matchStartsWithKey.setSelected(true);
+    }
 
 	public void storeSettings() {
 
@@ -250,7 +261,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put("vimServer", vimServer.getText());
         _prefs.put("latexEditorPath", led.getText());
         _prefs.put("citeCommand", citeCommand.getText());
-	}
+        _prefs.putBoolean("autolinkExactKeyOnly", matchExactKeyOnly.isSelected());
+    }
 
 	public boolean readyToClose() {
 		return true;

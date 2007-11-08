@@ -66,8 +66,8 @@ public class DownloadExternalFile {
                     try {
                         udl.download();
                     } catch (IOException e2) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL: "
-                                + e2.getMessage()), Globals.lang("Download file"),
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
+                                + e2.getMessage(), Globals.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
                         Globals.logger("Error while downloading " + url.toString());
                         return;
@@ -99,7 +99,7 @@ public class DownloadExternalFile {
         File file = new File(new File(suggestDir), suggestedName);
         FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getPath() : "",
                 Globals.prefs.getExternalFileTypeByExt(suffix));
-        editor = new FileListEntryEditor(frame, entry, true, metaData);
+        editor = new FileListEntryEditor(frame, entry, true, false, metaData);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
@@ -223,6 +223,17 @@ public class DownloadExternalFile {
      * @return The suffix, excluding the dot (e.g. ".pdf")
      */
     public String getSuffix(String link) {
+        try {
+            // Try to strip the query string, if any, to get the correct suffix:
+            URL url = new URL(link);
+            if ((url.getQuery() != null) && (url.getQuery().length() < link.length()-1)) {
+                link = link.substring(0, link.length()-url.getQuery().length()-1);
+                System.out.println(link);
+            }
+        } catch (MalformedURLException e) {
+            // Don't report this error, since this getting the suffix is a non-critical
+            // operation, and this error will be triggered and reported elsewhere.
+        }
         int index = link.lastIndexOf('.');
         if ((index <= 0) || (index == link.length() - 1)) // No occurence, or at the end
             return null;

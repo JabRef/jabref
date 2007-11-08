@@ -27,7 +27,7 @@ public class ColorSetupPanel extends JPanel {
     public ColorSetupPanel() {
 
         FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
+                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         buttons.add(new ColorButton("tableText", Globals.lang("Table text color")));

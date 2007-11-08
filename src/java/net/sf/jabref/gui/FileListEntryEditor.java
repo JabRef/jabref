@@ -33,6 +33,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -63,10 +64,10 @@ public class FileListEntryEditor {
     private AbstractAction okAction;
     private FileListEntry entry;
     private MetaData metaData;
-    private boolean okPressed = false;
+    private boolean okPressed = false, okDisabledExternally = false;
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
-                               MetaData metaData) {
+                               boolean showOpenButton, MetaData metaData) {
         this.entry = entry;
         this.metaData = metaData;
 
@@ -91,35 +92,38 @@ public class FileListEntryEditor {
         types = new JComboBox();
         types.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                ok.setEnabled(types.getSelectedItem() != null);
+                if (!okDisabledExternally)
+                    ok.setEnabled(types.getSelectedItem() != null);
             }
         });
         
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(Globals.lang("Link"));
         builder.append(link);
         BrowseListener browse = new BrowseListener(frame, link);
         JButton browseBut = new JButton(Globals.lang("Browse"));
         browseBut.addActionListener(browse);
         builder.append(browseBut);
+        if (showOpenButton)
+            builder.append(open);
         builder.nextLine();
         builder.append(Globals.lang("Description"));
-        builder.append(description);
+        builder.append(description, 3);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         builder.nextLine();
         builder.append(Globals.lang("File type"));
-        builder.append(types);
+        builder.append(types, 3);
         if (showProgressBar) {
             builder.nextLine();
             builder.append(downloadLabel);
-            builder.append(prog);
+            builder.append(prog, 3);
         }
         
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        bb.addGridded(open);
-        bb.addRelatedGap();
+        //bb.addGridded(open);
+        //bb.addRelatedGap();
         bb.addGridded(ok);
         bb.addGridded(cancel);
         bb.addGlue();
@@ -191,7 +195,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType)types.getSelectedItem();
         if (type != null)
             try {
-                Util.openExternalFileAnyFormat(metaData, link.getText(), entry.getType());
+                Util.openExternalFileAnyFormat(metaData, link.getText(), type);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -202,6 +206,7 @@ public class FileListEntryEditor {
     }
 
     public void setOkEnabled(boolean enabled) {
+        okDisabledExternally = !enabled;
         ok.setEnabled(enabled);
     }
 
@@ -227,12 +232,12 @@ public class FileListEntryEditor {
     public void setValues(FileListEntry entry) {
         description.setText(entry.getDescription());
         link.setText(entry.getLink());
-        if (link.getText().length() > 0)
-            checkExtension();
+        //if (link.getText().length() > 0)
+        //    checkExtension();
         types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        if (entry.getType() != null)
+        if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType))
             types.setSelectedItem(entry.getType());
         // If the entry has a link but not a file type, try to deduce the file type:
         else if ((entry.getLink() != null) && (entry.getLink().length() > 0)) {
