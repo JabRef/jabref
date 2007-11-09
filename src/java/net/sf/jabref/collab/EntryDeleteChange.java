@@ -22,7 +22,7 @@ public class EntryDeleteChange extends Change {
 
     // Compare the deleted entry in memory with the one in the tmpfile. The
     // entry could have been removed in memory.
-    matchWithTmp = Util.compareEntriesStrictly(memEntry, tmpEntry);
+    matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
 
     // Check if it has been modified locally, since last tempfile was saved.
     isModifiedLocally = !(matchWithTmp > 1);

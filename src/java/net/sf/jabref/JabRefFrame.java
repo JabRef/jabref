@@ -2049,8 +2049,8 @@ class FetchCiteSeerAction
             loop: for (Iterator<String> i2=database.getKeySet().iterator();
                        i2.hasNext();) {
                 BibtexEntry existingEntry = database.getEntryById(i2.next());
-                if (Util.isDuplicate(entry, existingEntry,
-                                     Globals.duplicateThreshold)) {
+                if (DuplicateCheck.isDuplicate(entry, existingEntry
+                )) {
                     DuplicateResolverDialog drd = new DuplicateResolverDialog
                         (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                     drd.setVisible(true);

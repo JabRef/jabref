@@ -113,7 +113,7 @@ public void run() {
         if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
             // Check if they are exact duplicates:
             boolean askAboutExact = false;
-            if (Util.compareEntriesStrictly(be[0], be[1]) > 1) {
+            if (DuplicateCheck.compareEntriesStrictly(be[0], be[1]) > 1) {
                 if (autoRemoveExactDuplicates) {
                     toRemove.add(be[1]);
                     duplicateCounter++;
@@ -184,8 +184,8 @@ class SearcherThread extends Thread {
   public void run() {
     for (int i = 0; (i < bes.length - 1) && !finished ; i++) {
       for (int j = i + 1; (j < bes.length) && !finished ; j++) {
-        boolean eq = Util.isDuplicate(bes[i], bes[j],
-                                      Globals.duplicateThreshold);
+        boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]
+        );
 
         // If (suspected) duplicates, add them to the duplicates vector.
         if (eq)

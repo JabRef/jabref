@@ -9,18 +9,19 @@ Chris:
   
 Morten:
 
-* [POSTPONE] Strange bug: when editing a field in entry editor, then clicking an entry of different type
+* Improve duplicate check.
+* "Move/rename linked file" feature
+* Add "Copy all externally linked files for this set of entries"-feature.
+  Basic functionality in AccessLinksForEntries.
+* Strange bug: when editing a field in entry editor, then clicking an entry of different type
    in the table, current entry is stored, but the selection drops back to the first entry.
+* Problem setting today with Microba calendar.
+
 * [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.
   - workaround is to autodisable native file dialog for dir selection.
 
 * [OK? Extension fields only] MODS exports "file" in raw form.
-
-* [POSTPONE] Problem setting today with Microba calendar.
 * [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
-* Improve Help information for external file links
-* [POSTPONE] Add "Copy all externally linked files for this set of entries"-feature.
-  Basic functionality in AccessLinksForEntries.
 * [POSTPONE] Fix Save/Export file dialog stuff
 * [POSTPONE] Look up Vista problem with opening file chooser:
     Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException:

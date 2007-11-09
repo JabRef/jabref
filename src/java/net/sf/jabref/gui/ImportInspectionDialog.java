@@ -266,7 +266,7 @@ public class ImportInspectionDialog extends JDialog {
             // We exploit the entry's group status for indicating duplicate status.
             // Checking duplicates means both checking against the background database (if
             // applicable) and against entries already in the table.
-            if (((panel != null) && (Util.containsDuplicate(panel.database(), entry) != null))
+            if (((panel != null) && (DuplicateCheck.containsDuplicate(panel.database(), entry) != null))
                 || (internalDuplicate(this.entries, entry) != null)) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
@@ -288,7 +288,7 @@ public class ImportInspectionDialog extends JDialog {
         for (BibtexEntry othEntry : entries) {
             if (othEntry == entry)
                 continue; // Don't compare the entry to itself
-            if (Util.isDuplicate(entry, othEntry, Globals.duplicateThreshold))
+            if (DuplicateCheck.isDuplicate(entry, othEntry))
                 return othEntry;
         }
         return null;
@@ -920,7 +920,7 @@ public class ImportInspectionDialog extends JDialog {
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibtexEntry first = sortedList.get(row);
-                BibtexEntry other = Util.containsDuplicate(panel.database(), first);
+                BibtexEntry other = DuplicateCheck.containsDuplicate(panel.database(), first);
                 if (other != null) {
                     // This will be true if the duplicate is in the existing
                     // database.

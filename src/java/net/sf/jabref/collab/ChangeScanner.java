@@ -137,7 +137,7 @@ public class ChangeScanner extends Thread {
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
             if (!used.contains(""+piv2) && (piv2<disk.getEntryCount())) {
-                comp = Util.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
+                comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
             }
             if (comp > 1) {
                 used.add(""+piv2);
@@ -149,7 +149,7 @@ public class ChangeScanner extends Thread {
             if (piv2 < disk.getEntryCount()-1) {
                 for (int i = piv2+1; i < disk.getEntryCount(); i++) {
                     if (!used.contains(""+i))
-                        comp = Util.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
+                        comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
                     else
                         comp = -1;
 
@@ -184,7 +184,7 @@ public class ChangeScanner extends Thread {
                 if (piv2 < disk.getEntryCount()-1) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
                         if (!used.contains(""+i)) {
-                            comp = Util.compareEntriesStrictly(tmp.getEntryAt(piv1),
+                            comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
                             disk.getEntryAt(i));
                         }
                         else
@@ -239,7 +239,7 @@ public class ChangeScanner extends Thread {
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;
                     for (int j = 0; j < mem.getEntryCount(); j++) {
-                        if (Util.compareEntriesStrictly(mem.getEntryAt(j),
+                        if (DuplicateCheck.compareEntriesStrictly(mem.getEntryAt(j),
                             disk.getEntryAt(i)) >= 1) {
                             hasAlready = true;
                             break;
@@ -271,7 +271,7 @@ public class ChangeScanner extends Thread {
         double comp = -1;
         int found = 0;
         loop: for (int i=0; i<neu.getEntryCount(); i++) {
-            double res = Util.compareEntriesStrictly(old.getEntryAt(index),
+            double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index),
             neu.getEntryAt(i));
             if (res > comp) {
                 comp = res;

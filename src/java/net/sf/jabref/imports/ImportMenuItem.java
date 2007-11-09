@@ -156,7 +156,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             try {
                                 // Check if the entry is a duplicate of an existing one:
                                 boolean keepEntry = true;
-                                BibtexEntry duplicate = Util.containsDuplicate(toAddTo, entry);
+                                BibtexEntry duplicate = DuplicateCheck.containsDuplicate(toAddTo, entry);
                                 if (duplicate != null) {
                                     int answer = DuplicateResolverDialog.resolveDuplicateInImport
                                             (frame, duplicate, entry);

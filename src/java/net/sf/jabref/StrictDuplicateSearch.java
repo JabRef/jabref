@@ -44,7 +44,7 @@ public class StrictDuplicateSearch extends Thread {
             for (int j = i + 1; j<bes.length; j++) {
                 // We only check the entries if none of the two are already marked for removal.
                 if (!toRemove.contains(bes[i]) && !toRemove.contains(bes[j]) && 
-                    Util.compareEntriesStrictly(bes[i], bes[j]) > 1) {
+                    DuplicateCheck.compareEntriesStrictly(bes[i], bes[j]) > 1) {
                     // These two entries are exactly the same, so we can remove one.                    
                     if (!toRemove.contains(bes[i]) && !toRemove.contains(bes[j])) {
                         toRemove.add(bes[j]);

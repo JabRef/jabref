@@ -7,10 +7,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
@@ -32,11 +29,11 @@ public class EntryChange extends Change {
 
     // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
     // locally as well, since last tempfile was saved.
-    isModifiedLocally = ! (Util.compareEntriesStrictly(memEntry, tmpEntry) > 1);
+    isModifiedLocally = ! (DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) > 1);
 
     // Another (unlikely?) possibility is that both disk and mem version has been modified
     // in the same way. Check for this, too.
-    modificationsAgree = (Util.compareEntriesStrictly(memEntry, diskEntry) > 1);
+    modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
 
     //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
     //        +" Modifications agree: "+modificationsAgree);
