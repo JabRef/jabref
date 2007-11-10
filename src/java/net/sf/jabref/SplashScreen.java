@@ -1,7 +1,13 @@
 package net.sf.jabref;
 
 //import javax.swing.*;
-import java.awt.*;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.net.URL;
 
 /**
@@ -35,11 +41,14 @@ public class SplashScreen extends Window {
         int imgHeight = splashImage.getHeight(this);  
 
         setSize(imgWidth, imgHeight);
-        Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocationRelativeTo(null);
+        
+        /* Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(
             (screenDim.width - imgWidth) / 2,
             (screenDim.height - imgHeight) / 2
         );
+        */
 
     }
     
