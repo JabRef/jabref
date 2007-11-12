@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body text="#275856">
+    <basefont size="4"
+          color="#2F4958"
+          face="arial" />
+
+    <h1>JabRef Plugin System</h1>
+
+    <p>Starting with 2.4b1, JabRef can be extended using a plugin system which was 
+    build using Java Plugin Framework (JPF).</p>
+
+    <p>To <i>use plugins</i> simply put the jar file of the plugin in a folder called <code>plugins</code> in the
+    folder where the JabRef.jar is located. When starting up, JabRef will print a list of all plugins loaded.</p>
+    
+    <h2>How to write a plugin</h2>
+    
+    <p>JabRef offers the following extension-points for developers:</p>
+    <ul>
+      <li><code>ImportFormat</code> - Add importers to JabRef accessible from the 'Import into ... database'.</li> 
+      <li><code>EntryFetcher</code> - Add access to databases like Citeseer or Medline to the <i>Web Search</i> menu.</li>
+      <li><code>ExportFormatTemplate</code> - Add a template based export like the ones accessible using the <i>Manage Custom Exports</i>.</li>
+      <li><code>ExportFormat</code> - Add an export filter to JabRef's export dialog, that is more complicated than the simple template based one.</li>
+      <li><code>ExportFormatProvider</code> - A more powerful way to add export formats to JabRef.</li> 
+      <li><code>LayoutFormatter</code> - Add formatters that can be used in the layout based exporters.</li>  
+	</ul>	      
+    
+    <p>These extension-points are defined in the <code>plugin.xml</code> of the JabRef-core-plugin,
+    which can be found in <code>JabRef/src/plugins/net.sf.jabref.core/</code>.</p>
+    
+    <p>To start developing follow these rough steps:</p>
+    <ol>
+      <li>Checkout the JabRef trunk from subversion (<code>https://jabref.svn.sourceforge.net/svnroot/jabref/trunk</code>).
+    This contains both JabRef itself and plug-ins contributed so far to JabRef (you don't need the htdocs folder), which make great starting points for your own plugins.</li>
+      <li>Compile JabRef using <code>ant jars</code>.</li>
+      <li>Create your own project and define your extension in your own plugin.xml that satisfy the extension points of the core plugin.xml. 
+      In particular make sure that:
+      <ul>
+        <li>...your plugin.xml has a <code>requires</code>-section that imports the core plugin (<code>net.sf.jabref.core</code>).</li>
+        <li>...your plugin.xml has a <code>runtime</code>-section, where you tell JPF, where in your project you have stored your class files and resources.</li>
+      </ul>
+      </li>
+      <li>Create a jar of your project and put it into the <code>plugins</code>-folder of JabRef.</li>
+      <li>Your plugin should be loaded when you run JabRef from the jar.</li>
+    </ol>
+
+	<p>Feel free to ask us questions related to the plugin system on the mailing-list!</p>     
+
+</body>
+</html>
