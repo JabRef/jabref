@@ -5,12 +5,18 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class GeneralTab extends JPanel implements PrefsTab {
@@ -104,9 +110,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(memoryStick, 13);
         
         // Create a new panel with its own FormLayout for the last items:
-        FormLayout layout2 = new FormLayout
-                ("left:pref, 8dlu, fill:50dlu, 4dlu, left:pref, 4dlu, left:pref, 4dlu, fill:50dlu, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
         builder.append(useOwner, 3);
         builder.append(defOwnerField);
         builder.append(overwriteOwner);

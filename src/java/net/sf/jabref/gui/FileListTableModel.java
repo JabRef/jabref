@@ -1,20 +1,16 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
-
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -163,16 +159,6 @@ public class FileListTableModel extends AbstractTableModel {
         return null;
     }
 
-
-    private FileListEntry decodeEntry(ArrayList<String> contents) {
-        return new FileListEntry(getElementIfAvailable(contents, 0),
-                getElementIfAvailable(contents, 1),
-                Globals.prefs.getExternalFileTypeByName
-                        (getElementIfAvailable(contents, 2)));
-    }
-
-
-
     /**
      * Convenience method for finding a label corresponding to the type of the
      * first file link in the given field content. The difference between using
@@ -192,7 +178,7 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     
-    private FileListEntry decodeEntry(ArrayList contents, boolean deduceUnknownType) {
+    private FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
         ExternalFileType type = Globals.prefs.getExternalFileTypeByName
                         (getElementIfAvailable(contents, 2));
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
