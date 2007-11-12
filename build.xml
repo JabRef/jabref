@@ -116,7 +116,7 @@
 		<include name="PDFBox-0.7.3-dev-reduced.jar" />
 		<include name="JempBox-0.2.0.jar" />
 		<include name="zoom-java.jar" />
-    <include name="mysql-connector-java-5.0.7-bin.jar" />
+    	<include name="mysql-connector-java-5.0.7-bin.jar" />
 		<!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />
@@ -146,14 +146,14 @@
 	</path>
 
 	<target name="run" depends="build">
-		<java classname="net.sf.jabref.JabRef" fork="true">
+		<java classname="net.sf.jabref.JabRefMain" fork="true">
 			<classpath refid="classpath" />
 		</java>
 	</target>
 
 	<!-- Runs project -->
 	<target name="runFromJar">
-		<java dir="${build.lib}" jvmversion="1.4" classname="net.sf.jabref.JabRef" fork="true">
+		<java dir="${build.lib}" classname="net.sf.jabref.JabRefMain" fork="true">
 			<classpath>
 				<pathelement location="${build.lib}/${build.jar}" />
 			</classpath>
