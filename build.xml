@@ -88,7 +88,8 @@
 	<property name="lib.dir" value="lib" />
 	<property name="tests.dir" value="${src.dir}/tests" />
 
-	<!--    <property name="nsis.executable" value="makensis.exe"/> -->
+	<property name="nsis.executable" value="makensis.exe"/>
+	<property name="nsis.executable.linux" value="makensis"/>
 
 	<!-- Load user dependent properties -->
 	<!-- For instance to redefine the NSIS-compiler write 
@@ -98,10 +99,10 @@
 
 	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
 	<condition property="is.windows">
-		<and>
-			<os family="windows" />
-			<isset property="nsis.executable" />
-		</and>
+	  <and>
+	    <isset property="nsis.executable" />
+	    <os family="windows" />
+	  </and>
 	</condition>
 
 	<fileset id="jarsFileset" dir="${lib.dir}">
@@ -439,12 +440,45 @@ version=${jabref.version}</echo>
 
 		<!-- "Create Exe-Wrapper" -->
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="'/DJARFILE=${build.jar}' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+		  <arg line="'/DJARFILE=${build.jar}' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
 		</exec>
 
 		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
+		</exec>
+
+		<delete dir="${win.installer.dir}/dist" />
+
+	</target>
+
+	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars">
+
+		<!-- Gather everything that will go into the installer in dist -->
+		<mkdir dir="${win.installer.dir}/dist" />
+
+		<copy file="${build.lib}/${build.jar}" todir="${win.installer.dir}/dist" />
+
+		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}" />
+
+		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}" />
+
+		<copy todir="${win.installer.dir}/dist">
+			<fileset dir="${txt.dir}">
+				<include name="gpl.txt" />
+				<include name="lesser.txt" />
+				<include name="README" />
+			</fileset>
+		</copy>
+
+		<!-- "Create Exe-Wrapper" -->
+		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
+		  <arg line="'-DJARFILE=${build.jar}' '-DVERSION=${jabref.version}' '-DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+		</exec>
+
+		<!-- Finally create Windows-Installer -->
+		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
+			<arg line="'-DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
 
 		<delete dir="${win.installer.dir}/dist" />
@@ -457,6 +491,7 @@ version=${jabref.version}</echo>
 			<classpath refid="classpathTest" />
 		</java>
 	</target>
+
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets
