@@ -46,5 +46,52 @@
 
 	<p>Feel free to ask us questions related to the plugin system on the mailing-list!</p>     
 
+    <h2>How to add an extension point to JabRef</h2>
+    
+    <p>This documentation is intended for JabRef developers who want to add further extensions points.</p>
+    
+    <p>To add a new extension-point, you need to declare this extension-point in the plugin.xml of the core plugin similar to this:</p>
+    
+<code><pre>    
+&lt;extension-point id=&quot;PushToApplication&quot;&gt;
+	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
+		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
+	&lt;!-- optionally other parameters (we currently do not use any of these for anything)
+		&lt;parameter-def type=&quot;string&quot; id=&quot;name&quot; /&gt;
+		&lt;parameter-def type=&quot;string&quot; id=&quot;description&quot;
+			multiplicity=&quot;none-or-one&quot; /&gt;
+			--&gt;
+&lt;/extension-point&gt;
+</pre></code>
+
+	<p>Then you need to re-run the plugin code generator "<code>ant generate</code>", which will re-create the helper class in 
+	"<code>net.sf.jabref.plugin.core.generated</code>" so that it includes a method <code>getPushToApplicationExtensions()</code> which 
+	returns a list of all PushToTalk extensions registered with the system.</p>
+ 
+    <p>This list then can be used like this (here an example what we do with the entry fetcher extensions):</p>
+
+<code><pre> 
+/*
+ * Load fetchers that are plug-in extensions
+ */
+JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+if (jabrefPlugin != null){
+	for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
+		EntryFetcher fetcher = ext.getEntryFetcher();
+		if (fetcher != null){
+			fetchers.add(fetcher);
+		}
+	}
+}
+ 
+// and later...
+ 
+for (EntryFetcher fetcher : fetchers){
+  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
+  web.add(generalFetcher.getAction());
+  fetcherActions.add(generalFetcher.getAction());
+}
+</pre></code>
+
 </body>
 </html>
