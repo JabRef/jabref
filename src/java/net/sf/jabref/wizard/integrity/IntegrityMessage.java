@@ -30,8 +30,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 //
 // function : a class for wrapping a IntegrityCheck message
 //
-//     todo :
-//
 // modified :
 
 package net.sf.jabref.wizard.integrity ;

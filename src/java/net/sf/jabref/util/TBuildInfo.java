@@ -29,7 +29,6 @@
 //
 // function : read build informations from build.properies file
 //
-// todo:
 //
 // modified:
 //

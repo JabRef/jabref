@@ -28,8 +28,6 @@
 //
 // function : utility functions
 //
-// todo     :
-//
 // modified :  - r.nagel 20.04.2006
 //               make the DateFormatter abstract and splitt the easyDate methode
 //               (now we cannot change the dateformat dynamicly, sorry)

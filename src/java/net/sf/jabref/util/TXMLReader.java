@@ -31,7 +31,6 @@
 //
 // function : simple xml reader functions
 //
-// todo     :
 //
 // modified :
 

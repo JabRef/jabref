@@ -10,8 +10,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Will expand the relative PDF path and return a URI for the given file (which
  * must exist).
  * 
- * TODO Search also relative to Bib-file.
- * 
  * @author $Author$
  * @version $Revision$ ($Date$)
  */

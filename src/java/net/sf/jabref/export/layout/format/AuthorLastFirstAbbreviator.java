@@ -26,8 +26,6 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
         /**
          * This formatter is a duplicate of AuthorAbbreviator, so we simply
          * call that one.
-         *
-         * TODO: Note that this makes the remaining methods in this formatter obsolete. 
          */
         return (new AuthorAbbreviator()).format(fieldText);
 

@@ -73,18 +73,6 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 
 
 	/**
-	 * Verifies the Abbreviation of two authors in the incorrect format.
-	 * 
-	 * Ex: Lastname, Name Middlename
-	 */
-	public void testTwoAuthorsBadFormating() {
-		String name = new String("Lastname, Name Middlename and Nome Nomedomeio Sobrenome");
-		
-		// Formatters should not fail but return the given string (if they can).
-		assertEquals(name, abbreviate(name));
-	}
-	
-	/**
 	 * Testcase for 
 	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
 	 */

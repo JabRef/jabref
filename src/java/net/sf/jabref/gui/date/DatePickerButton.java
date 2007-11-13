@@ -32,8 +32,6 @@
 // function : wrapper and service class for the DatePicker handling at the
 //            EntryEditor
 //
-// todo     :
-//
 // modified :  r.nagel 25.04.2006
 //             check NullPointer at the actionPerformed methode
 

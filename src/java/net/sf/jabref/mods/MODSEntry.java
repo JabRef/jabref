@@ -321,8 +321,6 @@ public class MODSEntry {
 	/*
 	 * render as XML
 	 * 
-	 * TODO This is untested.
-	 * 
 	 */
 	public String toString() {
 		StringWriter sresult = new StringWriter();

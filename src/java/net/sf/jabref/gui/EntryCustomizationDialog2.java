@@ -217,7 +217,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
             Object o = i.next();
             if (!types.contains(o)) {
-                //System.out.println("Deleted entry type (TODO): "+o);
                 toRemove.add(o);
             }
         }

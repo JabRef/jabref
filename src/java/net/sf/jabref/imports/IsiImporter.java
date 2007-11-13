@@ -25,7 +25,6 @@ import net.sf.jabref.util.CaseChanger;
  * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
  * 
- * Todo:
  * <ul>
  * <li>Check compatibility with other ISI2Bib tools like:
  * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or

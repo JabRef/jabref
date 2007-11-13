@@ -29,8 +29,6 @@
 //
 // function : supports an underlying text for jcomponents
 //
-// todo     :
-//
 // modified :
 //
 

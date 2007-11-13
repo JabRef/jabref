@@ -29,8 +29,6 @@
 //
 // function :
 //
-// todo:
-//
 // modified:
 //
 

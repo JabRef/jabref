@@ -29,8 +29,6 @@
 //
 // function : save the textposition for tags in a recent TextInputDialog context
 //
-// todo     :
-//
 // modified :
 
 package net.sf.jabref.wizard.text ;
