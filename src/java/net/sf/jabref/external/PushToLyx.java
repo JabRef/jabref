@@ -7,10 +7,7 @@ import java.io.IOException;
 
 import javax.swing.Icon;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.*;
 
 public class PushToLyx implements PushToApplication {
 
@@ -18,7 +15,7 @@ public class PushToLyx implements PushToApplication {
     private boolean couldNotWrite=false;
     private String message = "";
 
-    public void pushEntries(final BibtexEntry[] entries, final String keyString) {
+    public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
         couldNotFindPipe = false;
         couldNotWrite = false;

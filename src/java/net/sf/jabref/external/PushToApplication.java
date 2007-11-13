@@ -1,9 +1,11 @@
 package net.sf.jabref.external;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.MetaData;
+
+import javax.swing.*;
 
 /**
  * Class that defines interaction with an external application in the form of
@@ -20,12 +22,16 @@ public interface PushToApplication {
     public Icon getIcon();
 
     public String getKeyStrokeName();
+
     /**
      * The actual operation. This method will not be called on the event dispatch
      * thread, so it should not do GUI operations without utilizing invokeLater().
+     * @param database
      * @param entries
+     * @param metaData
      */
-    public void pushEntries(BibtexEntry[] entries, String keyString);
+    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries,
+                            String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after

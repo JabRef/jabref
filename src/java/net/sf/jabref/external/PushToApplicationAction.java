@@ -60,7 +60,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
 
     public void run() {
         // Do the operation:
-        operation.pushEntries(entries, getKeyString(entries));
+        operation.pushEntries(panel.database(), entries, getKeyString(entries), panel.metaData());
 
         // Call the operationCompleted() method on the event dispatch thread:
         SwingUtilities.invokeLater(new Runnable() {

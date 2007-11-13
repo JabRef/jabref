@@ -4,10 +4,7 @@ import java.io.IOException;
 
 import javax.swing.Icon;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,7 +38,7 @@ public class PushToLatexEditor implements PushToApplication {
         return null;
     }
 
-    public void pushEntries(BibtexEntry[] entries, String keyString) {
+    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotCall = false;
         notDefined = false;

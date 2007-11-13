@@ -125,4 +125,14 @@
 		<parameter-def type="string" id="extension" />
 	</extension-point>
 
+    <extension-point id="PushToApplication">
+        <parameter-def type="string" id="pushToApp"
+                       custom-data="net.sf.jabref.external.PushToApplication" />
+        <!-- optionally other parameters (we currently do not use any of these
+for anything) -->
+       <parameter-def type="string" id="name" />
+       <parameter-def type="string" id="description"
+               multiplicity="none-or-one" />
+    </extension-point>
+
 </plugin>

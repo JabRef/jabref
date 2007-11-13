@@ -196,6 +196,45 @@ public abstract class _JabRefPlugin extends Plugin {
   
       }
 
+	public List<PushToApplicationExtension> getPushToApplicationExtensions(){
+        ExtensionPoint extPoint = getManager().getRegistry().getExtensionPoint(getId(), "PushToApplication");
+        List<PushToApplicationExtension> result = new ArrayList<PushToApplicationExtension>();
+        for (Extension ext : extPoint.getConnectedExtensions()) {
+			try {
+				result.add(new PushToApplicationExtension(getManager().getPlugin(
+						ext.getDeclaringPluginDescriptor().getId()), ext));
+			} catch (PluginLifecycleException e) {
+				log.error("Failed to activate plug-in " + ext.getDeclaringPluginDescriptor().getId(), e);
+			}
+		}
+        return result;
+    }
+
+    public static class PushToApplicationExtension extends RuntimeExtension {
+        public PushToApplicationExtension(Plugin declaringPlugin, Extension wrapped){
+            super(declaringPlugin, wrapped);
+        }
+                
+	     
+              /**
+         * @return A singleton instance of the class parameter or null if the class could not be found!
+         */
+        public net.sf.jabref.external.PushToApplication getPushToApp(){
+          return (net.sf.jabref.external.PushToApplication)getClassParameter("pushToApp");
+        }
+  
+  	     
+              public String getName(){
+            return getStringParameter("name");
+        }
+  
+  	     
+              public String getDescription(){
+            return getStringParameter("description");
+        }
+  
+      }
+
 	public List<LayoutFormatterExtension> getLayoutFormatterExtensions(){
         ExtensionPoint extPoint = getManager().getRegistry().getExtensionPoint(getId(), "LayoutFormatter");
         List<LayoutFormatterExtension> result = new ArrayList<LayoutFormatterExtension>();

@@ -1,19 +1,20 @@
 package net.sf.jabref.external;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.*;
-
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.util.*;
+import java.util.List;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup
@@ -41,12 +42,22 @@ public class PushToApplicationButton implements ActionListener {
      * Set up the current available choices:
      */
     static {
-      applications = new ArrayList<PushToApplication>();
-      applications.add(new PushToLyx());
-      applications.add(new PushToEmacs());
-      applications.add(new PushToWinEdt());
-      applications.add(new PushToLatexEditor());
-      applications.add(new PushToVim());
+
+        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+        List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
+        for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
+            System.out.println("Added PushToApplication plugin: "+extension);
+            applications.add(extension.getPushToApp());
+        }
+        applications = new ArrayList<PushToApplication>();
+        applications.add(new PushToLyx());
+        applications.add(new PushToEmacs());
+        applications.add(new PushToWinEdt());
+        applications.add(new PushToLatexEditor());
+        //applications.add(new PushToVim());
+
+        // Finally, sort the entries:
+        Collections.sort(applications, new PushToApplicationComparator());
     }
 
 
@@ -186,4 +197,13 @@ public class PushToApplicationButton implements ActionListener {
         }
     }
 
+    /**
+     * Comparator for sorting the selection according to name.
+     */
+    static class PushToApplicationComparator implements Comparator {
+
+        public int compare(Object one, Object two) {
+            return ((PushToApplication)one).getName().compareTo(((PushToApplication)two).getName());
+        }
+    }
 }

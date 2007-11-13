@@ -6,10 +6,7 @@ import java.io.InputStream;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,7 +39,7 @@ public class PushToEmacs implements PushToApplication {
         return "Push to Emacs";
     }
 
-    public void pushEntries(BibtexEntry[] entries, String keys) {
+    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect=false;
         couldNotRunClient=false;
