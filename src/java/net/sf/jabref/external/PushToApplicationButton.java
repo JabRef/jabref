@@ -48,7 +48,6 @@ public class PushToApplicationButton implements ActionListener {
         JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
         List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
         for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
-            System.out.println("Added PushToApplication plugin: "+extension);
             applications.add(extension.getPushToApp());
         }
 
@@ -59,7 +58,7 @@ public class PushToApplicationButton implements ActionListener {
         applications.add(new PushToVim());
 
         // Finally, sort the entries:
-        Collections.sort(applications, new PushToApplicationComparator());
+        //Collections.sort(applications, new PushToApplicationComparator());
     }
 
 
@@ -83,7 +82,7 @@ public class PushToApplicationButton implements ActionListener {
         if (Globals.prefs.hasKey("pushToApplication")) {
             String appSelected = Globals.prefs.get("pushToApplication");
             for (int i=0; i<pushActions.size(); i++) {
-                PushToApplication toApp = (PushToApplication)pushActions.get(i);
+                PushToApplication toApp = pushActions.get(i);
                 if (toApp.getName().equals(appSelected)) {
                     selected = i;
                     break;
@@ -123,7 +122,7 @@ public class PushToApplicationButton implements ActionListener {
      */
     private void setSelected(int i) {
         this.selected = i;
-        PushToApplication toApp = (PushToApplication)pushActions.get(i);
+        PushToApplication toApp = pushActions.get(i);
         pushButton.setIcon(toApp.getIcon());
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
@@ -144,7 +143,7 @@ public class PushToApplicationButton implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        PushToApplication toApp = (PushToApplication)pushActions.get(selected);
+        PushToApplication toApp = pushActions.get(selected);
 
         // Lazy initialization of the push action:
         PushToApplicationAction action = actions.get(toApp);
