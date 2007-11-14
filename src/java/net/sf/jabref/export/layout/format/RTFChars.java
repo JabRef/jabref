@@ -40,14 +40,14 @@ public class RTFChars implements LayoutFormatter {
 				currentCommand = new StringBuffer();
 			} else if (!incommand && (c == '{' || c == '}')) {
 				// Swallow the brace.
-			} else if (Character.isLetter((char) c)
-				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + (char) c) >= 0)) {
+			} else if (Character.isLetter(c)
+				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + c) >= 0)) {
 				escaped = false;
 				if (!incommand){
-					sb.append((char) c);
+					sb.append(c);
 				} else {
 					// Else we are in a command, and should not keep the letter.
-					currentCommand.append((char) c);
+					currentCommand.append(c);
 
 					testCharCom: if ((currentCommand.length() == 1)
 						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
@@ -67,7 +67,7 @@ public class RTFChars implements LayoutFormatter {
 						} else {
 							combody = field.substring(i, i + 1);
 						}
-						String result = (String)Globals.RTFCHARS.get(command + combody);
+						String result = Globals.RTFCHARS.get(command + combody);
 
 						if (result != null)
 							sb.append(result);
@@ -82,7 +82,7 @@ public class RTFChars implements LayoutFormatter {
 			} else {
 				// if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
 				testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
-					sb.append((char) c);
+					sb.append(c);
 				else {
 					// First test if we are already at the end of the string.
 					if (i >= field.length() - 1)
@@ -103,7 +103,7 @@ public class RTFChars implements LayoutFormatter {
 							sb.append("}{\\b ").append(part.s).append("}{");
 						}
 					} else
-						sb.append((char) c);
+						sb.append(c);
 
 				}
 				incommand = false;
@@ -138,7 +138,7 @@ public class RTFChars implements LayoutFormatter {
 			else if (c == '{')
 				count++;
 
-			part.append((char) c);
+			part.append(c);
 		}
 		return new IntAndString(part.length(), format(part.toString()));
 	}

@@ -219,7 +219,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
 			// Finally, we store the new preferences.
 			JabRefPreferences.getInstance().putStringArray("xmpPrivacyFilters",
-				(String[]) tableRows.toArray(new String[tableRows.size()]));
+				tableRows.toArray(new String[tableRows.size()]));
 		}
 
 		JabRefPreferences.getInstance().putBoolean("useXmpPrivacyFilter", privacyFilterCheckBox.isSelected());

@@ -1,6 +1,10 @@
 package net.sf.jabref.imports;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -15,11 +19,23 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HelpAction;
+import net.sf.jabref.SidePaneComponent;
+import net.sf.jabref.SidePaneManager;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
@@ -69,7 +85,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     MedlineFetcher ths = this;
-    AuthorDialog authorDialog;
     JFrame jFrame; // invisible dialog holder
     JButton go = new JButton(Globals.lang("Fetch")),
         helpBut = new JButton(GUIGlobals.getImage("helpSmall"));

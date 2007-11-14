@@ -58,7 +58,7 @@ public class LabelMaker {
 	    char c = 'b';
 	    String modKey = newKey+"a";
 	    while (base.setCiteKeyForEntry(newEntry.getId(), modKey))
-		modKey = newKey+((char)(c++));	    
+		modKey = newKey+((c++));	    
 	}
 
 	//newEntry.setField(Globals.KEY_FIELD, newKey);

@@ -563,7 +563,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
         java.util.List<String> l = new java.util.ArrayList<String>();
         int scnt = Utility.count( str, '"' );
         boolean q = false;
-        if ( ((double)scnt) / 2.0 != (double)(scnt / 2) ) {
+        if ( (scnt) / 2.0 != (scnt / 2) ) {
             throw new OptionProcessingException( "Expecting an end quote." );
         }
         for ( int n = 0; n < str.length(); n++ ) {

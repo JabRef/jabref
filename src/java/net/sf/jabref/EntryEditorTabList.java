@@ -50,7 +50,7 @@ public final class EntryEditorTabList {
     }
 
     public String getTabName(int tab) {
-        return (String) names.get(tab);
+        return names.get(tab);
     }
 
     public List<String> getTabFields(int tab) {

@@ -59,7 +59,7 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
-        String s1 = (String) one.getField(field), s2 = (String) two.getField(field);
+        String s1 = one.getField(field), s2 = two.getField(field);
         if (s1 == null) {
             if (s2 == null)
                 return Util.EMPTY_IN_BOTH;
@@ -99,7 +99,7 @@ public class DuplicateCheck {
 
         int score = 0;
         for (Iterator<String> fld = allFields.iterator(); fld.hasNext();) {
-            String field = (String) fld.next();
+            String field = fld.next();
             Object en = one.getField(field), to = two.getField(field);
             if ((en != null) && (to != null) && (en.equals(to)))
                 score++;

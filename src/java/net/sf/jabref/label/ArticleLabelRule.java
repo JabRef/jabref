@@ -35,14 +35,14 @@ public class ArticleLabelRule extends DefaultLabelRule {
     // this is the rule used handle articles
     // we try (first author last name)/(year)/(first unique journal word)
     public String applyRule(BibtexEntry oldEntry){
-        String oldLabel = (String) (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
+        String oldLabel = (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
         String newLabel = "" ;
 
         String author="";
 
         //## to be done: i need to check if the key is unique else need to make another one with suffix
         try{
-            author=(String)oldEntry.getField("author");
+            author=oldEntry.getField("author");
             String[] tokens= author.split("\\band\\b");
             if( tokens.length > 0){ // if author is empty
                 if(tokens[0].indexOf(",") > 0)

@@ -3,7 +3,15 @@ package net.sf.jabref.bst;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Stack;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +19,11 @@ import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
@@ -111,11 +123,6 @@ public class VM implements Warn {
 					throw new VMException("Can only compare two integers with >");
 				}
 
-				if (o1 == null ^ o2 == null) {
-					stack.push(VM.FALSE);
-					return;
-				}
-
 				if (o1 == o2) {
 					stack.push(VM.FALSE);
 					return;
@@ -136,11 +143,6 @@ public class VM implements Warn {
 
 				if (!(o1 instanceof Integer && o2 instanceof Integer)) {
 					throw new VMException("Can only compare two integers with <");
-				}
-
-				if (o1 == null ^ o2 == null) {
-					stack.push(VM.FALSE);
-					return;
 				}
 
 				if (o1 == o2) {
@@ -330,7 +332,7 @@ public class VM implements Warn {
 
 				String s = (String) o1;
 
-				stack.push(new Integer((int) s.charAt(0)));
+				stack.push(new Integer(s.charAt(0)));
 			}
 		});
 
@@ -1107,7 +1109,7 @@ public class VM implements Warn {
 	private void sort(Tree child) {
 		Collections.sort(entries, new Comparator<BstEntry>() {
 			public int compare(BstEntry o1, BstEntry o2) {
-				return ((String) o1.strings.get("sort.key$")).compareTo((String) o2.strings
+				return (o1.strings.get("sort.key$")).compareTo(o2.strings
 					.get("sort.key$"));
 			}
 		});

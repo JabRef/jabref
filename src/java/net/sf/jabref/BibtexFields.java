@@ -277,7 +277,7 @@ public class BibtexFields
   {
     if (name != null)
     {
-      return (BibtexSingleField) runtime.fieldSet.get(name.toLowerCase()) ;
+      return runtime.fieldSet.get(name.toLowerCase()) ;
     }
 
     return null ;
@@ -397,7 +397,7 @@ public class BibtexFields
   /** returns the fieldname of the entry at index t */
   public static String getFieldName( int t )
   {
-    return  (String) runtime.PUBLIC_FIELDS[t] ;
+    return  runtime.PUBLIC_FIELDS[t] ;
   }
 
   /** returns the number of available fields */

@@ -151,7 +151,7 @@ public class BibtexEntry
             _type = type;
             firePropertyChangedEvent(GUIGlobals.TYPE_HEADER,
                     oldType != null ? oldType.getName() : null,
-                    type != null ? type.getName() : null);
+                    type.getName());
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
         }
@@ -341,7 +341,7 @@ public class BibtexEntry
         // Write header with type and bibtex-key.
         out.write("@"+_type.getName().toUpperCase()+"{");
 
-        String str = Util.shaveString((String)getField(BibtexFields.KEY_FIELD));
+        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
@@ -443,9 +443,9 @@ public class BibtexEntry
      */
     public String getAuthorTitleYear(int maxCharacters) {
         String[] s = new String[] {
-                (String) getField("author"),
-                (String) getField("title"),
-                (String) getField("year")};
+                getField("author"),
+                getField("title"),
+                getField("year")};
         for (int i = 0; i < s.length; ++i)
             if (s[i] == null)
                 s[i] = "N/A";

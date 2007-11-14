@@ -28,14 +28,14 @@ public class RemoveLatexCommands implements LayoutFormatter {
         // Swallow the brace.
       }
 
-      else if (Character.isLetter((char)c) ||
-                (Globals.SPECIAL_COMMAND_CHARS.indexOf(""+(char)c) >= 0)) {
+      else if (Character.isLetter(c) ||
+                (Globals.SPECIAL_COMMAND_CHARS.indexOf(""+c) >= 0)) {
          escaped = false;
          if (!incommand)
-           sb.append((char)c);
+           sb.append(c);
            // Else we are in a command, and should not keep the letter.
          else {
-           currentCommand.append( (char) c);
+           currentCommand.append( c);
            if ((currentCommand.length() == 1)
                && (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
              // This indicates that we are in a command of the type \^o or \~{n}
@@ -68,21 +68,21 @@ public class RemoveLatexCommands implements LayoutFormatter {
         }
       }
 
-      else if (Character.isLetter((char)c)) {
+      else if (Character.isLetter(c)) {
         escaped = false;
         if (!incommand)
-          sb.append((char)c);
+          sb.append(c);
           // Else we are in a command, and should not keep the letter.
         else
-          currentCommand.append((char)c);
+          currentCommand.append(c);
       }
       else {
         //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
         if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
-          sb.append((char)c);
+          sb.append(c);
         else {
           if (c != '{')
-            sb.append((char)c);
+            sb.append(c);
         }
         incommand = false;
         escaped = false;

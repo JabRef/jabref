@@ -135,7 +135,7 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
     public String constructUrl(String key) {
         String identifier = "";
         try {
-            identifier = URLEncoder.encode((String) key, "UTF-8");
+            identifier = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             return "";
         }

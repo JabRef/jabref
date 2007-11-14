@@ -100,14 +100,14 @@ public class MODSEntry {
 		{
 			host = new MODSEntry();
 			host.entryType = "relatedItem";
-			host.title = (String) bibtex.getField("booktitle");
-			host.publisher = (String) bibtex.getField("publisher");
-			host.number = (String) bibtex.getField("number");
+			host.title = bibtex.getField("booktitle");
+			host.publisher = bibtex.getField("publisher");
+			host.number = bibtex.getField("number");
 			if (bibtex.getField("pages") != null)
-				host.volume = (String) bibtex.getField("volume");
+				host.volume = bibtex.getField("volume");
 			host.issuance = "continuing";
 			if (bibtex.getField("pages") != null)
-				host.pages = new PageNumbers((String) bibtex.getField("pages"));
+				host.pages = new PageNumbers(bibtex.getField("pages"));
 		}
 		
 		populateExtensionFields(bibtex);

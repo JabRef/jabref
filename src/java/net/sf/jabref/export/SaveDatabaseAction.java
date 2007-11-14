@@ -1,12 +1,21 @@
 package net.sf.jabref.export;
 
-import net.sf.jabref.*;
-import net.sf.jabref.collab.ChangeScanner;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.CallBack;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Worker;
+import net.sf.jabref.collab.ChangeScanner;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -239,11 +248,9 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void saveAs() throws Throwable {
-        boolean repeat = true;
         String chosenFile = null;
         File f = null;
-        while (repeat) {
-            repeat = false;
+        while (f == null) {
             chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                     JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
@@ -256,7 +263,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                             Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                     != JOptionPane.OK_OPTION)) {
-                repeat = true;
+                f = null;
             }
         }
 

@@ -12,7 +12,12 @@
 package net.sf.jabref ;
 
 import java.awt.Toolkit;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 public class ClipBoardManager implements ClipboardOwner
@@ -50,9 +55,8 @@ public class ClipBoardManager implements ClipboardOwner
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard() ;
     //odd: the Object param of getContents is not currently used
     Transferable contents = clipboard.getContents( null ) ;
-    boolean hasTransferableText = ( contents != null ) &&
-        contents.isDataFlavorSupported( DataFlavor.stringFlavor ) ;
-    if ( hasTransferableText )
+    if ( ( contents != null ) &&
+        contents.isDataFlavorSupported( DataFlavor.stringFlavor ) )
     {
       try
       {

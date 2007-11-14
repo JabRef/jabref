@@ -44,9 +44,9 @@ public class EntryChange extends Change {
     allFields.addAll(diskEntry.getAllFields());
   
     for (String field : allFields){
-      String mem = (String)memEntry.getField(field),
-          tmp = (String)tmpEntry.getField(field),
-          disk = (String)diskEntry.getField(field);
+      String mem = memEntry.getField(field),
+          tmp = tmpEntry.getField(field),
+          disk = diskEntry.getField(field);
 
       if ((tmp != null) && (disk != null)) {
         if (!tmp.equals(disk)) {
@@ -72,7 +72,7 @@ public void makeChange(BasePanel panel, NamedCompound undoEdit) {
 	@SuppressWarnings("unchecked")
     Enumeration<Change> e = children();
     for (; e.hasMoreElements();) {
-      Change c = (Change)e.nextElement();
+      Change c = e.nextElement();
       if (c.isAcceptable() && c.isAccepted())
         c.makeChange(panel, undoEdit);
     }

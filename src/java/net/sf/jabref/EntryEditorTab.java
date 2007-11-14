@@ -167,7 +167,7 @@ public class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
 		if (addKeyField) {
-			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, (String) parent
+			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, parent
 				.getEntry().getField(BibtexFields.KEY_FIELD), true);
 			setupJTextComponent(tf);
 
@@ -415,7 +415,7 @@ public class EntryEditorTab {
 				}
 			}
 			if (!e.isTemporary())
-				parent.updateField((FieldEditor) e.getSource());
+				parent.updateField(e.getSource());
 		}
 	};
 }

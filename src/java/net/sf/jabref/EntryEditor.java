@@ -711,7 +711,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 throw new Exception("No entries found.");
 
             NamedCompound compound = new NamedCompound(Globals.lang("source edit"));
-            BibtexEntry nu = db.getEntryById((String) db.getKeySet().iterator().next());
+            BibtexEntry nu = db.getEntryById(db.getKeySet().iterator().next());
             String id = entry.getId();
             String
             // oldKey = entry.getCiteKey(),
@@ -740,7 +740,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // Then set all fields that have been set by the user.
             for (String field : nu.getAllFields()){
                 if (entry.getField(field.toString()) != nu.getField(field.toString())) {
-                    String toSet = (String) nu.getField(field.toString());
+                    String toSet = nu.getField(field.toString());
 
                     // Test if the field is legally set.
                     (new LatexFieldFormatter()).format(toSet, field.toString());
@@ -990,7 +990,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            String s = (String) (entry.getField(BibtexFields.KEY_FIELD));
+            String s = (entry.getField(BibtexFields.KEY_FIELD));
             StringSelection ss = new StringSelection(s);
 
             if (s != null)
@@ -1262,10 +1262,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
                 // Store undo information:
                 panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-                    (String) oldValue, (String) entry.getField(BibtexFields.KEY_FIELD)));
+                    (String) oldValue, entry.getField(BibtexFields.KEY_FIELD)));
 
                 // here we update the field
-                String bibtexKeyData = (String) entry.getField(BibtexFields.KEY_FIELD);
+                String bibtexKeyData = entry.getField(BibtexFields.KEY_FIELD);
 
                 // set the field named for "bibtexkey"
                 setField(BibtexFields.KEY_FIELD, bibtexKeyData);

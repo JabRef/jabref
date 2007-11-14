@@ -73,7 +73,7 @@ public class OAI2Handler extends DefaultHandler {
 			pages = pages.replaceAll(" ", "");
 			entry.setField("pages", pages);
 		} else if (qualifiedName.equals("datestamp")) {
-			String year = (String) entry.getField("year");
+			String year = entry.getField("year");
 			if (year == null || year.equals("")) {
 				entry.setField("year", content.replaceFirst("-.*", ""));
 			}

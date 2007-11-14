@@ -1,6 +1,13 @@
 package net.sf.jabref.gui;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Comparator;
 
@@ -8,7 +15,17 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldComparator;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.PreviewPrefsTab;
+import net.sf.jabref.RightClickMenu;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -155,7 +172,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     public void editSignalled() {
         if (table.getSelected().size() == 1) {
-            editSignalled((BibtexEntry) table.getSelected().get(0));
+            editSignalled(table.getSelected().get(0));
         }
     }
 
@@ -196,7 +213,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
 
-            BibtexEntry toShow = (BibtexEntry) tableRows.get(row);
+            BibtexEntry toShow = tableRows.get(row);
             editSignalled(toShow);
         }
 
@@ -225,7 +242,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             Object value = table.getValueAt(row, col);
             if (value == null) return; // No icon here, so we do nothing.
 
-            final BibtexEntry entry = (BibtexEntry) tableRows.get(row);
+            final BibtexEntry entry = tableRows.get(row);
 
             // Get the icon type. Corresponds to the field name.
             int hasField = -1;
@@ -242,7 +259,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                     panel.output(Globals.lang("External viewer called") + ".");
 
                     Object link = entry.getField(fieldName);
-                    if (iconType == null) {
+                    if (link == null) {
                         Globals.logger("Error: no link to " + fieldName + ".");
                         return; // There is an icon, but the field is not set.
                     }
@@ -306,7 +323,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      *  this table cell.
      */
     private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
-        BibtexEntry entry = (BibtexEntry) tableRows.get(row);
+        BibtexEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         int count = 0;
 
@@ -377,7 +394,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             panel.hideBottomComponent();
         } else {
             if (table.getSelected().size() > 0 ) {
-                updatePreview((BibtexEntry) table.getSelected().get(0), false);
+                updatePreview(table.getSelected().get(0), false);
             }
         }
     }
@@ -391,7 +408,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             this.preview = previewPanel[activePreview];
 
             if (table.getSelected().size() > 0) {
-                updatePreview((BibtexEntry) table.getSelected().get(0), true);
+                updatePreview(table.getSelected().get(0), true);
             }
         }
     }

@@ -76,7 +76,7 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                     Vector<ParserResult> loaded = jabref.processArguments(args, false);
 
                     for (int i=0; i<loaded.size(); i++) {
-                        ParserResult pr = (ParserResult) loaded.elementAt(i);
+                        ParserResult pr = loaded.elementAt(i);
                         if (!pr.toOpenTab()) {
                             jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
                         } else {

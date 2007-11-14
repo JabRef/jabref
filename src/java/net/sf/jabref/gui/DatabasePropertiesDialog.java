@@ -111,7 +111,7 @@ public class DatabasePropertiesDialog extends JDialog {
         else {
             // Better be a little careful about how many entries the Vector has:
             if (fileD.size() >= 1)
-                fileDir.setText(((String)fileD.get(0)).trim());
+                fileDir.setText((fileD.get(0)).trim());
         }
 
         Vector<String> pdfD = metaData.getData("pdfDirectory");
@@ -120,7 +120,7 @@ public class DatabasePropertiesDialog extends JDialog {
         else {
             // Better be a little careful about how many entries the Vector has:
             if (pdfD.size() >= 1)
-                pdfDir.setText(((String)pdfD.get(0)).trim());
+                pdfDir.setText((pdfD.get(0)).trim());
         }
 
         Vector<String> psD = metaData.getData("psDirectory");
@@ -129,7 +129,7 @@ public class DatabasePropertiesDialog extends JDialog {
         else {
             // Better be a little careful about how many entries the Vector has:
             if (psD.size() >= 1)
-                psDir.setText(((String)psD.get(0)).trim());
+                psDir.setText((psD.get(0)).trim());
         }
 
         // Store original values to see if they get changed:

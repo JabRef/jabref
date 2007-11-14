@@ -51,7 +51,7 @@ public class CopacImporterTest extends TestCase {
 		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
 			.getResourceAsStream("CopacImporterTest1.txt"));
 		assertEquals(1, entries.size());
-		BibtexEntry entry = (BibtexEntry) entries.get(0);
+		BibtexEntry entry = entries.get(0);
 		
 		assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
 		assertEquals(
@@ -69,11 +69,11 @@ public class CopacImporterTest extends TestCase {
 		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
 			.getResourceAsStream("CopacImporterTest2.txt"));
 		assertEquals(2, entries.size());
-		BibtexEntry one = (BibtexEntry) entries.get(0);
+		BibtexEntry one = entries.get(0);
 		
 		assertEquals("Computing and operational research at the London Hospital", one.getField("title"));
 		
-		BibtexEntry two = (BibtexEntry) entries.get(1);
+		BibtexEntry two = entries.get(1);
 	
 		assertEquals("Real time systems : management and design", two.getField("title"));
 	}

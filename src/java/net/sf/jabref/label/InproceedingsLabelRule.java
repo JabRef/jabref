@@ -40,7 +40,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
         StringTokenizer authorTokens = null ;
         // use the author token
         try{
-            authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ;
+            authorTokens= new StringTokenizer(oldEntry.getField("author"),",") ;
             newLabel += authorTokens.nextToken().toLowerCase().replaceAll(" ","").replaceAll("\\.","")   ;
         }catch(Throwable t){
                         System.out.println("error getting author: "+t) ;
@@ -60,7 +60,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
         try{
 
           if(oldEntry.getField("booktitle") != null) {
-            authorTokens = new StringTokenizer( ((String) oldEntry.getField("booktitle")).replaceAll(","," ").replaceAll("/"," ")) ;
+            authorTokens = new StringTokenizer( (oldEntry.getField("booktitle")).replaceAll(","," ").replaceAll("/"," ")) ;
             String tempString = authorTokens.nextToken() ;
             tempString = tempString.replaceAll(",","") ;
             boolean done = false ;

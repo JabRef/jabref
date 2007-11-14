@@ -301,7 +301,7 @@ public class XMPUtilTest extends TestCase {
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry e = (BibtexEntry) l.get(0);
+		BibtexEntry e = l.get(0);
 
 		assertNotNull(e);
 		assertEquals("OezbekC06", e.getCiteKey());
@@ -328,7 +328,7 @@ public class XMPUtilTest extends TestCase {
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry e = (BibtexEntry) l.get(0);
+		BibtexEntry e = l.get(0);
 
 		assertNotNull(e);
 		assertEquals("OezbekC06", e.getCiteKey());
@@ -358,7 +358,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
-			BibtexEntry x = (BibtexEntry) l.get(0);
+			BibtexEntry x = l.get(0);
 
 			Set<String> ts = x.getAllFields();
 
@@ -386,7 +386,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
-			BibtexEntry x = (BibtexEntry) l.get(0);
+			BibtexEntry x = l.get(0);
 			Set<String> ts = x.getAllFields();
 			assertEquals(8, ts.size());
 
@@ -419,7 +419,7 @@ public class XMPUtilTest extends TestCase {
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry e = (BibtexEntry) l.get(0);
+		BibtexEntry e = l.get(0);
 
 		assertNotNull(e);
 		assertEquals("Clarkson06", e.getCiteKey());
@@ -442,7 +442,7 @@ public class XMPUtilTest extends TestCase {
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry e = (BibtexEntry) l.get(0);
+		BibtexEntry e = l.get(0);
 
 		assertNotNull(e);
 		assertEquals(BibtexEntryType.ARTICLE, e.getType());
@@ -535,13 +535,13 @@ public class XMPUtilTest extends TestCase {
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
 		XMPUtil.writeXMP(pdfFile, e, null);
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry x = (BibtexEntry) l.get(0);
+		BibtexEntry x = l.get(0);
 
 		assertEquals(e, x);
 	}
@@ -562,7 +562,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
-			BibtexEntry e = (BibtexEntry) l.get(0);
+			BibtexEntry e = l.get(0);
 
 			assertNotNull(e);
 			assertEquals("Hallo World this is not an exercise .", e
@@ -589,7 +589,7 @@ public class XMPUtilTest extends TestCase {
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry e = (BibtexEntry) l.get(0);
+		BibtexEntry e = l.get(0);
 
 		assertEquals(t2BibtexEntry(), e);
 	}
@@ -668,7 +668,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
-			BibtexEntry e = (BibtexEntry) l.get(0);
+			BibtexEntry e = l.get(0);
 
 			assertEquals(t1BibtexEntry(), e);
 
@@ -867,13 +867,13 @@ public class XMPUtilTest extends TestCase {
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
 		XMPUtil.writeXMP(pdfFile, e, null);
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry x = (BibtexEntry) l.get(0);
+		BibtexEntry x = l.get(0);
 
 		assertEquals(e, x);
 	}
@@ -945,8 +945,8 @@ public class XMPUtilTest extends TestCase {
 
 		assertEquals(2, l.size());
 
-		BibtexEntry a = (BibtexEntry) l.get(0);
-		BibtexEntry b = (BibtexEntry) l.get(1);
+		BibtexEntry a = l.get(0);
+		BibtexEntry b = l.get(1);
 
 		if (a.getCiteKey().equals("foo")) {
 			BibtexEntry tmp = a;
@@ -980,8 +980,8 @@ public class XMPUtilTest extends TestCase {
 
 		assertEquals(2, l.size());
 
-		BibtexEntry a = (BibtexEntry) l.get(0);
-		BibtexEntry b = (BibtexEntry) l.get(1);
+		BibtexEntry a = l.get(0);
+		BibtexEntry b = l.get(1);
 
 		if (a.getCiteKey().equals("Clarkson06")) {
 			BibtexEntry tmp = a;
@@ -1060,6 +1060,7 @@ public class XMPUtilTest extends TestCase {
 
 			if (metaRaw == null) {
 				fail();
+				return;
 			}
 
 			XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw
@@ -1265,7 +1266,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 			assertEquals(1, l.size());
-			assertEquals(t1BibtexEntry(), (BibtexEntry) l.get(0));
+			assertEquals(t1BibtexEntry(), l.get(0));
 
 		} finally {
 			if (fileWriter != null)
@@ -1300,7 +1301,7 @@ public class XMPUtilTest extends TestCase {
 			ParserResult result = BibtexParser.parse(new StringReader(bibtex));
 			Collection<BibtexEntry> c = result.getDatabase().getEntries();
 			assertEquals(1, c.size());
-			BibtexEntry x = (BibtexEntry) c.iterator().next();
+			BibtexEntry x = c.iterator().next();
 
 			assertEquals(e, x);
 		}
@@ -1340,7 +1341,7 @@ public class XMPUtilTest extends TestCase {
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 			assertEquals(1, l.size());
 
-			assertEquals(t1BibtexEntry(), (BibtexEntry) l.get(0));
+			assertEquals(t1BibtexEntry(), l.get(0));
 		}
 	}
 
@@ -1373,7 +1374,7 @@ public class XMPUtilTest extends TestCase {
 				// PDF should be annotated:
 				List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 				assertEquals(1, l.size());
-				assertEquals(t1BibtexEntry(), (BibtexEntry) l.get(0));
+				assertEquals(t1BibtexEntry(), l.get(0));
 			}
 			{ // Now try OezbekC06
 				ByteArrayOutputStream s = new ByteArrayOutputStream();
@@ -1386,7 +1387,7 @@ public class XMPUtilTest extends TestCase {
 				// PDF should be annotated:
 				List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 				assertEquals(1, l.size());
-				assertEquals(t2BibtexEntry(), (BibtexEntry) l.get(0));
+				assertEquals(t2BibtexEntry(), l.get(0));
 			}
 		} finally {
 			if (fileWriter != null)
@@ -1424,8 +1425,8 @@ public class XMPUtilTest extends TestCase {
 
 			assertEquals(2, l.size());
 
-			BibtexEntry a = (BibtexEntry) l.get(0);
-			BibtexEntry b = (BibtexEntry) l.get(1);
+			BibtexEntry a = l.get(0);
+			BibtexEntry b = l.get(1);
 
 			if (a.getCiteKey().equals("Clarkson06")) {
 				BibtexEntry tmp = a;
@@ -1482,13 +1483,13 @@ public class XMPUtilTest extends TestCase {
 		Collection<BibtexEntry> c = original.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
 		XMPUtil.writeXMP(pdfFile, e, original.getDatabase());
 
 		List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 		assertEquals(1, l.size());
-		BibtexEntry x = (BibtexEntry) l.get(0);
+		BibtexEntry x = l.get(0);
 
 		assertEquals(
 				AuthorList

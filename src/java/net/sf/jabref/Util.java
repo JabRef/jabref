@@ -803,7 +803,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
         // User wants to change the type of this link.
         // First get a model of all file links for this entry:
         FileListTableModel tModel = new FileListTableModel();
-        String oldValue = (String)entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
         tModel.setContent(oldValue);
         FileListEntry flEntry = null;
         // Then find which one we are looking at:
@@ -1526,7 +1526,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * null if the file does not exist.
 	 */
 	public static File expandFilename(String name, String dir) {
-		// System.out.println("expandFilename: name="+name+"\t dir="+dir);
+
 		File file = null;
 		if (name == null || name.length() == 0)
 			return null;
@@ -1534,40 +1534,39 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 			file = new File(name);
 		}
 
-		if (file != null) {
-			if (!file.exists() && (dir != null)) {
-				if (dir.endsWith(System.getProperty("file.separator")))
-					name = dir + name;
-				else
-					name = dir + System.getProperty("file.separator") + name;
+		if (!file.exists() && (dir != null)) {
+            if (dir.endsWith(System.getProperty("file.separator")))
+                name = dir + name;
+            else
+                name = dir + System.getProperty("file.separator") + name;
 
-				// System.out.println("expanded to: "+name);
-				// if (name.startsWith("ftp"))
+            // System.out.println("expanded to: "+name);
+            // if (name.startsWith("ftp"))
 
-				file = new File(name);
+            file = new File(name);
 
-                if (file.exists())
-					return file;
-				// Ok, try to fix / and \ problems:
-				if (Globals.ON_WIN) {
-					// workaround for catching Java bug in regexp replacer
-					// and, why, why, why ... I don't get it - wegner 2006/01/22
-					try {
-						name = name.replaceAll("/", "\\\\");
-					} catch (java.lang.StringIndexOutOfBoundsException exc) {
-						System.err.println("An internal Java error was caused by the entry " + "\""
-							+ name + "\"");
-					}
-				} else
-					name = name.replaceAll("\\\\", "/");
-				// System.out.println("expandFilename: "+name);
-				file = new File(name);
-				if (!file.exists())
-					file = null;
-			}
-		}
-		return file;
-	}
+            if (file.exists())
+                return file;
+            // Ok, try to fix / and \ problems:
+            if (Globals.ON_WIN) {
+                // workaround for catching Java bug in regexp replacer
+                // and, why, why, why ... I don't get it - wegner 2006/01/22
+                try {
+                    name = name.replaceAll("/", "\\\\");
+                } catch (java.lang.StringIndexOutOfBoundsException exc) {
+                    System.err
+                        .println("An internal Java error was caused by the entry " +
+                            "\"" + name + "\"");
+                }
+            } else
+                name = name.replaceAll("\\\\", "/");
+            // System.out.println("expandFilename: "+name);
+            file = new File(name);
+            if (!file.exists())
+                file = null;
+        }
+        return file;
+    }
 
 	private static String findInDir(String key, String dir, OpenFileFilter off) {
 		File f = new File(dir);
@@ -1779,13 +1778,13 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             // If there are already links in the file field, keep those on top:
             String oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
             if (oldFileContent != null) {
-                tableModel.setContent((String) oldFileContent);
+                tableModel.setContent(oldFileContent);
             }
             int oldRowCount = tableModel.getRowCount();
             for (int j = 0; j < fields.length; j++) {
                 String o = entry.getField(fields[j]);
                 if (o != null) {
-                    String s = (String) o;
+                    String s = o;
                     if (s.trim().length() > 0) {
                         File f = new File(s);
                         FileListEntry flEntry = new FileListEntry(f.getName(), s,
@@ -2375,7 +2374,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 			// If we are not allowed to overwrite values, check if there is a
 			// nonempty
 			// value already for this entry:
-			if (!overwriteValues && (oldVal != null) && (((String) oldVal).length() > 0))
+			if (!overwriteValues && (oldVal != null) && ((oldVal).length() > 0))
 				continue;
 			if (text != null)
 				entry.setField(field, text);

@@ -79,7 +79,7 @@ public class XMLChars implements LayoutFormatter {
 		StringBuffer buffer = new StringBuffer(fieldText.length() * 2);
 		
 		for (int i = 0; i < fieldText.length(); i++) {
-			int code = ((int) fieldText.charAt(i));
+			int code = (fieldText.charAt(i));
 		
 			// TODO: Check whether > 125 is correct here or whether it should rather be >=  
 			if (code > 125 || forceReplace[code]) {

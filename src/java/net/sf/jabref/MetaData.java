@@ -203,7 +203,7 @@ public class MetaData implements Iterable<String> {
             if (orderedData.size() >= 0) {
                 sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
                 for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(Util.quote((String) orderedData.elementAt(j), ";", '\\')).append(";");
+                    sb.append(Util.quote(orderedData.elementAt(j), ";", '\\')).append(";");
                 }
                 sb.append("}");
                 sb.append(Globals.NEWLINE);

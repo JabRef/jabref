@@ -35,17 +35,44 @@
 
 package net.sf.jabref.wizard.auximport.gui ;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -117,8 +144,8 @@ public class FromAuxDialog
 
     bb.addGlue();
     bb.addGridded( generateButton ) ;
-    bb.addGridded( okButton ); ;
-    bb.addGridded( cancelButton ); ;
+    bb.addGridded( okButton ); 
+    bb.addGridded( cancelButton );
     bb.addGlue();
     this.setModal( true ) ;
     this.setResizable( false ) ;
@@ -165,7 +192,7 @@ public class FromAuxDialog
     int len = parentTabbedPane.getTabCount() ;
     for ( int t = 0 ; t < len ; t++ )
     {
-      dbChooser.addItem( ( String ) parentTabbedPane.getTitleAt( t ) ) ;
+      dbChooser.addItem( parentTabbedPane.getTitleAt( t ) ) ;
     }
 
     // panel view
@@ -265,44 +292,33 @@ public class FromAuxDialog
 // ---------------------------------------------------------------------------
 
   // returns a "short info" panel, if something is available
-  private JPanel getDescriptionPanel()
-  {
-    JPanel back = null ;
+    private JPanel getDescriptionPanel() {
+        JPanel back = null;
 
-    JEditorPane infoText = null ;
+        JEditorPane infoText = null;
 
-    URL infoURL = JabRef.class.getResource( GUIGlobals.getLocaleHelpPath()
-                                            + GUIGlobals.shortAuxImport ) ;
-    if ( infoURL != null )
-    {
-      try
-      {
-        infoText = new JEditorPane() ;
-        infoText.setEditable( false ) ;
-        infoText.setPreferredSize( new Dimension( 240, 50 ) ) ;
-        infoText.setMinimumSize( new Dimension( 180, 50 ) ) ;
-        infoText.setPage( infoURL ) ;
-        infoText.setBackground( GUIGlobals.infoField ) ;
-        infoText.setBorder( new EtchedBorder( EtchedBorder.LOWERED ) ) ;
+        URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath() +
+            GUIGlobals.shortAuxImport);
+        if (infoURL != null) {
+            try {
+                infoText = new JEditorPane();
+                infoText.setEditable(false);
+                infoText.setPreferredSize(new Dimension(240, 50));
+                infoText.setMinimumSize(new Dimension(180, 50));
+                infoText.setPage(infoURL);
+                infoText.setBackground(GUIGlobals.infoField);
+                infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-        // content
-        back = new JPanel() ;
-        back.setLayout( new BorderLayout());
-
-        if (infoText != null) // only if some help available
-        {
-          back.add( infoText, BorderLayout.PAGE_START ) ;
+                // content
+                back = new JPanel();
+                back.setLayout(new BorderLayout());
+                back.add(infoText, BorderLayout.PAGE_START);
+            } catch (IOException e) {
+            }
         }
 
-      }
-      catch ( IOException e )
-      {
-        back = null ;
-      }
+        return back;
     }
-
-    return back ;
-  }
 
 // ---------------------------------------------------------------------------
 

@@ -109,7 +109,7 @@ public class FieldWeightDialog extends JDialog {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = GUIGlobals.MAX_FIELD_WEIGHT*((double)slider.getValue())/100d;
+                double weight = GUIGlobals.MAX_FIELD_WEIGHT*(slider.getValue())/100d;
                 BibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }

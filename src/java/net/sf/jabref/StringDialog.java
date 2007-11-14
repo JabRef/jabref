@@ -27,13 +27,32 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.TreeSet;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
@@ -146,7 +165,7 @@ public class StringDialog extends JDialog {
     }
 
     class StringTable extends JTable {
-	JScrollPane sp = new JScrollPane((JTable)this);
+	JScrollPane sp = new JScrollPane(this);
 	public StringTable(StringTableModel stm) {
 	    super(stm);
 	    setShowVerticalLines(true);
@@ -233,7 +252,7 @@ public class StringDialog extends JDialog {
                             Globals.lang("Label"),
                             JOptionPane.ERROR_MESSAGE);
                       }   
-                      else if ((value != null) && isNumber((String)value)) {
+                      else if (isNumber((String)value)) {
                           JOptionPane.showMessageDialog
                               (parent,
                                Globals.lang("The label of the string can not be a number."),

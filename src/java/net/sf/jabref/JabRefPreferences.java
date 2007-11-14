@@ -583,13 +583,13 @@ public class JabRefPreferences {
      */
     public KeyStroke getKey(String bindName) {
 
-        String s = (String)keyBinds.get(bindName);
+        String s = keyBinds.get(bindName);
         // If the current key bindings don't contain the one asked for,
         // we fall back on the default. This should only happen when a
         // user has his own set in Preferences, and has upgraded to a
         // new version where new bindings have been introduced.
         if (s == null) {
-            s = (String)defKeyBinds.get(bindName);
+            s = defKeyBinds.get(bindName);
             // So, if this happens, we add the default value to the current
             // hashmap, so this doesn't happen again, and so this binding
             // will appear in the KeyBindingsDialog.
@@ -669,7 +669,7 @@ public class JabRefPreferences {
             for (Iterator<String> i=newBindings.keySet().iterator();
                  i.hasNext();) {
                 String nm = i.next();
-                String bnd = (String)newBindings.get(nm);
+                String bnd = newBindings.get(nm);
                 bindNames[index] = nm;
                 bindings[index] = bnd;
                 index++;

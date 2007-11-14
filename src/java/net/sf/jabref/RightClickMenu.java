@@ -59,7 +59,7 @@ public class RightClickMenu extends JPopupMenu
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibtexEntry be = null;
         if (panel.mainTable.getSelectedRowCount() == 1)
-          be = (BibtexEntry)panel.mainTable.getSelected().get(0);
+          be = panel.mainTable.getSelected().get(0);
 
         addPopupMenuListener(this);
 

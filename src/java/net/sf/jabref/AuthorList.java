@@ -243,7 +243,7 @@ public class AuthorList {
 	 * @return An AuthorList object representing the given authors.
 	 */
 	public static AuthorList getAuthorList(String authors) {
-		AuthorList authorList = (AuthorList) authorCache.get(authors);
+		AuthorList authorList = authorCache.get(authors);
 		if (authorList == null) {
 			authorList = new AuthorList(authors);
 			authorCache.put(authors, authorList);
@@ -587,7 +587,7 @@ public class AuthorList {
 	 * @return the <CODE>Author</CODE> object.
 	 */
 	public Author getAuthor(int i) {
-		return (Author) authors.get(i);
+		return authors.get(i);
 	}
 
 	/**

@@ -39,7 +39,17 @@ package net.sf.jabref;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -80,7 +90,7 @@ public class BibtexDatabase {
                 {
                     // locate the entry under its old key
                     BibtexEntry oldEntry =
-                        _entries.remove((String) pce.getOldValue());
+                        _entries.remove(pce.getOldValue());
 
                     if (oldEntry != pce.getSource())
                     {
@@ -226,17 +236,18 @@ public class BibtexDatabase {
 
     /**
      * Removes the entry with the given string.
+     * 
+     * Returns null if not found.
      */
     public synchronized BibtexEntry removeEntry(String id)
     {
         BibtexEntry oldValue = _entries.remove(id);
+        
+        if (oldValue == null)
+            return null;
+        
         removeKeyFromSet(oldValue.getCiteKey());
-
-        if (oldValue != null)
-        {
-            oldValue.removePropertyChangeListener(listener);
-        }
-
+        oldValue.removePropertyChangeListener(listener);
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.REMOVED_ENTRY, oldValue));
 
         return oldValue;
@@ -567,7 +578,7 @@ public class BibtexDatabase {
                         if(tI.intValue()==1)
                                 allKeys.remove( key);
                         else
-                                allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
+                                allKeys.put( key, new Integer( (tI).intValue() - 1));//decrementInteger( tI ));
                 }
     }
 

@@ -75,10 +75,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
 		// Now we now that both f1 and f2 are != null
 		if (isNameField) {
-			if (f1 != null)
-				f1 = AuthorList.fixAuthorForAlphabetization((String) f1);
-			if (f2 != null)
-				f2 = AuthorList.fixAuthorForAlphabetization((String) f2);
+			f1 = AuthorList.fixAuthorForAlphabetization((String) f1);
+			f2 = AuthorList.fixAuthorForAlphabetization((String) f2);
 		} else if (isYearField) {
 			/*
 			 * [ 1285977 ] Impossible to properly sort a numeric field
@@ -98,32 +96,29 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 		}
 
         if (isNumeric) {
-            boolean numeric1 = false, numeric2 = false;
             Integer i1 = null, i2 = null;
             try {
                 i1 = Integer.parseInt((String)f1);
-                numeric1 = true;
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
             try {
                 i2 = Integer.parseInt((String)f2);
-                numeric2 = true;
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
-            if (numeric1 && numeric2) {
+            if (i2 != null && i1 != null) {
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
-            } else if (numeric1) {
+            } else if (i1 != null) {
                 // The first one was parseable, but not the second one.
                 // This means we consider one < two
                 f1 = i1;
                 f2 = new Integer(i1.intValue()+1);
-            } else if (numeric2) {
+            } else if (i2 != null) {
                 // The second one was parseable, but not the first one.
                 // This means we consider one > two
                 f2 = i2;

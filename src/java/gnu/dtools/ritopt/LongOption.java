@@ -46,7 +46,7 @@ public class LongOption extends Option {
      */
 
     public LongOption() {
-	this( (long)0 );
+	this( 0 );
     }
 
     /**

@@ -142,7 +142,7 @@ public class IntegrityMessagePanel
 
         if (entry != null)
         {
-          str = (String) entry.getField(msg.getFieldName()) ;
+          str = entry.getField(msg.getFieldName()) ;
           basePanel.highlightEntry(entry);
   // make the "invalid" field visible  ....
   //          EntryEditor editor = basePanel.getCurrentEditor() ;

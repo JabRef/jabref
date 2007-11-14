@@ -507,7 +507,7 @@ public class FileActions
      */
     private static boolean nonZeroField(BibtexEntry be, String field)
     {
-        String o = (String) (be.getField(field));
+        String o = (be.getField(field));
 
         return ((o != null) && !o.equals("0"));
     }

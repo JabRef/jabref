@@ -1,21 +1,28 @@
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import javax.swing.JDialog;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BaseAction;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-
-import javax.swing.*;
-import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.*;
 
 
 /**
@@ -37,7 +44,7 @@ public class AccessLinksForEntries {
         FileListTableModel model = new FileListTableModel();
         for (Iterator<BibtexEntry> iterator = entries.iterator(); iterator.hasNext();) {
             BibtexEntry entry = iterator.next();
-            String links = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            String links = entry.getField(GUIGlobals.FILE_FIELD);
             if (links == null)
                 continue;
             model.setContent(links);
@@ -159,6 +166,7 @@ public class AccessLinksForEntries {
             this.panel = panel;
         }
 
+        @Override
         public void action() throws Throwable {
 
             ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();

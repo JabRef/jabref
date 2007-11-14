@@ -555,7 +555,7 @@ public class LabelPatternUtil {
         }
         String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").split(" ");
         author = firstAuthor[0].substring(0,
-            (int) Math.min(CHARS_OF_FIRST,
+            Math.min(CHARS_OF_FIRST,
                 firstAuthor[0].length()));
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname

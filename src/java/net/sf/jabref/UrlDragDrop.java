@@ -26,11 +26,14 @@
  */
 package net.sf.jabref;
 
-import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -137,7 +140,7 @@ public class UrlDragDrop implements DropTargetListener {
         try{
             URL url = (URL) tsf.getTransferData(dtURL);
             JOptionChoice res = (JOptionChoice) JOptionPane
-                    .showInputDialog((Component) editor, "", Globals
+                    .showInputDialog(editor, "", Globals
                             .lang("Select action"),
                             JOptionPane.QUESTION_MESSAGE, null,
                             new JOptionChoice[] {
@@ -160,7 +163,7 @@ public class UrlDragDrop implements DropTargetListener {
                             .get("pdfDirectory")), editor.getEntry()
                             .getField(BibtexFields.KEY_FIELD)
                             + ".pdf");
-                    URLDownload udl = new URLDownload((Component) editor, url,
+                    URLDownload udl = new URLDownload(editor, url,
                             file);
                     frame.output(Globals.lang("Downloading..."));
                     udl.download();
@@ -171,7 +174,7 @@ public class UrlDragDrop implements DropTargetListener {
                 }catch (IOException ioex){
                     logger.log(Level.SEVERE, "Error while downloading file",
                             ioex);
-                    JOptionPane.showMessageDialog((Component) editor, Globals
+                    JOptionPane.showMessageDialog(editor, Globals
                             .lang("File download"), Globals
                             .lang("Error while downloading file:"
                                     + ioex.getMessage()),
@@ -193,7 +196,7 @@ public class UrlDragDrop implements DropTargetListener {
                     .getTransferData(DataFlavor.javaFileListFlavor);
             if (filelist.size() > 1){
                 JOptionPane
-                        .showMessageDialog((Component) editor, Globals
+                        .showMessageDialog(editor, Globals
                                 .lang("Only one item is supported"), Globals
                                 .lang("Drag and Drop Error"),
                                 JOptionPane.ERROR_MESSAGE);
@@ -204,7 +207,7 @@ public class UrlDragDrop implements DropTargetListener {
             editor.updateField(feditor);
 
         }catch (UnsupportedFlavorException nfe){
-            JOptionPane.showMessageDialog((Component) editor, Globals
+            JOptionPane.showMessageDialog(editor, Globals
                     .lang("Operation not supported"), Globals
                     .lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             logger.log(Level.WARNING, "Transfer exception", nfe);

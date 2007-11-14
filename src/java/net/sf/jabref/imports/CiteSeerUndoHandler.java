@@ -117,7 +117,7 @@ public class CiteSeerUndoHandler extends DefaultHandler {
         if (nextAssign == true) {
             String target = new String(ch, start, length);        
             if (nextField.equals("title")) {
-                if (makeOverwriteChoice((String) bibEntry.getField(nextField),
+                if (makeOverwriteChoice(bibEntry.getField(nextField),
                         target, nextField)) {
                     UndoableFieldChange fieldChange = new UndoableFieldChange(
                             bibEntry, nextField, bibEntry.getField(nextField),
@@ -126,7 +126,7 @@ public class CiteSeerUndoHandler extends DefaultHandler {
                     bibEntry.setField(nextField, target);
                 }
             } else if (nextField.equals("year")) {
-                if (makeOverwriteChoice((String) bibEntry.getField(nextField),
+                if (makeOverwriteChoice(bibEntry.getField(nextField),
                         String.valueOf(target.substring(0, 4)), nextField)) {
                     UndoableFieldChange fieldChange = new UndoableFieldChange(
                             bibEntry, nextField, bibEntry.getField(nextField),
@@ -136,7 +136,7 @@ public class CiteSeerUndoHandler extends DefaultHandler {
                             .substring(0, 4)));
                 }
             } else if (nextField.equals("citeseerurl")) {
-                if (makeOverwriteChoice((String) bibEntry.getField(nextField),
+                if (makeOverwriteChoice(bibEntry.getField(nextField),
                         target, nextField)) {
                     UndoableFieldChange fieldChange = new UndoableFieldChange(
                             bibEntry, nextField, bibEntry.getField(nextField),
@@ -199,7 +199,7 @@ public class CiteSeerUndoHandler extends DefaultHandler {
 
     public void endDocument() {
         if (newAuthors != null) {
-            if (makeOverwriteChoice((String) bibEntry.getField("author"),
+            if (makeOverwriteChoice(bibEntry.getField("author"),
                     newAuthors, "author")) {
                 UndoableFieldChange fieldChange = new UndoableFieldChange(
                         bibEntry, "author", bibEntry.getField("author"), newAuthors);

@@ -792,7 +792,7 @@ public class ImportInspectionDialog extends JDialog {
             final int col = glTable.columnAtPoint(e.getPoint()),
               row = glTable.rowAtPoint(e.getPoint());
             if (isIconColumn(col)) {
-                BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+                BibtexEntry entry = sortedList.get(row);
 
                 switch (col) {
                     case FILE_COL:
@@ -856,7 +856,7 @@ public class ImportInspectionDialog extends JDialog {
          */
         public void showFileFieldMenu(MouseEvent e) {
             final int row = glTable.rowAtPoint(e.getPoint());
-            BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+            BibtexEntry entry = sortedList.get(row);
             JPopupMenu menu = new JPopupMenu();
             int count = 0;
             Object o = entry.getField(GUIGlobals.FILE_FIELD);
@@ -887,7 +887,7 @@ public class ImportInspectionDialog extends JDialog {
          */
         public void openExternalLink(String fieldName, MouseEvent e) {
             final int row = glTable.rowAtPoint(e.getPoint());
-            BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+            BibtexEntry entry = sortedList.get(row);
 
             Object link = entry.getField(fieldName);
             try {
@@ -1029,7 +1029,7 @@ public class ImportInspectionDialog extends JDialog {
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel model = new FileListTableModel();
-            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
             if (oldVal != null)
                 model.setContent(oldVal);
             model.addEntry(model.getRowCount(), file);
@@ -1063,7 +1063,7 @@ public class ImportInspectionDialog extends JDialog {
                 } else return; // Can't go on without the bibtex key.
             }
             final FileListTableModel model = new FileListTableModel();
-            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
             if (oldVal != null)
                 model.setContent(oldVal);
             // We have a static utility method for searching for all relevant links:
@@ -1101,7 +1101,7 @@ public class ImportInspectionDialog extends JDialog {
             editor.setVisible(true);                                                 
             if (editor.okPressed()) {
                 FileListTableModel model = new FileListTableModel();
-                String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+                String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
                 if (oldVal != null)
                     model.setContent(oldVal);
                 model.addEntry(model.getRowCount(), flEntry);
@@ -1115,7 +1115,7 @@ public class ImportInspectionDialog extends JDialog {
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel model = new FileListTableModel();
-            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
             if (oldVal != null)
                 model.setContent(oldVal);
             model.addEntry(model.getRowCount(), file);
@@ -1303,7 +1303,7 @@ public class ImportInspectionDialog extends JDialog {
             else {
                 String field = fields[i-PAD];
                 if (field.equals("author") || field.equals("editor")) {
-                    String contents = (String)entry.getField(field);
+                    String contents = entry.getField(field);
                     return (contents != null) ?
                         AuthorList.fixAuthor_Natbib(contents) : "";
                 }

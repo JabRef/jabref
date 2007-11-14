@@ -69,7 +69,7 @@ public class AddToGroupAction extends AbstractAction {
             Enumeration<GroupTreeNode> e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
             GroupTreeNode node;
             while (e.hasMoreElements()) {
-                node = (GroupTreeNode) e.nextElement();
+                node = e.nextElement();
                 if (!node.getGroup().supportsRemove())
                     continue;
                 for (int i = 0; i < entries.length; ++i) {

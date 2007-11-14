@@ -550,7 +550,7 @@ public class MainTable extends JTable {
         if (l.size() <= number)
             return -1;
         else
-            return ((Integer)l.get(number)).intValue();
+            return (l.get(number)).intValue();
     }
 
     /**

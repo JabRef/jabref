@@ -108,7 +108,7 @@ public class ImportFormats {
                 }
 
             }
-        };
+        }
 
         return new ImportAction(frame, openInNew);
     }

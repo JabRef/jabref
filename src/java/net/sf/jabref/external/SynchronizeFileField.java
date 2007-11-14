@@ -141,7 +141,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
-                    tableModel.setContentDontGuessTypes((String)old);
+                    tableModel.setContentDontGuessTypes(old);
                     for (int j=0; j<tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:

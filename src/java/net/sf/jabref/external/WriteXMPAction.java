@@ -100,7 +100,7 @@ public class WriteXMPAction extends AbstractWorker {
             List<File> files = new ArrayList<File>();
 
             // First check the (legacy) "pdf" field:
-            String pdf = (String) entry.getField("pdf");
+            String pdf = entry.getField("pdf");
             String dir = panel.metaData().getFileDirectory("pdf");
             File f = Util.expandFilename(pdf, new String[]{dir,"."});
             if (f != null)
@@ -108,7 +108,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             // Then check the "file" field:
             dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            String field = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            String field = entry.getField(GUIGlobals.FILE_FIELD);
             if (field != null) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(field);

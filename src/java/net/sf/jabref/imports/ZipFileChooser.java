@@ -39,7 +39,14 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -178,7 +185,7 @@ class ZipFileChooser extends JDialog {
     List<ZipEntry> entries = new ArrayList<ZipEntry>();
     Enumeration<? extends ZipEntry> e = zipFile.entries();
     while (e.hasMoreElements()) {
-      ZipEntry entry = (ZipEntry)e.nextElement();
+      ZipEntry entry = e.nextElement();
       if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
         entries.add(entry); 
       }

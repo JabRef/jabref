@@ -162,7 +162,7 @@ class KeyBindingsDialog
       }
       keyTF.setText(newKey);
       //find which key is selected and set its value int the bindHM
-      String selectedFunction = (String) table.getOriginalName(selRow);
+      String selectedFunction = table.getOriginalName(selRow);
       table.setValueAt(newKey, selRow, 1);
       table.revalidate();
       table.repaint();

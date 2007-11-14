@@ -26,19 +26,64 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.ErrorMessageDisplay;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HelpAction;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.SearchRule;
+import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.SidePaneComponent;
+import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
@@ -873,7 +918,7 @@ public class GroupSelector extends SidePaneComponent implements
                         group.getName()));
             }
         }
-    };
+    }
 
     private class RemoveSubgroupsAction extends NodeAction {
         public RemoveSubgroupsAction() {
@@ -899,7 +944,7 @@ public class GroupSelector extends SidePaneComponent implements
                         group.getName()));
             }
         }
-    };
+    }
 
     private class RemoveGroupKeepSubgroupsAction extends NodeAction {
         public RemoveGroupKeepSubgroupsAction() {
@@ -929,7 +974,7 @@ public class GroupSelector extends SidePaneComponent implements
                         group.getName()));
             }
         }
-    };
+    }
 
     public TreePath getSelectionPath() {
         return groupsTree.getSelectionPath();
@@ -963,7 +1008,7 @@ public class GroupSelector extends SidePaneComponent implements
             panel.markBaseChanged(); // JZTODO lyrics
             frame.output(Globals.lang("Sorted all subgroups recursively."));
         }
-    };
+    }
 
     public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
         public void actionPerformed(ActionEvent ae) {
@@ -1278,7 +1323,7 @@ public class GroupSelector extends SidePaneComponent implements
       Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
       Map<String, String> dummyMap = new HashMap<String, String>(); // just because I don't want to use null...
       for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
-          node = (GroupTreeNode) e.nextElement();
+          node = e.nextElement();
           rule = node.getSearchRule();
           for (Iterator<BibtexEntry> it = matches.iterator(); it.hasNext(); ) {
               entry = it.next();

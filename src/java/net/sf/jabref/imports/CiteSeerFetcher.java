@@ -388,7 +388,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		UpdateProgressStatus progressStatus = new UpdateProgressStatus(Globals.lang("Fetching Identifiers"));
 		SwingUtilities.invokeLater(progressStatus);
 		while (targetIterator.hasNext() && !abortOperation) {
-			currentKey = (String) targetIterator.next();
+			currentKey = targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);
 			abortOperation = generateIdentifierList(currentEntry, citationHashTable, rejectedEntries);
 			UpdateProgressBarValue updateValue = new UpdateProgressBarValue(++identifierCounter);			
@@ -452,7 +452,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	}
 
 	public static String generateCanonicalNumber(BibtexEntry be) {
-	    return(generateCanonicalNumber((String) be.getField("citeseerurl")));
+	    return(generateCanonicalNumber(be.getField("citeseerurl")));
 	}
 	
     public static String generateCanonicalNumber(String link) {
@@ -486,7 +486,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	}	
 
     public static String generateCanonicalURL(BibtexEntry be) {
-        return(generateCanonicalURL((String) be.getField("citeseerurl")));
+        return(generateCanonicalURL(be.getField("citeseerurl")));
 	}
 	
 	private boolean generateIdentifierList(BibtexEntry currentEntry, Map<String, Boolean> citationHashTable, Hashtable<Integer, BibtexEntry> rejectedEntries)

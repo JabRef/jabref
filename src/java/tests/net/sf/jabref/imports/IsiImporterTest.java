@@ -98,7 +98,7 @@ public class IsiImporterTest extends TestCase {
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTest1.isi"));
 		assertEquals(1, entries.size());
-		BibtexEntry entry = (BibtexEntry) entries.get(0);
+		BibtexEntry entry = entries.get(0);
 		assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry
 			.getField("title"));
 		assertEquals(
@@ -122,8 +122,8 @@ public class IsiImporterTest extends TestCase {
 			.getResourceAsStream("IsiImporterTestInspec.isi"));
 
 		assertEquals(2, entries.size());
-		BibtexEntry a = (BibtexEntry) entries.get(0);
-		BibtexEntry b = (BibtexEntry) entries.get(1);
+		BibtexEntry a = entries.get(0);
+		BibtexEntry b = entries.get(1);
 
 		if (a.getField("title").equals(
 			"Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals")) {
@@ -207,8 +207,8 @@ public class IsiImporterTest extends TestCase {
 			.getResourceAsStream("IsiImporterTestWOS.isi"));
 
 		assertEquals(2, entries.size());
-		BibtexEntry a = (BibtexEntry) entries.get(0);
-		BibtexEntry b = (BibtexEntry) entries.get(1);
+		BibtexEntry a = entries.get(0);
+		BibtexEntry b = entries.get(1);
 
 		if (a.getField("title").equals(
 			"Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation")) {
@@ -278,7 +278,7 @@ public class IsiImporterTest extends TestCase {
 			.getResourceAsStream("IEEEImport1.txt"));
 
 		assertEquals(1, entries.size());
-		BibtexEntry a = (BibtexEntry) entries.get(0);
+		BibtexEntry a = entries.get(0);
 		
 		assertEquals(a.getType().getName(), BibtexEntryType.ARTICLE, a.getType());
 		assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
@@ -295,11 +295,11 @@ public class IsiImporterTest extends TestCase {
 
 		assertEquals("387--391", a.getField("pages"));
 
-		assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", (String) a.getField("author"));
+		assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
 
 		assertEquals("2006", a.getField("year"));
 
-		assertEquals("Perceptual grouping, street extraction, urban remote sensing", (String)a.getField("keywords"));
+		assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
 
 		assertEquals("In this letter, the problem of detecting urban road " +
 				"networks from high-resolution optical/synthetic aperture " +
@@ -318,7 +318,7 @@ public class IsiImporterTest extends TestCase {
 				"pair of very high resolution images, one from an optical " +
 				"sensor and one from a SAR sensor. The experiments show an " +
 				"increase in both the completeness and the quality indexes " +
-				"for the extracted road network.", (String)a.getField("abstract"));
+				"for the extracted road network.", a.getField("abstract"));
 		
 	}
 	
@@ -329,10 +329,10 @@ public class IsiImporterTest extends TestCase {
 			.getResourceAsStream("IsiImporterTestMedline.isi"));
 
 		assertEquals(2, entries.size());
-		BibtexEntry a = (BibtexEntry) entries.get(0);
-		BibtexEntry b = (BibtexEntry) entries.get(1);
+		BibtexEntry a = entries.get(0);
+		BibtexEntry b = entries.get(1);
 
-		if (((String) a.getField("title")).startsWith("Estrogen")) {
+		if ((a.getField("title")).startsWith("Estrogen")) {
 			BibtexEntry tmp = a;
 			a = b;
 			b = tmp;
@@ -343,7 +343,7 @@ public class IsiImporterTest extends TestCase {
 			"Effects of modafinil on cognitive performance and alertness during sleep deprivation.",
 			a.getField("title"));
 
-		assertEquals("Wesensten, Nancy J.", (String) a.getField("author"));
+		assertEquals("Wesensten, Nancy J.", a.getField("author"));
 		assertEquals("Curr Pharm Des", a.getField("journal"));
 		assertEquals("2006", a.getField("year"));
 		assertEquals(null, a.getField("month"));
@@ -358,7 +358,7 @@ public class IsiImporterTest extends TestCase {
 			b.getField("title").toString());
 		assertEquals(
 			"Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
-			(String) b.getField("author"));
+			b.getField("author"));
 		assertEquals("2006", b.getField("year"));
 		assertEquals("#may#", b.getField("month"));
 		assertEquals("13", b.getField("volume"));

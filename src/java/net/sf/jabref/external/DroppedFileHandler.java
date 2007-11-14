@@ -305,7 +305,7 @@ public class DroppedFileHandler {
         boolean avoidDuplicate, NamedCompound edits) {
 
 
-        String oldValue = (String)entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (oldValue != null)
             tm.setContent(oldValue);

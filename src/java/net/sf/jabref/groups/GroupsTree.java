@@ -421,7 +421,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 	/** Collapse this node and all its children. */
 	public void collapseSubtree(GroupTreeNode node) {
 		for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();)
-			collapsePath(new TreePath(((GroupTreeNode) e.nextElement())
+			collapsePath(new TreePath((e.nextElement())
 					.getPath()));
 	}
 

@@ -1,5 +1,26 @@
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -7,14 +28,6 @@ import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.*;
-import java.util.List;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup
@@ -201,10 +214,10 @@ public class PushToApplicationButton implements ActionListener {
     /**
      * Comparator for sorting the selection according to name.
      */
-    static class PushToApplicationComparator implements Comparator {
+    static class PushToApplicationComparator implements Comparator<PushToApplication> {
 
-        public int compare(Object one, Object two) {
-            return ((PushToApplication)one).getName().compareTo(((PushToApplication)two).getName());
+        public int compare(PushToApplication one, PushToApplication two) {
+            return one.getName().compareTo(two.getName());
         }
     }
 }

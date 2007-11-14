@@ -323,9 +323,9 @@ public class ResourceLoader
 
         try
         {
-            while (((int) size - rb) > 0)
+            while ((size - rb) > 0)
             {
-                chunk = bis.read(b, rb, (int) size - rb);
+                chunk = bis.read(b, rb, size - rb);
 
                 if (chunk == -1)
                 {
@@ -360,14 +360,14 @@ public class ResourceLoader
 
         try
         {
-            int size = (int) bis.available();
+            int size = bis.available();
             byte[] b = new byte[size];
             int rb = 0;
             int chunk = 0;
 
-            while (((int) size - rb) > 0)
+            while ((size - rb) > 0)
             {
-                chunk = bis.read(b, rb, (int) size - rb);
+                chunk = bis.read(b, rb, size - rb);
 
                 if (chunk == -1)
                 {

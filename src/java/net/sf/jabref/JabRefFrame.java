@@ -537,7 +537,7 @@ public class JabRefFrame extends JFrame {
         medlineFetcher = new MedlineFetcher(sidePaneManager);
         citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
         citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
-            (CiteSeerFetcher) citeSeerFetcher);
+            citeSeerFetcher);
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);
 
@@ -718,7 +718,7 @@ public JabRefPreferences prefs() {
       // Let the search interface store changes to prefs.
       // But which one? Let's use the one that is visible.
       if (basePanel() != null) {
-        ((SearchManager2)searchManager).updatePrefs();
+        (searchManager).updatePrefs();
       }
       
       prefs.flush();

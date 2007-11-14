@@ -152,7 +152,7 @@ public class AppendDatabaseAction extends BaseAction {
                   
                   for (Enumeration<GroupTreeNode> e = newGroups
 					.preorderEnumeration(); e.hasMoreElements();) {
-					node = (GroupTreeNode) e.nextElement();
+					node = e.nextElement();
 					if (!(node.getGroup() instanceof ExplicitGroup))
 						continue;
 					group = (ExplicitGroup) node.getGroup();

@@ -11,7 +11,7 @@ import antlr.NoViableAltException;
 import antlr.RecognitionException;
 import antlr.collections.AST;
 
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked", "unused", "null"})
 public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes
  {
 
@@ -48,7 +48,7 @@ public SearchExpressionTreeParser() {
 			case And:
 			{
 				AST __t87 = _t;
-				AST tmp1_AST_in = (AST)_t;
+				AST tmp1_AST_in = _t;
 				match(_t,And);
 				_t = _t.getFirstChild();
 				a=tSearchExpression(_t);
@@ -60,7 +60,7 @@ public SearchExpressionTreeParser() {
 					_t = _retTree;
 				}
 				else if (((_t.getType() >= LITERAL_and && _t.getType() <= ExpressionSearch))) {
-					AST tmp2_AST_in = (AST)_t;
+					AST tmp2_AST_in = _t;
 					if ( _t==null ) throw new MismatchedTokenException();
 					_t = _t.getNextSibling();
 				}
@@ -77,7 +77,7 @@ public SearchExpressionTreeParser() {
 			case Or:
 			{
 				AST __t89 = _t;
-				AST tmp3_AST_in = (AST)_t;
+				AST tmp3_AST_in = _t;
 				match(_t,Or);
 				_t = _t.getFirstChild();
 				a=tSearchExpression(_t);
@@ -89,7 +89,7 @@ public SearchExpressionTreeParser() {
 					_t = _retTree;
 				}
 				else if (((_t.getType() >= LITERAL_and && _t.getType() <= ExpressionSearch))) {
-					AST tmp4_AST_in = (AST)_t;
+					AST tmp4_AST_in = _t;
 					if ( _t==null ) throw new MismatchedTokenException();
 					_t = _t.getNextSibling();
 				}
@@ -106,7 +106,7 @@ public SearchExpressionTreeParser() {
 			case Not:
 			{
 				AST __t91 = _t;
-				AST tmp5_AST_in = (AST)_t;
+				AST tmp5_AST_in = _t;
 				match(_t,Not);
 				_t = _t.getFirstChild();
 				a=tSearchExpression(_t);
@@ -147,15 +147,15 @@ public SearchExpressionTreeParser() {
 		
 		try {      // for error handling
 			AST __t94 = _t;
-			AST tmp6_AST_in = (AST)_t;
+			AST tmp6_AST_in = _t;
 			match(_t,ExpressionSearch);
 			_t = _t.getFirstChild();
-			var_f = (AST)_t;
+			var_f = _t;
 			match(_t,RegularExpression);
 			_t = _t.getNextSibling();
 			matchType=tSearchType(_t);
 			_t = _retTree;
-			var_v = (AST)_t;
+			var_v = _t;
 			match(_t,RegularExpression);
 			_t = _t.getNextSibling();
 			
@@ -174,7 +174,7 @@ public SearchExpressionTreeParser() {
 								default: // regular field
 									if (!fieldSpec.matcher(searchKeys[i].toString()).matches())
 										continue;
-									content = (String)bibtexEntry.getField(searchKeys[i].toString());
+									content = bibtexEntry.getField(searchKeys[i].toString());
 							}
 			noSuchField = false;
 							if (content == null)
@@ -216,7 +216,7 @@ public SearchExpressionTreeParser() {
 			switch ( _t.getType()) {
 			case LITERAL_contains:
 			{
-				AST tmp7_AST_in = (AST)_t;
+				AST tmp7_AST_in = _t;
 				match(_t,LITERAL_contains);
 				_t = _t.getNextSibling();
 				matchType = MATCH_CONTAINS;
@@ -224,7 +224,7 @@ public SearchExpressionTreeParser() {
 			}
 			case LITERAL_matches:
 			{
-				AST tmp8_AST_in = (AST)_t;
+				AST tmp8_AST_in = _t;
 				match(_t,LITERAL_matches);
 				_t = _t.getNextSibling();
 				matchType = MATCH_EXACT;
@@ -232,7 +232,7 @@ public SearchExpressionTreeParser() {
 			}
 			case EQUAL:
 			{
-				AST tmp9_AST_in = (AST)_t;
+				AST tmp9_AST_in = _t;
 				match(_t,EQUAL);
 				_t = _t.getNextSibling();
 				matchType = MATCH_CONTAINS;
@@ -240,7 +240,7 @@ public SearchExpressionTreeParser() {
 			}
 			case EEQUAL:
 			{
-				AST tmp10_AST_in = (AST)_t;
+				AST tmp10_AST_in = _t;
 				match(_t,EEQUAL);
 				_t = _t.getNextSibling();
 				matchType = MATCH_EXACT;
@@ -248,7 +248,7 @@ public SearchExpressionTreeParser() {
 			}
 			case NEQUAL:
 			{
-				AST tmp11_AST_in = (AST)_t;
+				AST tmp11_AST_in = _t;
 				match(_t,NEQUAL);
 				_t = _t.getNextSibling();
 				matchType = MATCH_DOES_NOT_CONTAIN;

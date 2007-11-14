@@ -234,7 +234,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 		Enumeration<GroupTreeNode> e = preorderEnumeration();
 		AbstractGroup group;
 		while (e.hasMoreElements()) {
-			group = ((GroupTreeNode) e.nextElement()).getGroup();
+			group = (e.nextElement()).getGroup();
 			if (group.contains(null, entry)) // first argument is never used
 				matchingGroups.add(group);
 		}

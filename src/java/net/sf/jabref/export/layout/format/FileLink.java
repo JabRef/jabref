@@ -29,8 +29,6 @@ public class FileLink implements ParamLayoutFormatter {
             // No file type specified. Simply take the first link.
             if (tableModel.getRowCount() > 0)
                 link = tableModel.getEntry(0).getLink();
-            else
-                link = null;
         }
         else {
             // A file type is specified:

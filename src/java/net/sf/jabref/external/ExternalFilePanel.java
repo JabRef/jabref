@@ -12,10 +12,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldEditor;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.OpenFileFilter;
+import net.sf.jabref.UrlDragDrop;
+import net.sf.jabref.Util;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.XMPUtil;
 
@@ -155,14 +170,8 @@ public class ExternalFilePanel extends JPanel {
 				if (file == null) {
 					file = new File(editor.getText());
 				}
-
-				if (file == null) {
-					output(Globals.lang("No file associated"));
-					return;
-				}
 				
 				final File finalFile = file;
-
 		
 				output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
 				try {
@@ -342,10 +351,8 @@ public class ExternalFilePanel extends JPanel {
 						 * and not set the text of the editor.
 						 */
 						targetEntry.setField(fieldName, textToSet);
-                        if (fieldEditor != null) {
-                            fieldEditor.setText(textToSet);
-                            fieldEditor.setEnabled(true);
-                        }
+                        fieldEditor.setText(textToSet);
+                        fieldEditor.setEnabled(true);
                         updateEditor = false;
 					} else {
 						/*
@@ -425,7 +432,7 @@ public class ExternalFilePanel extends JPanel {
 				 */
 				list.add(".");
 
-				String found = Util.findPdf(getEntry(), fieldName, (String[]) list
+				String found = Util.findPdf(getEntry(), fieldName, list
 					.toArray(new String[list.size()]));// , off);
                                         
                                 

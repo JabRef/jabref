@@ -175,7 +175,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
   public void store() {
     purgeAll();
-    Importer[] importers = (Importer[])this.toArray(new Importer[]{});
+    Importer[] importers = this.toArray(new Importer[]{});
     for (int i = 0; i < importers.length; i++) {
       Globals.prefs.putStringArray("customImportFormat"+i, importers[i].getAsStringArray());
     }

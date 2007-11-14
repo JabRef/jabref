@@ -50,22 +50,22 @@ public class OAI2ImportTest extends TestCase {
 	public void testParse() throws Throwable {
 		try {
 			saxParser.parse(this.getClass().getResourceAsStream("oai2.xml"), handler);
-			assertEquals("hep-ph/0408155", (String) be.getField("eprint"));
+			assertEquals("hep-ph/0408155", be.getField("eprint"));
 			assertEquals("G. F. Giudice and A. Riotto and A. Zaffaroni and J. López-Peña",
-				(String) be.getField("author"));
-			assertEquals("Nucl.Phys. B", (String) be.getField("journal"));
-			assertEquals("710", (String) be.getField("volume"));
-			assertEquals("2005", (String) be.getField("year"));
-			assertEquals("511-525", (String) be.getField("pages"));
+				be.getField("author"));
+			assertEquals("Nucl.Phys. B", be.getField("journal"));
+			assertEquals("710", be.getField("volume"));
+			assertEquals("2005", be.getField("year"));
+			assertEquals("511-525", be.getField("pages"));
 
 			// Citekey is only generated if the user says so in the import
 			// inspection dialog.
 			assertEquals(null, be.getCiteKey());
 
-			assertEquals("Heavy Particles from Inflation", (String) be.getField("title"));
-			assertNotNull((String) be.getField("abstract"));
-			assertEquals("23 pages", (String) be.getField("comments"));
-			assertEquals("CERN-PH-TH/2004-151", (String) be.getField("reportno"));
+			assertEquals("Heavy Particles from Inflation", be.getField("title"));
+			assertNotNull(be.getField("abstract"));
+			assertEquals("23 pages", be.getField("comments"));
+			assertEquals("CERN-PH-TH/2004-151", be.getField("reportno"));
 		} catch (SAXException e) {
 			throw e.getException();
 		}
@@ -74,7 +74,7 @@ public class OAI2ImportTest extends TestCase {
 	public void testOai22xml() throws Exception {
 		try {
 			saxParser.parse(this.getClass().getResourceAsStream("oai22.xml"), handler);
-			assertEquals("2005", (String) be.getField("year"));
+			assertEquals("2005", be.getField("year"));
 		} catch (SAXException e) {
 			throw e.getException();
 		}
@@ -119,7 +119,7 @@ public class OAI2ImportTest extends TestCase {
 			be = fetcher.importOai2Entry("math.RA/0612188");
 			assertNotNull(be);
 
-			assertEquals("math/0612188", (String) be.getField("eprint"));
+			assertEquals("math/0612188", be.getField("eprint"));
 			assertEquals("On the classification and properties of noncommutative duplicates", be
 				.getField("title").toString());
 			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
@@ -133,7 +133,7 @@ public class OAI2ImportTest extends TestCase {
 			be = fetcher.importOai2Entry("astro-ph/0702080");
 			assertNotNull(be);
 
-			assertEquals("astro-ph/0702080", (String) be.getField("eprint"));
+			assertEquals("astro-ph/0702080", be.getField("eprint"));
 			assertEquals(
 				"Magnetized Hypermassive Neutron Star Collapse: a candidate central engine for short-hard GRBs",
 				be.getField("title").toString());
@@ -146,7 +146,7 @@ public class OAI2ImportTest extends TestCase {
 			be = fetcher.importOai2Entry("math.QA/0601001");
 			assertNotNull(be);
 
-			assertEquals("math/0601001", (String) be.getField("eprint"));
+			assertEquals("math/0601001", be.getField("eprint"));
 			Thread.sleep(20000);
 		}
 
@@ -155,7 +155,7 @@ public class OAI2ImportTest extends TestCase {
 			be = fetcher.importOai2Entry("hep-ph/0408155");
 			assertNotNull(be);
 			
-			assertEquals("hep-ph/0408155", (String) be.getField("eprint"));
+			assertEquals("hep-ph/0408155", be.getField("eprint"));
 			  Thread.sleep(20000);
         }
 

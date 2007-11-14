@@ -298,7 +298,6 @@ public class GUIGlobals {
 				try {
 					url = new URL(path);
 				} catch (MalformedURLException e) {
-					url = null;
 				}
 				if (url == null)
 					System.err.println(Globals.lang("Could not find image file")+" '"+path+"'");

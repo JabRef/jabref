@@ -74,7 +74,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		astFactory.addASTChild(currentAST, var_s_AST);
 		match(STRING);
 		if ( inputState.guessing==0 ) {
-			quotedRegularExpression_AST = (AST)currentAST.root;
+			quotedRegularExpression_AST = currentAST.root;
 			
 							quotedRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(quotedRegularExpression_AST));
 						
@@ -83,7 +83,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 				quotedRegularExpression_AST.getFirstChild() : quotedRegularExpression_AST;
 			currentAST.advanceChildToEnd();
 		}
-		quotedRegularExpression_AST = (AST)currentAST.root;
+		quotedRegularExpression_AST = currentAST.root;
 		returnAST = quotedRegularExpression_AST;
 	}
 	
@@ -102,7 +102,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		astFactory.addASTChild(currentAST, var_s_AST);
 		match(FIELDTYPE);
 		if ( inputState.guessing==0 ) {
-			simpleRegularExpression_AST = (AST)currentAST.root;
+			simpleRegularExpression_AST = currentAST.root;
 			
 							simpleRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(simpleRegularExpression_AST));
 						
@@ -111,7 +111,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 				simpleRegularExpression_AST.getFirstChild() : simpleRegularExpression_AST;
 			currentAST.advanceChildToEnd();
 		}
-		simpleRegularExpression_AST = (AST)currentAST.root;
+		simpleRegularExpression_AST = currentAST.root;
 		returnAST = simpleRegularExpression_AST;
 	}
 	
@@ -127,7 +127,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		tmp1_AST = astFactory.create(LT(1));
 		astFactory.addASTChild(currentAST, tmp1_AST);
 		match(Token.EOF_TYPE);
-		searchExpression_AST = (AST)currentAST.root;
+		searchExpression_AST = currentAST.root;
 		returnAST = searchExpression_AST;
 	}
 	
@@ -162,14 +162,14 @@ inputState.guessing--;
 			condition();
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
-				condition_AST = (AST)currentAST.root;
-				condition_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(And)).add(condition_AST));
+				condition_AST = currentAST.root;
+				condition_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(And)).add(condition_AST));
 				currentAST.root = condition_AST;
 				currentAST.child = condition_AST!=null &&condition_AST.getFirstChild()!=null ?
 					condition_AST.getFirstChild() : condition_AST;
 				currentAST.advanceChildToEnd();
 			}
-			condition_AST = (AST)currentAST.root;
+			condition_AST = currentAST.root;
 		}
 		else {
 			boolean synPredMatched82 = false;
@@ -197,19 +197,19 @@ inputState.guessing--;
 				condition();
 				astFactory.addASTChild(currentAST, returnAST);
 				if ( inputState.guessing==0 ) {
-					condition_AST = (AST)currentAST.root;
-					condition_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(Or)).add(condition_AST));
+					condition_AST = currentAST.root;
+					condition_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(Or)).add(condition_AST));
 					currentAST.root = condition_AST;
 					currentAST.child = condition_AST!=null &&condition_AST.getFirstChild()!=null ?
 						condition_AST.getFirstChild() : condition_AST;
 					currentAST.advanceChildToEnd();
 				}
-				condition_AST = (AST)currentAST.root;
+				condition_AST = currentAST.root;
 			}
 			else if ((_tokenSet_0.member(LA(1))) && (_tokenSet_1.member(LA(2))) && (_tokenSet_1.member(LA(3)))) {
 				expression();
 				astFactory.addASTChild(currentAST, returnAST);
-				condition_AST = (AST)currentAST.root;
+				condition_AST = currentAST.root;
 			}
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
@@ -230,7 +230,7 @@ inputState.guessing--;
 		{
 			expressionSearch();
 			astFactory.addASTChild(currentAST, returnAST);
-			expression_AST = (AST)currentAST.root;
+			expression_AST = currentAST.root;
 			break;
 		}
 		case LPAREN:
@@ -239,7 +239,7 @@ inputState.guessing--;
 			condition();
 			astFactory.addASTChild(currentAST, returnAST);
 			match(RPAREN);
-			expression_AST = (AST)currentAST.root;
+			expression_AST = currentAST.root;
 			break;
 		}
 		default:
@@ -248,14 +248,14 @@ inputState.guessing--;
 				expressionSearch();
 				astFactory.addASTChild(currentAST, returnAST);
 				if ( inputState.guessing==0 ) {
-					expression_AST = (AST)currentAST.root;
-					expression_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(Not)).add(expression_AST));
+					expression_AST = currentAST.root;
+					expression_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(Not)).add(expression_AST));
 					currentAST.root = expression_AST;
 					currentAST.child = expression_AST!=null &&expression_AST.getFirstChild()!=null ?
 						expression_AST.getFirstChild() : expression_AST;
 					currentAST.advanceChildToEnd();
 				}
-				expression_AST = (AST)currentAST.root;
+				expression_AST = currentAST.root;
 			}
 			else if ((LA(1)==LITERAL_not) && (LA(2)==LPAREN)) {
 				match(LITERAL_not);
@@ -264,14 +264,14 @@ inputState.guessing--;
 				astFactory.addASTChild(currentAST, returnAST);
 				match(RPAREN);
 				if ( inputState.guessing==0 ) {
-					expression_AST = (AST)currentAST.root;
-					expression_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(Not)).add(expression_AST));
+					expression_AST = currentAST.root;
+					expression_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(Not)).add(expression_AST));
 					currentAST.root = expression_AST;
 					currentAST.child = expression_AST!=null &&expression_AST.getFirstChild()!=null ?
 						expression_AST.getFirstChild() : expression_AST;
 					currentAST.advanceChildToEnd();
 				}
-				expression_AST = (AST)currentAST.root;
+				expression_AST = currentAST.root;
 			}
 		else {
 			throw new NoViableAltException(LT(1), getFilename());
@@ -294,14 +294,14 @@ inputState.guessing--;
 			quotedRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
-				expressionSearch_AST = (AST)currentAST.root;
-				expressionSearch_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
+				expressionSearch_AST = currentAST.root;
+				expressionSearch_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
 				currentAST.root = expressionSearch_AST;
 				currentAST.child = expressionSearch_AST!=null &&expressionSearch_AST.getFirstChild()!=null ?
 					expressionSearch_AST.getFirstChild() : expressionSearch_AST;
 				currentAST.advanceChildToEnd();
 			}
-			expressionSearch_AST = (AST)currentAST.root;
+			expressionSearch_AST = currentAST.root;
 		}
 		else if ((LA(1)==FIELDTYPE) && (_tokenSet_2.member(LA(2))) && (LA(3)==STRING)) {
 			simpleRegularExpression(false,true);
@@ -311,14 +311,14 @@ inputState.guessing--;
 			quotedRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
-				expressionSearch_AST = (AST)currentAST.root;
-				expressionSearch_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
+				expressionSearch_AST = currentAST.root;
+				expressionSearch_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
 				currentAST.root = expressionSearch_AST;
 				currentAST.child = expressionSearch_AST!=null &&expressionSearch_AST.getFirstChild()!=null ?
 					expressionSearch_AST.getFirstChild() : expressionSearch_AST;
 				currentAST.advanceChildToEnd();
 			}
-			expressionSearch_AST = (AST)currentAST.root;
+			expressionSearch_AST = currentAST.root;
 		}
 		else if ((LA(1)==FIELDTYPE) && (_tokenSet_2.member(LA(2))) && (LA(3)==FIELDTYPE)) {
 			simpleRegularExpression(false,true);
@@ -328,14 +328,14 @@ inputState.guessing--;
 			simpleRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
-				expressionSearch_AST = (AST)currentAST.root;
-				expressionSearch_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
+				expressionSearch_AST = currentAST.root;
+				expressionSearch_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
 				currentAST.root = expressionSearch_AST;
 				currentAST.child = expressionSearch_AST!=null &&expressionSearch_AST.getFirstChild()!=null ?
 					expressionSearch_AST.getFirstChild() : expressionSearch_AST;
 				currentAST.advanceChildToEnd();
 			}
-			expressionSearch_AST = (AST)currentAST.root;
+			expressionSearch_AST = currentAST.root;
 		}
 		else if ((LA(1)==STRING) && (_tokenSet_2.member(LA(2))) && (LA(3)==FIELDTYPE)) {
 			quotedRegularExpression(false,true);
@@ -345,14 +345,14 @@ inputState.guessing--;
 			simpleRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
-				expressionSearch_AST = (AST)currentAST.root;
-				expressionSearch_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
+				expressionSearch_AST = currentAST.root;
+				expressionSearch_AST = astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
 				currentAST.root = expressionSearch_AST;
 				currentAST.child = expressionSearch_AST!=null &&expressionSearch_AST.getFirstChild()!=null ?
 					expressionSearch_AST.getFirstChild() : expressionSearch_AST;
 				currentAST.advanceChildToEnd();
 			}
-			expressionSearch_AST = (AST)currentAST.root;
+			expressionSearch_AST = currentAST.root;
 		}
 		else {
 			throw new NoViableAltException(LT(1), getFilename());
@@ -374,7 +374,7 @@ inputState.guessing--;
 			tmp10_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp10_AST);
 			match(LITERAL_contains);
-			compareType_AST = (AST)currentAST.root;
+			compareType_AST = currentAST.root;
 			break;
 		}
 		case LITERAL_matches:
@@ -383,7 +383,7 @@ inputState.guessing--;
 			tmp11_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp11_AST);
 			match(LITERAL_matches);
-			compareType_AST = (AST)currentAST.root;
+			compareType_AST = currentAST.root;
 			break;
 		}
 		case EQUAL:
@@ -392,7 +392,7 @@ inputState.guessing--;
 			tmp12_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp12_AST);
 			match(EQUAL);
-			compareType_AST = (AST)currentAST.root;
+			compareType_AST = currentAST.root;
 			break;
 		}
 		case EEQUAL:
@@ -401,7 +401,7 @@ inputState.guessing--;
 			tmp13_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp13_AST);
 			match(EEQUAL);
-			compareType_AST = (AST)currentAST.root;
+			compareType_AST = currentAST.root;
 			break;
 		}
 		case NEQUAL:
@@ -410,7 +410,7 @@ inputState.guessing--;
 			tmp14_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp14_AST);
 			match(NEQUAL);
-			compareType_AST = (AST)currentAST.root;
+			compareType_AST = currentAST.root;
 			break;
 		}
 		default:

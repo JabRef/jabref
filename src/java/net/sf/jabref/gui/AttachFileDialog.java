@@ -42,7 +42,7 @@ public class AttachFileDialog extends JDialog {
         this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
-        this.editor = new FieldTextField(fieldName, (String)entry.getField(fieldName), false);
+        this.editor = new FieldTextField(fieldName, entry.getField(fieldName), false);
 
         initGui();
     }
@@ -52,7 +52,7 @@ public class AttachFileDialog extends JDialog {
         this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
-        this.editor = new FieldTextField(fieldName, (String)entry.getField(fieldName), false);
+        this.editor = new FieldTextField(fieldName, entry.getField(fieldName), false);
 
         initGui();
     }

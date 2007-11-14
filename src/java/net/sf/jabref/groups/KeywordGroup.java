@@ -158,7 +158,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 			boolean modified = false;
 			for (int i = 0; i < entries.length; i++) {
 				if (applyRule(null, entries[i]) == 0) {
-					String oldContent = (String) entries[i]
+					String oldContent = entries[i]
 							.getField(m_searchField), 
 							pre = Globals.prefs.get("groupKeywordSeparator");
 					String newContent = (oldContent == null ? "" : oldContent
@@ -191,7 +191,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 			boolean modified = false;
 			for (int i = 0; i < entries.length; ++i) {
 				if (applyRule(null, entries[i]) > 0) {
-					String oldContent = (String) entries[i]
+					String oldContent = entries[i]
 							.getField(m_searchField);
 					removeMatches(entries[i]);
 					// Store undo information.
@@ -249,7 +249,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 	 * possible if the search expression is not a regExp.
 	 */
 	private void removeMatches(BibtexEntry entry) {
-		String content = (String) entry.getField(m_searchField);
+		String content = entry.getField(m_searchField);
 		if (content == null)
 			return; // nothing to modify
 		StringBuffer sbOrig = new StringBuffer(content);

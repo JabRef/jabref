@@ -41,15 +41,15 @@ public class HTMLChars implements LayoutFormatter {
 				currentCommand = new StringBuffer();
 			} else if (!incommand && (c == '{' || c == '}')) {
 				// Swallow the brace.
-			} else if (Character.isLetter((char) c) || (c == '%')
-				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf(String.valueOf((char)c)) >= 0)) {
+			} else if (Character.isLetter(c) || (c == '%')
+				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf(String.valueOf(c)) >= 0)) {
 				escaped = false;
 
                 if (!incommand)
-					sb.append((char) c);
+					sb.append(c);
 					// Else we are in a command, and should not keep the letter.
 				else {
-					currentCommand.append((char) c);
+					currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
 						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
 						// This indicates that we are in a command of the type
@@ -99,7 +99,7 @@ public class HTMLChars implements LayoutFormatter {
 				String argument = null;
 
 				if (!incommand) {
-					sb.append((char) c);
+					sb.append(c);
 				} else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
 					// First test if we are already at the end of the string.
 					// if (i >= field.length()-1)
@@ -205,7 +205,7 @@ public class HTMLChars implements LayoutFormatter {
 				break;
 			else if (c == '{')
 				count++;
-			part.append((char) c);
+			part.append(c);
 			i++;
 		}
 		return new IntAndString(part.length(), format(part.toString()));

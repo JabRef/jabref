@@ -478,7 +478,7 @@ public class XMPUtil {
 
 		Iterator<BibtexEntry> it = bibtexEntries.iterator();
 		while (it.hasNext()) {
-			BibtexEntry e = (BibtexEntry) it.next();
+			BibtexEntry e = it.next();
 			XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
 			x.addSchema(schema);
 			schema.setBibtexEntry(e);
@@ -1029,7 +1029,7 @@ public class XMPUtil {
 			}
 
 			if (writePDFInfo && bibtexEntries.size() == 1) {
-				writeDocumentInformation(document, (BibtexEntry) bibtexEntries
+				writeDocumentInformation(document, bibtexEntries
 						.iterator().next(), null);
 				writeDublinCore(document, bibtexEntries, null);
 			}
@@ -1153,7 +1153,7 @@ public class XMPUtil {
 
 				Iterator<BibtexEntry> it = l.iterator();
 				while (it.hasNext()) {
-					BibtexEntry e = (BibtexEntry) it.next();
+					BibtexEntry e = it.next();
 					StringWriter sw = new StringWriter();
 					e.write(sw, new net.sf.jabref.export.LatexFieldFormatter(),
 							false);

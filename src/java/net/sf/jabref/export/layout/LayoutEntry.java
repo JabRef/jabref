@@ -370,7 +370,7 @@ public class LayoutEntry {
 			}
 
 			// Then check whether this is a user defined formatter
-			String formatterParameter = (String) userNameFormatter
+			String formatterParameter = userNameFormatter
 					.get(className);
 
 			if (formatterParameter != null) {

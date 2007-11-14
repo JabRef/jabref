@@ -109,7 +109,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
             if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
-                o = FileListTableModel.getFirstLabel((String)be.getField(GUIGlobals.FILE_FIELD));
+                o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
             } else
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
         } else if (columns[col - padleft].equals(GUIGlobals.TYPE_HEADER)) {

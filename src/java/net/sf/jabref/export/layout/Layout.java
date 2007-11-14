@@ -72,20 +72,21 @@ public class Layout
             }
             else if (si.i == LayoutHelper.IS_FIELD_END)
             {
-                if (blockStart.equals(si.s))
-                {
-                    blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
-                    tmpEntries.add(le);
-                    blockEntries = null;
-                }
-                else
-                {
-                    System.out.println(blockStart+"\n"+si.s);
-                    System.out.println(
-                        "Nested field entries are not implemented !!!");
-                    //System.out.println("..."+blockStart+"..."+si.s+"...");
-                    Thread.dumpStack();
+                if (blockStart != null && blockEntries != null){
+                    if (blockStart.equals(si.s))
+                    {
+                        blockEntries.add(si);
+                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                        tmpEntries.add(le);
+                        blockEntries = null;
+                    }
+                    else
+                    {
+                        System.out.println(blockStart+"\n"+si.s);
+                        System.out.println(
+                            "Nested field entries are not implemented !!!");
+                        Thread.dumpStack();
+                    }
                 }
             }
             else if (si.i == LayoutHelper.IS_GROUP_START)
@@ -95,19 +96,19 @@ public class Layout
             }
             else if (si.i == LayoutHelper.IS_GROUP_END)
             {
-                if (blockStart.equals(si.s))
-                {
-                    blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
-                    tmpEntries.add(le);
-                    blockEntries = null;
-                } else
-                {
-                    System.out.println(
-                        "Nested field entries are not implemented !!!");
-                    Thread.dumpStack();
-
-                }                
+                if (blockStart != null && blockEntries != null) {
+                    if (blockStart.equals(si.s)) {
+                        blockEntries.add(si);
+                        le = new LayoutEntry(blockEntries, classPrefix,
+                            LayoutHelper.IS_GROUP_START);
+                        tmpEntries.add(le);
+                        blockEntries = null;
+                    } else {
+                        System.out
+                            .println("Nested field entries are not implemented !!!");
+                        Thread.dumpStack();
+                    }
+                }
             }
             else if (si.i == LayoutHelper.IS_OPTION_FIELD)
             {

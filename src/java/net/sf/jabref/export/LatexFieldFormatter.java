@@ -175,7 +175,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         if (Character.isLetter(c) && (escape || inCommandName)) {
             inCommandName = true;
             if (!inCommandOption)
-                commandName.append((char)c);
+                commandName.append(c);
         }
         else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
             //System.out.println("whitespace here");
@@ -263,8 +263,8 @@ public class LatexFieldFormatter implements FieldFormatter {
     if ((right.size() > 0) && (left.size() == 0))
         throw new IllegalArgumentException
         ("'}' character ends string prematurely.");
-    if ((right.size() > 0) && (((Integer)right.elementAt(0)).intValue()
-                   < ((Integer)left.elementAt(0)).intValue()))
+    if ((right.size() > 0) && ((right.elementAt(0)).intValue()
+                   < (left.elementAt(0)).intValue()))
         throw new IllegalArgumentException
         ("'}' character ends string prematurely.");
     if (left.size() != right.size())

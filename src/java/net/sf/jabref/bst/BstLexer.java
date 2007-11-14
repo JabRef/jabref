@@ -2,7 +2,13 @@ package net.sf.jabref.bst;
 
 // $ANTLR 3.0b5 Bst.g 2006-11-23 23:20:24
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.Lexer;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 
 public class BstLexer extends Lexer {
     public static final int LETTER=21;
@@ -37,7 +43,9 @@ public class BstLexer extends Lexer {
     public static final int IDLIST=4;
     public static final int NUMERAL=22;
     public static final int READ=13;
-    public BstLexer() {;} 
+    public BstLexer() {
+        
+    } 
     public BstLexer(CharStream input) {
         super(input);
     }

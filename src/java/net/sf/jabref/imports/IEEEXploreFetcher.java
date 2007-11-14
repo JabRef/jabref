@@ -1,8 +1,17 @@
 package net.sf.jabref.imports;
 
 import java.awt.BorderLayout;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,7 +21,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.journals.JournalAbbreviations;
 
@@ -322,7 +336,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             if (isStandard == true) {
                 entry.setType(BibtexEntryType.getType("standard"));
                 entry.setField("organization", "IEEE");
-                String stdNumber = (String)entry.getField("journal");
+                String stdNumber = entry.getField("journal");
                 String[] parts = stdNumber.split("Std ");
                 if (parts.length == 2) {
                     stdNumber = parts[1];
@@ -340,7 +354,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 entry.clearField("journal");
                 entry.clearField("booktitle");
                 
-                String title = (String)entry.getField("title");
+                String title = entry.getField("title");
                 entry.setField("title", title);
             }
             return entry;
@@ -354,7 +368,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         if (entry.getType().getName() == "Standard")
             return entry;
         // clean up month
-        String month = (String)entry.getField("month");
+        String month = entry.getField("month");
         // hash or map TODO
         entry.setField("month", month);
         // clean up publication field
@@ -367,7 +381,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         } else {
             sourceField = "booktitle";
         }
-        String fullName = (String)entry.getField(sourceField);
+        String fullName = entry.getField(sourceField);
         if (fullName == null) {
             System.err.println("Null publication");
             return null;
@@ -461,7 +475,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             fullName = fullName.trim();
             
             fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-            String year = (String)entry.getField("year");
+            String year = entry.getField("year");
             fullName = fullName.replaceAll(", " + year + "\\.?", "");
             //System.out.println(fullName);
             
@@ -514,7 +528,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 return entry;
             }
             */
-            BibtexEntryType type = null;
+            BibtexEntryType type = BibtexEntryType.getType("article");
             String sourceField = null;
             if (text.indexOf("JNL") >= 0) {
                 type = BibtexEntryType.getType("article");

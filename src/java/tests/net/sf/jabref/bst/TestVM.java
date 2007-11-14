@@ -48,7 +48,7 @@ public class TestVM extends TestCase {
 		assertEquals(2, vm.getStrings().size());
 		assertEquals(7, vm.getIntegers().size());
 		assertEquals(1, vm.getEntries().size());
-		assertEquals(5, ((BstEntry)vm.getEntries().get(0)).getFields().size());
+		assertEquals(5, (vm.getEntries().get(0)).getFields().size());
 		assertEquals(38, vm.getFunctions().size());
 
 	}
@@ -103,7 +103,7 @@ public class TestVM extends TestCase {
 
 			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
-			assertEquals(new Integer(5), (Integer) vm.getIntegers().get("variable.a"));
+			assertEquals(new Integer(5), vm.getIntegers().get("variable.a"));
 		}
 		{
 			VM vm = new VM("FUNCTION {a}{ #5 #5 = " + "#1 #2 = " + "#3 #4 < " + "#4 #3 < "

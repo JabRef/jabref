@@ -51,7 +51,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.auximport ;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
@@ -188,7 +192,9 @@ public class AuxSubGenerator
         String line ;
         try
         {
-          line = br.readLine() ;
+            if (br == null)
+                throw new IOException();
+            line = br.readLine() ;
         }
         catch ( IOException ioe )
         {
@@ -251,7 +257,8 @@ public class AuxSubGenerator
       {
         try
         {
-          br.close() ;
+            if (br != null)
+                br.close() ;
           nestedAuxCounter++ ;
         }
         catch ( IOException ioe )
@@ -292,7 +299,7 @@ public class AuxSubGenerator
           // Check if the entry we just found references another entry which
           // we don't already have in our list of entries to include. If so,
           // pull in that entry as well:
-          String crossref = (String)entry.getField("crossref");
+          String crossref = entry.getField("crossref");
           if ((crossref != null) && (!mySet.contains(crossref))) {
               BibtexEntry refEntry = db.getEntryByKey(crossref);
               /**

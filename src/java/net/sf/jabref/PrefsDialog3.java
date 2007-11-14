@@ -105,7 +105,7 @@ public class PrefsDialog3 extends JDialog {
 		int i = 0;
         //ArrayList<Component> comps = new ArrayList<Component>();
         while (it.hasNext()) {
-			PrefsTab tab = (PrefsTab) it.next();
+			PrefsTab tab = it.next();
 			names[i++] = tab.getTabName(); 
 			main.add((Component) tab, tab.getTabName());
             //comps.add((Component)tab); // for debug only

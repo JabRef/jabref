@@ -189,7 +189,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         outer: for (int i=0; i<tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
             for (Iterator<String> j=fields.iterator(); j.hasNext();) {
-                String field = (String)j.next();
+                String field = j.next();
                 if (field.equals(GUIGlobals.FILE_FIELD)) {
                     found = true;
                     break outer;

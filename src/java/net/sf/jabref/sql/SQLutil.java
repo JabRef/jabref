@@ -358,7 +358,7 @@ public class SQLutil {
         
 		// populate entry_group table
         dmlPopTab_EG(gtn,out);
-    };
+    }
 
     
     /**

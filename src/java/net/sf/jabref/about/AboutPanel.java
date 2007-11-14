@@ -35,7 +35,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.sf.jabref.about ;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.io.BufferedReader;
@@ -178,11 +182,7 @@ public class AboutPanel extends JComponent
                                                  "credits.txt" ) ;
       }
       InputStreamReader reader = new InputStreamReader( stream ) ;
-//          getClass().getResourceAsStream(GUIGlobals.getLocaleHelpPath() + "credits.txt" ) ) ;
-//          getClass().getResourceAsStream( "/help/credits.txt" ) ) ;
       BufferedReader input = new BufferedReader(reader, 1000) ;
-
-//      System.out.println("encoding :" +reader.getEncoding() ) ;
 
       while ( input.ready() )
       {
@@ -222,9 +222,10 @@ public class AboutPanel extends JComponent
               aLine.setDirection( 0.0, -1.0 ) ;
               aLine.setFont( font3 ) ;
 
-//              System.out.println( "line " +aLine.getText() +"<" +(borders[3] + ( index * fm.getHeight() * 1.5 )) +">" ) ;
-
+              block = new TextBlock() ;
               block.add( aLine ) ;
+              block.setVisible(true);
+              
               index++ ;
             }
           }

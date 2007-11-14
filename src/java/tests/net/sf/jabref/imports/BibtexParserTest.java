@@ -179,7 +179,7 @@ public class BibtexParserTest extends TestCase {
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 		assertEquals("test", e.getCiteKey());
 		assertEquals(2, e.getAllFields().size());
 		assertTrue(e.getAllFields().contains("author"));
@@ -202,7 +202,7 @@ public class BibtexParserTest extends TestCase {
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e2 = (BibtexEntry) c.iterator().next();
+		BibtexEntry e2 = c.iterator().next();
 
 		assertNotSame(e.getId(), e2.getId());
 
@@ -227,11 +227,11 @@ public class BibtexParserTest extends TestCase {
 			+ "small = 1234,\n" + "}"));
 
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
-		assertEquals("1234567890123456789", (String) e.getField("isbn"));
-		assertEquals("1234567890123456789", (String) e.getField("isbn2"));
-		assertEquals("1234", (String) e.getField("small"));
+		assertEquals("1234567890123456789", e.getField("isbn"));
+		assertEquals("1234567890123456789", e.getField("isbn2"));
+		assertEquals("1234", e.getField("small"));
 	}
 
 	public void testBigNumbers2() throws IOException {
@@ -245,16 +245,16 @@ public class BibtexParserTest extends TestCase {
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
 		assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
 		assertEquals(BibtexEntryType.BOOK, e.getType());
-		assertEquals("2707318256", (String) e.getField("isbn"));
-		assertEquals("Paris", (String) e.getField("address"));
-		assertEquals("Minuit", (String) e.getField("publisher"));
-		assertEquals("Questions de sociologie", (String) e.getField("title"));
-		assertEquals("#bourdieu#", (String) e.getField("author"));
-		assertEquals("2002", (String) e.getField("year"));
+		assertEquals("2707318256", e.getField("isbn"));
+		assertEquals("Paris", e.getField("address"));
+		assertEquals("Minuit", e.getField("publisher"));
+		assertEquals("Questions de sociologie", e.getField("title"));
+		assertEquals("#bourdieu#", e.getField("author"));
+		assertEquals("2002", e.getField("year"));
 	}
 
 	public void testNewlineHandling() throws IOException {
@@ -271,13 +271,13 @@ public class BibtexParserTest extends TestCase {
 		assertEquals("canh05", e.getCiteKey());
 		assertEquals(BibtexEntryType.ARTICLE, e.getType());
 
-		assertEquals("a b", (String)e.getField("a"));
-		assertEquals("a\nb", (String)e.getField("b"));
-		assertEquals("a b", (String)e.getField("c"));
-		assertEquals("a b", (String)e.getField("d"));
+		assertEquals("a b", e.getField("a"));
+		assertEquals("a\nb", e.getField("b"));
+		assertEquals("a b", e.getField("c"));
+		assertEquals("a b", e.getField("d"));
 		
 		// I think the last \n is a bug in the parser...
-		assertEquals("Hallo World this is\nnot \nan \n exercise . \n\n", (String) e.getField("title"));
-		assertEquals("Hallo World this isnot an exercise . ", (String) e.getField("tabs"));
+		assertEquals("Hallo World this is\nnot \nan \n exercise . \n\n", e.getField("title"));
+		assertEquals("Hallo World this isnot an exercise . ", e.getField("tabs"));
 	}
 }

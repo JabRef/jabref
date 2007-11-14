@@ -71,22 +71,6 @@ public void run() {
   st.setPriority(Thread.MIN_PRIORITY);
   st.start();
   int current = 0;
-  DuplicateResolverDialog drd = null;
-
-/*
-  loop: while (!st.finished() || (current < duplicates.size()))
-  {
-    if ( current >= duplicates.size() )
-    {
-      // No more duplicates to resolve, but search is still in progress. Sleep a little.
-       try
-       {
-         sleep(10);
-       } catch (InterruptedException ex) {}
-       continue loop;
-    }
-  }
-*/
 
    final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
   while (!st.finished() || (current < duplicates.size()))
@@ -146,8 +130,6 @@ public void run() {
     }
   }
 
-  if (drd != null)
-    drd.dispose();
     final int dupliC = duplicateCounter;
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
@@ -163,11 +145,9 @@ public void run() {
             panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
                        +" " +Globals.lang("pairs processed") +": " +dupliC );
 
-            if (ce != null)
-            {
+
                 ce.end();
                 panel.undoManager.addEdit(ce);
-            }
 
         }
 

@@ -892,7 +892,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldvals.get(bes),
-                                    (String)bes.getField(BibtexFields.KEY_FIELD)));
+                                    bes.getField(BibtexFields.KEY_FIELD)));
                     }
                     ce.end();
                     undoManager.addEdit(ce);
@@ -1261,8 +1261,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
                   BibtexEntry[] bes = mainTable.getSelectedEntries();
                   besLength = bes.length;
-          if (bes == null)
-              return;
+
                   for (int i=0; i<bes.length; i++) {
                       Util.markEntry(bes[i], ce);
                   }
@@ -2351,7 +2350,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((oldKey == null) || (oldKey.equals(""))) {
                     LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
-                        (String)bes.getField(BibtexFields.KEY_FIELD)));
+                        bes.getField(BibtexFields.KEY_FIELD)));
                     any = true;
                 }
             }
@@ -2512,7 +2511,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         String citeKey = "";//, message = "";
         boolean first = true;
         for (BibtexEntry bes : mainTable.getSelected()){
-            citeKey = (String) bes.getField(BibtexFields.KEY_FIELD);
+            citeKey = bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
             if (citeKey == null || citeKey.equals(""))
                 continue;

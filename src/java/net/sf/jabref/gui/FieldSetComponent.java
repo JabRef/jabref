@@ -256,7 +256,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     @SuppressWarnings("unchecked")
 	public List<String> getFields() {
         Object[] o = listModel.toArray();
-        return (List<String>)(List)java.util.Arrays.asList(o);
+        return (List)java.util.Arrays.asList(o);
     }
     
     /**

@@ -4,12 +4,22 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 
 // The action concerned with opening an existing database.
@@ -75,7 +85,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             File file = iterator.next();
             for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
-                BasePanel bp = (BasePanel)frame.baseAt(i);
+                BasePanel bp = frame.baseAt(i);
                 if ((bp.getFile() != null) && bp.getFile().equals(file)) {
                     iterator.remove();
                     removed++;
@@ -299,9 +309,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
                     // Found the signature. The rest of the line is unknown, so we skip
                     // it:
-                    while (reader.read() != '\n');
+                    while (reader.read() != '\n'){
+                        // keep reading
+                    }
                     // If the next line starts with something like "% ", handle this:
-                    while (((c =reader.read()) == '%') || (Character.isWhitespace((char)c)));
+                    while (((c =reader.read()) == '%') || (Character.isWhitespace((char)c))){
+                        // keep reading
+                    }
                     // Then we must skip the "Encoding: ". We may already have read the first
                     // character:
                     if ((char)c != GUIGlobals.encPrefix.charAt(0))

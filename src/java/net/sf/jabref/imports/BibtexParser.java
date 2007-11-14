@@ -27,13 +27,28 @@
 
 package net.sf.jabref.imports;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.UnknownEntryType;
+import net.sf.jabref.Util;
 
 /**
  * Class for importing BibTeX-files.
@@ -128,7 +143,7 @@ public class BibtexParser {
 		if (c == null){
 			return null;
 		}
-		return (BibtexEntry)c.iterator().next();
+		return c.iterator().next();
 	}	
 	
 	/**
@@ -463,9 +478,8 @@ public class BibtexParser {
 
 		if ((key != null) && key.equals(""))
 			key = null;
-		// System.out.println("Key: "+key);
-		if (result != null)
-			result.setField(BibtexFields.KEY_FIELD, key);
+
+		result.setField(BibtexFields.KEY_FIELD, key);
 		skipWhitespace();
 
 		while (true) {
@@ -836,8 +850,10 @@ public class BibtexParser {
 
 	private boolean consumeUncritically(char expected) throws IOException {
 		int c;
-		while (((c = read()) != expected) && (c != -1) && (c != 65535))
-			;
+		while (((c = read()) != expected) && (c != -1) && (c != 65535)){
+		    // do nothing
+		}
+			
 		if ((c == -1) || (c == 65535))
 			_eof = true;
 
@@ -852,7 +868,7 @@ public class BibtexParser {
 
 		if ((c != expected1) && (c != expected2)) {
 			throw new RuntimeException("Error in line " + line + ": Expected " + expected1 + " or "
-				+ expected2 + " but received " + (int) c);
+				+ expected2 + " but received " + c);
 
 		}
 

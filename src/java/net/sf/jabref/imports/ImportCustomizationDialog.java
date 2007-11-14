@@ -299,7 +299,7 @@ public class ImportCustomizationDialog extends JDialog {
     }
 
     public CustomImportList.Importer getImporter(int rowIndex) {
-      CustomImportList.Importer[] importers = (CustomImportList.Importer[])Globals.prefs.customImports.toArray(new CustomImportList.Importer[] {});
+      CustomImportList.Importer[] importers = Globals.prefs.customImports.toArray(new CustomImportList.Importer[] {});
       return importers[rowIndex];
     }
   }

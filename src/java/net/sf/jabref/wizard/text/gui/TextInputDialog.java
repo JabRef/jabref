@@ -474,7 +474,7 @@ public class TextInputDialog
           marked.appendPosition( type, selStart, selEnd ) ;
 
           // get old text from bibtex tag
-          String old = ( String ) entry.getField( type ) ;
+          String old = entry.getField( type ) ;
 
           // merge old and selected text
           if ( old != null )
