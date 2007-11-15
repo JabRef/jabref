@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.Icon;
+import javax.swing.*;
 
 import net.sf.jabref.*;
 
 public class PushToLyx implements PushToApplication {
+
+    private JTextField lyxPipe=new JTextField(30);
+    private JPanel settings = null;
 
     private boolean couldNotFindPipe=false;
     private boolean couldNotWrite=false;
@@ -97,6 +100,22 @@ public class PushToLyx implements PushToApplication {
         return true;
     }
 
+    public JPanel getSettingsPanel() {
+        if (settings == null)
+            initSettingsPanel();
+        lyxPipe.setText(Globals.prefs.get("lyxpipe"));
+        return settings;
+    }
+
+    public void storeSettings() {
+        Globals.prefs.put("lyxpipe", lyxPipe.getText());
+    }
+
+    private void initSettingsPanel() {
+        settings = new JPanel();
+        settings.add(new JLabel(Globals.lang("Path to LyX pipe") + ":"));
+        settings.add(lyxPipe);
+    }
     /*class Timeout extends javax.swing.Timer
     {
       public Timeout(int timeout, final Thread toStop, final String message) {

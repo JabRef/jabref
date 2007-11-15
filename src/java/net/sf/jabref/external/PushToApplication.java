@@ -23,6 +23,27 @@ public interface PushToApplication {
 
     public String getKeyStrokeName();
 
+
+    /**
+     * This method asks the implementing class to return a JPanel populated
+     * with the imlementation's options panel, if necessary. If the JPanel
+     * is shown to the user, and the user indicates that settings should
+     * be stored, the implementation's storeSettings() method will be called.
+     * This method must make sure all widgets in the panel are in the correct
+     * selection states.
+     *
+     * @return a JPanel containing options, or null if options are not needed.
+     */
+    public JPanel getSettingsPanel();
+
+    /**
+     * This method is called to indicate that the settings panel returned from
+     * the getSettingsPanel() method has been shown to the user and that the
+     * user has indicated that the settings should be stored. This method must
+     * store the state of the widgets in the settings panel to Globals.prefs.
+     */
+    public void storeSettings();
+
     /**
      * The actual operation. This method will not be called on the event dispatch
      * thread, so it should not do GUI operations without utilizing invokeLater().

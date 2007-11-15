@@ -3,8 +3,7 @@ package net.sf.jabref.external;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import net.sf.jabref.*;
 
@@ -16,6 +15,9 @@ import net.sf.jabref.*;
  * To change this template use File | Settings | File Templates.
  */
 public class PushToEmacs implements PushToApplication {
+
+    //private JPanel settings = null;
+    //private JTextField citeCommand = new JTextField(30);
 
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
@@ -38,6 +40,24 @@ public class PushToEmacs implements PushToApplication {
     public String getKeyStrokeName() {
         return "Push to Emacs";
     }
+
+    public JPanel getSettingsPanel() {
+        return null;
+        /*if (settings == null)
+            initSettingsPanel();
+        citeCommand.setText(Globals.prefs.get("lyxpipe"));
+        return settings;*/
+    }
+
+    public void storeSettings() {
+        //Globals.prefs.put("lyxpipe", citeCommand.getText());
+    }
+
+    /*private void initSettingsPanel() {
+        settings = new JPanel();
+        settings.add(new JLabel(Globals.lang("Path to LyX pipe") + ":"));
+        settings.add(citeCommand);
+    }*/
 
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 

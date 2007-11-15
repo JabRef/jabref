@@ -1,5 +1,7 @@
 package net.sf.jabref.external;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 
 import javax.swing.*;
@@ -15,6 +17,9 @@ import java.io.InputStream;
  */
 public class PushToVim implements PushToApplication {
 
+    private JPanel settings = null;
+    private JTextField vimPath = new JTextField(30),
+        vimServer = new JTextField(30);
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
@@ -35,6 +40,31 @@ public class PushToVim implements PushToApplication {
 
     public String getKeyStrokeName() {
         return null;
+    }
+
+    public JPanel getSettingsPanel() {
+        if (settings == null)
+            initSettingsPanel();
+        vimPath.setText(Globals.prefs.get("vim"));
+        vimServer.setText(Globals.prefs.get("vimServer"));
+        return settings;
+    }
+
+    public void storeSettings() {
+        Globals.prefs.put("vim", vimPath.getText());
+        Globals.prefs.put("vimServer", vimServer.getText());
+    }
+
+    private void initSettingsPanel() {
+        DefaultFormBuilder builder = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+
+        builder.append(new JLabel(Globals.lang("Path to Vim") + ":"));
+        builder.append(vimPath);
+        builder.nextLine();
+        builder.append(Globals.lang("Vim Server Name") + ":");
+        builder.append(vimServer);
+        settings = builder.getPanel();
     }
 
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys,

@@ -2,7 +2,7 @@ package net.sf.jabref.external;
 
 import java.io.IOException;
 
-import javax.swing.Icon;
+import javax.swing.*;
 
 import net.sf.jabref.*;
 
@@ -10,6 +10,8 @@ public class PushToWinEdt implements PushToApplication {
 
     private boolean couldNotCall=false;
     private boolean notDefined=false;
+    private JPanel settings = null;
+    private JTextField winEdtPath = new JTextField(30);
 
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
@@ -74,5 +76,22 @@ public class PushToWinEdt implements PushToApplication {
 
     public boolean requiresBibtexKeys() {
         return true;
+    }
+
+    public JPanel getSettingsPanel() {
+        if (settings == null)
+            initSettingsPanel();
+        winEdtPath.setText(Globals.prefs.get("winEdtPath"));
+        return settings;
+    }
+
+    private void initSettingsPanel() {
+        settings = new JPanel();
+        settings.add(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
+        settings.add(winEdtPath);
+    }
+
+    public void storeSettings() {
+        Globals.prefs.put("winEdtPath", winEdtPath.getText());
     }
 }

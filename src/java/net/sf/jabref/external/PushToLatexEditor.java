@@ -2,7 +2,7 @@ package net.sf.jabref.external;
 
 import java.io.IOException;
 
-import javax.swing.Icon;
+import javax.swing.*;
 
 import net.sf.jabref.*;
 
@@ -80,5 +80,13 @@ public class PushToLatexEditor implements PushToApplication {
 
     public boolean requiresBibtexKeys() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public JPanel getSettingsPanel() {
+        return null;
+    }
+
+    public void storeSettings() {
+        
     }
 }

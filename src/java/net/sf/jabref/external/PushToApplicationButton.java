@@ -1,26 +1,6 @@
 package net.sf.jabref.external;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -28,6 +8,18 @@ import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup
@@ -50,6 +42,9 @@ public class PushToApplicationButton implements ActionListener {
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
     private MenuAction mAction = new MenuAction();
+    private JPopupMenu optPopup = new JPopupMenu();
+    private JMenuItem settings = new JMenuItem(Globals.lang("Settings"));
+    private boolean settingsOkPressed = false;
 
     /**
      * Set up the current available choices:
@@ -105,13 +100,24 @@ public class PushToApplicationButton implements ActionListener {
 
         setSelected(selected);
         pushButton.addActionListener(this);
+        pushButton.addMouseListener(new PushButtonMouseListener());
 
         comp.add(pushButton, BorderLayout.CENTER);
         comp.add(menuButton, BorderLayout.EAST);
         comp.setBorder(BorderFactory.createLineBorder(Color.gray));
         comp.setMaximumSize(comp.getPreferredSize());
 
+        optPopup.add(settings);
+        settings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                PushToApplication toApp = pushActions.get(selected);
+                JPanel options = toApp.getSettingsPanel();
+                if (options != null) {
+                    showSettingsDialog(toApp, options);
+                }
 
+            }
+        });
     }
 
     /**
@@ -167,6 +173,51 @@ public class PushToApplicationButton implements ActionListener {
         action.actionPerformed(new ActionEvent(toApp, 0, "push"));
     }
 
+    private void showSettingsDialog(PushToApplication toApp, JPanel options) {
+        final JDialog diag = new JDialog(frame, Globals.lang("Settings"), true);
+        options.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        diag.getContentPane().add(options, BorderLayout.CENTER);
+        ButtonBarBuilder bb = new ButtonBarBuilder();
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        bb.addGlue();
+        bb.addGridded(ok);
+        bb.addGridded(cancel);
+        bb.addGlue();
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                settingsOkPressed = true;
+                diag.dispose();
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                diag.dispose();
+            }
+        });
+        // Key bindings:
+        ActionMap am = bb.getPanel().getActionMap();
+        InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                diag.dispose();
+            }
+        });
+        settingsOkPressed = false;
+        diag.pack();
+        diag.setLocationRelativeTo(frame);
+        // Show the dialog:
+        diag.setVisible(true);
+        // If the user pressed Ok, ask the PushToApplication implementation
+        // to store its settings:
+        if (settingsOkPressed) {
+            toApp.storeSettings();
+        }
+    }
+
     class PopupItemActionListener implements ActionListener {
         private int index;
         public PopupItemActionListener(int index) {
@@ -208,6 +259,32 @@ public class PushToApplicationButton implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             PushToApplicationButton.this.actionPerformed(null);
+        }
+    }
+
+    class PushButtonMouseListener extends MouseAdapter {
+        public void mousePressed(MouseEvent event) {
+            if (event.isPopupTrigger())
+                processPopupTrigger(event);
+        }
+
+        public void mouseClicked(MouseEvent event) {
+            if (event.isPopupTrigger())
+                processPopupTrigger(event);
+        }
+
+        public void mouseReleased(MouseEvent event) {
+            if (event.isPopupTrigger())
+                processPopupTrigger(event);
+        }
+
+        private void processPopupTrigger(MouseEvent e) {
+            // We only want to show the popup if a settings panel exists for the selected
+            // item:
+            PushToApplication toApp = pushActions.get(selected);
+            if (toApp.getSettingsPanel() != null)
+                optPopup.show(pushButton, e.getX(), e.getY());
+
         }
     }
 
