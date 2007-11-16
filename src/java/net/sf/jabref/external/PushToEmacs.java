@@ -6,6 +6,8 @@ import java.io.InputStream;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,8 +18,8 @@ import net.sf.jabref.*;
  */
 public class PushToEmacs implements PushToApplication {
 
-    //private JPanel settings = null;
-    //private JTextField citeCommand = new JTextField(30);
+    private JPanel settings = null;
+    private JTextField citeCommand = new JTextField(30);
 
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
@@ -42,22 +44,23 @@ public class PushToEmacs implements PushToApplication {
     }
 
     public JPanel getSettingsPanel() {
-        return null;
-        /*if (settings == null)
+        if (settings == null)
             initSettingsPanel();
-        citeCommand.setText(Globals.prefs.get("lyxpipe"));
-        return settings;*/
+        citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
+        return settings;
     }
 
     public void storeSettings() {
-        //Globals.prefs.put("lyxpipe", citeCommand.getText());
+        Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
     }
 
-    /*private void initSettingsPanel() {
-        settings = new JPanel();
-        settings.add(new JLabel(Globals.lang("Path to LyX pipe") + ":"));
-        settings.add(citeCommand);
-    }*/
+    private void initSettingsPanel() {
+        DefaultFormBuilder builder = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(citeCommand);
+        settings = builder.getPanel();
+    }
 
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 
@@ -70,7 +73,7 @@ public class PushToEmacs implements PushToApplication {
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
                 new String[] {"gnuclient", "-qe",
-                "(insert \\\"\\\\" + Globals.prefs.get("citeCommand") +
+                "(insert \\\"\\\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
                         "{" + keys + "}\\\")"}
             :
                 // Linux gnuclient escaping:
@@ -78,7 +81,7 @@ public class PushToEmacs implements PushToApplication {
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
                 new String[] {"gnuclient", "-batch", "-eval",
-                "(insert \"\\\\" + Globals.prefs.get("citeCommand") +
+                "(insert \"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
                        "{" + keys + "}\")"};
 
             final Process p = Runtime.getRuntime().exec(com);

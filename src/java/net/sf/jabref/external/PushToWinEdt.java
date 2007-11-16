@@ -5,13 +5,16 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class PushToWinEdt implements PushToApplication {
 
     private boolean couldNotCall=false;
     private boolean notDefined=false;
     private JPanel settings = null;
-    private JTextField winEdtPath = new JTextField(30);
+    private JTextField winEdtPath = new JTextField(30),
+        citeCommand = new JTextField(30);
 
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
@@ -45,8 +48,8 @@ public class PushToWinEdt implements PushToApplication {
         }
 
         try {
-            StringBuffer toSend = new StringBuffer("\"[InsText('\\")
-                    .append(Globals.prefs.get("citeCommand")).append("{")
+            StringBuffer toSend = new StringBuffer("\"[InsText('")
+                    .append(Globals.prefs.get("citeCommandWinEdt")).append("{")
                     .append(keyString.replaceAll("'", "''"))
                     .append("}');]\"");
             Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
@@ -82,16 +85,23 @@ public class PushToWinEdt implements PushToApplication {
         if (settings == null)
             initSettingsPanel();
         winEdtPath.setText(Globals.prefs.get("winEdtPath"));
+        citeCommand.setText(Globals.prefs.get("citeCommandWinEdt"));
         return settings;
     }
 
     private void initSettingsPanel() {
-        settings = new JPanel();
-        settings.add(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
-        settings.add(winEdtPath);
+        DefaultFormBuilder builder = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+        builder.append(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
+        builder.append(winEdtPath);
+        builder.nextLine();
+        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(citeCommand);
+        settings = builder.getPanel();
     }
 
     public void storeSettings() {
         Globals.prefs.put("winEdtPath", winEdtPath.getText());
+        Globals.prefs.put("citeCommandWinEdt", citeCommand.getText());
     }
 }

@@ -5,18 +5,19 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Apr 4, 2006
- * Time: 10:14:04 PM
- * To change this template use File | Settings | File Templates.
+ * Class for pushing entries into LatexEditor.
  */
 public class PushToLatexEditor implements PushToApplication {
 
     private boolean couldNotCall=false;
     private boolean notDefined=false;
+    private JPanel settings = null;
+    private JTextField ledPath = new JTextField(30),
+        citeCommand = new JTextField(30);
 
     public String getName() {
         return Globals.menuTitle("Insert selected citations into LatexEditor");
@@ -51,8 +52,8 @@ public class PushToLatexEditor implements PushToApplication {
         }
 
         try {
-            StringBuffer toSend = new StringBuffer("-i \\")
-                    .append(Globals.prefs.get("citeCommand")).append("{")
+            StringBuffer toSend = new StringBuffer("-i ")
+                    .append(Globals.prefs.get("citeCommandLed")).append("{")
                     .append(keyString)
                     .append("}");
             Runtime.getRuntime().exec(led + " " + toSend.toString());
@@ -75,18 +76,34 @@ public class PushToLatexEditor implements PushToApplication {
                     +Globals.prefs.get("latexEditorPath") + "'.");
         }
         else
-            Globals.lang("Pushed citations to WinEdt");
+            Globals.lang("Pushed citations to %0", "LatexEditor");
     }
 
     public boolean requiresBibtexKeys() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;
     }
 
     public JPanel getSettingsPanel() {
-        return null;
+        if (settings == null)
+            initSettingsPanel();
+        ledPath.setText(Globals.prefs.get("latexEditorPath"));
+        citeCommand.setText(Globals.prefs.get("citeCommandLed"));
+        return settings;
+    }
+
+    private void initSettingsPanel() {
+        DefaultFormBuilder builder = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+        builder.append(new JLabel(Globals.lang("Path to LatexEditor (LEd.exe)") + ":"));
+        builder.append(ledPath);
+        builder.nextLine();
+        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(citeCommand);
+        settings = builder.getPanel();
     }
 
     public void storeSettings() {
-        
+        Globals.prefs.put("latexEditorPath", ledPath.getText());
+        Globals.prefs.put("citeCommandLed", citeCommand.getText());
     }
 }

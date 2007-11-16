@@ -228,7 +228,7 @@ public class PushToApplicationButton implements ActionListener {
             // Change the selection:
             setSelected(index);
             // Invoke the selected operation (is that expected behaviour?):
-            PushToApplicationButton.this.actionPerformed(null);
+            //PushToApplicationButton.this.actionPerformed(null);
             // It makes sense to transfer focus to the push button after the
             // menu closes:
             pushButton.requestFocus();

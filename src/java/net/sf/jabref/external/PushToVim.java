@@ -19,7 +19,9 @@ public class PushToVim implements PushToApplication {
 
     private JPanel settings = null;
     private JTextField vimPath = new JTextField(30),
-        vimServer = new JTextField(30);
+        vimServer = new JTextField(30),
+        citeCommand = new JTextField(30);
+
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
@@ -47,12 +49,14 @@ public class PushToVim implements PushToApplication {
             initSettingsPanel();
         vimPath.setText(Globals.prefs.get("vim"));
         vimServer.setText(Globals.prefs.get("vimServer"));
+        citeCommand.setText(Globals.prefs.get("citeCommandVim"));
         return settings;
     }
 
     public void storeSettings() {
         Globals.prefs.put("vim", vimPath.getText());
         Globals.prefs.put("vimServer", vimServer.getText());
+        Globals.prefs.put("citeCommandVim", citeCommand.getText());
     }
 
     private void initSettingsPanel() {
@@ -64,6 +68,9 @@ public class PushToVim implements PushToApplication {
         builder.nextLine();
         builder.append(Globals.lang("Vim Server Name") + ":");
         builder.append(vimServer);
+        builder.nextLine();
+        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(citeCommand);
         settings = builder.getPanel();
     }
 
@@ -74,7 +81,7 @@ public class PushToVim implements PushToApplication {
         couldNotRunClient=false;
         try {
                 String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
-                "<C-\\><C-N>a\\" + Globals.prefs.get("citeCommand") +
+                "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
                        "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
