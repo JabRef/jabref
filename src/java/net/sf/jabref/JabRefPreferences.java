@@ -346,7 +346,11 @@ public class JabRefPreferences {
 
         defaults.put("personalJournalList", null);
         defaults.put("externalJournalLists", null);
-        defaults.put("citeCommand", "cite");
+        defaults.put("citeCommand", "cite"); // obsoleted by the app-specific ones
+        defaults.put("citeCommandVim", "\\cite");
+        defaults.put("citeCommandEmacs", "\\cite");
+        defaults.put("citeCommandWinEdt", "\\cite");
+        defaults.put("citeCommandLed", "\\cite");
         defaults.put("floatMarkedEntries", Boolean.TRUE);
 
         defaults.put("useNativeFileDialogOnMac", Boolean.FALSE);
