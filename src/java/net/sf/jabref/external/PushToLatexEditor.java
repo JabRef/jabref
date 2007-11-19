@@ -93,9 +93,13 @@ public class PushToLatexEditor implements PushToApplication {
 
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(new JLabel(Globals.lang("Path to LatexEditor (LEd.exe)") + ":"));
         builder.append(ledPath);
+        BrowseAction action = new BrowseAction(null, ledPath, false);
+        JButton browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(action);
+        builder.append(browse);
         builder.nextLine();
         builder.append(Globals.lang("Cite command") + ":");
         builder.append(citeCommand);

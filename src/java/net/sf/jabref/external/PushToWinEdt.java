@@ -91,9 +91,13 @@ public class PushToWinEdt implements PushToApplication {
 
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
         builder.append(winEdtPath);
+        BrowseAction action = new BrowseAction(null, winEdtPath, false);
+        JButton browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(action);
+        builder.append(browse);
         builder.nextLine();
         builder.append(Globals.lang("Cite command") + ":");
         builder.append(citeCommand);
