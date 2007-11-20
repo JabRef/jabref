@@ -9,6 +9,7 @@ Chris:
   
 Morten:
 
+* Merge patch for entry types (see patch for IEEEXploreFetcher)
 * Test that push to WinEdt stil works.
 * Improve duplicate check.
 * "Move/rename linked file" feature
