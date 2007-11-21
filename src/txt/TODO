@@ -9,6 +9,10 @@ Chris:
   
 Morten:
 
+* Look into Medline freeze: "11221 ", "11223" doesn't?
+  (not regular - does it freeze only when the entry hasn't been
+   downloaded before?)
+* Look into submitted PDF downloader (d/l through Google)
 * Merge patch for entry types (see patch for IEEEXploreFetcher)
 * Test that push to WinEdt stil works.
 * Improve duplicate check.
