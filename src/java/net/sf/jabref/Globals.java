@@ -461,9 +461,9 @@ public class Globals {
 
 		JFileChooser fc;
 		try {
-			fc = new JabRefFileChooser(directory);
-                        if (accessory != null)
-                            fc.setAccessory(accessory);
+			fc = new JFileChooser(directory);//JabRefFileChooser(directory);
+            if (accessory != null)
+                fc.setAccessory(accessory);
 		} catch (InternalError errl) {
 			// This try/catch clause was added because a user reported an
 			// InternalError getting thrown on WinNT, presumably because of a

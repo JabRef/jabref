@@ -8,6 +8,7 @@
 		- ExportFormat based on IExportFormat (patch contributed by Kariem Hussein)
 		- LayoutFormatter
 		- EntryFetcher
+		- PushToApplication
 	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
 	  classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/

@@ -241,7 +241,7 @@ public class GUIGlobals {
 		LANGUAGES.put("Italiano", "it");
         LANGUAGES.put("Nederlands", "du");
         LANGUAGES.put("Norsk", "no");
-        //LANGUAGES.put("Español", "es");
+        LANGUAGES.put("Español", "es");
 	}
 
 	/**
