@@ -17,6 +17,7 @@
 	- Improved handling of crossrefs. Fields are now resolved in preview and export.
 	- Updated dependencies, now using: JempBox-0.2
 	- Improved handling of ArXiv URIs.
+	- [ 1620792 ] Fixed: JabRef randomly hangs during Medline fetch
 	- [ 1738920 ] Fixed: Windows Position in Multi-Monitor environment
 	- [ 1795355 ] Fixed: LatexFieldFormatter omits "{" on beginning of optional field
 	- [ 1297576 ] New feature: Printing of entry preview (use right-click menu)

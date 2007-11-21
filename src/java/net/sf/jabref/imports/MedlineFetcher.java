@@ -149,45 +149,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 
             ArrayList<BibtexEntry> bibs = fetchMedline(idList);
             if ((bibs != null) && (bibs.size() > 0)) {
-                //if (panel.prefs().getBoolean("useOwner")) {
-                //    Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
-                //}
                 tf.setText("");
-                /*NamedCompound ce = new NamedCompound("fetch Medline");
-                Iterator i = bibs.iterator();
-                while (i.hasNext()) {
-                    try {
-                        BibtexEntry be = (BibtexEntry) i.next();
-                        String id = Util.createId(be.getType(), panel.database());
-                        be.setId(id);
-                        entries.add(be);
-                        //panel.database().insertEntry(be);
-                        //ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-                    }
-                    catch (KeyCollisionException ex) {
-                    }
-                    }*/
-                //ce.end();
+                
+                panel.frame().addImportedEntries(panel, bibs, null, false, this);
 
-        panel.frame().addImportedEntries(panel, bibs, null, false, this);
-
-        /*
-                int importedEntries = panel.frame().addBibEntries(bibs, null, false);
-        if (importedEntries == 0) {
-            return; // Nothing to refresh!
-        }
-        panel.markBaseChanged();
-                panel.refreshTable();
-        if (bibs.size() > 0) {
-            BibtexEntry[] entries = (BibtexEntry[])bibs.toArray(new BibtexEntry[0]);
-            panel.selectEntries(entries, 0);
-            if (entries.length == 1)
-                panel.showEntry(entries[0]);
-            //else
-            //    panel.updateViewToSelected();
-        }*/
-
-                //panel.undoManager.addEdit(ce);
             } else
                 panel.output(Globals.lang("No Medline entries found."));
         } else {
@@ -200,22 +165,14 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 //==================================================
 //
 //==================================================
-  public static ArrayList<BibtexEntry> fetchMedline(String id)
-  {
+public static ArrayList<BibtexEntry> fetchMedline(String id)
+{
     ArrayList<BibtexEntry> bibItems=null;
     try {
 
-      String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" + id;
-
-      URL url = new URL( baseUrl );
-      HttpURLConnection data = (HttpURLConnection)url.openConnection();
-
-
-       /* Reader un = new InputStreamReader(data.getInputStream());
-        int c;
-        while ((c=un.read()) != -1) {
-          System.out.print((char)c);
-        }*/
+        String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" + id;
+        URL url = new URL( baseUrl );
+        HttpURLConnection data = (HttpURLConnection)url.openConnection();
 
 
         // Obtain a factory object for creating SAX parsers
@@ -228,7 +185,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         SAXParser parser = parserFactory.newSAXParser();   //May throw exceptions
         MedlineHandler handler = new MedlineHandler();
         // Start the parser. It reads the file and calls methods of the handler.
-
         parser.parse( data.getInputStream(), handler);
         /*FileOutputStream out = new FileOutputStream(new File("/home/alver/ut.txt"));
         System.out.println("#####");

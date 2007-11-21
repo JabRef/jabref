@@ -1513,7 +1513,7 @@ public JabRefPreferences prefs() {
 
   /**
    * This method causes all open BasePanels to set up their tables
-   * anew. When called from PrefsDialog2, this updates to the new
+   * anew. When called from PrefsDialog3, this updates to the new
    * settings.
    */
   public void setupAllTables() {
@@ -1947,21 +1947,28 @@ class FetchCiteSeerAction
    * @param openInNew Should the entries be imported into a new database?
    * @param callBack The callback for the ImportInspectionDialog to use.
    */
-  public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, String filename, boolean openInNew,
-                                 ImportInspectionDialog.CallBack callBack) {
+  public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, String filename,
+                                 final boolean openInNew,
+                                 final ImportInspectionDialog.CallBack callBack) {
       // Use the import inspection dialog if it is enabled in preferences, and (there are more than
       // one entry or the inspection dialog is also enabled for single entries):
       if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
               (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
-                ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel,
-                        BibtexFields.DEFAULT_INSPECTION_FIELDS,
-                        Globals.lang("Import"), openInNew);
-                diag.addEntries(entries);
-                diag.addCallBack(callBack);
-                diag.entryListComplete();
-                Util.placeDialog(diag, ths);
-                diag.setVisible(true);
-        diag.toFront();
+
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                  ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel,
+                          BibtexFields.DEFAULT_INSPECTION_FIELDS,
+                          Globals.lang("Import"), openInNew);
+                  diag.addEntries(entries);
+                  diag.addCallBack(callBack);
+                  diag.entryListComplete();
+                  Util.placeDialog(diag, ths);
+                  diag.setVisible(true);
+                  diag.toFront();
+              }
+          });
+
         } else {
             ths.addBibEntries(entries, filename, openInNew);
           if ((panel != null) && (entries.size() == 1)) {
