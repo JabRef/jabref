@@ -1,0 +1,93 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body text="#275856">
+    <basefont size="4"
+          color="#2F4958"
+          face="arial" />
+
+    <h1>Le Système de greffons de JabRef </h1>
+
+    <p>Depuis la version 2.4b1, JabRef peut être étendu en utilisant un système de greffons construit en utilisant le "Java Plugin Framework" (JPF).</p>
+
+    <p>Pour <i>utiliser des greffons</i>, mettez simplement le fichier jar du greffon dans le répertoire nommé <code>plugins</code> dans le répertoire où se trouve JabRef.jar. Au démarrage, JabRef affichera la liste de tous les greffons chargés.</p>
+    
+    <h2>Comment écrire un greffon</h2>
+    
+    <p>JabRef offre aux développeurs les points d'extension suivants&nbsp;:</p>
+    <ul>
+      <li><code>ImportFormat</code> - Ajoute à JabRef des importateurs accessibles depuis 'Importer dans ...'.</li> 
+      <li><code>EntryFetcher</code> - Ajoute l'accès à des bases de données comme Citeseer ou Medline au menu <i>Recherche internet</i>.</li>
+      <li><code>ExportFormatTemplate</code> - Ajoute un modèle d'exportation comme ceux accessible par <i>Gérer les exportations personnalisées</i>.</li>
+      <li><code>ExportFormat</code> - Ajoute à la fenêtre d'exportation de JabRef un filtre d'exportation (qui est plus sophistiqué que le simple modèle d'exportation).</li>
+      <li><code>ExportFormatProvider</code> - Une façon plus puissante d'ajouter des formats d'exportation à JabRef.</li> 
+      <li><code>LayoutFormatter</code> - Ajoute des formateurs qui pourront être utilisés dans la mise en page des exportations.</li>  
+	</ul>	      
+    
+    <p>Ces points d'extension sont définis dans <code>plugin.xml</code> du JabRef-core-plugin,
+    qui peut être trouvé dans <code>JabRef/src/plugins/net.sf.jabref.core/</code>.</p>
+    
+    <p>Pour commencer un développement, suivez ces principales étapes&nbsp;:</p>
+    <ol>
+      <li>Extrayer le tronc de JabRef en utilisant SubVersion (<code>https://jabref.svn.sourceforge.net/svnroot/jabref/trunk</code>).
+    Il contient JabRef lui-même ainsi que les greffons ajoutés jusqu'à présent à JabRef (vous n'avez pas besoin du répertoire htdocs) et qui peuvent vous servir de point de départ pour vos propres greffons.</li>
+      <li>Compiler JabRef en utilisant <code>ant jars</code>.</li>
+      <li>Créer votre propre projet et définissez votre entension dans votre propre plugin.xml qui doit satisfaire les points d'extension du "core" plugin.xml. 
+      En particulier, assurez-vous que&nbsp;:
+      <ul>
+        <li>...votre plugin.xml a une section <code>requires</code> qui importe le "core plugin" (<code>net.sf.jabref.core</code>).</li>
+        <li>...votre plugin.xml a la section <code>runtime</code>, où vous dites à JPF où vous avez stocké vos fichiers de classe et ressources dans votre projet.</li>
+      </ul>
+      </li>
+      <li>Créer un jar de votre projet et mettez-le dans le répertoire <code>plugins</code> de JabRef.</li>
+      <li>Votre greffon devrait être chargé quand vous démarrez JabRef à partir du jar.</li>
+    </ol>
+
+	<p>Ne vous génez pas pour nous poser des questions liées au système de greffons sur la liste de diffusion&nbsp;!</p>     
+
+    <h2>Comment ajouter un point d'extension à JabRef</h2>
+    
+    <p>Ce document est destiné aux développeurs de JabRef qui veulent ajouter des points d'extension supplémentaires.</p>
+    
+    <p>Pour ajouter un nouveau point d'extension, vous devez déclarer ce point d'extension dans le plugin.xml du "core plugin" de façon similaire à ceci&nbsp;:</p>
+    
+<code><pre>    
+&lt;extension-point id=&quot;PushToApplication&quot;&gt;
+	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
+		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
+	&lt;!-- optionally other parameters (we currently do not use any of these for anything)
+		&lt;parameter-def type=&quot;string&quot; id=&quot;name&quot; /&gt;
+		&lt;parameter-def type=&quot;string&quot; id=&quot;description&quot;
+			multiplicity=&quot;none-or-one&quot; /&gt;
+			--&gt;
+&lt;/extension-point&gt;
+</pre></code>
+
+	<p>Ensuite, vous devez relancer le générateur de code de greffon "<code>ant generate</code>", qui recréera la classe "helper" dans  "<code>net.sf.jabref.plugin.core.generated</code>" afin qu'il inclut une méthode <code>getPushToApplicationExtensions()</code> qui renvoie une liste de toutes les extensions PushToTalk référencées dans votre système.</p>
+ 
+    <p>Cette liste peut ensuite être utilisée comme ceci (un exemple de ce que nous faisons avec les extensiosn "entry fetcher")&nbsp;:</p>
+
+<code><pre> 
+/*
+ * Load fetchers that are plug-in extensions
+ */
+JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+if (jabrefPlugin != null){
+	for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
+		EntryFetcher fetcher = ext.getEntryFetcher();
+		if (fetcher != null){
+			fetchers.add(fetcher);
+		}
+	}
+}
+ 
+// and later...
+ 
+for (EntryFetcher fetcher : fetchers){
+  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
+  web.add(generalFetcher.getAction());
+  fetcherActions.add(generalFetcher.getAction());
+}
+</pre></code>
+
+</body>
+</html>
