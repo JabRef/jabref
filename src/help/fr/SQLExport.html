@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body text="#275856">
+    <basefont size="4"
+          color="#2F4958"
+          face="arial" />
+
+    <h1>Exportation vers une base de données SQL externe</h1>
+
+    <p> JabRef est capable d'exporter le contenu de la base BibTeX, ainsi que les informations sur les groupes, dans une base de données SQL externe.</p>
+
+    <h2>Configuration</h2>
+    <ol>
+      <li> En utilisant votre outil d'administration favori de MySQL, créer une base de données MySQL vide.</li>
+      <li> Assurez-vous qu'un utilisateur de cette base dispose de <em>tous les privilèges</em>.</li>
+    </ol>
+
+    <h2>Exportation</h2>
+    <ol>
+      <li> Choisissez <b>Fichier -&gt; Exporter vers une base SQL externe</b>, ou cliquez sur le bouton correspondant dans la barre d'outils.</li>
+      <li> Entrez les informations de connexion de la base de données, et cliquez sur <b>Connecter</b>.</li>
+    </ol>
+
+		<p>
+		JabRef se connectera alors à la base de données spécifiée, <b><em>effacera les tables existantes</em></b>, creera de nouvelles tables et remplira ces tables avec les informations sur les entrées et sur les groupes. Notez que les informations de connexion ne vous seront pas demandées lors des prochaines exportations.
+		Si vous souhaitez exporter vers une base de données différente, vous pouvez changez les informations de connexion en choisissant <b>Fichier -&gt; Connecter vers une base SQL externe</b> (ou en cliquant sur le bouton correspondant dans le barre d'outils), puis en effectuant une exportation.
+    </p>
+
+  </body>
+
+</html>
