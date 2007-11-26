@@ -553,6 +553,16 @@ public class JabRefPreferences {
     }
 
     /**
+     * Set the default value for a key. This is useful for plugins that need to
+     * add default values for the prefs keys they use.
+     * @param key The preferences key.
+     * @param value The default value.
+     */
+    public void putDefaultValue(String key, String value) {
+        defaults.put(key, value);
+    }
+
+    /**
      * Stores a color in preferences.
      * @param key The key for this setting.
      * @param color The Color to store.

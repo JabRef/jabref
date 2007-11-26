@@ -118,6 +118,45 @@ public abstract class _JabRefPlugin extends Plugin {
   
       }
 
+	public List<SidePanePluginExtension> getSidePanePluginExtensions(){
+        ExtensionPoint extPoint = getManager().getRegistry().getExtensionPoint(getId(), "SidePanePlugin");
+        List<SidePanePluginExtension> result = new ArrayList<SidePanePluginExtension>();
+        for (Extension ext : extPoint.getConnectedExtensions()) {
+			try {
+				result.add(new SidePanePluginExtension(getManager().getPlugin(
+						ext.getDeclaringPluginDescriptor().getId()), ext));
+			} catch (PluginLifecycleException e) {
+				log.error("Failed to activate plug-in " + ext.getDeclaringPluginDescriptor().getId(), e);
+			}
+		}
+        return result;
+    }
+
+    public static class SidePanePluginExtension extends RuntimeExtension {
+        public SidePanePluginExtension(Plugin declaringPlugin, Extension wrapped){
+            super(declaringPlugin, wrapped);
+        }
+                
+	     
+              /**
+         * @return A singleton instance of the class parameter or null if the class could not be found!
+         */
+        public net.sf.jabref.plugin.SidePanePlugin getSidePanePlugin(){
+          return (net.sf.jabref.plugin.SidePanePlugin)getClassParameter("sidePanePlugin");
+        }
+  
+  	     
+              public String getName(){
+            return getStringParameter("name");
+        }
+  
+  	     
+              public String getDescription(){
+            return getStringParameter("description");
+        }
+  
+      }
+
 	public List<EntryFetcherExtension> getEntryFetcherExtensions(){
         ExtensionPoint extPoint = getManager().getRegistry().getExtensionPoint(getId(), "EntryFetcher");
         List<EntryFetcherExtension> result = new ArrayList<EntryFetcherExtension>();

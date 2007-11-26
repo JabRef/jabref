@@ -35,7 +35,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 
@@ -48,6 +47,10 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin;
+import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.SidePanePlugin;
 
 import com.jgoodies.looks.FontPolicies;
 import com.jgoodies.looks.FontPolicy;
@@ -650,7 +653,7 @@ lastEdLoop:
             jrf.setVisible(true);
 
             // TEST TEST TEST TEST TEST TEST
-            startOOPlugin(jrf);
+            startSidePanePlugins(jrf);
 
             for (int i = 0; i < loaded.size(); i++) {
                 ParserResult pr = loaded.elementAt(i);
@@ -690,29 +693,19 @@ lastEdLoop:
     }
 
     /**
-     * Morten Alver (sept. 06): I'm adding this to run the functionality for
-     * OpenOffice integration. I'm not sure yet how to handle deployment issues,
-     * because the OO stuff requires several OO jars on the classpath, which we
-     * shouldn't distribute because OO installations already have them.
-     *
-     * To avoid introducing dependencies on these jars for the time being,
-     * I'm keeping OO "plugin" files separate, only invoking them through reflection.
+     * Go through all registered instances of SidePanePlugin, and register them
+     * in the SidePaneManager.
      *
      * @param jrf The JabRefFrame.
      */
-    private void startOOPlugin(JabRefFrame jrf) {
+    private void startSidePanePlugins(JabRefFrame jrf) {
 
-
-        try {
-            Class<?> c = Class.forName("net.sf.jabref.oo.OOTestPanel");
-            Method m = c.getDeclaredMethod("open",
-                    new Class[] {JabRefFrame.class});
-            Object i = c.newInstance();
-            m.invoke(i, new Object[] {jrf});
-        } catch (Exception e) {
-            // Do nothing.
-            //System.out.println("OO plugin not found.");
-            //e.printStackTrace();
+        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+        List<_JabRefPlugin.SidePanePluginExtension> plugins = jabrefPlugin.getSidePanePluginExtensions();
+        for (_JabRefPlugin.SidePanePluginExtension extension : plugins) {
+            SidePanePlugin plugin = extension.getSidePanePlugin();
+            SidePaneComponent comp = plugin.getSidePaneComponent(jrf, jrf.sidePaneManager);
+            jrf.sidePaneManager.registerAndShow(comp.getName(), comp);
         }
     }
 

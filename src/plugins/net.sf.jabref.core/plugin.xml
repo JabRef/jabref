@@ -128,8 +128,14 @@
     <extension-point id="PushToApplication">
         <parameter-def type="string" id="pushToApp"
                        custom-data="net.sf.jabref.external.PushToApplication" />
-        <!-- optionally other parameters (we currently do not use any of these
-for anything) -->
+       <parameter-def type="string" id="name" />
+       <parameter-def type="string" id="description"
+               multiplicity="none-or-one" />
+    </extension-point>
+
+    <extension-point id="SidePanePlugin">
+        <parameter-def type="string" id="sidePanePlugin"
+                       custom-data="net.sf.jabref.plugin.SidePanePlugin" />
        <parameter-def type="string" id="name" />
        <parameter-def type="string" id="description"
                multiplicity="none-or-one" />

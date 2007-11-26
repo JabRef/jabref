@@ -32,7 +32,7 @@ public class JabRefPlugin extends _JabRefPlugin {
 	 */
 	public static JabRefPlugin getInstance(PluginManager manager) {
 		try {
-			return (JabRefPlugin) manager
+            return (JabRefPlugin) manager
 					.getPlugin(JabRefPlugin.getId());
 		} catch (PluginLifecycleException e) {
 			return null;
