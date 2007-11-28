@@ -2169,7 +2169,6 @@ class FetchCiteSeerAction
      */
     public void block() {
         getGlassPane().setVisible(true);
-        //getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     /**
@@ -2178,9 +2177,7 @@ class FetchCiteSeerAction
      */
     public void unblock() {
         getGlassPane().setVisible(false);
-        //  getGlassPane().setCursor(Cursor.WAIT_CURSOR);
     }
-
 
     /** Set the visibility of the progress bar in the right end of the
       * status line at the bottom of the frame.

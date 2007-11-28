@@ -115,6 +115,12 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
     public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
+    
+    /*
+     * The database shown in this panel.
+     */
+    BibtexDatabase database;
+    
     private int mode=0;
     private EntryEditor currentEditor = null;
     private PreviewPanel currentPreview = null;
@@ -126,15 +132,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     UIFSplitPane contentPane = new UIFSplitPane();
 
     JSplitPane splitPane;
-    //BibtexEntry testE = new BibtexEntry("tt");
-    //boolean previewActive = true;
 
     JabRefFrame frame;
-    BibtexDatabase database;
-    // The database shown in this panel.
-    
-    //  	Moving file to MetaData (Morten, 2006.08.29)
-    // private File fileToOpen = null; 
     
     String fileMonitorHandle = null;
     boolean saving = false, updatedExternally = false;
