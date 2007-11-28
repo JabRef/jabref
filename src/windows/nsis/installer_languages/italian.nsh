@@ -9,10 +9,8 @@
 LicenseLangString JabRefLicenseData ${JabRef_LANG} "${PRODUCT_LICENSE_FILE}"
 
 LangString WelcomePageText "${JabRef_LANG}" "Questa procedura ti guiderà durante il processo di installazione di JabRef.\r\n\
-                         \r\n\
-                         $_CLICK"
-
-LangString FileTypeTitle "${JabRef_LANG}" "File BibTeX"
+                                            \r\n\
+					    $_CLICK"
 
 LangString SecAssociateBibTitle "${JabRef_LANG}" "Associazione dei file BibTeX"
 LangString SecDesktopTitle "${JabRef_LANG}" "Icona del Desktop"
@@ -20,9 +18,7 @@ LangString SecDesktopTitle "${JabRef_LANG}" "Icona del Desktop"
 LangString SecAssociateBibDescription "${JabRef_LANG}" "I file con estensione .bib saranno aperti automaticamente con JabRef."
 LangString SecDesktopDescription "${JabRef_LANG}" "Aggiungi l'icona di JabRef sul Desktop"
 
-LangString OpenIn "${JabRef_LANG}" "Apri con JabRef"
-
-LangString NotAdmin "${JabRef_LANG}" "Sono necessari privilegi di amministratore per installare JabRef!"
+LangString StillInstalled "${JabRef_LANG}" "JabRef ${Version} is already installed!"
 
 LangString FinishPageMessage "${JabRef_LANG}" "Congratulazioni! L'installazione di JabRef è terminata con successo."
 LangString FinishPageRun "${JabRef_LANG}" "Avvia JabRef"

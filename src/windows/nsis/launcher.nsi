@@ -22,6 +22,7 @@ OutFile "dist\${APPNAME}.exe"
 
 SilentInstall silent
 XPStyle on
+RequestExecutionLevel user
 
 Section ""
 

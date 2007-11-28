@@ -12,17 +12,13 @@ LangString WelcomePageText "${JabRef_LANG}" "This wizard will guide you through 
 					     \r\n\
 					     $_CLICK"
 
-LangString FileTypeTitle "${JabRef_LANG}" "BibTeX-file"
-
 LangString SecAssociateBibTitle "${JabRef_LANG}" "Associate BibTeX-files"
 LangString SecDesktopTitle "${JabRef_LANG}" "Desktop icon"
 
 LangString SecAssociateBibDescription "${JabRef_LANG}" "Files with the extension .bib will automatically be opened with JabRef."
 LangString SecDesktopDescription "${JabRef_LANG}" "Puts JabRef icon on the desktop."
 
-LangString OpenIn "${JabRef_LANG}" "Open in JabRef"
-
-LangString NotAdmin "${JabRef_LANG}" "You must have administrator privileges to install JabRef!"
+LangString StillInstalled "${JabRef_LANG}" "JabRef ${Version} is already installed!"
 
 LangString FinishPageMessage "${JabRef_LANG}" "Congratulations! JabRef has been installed successfully."
 LangString FinishPageRun "${JabRef_LANG}" "Launch JabRef"
