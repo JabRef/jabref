@@ -141,11 +141,21 @@ def traverseFileTree(dir):
 # Searches out all translation calls in the Java source files, and reports which
 # are not present in the given resource file.
 def findNewKeysInJavaCode(mainFile, dir, update):
+    keystempo = []
     f1 = open(mainFile)
     lines = f1.readlines()
     f1.close()
     keys = indexFile(lines)
     keyList = traverseFileTree(dir)
+    
+    #to process properly column character
+    for key in keys:
+       keystempo.append(key.replace("\:",":"))  
+    keys=keystempo
+    for key in keyList:
+       keystempo.append(key.replace("\:",":"))  
+    keys=keystempo
+    
     # Open the file again, for appending:
     if update:
         f1 = open(mainFile, "a")
