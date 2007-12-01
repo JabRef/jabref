@@ -142,6 +142,7 @@ def traverseFileTree(dir):
 # are not present in the given resource file.
 def findNewKeysInJavaCode(mainFile, dir, update):
     keystempo = []
+    keyListtempo = []
     f1 = open(mainFile)
     lines = f1.readlines()
     f1.close()
@@ -153,8 +154,8 @@ def findNewKeysInJavaCode(mainFile, dir, update):
        keystempo.append(key.replace("\:",":"))  
     keys=keystempo
     for key in keyList:
-       keystempo.append(key.replace("\:",":"))  
-    keys=keystempo
+       keyListtempo.append(key.replace("\:",":"))  
+    keyList=keyListtempo
     
     # Open the file again, for appending:
     if update:
