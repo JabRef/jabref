@@ -1,12 +1,30 @@
 package net.sf.jabref.imports;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HelpAction;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.SidePaneComponent;
+import net.sf.jabref.SidePaneManager;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
@@ -99,11 +117,16 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     public void actionPerformed(ActionEvent e) {
         if (tf.getText().trim().length() == 0)
             return;
-        ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
+        final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
                 BibtexFields.DEFAULT_INSPECTION_FIELDS, fetcher.getTitle(), false);
         dialog.addCallBack(fetcher);
         Util.placeDialog(dialog, frame);
-        fetcher.processQuery(tf.getText().trim(), dialog, frame);
+        
+        new Thread(new Runnable(){
+            public void run(){
+                fetcher.processQuery(tf.getText().trim(), dialog, frame);        
+            }
+        }).start();
     }
 
     class FetcherAction extends AbstractAction {

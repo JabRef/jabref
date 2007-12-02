@@ -112,8 +112,6 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         (new Thread(this)).start();
     }
 
-
-
     public String getTitle() {
         return Globals.menuTitle("Search IEEEXplore");
     }
