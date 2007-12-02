@@ -9,20 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -56,6 +43,8 @@ public class FileListEntryEditor {
     JButton ok = new JButton(Globals.lang("Ok")),
             cancel = new JButton(Globals.lang("Cancel")),
             open = new JButton(Globals.lang("Open"));
+
+
     JComboBox types;
     JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
     JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
@@ -124,6 +113,7 @@ public class FileListEntryEditor {
         bb.addGlue();
         //bb.addGridded(open);
         //bb.addRelatedGap();
+        bb.addRelatedGap();
         bb.addGridded(ok);
         bb.addGridded(cancel);
         bb.addGlue();
@@ -146,6 +136,7 @@ public class FileListEntryEditor {
                 }
             };
         cancel.addActionListener(cancelAction);
+
 
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
@@ -313,4 +304,6 @@ public class FileListEntryEditor {
             }
         }
     }
+
+
 }

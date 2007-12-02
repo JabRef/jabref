@@ -58,6 +58,8 @@ import com.jgoodies.looks.FontSet;
 import com.jgoodies.looks.FontSets;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.theme.SubstanceTheme;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -704,7 +706,8 @@ lastEdLoop:
         List<_JabRefPlugin.SidePanePluginExtension> plugins = jabrefPlugin.getSidePanePluginExtensions();
         for (_JabRefPlugin.SidePanePluginExtension extension : plugins) {
             SidePanePlugin plugin = extension.getSidePanePlugin();
-            SidePaneComponent comp = plugin.getSidePaneComponent(jrf, jrf.sidePaneManager);
+            plugin.init(jrf, jrf.sidePaneManager);
+            SidePaneComponent comp = plugin.getSidePaneComponent();
             jrf.sidePaneManager.registerAndShow(comp.getName(), comp);
         }
     }

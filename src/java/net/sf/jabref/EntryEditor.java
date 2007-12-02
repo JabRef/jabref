@@ -869,9 +869,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
     }
 
+
     private class TypeLabel extends JPanel {
         private String label;
-
         public TypeLabel(String type) {
             label = type;
             addMouseListener(new MouseAdapter() {
@@ -896,10 +896,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             Graphics2D g2 = (Graphics2D) g;
             g2.setColor(GUIGlobals.validFieldColor);
             g2.setFont(GUIGlobals.typeNameFont);
-
             FontMetrics fm = g2.getFontMetrics();
             int width = fm.stringWidth(label);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.rotate(-Math.PI / 2, 0, 0);
             g2.drawString(label, -width - 7, 28);
         }

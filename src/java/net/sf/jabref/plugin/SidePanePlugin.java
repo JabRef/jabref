@@ -13,7 +13,9 @@ import net.sf.jabref.SidePaneManager;
  */
 public interface SidePanePlugin {
 
-    public SidePaneComponent getSidePaneComponent(JabRefFrame frame, SidePaneManager manager);
+    public void init(JabRefFrame frame, SidePaneManager manager);
+    
+    public SidePaneComponent getSidePaneComponent();
 
     public String getMenuName();
 

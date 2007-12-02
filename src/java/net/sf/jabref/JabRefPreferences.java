@@ -840,6 +840,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
         defKeyBinds.put("Search IEEEXplore", "F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
+        defKeyBinds.put("Fetch SPIRES", "ctrl F8");
         defKeyBinds.put("Write XMP", "ctrl F4");
         defKeyBinds.put("New file link", "ctrl N");
         //defKeyBinds.put("Select value", "ctrl B");

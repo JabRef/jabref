@@ -47,10 +47,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
-import net.sf.jabref.external.DownloadExternalFile;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.external.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
@@ -75,8 +72,9 @@ public class FileListEditor extends JTable implements FieldEditor,
     private JScrollPane sPane;
     private JButton add, remove, up, down, auto, download;
     private JPopupMenu menu = new JPopupMenu();
-    private JMenuItem item = new JMenuItem(Globals.lang("Open"));
 
+    private JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
+    private JMenuItem rename = new JMenuItem(Globals.lang("Move/rename file"));
 
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
@@ -174,12 +172,14 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
-        menu.add(item);
-        item.addActionListener(new ActionListener() {
+        menu.add(openLink);
+        openLink.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 openSelectedFile();
             }
         });
+        menu.add(rename);
+        rename.addActionListener(new MoveFileAction(frame, entryEditor, this));
     }
 
     private void openSelectedFile() {
@@ -194,6 +194,9 @@ public class FileListEditor extends JTable implements FieldEditor,
         }
     }
 
+    public FileListTableModel getTableModel() {
+        return tableModel;
+    }
 
     public String getFieldName() {
         return fieldName;

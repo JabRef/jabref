@@ -22,36 +22,35 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.event.InputEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.TransferHandler;
-
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
+
+import javax.swing.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
@@ -117,8 +116,6 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * Imports the dropped URL or plain text as a new entry in the current
 	 * database.
 	 * 
-	 * @todo It would be nice to support dropping of pdfs onto the table as a
-	 *       way to link them to the corresponding entries.
 	 */
 	public boolean importData(JComponent comp, Transferable t) {
 
@@ -194,7 +191,21 @@ public class EntryTableTransferHandler extends TransferHandler {
 
 	public void exportAsDrag(JComponent comp, InputEvent e, int action) {
 		// action is always LINK
-		super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
+        /* TODO: add support for dragging file link from table icon into other apps
+        if (e instanceof MouseEvent) {
+            MouseEvent me = (MouseEvent)e;
+            int col = entryTable.columnAtPoint(me.getPoint());
+            String[] res = entryTable.getIconTypeForColumn(col);
+            if (res == null) {
+                super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
+                return;
+            }
+            // We have an icon column:
+            if (res == MainTableFormat.FILE) {
+                System.out.println("dragging file");
+            }
+        }*/
+        super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
 	}
 
 	protected void exportDone(JComponent source, Transferable data, int action) {

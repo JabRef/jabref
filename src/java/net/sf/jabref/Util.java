@@ -722,7 +722,10 @@ public class Util {
 			try {
                 String filePath = httpLink ? link : file.getPath();
                 if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
+                    // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+                    String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+                            new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
+                            new String[] { "/usr/bin/open", filePath };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
                     if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
