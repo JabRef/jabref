@@ -100,8 +100,10 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  * If the importer wants to cancel the import, it should call the dispose()
  * method.
  * 
- * If the importer receives the stopFetching-call, it should not stop fetching
- * at the next possible situation.
+ * If the importer receives the stopFetching-call, it should stop fetching as
+ * soon as possible (it is not really critical, but good style to not contribute
+ * any more results via addEntry, call entryListComplete() or dispose(), after
+ * receiving this call).
  * 
  * @author alver
  * @author $Author$
@@ -110,7 +112,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  * 
  */
 public class ImportInspectionDialog extends JDialog {
-    
+
     public static interface CallBack {
 
         /**
@@ -149,8 +151,8 @@ public class ImportInspectionDialog extends JDialog {
     /**
      * Duplicate resolving may require deletion of old entries.
      */
-    protected List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>(); 
-    
+    protected List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>();
+
     protected String undoName;
 
     protected ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
@@ -175,8 +177,10 @@ public class ImportInspectionDialog extends JDialog {
 
     protected PreviewPanel preview;
 
-    protected boolean generatedKeys = false; // Set to true after keys have been
-                                            // generated.
+    protected boolean generatedKeys = false; // Set to true after keys have
+                                                // been
+
+    // generated.
 
     protected boolean defaultSelected = true;
 
@@ -267,7 +271,7 @@ public class ImportInspectionDialog extends JDialog {
         if (!newDatabase) {
             GroupTreeNode node = metaData.getGroups();
             groupsAdd.setEnabled(false); // Will get enabled if there are
-                                            // groups that can be added to.
+            // groups that can be added to.
             insertNodes(groupsAdd, node);
             popup.add(groupsAdd);
         }
@@ -751,14 +755,16 @@ public class ImportInspectionDialog extends JDialog {
 
             dispose();
             SwingUtilities.invokeLater(new Thread() {
+
                 public void run() {
                     if (newDatabase) {
                         frame.addTab(panel, null, true);
                     }
                     panel.markBaseChanged();
-                    
+
                     if (selected.size() > 0) {
-                        frame.output(Globals.lang("Number of entries successfully imported") + ": " + selected.size());
+                        frame.output(Globals.lang("Number of entries successfully imported") +
+                            ": " + selected.size());
                     } else {
                         frame.output(Globals.lang("No entries imported."));
                     }
@@ -813,7 +819,7 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             generate.setEnabled(false);
             generatedKeys = true; // To prevent the button from getting
-                                    // enabled again.
+            // enabled again.
             generateKeys(true); // Generate the keys.
         }
     }
@@ -1108,8 +1114,8 @@ public class ImportInspectionDialog extends JDialog {
             if (selectionModel.getSelected().size() != 1)
                 return;
             BibtexEntry entry = selectionModel.getSelected().get(0);
-            String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Globals.lang("Enter URL"), entry
-                .getField("url"));
+            String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Globals
+                .lang("Enter URL"), entry.getField("url"));
             entries.getReadWriteLock().writeLock().lock();
             if (result != null) {
                 if (result.equals("")) {
@@ -1277,7 +1283,8 @@ public class ImportInspectionDialog extends JDialog {
             BibtexEntry entry = selectionModel.getSelected().get(0);
             // Call up a dialog box that provides Browse, Download and auto
             // buttons:
-            AttachFileDialog diag = new AttachFileDialog(ImportInspectionDialog.this, metaData, entry, fileType);
+            AttachFileDialog diag = new AttachFileDialog(ImportInspectionDialog.this, metaData,
+                entry, fileType);
             Util.placeDialog(diag, ImportInspectionDialog.this);
             diag.setVisible(true);
             // After the dialog has closed, if it wasn't cancelled, list the
