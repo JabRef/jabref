@@ -121,78 +121,78 @@ public class ImportInspectionDialog extends JDialog {
         public void stopFetching();
     }
 
-    private BasePanel panel;
+    protected BasePanel panel;
 
-    private JabRefFrame frame;
+    protected JabRefFrame frame;
 
-    private MetaData metaData;
+    protected MetaData metaData;
 
-    private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    protected UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
 
-    private JTable glTable;
+    protected JTable glTable;
 
-    private TableComparatorChooser<BibtexEntry> comparatorChooser;
+    protected TableComparatorChooser<BibtexEntry> comparatorChooser;
 
-    private EventSelectionModel<BibtexEntry> selectionModel;
+    protected EventSelectionModel<BibtexEntry> selectionModel;
 
-    private String[] fields;
+    protected String[] fields;
 
-    private JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+    protected JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
 
-    private JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
+    protected JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
         .lang("Cancel")), generate = new JButton(Globals.lang("Generate now"));
 
-    private EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    protected EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
 
-    private SortedList<BibtexEntry> sortedList;
+    protected SortedList<BibtexEntry> sortedList;
 
     /**
      * Duplicate resolving may require deletion of old entries.
      */
-    private List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>(); 
+    protected List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>(); 
     
-    private String undoName;
+    protected String undoName;
 
-    private ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
+    protected ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
 
-    private boolean newDatabase;
+    protected boolean newDatabase;
 
-    private JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
+    protected JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
 
-    private JPopupMenu popup = new JPopupMenu();
+    protected JPopupMenu popup = new JPopupMenu();
 
-    private JButton selectAll = new JButton(Globals.lang("Select all"));
+    protected JButton selectAll = new JButton(Globals.lang("Select all"));
 
-    private JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    protected JButton deselectAll = new JButton(Globals.lang("Deselect all"));
 
-    private JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
+    protected JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
 
-    private JButton stop = new JButton(Globals.lang("Stop"));
+    protected JButton stop = new JButton(Globals.lang("Stop"));
 
-    private JButton delete = new JButton(Globals.lang("Delete"));
+    protected JButton delete = new JButton(Globals.lang("Delete"));
 
-    private JButton help = new JButton(Globals.lang("Help"));
+    protected JButton help = new JButton(Globals.lang("Help"));
 
-    private PreviewPanel preview;
+    protected PreviewPanel preview;
 
-    private boolean generatedKeys = false; // Set to true after keys have been
+    protected boolean generatedKeys = false; // Set to true after keys have been
                                             // generated.
 
-    private boolean defaultSelected = true;
+    protected boolean defaultSelected = true;
 
-    private Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    private Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
+    protected Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
 
-    private JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
+    protected JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
         .getBoolean("generateKeysAfterInspection"));
 
-    private JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
+    protected JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
         fileLabel = new JLabel(GUIGlobals.getImage("psSmall")), pdfLabel = new JLabel(GUIGlobals
             .getImage("pdfSmall")), psLabel = new JLabel(GUIGlobals.getImage("psSmall")),
         urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
-    private final int DUPL_COL = 1, FILE_COL = 2, PDF_COL = -1,// 3,
+    protected final int DUPL_COL = 1, FILE_COL = 2, PDF_COL = -1,// 3,
         PS_COL = -2,// 4,
         URL_COL = 3,// 5,
         PAD = 4; // 6;
@@ -565,7 +565,7 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
-    private AbstractAction getAction(GroupTreeNode node) {
+    protected AbstractAction getAction(GroupTreeNode node) {
         AbstractAction action = new AddToGroupAction(node);
         AbstractGroup group = node.getGroup();
         action.setEnabled(group.supportsAdd());
@@ -580,7 +580,7 @@ public class ImportInspectionDialog extends JDialog {
      */
     class AddToGroupAction extends AbstractAction {
 
-        private GroupTreeNode node;
+        protected GroupTreeNode node;
 
         public AddToGroupAction(GroupTreeNode node) {
             super(node.getGroup().getName());
@@ -758,24 +758,22 @@ public class ImportInspectionDialog extends JDialog {
                     panel.markBaseChanged();
                     
                     if (selected.size() > 0) {
-                        frame.output(Globals.lang("Entries imported") + selected.size());
+                        frame.output(Globals.lang("Number of entries successfully imported") + ": " + selected.size());
                     } else {
                         frame.output(Globals.lang("No entries imported."));
                     }
                 }
             });
-
         }
-
     }
 
-    private void signalStopFetching() {
+    protected void signalStopFetching() {
         for (CallBack c : callBacks) {
             c.stopFetching();
         }
     }
 
-    private void setWidths() {
+    protected void setWidths() {
         TableColumnModel cm = glTable.getColumnModel();
         cm.getColumn(0).setPreferredWidth(55);
         cm.getColumn(0).setMinWidth(55);
@@ -856,7 +854,7 @@ public class ImportInspectionDialog extends JDialog {
 
     class SelectionButton implements ActionListener {
 
-        private Boolean enable;
+        protected Boolean enable;
 
         public SelectionButton(boolean enable) {
             this.enable = Boolean.valueOf(enable);
@@ -1295,7 +1293,7 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     @SuppressWarnings("unchecked")
-    private void setupComparatorChooser() {
+    protected void setupComparatorChooser() {
         // First column:
         java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser
             .getComparatorsForColumn(0);
