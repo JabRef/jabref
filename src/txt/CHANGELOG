@@ -1,7 +1,7 @@
 
 
 2.4xx
-    - Support for fetching from JSTOR (Tobias Langner and Juliane Doege)
+    - Support for fetching from JSTOR (Tobias Langner, Juliane Doege, Sebastian de Hoog and Christoph Jacob)
 	- JabRef can now be extended by plugins (using the Java Plugin Framework JPF as the
 	  underlying technology). Currently extension points exist for:
 		- ImportFormat

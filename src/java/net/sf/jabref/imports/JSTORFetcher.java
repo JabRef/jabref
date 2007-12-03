@@ -65,8 +65,7 @@ public class JSTORFetcher implements EntryFetcher {
     protected static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
 
     public String getHelpPage() {
-        // No help page
-        return null;
+        return "JSTOR.html";
     }
 
     public URL getIcon() {
