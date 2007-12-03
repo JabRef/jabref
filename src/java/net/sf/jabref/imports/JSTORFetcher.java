@@ -84,6 +84,10 @@ public class JSTORFetcher implements EntryFetcher {
     public String getTitle() {
         return Globals.menuTitle("Search JSTOR");
     }
+    
+    public void stopFetching() {
+        // cannot be interrupted
+    }
 
     public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
         dialog.setVisible(true);
@@ -140,18 +144,6 @@ public class JSTORFetcher implements EntryFetcher {
             // Propagate...
             throw new RuntimeException(e);
         }
-    }
-
-    public void cancelled() {
-        // do nothing
-    }
-
-    public void done(int entriesImported) {
-        // do nothing
-    }
-
-    public void stopFetching() {
-        // cannot be interrupted
     }
 
     /**

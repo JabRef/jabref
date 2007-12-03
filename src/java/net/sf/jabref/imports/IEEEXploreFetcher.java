@@ -170,7 +170,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
     }
         
-        
     public String getTitle() {
         return Globals.menuTitle("Search IEEEXplore");
     }
@@ -187,16 +186,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return "Search IEEEXplore";
     }
 
-    // This method is called by the dialog when the user has cancelled the import.
-    public void cancelled() {
-        shouldContinue = false;
-    }
-
-    public void done(int entriesImported) {
-        frame.output("Number of entries parsed: "+parsed);
-        frame.output("Parsing failed for "+unparseable+" entries");
-    }
-
+    /**
+     * This method is called by the dialog when the user has cancelled the import.
+     */
     public void stopFetching() {
         shouldContinue = false;
     }
@@ -573,90 +565,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         entry.setField("year", ms5.group(2));
                     }
                 }
-            }
-            /*if (m1.find()) {
-                m = m1;
-                // Title:
-                entry.setField("title", convertHTMLChars(m.group(1)));
-                // Author:
-                tmp = convertHTMLChars(m.group(2));
-                if (tmp.charAt(tmp.length()-1) == ';')
-                    tmp= tmp.substring(0, tmp.length()-1);
-                entry.setField("author", tmp.replaceAll("; ", " and "));
-                // Publication:
-                tmp = m.group(4);
-                entry.setField(sourceField, convertHTMLChars(tmp));
-                // Volume:
-                entry.setField("volume", convertHTMLChars(m.group(5)));
-                // Month:
-                entry.setField("month", convertHTMLChars(m.group(6)));
-                // Year
-                entry.setField("year", m.group(7));
-
-            }
-            else if (m2.find()) {
-                m = m2;
-                // Title:
-                entry.setField("title", convertHTMLChars(m.group(1)));
-                // Author:
-                tmp = convertHTMLChars(m.group(2));
-                if (tmp.charAt(tmp.length()-1) == ';')
-                    tmp= tmp.substring(0, tmp.length()-1);
-                entry.setField("author", tmp.replaceAll("; ", " and "));
-                // Publication:
-                tmp = m.group(4);
-                entry.setField(sourceField, convertHTMLChars(tmp));
-                // Volume:
-                entry.setField("volume", convertHTMLChars(m.group(5)));
-                // Number:
-                entry.setField("number", convertHTMLChars(m.group(6)));
-                // Month:
-                entry.setField("month", convertHTMLChars(m.group(7)));
-                // Year:
-                entry.setField("year", m.group(8));
-
-            }
-            else if (m3.find()) {
-                m = m3;
-                // Title:
-                entry.setField("title", convertHTMLChars(m.group(1)));
-                // Author:
-                tmp = convertHTMLChars(m.group(2));
-                if (tmp.charAt(tmp.length()-1) == ';')
-                    tmp= tmp.substring(0, tmp.length()-1);
-                entry.setField("author", tmp.replaceAll("; ", " and "));
-                // Publication:
-                tmp = m.group(4);
-                entry.setField(sourceField, convertHTMLChars(tmp));
-                // Volume:
-                entry.setField("volume", convertHTMLChars(m.group(5)));
-                // Number:
-                entry.setField("number", convertHTMLChars(m.group(6)));
-                // Month:
-                entry.setField("month", convertHTMLChars(m.group(8)));
-                // Year
-                entry.setField("year", m.group(9));
-
-            }
-            else if (m4.find()) {
-                m = m4;
-                // Title:
-                entry.setField("title", convertHTMLChars(m.group(1)));
-                // Author:
-                tmp = convertHTMLChars(m.group(2));
-                if (tmp.charAt(tmp.length()-1) == ';')
-                    tmp= tmp.substring(0, tmp.length()-1);
-                entry.setField("author", tmp.replaceAll("; ", " and "));
-                // Publication:
-                tmp = m.group(4);
-                entry.setField(sourceField, convertHTMLChars(tmp));
-                // Month:
-                entry.setField("month", convertHTMLChars(m.group(5)));
-                // Year
-                entry.setField("year", m.group(6));
-
-            }*/
-               else {
+            } else {
                 System.err.println("---no structure match---");
                 System.err.println(text);
                 unparseable++;
@@ -765,7 +674,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return sb.toString();
     }
 
-
     /**
      * Download and parse the web page containing an entry's Abstract:
      * @param link
@@ -775,9 +683,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     public String fetchAbstract(String link) throws IOException {
         URL url = new URL(link);
         String page = getResults(url);
-        //System.out.println(link);
-
-        //System.out.println("Fetched abstract page.");
 
         String marker = "Abstract</span><br>";
         int index = page.indexOf(marker);

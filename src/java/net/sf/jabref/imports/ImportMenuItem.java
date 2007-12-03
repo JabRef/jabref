@@ -12,7 +12,19 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.*;
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.DuplicateCheck;
+import net.sf.jabref.DuplicateResolverDialog;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
@@ -195,7 +207,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 else {
                     frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
                             bibtexResult.getMetaData(), Globals.prefs.get("defaultEncoding"), true);
-                    done(bibtexResult.getDatabase().getEntryCount());
+                    frame.output(Globals.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
 
 
@@ -210,48 +222,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             frame.unblock();
         }
 
-        public void done(int entriesImported) {
-
-            /*
-            final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
-            BibtexDatabase toAddTo = panel.database();
-
-            // Add the strings, if any:
-            for (Iterator i = bibtexResult.getDatabase().getStringKeySet().iterator(); i.hasNext();) {
-                BibtexString s = bibtexResult.getDatabase().getString(i.next());
-                try {
-                    toAddTo.addString(s);
-                } catch (KeyCollisionException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-
-            if ((panel != null) && (bibtexResult.getDatabase().getEntryCount() == 1)) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        panel.highlightEntry((BibtexEntry)
-                                bibtexResult.getDatabase().getEntries().
-                                        iterator().next());
-                    }
-                });
-
-
-            }
-            */
-            frame.output(Globals.lang("Imported entries") + ": " + entriesImported);
-
-        }
-
-        public void cancelled() {
-            frame.output(Globals.lang("Import cancelled."));
-        }
-
-
-        // This method is called by the dialog when the user has cancelled or
-        // signalled a stop. It is expected that any long-running fetch operations
-        // will stop after this method is called.
         public void stopFetching() {
             // No process to stop.
         }

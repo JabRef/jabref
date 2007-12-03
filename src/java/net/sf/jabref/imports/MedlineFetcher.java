@@ -121,18 +121,6 @@ public class MedlineFetcher implements EntryFetcher {
         return result;
     }
 
-    public void done(int entriesImported) {
-        if (entriesImported > 0) {
-            frame.output(Globals.lang("Medline entries fetched") + ": " + entriesImported);
-        } else {
-            frame.output(Globals.lang("No Medline entries found."));
-        }
-    }
-
-    public void cancelled() {
-        frame.output(Globals.lang("%0 import cancelled.", "Medline"));
-    }
-
     public void stopFetching() {
         shouldContinue = false;
     }

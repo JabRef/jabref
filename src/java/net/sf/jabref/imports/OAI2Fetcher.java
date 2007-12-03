@@ -311,14 +311,6 @@ public class OAI2Fetcher implements EntryFetcher {
         }
     }
 
-    public void cancelled() {
-        // do nothing
-    }
-
-    public void done(int entriesImported) {
-        // do nothing
-    }
-
     public void stopFetching() {
         shouldContinue = false;
     }
