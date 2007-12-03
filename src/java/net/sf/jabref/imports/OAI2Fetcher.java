@@ -68,8 +68,9 @@ public class OAI2Fetcher implements EntryFetcher {
 
     private JabRefFrame frame;
 
-    /* some archives - like arxive.org - might expect of you to wait some time */
-
+    /**
+     * some archives - like arxive.org - might expect of you to wait some time 
+     */
     private boolean shouldWait() {
         return waitTime > 0;
     }
@@ -203,7 +204,7 @@ public class OAI2Fetcher implements EntryFetcher {
             
             /* Correct line breaks and spacing */
             for (String name : be.getAllFields()){
-                be.setField(name, correctLineBreaks(be.getField(name).toString()));
+                be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name).toString()));
             }
             
             if (key.matches("\\d\\d\\d\\d\\..*")){

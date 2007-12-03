@@ -96,7 +96,6 @@ import net.sf.jabref.gui.GenFieldsCustomizer;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.SortTabsAction;
 import net.sf.jabref.imports.CiteSeerFetcher;
-import net.sf.jabref.imports.CiteSeerFetcherPanel;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.GeneralFetcher;
 import net.sf.jabref.imports.ImportCustomizationDialog;
@@ -260,7 +259,6 @@ public class JabRefFrame extends JFrame {
 
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
-      citeSeerPanelAction = new CiteSeerPanelAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
       //"Put a BibTeX reference to the selected entries on the clipboard",
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
@@ -364,7 +362,6 @@ public class JabRefFrame extends JFrame {
     PushToApplicationButton pushExternalButton;
 
     CiteSeerFetcher citeSeerFetcher;
-    CiteSeerFetcherPanel citeSeerFetcherPanel;
     
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
     List<Action> fetcherActions = new LinkedList<Action>();
@@ -527,13 +524,10 @@ public class JabRefFrame extends JFrame {
     	}
         
         citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
-        citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
-            citeSeerFetcher);
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);
 
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
-        sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
         sidePaneManager.register("groups", groupSelector);
         sidePaneManager.register("search", searchManager);
 
@@ -1245,7 +1239,6 @@ public JabRefPreferences prefs() {
       
       mb.add(tools);
 
-      web.add(citeSeerPanelAction);
       web.add(fetchCiteSeer);
       
       /*
@@ -1441,7 +1434,7 @@ public JabRefPreferences prefs() {
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
                 openPdf, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-            highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
+            highlightAny, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
             abbreviateMedline, unabbreviate, exportAll, exportSelected,
@@ -1867,24 +1860,6 @@ class FetchCiteSeerAction
          }
        }
       }
-    }
-
-  class CiteSeerPanelAction extends MnemonicAwareAction {
-        public CiteSeerPanelAction() {
-            super(GUIGlobals.getImage("medline"));
-            putValue(NAME, "Fetch CiteSeer");
-            putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Fetch CiteSeer by ID"));
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if (tabbedPane.getTabCount() > 0) {
-                sidePaneManager.toggle("CiteSeerPanel");
-                if (sidePaneManager.isComponentVisible("CiteSeerPanel")) {
-                    new FocusRequester(citeSeerFetcherPanel.getTextField());
-                }
-            }
-        }
     }
 
   // The action for opening the preferences dialog.
