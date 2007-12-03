@@ -1,7 +1,9 @@
 %%%%% To do %%%%%
-% DW 2007-12-01
-% - Doku aus Plugin.html ergänzen (für 2.4)
-% - Bibliographie mit biblatex statt jurabib?
+% DW 2007-12-03
+% - Wiki-Seiten 'Searching with regular expressions' und 'Translating JabRef' übersetzen und einbinden
+% - [2.4 beta] Plugin.html ergänzen 
+% - [2.4 beta?] SQLExport.html ergänzen
+
 \documentclass[10pt,normalheadings,ngerman]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
@@ -11,7 +13,7 @@
 \usepackage{xspace}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{1.\,12.\,2007}
+\newcommand{\versiondate}{in Bearb.}%3.\,12.\,2007
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -90,7 +92,7 @@
 }
 
 %%% version number
-\newcommand{\versionnr}{\texorpdfstring{2.3}{2.3}} %
+\newcommand{\versionnr}{\texorpdfstring{2.3.1}{2.3.1}} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref~\versionnr}
 %%% BibTeX logo
@@ -105,6 +107,13 @@
   \colorbox{pyellow}{\parbox{0.85\textwidth}{%
     \color{dkblue}\textit{#1}#2}}%
   \end{center}%
+}%
+
+\newcommand{\verfasser}[1]{%
+  \begin{flushright}%
+  \colorbox{pyellow}{\parbox{0.7\textwidth}{%
+    \color{dkblue}\textit{Dieser Abschnitt stammt von #1}}}%
+  \end{flushright}%
 }%
 
 %%% for the FAQ 
@@ -787,7 +796,7 @@ Hierbei sucht das Programm nach allen Vorkommen der Wörter ihres Suchausdrucks, 
 
 Der \menu{Einstellungen}-Button im Suchdialog öffnet ein Menü, in
 dem man mehrere Optionen (de)aktivieren kann: das Beachten von Groß-
-und Kleinschreibung, das Nutzen regulärer Ausdrücke sowie das Auswählen
+und Kleinschreibung, das Nutzen regulärer Ausdrücke (siehe dazu den Abschnitt ">\nameref{search-regular-expressions}"<) sowie das Auswählen
 der Suchergebnisse.
 
 \tip{Suchen Sie mit der Option \menu{Treffer auswählen} und drücken
@@ -844,6 +853,109 @@ die Suche nach \bibtex{}-Keys, z.\,B.:
 \begin{lstlisting}
 bibtexkey = miller2005
 \end{lstlisting}
+
+\subsubsection{Suche mit regulären Ausdrücken}
+\label{search-regular-expressions}
+\verfasser{Pedro J. Aphalo, zuerst veröffentlicht im \jabref{}-Wiki in englischer Sprache}
+
+\paragraph{Hintergrund}
+Reguläre Ausdrücke (kurz ">regex"< für engl. ">regular expressions"<) definieren eine Sprache zum Spezifizieren von passendem Text, zum Beispiel bei Suchanfragen. \jabref{} nutzt reguläre Ausdrücke, wie sie in Java definiert sind. Eine Dokumentation dazu findet sich unter \href{http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html}{http://java.sun.com\slash{}j2se\slash{}1.4.2\slash{}docs\slash{}api\slash{}java\slash{}util\slash{}regex\slash{}Pattern.html}.
+
+\tip[]{Die folgenden Beispiele sind alle in Kleinbuchstaben, damit werden aber auch Großbuchstaben oder gemischte Varianten gefunden.}
+
+\paragraph{Suche nach Einträgen mit leerem oder fehlendem Feld}
+\tip[]{\texttt{.} bezeichnet irgendein Zeichen
+
+\texttt{+} heißt ein- oder mehrmals}
+\begin{lstlisting}
+author != .+
+\end{lstlisting}
+
+\paragraph{Wortgrenzen beachten}
+\tip[]{\texttt{\textbackslash b} bezeichnet eine Wortgrenze
+
+\texttt{\textbackslash B} heißt: keine Wortgrenze}
+\begin{lstlisting}
+keywords = \buv\b
+\end{lstlisting}
+findet ">uv"<, aber nicht ">lluvia"< (es findet allerdings ">uv-b"<)
+\begin{lstlisting}
+author = \bblack\b
+\end{lstlisting}
+findet ">black"<, aber weder ">blackwell"< noch ">blacker"<
+
+\begin{lstlisting}
+author == black
+\end{lstlisting} findet ">john black"< nicht, 
+\begin{lstlisting}
+author = \bblack\b
+\end{lstlisting} hingegen schon
+
+\begin{lstlisting}
+author = \bblack\B
+\end{lstlisting}
+findet ">blackwell"< und ">blacker"<, aber nicht ">black"<
+
+\paragraph{Suche mit optionaler Schreibweise}
+
+\tip[]{\texttt{?} bezeichnet keine oder eine Kopie des vorhergehenden Buchstaben
+
+\texttt{{n,m}} heißt mindestens n, aber nicht mehr als m Kopien des vorhergehenden Buchstaben
+
+\texttt{[ ]} definiert eine Buchstabengruppe}
+
+\begin{lstlisting}
+title =neighbou?r
+\end{lstlisting}
+findet ">neighbour"< und ">neighbor"<, aber auch ">neighbours"< und ">neighbors"<, ">neighbouring"< und ">neighboring"< etc.
+
+\begin{lstlisting}
+title = neighbou?rs?\b
+\end{lstlisting}
+findet ">neighbour"< und ">neighbor"<, auch ">neighbours"< und ">neighbors"< , aber weder ">neighbouring"< noch ">neighboring"<.
+
+\begin{lstlisting}
+author = s[aá]nchez
+\end{lstlisting}
+findet ">sanchez"< und ">sánchez"<
+
+\begin{lstlisting}
+abstract = model{1,2}ing
+\end{lstlisting}
+findet ">modeling"< und ">modelling"<
+
+\begin{lstlisting}
+abstract = modell?ing
+\end{lstlisting}
+findet ebenfalls ">modeling"< und ">modelling"<
+
+\paragraph{Das Problem von Anführungszeichen (\texorpdfstring{\texttt{"}}{"}) in Suchausdrücken}
+Sind reguläre Ausdrücke ausgeschaltet, findet 
+\begin{lstlisting}
+author = {\"O}quist
+\end{lstlisting} nichts, auch wenn der Name in der Datenbank vorkommt. Ebensowenig wird bei aktivierten regulären Ausdrücken 
+\begin{lstlisting}
+author = \{\\\"O\}quist
+\end{lstlisting} irgendetwas finden.
+
+\begin{lstlisting}
+author = \{\\\x22O\}quist
+\end{lstlisting}
+funktioniert bei aktivierten regulären Ausdrücken für ">\texttt{\{\textbackslash "{}O\}quist}"<, weil \lstinline{\"} nicht als Aufhebung von \lstinline{"} wirkt, \lstinline{\x22} aber schon (also das Zeichen hexadezimal 22 in der ASCII-Tabelle).
+
+\begin{lstlisting}
+author = Bolh{\`a}r 
+\end{lstlisting}
+funktioniert mit ausgeschalteten regulären Ausdrücken und
+
+\begin{lstlisting}
+author = Bolh\{\\`a\}r 
+\end{lstlisting}
+funktioniert mit aktivierten regulären Ausdrücken.
+
+Einfache Anführungszeichen (\texttt{'}) funktionieren ebenfalls.
+
+Es gibt also anscheinend eine Einschränkung, wie \lstinline{"} in der Eingabe behandelt wird, aber Sie können stattdessen \lstinline{\x22} nutzen, um dieses Problem zu umgehen. (Das Zeichen \lstinline{"} hat eine spezielle Bedeutung: es wird benutzt, um mehrere Wörter zu einer Phrase zu gruppieren, die exakt gefunden werden soll.)
 
 \subsection{Gruppen}
 
@@ -2875,6 +2987,11 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
+\item Abschnitt ">\nameref{search-regular-expressions}"< ergänzt
+\item Kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{1.\,12.\,2007}
 \item Abschnitt ">\nameref{NameFormatter}"< hinzugefügt
 \item Abschnitte ">\nameref{par:Feldformatierer}"< und ">\nameref{subsub:SpezielleFeldmarken}"< ergänzt
 \end{revhist}
