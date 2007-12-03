@@ -60,6 +60,15 @@
 			value="Fetch Entries from OAI2 Archives like ArXiv." />
 	</extension>
 
+	<extension id="MedlineFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.MedlineFetcher" />
+		<parameter id="name" value="Medline Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from Medline." />
+	</extension>
+	
 	<!-- To extend JabRef with an Layout Formatters use the following extension point -->
 	<extension-point id="LayoutFormatter">
 		<parameter-def type="string" id="layoutFormatter"

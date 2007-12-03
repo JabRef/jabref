@@ -31,8 +31,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Filter;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -315,10 +325,6 @@ public class Globals {
 			}
 		} catch (MissingResourceException ex) {
 			translation = key;
-
-			//System.err.println("Warning: could not get menu item translation for \""
-			//+ key + "\"");
-
 		}
 		if ((translation != null) && (translation.length() != 0)) {
 			return translation.replaceAll("_", " ");

@@ -22,26 +22,12 @@
 
 package net.sf.jabref.groups;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.imports.ImportMenuItem;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.net.URLDownload;
-
-import javax.swing.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -51,6 +37,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.TransferHandler;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.imports.ImportMenuItem;
+import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.net.URLDownload;
 
 public class EntryTableTransferHandler extends TransferHandler {
 

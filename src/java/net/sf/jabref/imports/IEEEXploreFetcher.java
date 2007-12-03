@@ -31,7 +31,7 @@ import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.journals.JournalAbbreviations;
 
 
-public class IEEEXploreFetcher implements Runnable, EntryFetcher {
+public class IEEEXploreFetcher implements EntryFetcher {
 
     ImportInspectionDialog dialog = null;
     JabRefFrame frame = null;
@@ -47,12 +47,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     private JCheckBox fetchAstracts = new JCheckBox(Globals.lang("Include abstracts"), false);
     private boolean fetchingAbstracts = false;
     private boolean fetchRis = true;
-    //private static final int MAX_ABSTRACT_FETCH = 5;
     private static final int MAX_RIS_FETCH = 25;
-
-    public IEEEXploreFetcher() {
-    }
-
 
     //Pattern hitsPattern = Pattern.compile("Your search matched <strong>(\\d+)</strong>");
     Pattern hitsPattern = Pattern.compile(".*Your search matched <strong>(\\d+)</strong>.*");
@@ -73,24 +68,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
     String abbrvPattern = ".*[^,] '?\\d+\\)?";
     Pattern acceptedPatterns = Pattern.compile("(.*) : (Accepted.*)");
-    /*Pattern entryPattern1 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s*"
-                +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
 
-    Pattern entryPattern2 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s+Issue (\\d+),&nbsp;\\s*"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
-
-    Pattern entryPattern3 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s+Issue (\\d+),&nbsp;" +
-                    "\\s+Part (\\d+),&nbsp;\\s*" //"[\\s-\\d]+"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
-    Pattern entryPattern4 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s*" //[\\s-\\da-z]+"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-    */
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\"(.+)\" class=\"bodyCopySpaced\">Abstract</a>");
 
@@ -109,50 +87,6 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         this.frame =frame;
         this.terms = query;
         piv = 0;
-        (new Thread(this)).start();
-    }
-
-    public String getTitle() {
-        return Globals.menuTitle("Search IEEEXplore");
-    }
-
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
-    public String getHelpPage() {
-        return "IEEEXploreHelp.html";
-    }
-
-    public String getKeyName() {
-        return "Search IEEEXplore";
-    }
-
-    // This method is called by the dialog when the user has cancelled the import.
-    public void cancelled() {
-        shouldContinue = false;
-    }
-
-    // This method is called by the dialog when the user has selected the
-// wanted entries, and clicked Ok. The callback object can update status
-// line etc.
-    public void done(int entriesImported) {
-        //System.out.println("Number of entries parsed: "+parsed);
-        //System.out.println("Parsing failed for "+unparseable+" entries");
-    }
-
-    // This method is called by the dialog when the user has cancelled or
-// signalled a stop. It is expected that any long-running fetch operations
-// will stop after this method is called.
-    public void stopFetching() {
-        shouldContinue = false;
-    }
-
-    /**
-     * The code that runs the actual search and fetch operation.
-     */
-    public void run() {
         frame.block();
         shouldContinue = true;
         parsed = 0;
@@ -178,8 +112,6 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 return;
             }
             
-            
-            
             if (page.indexOf("No results") >= 0) {
                 dialog.dispose();
                 JOptionPane.showMessageDialog(frame, Globals.lang("No entries found for the search string '%0'",
@@ -188,32 +120,10 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 return;
             }
             hits = getNumberOfHits(page, "Your search matched", hitsPattern);
-            /*if (hits == 0) {
-                dialog.dispose();
-                JOptionPane.showMessageDialog(frame, Globals.lang("No entries found for the search string '%0'",
-                        terms),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
-                return;
-            } else {
-                fetchingAbstracts = fetchAstracts.isSelected();
-                if (fetchingAbstracts && (hits > MAX_ABSTRACT_FETCH)) {
-                    fetchingAbstracts = false;
-                    JOptionPane.showMessageDialog(frame,
-                            Globals.lang("%0 entries found. To reduce server load, abstracts "
-                            +"will only be downloaded for searches returning %1 hits or less.",
-                                    new String[] {String.valueOf(hits), String.valueOf(MAX_ABSTRACT_FETCH)}),
-                            Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
-                }
-                dialog.setVisible(true);
-            }
-            */
 
             int maxHits = getNumberOfHits(page, "A maximum of", maxHitsPattern);
             //String page = getResultsFromFile(new File("/home/alver/div/temp50.txt"));
 
-            //List entries = new ArrayList();
-            //System.out.println("Number of hits: "+hits);
-            //System.out.println("Maximum returned: "+maxHits);
             if (hits > maxHits)
                 hits = maxHits;
             
@@ -234,16 +144,12 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             }
             dialog.setVisible(true);
 
-           //parse(dialog, page, 0, 51);
-            //dialog.setProgress(perPage/2, hits);
             parse(dialog, page, 0, 1);
             int firstEntry = perPage;
             while (shouldContinue && (firstEntry < hits)) {
-                //System.out.println("Fetching from: "+firstEntry);
                 address = makeUrl(firstEntry);
-                //System.out.println(address);
                 page = getResults(new URL(address));
-                //dialog.setProgress(firstEntry+perPage/2, hits);
+
                 if (!shouldContinue)
                     break;
 
@@ -262,8 +168,37 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         } finally {
             frame.unblock(); // We call this to ensure no lockup.
         }
+    }
+        
+        
+    public String getTitle() {
+        return Globals.menuTitle("Search IEEEXplore");
+    }
 
+    public URL getIcon() {
+        return GUIGlobals.getIconUrl("www");
+    }
 
+    public String getHelpPage() {
+        return "IEEEXploreHelp.html";
+    }
+
+    public String getKeyName() {
+        return "Search IEEEXplore";
+    }
+
+    // This method is called by the dialog when the user has cancelled the import.
+    public void cancelled() {
+        shouldContinue = false;
+    }
+
+    public void done(int entriesImported) {
+        frame.output("Number of entries parsed: "+parsed);
+        frame.output("Parsing failed for "+unparseable+" entries");
+    }
+
+    public void stopFetching() {
+        shouldContinue = false;
     }
 
     private String makeUrl(int startIndex) {

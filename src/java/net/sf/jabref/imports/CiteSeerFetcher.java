@@ -14,16 +14,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.SidePaneComponent;
+import net.sf.jabref.SidePaneManager;
+import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 
 import org.xml.sax.SAXException;
@@ -361,7 +378,6 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
 		progressBar.setValue(100);
-//	    progressBar.setString(null);
 	}
 
 

@@ -150,7 +150,6 @@ public class GUIGlobals {
 	medlineHelp = "MedlineHelp.html",
 	citeSeerHelp = "CiteSeerHelp.html",
 	generalFieldsHelp = "GeneralFields.html",
-//	searchHelp = "SearchHelp.html",
 	aboutPage = "About.html",
 	shortPlainImport="ShortPlainImport.html",
 	importInspectionHelp = "ImportInspectionDialog.html",

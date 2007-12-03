@@ -38,19 +38,28 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
-import net.sf.jabref.export.*;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.IExportFormat;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.SidePanePlugin;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.SidePanePlugin;
 
 import com.jgoodies.looks.FontPolicies;
 import com.jgoodies.looks.FontPolicy;
@@ -58,8 +67,6 @@ import com.jgoodies.looks.FontSet;
 import com.jgoodies.looks.FontSets;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.theme.SubstanceTheme;
 
 /**
  * JabRef Main Class - The application gets started here.

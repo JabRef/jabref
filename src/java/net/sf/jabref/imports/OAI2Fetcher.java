@@ -36,7 +36,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @version $Revision$ ($Date$)
  * 
  */
-public class OAI2Fetcher implements EntryFetcher, Runnable {
+public class OAI2Fetcher implements EntryFetcher {
 
     public static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
@@ -65,10 +65,6 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
     private String oai2ArchiveName;
 
     private boolean shouldContinue = true;
-
-    private String query;
-
-    private ImportInspectionDialog dialog;
 
     private JabRefFrame frame;
 
@@ -259,33 +255,18 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
     }
 
     public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
-        this.query = query;
-        this.dialog = dialog;
         this.frame = frame;
-        (new Thread(this)).start();
-    }
 
-    public void cancelled() {
-        shouldContinue = false;
-    }
-
-    public void done(int entriesImported) {
-        // do nothing
-    }
-
-    public void stopFetching() {
-        shouldContinue = false;
-    }
-
-    public void run() {
         try {
             dialog.setVisible(true);
             shouldContinue = true;
+            
             /* multiple keys can be delimited by ; or space */
             query = query.replaceAll(" ", ";");
             String[] keys = query.split(";");
             for (int i = 0; i < keys.length; i++) {
                 String key = keys[i];
+                
                 /*
                  * some archives - like arxive.org - might expect of you to wait
                  * some time
@@ -327,5 +308,17 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
             frame.output(Globals.lang("Error while fetching from OIA2")+ ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void cancelled() {
+        // do nothing
+    }
+
+    public void done(int entriesImported) {
+        // do nothing
+    }
+
+    public void stopFetching() {
+        shouldContinue = false;
     }
 }

@@ -103,7 +103,6 @@ import net.sf.jabref.imports.ImportCustomizationDialog;
 import net.sf.jabref.imports.ImportFormat;
 import net.sf.jabref.imports.ImportFormats;
 import net.sf.jabref.imports.ImportMenuItem;
-import net.sf.jabref.imports.MedlineFetcher;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.label.ArticleLabelRule;
@@ -261,9 +260,7 @@ public class JabRefFrame extends JFrame {
 
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
-      fetchMedline = new FetchMedlineAction(),
       citeSeerPanelAction = new CiteSeerPanelAction(),
-      //fetchAuthorMedline = new FetchAuthorMedlineAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
       //"Put a BibTeX reference to the selected entries on the clipboard",
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
@@ -365,12 +362,7 @@ public class JabRefFrame extends JFrame {
           GUIGlobals.getIconUrl("dbExport") );
 
     PushToApplicationButton pushExternalButton;
-  /*setupSelector = new GeneralAction("setupSelector", "", "",
-          GUIGlobals.pasteIconFile,
-          prefs.getKey(")),*/
 
-
-    MedlineFetcher medlineFetcher;
     CiteSeerFetcher citeSeerFetcher;
     CiteSeerFetcherPanel citeSeerFetcherPanel;
     
@@ -534,14 +526,12 @@ public class JabRefFrame extends JFrame {
     		}
     	}
         
-        medlineFetcher = new MedlineFetcher(sidePaneManager);
         citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
         citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
             citeSeerFetcher);
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);
 
-        sidePaneManager.register("fetchMedline", medlineFetcher);
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
         sidePaneManager.register("groups", groupSelector);
@@ -1237,11 +1227,6 @@ public JabRefPreferences prefs() {
       tools.add(pushExternalButton.getMenuAction());
       tools.add(writeXmpAction);
 
-      //tools.add(emacsPushAction);
-      //tools.add(lyxPushAction);
-      //tools.add(winEdtPushAction);
-      //tools.add(latexEditorPushAction);
-      //tools.add(fetchAuthorMedline);
       tools.addSeparator();
       tools.add(openFile);
       tools.add(openPdf);
@@ -1260,7 +1245,6 @@ public JabRefPreferences prefs() {
       
       mb.add(tools);
 
-      web.add(fetchMedline);
       web.add(citeSeerPanelAction);
       web.add(fetchCiteSeer);
       
@@ -1455,7 +1439,7 @@ public JabRefPreferences prefs() {
             redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
             selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
-            incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
+            incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
                 openPdf, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
@@ -1885,24 +1869,6 @@ class FetchCiteSeerAction
       }
     }
 
-  class FetchMedlineAction extends MnemonicAwareAction {
-        public FetchMedlineAction() {
-            super(GUIGlobals.getImage("medline"));
-            putValue(NAME, "Fetch Medline");
-            putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if (tabbedPane.getTabCount() > 0) {
-                sidePaneManager.toggle("fetchMedline");
-                if (sidePaneManager.isComponentVisible("fetchMedline")) {
-                    new FocusRequester(medlineFetcher.getTextField());
-                }
-            }
-        }
-    }
-
   class CiteSeerPanelAction extends MnemonicAwareAction {
         public CiteSeerPanelAction() {
             super(GUIGlobals.getImage("medline"));
@@ -1977,8 +1943,6 @@ class FetchCiteSeerAction
                       panel.highlightEntry(entries.get(0));
                   }
               });
-
-
           }
        }
   }
