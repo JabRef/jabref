@@ -90,7 +90,7 @@ public class AutoCompleteListener extends KeyAdapter {
                 }
             }
 
-            if ((toSetIn != null) && ((toSetIn.length() < 1) ||
+            if ((toSetIn != null) && ((toSetIn.length() <= 1) ||
                     (ch != toSetIn.charAt(1)))) {
                 // User discontinues the word that was suggested.
                 lastBeginning = lastBeginning + ch;
