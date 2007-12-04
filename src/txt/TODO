@@ -9,6 +9,8 @@ Chris:
   
 Morten:
 
+* OO plugin: - fill in fields from crossreferenced entries
+* OO plugin: - could not map "editor" to OpenOffice type ???
 * Look into submitted PDF downloader (d/l through Google)
 * Merge patch for entry types (see patch for IEEEXploreFetcher)
 * Improve duplicate check.
