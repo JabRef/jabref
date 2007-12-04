@@ -4,7 +4,7 @@ import java.net.URL;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
@@ -15,26 +15,30 @@ import net.sf.jabref.gui.ImportInspectionDialog;
  * 
  * Note: You also need to implement the method stopFetching from
  * ImportInspectionDialog.Callback
+ * 
+ * A Fetcher should not execute any GUI Operations, because it might be run in
+ * headless mode, but rather use the OutputPrinter for talking to the user.
  */
 public interface EntryFetcher extends ImportInspectionDialog.CallBack {
 
     /**
      * Handle a query entered by the user.
      * 
-     * The method may block the caller if query takes some time.
-     * 
-     * The caller may not assume that the query is done when the call returns,
-     * but should rather wait for the call "entryListComplete" to the import
-     * inspection dialog.
+     * The method is expected to block the caller until all entries have been
+     * reported to the inspector.
      * 
      * @param query
      *            The query text.
-     * @param dialog
+     * @param inspector
      *            The dialog to add imported entries to.
-     * @param frame
-     *            The application frame.
+     * @param status
+     *            An OutputPrinter passed to the fetcher for reporting about the
+     *            status of the fetching.
+     * 
+     * @return True if the query was completed successfully, false if an error
+     *         occurred.
      */
-    public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame);
+    public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status);
 
     /**
      * The title for this fetcher, displayed in the menu and in the side pane.

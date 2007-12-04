@@ -13,9 +13,8 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
-import net.sf.jabref.gui.ImportInspectionDialog;
 
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -31,11 +30,9 @@ public class CiteSeerEntryFetcher implements EntryFetcher {
 
     protected boolean stop;
 
-    public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
 
         stop = false;
-
-        dialog.setVisible(true);
 
         String[] ids = query.trim().split("[;,\\s]+");
 
@@ -52,7 +49,7 @@ public class CiteSeerEntryFetcher implements EntryFetcher {
 
             // Can only fetch for numerical IDs
             if (!id.matches("^\\d+$")) {
-                JOptionPane.showMessageDialog(dialog, Globals.lang(
+            	frame.showMessage(Globals.lang(
                     "Citeseer only supports numerical ids, '%0' is invalid.\n"
                         + "See the help for further information.", id), Globals
                     .lang("Fetch Citeseer"), JOptionPane.INFORMATION_MESSAGE);
@@ -86,13 +83,14 @@ public class CiteSeerEntryFetcher implements EntryFetcher {
                 dialog.addEntry(entry);
                 dialog.setProgress(i + 1, ids.length);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(dialog, Globals
+            	frame.showMessage(Globals
                     .lang("Error fetching from Citeseer:\n" + e.getLocalizedMessage()), Globals
                     .lang("Fetch Citeseer"), JOptionPane.ERROR_MESSAGE);
             }
 
-            dialog.entryListComplete();
+            return true;
         }
+        return false;
     }
 
     public String getHelpPage() {
@@ -114,14 +112,6 @@ public class CiteSeerEntryFetcher implements EntryFetcher {
 
     public String getTitle() {
         return "Fetch CiteSeer by ID";
-    }
-
-    public void cancelled() {
-
-    }
-
-    public void done(int entriesImported) {
-
     }
 
     public void stopFetching() {

@@ -12,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,16 +24,15 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
-import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.journals.JournalAbbreviations;
 
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
-    ImportInspectionDialog dialog = null;
-    JabRefFrame frame = null;
+    ImportInspector dialog = null;
+    OutputPrinter status;
     HTMLConverter htmlConverter = new HTMLConverter();
     JournalAbbreviations journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
     private String terms;
@@ -82,12 +80,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return pan;
     }
 
-    public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         this.dialog = dialog;
-        this.frame =frame;
+        this.status = status;
         this.terms = query;
         piv = 0;
-        frame.block();
+        // frame.block();
         shouldContinue = true;
         parsed = 0;
         unparseable = 0;
@@ -103,21 +101,19 @@ public class IEEEXploreFetcher implements EntryFetcher {
             String page = getResults(url);
             //hits = getNumberOfHits(page, "Your search matched", hitsPattern);
 
-            frame.unblock();
+            // frame.unblock();
             if (page.indexOf("You have entered an invalid search") >= 0) {
-                dialog.dispose();
-                JOptionPane.showMessageDialog(frame, Globals.lang("You have entered an invalid search '%0'.",
+                status.showMessage(Globals.lang("You have entered an invalid search '%0'.",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
-                return;
+                return false;
             }
             
             if (page.indexOf("No results") >= 0) {
-                dialog.dispose();
-                JOptionPane.showMessageDialog(frame, Globals.lang("No entries found for the search string '%0'",
+                status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
-                return;
+                return false;
             }
             hits = getNumberOfHits(page, "Your search matched", hitsPattern);
 
@@ -131,7 +127,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             if (hits > MAX_RIS_FETCH) {
                 if (fetchingAbstracts == true) {
-                    JOptionPane.showMessageDialog(frame,
+                    status.showMessage(
                         Globals.lang("%0 entries found. To reduce server load, "
                         +"only %1 will be downloaded.",
                                 new String[] {String.valueOf(hits), String.valueOf(MAX_RIS_FETCH)}),
@@ -142,7 +138,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fetchRis = false;
                 }
             }
-            dialog.setVisible(true);
 
             parse(dialog, page, 0, 1);
             int firstEntry = perPage;
@@ -157,17 +152,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 firstEntry += perPage;
 
             }
-            dialog.entryListComplete();
+            return true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Connection to IEEEXplore failed"),
+            status.showMessage(Globals.lang("Connection to IEEEXplore failed"),
                     Globals.lang("Search IEEExplore"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            frame.unblock(); // We call this to ensure no lockup.
         }
+        return false;
     }
         
     public String getTitle() {
@@ -203,25 +197,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     int piv = 0;
 
-    private void parse(ImportInspectionDialog dialog, String text, int startIndex, int firstEntryNumber) {
+    private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
-        List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        
         BibtexEntry entry;
         while (((entry = parseNextEntry(text, piv, entryNumber)) != null)
             && (shouldContinue)) {
             if (entry.getField("title") != null) {
-                entries.add(entry);
-                dialog.addEntries(entries);
+                dialog.addEntry(entry);
                 dialog.setProgress(parsed+unparseable, hits);
-                entries.clear();
                 parsed++;
             }
             entryNumber++;
-            //break;
         }
-
-
     }
 
     private BibtexEntry parseEntryRis(String number, boolean abs, boolean isStandard)

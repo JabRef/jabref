@@ -66,6 +66,7 @@ import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
+import net.sf.jabref.imports.ImportInspector;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
@@ -111,7 +112,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  *          2007) $)
  * 
  */
-public class ImportInspectionDialog extends JDialog {
+public class ImportInspectionDialog extends JDialog implements ImportInspector {
 
     public static interface CallBack {
 
@@ -122,6 +123,8 @@ public class ImportInspectionDialog extends JDialog {
          */
         public void stopFetching();
     }
+
+	protected ImportInspectionDialog ths = this;
 
     protected BasePanel panel;
 
@@ -338,6 +341,9 @@ public class ImportInspectionDialog extends JDialog {
 
     }
 
+    /* (non-Javadoc)
+	 * @see net.sf.jabref.gui.ImportInspection#setProgress(int, int)
+	 */
     public void setProgress(int current, int max) {
         progressBar.setIndeterminate(false);
         progressBar.setMinimum(0);
@@ -345,25 +351,18 @@ public class ImportInspectionDialog extends JDialog {
         progressBar.setValue(current);
     }
 
-    /**
-     * Wrapper for addEntries(List) that takes a single entry.
-     * 
-     * @param entry
-     *            The entry to add.
-     */
+    /* (non-Javadoc)
+	 * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibtexEntry)
+	 */
     public void addEntry(BibtexEntry entry) {
         List<BibtexEntry> list = new ArrayList<BibtexEntry>();
         list.add(entry);
         addEntries(list);
     }
 
-    /**
-     * Add a List of entries to the table view. The table will update to show
-     * the added entries. Synchronizes on this.entries to avoid conflict with
-     * the delete button which removes entries.
-     * 
-     * @param entries
-     */
+    /* (non-Javadoc)
+	 * @see net.sf.jabref.gui.ImportInspection#addEntries(java.util.Collection)
+	 */
     public void addEntries(Collection<BibtexEntry> entries) {
 
         for (BibtexEntry entry : entries) {
@@ -427,10 +426,9 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
-    /**
-     * When this method is called, the dialog will visually change to indicate
-     * that all entries are in place.
-     */
+    /* (non-Javadoc)
+	 * @see net.sf.jabref.gui.ImportInspection#entryListComplete()
+	 */
     public void entryListComplete() {
         progressBar.setIndeterminate(false);
         progressBar.setVisible(false);

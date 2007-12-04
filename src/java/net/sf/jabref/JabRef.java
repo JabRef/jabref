@@ -35,6 +35,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -51,12 +52,15 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.IExportFormat;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.imports.EntryFetcher;
+import net.sf.jabref.imports.ImportInspectionCommandLine;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.SidePanePlugin;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
@@ -82,7 +86,7 @@ public class JabRef {
 
     boolean graphicFailure = false;
 
-    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase;
+    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine;
     BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
     
     public static void main(String[] args) {
@@ -183,6 +187,7 @@ public class JabRef {
         importPrefs = new StringOption("jabref_prefs.xml");
         auxImExport = new StringOption("");
         importToOpenBase = new StringOption("");
+        fetcherEngine = new StringOption("");
 
         options = new Options("JabRef "); // Create an options repository.
         options.setVersion(GUIGlobals.version);
@@ -214,6 +219,8 @@ public class JabRef {
 
         options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
 
+        options.register("fetch", 'f', Globals.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\""), fetcherEngine);
+
         options.setUseMenu(false);
     }
 
@@ -240,12 +247,14 @@ public class JabRef {
                 + ".");
             System.exit(0);
         }
-
+        
+        boolean commandmode = disableGui.isInvoked() || fetcherEngine.isInvoked();
+        
         // First we quickly scan the command line parameters for any that signal
         // that the GUI
         // should not be opened. This is used to decide whether we should show the
         // splash screen or not.
-        if (initialStartup && !disableGui.isInvoked() && !disableSplash.isInvoked()) {
+        if (initialStartup && !commandmode && !disableSplash.isInvoked()) {
             try {
                 splashScreen = SplashScreen.splash();
             } catch (Throwable ex) {
@@ -301,6 +310,12 @@ public class JabRef {
 
         if (!blank.isInvoked() && importToOpenBase.isInvoked()) {
             ParserResult res = importToOpenBase(importToOpenBase.getStringValue());
+            if (res != null)
+                loaded.add(res);
+        }
+
+        if (!blank.isInvoked() && fetcherEngine.isInvoked()) {
+            ParserResult res = fetch(fetcherEngine.getStringValue());
             if (res != null)
                 loaded.add(res);
         }
@@ -447,7 +462,66 @@ public class JabRef {
         return loaded;
     }
 
-    public void openWindow(Vector<ParserResult> loaded) {
+    /**
+     * Run an entry fetcher from the command line.
+     * 
+     * Note that this only works headlessly if the EntryFetcher does not show
+     * any GUI.
+     * 
+     * @param fetchCommand
+     *            A string containing both the fetcher to use (id of
+     *            EntryFetcherExtension minus Fetcher) and the search query,
+     *            separated by a :
+     * @return A parser result containing the entries fetched or null if an
+     *         error occurred.
+     */
+    protected ParserResult fetch(String fetchCommand) {
+
+        if (fetchCommand == null || !fetchCommand.contains(":") ||
+            fetchCommand.split(":").length != 2) {
+            System.out.println(Globals.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
+            System.out.println(Globals.lang("The following fetchers are available:"));
+            for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
+                .getEntryFetcherExtensions()) {
+                System.out.println("  " + e.getId().replaceAll("Fetcher", "").toLowerCase());
+            }
+            return null;
+        }
+
+        String engine = fetchCommand.split(":")[0];
+        String query = fetchCommand.split(":")[1];
+
+        EntryFetcher fetcher = null;
+        for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
+            .getEntryFetcherExtensions()) {
+            if (engine.toLowerCase().equals(e.getId().replaceAll("Fetcher", "").toLowerCase()))
+                fetcher = e.getEntryFetcher();
+        }
+
+        if (fetcher == null) {
+            System.out.println(Globals.lang("Could not find fetcher '%0'", engine));
+            System.out.println(Globals.lang("The following fetchers are available:"));
+            for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
+                .getEntryFetcherExtensions()) {
+                System.out.println("  " + e.getId().replaceAll("Fetcher", "").toLowerCase());
+            }
+            return null;
+        }
+
+        System.out.println(Globals.lang("Running Query '%0' with fetcher '%1'.", query, engine) +
+            " " + Globals.lang("Please wait!"));
+        Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
+
+        if (result == null || result.size() == 0) {
+            System.out.println(Globals.lang(
+                "Query '%0' with fetcher '%1' did not return any results.", query, engine));
+            return null;
+        }
+
+        return new ParserResult(result);
+    }
+
+	public void openWindow(Vector<ParserResult> loaded) {
         if (!graphicFailure && !disableGui.isInvoked()) {
             // Call the method performCompatibilityUpdate(), which does any
             // necessary changes for users with a preference set from an older

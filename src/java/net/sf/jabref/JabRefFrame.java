@@ -126,13 +126,11 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends JFrame {
+public class JabRefFrame extends JFrame implements OutputPrinter {
 
-    // CO: Code Smells...
-    JabRefFrame ths = this;
     UIFSplitPane contentPane = new UIFSplitPane();
 
-    JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
+    JabRefPreferences prefs = Globals.prefs; 
     PrefsDialog3 prefsDialog = null;
     
     private int lastTabbedPanelSelectionIndex = -1 ;
@@ -165,8 +163,6 @@ public class JabRefFrame extends JFrame {
         .lang("Status")
         + ":", SwingConstants.LEFT);
     JProgressBar progressBar = new JProgressBar();
-
-    // SearchManager searchManager = new SearchManager(ths, prefs);
 
     private FileHistory fileHistory = new FileHistory(prefs, this);
 
@@ -213,7 +209,7 @@ public class JabRefFrame extends JFrame {
       saveAs = new GeneralAction("saveAs", "Save database as ...",
                                  Globals.lang("Save database as ..."),
                                  prefs.getKey("Save database as ...")),
-      saveAll = new SaveAllAction(ths),
+      saveAll = new SaveAllAction(JabRefFrame.this),
       saveSelectedAs = new GeneralAction("saveSelectedAs",
                                          "Save selected as ...",
                                          Globals.lang("Save selected as ..."),
@@ -554,7 +550,7 @@ AboutAction aboutAction = new AboutAction();
   // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
   // is selected from the application menu.
   public void about() {
-    JDialog about = new JDialog(ths, Globals.lang("About JabRef"),
+    JDialog about = new JDialog(JabRefFrame.this, Globals.lang("About JabRef"),
                                 true);
     JEditorPane jp = new JEditorPane();
     JScrollPane sp = new JScrollPane
@@ -578,12 +574,12 @@ AboutAction aboutAction = new AboutAction();
       });
       about.getContentPane().add(sp);
       about.setSize(GUIGlobals.aboutSize);
-      Util.placeDialog(about, ths);
+      Util.placeDialog(about, JabRefFrame.this);
       about.setVisible(true);
     }
     catch (IOException ex) {
       ex.printStackTrace();
-      JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'",
+      JOptionPane.showMessageDialog(JabRefFrame.this, "Could not load file 'About.html'",
                                     "Error", JOptionPane.ERROR_MESSAGE);
     }
 
@@ -592,7 +588,7 @@ AboutAction aboutAction = new AboutAction();
   // General preferences dialog.  The OSXAdapter calls this method when "Preferences..."
   // is selected from the application menu.
   public void preferences() {
-    //PrefsDialog.showPrefsDialog(ths, prefs);
+    //PrefsDialog.showPrefsDialog(JabRefFrame.this, prefs);
       AbstractWorker worker = new AbstractWorker() {
               public void run() {
                   output(Globals.lang("Opening preferences..."));
@@ -629,7 +625,7 @@ public JabRefPreferences prefs() {
         if (baseAt(i).baseChanged) {
           tabbedPane.setSelectedIndex(i);
           int answer = JOptionPane.showConfirmDialog
-              (ths, Globals.lang
+              (JabRefFrame.this, Globals.lang
                ("Database has changed. Do you "
                 + "want to save before closing?"),
                Globals.lang("Save before closing"),
@@ -667,10 +663,10 @@ public JabRefPreferences prefs() {
     if (close) {
       dispose();
 
-      prefs.putInt("posX", ths.getLocation().x);
-      prefs.putInt("posY", ths.getLocation().y);
-      prefs.putInt("sizeX", ths.getSize().width);
-      prefs.putInt("sizeY", ths.getSize().height);
+      prefs.putInt("posX", JabRefFrame.this.getLocation().x);
+      prefs.putInt("posY", JabRefFrame.this.getLocation().y);
+      prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
+      prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();
@@ -1057,8 +1053,8 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
       String thisType = type;
       if (thisType == null) {
-        EntryTypeDialog etd = new EntryTypeDialog(ths);
-        Util.placeDialog(etd, ths);
+        EntryTypeDialog etd = new EntryTypeDialog(JabRefFrame.this);
+        Util.placeDialog(etd, JabRefFrame.this);
         etd.setVisible(true);
         BibtexEntryType tp = etd.getChoice();
         if (tp == null) {
@@ -1235,7 +1231,7 @@ public JabRefPreferences prefs() {
 
       // TODO: Temporary for 2.2 release: we should perhaps find a better solution:
       tools.addSeparator();
-      tools.add(new ExpandEndnoteFilters(ths));
+      tools.add(new ExpandEndnoteFilters(JabRefFrame.this));
       
       mb.add(tools);
 
@@ -1264,9 +1260,9 @@ public JabRefPreferences prefs() {
 
       /*options.add(new AbstractAction("Font") {
       public void actionPerformed(ActionEvent e) {
-          // JDialog dl = new EntryCustomizationDialog(ths);
+          // JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
           Font f=new FontSelectorDialog
-        (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
+        (JabRefFrame.this, GUIGlobals.CURRENTFONT).getSelectedFont();
        if(f==null)
         return;
        else
@@ -1513,7 +1509,7 @@ public JabRefPreferences prefs() {
   }
 
   public BasePanel addTab(BibtexDatabase db, File file, HashMap<String, String> meta, String encoding, boolean raisePanel) {
-      BasePanel bp = new BasePanel(ths, db, file, meta, encoding);
+      BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
       addTab(bp, file, raisePanel);
       return bp;
   }
@@ -1540,12 +1536,12 @@ public JabRefPreferences prefs() {
            prefs.getDefaultKeys());
       d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       d.pack(); //setSize(300,500);
-      Util.placeDialog(d, ths);
+      Util.placeDialog(d, JabRefFrame.this);
       d.setVisible(true);
       if (d.getAction()) {
         prefs.setNewKeyBindings(d.getNewKeyBindings());
         JOptionPane.showMessageDialog
-            (ths,
+            (JabRefFrame.this,
              Globals.lang("Your new key bindings have been stored.") + "\n"
              + Globals.lang("You must restart JabRef for the new key "
                             + "bindings to work properly."),
@@ -1594,7 +1590,7 @@ public JabRefPreferences prefs() {
             }
 
             if (basePanel().baseChanged) {
-                int answer = JOptionPane.showConfirmDialog(ths, Globals
+                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Globals
                     .lang("Database has changed. Do you want to save " + "before closing?"),
                     Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
                 if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
@@ -1768,7 +1764,7 @@ class FetchCiteSeerAction
 
                                   public void run() {
                                         try {
-                                                newBp = new BasePanel(ths);
+                                                newBp = new BasePanel(JabRefFrame.this);
                                                 int errorCode;
                                                 targetBp = (BasePanel) tabbedPane.getSelectedComponent();
                                                 newDatabase = newBp.getDatabase();
@@ -1814,14 +1810,14 @@ class FetchCiteSeerAction
       {
         // Create a new, empty, database.
 
-        FromAuxDialog dialog = new FromAuxDialog(ths, "", true, ths.tabbedPane) ;
+        FromAuxDialog dialog = new FromAuxDialog(JabRefFrame.this, "", true, JabRefFrame.this.tabbedPane) ;
 
-        Util.placeDialog(dialog, ths);
+        Util.placeDialog(dialog, JabRefFrame.this);
         dialog.setVisible(true) ;
 
         if (dialog.okPressed())
         {
-          BasePanel bp = new BasePanel( ths,
+          BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database
                                         null,                     // file
                                         null, Globals.prefs.get("defaultEncoding"));                     // meta data
@@ -1853,8 +1849,8 @@ class FetchCiteSeerAction
          BibtexDatabase refBase = bp.getDatabase() ;
          if (refBase != null)
          {
-             IntegrityWizard wizard = new IntegrityWizard(ths, basePanel()) ;
-             Util.placeDialog(wizard, ths);
+             IntegrityWizard wizard = new IntegrityWizard(JabRefFrame.this, basePanel()) ;
+             Util.placeDialog(wizard, JabRefFrame.this);
              wizard.setVisible(true) ;
 
          }
@@ -1879,48 +1875,56 @@ class FetchCiteSeerAction
   }
 
   /**
-   * This method does the job of adding imported entries into the active database, or into a new one.
-   * It shows the ImportInspectionDialog if preferences indicate it should be used. Otherwise it imports
-   * directly.
-   * @param panel The BasePanel to add to.
-   * @param entries The entries to add.
-   * @param filename Name of the file where the import came from.
-   * @param openInNew Should the entries be imported into a new database?
-   * @param callBack The callback for the ImportInspectionDialog to use.
-   */
-  public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, String filename,
-                                 final boolean openInNew,
-                                 final ImportInspectionDialog.CallBack callBack) {
-      // Use the import inspection dialog if it is enabled in preferences, and (there are more than
-      // one entry or the inspection dialog is also enabled for single entries):
-      if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
-              (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
+     * This method does the job of adding imported entries into the active
+     * database, or into a new one. It shows the ImportInspectionDialog if
+     * preferences indicate it should be used. Otherwise it imports directly.
+     * 
+     * @param panel
+     *            The BasePanel to add to.
+     * @param entries
+     *            The entries to add.
+     * @param filename
+     *            Name of the file where the import came from.
+     * @param openInNew
+     *            Should the entries be imported into a new database?
+     * @param callBack
+     *            The callback for the ImportInspectionDialog to use.
+     */
+    public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
+        String filename, final boolean openInNew) {
+        /*
+         * Use the import inspection dialog if it is enabled in preferences, and
+         * (there are more than one entry or the inspection dialog is also
+         * enabled for single entries):
+         */
+        if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
+            (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
 
-          SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                  ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel,
-                          BibtexFields.DEFAULT_INSPECTION_FIELDS,
-                          Globals.lang("Import"), openInNew);
-                  diag.addEntries(entries);
-                  diag.addCallBack(callBack);
-                  diag.entryListComplete();
-                  Util.placeDialog(diag, ths);
-                  diag.setVisible(true);
-                  diag.toFront();
-              }
-          });
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
+                        panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Globals.lang("Import"),
+                        openInNew);
+                    diag.addEntries(entries);
+                    diag.entryListComplete();
+                    Util.placeDialog(diag, JabRefFrame.this);
+                    diag.setVisible(true);
+                    diag.toFront();
+                }
+            });
 
         } else {
-            ths.addBibEntries(entries, filename, openInNew);
-          if ((panel != null) && (entries.size() == 1)) {
-              SwingUtilities.invokeLater(new Runnable() {
-                  public void run() {
-                      panel.highlightEntry(entries.get(0));
-                  }
-              });
-          }
-       }
-  }
+            JabRefFrame.this.addBibEntries(entries, filename, openInNew);
+            if ((panel != null) && (entries.size() == 1)) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        panel.highlightEntry(entries.get(0));
+                    }
+                });
+            }
+        }
+    }
 
     /**
      * Adds the entries to the database, possibly checking for duplicates first.
@@ -1935,7 +1939,7 @@ class FetchCiteSeerAction
           if (bibentries == null || bibentries.size() == 0) {
 
       // No entries found. We need a message for this.
-      JOptionPane.showMessageDialog(ths, Globals.lang("No entries found. Please make sure you are "
+      JOptionPane.showMessageDialog(JabRefFrame.this, Globals.lang("No entries found. Please make sure you are "
                                                       +"using the correct import filter."), Globals.lang("Import failed"),
                                     JOptionPane.ERROR_MESSAGE);
       return 0;
@@ -1963,7 +1967,7 @@ class FetchCiteSeerAction
       HashMap<String, String> meta = new HashMap<String, String>();
       // Metadata are only put in bibtex files, so we will not find it
       // in imported files. Instead we pass an empty HashMap.
-      BasePanel bp = new BasePanel(ths, database, null, meta, Globals.prefs.get("defaultEncoding"));
+      BasePanel bp = new BasePanel(JabRefFrame.this, database, null, meta, Globals.prefs.get("defaultEncoding"));
       /*
             if (prefs.getBoolean("autoComplete")) {
             db.setCompleters(autoCompleters);
@@ -1998,7 +2002,7 @@ class FetchCiteSeerAction
                 if (DuplicateCheck.isDuplicate(entry, existingEntry
                 )) {
                     DuplicateResolverDialog drd = new DuplicateResolverDialog
-                        (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                        (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                     drd.setVisible(true);
                     int res = drd.getSelected();
                     if (res == DuplicateResolverDialog.KEEP_LOWER)   {
@@ -2051,7 +2055,7 @@ class FetchCiteSeerAction
       importMenu.removeAll();
 
       // Add a menu item for autodetecting import format:
-      importMenu.add(new ImportMenuItem(ths, intoNew));
+      importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew));
 
       // Add custom importers
       importMenu.addSeparator();
@@ -2062,7 +2066,7 @@ class FetchCiteSeerAction
       
       // Put in all formatters registered in ImportFormatReader:
         for (ImportFormat imFo : customImporters){
-            submenu.add(new ImportMenuItem(ths, intoNew, imFo));
+            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew, imFo));
         }
       
       if (customImporters.size() > 0)
@@ -2075,7 +2079,7 @@ class FetchCiteSeerAction
 
       // Put in all formatters registered in ImportFormatReader:
       for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()){
-          importMenu.add(new ImportMenuItem(ths, intoNew, imFo));
+          importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew, imFo));
       }
   }
 
@@ -2208,7 +2212,7 @@ class SaveSessionAction
           if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
             tabbedPane.setSelectedIndex(i);
             int answer = JOptionPane.showConfirmDialog
-                (ths, Globals.lang
+                (JabRefFrame.this, Globals.lang
                  ("This untitled database must be saved first to be "
                   + "included in the saved session. Save now?"),
                  Globals.lang("Save database"),
@@ -2353,7 +2357,7 @@ class SaveSessionAction
     }
 
     public void actionPerformed(ActionEvent e) {
-      ExportCustomizationDialog ecd = new ExportCustomizationDialog(ths);
+      ExportCustomizationDialog ecd = new ExportCustomizationDialog(JabRefFrame.this);
       ecd.setVisible(true);
     }
   }
@@ -2364,7 +2368,7 @@ class SaveSessionAction
     }
 
     public void actionPerformed(ActionEvent e) {
-      ImportCustomizationDialog ecd = new ImportCustomizationDialog(ths);
+      ImportCustomizationDialog ecd = new ImportCustomizationDialog(JabRefFrame.this);
       ecd.setVisible(true);
     }
   }
@@ -2375,8 +2379,8 @@ class SaveSessionAction
             putValue(NAME, "Customize entry types");
         }
         public void actionPerformed(ActionEvent e) {
-            JDialog dl = new EntryCustomizationDialog2(ths);
-            Util.placeDialog(dl, ths);
+            JDialog dl = new EntryCustomizationDialog2(JabRefFrame.this);
+            Util.placeDialog(dl, JabRefFrame.this);
             dl.setVisible(true);
         }
     }
@@ -2386,8 +2390,8 @@ class SaveSessionAction
             putValue(NAME, "Set up general fields");
         }
         public void actionPerformed(ActionEvent e) {
-            GenFieldsCustomizer gf = new GenFieldsCustomizer(ths);
-            Util.placeDialog(gf, ths);
+            GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
+            Util.placeDialog(gf, JabRefFrame.this);
             gf.setVisible(true);
 
         }
@@ -2436,5 +2440,17 @@ class SaveSessionAction
     }
       // Override isOpaque() to prevent the glasspane from hiding the window contents:
       public boolean isOpaque() { return false; }
+  }
+
+  public void showMessage(Object message, String title, int msgType){
+      JOptionPane.showMessageDialog(this, message, title, msgType);
+  }
+
+  public void setStatus(String s){
+	  output(s);
+  }
+
+  public void showMessage(String message){
+	  JOptionPane.showMessageDialog(this, message);
   }
 }

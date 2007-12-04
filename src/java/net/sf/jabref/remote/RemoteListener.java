@@ -1,19 +1,22 @@
 package net.sf.jabref.remote;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.imports.ParserResult;
-
-import java.net.*;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
-import java.util.Vector;
-import java.util.List;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.imports.ParserResult;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +25,7 @@ import java.util.ArrayList;
  * Time: 8:11:58 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RemoteListener extends Thread implements ImportInspectionDialog.CallBack {
+public class RemoteListener extends Thread {
 
     private JabRef jabref;
     private ServerSocket socket;
@@ -54,8 +57,6 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                     active = false;
                     return;
                 }
-                //byte[] address = socket.getInetAddress().getAddress();
-                //System.out.println("Connection: "+address[0]+" "+address[1]+" "+address[2]+" "+address[3]);
 
                 OutputStream out = newSocket.getOutputStream();
                 InputStream in = newSocket.getInputStream();
@@ -87,7 +88,7 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                                 jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
                             } else {
                                 List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
-                                jabref.jrf.addImportedEntries(panel, entries, "", false, this);
+                                jabref.jrf.addImportedEntries(panel, entries, "", false);
                             }
                         }
                     }
@@ -174,24 +175,5 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
             e.printStackTrace();
             return false;
         }
-    }
-
-    // This method is called by the dialog when the user has selected the
-// wanted entries, and clicked Ok. The callback object can update status
-// line etc.
-    public void done(int entriesImported) {
-        jabref.jrf.output(Globals.lang("Imported entries"));
-    }
-
-    // This method is called by the dialog when the user has cancelled the import.
-    public void cancelled() {
-
-    }
-
-    // This method is called by the dialog when the user has cancelled or
-// signalled a stop. It is expected that any long-running fetch operations
-// will stop after this method is called.
-    public void stopFetching() {
-
     }
 }

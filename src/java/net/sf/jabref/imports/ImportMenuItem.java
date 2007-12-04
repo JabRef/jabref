@@ -78,7 +78,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     }
     
 
-    class MyWorker extends AbstractWorker implements ImportInspectionDialog.CallBack {
+    class MyWorker extends AbstractWorker {
         String[] filenames = null, formatName = null;
         ParserResult bibtexResult = null; // Contains the merged import results
         boolean fileOk = false;
@@ -88,14 +88,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     new File(Globals.prefs.get("workingDirectory")),
                     (importer != null ? importer.getExtensions() : null), true);
 
-            /*if ((filenames != null) && !(new File(filename)).exists()) {
-               JOptionPane.showMessageDialog(frame, Globals.lang("File not found") + ": '" + filename + "'",
-                       Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-           } else*/
             if ((filenames != null) && (filenames.length > 0)) {
                 frame.block();
                 frame.output(Globals.lang("Starting import"));
-                //frame.output(Globals.lang("Importing file") + ": '" + filename + "'");
                 fileOk = true;
                 
                 Globals.prefs.put("workingDirectory", filenames[0]);
@@ -145,6 +140,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 if (!openInNew) {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
                     BibtexDatabase toAddTo = panel.database();
+                    
                     // Use the import inspection dialog if it is enabled in preferences, and
                     // (there are more than one entry or the inspection dialog is also enabled
                     // for single entries):
@@ -155,7 +151,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
                                 Globals.lang("Import"), openInNew);
                         diag.addEntries(bibtexResult.getDatabase().getEntries());
-                        diag.addCallBack(this);
                         diag.entryListComplete();
                         Util.placeDialog(diag, frame);
                         diag.setVisible(true);
@@ -221,13 +216,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
             frame.unblock();
         }
-
-        public void stopFetching() {
-            // No process to stop.
-        }
     }
-
-
 
     public static ParserResult mergeImportResults(List<Pair<String, ParserResult>> imports) {
         BibtexDatabase database = new BibtexDatabase();

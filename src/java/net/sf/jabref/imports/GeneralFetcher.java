@@ -121,10 +121,16 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                 BibtexFields.DEFAULT_INSPECTION_FIELDS, fetcher.getTitle(), false);
         dialog.addCallBack(fetcher);
         Util.placeDialog(dialog, frame);
+        dialog.setVisible(true);
         
         new Thread(new Runnable(){
             public void run(){
-                fetcher.processQuery(tf.getText().trim(), dialog, frame);        
+                
+                if (fetcher.processQuery(tf.getText().trim(), dialog, frame)){
+                    dialog.entryListComplete();
+                } else {
+                    dialog.dispose();
+                }
             }
         }).start();
     }

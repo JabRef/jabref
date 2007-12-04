@@ -18,9 +18,8 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
-import net.sf.jabref.gui.ImportInspectionDialog;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -66,7 +65,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     private boolean shouldContinue = true;
 
-    private JabRefFrame frame;
+    private OutputPrinter status;
 
     /**
      * some archives - like arxive.org - might expect of you to wait some time 
@@ -218,15 +217,15 @@ public class OAI2Fetcher implements EntryFetcher {
             
             return be;
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, Globals.lang(
+            status.showMessage(Globals.lang(
                 "An Exception ocurred while accessing '%0'", url)
                 + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            JOptionPane.showMessageDialog(frame, Globals.lang(
+            status.showMessage(Globals.lang(
                 "An SAXException ocurred while parsing '%0':", new String[]{url})
                 + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e){
-            JOptionPane.showMessageDialog(frame, Globals.lang(
+            status.showMessage(Globals.lang(
                 "An Error occurred while fetching from OAI2 source (%0):", new String[]{url})
                 + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } 
@@ -255,11 +254,11 @@ public class OAI2Fetcher implements EntryFetcher {
         return Globals.menuTitle(getKeyName());
     }
 
-    public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
-        this.frame = frame;
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
+
+        this.status = status;
 
         try {
-            dialog.setVisible(true);
             shouldContinue = true;
             
             /* multiple keys can be delimited by ; or space */
@@ -277,13 +276,13 @@ public class OAI2Fetcher implements EntryFetcher {
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
                     while (elapsed < waitTime) {
-                        frame.output(Globals.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
+                        status.setStatus(Globals.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
                         Thread.sleep(1000);
                         elapsed = new Date().getTime() - lastCall.getTime();
                     }
                 }
 
-                frame.output(Globals.lang("Processing ") + key);
+                status.setStatus(Globals.lang("Processing ") + key);
 
                 /* the cancel button has been hit */
                 if (!shouldContinue)
@@ -302,13 +301,13 @@ public class OAI2Fetcher implements EntryFetcher {
                 /* update the dialogs progress bar */
                 dialog.setProgress(i + 1, keys.length);
             }
-            /* inform the inspection dialog, that we're done */
-            dialog.entryListComplete();
-            frame.output("");
+            
+            return true;
         } catch (Exception e) {
-            frame.output(Globals.lang("Error while fetching from OIA2")+ ": " + e.getMessage());
+            status.setStatus(Globals.lang("Error while fetching from OIA2")+ ": " + e.getMessage());
             e.printStackTrace();
         }
+        return false;
     }
 
     public void stopFetching() {

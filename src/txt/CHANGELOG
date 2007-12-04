@@ -1,21 +1,24 @@
 
 
 2.4xx
-    - Support for fetching from JSTOR (Tobias Langner, Juliane Doege, Sebastian de Hoog and Christoph Jacob)
-	- JabRef can now be extended by plugins (using the Java Plugin Framework JPF as the
-	  underlying technology). Currently extension points exist for:
+    - Support for fetching from the command line using --fetch (contributed by 
+      Jan F. Boldt and David Kaltschmidt)
+    - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 
+      Doege, Sebastian de Hoog and Christoph Jacob)
+	- JabRef can now be extended by plugins (using the Java Plugin Framework 
+	  JPF as the underlying technology). Currently extension points exist for:
 		- ImportFormat
 		- ExportFormat based on Templates
-		- ExportFormat based on IExportFormat (patch contributed by Kariem Hussein)
+		- ExportFormat based on IExportFormat (contributed by Kariem Hussein)
 		- LayoutFormatter
 		- EntryFetcher
 		- PushToApplication
-	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
-	  classes for making JPF easier. Current version used: 0.4
+	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to
+	  generate helper classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
 	- Print warnings if insufficient Java version is used or if JRE is not from Sun.
-	- Memory Stick Mode: JabRef automatically loads configuration settings from jabref.xml
-	  and also writes them there if enabled.
+	- Memory Stick Mode: JabRef automatically loads configuration settings from 
+	  jabref.xml and also writes them there if enabled.
 	- Improved handling of crossrefs. Fields are now resolved in preview and export.
 	- Updated dependencies, now using: JempBox-0.2
 	- Improved handling of ArXiv URIs.
@@ -23,7 +26,7 @@
 	- [ 1738920 ] Fixed: Windows Position in Multi-Monitor environment
 	- [ 1795355 ] Fixed: LatexFieldFormatter omits "{" on beginning of optional field
 	- [ 1297576 ] New feature: Printing of entry preview (use right-click menu)
-	- [ 1717849 ] Fixed: Bug in aux import (patch contributed by Kai Eckert)
+	- [ 1717849 ] Fixed: Bug in aux import (contributed by Kai Eckert)
     - [ 1749613 ] Fixed: About translation
     - [ 1709449 ] Fixed: Clicking a DOI from context menu fails
 2.3
