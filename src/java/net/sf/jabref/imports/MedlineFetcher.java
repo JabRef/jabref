@@ -47,11 +47,7 @@ public class MedlineFetcher implements EntryFetcher {
      */
     public static final int PACING = 20;
 
-    boolean shouldContinue = true;
-
-    JabRefFrame frame;
-
-    ImportInspectionDialog dialog;
+    boolean shouldContinue;
 
     public String toSearchTerm(String in) {
         Pattern part1 = Pattern.compile(", ");
@@ -148,10 +144,9 @@ public class MedlineFetcher implements EntryFetcher {
 
     public void processQuery(String query, ImportInspectionDialog dialog, JabRefFrame frame) {
 
-        this.dialog = dialog;
-        this.frame = frame;
+        shouldContinue = true;
 
-        query = query.replace(';', ',');
+        query = query.trim().replace(';', ',');
 
         if (query.matches("\\d+[,\\d+]*")) {
             frame.output(Globals.lang("Fetching Medline by id..."));
@@ -183,17 +178,26 @@ public class MedlineFetcher implements EntryFetcher {
 
             int numberToFetch = result.count;
             if (numberToFetch > PACING) {
-                String strCount = JOptionPane.showInputDialog(Globals.lang("References found") +
-                    ": " + numberToFetch + "  " + Globals.lang("Number of references to fetch?"),
-                    Integer.toString(numberToFetch));
+                
+                while (true) {
+                    String strCount = JOptionPane.showInputDialog(Globals.lang("References found") +
+                        ": " + numberToFetch + "  " +
+                        Globals.lang("Number of references to fetch?"), Integer
+                        .toString(numberToFetch));
 
-                try {
-                    numberToFetch = Integer.parseInt(strCount.trim());
-                } catch (NumberFormatException ex) {
-                    dialog.dispose();
-                    frame.output("");
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Not a valid number"));
-                    return;
+                    if (strCount == null) {
+                        dialog.dispose();
+                        frame.output(Globals.lang("Medline import canceled"));
+                        return;
+                    }
+
+                    try {
+                        numberToFetch = Integer.parseInt(strCount.trim());
+                        break;
+                    } catch (RuntimeException ex) {
+                        dialog.dispose();
+                        frame.output("Please enter a valid number");
+                    }
                 }
             }
 

@@ -1,16 +1,3 @@
-package net.sf.jabref.imports;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.TreeSet;
-
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
-
-
 /*
   Copyright (C) 2002-2003 Morten O. Alver & Nizar N. Batada
   All programs in this directory and
@@ -36,6 +23,17 @@ import org.xml.sax.helpers.DefaultHandler;
   http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.imports;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeSet;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class MedlineHandler extends DefaultHandler
 {
