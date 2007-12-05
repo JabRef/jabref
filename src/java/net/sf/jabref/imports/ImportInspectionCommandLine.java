@@ -9,9 +9,6 @@ package net.sf.jabref.imports;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
@@ -29,7 +26,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
         status.setStatus(Globals.lang("Progress: %0 of %1", String.valueOf(current), String
             .valueOf(max)));
     }
-    
+
     OutputPrinter status = new OutputPrinter() {
 
         public void setStatus(String s) {
@@ -45,23 +42,10 @@ public class ImportInspectionCommandLine implements ImportInspector {
         }
     };
 
-    public Collection<BibtexEntry> query(final String query, final EntryFetcher fetcher) {
-
-        FutureTask<Boolean> future = new FutureTask<Boolean>(new Callable<Boolean>() {
-
-            public Boolean call() throws Exception {
-                return fetcher.processQuery(query, ImportInspectionCommandLine.this, status);
-            }
-        });
-
-        new Thread(future).start();
-
-        try {
-            if (future.get()) {
-                return entries;
-            }
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
+    public Collection<BibtexEntry> query(String query, EntryFetcher fetcher) {
+        entries.clear();
+        if (fetcher.processQuery(query, ImportInspectionCommandLine.this, status)) {
+            return entries;
         }
         return null;
     }
