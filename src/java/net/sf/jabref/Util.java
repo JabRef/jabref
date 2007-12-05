@@ -734,8 +734,11 @@ public class Util {
                     } else
                         openFileOnWindows(filePath, true);
 				} else {
-                    String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
-					Runtime.getRuntime().exec(cmdArray);
+                    String[] openWith = fileType.getOpenWith().split(" ");
+                    String[] cmdArray = new String[openWith.length+1];
+                    System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+                    cmdArray[cmdArray.length-1] = filePath;
+                    Runtime.getRuntime().exec(cmdArray);
 				}
 			} catch (IOException e) {
                 throw e;
@@ -757,9 +760,12 @@ public class Util {
 			} else if (Globals.ON_WIN) {
 				openFileOnWindows(link, false);
 			} else {
-				String[] cmdArray = new String[] { Globals.prefs.get("htmlviewer"), link };
-				Runtime.getRuntime().exec(cmdArray);
-			}
+				String[] openWith = Globals.prefs.get("htmlviewer").split(" ");
+                String[] cmdArray = new String[openWith.length+1];
+                System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+                cmdArray[cmdArray.length-1] = link;
+                Runtime.getRuntime().exec(cmdArray);
+            }
 
 		}
 	}
