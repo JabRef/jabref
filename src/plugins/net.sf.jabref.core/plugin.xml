@@ -69,6 +69,15 @@
 			value="Fetch Entries from OAI2 Archives like ArXiv." />
 	</extension>
 
+	<extension id="SPIRESFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.SPIRESFetcher" />
+		<parameter id="name" value="SPIRES Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from SLAC SPIRES Database." />
+	</extension>
+
 	<extension id="MedlineFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
@@ -77,7 +86,7 @@
 		<parameter id="description"
 			value="Fetch Entries from Medline." />
 	</extension>
-	
+
 	<extension id="JSTORFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
@@ -86,8 +95,8 @@
 		<parameter id="description"
 			value="Fetch Entries from JSTOR." />
 	</extension>
-	
-	<!-- To extend JabRef with an Layout Formatters use the following extension point -->
+
+    <!-- To extend JabRef with an Layout Formatters use the following extension point -->
 	<extension-point id="LayoutFormatter">
 		<parameter-def type="string" id="layoutFormatter"
 			custom-data="net.sf.jabref.export.layout.LayoutFormatter" />

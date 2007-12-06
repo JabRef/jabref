@@ -314,6 +314,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
                                   Globals.lang("Open URL or DOI"),
                                   prefs.getKey("Open URL or DOI")),
+      openSpires = new GeneralAction("openSpires", "Open SPIRES entry",
+                                          Globals.lang("Open SPIRES entry"),
+                                          prefs.getKey("Open SPIRES entry")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
       //strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
       plainTextImport = new GeneralAction("plainTextImport",
@@ -1221,6 +1224,7 @@ public JabRefPreferences prefs() {
       tools.add(openFile);
       tools.add(openPdf);
       tools.add(openUrl);
+      tools.add(openSpires);
       tools.addSeparator();
       tools.add(newSubDatabaseAction);
 
@@ -1429,7 +1433,7 @@ public JabRefPreferences prefs() {
             selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
-                openPdf, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+                openPdf, openUrl, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,

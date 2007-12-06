@@ -822,6 +822,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Open file", "F4");
         defKeyBinds.put("Open PDF or PS", "shift F5");
         defKeyBinds.put("Open URL or DOI", "F3");
+        defKeyBinds.put("Open SPIRES entry", "ctrl F3");
         defKeyBinds.put("Toggle entry preview", "ctrl F9");
         defKeyBinds.put("Switch preview layout", "F9");
         defKeyBinds.put("Edit entry", "ctrl E");
@@ -844,6 +845,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");
         defKeyBinds.put("Write XMP", "ctrl F4");
         defKeyBinds.put("New file link", "ctrl N");
+        defKeyBinds.put("Fetch SPIRES", "ctrl F8");
     }
 
     private String getNextUnit(Reader data) throws IOException {
