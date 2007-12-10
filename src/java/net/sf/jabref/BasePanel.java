@@ -28,64 +28,21 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.Matcher;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.export.ExportToClipboardAction;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.SaveDatabaseAction;
-import net.sf.jabref.export.SaveException;
-import net.sf.jabref.export.SaveSession;
-import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.SynchronizeFileField;
-import net.sf.jabref.external.UpgradeExternalLinks;
-import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.export.*;
+import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.AutoCompleter;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.GlazedEntrySorter;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -97,21 +54,24 @@ import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLutil;
-import net.sf.jabref.undo.CountingUndoManager;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableChangeType;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.undo.UndoableKeyChange;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.matchers.Matcher;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.sql.Connection;
+import java.util.*;
+import java.util.List;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -1045,20 +1005,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 Object key = bes[0].getField(BibtexFields.KEY_FIELD);
                                 if (key != null) {
                                     basefile = key.toString();
-                                    final String[] types = new String[]{"pdf", "ps"};
+                                    final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                                     final String sep = System.getProperty("file.separator");
-                                    for (int i = 0; i < types.length; i++) {
-                                        String dir = Globals.prefs.get(types[i] + "Directory");
-                                        if (dir != null) {
-                                            if (dir.endsWith(sep)) {
-                                                dir = dir.substring(0, dir.length() - sep.length());
+                                    String dir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                                    if ((dir != null) && (dir.length() > 0)) {
+                                        if (dir.endsWith(sep)) {
+                                            dir = dir.substring(0, dir.length() - sep.length());
+                                        }
+                                        System.out.println(dir);
+                                        for (int i = 0; i < types.length; i++) {
+                                            String found = Util.findPdf(basefile, types[i].getExtension(),
+                                                    dir, new OpenFileFilter("." + types[i].getExtension()));
+                                            if (found != null) {
+                                                filepath = dir + sep + found;
+                                                break;
                                             }
-                                        } else
-                                            dir = "";
-                                        String found = Util.findPdf(basefile, types[i], dir, new OpenFileFilter("." + types[i]));
-                                        if (found != null) {
-                                            filepath = dir + sep + found;
-                                            break;
                                         }
                                     }
                                 }
