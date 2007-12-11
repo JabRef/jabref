@@ -13,7 +13,7 @@
 \usepackage{xspace}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%3.\,12.\,2007
+\newcommand{\versiondate}{in Bearb.}%11.\,12.\,2007
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -1999,7 +1999,7 @@ wird.
 
 
 \subsubsection{Kommandozeilen-Optionen}
-
+\label{kommandozeilenoptionen}
 Im folgenden werden die wichtigsten Optionen und Befehle für die Kommandozeile
 vorgestellt.
 
@@ -2091,6 +2091,18 @@ kann diese Datei analysieren, um eine neue \bibtex{}-Datei zu erstellen,
 die nur die bekannten und benutzten Einträge enthält. Das bedeutet,
 dass ein Eintrag, der in der Standard-\bibtex{}-Datei nicht definiert
 ist, auch nicht in die neue Datei geschrieben werden kann.
+
+\item Aus dem Internet abrufen: \lstinline{--fetch==Name des Fetchers:Suchausdruck}
+
+Die \emph{Fetcher}, also die direkte Suche in Online-Datenbanken,
+die Sie im Menü \menu{Internet} finden, können auch von der Kommandozeile
+aus gestartet werden. Nutzen Sie dazu die Option \lstinline{--fetch} und geben
+sowohl den Namen des Fetchers (z.B. ">ieee"<, ">medline"< oder ">jstor"<)
+als auch den Suchausdruck oder die ID des gesuchten Mediums an. Beachten
+Sie, dass einige Fetcher eine graphische Oberfläche (GUI) anzeigen,
+falls Sie eine Rückmeldung von Ihnen brauchen. Um eine Übersicht der
+verfügbaren Fetcher zu erhalten, geben Sie \texttt{-{-}fetch} ohne
+Parameter ein.
 
 \end{itemize}
 
@@ -2987,7 +2999,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
-\item Abschnitt ">\nameref{search-regular-expressions}"< ergänzt
+\item Abschnitte ">\nameref{search-regular-expressions}"< und ">\nameref{kommandozeilenoptionen}"< ergänzt
 \item Kleinere Änderungen
 \end{revhist}
 
