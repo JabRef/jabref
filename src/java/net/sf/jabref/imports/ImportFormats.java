@@ -68,6 +68,8 @@ public class ImportFormats {
 
                 putValue(NAME, openInNew ? "Import into new database" :
                         "Import into current database");
+                putValue(ACCELERATOR_KEY, openInNew ? Globals.prefs.getKey("Import into new database") :
+                        Globals.prefs.getKey("Import into current database"));
             }
 
             public void actionPerformed(ActionEvent e) {

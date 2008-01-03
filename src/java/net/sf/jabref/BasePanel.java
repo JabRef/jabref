@@ -1012,7 +1012,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                         if (dir.endsWith(sep)) {
                                             dir = dir.substring(0, dir.length() - sep.length());
                                         }
-                                        System.out.println(dir);
                                         for (int i = 0; i < types.length; i++) {
                                             String found = Util.findPdf(basefile, types[i].getExtension(),
                                                     dir, new OpenFileFilter("." + types[i].getExtension()));
