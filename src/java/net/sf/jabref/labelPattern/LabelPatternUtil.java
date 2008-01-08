@@ -297,7 +297,7 @@ public class LabelPatternUtil {
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return _entry.getField(val).toString();
+                    return getField(_entry, val);
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
@@ -337,7 +337,7 @@ public class LabelPatternUtil {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return _entry.getField(val).toString();
+                    return getField(_entry, val);
                 }
             } else if (val.equals("firstpage")) {
                 return firstPage(_entry.getField("pages"));
@@ -359,7 +359,7 @@ public class LabelPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 StringBuilder sb = new StringBuilder();
                 int num = Integer.parseInt(val.substring(7));
-                String kw = _entry.getField("keywords").toString();
+                String kw = getField(_entry, "keywords");
                 if (kw != null) {
                     String[] keywords = kw.split("[,;]\\s*");
                     if ((num > 0) && (num < keywords.length))
@@ -368,12 +368,24 @@ public class LabelPatternUtil {
                 return sb.toString();
             } else {
                 // we havent seen any special demands
-                return _entry.getField(val);
+                return getField(_entry, val);
             }
         } catch (NullPointerException ex) {
             return "";
         }
 
+    }
+
+    /**
+     * Look up a field of a BibtexEntry, returning its String value, or an
+     * empty string if it isn't set.
+     * @param entry The entry.
+     * @param field The field to look up.
+     * @return The field value.
+     */
+    private static String getField(BibtexEntry entry, String field) {
+        Object o = entry.getField(field);
+        return o != null ? (String)o : "";
     }
 
     /**

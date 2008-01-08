@@ -28,8 +28,16 @@ public class RTFChars implements LayoutFormatter {
 		StringBuffer currentCommand = null;
 		boolean escaped = false, incommand = false;
 		for (int i = 0; i < field.length(); i++) {
-			char c = field.charAt(i);
-			if (escaped && (c == '\\')) {
+
+            /*System.out.println("incommand="+incommand+". escaped="+escaped
+                            +". currentCommand='"+(currentCommand!=null?currentCommand.toString():"")+"'");
+            System.out.println("sb: '"+sb.toString()+"'");*/
+
+            char c = field.charAt(i);
+
+            //System.out.println("Char: '"+((char)c)+"'");
+
+            if (escaped && (c == '\\')) {
 				sb.append('\\');
 				escaped = false;
 			}
@@ -48,8 +56,7 @@ public class RTFChars implements LayoutFormatter {
 				} else {
 					// Else we are in a command, and should not keep the letter.
 					currentCommand.append(c);
-
-					testCharCom: if ((currentCommand.length() == 1)
+                    testCharCom: if ((currentCommand.length() == 1)
 						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
 						// This indicates that we are in a command of the type
 						// \^o or \~{n}
@@ -67,9 +74,10 @@ public class RTFChars implements LayoutFormatter {
 						} else {
 							combody = field.substring(i, i + 1);
 						}
-						String result = Globals.RTFCHARS.get(command + combody);
 
-						if (result != null)
+                        String result = Globals.RTFCHARS.get(command + combody);
+
+                        if (result != null)
 							sb.append(result);
 
 						incommand = false;
@@ -81,16 +89,35 @@ public class RTFChars implements LayoutFormatter {
 
 			} else {
 				// if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-				testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
+				testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')
+                    && (c != '}')))
 					sb.append(c);
 				else {
-					// First test if we are already at the end of the string.
+
+                    // First test for braces that may be part of a LaTeX command:
+                    if ((c == '{') && (currentCommand.length() == 0)) {
+                        // We have seen something like \{, which is probably the start
+                        // of a command like \{aa}. Swallow the brace.
+                        continue;
+                    } else if ((c == '}') && (currentCommand.length() > 0)) {
+                        // Seems to be the end of a command like \{aa}. Look it up:
+                        String command = currentCommand.toString();
+                        String result = Globals.RTFCHARS.get(command);
+                        if (result != null) {
+                            sb.append(result);
+                        }
+                        incommand = false;
+				        escaped = false;
+                        continue;
+                    }
+
+                    // Then look for italics etc.,
+                    // but first check if we are already at the end of the string.
 					if (i >= field.length() - 1)
 						break testContent;
 
-					if (c == '{') {
-
-						String command = currentCommand.toString();
+					if ((c == '{') && (currentCommand.length() > 0)) {
+                        String command = currentCommand.toString();
 						// Then test if we are dealing with a italics or bold
 						// command. If so, handle.
 						if (command.equals("emph") || command.equals("textit")) {
@@ -102,7 +129,7 @@ public class RTFChars implements LayoutFormatter {
 							i += part.i;
 							sb.append("}{\\b ").append(part.s).append("}{");
 						}
-					} else
+                    } else
 						sb.append(c);
 
 				}

@@ -1147,8 +1147,9 @@ public class Globals {
 		// codepage
 		RTFCHARS.put("'Y", "\\u221Y"); // "Yacute"
 		RTFCHARS.put("TH", "{\\uc2\\u222TH}"); // "THORN"
-		RTFCHARS.put("ss", "{\\uc2\\u223ss"); // "szlig"
-		// RTFCHARS.put("`a", "\\u224"); // "agrave" exists in standard
+		RTFCHARS.put("ss", "{\\uc2\\u223ss}"); // "szlig"
+        //RTFCHARS.put("ss", "AFFEN"); // "szlig"
+        // RTFCHARS.put("`a", "\\u224"); // "agrave" exists in standard
 		// codepage
 		RTFCHARS.put("'a", "\\u225a"); // "aacute"
 		// RTFCHARS.put("^a", "\\u226"); // "acirc" exists in standard
