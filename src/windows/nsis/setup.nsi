@@ -235,7 +235,7 @@ Section "un.JabRef" un.SecUnProgramFiles
   ; delete desktop icon
   Delete "$DESKTOP\$(^Name).lnk"
   
-  # remove file extension .lyx
+  # remove file extension 
   ReadRegStr $R0 SHCTX "Software\Classes\${PRODUCT_EXT}" ""
   ${if} $R0 == "${PRODUCT_REGNAME}"
    DeleteRegKey SHCTX "Software\Classes\${PRODUCT_EXT}"

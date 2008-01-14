@@ -30,6 +30,7 @@
     - [ 1749613 ] Fixed: About translation
     - [ 1709449 ] Fixed: Clicking a DOI from context menu fails
     - [ 1869331 ] Fixed: Uninstall after silent install removes Windows start menu
+    - [ 1723219 ] Fixed: Strange message (LyX) while installing
 2.3
     - Added handling of unknown file types when synchronizing the file field.
     - Changed the way customized external file types are stored. Types are now stored in a

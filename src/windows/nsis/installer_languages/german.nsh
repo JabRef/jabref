@@ -8,7 +8,7 @@
 
 LicenseLangString JabRefLicenseData ${JabRef_LANG} "${PRODUCT_LICENSE_FILE}"
 
-LangString WelcomePageText "${JabRef_LANG}" "Dieser Assistent wird Sie durch die Installation von LyX begleiten.\r\n\
+LangString WelcomePageText "${JabRef_LANG}" "Dieser Assistent wird Sie durch die Installation von JabRef begleiten.\r\n\
 					     \r\n\
 					     $_CLICK"
 
