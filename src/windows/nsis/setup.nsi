@@ -258,11 +258,12 @@ SectionEnd
 # Installer functions
 Function .onInit
 
+  StrCpy $StartmenuFolder ${PRODUCT_NAME}
 
  # check if the same Jabref version is already installed
   ReadRegStr $0 SHCTX "${PRODUCT_UNINST_KEY}" "Publisher"
   ${if} $0 != ""
-   MessageBox MB_OK|MB_ICONSTOP "$(StillInstalled)"
+   MessageBox MB_OK|MB_ICONSTOP "$(StillInstalled)" /SD IDOK
    Abort
   ${endif}
   
@@ -293,14 +294,14 @@ Function un.onInit
    # check if the Jabref has been installed with admin permisions
    ReadRegStr $0 HKLM "${PRODUCT_UNINST_KEY}" "Publisher"
    ${if} $0 != ""
-    MessageBox MB_OK|MB_ICONSTOP "$(UnNotAdminLabel)"
+    MessageBox MB_OK|MB_ICONSTOP "$(UnNotAdminLabel)" /SD IDOK
     Abort
    ${endif}
    SetShellVarContext current
   ${endif}
   
   ; ask if it should really be removed
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" /SD IDYES IDYES +2
   Abort
 
 FunctionEnd
@@ -308,7 +309,7 @@ FunctionEnd
 Function un.onUninstSuccess
 
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(UnRemoveSuccessLabel)"
+  MessageBox MB_ICONINFORMATION|MB_OK "$(UnRemoveSuccessLabel)" /SD IDOK
 
 FunctionEnd
 
