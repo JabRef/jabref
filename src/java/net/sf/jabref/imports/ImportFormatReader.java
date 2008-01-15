@@ -446,21 +446,27 @@ public class ImportFormatReader {
 		
 		// Cycle through all importers:
 		int bestResult = 0;
-		for (ImportFormat imFo : getImportFormats()) {
-			List<BibtexEntry> entries = importFromFile(imFo, filename);
 
-			if (entries != null)
-				purgeEmptyEntries(entries);
+        for (ImportFormat imFo : getImportFormats()) {
 
-			int entryCount = ((entries != null) ? entries.size() : 0);
+            try {
+                List<BibtexEntry> entries = importFromFile(imFo, filename);
 
-			if (entryCount > bestResult) {
-				bestResult = entryCount;
-				
-				result = new Pair<String, ParserResult>(imFo.getFormatName(),  
-				new ParserResult(entries));
-			}
-		}
+                if (entries != null)
+                    purgeEmptyEntries(entries);
+
+                int entryCount = ((entries != null) ? entries.size() : 0);
+
+                if (entryCount > bestResult) {
+                    bestResult = entryCount;
+
+                    result = new Pair<String, ParserResult>(imFo.getFormatName(),
+                    new ParserResult(entries));
+                }
+            } catch (IOException ex) {
+                // The import didn't succeed. Go on.
+            }
+        }
 		
 		if (result != null)
 			return result;

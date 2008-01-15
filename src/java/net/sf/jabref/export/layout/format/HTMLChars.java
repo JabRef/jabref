@@ -110,7 +110,7 @@ public class HTMLChars implements LayoutFormatter {
                     // Then test if we are dealing with a italics or bold
 					// command.
 					// If so, handle.
-					if (command.equals("emph") || command.equals("textit")) {
+					if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
 						IntAndString part = getPart(field, i, true);
 
 						i += part.i;

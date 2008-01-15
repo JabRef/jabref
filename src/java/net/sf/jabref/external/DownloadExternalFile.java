@@ -222,22 +222,39 @@ public class DownloadExternalFile {
      * @param link The link
      * @return The suffix, excluding the dot (e.g. ".pdf")
      */
-    public String getSuffix(String link) {
+    public String getSuffix(final String link) {
+        String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
             if ((url.getQuery() != null) && (url.getQuery().length() < link.length()-1)) {
-                link = link.substring(0, link.length()-url.getQuery().length()-1);
-                System.out.println(link);
+                strippedLink = link.substring(0, link.length()-url.getQuery().length()-1);
             }
         } catch (MalformedURLException e) {
             // Don't report this error, since this getting the suffix is a non-critical
             // operation, and this error will be triggered and reported elsewhere.
         }
-        int index = link.lastIndexOf('.');
-        if ((index <= 0) || (index == link.length() - 1)) // No occurence, or at the end
-            return null;
-        return link.substring(index + 1);
+        // First see if the stripped link gives a reasonable suffix:
+        String suffix;
+        int index = strippedLink.lastIndexOf('.');
+        if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
+            suffix = null;
+        else suffix = strippedLink.substring(index + 1);
+        System.out.println(Globals.prefs.getExternalFileTypeByExt(suffix));
+        if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
+            return suffix;
+        }
+        else {
+            // If the suffix doesn't seem to give any reasonable file type, try
+            // with the non-stripped link:
+            String suffix2;
+            index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
+                return suffix; // return the first one we found, anyway.
+            else
+                return link.substring(index + 1);
+        }
+
     }
 
     public String getFileDirectory(String link) {

@@ -120,7 +120,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 					}
 				} catch (IOException e) {
 					// No entries found...
-				}
+                    e.printStackTrace();
+                }
 			}
 
             // Ok, done. Then try to gather in all we have found. Since we might
