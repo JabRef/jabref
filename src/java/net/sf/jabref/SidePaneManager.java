@@ -114,7 +114,7 @@ public class SidePaneManager {
 	}
 
 	public synchronized void register(String name, SidePaneComponent comp) {
-		components.put(name, comp);
+        components.put(name, comp);
 	}
 
 	public synchronized void registerAndShow(String name, SidePaneComponent comp) {

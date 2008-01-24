@@ -789,7 +789,8 @@ lastEdLoop:
             SidePanePlugin plugin = extension.getSidePanePlugin();
             plugin.init(jrf, jrf.sidePaneManager);
             SidePaneComponent comp = plugin.getSidePaneComponent();
-            jrf.sidePaneManager.registerAndShow(comp.getName(), comp);
+            jrf.sidePaneManager.register(comp.getName(), comp);
+            jrf.addPluginMenuItem(plugin.getMenuItem());
         }
     }
 

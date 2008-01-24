@@ -4,6 +4,8 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
 
+import javax.swing.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: alver
@@ -17,7 +19,7 @@ public interface SidePanePlugin {
     
     public SidePaneComponent getSidePaneComponent();
 
-    public String getMenuName();
+    public JMenuItem getMenuItem();
 
     public String getShortcutKey();
 }
