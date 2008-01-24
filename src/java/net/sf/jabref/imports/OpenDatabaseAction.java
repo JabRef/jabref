@@ -147,7 +147,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
-                ParserResult pr = loadDatabase(file, encoding);
+                final ParserResult pr = loadDatabase(file, encoding);
 
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Globals.lang("Error opening file" + " '" + fileName + "'"),
@@ -157,14 +157,19 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     return;
                 }
 
-                BasePanel panel = addNewDatabase(pr, file, raisePanel);
-
+                final BasePanel panel = addNewDatabase(pr, file, raisePanel);
+                
                 // After adding the database, go through our list and see if
                 // any post open actions need to be done. For instance, checking
                 // if we found new entry types that can be imported, or checking
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
-                performPostOpenActions(panel, pr, true);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        performPostOpenActions(panel, pr, true);
+                    }
+                });
+
 
             } catch (Exception ex) {
                 //ex.printStackTrace();
