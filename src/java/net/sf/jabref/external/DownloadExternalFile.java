@@ -193,11 +193,10 @@ public class DownloadExternalFile {
     }
 
     public String getSuggestedFileName(String res, String suffix) {
-        if (suffix == null) {
-            System.out.println("Link has no obvious extension (DownloadExternalFile.download()");
-        }
-
-        String plannedName = bibtexKey + "." + suffix;
+        
+        String plannedName = bibtexKey;
+        if (suffix.length() > 0)
+            plannedName += "." + suffix;
 
         /*
         * [ 1548875 ] download pdf produces unsupported filename
@@ -240,19 +239,30 @@ public class DownloadExternalFile {
         if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
             suffix = null;
         else suffix = strippedLink.substring(index + 1);
-        System.out.println(Globals.prefs.getExternalFileTypeByExt(suffix));
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         }
         else {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
-            String suffix2;
             index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
-                return suffix; // return the first one we found, anyway.
-            else
-                return link.substring(index + 1);
+            if ((index <= 0) || (index == strippedLink.length() - 1)) {
+                // No occurence, or at the end
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (suffix.indexOf('/') > 0)
+                    return "";
+                else
+                    return suffix; // return the first one we found, anyway.
+            }
+            else {
+                 // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (link.substring(index + 1).indexOf('/') > 0)
+                    return "";
+                else
+                    return link.substring(index + 1);
+            }
         }
 
     }
