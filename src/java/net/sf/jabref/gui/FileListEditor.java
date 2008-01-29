@@ -75,7 +75,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
     private JMenuItem rename = new JMenuItem(Globals.lang("Move/rename file"));
-
+    private JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -179,7 +179,10 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
         menu.add(rename);
-        rename.addActionListener(new MoveFileAction(frame, entryEditor, this));
+        rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
+
+        menu.add(moveToFileDir);
+        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
     }
 
     private void openSelectedFile() {

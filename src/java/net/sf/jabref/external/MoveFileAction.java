@@ -16,11 +16,14 @@ public class MoveFileAction extends AbstractAction {
     private JabRefFrame frame;
     private EntryEditor eEditor;
     private FileListEditor editor;
+    private boolean toFileDir;
 
-    public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
+    public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor,
+                          boolean toFileDir) {
         this.frame = frame;
         this.eEditor = eEditor;
         this.editor = editor;
+        this.toFileDir = toFileDir;
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -49,7 +52,39 @@ public class MoveFileAction extends AbstractAction {
             boolean repeat = true;
             while (repeat) {
                 repeat = false;
-                String chosenFile = Globals.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
+                String chosenFile;
+                if (toFileDir) {
+                    String suggName = eEditor.getEntry().getCiteKey()+extension;
+                    CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Move file to file directory?"),
+                            Globals.lang("Rename to '%0'",suggName),
+                            Globals.prefs.getBoolean("renameOnMoveFileToFileDir"));
+                    int answer;
+                    // Only ask about renaming file if the file doesn't have the proper name already:
+                    if (!suggName.equals(file.getName()))
+                        answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Move/Rename file"),
+                                JOptionPane.YES_NO_OPTION);
+                    else
+                        answer = JOptionPane.showConfirmDialog(frame, Globals.lang("Move file to file directory?"),
+                                Globals.lang("Move/Rename file"), JOptionPane.YES_NO_OPTION);
+                    if (answer != JOptionPane.YES_OPTION)
+                        return;
+                    Globals.prefs.putBoolean("renameOnMoveFileToFileDir", cbm.isSelected());
+                    StringBuilder sb = new StringBuilder(dir);
+                    if (!dir.endsWith(File.separator))
+                        sb.append(File.separator);
+                    if (cbm.isSelected()) {
+                        // Rename:
+                        sb.append(suggName);
+                    }
+                    else {
+                        // Do not rename:
+                        sb.append(file.getName());
+                    }
+                    chosenFile = sb.toString();
+                    System.out.println(chosenFile);
+                } else {
+                    chosenFile = Globals.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
+                }
                 if (chosenFile == null) {
                     return; // cancelled
                 }
@@ -59,7 +94,10 @@ public class MoveFileAction extends AbstractAction {
                         (frame, "'" + newFile.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Move/Rename file"), JOptionPane.OK_CANCEL_OPTION)
                         != JOptionPane.OK_OPTION)) {
-                    repeat = true;
+                    if (!toFileDir)
+                        repeat = true;
+                    else
+                        return;
                 }
             }
 
@@ -70,8 +108,18 @@ public class MoveFileAction extends AbstractAction {
                         success = Util.copyFile(file, newFile, true);
                     }
                     if (success) {
-                        // TODO: Relativise path?
-                        flEntry.setLink(newFile.getPath());
+                        // Relativise path, if possible.
+                        if (newFile.getPath().startsWith(dir)) {
+                            if ((newFile.getPath().length() > dir.length()) &&
+                                    (newFile.getPath().charAt(dir.length()) == File.separatorChar))
+                                flEntry.setLink(newFile.getPath().substring(1+dir.length()));
+                            else
+                                flEntry.setLink(newFile.getPath().substring(dir.length()));
+
+
+                        }
+                        else
+                            flEntry.setLink(newFile.getCanonicalPath());
                         eEditor.updateField(editor);
                         JOptionPane.showMessageDialog(frame, Globals.lang("File moved"),
                                 Globals.lang("Move/Rename file"), JOptionPane.INFORMATION_MESSAGE);

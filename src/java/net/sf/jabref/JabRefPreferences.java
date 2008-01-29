@@ -226,7 +226,8 @@ public class JabRefPreferences {
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
         defaults.put("memoryStickMode", Boolean.FALSE);
-        
+        defaults.put("renameOnMoveFileToFileDir", Boolean.TRUE);
+
     // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put("generalFields", "crossref;keywords;file;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");

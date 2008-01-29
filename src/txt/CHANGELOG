@@ -5,6 +5,9 @@
       Jan F. Boldt and David Kaltschmidt)
     - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 
       Doege, Sebastian de Hoog and Christoph Jacob)
+    - Added context menu for file list editor with options to move/rename linked file
+      as well as to automatically move the file to file directory and optionally rename
+      after BibTeX key.
 	- JabRef can now be extended by plugins (using the Java Plugin Framework 
 	  JPF as the underlying technology). Currently extension points exist for:
 		- ImportFormat
