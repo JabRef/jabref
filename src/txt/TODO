@@ -9,12 +9,12 @@ Chris:
   
 Morten:
 
+* Are SQL export features complete and documented?
 * Spires fetcher: needs some documentation on search queries
 * Open spires entry: ("openSpires" action). Think about better integration of this?
-* Look into submitted PDF downloader (d/l through Google)
+* [NOT COMPATIBLE] Look into submitted PDF downloader (d/l through Google)
 * Merge patch for entry types (see patch for IEEEXploreFetcher)
-* Improve duplicate check.
-* "Move/rename linked file" feature
+* [OK?] Improve duplicate check.
 * Add "Copy all externally linked files for this set of entries"-feature.
   Basic functionality in AccessLinksForEntries.
 * Strange bug: when editing a field in entry editor, then clicking an entry of different type
