@@ -99,6 +99,15 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         bb.addGridded(cancel);
         bb.addGlue();
                 
+        AbstractAction closeAction = new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        };
+        ActionMap am = main.getActionMap();
+        InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", closeAction);
 
         //con.fill = GridBagConstraints.BOTH;
         //con.weightx = 0.3;
@@ -276,9 +285,9 @@ protected boolean equalArrays(String[] one, String[] two) {
 public void actionPerformed(ActionEvent e) {
     if (e.getSource() == ok) {
         applyChanges();
-        setVisible(false);
+        dispose();
     } else if (e.getSource() == cancel) {
-        setVisible(false);
+        dispose();
     } else if (e.getSource() == apply) {
         applyChanges();
     } else if (e.getSource() == typeComp) {

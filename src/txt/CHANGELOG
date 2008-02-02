@@ -1,6 +1,7 @@
 
 
 2.4xx
+    - Added two new search modes - display search results in a dialog, and global search.
     - Support for fetching from the command line using --fetch (contributed by 
       Jan F. Boldt and David Kaltschmidt)
     - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 

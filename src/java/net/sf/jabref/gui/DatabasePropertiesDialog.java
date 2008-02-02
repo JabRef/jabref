@@ -81,6 +81,16 @@ public class DatabasePropertiesDialog extends JDialog {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
+        AbstractAction closeAction = new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        };
+        ActionMap am = builder.getPanel().getActionMap();
+        InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", closeAction);
+
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 storeSettings();

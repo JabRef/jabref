@@ -14,10 +14,7 @@ import net.sf.jabref.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.HashMap;
 
 /**
@@ -75,6 +72,17 @@ public class SearchResultsDialog {
         contentPane.setTopComponent(sp);
         contentPane.setBottomComponent(new JScrollPane(preview));
 
+        // Key bindings:
+        AbstractAction closeAction = new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            diag.dispose();
+          }
+        };
+        ActionMap am = contentPane.getActionMap();
+        InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", closeAction);
+        
         diag.addWindowListener(new WindowAdapter() {
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
