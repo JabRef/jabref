@@ -43,6 +43,7 @@ import net.sf.jabref.search.BasicSearch;
 import net.sf.jabref.search.SearchExpression;
 import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.gui.SearchResultsDialog;
 
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
@@ -53,6 +54,7 @@ class SearchManager2 extends SidePaneComponent
     GridBagConstraints con = new GridBagConstraints() ;
 
     IncrementalSearcher incSearcher;
+    SearchResultsDialog searchDialog = null;
 
     //private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
@@ -65,7 +67,8 @@ class SearchManager2 extends SidePaneComponent
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
     searchAll, caseSensitive, regExpSearch;
 
-    private JRadioButton increment, floatSearch, hideSearch;
+    private JRadioButton increment, floatSearch, hideSearch, showResultsInDialog,
+        searchAllBases;
     private JCheckBoxMenuItem select;
     private ButtonGroup types = new ButtonGroup();
     private boolean incSearch = false, startedFloatSearch=false, startedFilterSearch=false;
@@ -101,25 +104,30 @@ class SearchManager2 extends SidePaneComponent
         (Globals.lang("Use regular expressions"),
          Globals.prefs.getBoolean("regExpSearch"));
 
-
     increment = new JRadioButton(Globals.lang("Incremental"), false);
     floatSearch = new JRadioButton(Globals.lang("Float"), true);
     hideSearch = new JRadioButton(Globals.lang("Filter"), true);
+    showResultsInDialog = new JRadioButton(Globals.lang("Show results in dialog"), true);
+    searchAllBases = new JRadioButton(Globals.lang("Global search"),
+            Globals.prefs.getBoolean("searchAllBases"));
     types.add(increment);
     types.add(floatSearch);
-        types.add(hideSearch);
+    types.add(hideSearch);
+    types.add(showResultsInDialog);
+    types.add(searchAllBases);
 
         select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
         floatSearch.setToolTipText(Globals.lang("Gray out non-matching entries"));
         hideSearch.setToolTipText(Globals.lang("Hide non-matching entries"));
+        showResultsInDialog.setToolTipText(Globals.lang("Show search results in a window"));
 
     // Add an item listener that makes sure we only listen for key events
     // when incremental search is turned on.
     increment.addItemListener(this);
-        floatSearch.addItemListener(this);
-        hideSearch.addItemListener(this);
-
+    floatSearch.addItemListener(this);
+    hideSearch.addItemListener(this);
+    showResultsInDialog.addItemListener(this);
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         searchField.addFocusListener(Globals.focusListener);
@@ -141,7 +149,8 @@ class SearchManager2 extends SidePaneComponent
 
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
                       Globals.prefs.getBoolean("caseSensitiveSearch"));
-settings.add(select);
+
+    settings.add(select);
 
     // 2005.03.29, trying to remove field category searches, to simplify
         // search usability.
@@ -206,8 +215,17 @@ settings.add(select);
             help.setMargin(margin);
             help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.searchHelp, "Help"));
 
+    // Select the last used mode of search:
     if (Globals.prefs.getBoolean("incrementS"))
         increment.setSelected(true);
+    else if (Globals.prefs.getBoolean("grayOutNonHits"))
+        floatSearch.setSelected(true);
+    else if (Globals.prefs.getBoolean("showSearchInDialog"))
+        showResultsInDialog.setSelected(true);
+    else if (Globals.prefs.getBoolean("searchAllBases"))
+        searchAllBases.setSelected(true);
+    else
+        hideSearch.setSelected(true);
 
     JPanel main = new JPanel();
     main.setLayout(gbl);
@@ -234,6 +252,10 @@ settings.add(select);
         main.add(floatSearch);
         gbl.setConstraints(hideSearch, con);
         main.add(hideSearch);
+        gbl.setConstraints(showResultsInDialog, con);
+        main.add(showResultsInDialog);
+        gbl.setConstraints(searchAllBases, con);
+        main.add(searchAllBases);
     con.insets = new Insets(0, 0, 0,  0);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
@@ -283,18 +305,27 @@ settings.add(select);
         search.setPreferredSize(size2);
     }
 
-    public void updatePrefs() {
-    Globals.prefs.putBoolean("searchReq", searchReq.isSelected());
-    Globals.prefs.putBoolean("searchOpt", searchOpt.isSelected());
-    Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
-    Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
-    Globals.prefs.putBoolean("incrementS", increment.isSelected());
-    Globals.prefs.putBoolean("selectS", select.isSelected());
-    Globals.prefs.putBoolean("grayOutNonHits", floatSearch.isSelected());
-    Globals.prefs.putBoolean("caseSensitiveSearch",
-             caseSensitive.isSelected());
-    Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
+    /**
+     * Instantiate the search dialog, unless it has already been instantiated:
+     */
+    protected void instantiateSearchDialog() {
+        if (searchDialog == null)
+            searchDialog = new SearchResultsDialog(frame, Globals.lang("Search results"));
+    }
 
+    public void updatePrefs() {
+        Globals.prefs.putBoolean("searchReq", searchReq.isSelected());
+        Globals.prefs.putBoolean("searchOpt", searchOpt.isSelected());
+        Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
+        Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
+        Globals.prefs.putBoolean("incrementS", increment.isSelected());
+        Globals.prefs.putBoolean("selectS", select.isSelected());
+        Globals.prefs.putBoolean("grayOutNonHits", floatSearch.isSelected());
+        Globals.prefs.putBoolean("caseSensitiveSearch",
+                 caseSensitive.isSelected());
+        Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
+        Globals.prefs.putBoolean("showSearchInDialog", showResultsInDialog.isSelected());
+        Globals.prefs.putBoolean("searchAllBases", searchAllBases.isSelected());
     }
 
     public void startIncrementalSearch() {
@@ -322,8 +353,12 @@ settings.add(select);
             floatSearch.setSelected(true);
         else if (floatSearch.isSelected())
             hideSearch.setSelected(true);
+        else if (hideSearch.isSelected())
+            showResultsInDialog.setSelected(true);
+        else if (showResultsInDialog.isSelected())
+            searchAllBases.setSelected(true);
         else {
-        increment.setSelected(true);
+            increment.setSelected(true);
         }
         increment.revalidate();
         increment.repaint();
@@ -364,16 +399,6 @@ settings.add(select);
         rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
                 Globals.prefs.getBoolean("regExpSearch"));
 
-        /*
-        if (Globals.prefs.getBoolean("regExpSearch"))
-            rule1 = new RegExpRule(
-                    Globals.prefs.getBoolean("caseSensitiveSearch"));
-        else {
-            rule1 = new SimpleSearchRule(
-                    Globals.prefs.getBoolean("caseSensitiveSearch"));
-
-        }
-        */
         try {
             // this searches specified fields if specified,
             // and all fields otherwise
@@ -400,10 +425,24 @@ settings.add(select);
         }
 
         public void run() {
-        	for (BibtexEntry entry : panel.getDatabase().getEntries()){
-                boolean hit = rules.applyRule(searchTerm, entry) > 0;
-                entry.setSearchHit(hit);
-                if (hit) hits++;
+            if (!searchAllBases.isSelected()) {
+                // Search only the current database:
+                for (BibtexEntry entry : panel.getDatabase().getEntries()){
+                    boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                    entry.setSearchHit(hit);
+                    if (hit) hits++;
+                }
+            }
+            else {
+                // Search all databases:
+                for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
+                    BasePanel p = frame.baseAt(i);
+                    for (BibtexEntry entry : p.getDatabase().getEntries()){
+                        boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                        entry.setSearchHit(hit);
+                        if (hit) hits++;
+                    }
+                }
             }
         }
 
@@ -412,7 +451,50 @@ settings.add(select);
                     + ": " + hits);
 
             // Show the result in the chosen way:
-            if (hideSearch.isSelected()) {
+            if (searchAllBases.isSelected()) {
+                // Search all databases. This means we need to use the search results dialog.
+                // Turn off other search mode, if activated:
+                if (startedFloatSearch) {
+                    panel.mainTable.stopShowingFloatSearch();
+                    startedFloatSearch = false;
+                }
+                if (startedFilterSearch) {
+                    panel.stopShowingSearchResults();
+                    startedFilterSearch = false;
+                }
+                // Make sure the search dialog is instantiated and cleared:
+                instantiateSearchDialog();
+                searchDialog.clear();
+                for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
+                    BasePanel p = frame.baseAt(i);
+                    for (BibtexEntry entry : p.getDatabase().getEntries()){
+                        if (entry.isSearchHit())
+                            searchDialog.addEntry(entry, p);
+                    }
+                }
+                searchDialog.setVisible(true);
+            }
+
+            else if (showResultsInDialog.isSelected()) {
+                // Turn off other search mode, if activated:
+                if (startedFloatSearch) {
+                    panel.mainTable.stopShowingFloatSearch();
+                    startedFloatSearch = false;
+                }
+                if (startedFilterSearch) {
+                    panel.stopShowingSearchResults();
+                    startedFilterSearch = false;
+                }
+                // Make sure the search dialog is instantiated and cleared:
+                instantiateSearchDialog();
+                searchDialog.clear();
+                for (BibtexEntry entry : panel.getDatabase().getEntries()) {
+                    if (entry.isSearchHit())
+                        searchDialog.addEntry(entry, panel);
+                }
+                searchDialog.setVisible(true);
+            }
+            else if (hideSearch.isSelected()) {
                 // Filtering search - removes non-hits from the table:
                 if (startedFloatSearch) {
                     panel.mainTable.stopShowingFloatSearch();

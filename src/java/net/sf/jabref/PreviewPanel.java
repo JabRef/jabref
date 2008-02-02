@@ -256,7 +256,11 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		database = db;
 	}
 
-	public void readLayout(String layoutFormat) throws Exception {
+    public void setMetaData(MetaData metaData) {
+        this.metaData = metaData;
+    }
+
+    public void readLayout(String layoutFormat) throws Exception {
 		layoutFile = layoutFormat;
 		readLayout();
 	}

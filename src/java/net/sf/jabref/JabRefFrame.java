@@ -814,6 +814,10 @@ public JabRefPreferences prefs() {
       tabbedPane.setSelectedIndex(i);
   }
 
+    public void showBasePanel(BasePanel bp) {
+        tabbedPane.setSelectedComponent(bp);
+    }
+
   /**
    * Returns the currently viewed BasePanel.
    */
@@ -1091,7 +1095,7 @@ public JabRefPreferences prefs() {
       file.add(close);
       file.add(quit);
       mb.add(file);
-      //edit.add(test);
+      edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();

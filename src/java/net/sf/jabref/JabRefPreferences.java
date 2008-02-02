@@ -287,6 +287,8 @@ public class JabRefPreferences {
         defaults.put("warnBeforeOverwritingKey", Boolean.TRUE);
         defaults.put("confirmDelete", Boolean.TRUE);
         defaults.put("grayOutNonHits", Boolean.TRUE);
+        defaults.put("showSearchInDialog", Boolean.FALSE);
+        defaults.put("searchAllBases", Boolean.FALSE);
         defaults.put("defaultLabelPattern", "[auth][year]");
         defaults.put("previewEnabled", Boolean.TRUE);
         defaults.put("preview0", "<font face=\"arial\">"

@@ -297,6 +297,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
+
+                    SearchResultsDialog diag = new SearchResultsDialog(frame, "Test");
+                    diag.setVisible(true);
+                    List<BibtexEntry> list = new ArrayList<BibtexEntry>();
+                    BibtexEntry[] entries = getSelectedEntries();
+                    for (int i = 0; i < entries.length; i++) {
+                        BibtexEntry entry = entries[i];
+                        list.add(entry);
+                    }
+                    diag.addEntries(list, BasePanel.this);
+
+
                     // Z3950Connection conn = new Z3950Connection();
                     // conn.doSearch();
                     /*
