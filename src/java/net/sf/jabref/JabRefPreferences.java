@@ -363,6 +363,8 @@ public class JabRefPreferences {
 
         defaults.put("importInspectionDialogWidth", new Integer(650));
         defaults.put("importInspectionDialogHeight", new Integer(650));
+        defaults.put("searchDialogWidth", new Integer(650));
+        defaults.put("searchDialogHeight", new Integer(500));
 
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
 

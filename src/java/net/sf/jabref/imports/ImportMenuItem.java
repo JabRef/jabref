@@ -225,8 +225,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         boolean anythingUseful = false;
 
         for (Pair<String, ParserResult> importResult : imports){
-
-        	if (importResult.p.equals(ImportFormatReader.BIBTEX_FORMAT)){
+            if (importResult == null)
+                continue;
+            if (importResult.p.equals(ImportFormatReader.BIBTEX_FORMAT)){
         	    // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.v;
 

@@ -21,21 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -264,7 +250,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         centerPan.setLayout(new BorderLayout());
 
         contentPane.setTopComponent(new JScrollPane(glTable));
-        contentPane.setBottomComponent(new JScrollPane(preview));
+        contentPane.setBottomComponent(preview);
 
         centerPan.add(contentPane, BorderLayout.CENTER);
         centerPan.add(progressBar, BorderLayout.SOUTH);
@@ -338,6 +324,16 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
                 Globals.prefs.putInt("importInspectionDialogHeight", getSize().height);
             }
         });
+        // Key bindings:
+        AbstractAction closeAction = new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        };
+        ActionMap am = contentPane.getActionMap();
+        InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", closeAction);
 
     }
 
@@ -1413,6 +1409,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
                         FileListTableModel model = new FileListTableModel();
                         model.setContent((String) o);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
+                        if (model.getRowCount() > 0)
+                            fileLabel.setIcon(model.getEntry(0).getType().getIcon());
                         return fileLabel;
                     } else
                         return null;

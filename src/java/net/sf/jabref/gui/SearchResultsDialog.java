@@ -5,17 +5,21 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileMenuItem;
 
 import javax.swing.*;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.io.IOException;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -30,6 +34,10 @@ public class SearchResultsDialog {
     private String[] fields = new String[]{
             "author", "title", "year", "journal"
     };
+    protected final int FILE_COL = 0, URL_COL = 1,
+        PAD = 2;
+    private JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall")),
+            urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
     protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
@@ -58,10 +66,14 @@ public class SearchResultsDialog {
         model = new EventTableModel(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
-
-
+        GeneralRenderer renderer = new GeneralRenderer(Color.white);
+        entryTable.setDefaultRenderer(JLabel.class, renderer);
+        entryTable.setDefaultRenderer(String.class, renderer);
+        setWidths();
         TableComparatorChooser<BibtexEntry> tableSorter =
-                new TableComparatorChooser<BibtexEntry>(entryTable, sortedEntries, true);
+                new TableComparatorChooser<BibtexEntry>(entryTable, sortedEntries,
+                TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+        setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
         EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
@@ -70,7 +82,7 @@ public class SearchResultsDialog {
         entryTable.addMouseListener(new TableClickListener());
 
         contentPane.setTopComponent(sp);
-        contentPane.setBottomComponent(new JScrollPane(preview));
+        contentPane.setBottomComponent(preview);
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
@@ -87,10 +99,17 @@ public class SearchResultsDialog {
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
             }
+
+            public void windowClosing(WindowEvent event) {
+                Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
+                Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
+            }
         });
 
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
-        diag.pack();
+        // Remember and default to last size:
+        diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
+            .getInt("searchDialogHeight")));
         diag.setLocationRelativeTo(frame);
     }
 
@@ -104,6 +123,54 @@ public class SearchResultsDialog {
     public synchronized void clear() {
         entries.clear();
         entryHome.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
+        // First column:
+        java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser
+            .getComparatorsForColumn(0);
+        comparators.clear();
+
+        comparators = comparatorChooser.getComparatorsForColumn(1);
+        comparators.clear();
+
+        // Icon columns:
+        for (int i = 2; i < PAD; i++) {
+            comparators = comparatorChooser.getComparatorsForColumn(i);
+            comparators.clear();
+            if (i == FILE_COL)
+                comparators.add(new IconComparator(new String[] { GUIGlobals.FILE_FIELD }));
+            else if (i == URL_COL)
+                comparators.add(new IconComparator(new String[] { "url" }));
+
+        }
+        // Remaining columns:
+        for (int i = PAD; i < PAD + fields.length; i++) {
+            comparators = comparatorChooser.getComparatorsForColumn(i);
+            comparators.clear();
+            comparators.add(new FieldComparator(fields[i - PAD]));
+        }
+
+        sortedEntries.getReadWriteLock().writeLock().lock();
+        comparatorChooser.appendComparator(PAD, 0, false);
+        sortedEntries.getReadWriteLock().writeLock().unlock();
+
+    }
+
+    protected void setWidths() {
+        TableColumnModel cm = entryTable.getColumnModel();
+        for (int i = 0; i < PAD; i++) {
+            // Lock the width of icon columns.
+            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        }
+
+        for (int i = 0; i < fields.length; i++) {
+            int width = BibtexFields.getFieldLength(fields[i]);
+            cm.getColumn(i + PAD).setPreferredWidth(width);
+        }
     }
 
     /**
@@ -133,7 +200,19 @@ public class SearchResultsDialog {
      */
     class TableClickListener extends MouseAdapter {
 
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                processPopupTrigger(e);
+                return;
+            }
+        }
+
         public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                processPopupTrigger(e);
+                return;
+            }
+
             // First find the row on which the user has clicked.
             final int row = entryTable.rowAtPoint(e.getPoint());
 
@@ -150,7 +229,73 @@ public class SearchResultsDialog {
             }
         }
 
+        public void mouseClicked(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                processPopupTrigger(e);
+                return;
+            }
+            //if (e.)
+            final int col = entryTable.columnAtPoint(e.getPoint()),
+                    row = entryTable.rowAtPoint(e.getPoint());
+            if (col < PAD) {
+                BibtexEntry entry = sortedEntries.get(row);
+                BasePanel p = entryHome.get(entry);
+                switch (col) {
+                    case FILE_COL:
+                        Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                        if (o != null) {
+                            FileListTableModel tableModel = new FileListTableModel();
+                            tableModel.setContent((String) o);
+                            if (tableModel.getRowCount() == 0)
+                                return;
+                            FileListEntry fl = tableModel.getEntry(0);
+                            (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
+                                p.metaData(), fl.getType())).actionPerformed(null);
+                        }
+                        break;
+                    case URL_COL:
+                        Object link = entry.getField("url");
+                        try {
+                            if (link != null)
+                                Util.openExternalViewer(p.metaData(), (String) link, "url");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        break;
 
+                }
+            }
+        }
+
+        public void processPopupTrigger(MouseEvent e) {
+            BibtexEntry entry = sortedEntries.get(entryTable.rowAtPoint(e.getPoint()));
+            BasePanel p = entryHome.get(entry);
+            int col = entryTable.columnAtPoint(e.getPoint());
+            JPopupMenu menu = new JPopupMenu();
+            int count = 0;
+
+            if (col == FILE_COL) {
+                // We use a FileListTableModel to parse the field content:
+                Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                FileListTableModel fileList = new FileListTableModel();
+                fileList.setContent((String)o);
+                // If there are one or more links, open the first one:
+                for (int i=0; i<fileList.getRowCount(); i++) {
+                    FileListEntry flEntry = fileList.getEntry(i);
+                    String description = flEntry.getDescription();
+                    if ((description == null) || (description.trim().length() == 0))
+                        description = flEntry.getLink();
+                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
+                            flEntry.getLink(), flEntry.getType().getIcon(), p.metaData(),
+                            flEntry.getType()));
+                    count++;
+                }
+
+            }
+
+            if (count > 0)
+                menu.show(entryTable, e.getX(), e.getY());
+        }
     }
 
     class EntrySelectionListener implements ListEventListener<BibtexEntry> {
@@ -166,7 +311,7 @@ public class SearchResultsDialog {
                     preview.setEntry(entry);
                     contentPane.setDividerLocation(0.5f);
                     SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                        public void run() {
                             preview.scrollRectToVisible(toRect);
                         }
                     });
@@ -177,20 +322,58 @@ public class SearchResultsDialog {
     /**
      * TableFormat for the table shown in the dialog.
      */
-    public class EntryTableFormat implements TableFormat {
+    public class EntryTableFormat implements AdvancedTableFormat {
 
         public int getColumnCount() {
-            return fields.length;
+            return PAD+fields.length;
         }
 
         public String getColumnName(int column) {
-            return Util.nCase(fields[column]);
+            if (column >= PAD)
+                return Util.nCase(fields[column-PAD]);
+            else return "";
         }
 
-        public Object getColumnValue(Object o, int column) {
-            BibtexEntry entry = (BibtexEntry) o;
+        public Object getColumnValue(Object ob, int column) {
+            BibtexEntry entry = (BibtexEntry)ob;
+            if (column < PAD) {
+                Object o;
+                switch (column) {
+                    case FILE_COL:
+                        o = entry.getField(GUIGlobals.FILE_FIELD);
+                        if (o != null) {
+                            FileListTableModel model = new FileListTableModel();
+                            model.setContent((String) o);
+                            fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
+                            if (model.getRowCount() > 0)
+                                fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                            return fileLabel;
+                        } else
+                            return null;
+                    case URL_COL:
+                        o = entry.getField("url");
+                        if (o != null) {
+                            urlLabel.setToolTipText((String) o);
+                            return urlLabel;
+                        } else
+                            return null;
+                    default:
+                        return null;
+                }
+            }
+            else
+                return entry.getField(fields[column-PAD]);
+        }
 
-            return entry.getField(fields[column]);
+        public Class getColumnClass(int i) {
+            if (i < PAD)
+                return JLabel.class;
+            else
+                return String.class;
+        }
+
+        public Comparator getColumnComparator(int i) {
+            return null;
         }
     }
 }
