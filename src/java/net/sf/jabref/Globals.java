@@ -98,7 +98,8 @@ public class Globals {
 	public static Locale locale;
 
 	public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
-		LAYOUT_PREFIX = "/resource/layout/", MAC = "Mac OS X",
+        PROTECTED_FLAG_META = "protectedFlag",
+        LAYOUT_PREFIX = "/resource/layout/", MAC = "Mac OS X",
 		DOI_LOOKUP_PREFIX = "http://dx.doi.org/", NONE = "_non__",
 		FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 

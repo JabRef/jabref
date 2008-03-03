@@ -1,24 +1,15 @@
 package net.sf.jabref.export;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.*;
+import net.sf.jabref.collab.ChangeScanner;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.CallBack;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Worker;
-import net.sf.jabref.collab.ChangeScanner;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.util.Vector;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -47,6 +38,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         else {
 
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
+
                 String[] opts = new String[]{Globals.lang("Review changes"), Globals.lang("Save"),
                         Globals.lang("Cancel")};
                 int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("File has been updated externally. "
@@ -57,24 +49,58 @@ public class SaveDatabaseAction extends AbstractWorker {
 +"Are you sure you want to save?"), Globals.lang("File updated externally"),
                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
 
-                if (answer == JOptionPane.CANCEL_OPTION)
+                if (answer == JOptionPane.CANCEL_OPTION) {
+                    cancelled = true;
                     return;
+                }
                 else if (answer == JOptionPane.YES_OPTION) {
-                    ChangeScanner scanner = new ChangeScanner(panel.frame(), panel); //, panel.database(), panel.metaData());
                     //try {
-                    scanner.changeScan(panel.getFile());
-                    panel.setUpdatedExternally(false);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            panel.getSidePaneManager().hide("fileUpdate");
-                        }
-                    });
 
-                    //} catch (IOException ex) {
-                    //    ex.printStackTrace();
-                    //}
+                    cancelled = true;
+
+                    (new Thread(new Runnable() {
+                        public void run() {
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel);
+                            scanner.changeScan(panel.getFile());
+                            try {
+                                scanner.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if (scanner.changesFound()) {
+                                scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
+                                    public void scanResultsResolved(boolean resolved) {
+                                        if (!resolved) {
+                                            cancelled = true;
+                                        } else {
+                                            panel.setUpdatedExternally(false);
+                                            SwingUtilities.invokeLater(new Runnable() {
+                                                public void run() {
+                                                    panel.getSidePaneManager().hide("fileUpdate");
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    })).start();
 
                     return;
+                }
+                else { // User indicated to store anyway.
+                    // See if the database has the protected flag set:
+                    Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
+                    boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
+                    if (databaseProtectionFlag) {
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Database is protected. Cannot save until external changes have been reviewed."),
+                                Globals.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
+                        cancelled = true;
+                    }
+                    else {
+                        panel.setUpdatedExternally(false);
+                        panel.getSidePaneManager().hide("fileUpdate");
+                    }
                 }
             }
 
@@ -96,7 +122,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     public void run() {
-        if (panel.getFile() == null) {
+        if (cancelled || (panel.getFile() == null)) {
             return;
         }
 

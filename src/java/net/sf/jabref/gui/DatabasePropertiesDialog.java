@@ -29,6 +29,8 @@ public class DatabasePropertiesDialog extends JDialog {
     JTextField fileDir = new JTextField(40),
             pdfDir = new JTextField(40), psDir = new JTextField(40);
     String oldFileVal="", oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
+    JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
+    boolean oldProtectVal = false;
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), false);
@@ -71,6 +73,10 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.append(Globals.lang("PS directory"));
         builder.append(psDir);
         builder.append(browsePs);
+        builder.nextLine();
+        builder.appendSeparator(Globals.lang("Database protection"));
+        builder.nextLine();
+        builder.append(protect,3);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addGridded(ok);
@@ -142,10 +148,19 @@ public class DatabasePropertiesDialog extends JDialog {
                 psDir.setText((psD.get(0)).trim());
         }
 
+        Vector<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
+        if (prot == null)
+            protect.setSelected(false);
+        else {
+            if (prot.size() >= 1)
+                protect.setSelected(Boolean.parseBoolean(prot.get(0)));
+        }
+
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
         oldPdfVal = pdfDir.getText();
         oldPsVal = psDir.getText();
+        oldProtectVal = protect.isSelected();
     }
 
     public void storeSettings() {
@@ -180,10 +195,20 @@ public class DatabasePropertiesDialog extends JDialog {
         else
             metaData.remove("psDirectory");
 
+        if (protect.isSelected()) {
+            dir = new Vector<String>(1);
+            dir.add("true");
+            metaData.putData(Globals.PROTECTED_FLAG_META, dir);
+        }
+        else
+            metaData.remove(Globals.PROTECTED_FLAG_META);
+
+
         // See if any of the values have been modified:
         boolean changed = !newEncoding.equals(oldEncoding)
             || !oldPdfVal.equals(pdfDir.getText())
-            || !oldPsVal.equals(psDir.getText());
+            || !oldPsVal.equals(psDir.getText())
+            || (oldProtectVal != protect.isSelected());
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed)

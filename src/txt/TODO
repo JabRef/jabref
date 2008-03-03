@@ -11,7 +11,6 @@ Morten:
 
 * Spires fetcher: needs some documentation on search queries
 * Open spires entry: ("openSpires" action). Think about better integration of this?
-* [NOT COMPATIBLE] Look into submitted PDF downloader (d/l through Google)
 * Merge patch for entry types (see patch for IEEEXploreFetcher)
 * [OK?] Improve duplicate check.
 * Add "Copy all externally linked files for this set of entries"-feature.

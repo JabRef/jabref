@@ -563,7 +563,7 @@ public class JabRefPreferences {
      * @param key The preferences key.
      * @param value The default value.
      */
-    public void putDefaultValue(String key, String value) {
+    public void putDefaultValue(String key, Object value) {
         defaults.put(key, value);
     }
 

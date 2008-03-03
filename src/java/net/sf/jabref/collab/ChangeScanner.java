@@ -99,19 +99,21 @@ public class ChangeScanner extends Thread {
         return changes.getChildCount() > 0;
     }
 
-    public void displayResult() {
+    public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, changes);
                     Util.placeDialog(dial, frame);
                     dial.setVisible(true); // dial.show(); -> deprecated since 1.5
+                    fup.scanResultsResolved(dial.isOkPressed());
                 }
             });
 
         } else {
             JOptionPane.showMessageDialog(frame, Globals.lang("No actual changes found."),
             Globals.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+            fup.scanResultsResolved(true);
         }
     }
 
@@ -490,4 +492,8 @@ public class ChangeScanner extends Thread {
 //        }
     }
 
+
+    public static interface DisplayResultCallback {
+        public void scanResultsResolved(boolean resolved);
+    }
 }

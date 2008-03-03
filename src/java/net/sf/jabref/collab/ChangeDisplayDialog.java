@@ -28,6 +28,7 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
   JLabel rootInfo = new JLabel(Globals.lang("Select the tree nodes to view and accept or reject changes")+".");
   Change selected = null;
   JComponent infoShown = null;
+    private boolean okPressed = false;
 
   public ChangeDisplayDialog(JFrame owner, final BasePanel panel, final DefaultMutableTreeNode root) {
     super(owner, Globals.lang("External changes"), true);
@@ -83,13 +84,18 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
         panel.markBaseChanged();
         panel.setUpdatedExternally(false);
         dispose();
+        okPressed = true;
       }
     });
 
     pack();
   }
 
-  private void setInfo(JComponent comp) {
+    public boolean isOkPressed() {
+        return okPressed;
+    }
+
+    private void setInfo(JComponent comp) {
     if (infoShown != null)
       infoPanel.remove(infoShown);
     infoShown = comp;

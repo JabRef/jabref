@@ -113,6 +113,10 @@ public class SearchResultsDialog {
         diag.setLocationRelativeTo(frame);
     }
 
+    /**
+     * Control the visibility of the dialog.
+     * @param visible true to show dialog, false to hide.
+     */
     public void setVisible(boolean visible) {
         diag.setVisible(visible);
     }
@@ -125,6 +129,11 @@ public class SearchResultsDialog {
         entryHome.clear();
     }
 
+    /**
+     * Set up the comparators for each column, so the user can modify sort order
+     * by clicking the column labels.
+     * @param comparatorChooser The comparator chooser controlling the sort order.
+     */
     @SuppressWarnings("unchecked")
     protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
@@ -158,6 +167,10 @@ public class SearchResultsDialog {
 
     }
 
+    /**
+     * Set column widths according to which field is shown, and lock icon columns
+     * to a suitable width.
+     */
     protected void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
@@ -196,7 +209,8 @@ public class SearchResultsDialog {
     }
 
     /**
-     * Mouse listener for the entry table.
+     * Mouse listener for the entry table. Processes icon clicks to open external
+     * files or urls, as well as the opening of the context menu.
      */
     class TableClickListener extends MouseAdapter {
 
@@ -267,6 +281,13 @@ public class SearchResultsDialog {
             }
         }
 
+        /**
+         * If the user has signalled the opening of a context menu, the event
+         * gets redirected to this method. Here we open a file link menu if the
+         * user is pointing at a file link icon. Otherwise a general context
+         * menu should be shown.
+         * @param e The triggering mouse event.
+         */
         public void processPopupTrigger(MouseEvent e) {
             BibtexEntry entry = sortedEntries.get(entryTable.rowAtPoint(e.getPoint()));
             BasePanel p = entryHome.get(entry);
@@ -298,6 +319,10 @@ public class SearchResultsDialog {
         }
     }
 
+    /**
+     * The listener for the Glazed list monitoring the current selection.
+     * When selection changes, we need to update the preview panel.
+     */
     class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
             public void listChanged(ListEvent<BibtexEntry> listEvent) {
@@ -320,7 +345,8 @@ public class SearchResultsDialog {
         }
 
     /**
-     * TableFormat for the table shown in the dialog.
+     * TableFormat for the table shown in the dialog. Handles the display of entry
+     * fields and icons for linked files and urls.
      */
     public class EntryTableFormat implements AdvancedTableFormat {
 

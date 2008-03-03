@@ -272,7 +272,11 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 			.getLayoutFromText(Globals.FORMATTER_PACKAGE);
 	}
 
-	public void setEntry(BibtexEntry newEntry) {
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
+
+    public void setEntry(BibtexEntry newEntry) {
 		if (newEntry != entry) {
 			if (entry != null)
 				entry.removePropertyChangeListener(this);

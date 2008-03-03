@@ -2445,7 +2445,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 							    sidePaneManager, getFile(), scanner);
 		  sidePaneManager.register(FileUpdatePanel.NAME, pan);
 		  sidePaneManager.show(FileUpdatePanel.NAME);
-		  setUpdatedExternally(false);
+		  //setUpdatedExternally(false);
 		  //scanner.displayResult();
 	      }
 	  };

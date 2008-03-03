@@ -12,7 +12,8 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.*;
 
-public class FileUpdatePanel extends SidePaneComponent implements ActionListener {
+public class FileUpdatePanel extends SidePaneComponent implements ActionListener,
+        ChangeScanner.DisplayResultCallback {
 
     public static final String NAME = "fileUpdate";
 
@@ -31,7 +32,8 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 	public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,
 		ChangeScanner scanner) {
 		super(manager, GUIGlobals.getIconUrl("save"), Globals.lang("File changed"));
-		this.panel = panel;
+        close.setEnabled(false);
+        this.panel = panel;
 		this.frame = frame;
 		this.manager = manager;
 		this.scanner = scanner;
@@ -66,15 +68,27 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 	 *            ActionEvent
 	 */
 	public void actionPerformed(ActionEvent e) {
-		manager.hideComponent(this);
+
 		// ChangeScanner scanner = new ChangeScanner(frame, panel); //,
 		// panel.database(), panel.metaData());
 		// try {
-		scanner.displayResult();
+		scanner.displayResult(this);
 		// scanner.changeScan(panel.file());
-		panel.setUpdatedExternally(false);
+
 		// } catch (IOException ex) {
 		// ex.printStackTrace();
 		// }
 	}
+
+    /**
+     * Callback method for signalling that the change scanner has displayed the
+     * scan results to the user.
+     * @param resolved true if there were no changes, or if the user has resolved them.
+     */
+    public void scanResultsResolved(boolean resolved) {
+        if (resolved) {
+            manager.hideComponent(this);
+            panel.setUpdatedExternally(false);
+        }
+    }
 }
