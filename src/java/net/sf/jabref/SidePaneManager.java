@@ -131,7 +131,11 @@ public class SidePaneManager {
 		}
 	}
 
-	public synchronized void hideComponent(SidePaneComponent comp) {
+    public SidePaneComponent getComponent(String name) {
+        return components.get(name);
+    }
+
+    public synchronized void hideComponent(SidePaneComponent comp) {
 		if (visible.contains(comp)) {
 			comp.componentClosing();
 			visible.remove(comp);

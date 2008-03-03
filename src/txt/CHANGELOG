@@ -1,6 +1,11 @@
 
 
 2.4xx
+    - Added "protection" flag in Database properties. When this flag is set, JabRef will
+      refuse to save the database when the file has been externally modified, until the
+      changes have been reviewed and partly or completely accepted.
+    - Fixed bug where the external update notification in the side pane would remain
+      even if the referred database was closed.
     - Added two new search modes - display search results in a dialog, and global search.
     - Support for fetching from the command line using --fetch (contributed by 
       Jan F. Boldt and David Kaltschmidt)

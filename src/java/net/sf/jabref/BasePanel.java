@@ -2471,10 +2471,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
 
 
-      public void cleanUp() {
+    /**
+     * Perform necessary cleanup when this BasePanel is closed.
+     */
+    public void cleanUp() {
         if (fileMonitorHandle != null)
-          Globals.fileUpdateMonitor.removeUpdateListener(fileMonitorHandle);
-      }
+            Globals.fileUpdateMonitor.removeUpdateListener(fileMonitorHandle);
+        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
+        // remove it:
+        if (sidePaneManager.hasComponent("fileUpdate")) {
+            FileUpdatePanel fup = (FileUpdatePanel)sidePaneManager.getComponent("fileUpdate");
+            if (fup.getPanel() == this) {
+                sidePaneManager.hideComponent("fileUpdate");
+            }
+        }
+    }
 
   public void setUpdatedExternally(boolean b) {
     updatedExternally = b;

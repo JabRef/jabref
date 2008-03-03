@@ -53,13 +53,22 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 		test.addActionListener(this);
 	}
 
-	/**
+    /**
+     * We include a getter for the BasePanel this component refers to, because this
+     * component needs to be closed if the BasePanel is closed.
+     * @return the base panel this component refers to.
+     */
+    public BasePanel getPanel() {
+        return panel;
+    }
+
+    /**
 	 * Unregister when this component closes. We need that to avoid showing
 	 * two such external change warnings at the same time, only the latest one.
 	 */
 	public void componentClosing() {
 	    manager.unregisterComponent(NAME);
-	}
+    }
 
 	/**
 	 * actionPerformed
