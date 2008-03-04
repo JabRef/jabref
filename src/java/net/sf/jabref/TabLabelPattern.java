@@ -405,6 +405,6 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     }
 
 	public String getTabName() {
-	    return Globals.lang("Key pattern");
+	    return Globals.lang("BibTeX key generator");
 	}
 }

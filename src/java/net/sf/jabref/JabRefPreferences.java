@@ -334,7 +334,7 @@ public class JabRefPreferences {
         defaults.put("putBracesAroundCapitals","");//"title;journal;booktitle;review;abstract");
         defaults.put("nonWrappableFields", "pdf;ps;url;doi");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
-        defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
+        defaults.put("useImportInspectionDialogForSingle", Boolean.TRUE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
         defaults.put("useTimeStamp", Boolean.TRUE);

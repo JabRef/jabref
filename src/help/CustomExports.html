@@ -152,7 +152,6 @@
         characters (e.g. {\^a} or {\"{o}}) with their XML
         representations.</li>
 
-<<<<<<< .working
 <li><code>AuthorAndsReplacer</code> : replaces "and" between names with ";", and "&amp;" between the last two.
 <li><code>AuthorAndsCommaReplacer</code> : replaces "and" between names with ",", and "&amp;" between the last two.
 <li><code>AuthorOrgSci</code> : first author is in "last, first" all others in "first last". First names are abbreviated.
@@ -163,10 +162,8 @@
 <li><code>NoSpaceBetweenAbbreviations</code> : spaces between multiple abbreviated first names are removed.
 <li><code>FormatPagesForHTML</code> : replaces "--" with "-".
   <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
-=======
         <li><code>CreateDocBookAuthors</code> : formats the author
         field in DocBook style.</li>
->>>>>>> .merge-right.r2290
 
         <li><code>CreateDocBookEditors</code> : to be
         documented.</li>
@@ -182,20 +179,10 @@
         <li><code>AuthorFirstFirst</code> : formats author/editor
         fields with the first names first.</li>
 
-<<<<<<< .working
-<p>If none of the available formatters can do what you want to achieve, you can add your own by implementing
-  the <code>net.sf.jabref.export.layout.LayoutFormatter</code> interface. If you insert your class
-  into the <code>net.sf.jabref.export.layout.format</code> package, you can call the formatter by its
-  class name only, like with the standard formatters. Otherwise, you must call the formatter by its fully
-  qualified name (including package name). In any case, the formatter must be in your classpath when running
-  JabRef.</p>
-  
-<h2 id="NameFormatter">Using Custom Name Formatters</h2>
-=======
+
         <li><code>AuthorFirstFirstCommas</code> : formats
         author/editor fields with the first names first, and
         deliminated by commas.</li>
->>>>>>> .merge-right.r2290
 
         <li><code>AuthorFirstAbbrLastCommas</code> : to be
         documented.</li>
@@ -277,16 +264,16 @@
         <li><code>RemoveBrackets</code> : removes all curly
         brackets "{" or "}".</li>
 
-<<<<<<< .working
+
 <p>With external layout files, it's fairly simple to share custom export formats between users.
 If you write an export filter for a format not supported by JabRef, or an improvement over an
 existing one, we encourage you to post your work on our SourceForge.net page. The same goes for
 formatter classes that you write. We'd be happy to distribute a collection of submitted
 layout files, or to add to the selection of standard export filters and formatters.
-=======
+
         <li><code>RemoveBracketsAddComma</code> : to be
         documented.</li>
->>>>>>> .merge-right.r2290
+
 </p>
 <p>Starting with JabRef 2.4b1 you can also package your ExportFormat or LayoutFormatter as a plug-in.
 If you do so, you can provide a single zip-file to other user to make use of your ExportFormat. 

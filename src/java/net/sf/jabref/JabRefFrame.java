@@ -587,6 +587,7 @@ public JabRefPreferences prefs() {
                 if (saveAction.isCancelled() || !saveAction.isSuccess())
                     // The action was either cancelled or unsuccessful.
                     // Break!
+                    output(Globals.lang("Unable to save database"));
                     close = false;
             }
             catch (Throwable ex) {
