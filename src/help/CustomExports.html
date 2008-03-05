@@ -152,16 +152,6 @@
         characters (e.g. {\^a} or {\"{o}}) with their XML
         representations.</li>
 
-<li><code>AuthorAndsReplacer</code> : replaces "and" between names with ";", and "&amp;" between the last two.
-<li><code>AuthorAndsCommaReplacer</code> : replaces "and" between names with ",", and "&amp;" between the last two.
-<li><code>AuthorOrgSci</code> : first author is in "last, first" all others in "first last". First names are abbreviated.
-<li><code>AuthorAbbreviator</code> : to be documented.
-<li><code>AuthorNatBib</code> : formats author names in NatBib style, with last names only, separating names by "and"
-    if there are two authors, and giving the first author followed by "et al." if there are more than
-    two authors.
-<li><code>NoSpaceBetweenAbbreviations</code> : spaces between multiple abbreviated first names are removed.
-<li><code>FormatPagesForHTML</code> : replaces "--" with "-".
-  <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
         <li><code>CreateDocBookAuthors</code> : formats the author
         field in DocBook style.</li>
 
@@ -178,7 +168,6 @@
 
         <li><code>AuthorFirstFirst</code> : formats author/editor
         fields with the first names first.</li>
-
 
         <li><code>AuthorFirstFirstCommas</code> : formats
         author/editor fields with the first names first, and
@@ -264,22 +253,8 @@
         <li><code>RemoveBrackets</code> : removes all curly
         brackets "{" or "}".</li>
 
-
-<p>With external layout files, it's fairly simple to share custom export formats between users.
-If you write an export filter for a format not supported by JabRef, or an improvement over an
-existing one, we encourage you to post your work on our SourceForge.net page. The same goes for
-formatter classes that you write. We'd be happy to distribute a collection of submitted
-layout files, or to add to the selection of standard export filters and formatters.
-
         <li><code>RemoveBracketsAddComma</code> : to be
         documented.</li>
-
-</p>
-<p>Starting with JabRef 2.4b1 you can also package your ExportFormat or LayoutFormatter as a plug-in.
-If you do so, you can provide a single zip-file to other user to make use of your ExportFormat. 
-For an example download the JabRef source release and have a look at the directory 
-<code>src/plugins/</code>. Don't hesitate to stop by the forums on Sourceforge, since we don't have
-extensive documentation, yet.</p>
 
         <li><code>RemoveWhitespace</code> : to be documented.</li>
 
@@ -466,5 +441,15 @@ extensive documentation, yet.</p>
     goes for formatter classes that you write. We'd be happy to
     distribute a collection of submitted layout files, or to add to
     the selection of standard export filters and formatters.</p>
+
+    <p>Starting with JabRef 2.4b1 you can also package your
+	ExportFormat or LayoutFormatter as a plug-in. If you do so,
+	you can provide a single zip-file to other user to make use
+	of your ExportFormat. For an example download the JabRef
+	source release and have a look at the directory
+	<code>src/plugins/</code>. Don't hesitate to stop by the
+	forums on Sourceforge, since we don't have extensive documentation, yet.</p>
+
+
 </body>
 </html>
