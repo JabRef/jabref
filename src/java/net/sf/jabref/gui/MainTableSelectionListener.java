@@ -279,7 +279,10 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                         (panel.frame(), entry, "",
                                         flEntry.getLink(), flEntry.getType().getIcon(),
                                         panel.metaData(), flEntry.getType());
-                                item.actionPerformed(null);
+                                boolean success = item.openLink();
+                                if (!success) {
+                                    panel.output(Globals.lang("Unable to open link."));
+                                }
                             }
                         } else {
                             Util.openExternalViewer(panel.metaData(), (String)link, fieldName);

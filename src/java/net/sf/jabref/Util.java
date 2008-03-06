@@ -679,8 +679,9 @@ public class Util {
 	 *            The MetaData for the database this file belongs to.
 	 * @param link
 	 *            The file name.
+     * @return false if the link couldn't be resolved, true otherwise.
 	 */
-	public static void openExternalFileAnyFormat(MetaData metaData, String link,
+	public static boolean openExternalFileAnyFormat(MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
 
@@ -740,7 +741,8 @@ public class Util {
                     cmdArray[cmdArray.length-1] = filePath;
                     Runtime.getRuntime().exec(cmdArray);
 				}
-			} catch (IOException e) {
+                return true;
+            } catch (IOException e) {
                 throw e;
                 /*e.printStackTrace();
 				System.err.println("An error occured on the command: " + fileType.getOpenWith()
@@ -749,10 +751,15 @@ public class Util {
 			}
 
 		} else {
-			// No file matched the name, or we didn't know the file type.
+
+            return false;
+            // No file matched the name, or we didn't know the file type.
 			// Perhaps it is an URL thing.
 
-		    link = sanitizeUrl(link);
+            /* TODO: find out if this fallback option of opening the link in a web browser is
+               TODO: actually necessary. */
+            /*
+            link = sanitizeUrl(link);
 
 			if (Globals.ON_MAC) {
 				String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
@@ -766,11 +773,13 @@ public class Util {
                 cmdArray[cmdArray.length-1] = link;
                 Runtime.getRuntime().exec(cmdArray);
             }
-
+            */
 		}
-	}
 
-public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
+
+    }
+
+public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
                                            String link, UnknownExternalFileType fileType) throws IOException {
 
     String cancelMessage = Globals.lang("Unable to open file.");
@@ -783,7 +792,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             JOptionPane.QUESTION_MESSAGE, null, options, defOption);
     if (answer == JOptionPane.CANCEL_OPTION) {
         frame.output(cancelMessage);
-        return;
+        return false;
     }
     else if (answer == JOptionPane.YES_OPTION) {
         // User wants to define the new file type. Show the dialog:
@@ -801,11 +810,11 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             Collections.sort(fileTypes);
             Globals.prefs.setExternalFileTypes(fileTypes);
             // Finally, open the file:
-            openExternalFileAnyFormat(metaData, link, newType);
+            return openExternalFileAnyFormat(metaData, link, newType);
         } else {
             // Cancelled:
             frame.output(cancelMessage);
-            return;
+            return false;
         }
     }
     else {
@@ -839,11 +848,11 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             frame.basePanel().undoManager.addEdit(ce);
             frame.basePanel().markBaseChanged();
             // Finally, open the link:
-            openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
+            return openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
         } else {
             // Cancelled:
             frame.output(cancelMessage);
-            return;
+            return false;
         }
     }
 }

@@ -41,6 +41,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        openLink();
+    }
+
+    public boolean openLink() {
         
         try {
             ExternalFileType type = fileType;
@@ -58,10 +62,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             }
 
             if (type instanceof UnknownExternalFileType)
-                Util.openExternalFileUnknown(frame, entry, metaData, link, 
+                return Util.openExternalFileUnknown(frame, entry, metaData, link,
                         (UnknownExternalFileType)type);
             else
-                Util.openExternalFileAnyFormat(metaData, link, type);
+                return Util.openExternalFileAnyFormat(metaData, link, type);
 
 
 
@@ -78,11 +82,11 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     +"The application '%0' associated with the file type '%1' could not be called.",
                         fileType.getOpenWith(), fileType.getName()),
                         Globals.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
-                return;
+                return false;
             }
 
             e1.printStackTrace();
         }
-
+        return false;
     }
 }

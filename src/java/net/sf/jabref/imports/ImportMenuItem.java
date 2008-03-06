@@ -195,7 +195,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             }
                         }
                         ce.end();
-                        panel.undoManager.addEdit(ce);
+                        if (ce.hasEdits()) {
+                            panel.undoManager.addEdit(ce);
+                            panel.markBaseChanged();
+                        }
+
                     }
 
                 }
