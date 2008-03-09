@@ -408,14 +408,14 @@ public class JabRefPreferences {
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
             for (int i=0; i<fields.length; i++)
-                putBracesAroundCapitalsFields.add(fields[i]);
+                putBracesAroundCapitalsFields.add(fields[i].trim());
         }
         nonWrappableFields.clear();
         fieldString = get("nonWrappableFields");
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
             for (int i=0; i<fields.length; i++)
-                nonWrappableFields.add(fields[i]);
+                nonWrappableFields.add(fields[i].trim());
         }
 
     }
