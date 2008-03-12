@@ -92,7 +92,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     ToolBar tlb = new ToolBar();
 
     JMenuBar mb = new JMenuBar();
-    JMenu pluginMenu = new JMenu(Globals.menuTitle("Plugins"));
+    JMenu pluginMenu = subMenu("Plugins");
 
     GridBagLayout gbl = new GridBagLayout();
 

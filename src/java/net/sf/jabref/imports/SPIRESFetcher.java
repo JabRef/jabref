@@ -156,8 +156,7 @@ public class SPIRESFetcher implements EntryFetcher {
 	 * @see net.sf.jabref.imports.EntryFetcher
 	 */
 	public String getHelpPage() {
-		// there is no helppage
-		return null;
+		return "Spires.html";
 	}
 
 	public URL getIcon() {
