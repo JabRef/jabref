@@ -1168,7 +1168,7 @@ public JabRefPreferences prefs() {
       tools.add(openFile);
       tools.add(openPdf);
       tools.add(openUrl);
-      tools.add(openSpires);
+      //tools.add(openSpires);
       tools.addSeparator();
       tools.add(newSubDatabaseAction);
 
@@ -1278,8 +1278,8 @@ public JabRefPreferences prefs() {
     tlb.addAction(open);
     tlb.addAction(save);
     tlb.addAction(saveAll);
-    tlb.addAction(dbConnect);
-    tlb.addAction(dbExport);
+    //tlb.addAction(dbConnect);
+    //tlb.addAction(dbExport);
     
     tlb.addSeparator();
     tlb.addAction(cut);
@@ -1387,12 +1387,12 @@ public JabRefPreferences prefs() {
             selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
-                openPdf, openUrl, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+                openPdf, openUrl, openFile, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
             abbreviateMedline, unabbreviate, exportAll, exportSelected,
-            importCurrent, saveAll}));
+            importCurrent, saveAll, dbConnect, dbExport}));
         
         openDatabaseOnlyActions.addAll(fetcherActions);
 

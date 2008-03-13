@@ -8,7 +8,8 @@
       even if the referred database was closed.
     - Added two new search modes - display search results in a dialog, and global search.
     - Support for fetching from the command line using --fetch (contributed by 
-      Jan F. Boldt and David Kaltschmidt)
+      Jan F. Boldt and David Kaltschmidt).
+    - Support for fetching from Spires (contributed by Fedor Bezrukov).
     - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 
       Doege, Sebastian de Hoog and Christoph Jacob)
     - Added context menu for file list editor with options to move/rename linked file
@@ -214,7 +215,7 @@
           all others in "first last". First names are abbreviated.
         - New LayoutFormatter: NoSpaceBetweenAbbreviations - spaces between multiple
           abbreviated first names are removed.
-        - Improved PDF link resolver to produce proper URIs.
+        - Improved PDF link resolver to produce proper URIs.                                                 s
         - [ 1503956 ] Fixed: Help text instead of Help icon.
         - [ 1542552 ] Fixed: Wrong author import from ISI file.
         - [ 1534537 ] Fixed: resize groups interface
