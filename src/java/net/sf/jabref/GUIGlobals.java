@@ -238,7 +238,7 @@ public class GUIGlobals {
 		LANGUAGES.put("Deutsch", "de");
 		LANGUAGES.put("Fran\u00E7ais", "fr");
 		LANGUAGES.put("Italiano", "it");
-        LANGUAGES.put("Nederlands", "du");
+        LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
         LANGUAGES.put("Español", "es");
         LANGUAGES.put("Polski", "pl");
