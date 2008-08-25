@@ -1,20 +1,20 @@
 package net.sf.jabref.export;
 
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
+
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.filechooser.FileFilter;
-
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Globals;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
 
 /**
  * Base class for export formats based on templates.
@@ -146,9 +146,16 @@ public class ExportFormat implements IExportFormat {
 		SaveSession ss = getSaveSession(encoding, outFile);
 		VerifyingWriter ps = ss.getWriter();
 
-		// Print header
-		Layout beginLayout = null;
-		Reader reader;
+        Layout beginLayout = null;
+		Reader reader = null;
+
+        // Check if this export filter has bundled name formatters:
+        HashMap<String,String> customNameFormatters = readFormatterFile(lfFileName);
+        // Set a global field, so all layouts have access to the custom name formatters: 
+        Globals.prefs.customExportNameFormatters = customNameFormatters;
+
+        // Print header
+
 		try {
 			reader = getReader(lfFileName + ".begin.layout");
 			LayoutHelper layoutHelper = new LayoutHelper(reader);
@@ -229,10 +236,65 @@ public class ExportFormat implements IExportFormat {
 			ps.write(endLayout.doLayout(database, encoding));
 		}
 
-		finalizeSaveSession(ss);
+        // Clear custom name formatters:
+        Globals.prefs.customExportNameFormatters = null;
+
+        finalizeSaveSession(ss);
 	}
 
-	protected SaveSession getSaveSession(final String encoding,
+    /**
+     * See if there is a name formatter file bundled with this export format. If so, read
+     * all the name formatters so they can be used by the filter layouts.
+     * @param lfFileName The layout file name.
+     */
+    private HashMap<String, String> readFormatterFile(String lfFileName) {
+        HashMap<String,String> formatters = new HashMap<String, String>();
+        File formatterFile = new File(lfFileName + ".formatters");
+        if (formatterFile.exists()) {
+            Reader in = null;
+            try {
+                in = new FileReader(formatterFile);
+                if (in != null) {
+                    // Ok, we found and opened the file. Read all contents:
+                    StringBuilder sb = new StringBuilder();
+                    int c;
+                    while ((c = in.read()) != -1) {
+                        sb.append((char)c);
+                    }
+                    String[] lines = sb.toString().split("\n");
+                    // Go through each line:
+                    for (int i=0; i<lines.length; i++) {
+                        String line = lines[i].trim();
+                        // Do not deal with empty lines:
+                        if (line.length() == 0)
+                            continue;
+                        int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
+                        if ((index > 0) && (index+1 < line.length())) {
+                            String formatterName = line.substring(0, index);
+                            String contents = line.substring(index+1);
+                            //System.out.println("Name: '"+formatterName+"'");
+                            //System.out.println("Contents: '"+contents+"'");
+                            formatters.put(formatterName, contents);
+                        }
+                    }
+                }
+
+            } catch (IOException ex) {
+                // TODO: show error message here?
+                ex.printStackTrace();
+            } finally {
+                if (in != null)
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+            }
+        }
+        return formatters;
+    }
+
+    protected SaveSession getSaveSession(final String encoding,
 		final File outFile) throws IOException {
 		return new SaveSession(outFile, encoding, false);
 	}

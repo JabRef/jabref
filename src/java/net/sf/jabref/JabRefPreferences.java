@@ -103,6 +103,11 @@ public class JabRefPreferences {
     // string to be formatted and possible formatter arguments.
     public String fileDirForDatabase = null;
 
+    // The following field is used as a global variable during the export of a database.
+    // It is used to hold custom name formatters defined by a custom export filter.
+    // It is set before the export starts:
+    public HashMap<String,String> customExportNameFormatters = null;
+
     // The only instance of this class:
     private static JabRefPreferences singleton = null;
 

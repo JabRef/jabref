@@ -1,5 +1,8 @@
-
-
+2.5?
+    - Added possibility for custom export filters to define their own name formatters.
+      This is done by adding a file named "<filtername>.formatters". This file defines
+      one formatter on each line, with each line containing the name of the formatter and
+      the formatter definition, separated by a colon (:).
 2.4b
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
       refuse to save the database when the file has been externally modified, until the
@@ -34,6 +37,8 @@
 	- Improved handling of ArXiv URIs.
 	- Changed default preference value: now using import inspection dialog also
 	  when just a single entry is imported.
+	- Parsing of field lists for non-wrappable fields and fields for which to automatically
+	  add braces around capitals now ignores whitespace between entries.
 	- [ 1620792 ] Fixed: JabRef randomly hangs during Medline fetch
 	- [ 1738920 ] Fixed: Windows Position in Multi-Monitor environment
 	- [ 1795355 ] Fixed: LatexFieldFormatter omits "{" on beginning of optional field

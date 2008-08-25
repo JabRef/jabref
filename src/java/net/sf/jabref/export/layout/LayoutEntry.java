@@ -353,9 +353,21 @@ public class LayoutEntry {
 
 		for (String[] strings : formatterStrings) {
 
-			// First load from formatters in formatter folder
-			String className = strings[0].trim();
-            try {
+            String className = strings[0].trim();
+                        
+            // Check if this is a name formatter defined by this export filter:
+            if (Globals.prefs.customExportNameFormatters != null) {
+                String contents = Globals.prefs.customExportNameFormatters.get(className);
+                if (contents != null) {
+                    NameFormat nf = new NameFormat();
+                    nf.setParameter(contents);
+                    results.add(nf);
+                    continue;
+                }
+            }
+
+            // Try to load from formatters in formatter folder
+			try {
 				LayoutFormatter f = getLayoutFormatterByClassName(className,
 						classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
