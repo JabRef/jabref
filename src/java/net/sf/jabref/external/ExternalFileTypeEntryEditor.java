@@ -27,6 +27,7 @@ public class ExternalFileTypeEntryEditor {
     JDialog diag;
     JTextField extension = new JTextField(),
         name = new JTextField(),
+        mimeType = new JTextField(),
         application = new JTextField();
     String selectedIcon = null;
     JButton icon = new JButton(GUIGlobals.getImage("picture"));
@@ -68,6 +69,9 @@ public class ExternalFileTypeEntryEditor {
         builder.nextLine();
         builder.append(Globals.lang("Extension"));
         builder.append(extension);
+        builder.nextLine();
+        builder.append(Globals.lang("MIME type"));
+        builder.append(mimeType);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         builder.nextLine();
         builder.append(Globals.lang("Application"));
@@ -182,6 +186,7 @@ public class ExternalFileTypeEntryEditor {
     public void setValues(ExternalFileType entry) {
         name.setText(entry.getName());
         extension.setText(entry.getExtension());
+        mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWith());
         icon.setIcon(entry.getIcon());
         if (true && (application.getText().length() == 0))
@@ -194,6 +199,7 @@ public class ExternalFileTypeEntryEditor {
     public void storeSettings(ExternalFileType entry) {
         entry.setName(name.getText().trim());
         entry.setExtension(extension.getText().trim());
+        entry.setMimeType(mimeType.getText().trim());
         if (selectedIcon != null)
             entry.setIconName(selectedIcon);
         if (!Globals.ON_WIN) {

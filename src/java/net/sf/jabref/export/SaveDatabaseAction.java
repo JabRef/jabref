@@ -127,6 +127,10 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         try {
+
+            // Make sure the current edit is stored:
+            panel.storeCurrentEdit();
+
             // If the option is set, autogenerate keys for all entries that are
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();

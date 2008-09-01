@@ -108,6 +108,8 @@ public class MoveFileAction extends AbstractAction {
                         success = Util.copyFile(file, newFile, true);
                     }
                     if (success) {
+                        // Remove the original file:
+                        file.delete();
                         // Relativise path, if possible.
                         if (newFile.getPath().startsWith(dir)) {
                             if ((newFile.getPath().length() > dir.length()) &&

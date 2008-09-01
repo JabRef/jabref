@@ -8,12 +8,10 @@
 // QuickSearch script for JabRef HTML export 
 // Version: 2.0
 //
-// Copyright (c) 2006-2007, Mark Schenk
+// Copyright (c) 2006-2008, Mark Schenk
 //
-// Permission to use, copy, modify, and distribute this software for any
-// purpose with or without fee is hereby granted, provided that the above
-// copyright notice and this permission notice appear in all copies.
-//
+// This software is distributed under a Creative Commons Attribution 3.0 License
+// http://creativecommons.org/licenses/by/3.0/
 
 // Some features:
 // + allows RegExp searches
@@ -21,9 +19,6 @@
 //   e.g. for any entry ending with 'symmetry', type:  symmetry$
 //   e.g. for all reftypes that are books: ^book$, or ^article$
 //   e.g. for entries by either John or Doe, type john|doe
-
-// Acknowledgements:
-// + incorporates speed improvements suggested by Jean-Luc Falcone
 
 // Speed optimisation introduced some esoteric problems with certain RegExp searches
 // e.g. if the previous search is 200[-7] and the next search is 200[4-7] then the search doesn't work properly until the next 'keyup'
@@ -191,7 +186,7 @@ function redoQS(){
 -->
 </script>
 <style type="text/css">
-body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; }
+body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; color: #2E2E2E; }
 
 #qs { width: auto; border-style: solid; border-color: gray; border-width: 1px 1px 0px 1px; padding: 0.5em 0.5em; display:none;  }
 #qs form { padding: 0px; margin: 0px; }
@@ -204,9 +199,19 @@ th, td { border: 1px gray solid; padding: 0.5em; vertical-align: top;  }
 td { text-align: left; vertical-align: top; }
 th { background-color: #EFEFEF; }
 
-td a, td a:hover { color: navy; font-weight: bold; }
+td a { color: navy; text-decoration: none; }
+td a:hover  { text-decoration: underline; }
 
 tr.noshow { display: none;}
+
+@media print {
+	p.infolinks, #qssettings, #qs { display: none !important; }
+	table { border-width: 0px; }
+	tr { page-break-inside: avoid; }
+	tr > * + * + * + * + * {display: none; }
+	thead tr::before { content: "Reference"; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-weight: bold; text-align: center; display: table-cell; background-color: #EFEFEF; }
+	tr[id]::before { content: attr(id); display: table-cell; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-style: italic; }
+}
 </style>
 </head>
 <body>

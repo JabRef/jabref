@@ -220,6 +220,10 @@ public class FileListEntryEditor {
         diag.setVisible(visible);
     }
 
+    public boolean isVisible() {
+        return diag != null && diag.isVisible();
+    }
+
     public void setValues(FileListEntry entry) {
         description.setText(entry.getDescription());
         link.setText(entry.getLink());

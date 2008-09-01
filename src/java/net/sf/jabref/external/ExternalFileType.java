@@ -11,16 +11,17 @@ import net.sf.jabref.GUIGlobals;
  */
 public class ExternalFileType implements Comparable<ExternalFileType> {
 
-    protected String name, extension, openWith, iconName;
+    protected String name, extension, openWith, iconName, mimeType;
     protected ImageIcon icon;
     protected JLabel label = new JLabel();
 
-    public ExternalFileType(String name, String extension, String openWith,
-                            String iconName) {
+    public ExternalFileType(String name, String extension, String mimeType,
+                            String openWith, String iconName) {
         label.setText(null);
         this.name = name;
         label.setToolTipText(this.name);
         this.extension = extension;
+        this.mimeType = mimeType;
         this.openWith = openWith;
         setIconName(iconName);
     }
@@ -44,9 +45,18 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         this.name = val[0];
         label.setToolTipText(this.name);
         this.extension = val[1];
-        this.openWith = val[2];
         label.setText(null);
-        setIconName(val[3]);
+        // Up to version 2.4b the mime type is not included:
+        if (val.length == 4) {
+            this.openWith = val[2];
+            setIconName(val[3]);
+        }
+        // When mime type is included, the array length should be 5:
+        else if (val.length == 5) {
+            this.mimeType = val[2];
+            this.openWith = val[3];
+            setIconName(val[4]);
+        }
     }
 
     /**
@@ -57,7 +67,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @return A String[] containing all information about this file type.
      */
     public String[] getStringArrayRepresentation() {
-        return new String[] {name, extension, openWith, iconName};
+        return new String[] {name, extension, mimeType, openWith, iconName};
     }
 
     public String getName() {
@@ -75,6 +85,14 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     /**
@@ -148,7 +166,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public ExternalFileType copy() {
-        return new ExternalFileType(name, extension, openWith, iconName);
+        return new ExternalFileType(name, extension, mimeType, openWith, iconName);
     }
 
 
@@ -169,6 +187,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
             return false;
         return (name == null ? other.name == null : name.equals(other.name))
                 && (extension == null ? other.extension == null : extension.equals(other.extension))
+                && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
                 && (openWith== null ? other.openWith == null : openWith.equals(other.openWith))
                 && (iconName== null ? other.iconName == null : iconName.equals(other.iconName));
     }

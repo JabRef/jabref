@@ -114,16 +114,21 @@ public class RisImporter extends ImportFormat {
             else if (lab.equals("T2") || lab.equals("T3") || lab.equals("BT")) {
                 hm.put("booktitle", val);
             }
-            else if (lab.equals("A1") || lab.equals("AU")){
+            else if (lab.equals("AU")){
                 if (author.equals("")) // don't add " and " for the first author
                     author = val;
                 else author += " and " + val;
             }
+	        else if (lab.equals("A1")){
+	           	if (!author.equals(""))
+	           		author = val;
+	        }
             else if (lab.equals("A2")){
                 if (editor.equals("")) // don't add " and " for the first editor
                     editor = val;
                 else editor += " and " + val;
-            } else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
+            }
+		   	else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
                 if (type.equals("inproceedings"))
                     hm.put("booktitle", val);
                 else

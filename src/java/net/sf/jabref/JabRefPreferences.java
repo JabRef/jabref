@@ -155,6 +155,7 @@ public class JabRefPreferences {
         defaults.put("posY", new Integer(0));
         defaults.put("sizeX", new Integer(840));
         defaults.put("sizeY", new Integer(680));
+        defaults.put("windowMaximised", Boolean.FALSE);
         defaults.put("rememberWindowLocation", Boolean.TRUE);
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_OFF));
         defaults.put("tableColorCodesOn", Boolean.TRUE);
@@ -209,7 +210,7 @@ public class JabRefPreferences {
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
-        defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords");
+        defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
@@ -775,7 +776,6 @@ public class JabRefPreferences {
         defKeyBinds.put("Push to application","ctrl L");
       defKeyBinds.put("Push to LyX","ctrl L");
       defKeyBinds.put("Push to WinEdt","ctrl shift W");
-      defKeyBinds.put("Push to Emacs","ctrl shift E");
         defKeyBinds.put("Quit JabRef", "ctrl Q");
         defKeyBinds.put("Open database", "ctrl O");
         defKeyBinds.put("Save database", "ctrl S");
@@ -846,10 +846,12 @@ public class JabRefPreferences {
         defKeyBinds.put("Synchronize files", "ctrl F4");
         defKeyBinds.put("Synchronize PDF", "shift F4");
         defKeyBinds.put("Synchronize PS", "ctrl shift F4");
+        defKeyBinds.put("Focus entry table", "ctrl shift E");
 
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
         defKeyBinds.put("Search IEEEXplore", "F8");
+        defKeyBinds.put("Search ACM Digital Library", "ctrl shift F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Search JSTOR", "shift F9");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");
@@ -938,34 +940,33 @@ public class JabRefPreferences {
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<ExternalFileType>();
-        list.add(new ExternalFileType("PDF", "pdf", "evince", "pdfSmall"));
-        list.add(new ExternalFileType("PostScript", "ps", "evince", "psSmall"));
-        list.add(new ExternalFileType("Word", "doc", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("Excel", "xls", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "ooimpress", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", "openoffice"));
-        list.add(new ExternalFileType("Rich Text Format", "rtf", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("PNG image", "png", "gimp", "picture"));
-        list.add(new ExternalFileType("GIF image", "gif", "gimp", "picture"));
-        list.add(new ExternalFileType("JPG image", "jpg", "gimp", "picture"));
-        list.add(new ExternalFileType("Djvu", "djvu", "evince", "psSmall"));
-        list.add(new ExternalFileType("Text", "txt", "emacs", "emacs"));
-        list.add(new ExternalFileType("LaTeX", "tex", "emacs", "emacs"));
-        list.add(new ExternalFileType("CHM", "chm", "gnochm", "www"));
-        list.add(new ExternalFileType("TIFF image", "tiff", "gimp", "picture"));
-        ExternalFileType tp = new ExternalFileType("URL", "html", "firefox", "www");
+        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall"));
+        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall"));
+        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice"));
+        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice"));
+        list.add(new ExternalFileType("PowerPoint", "ppt", "", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture"));
+        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture"));
+        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture"));
+        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall"));
+        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs"));
+        list.add(new ExternalFileType("LaTeX", "tex", "", "emacs", "emacs"));
+        list.add(new ExternalFileType("CHM", "chm", "", "gnochm", "www"));
+        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture"));
+        ExternalFileType tp = new ExternalFileType("URL", "html", "text/html", "firefox", "www");
         list.add(tp);
 
-        // Under Windows we initialize all file types with an empty viewer app, to
-        // rely on the default app instead:
-        if (Globals.ON_WIN) {
-            for (Iterator<ExternalFileType> iterator = list.iterator(); iterator.hasNext();) {
-                ExternalFileType type = iterator.next();
-                type.setOpenWith("");
-            }
+        // On all OSes there is a generic application available to handle file opening,
+        // so we don't need the default application settings anymore:
+        for (Iterator<ExternalFileType> iterator = list.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
+            type.setOpenWith("");
         }
+        
 
         return list;
     }
@@ -998,12 +999,25 @@ public class JabRefPreferences {
     public ExternalFileType getExternalFileTypeByExt(String extension) {
         for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
             ExternalFileType type = iterator.next();
-            if (type.getExtension().equals(extension))
+            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension))
                 return type;
         }
         return null;
     }
 
+    /**
+     * Look up the external file type registered for this MIME type, if any.
+     * @param mimeType The MIME type.
+     * @return The ExternalFileType registered, or null if none.
+     */
+    public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
+        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
+            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType))
+                return type;
+        }
+        return null;
+    }
 
     /**
      * Reset the List of external file types after user customization.

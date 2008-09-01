@@ -115,7 +115,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 							.getFormatName(), pr));
 					} else {
 						// Unknown format:
-						imports.add(Globals.importFormatReader
+                        frame.output(Globals.lang("Importing in unknown format")+"...");
+                        imports.add(Globals.importFormatReader
 							.importUnknownFormat(filename));
 					}
 				} catch (IOException e) {

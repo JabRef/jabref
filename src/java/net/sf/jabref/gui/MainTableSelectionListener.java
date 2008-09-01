@@ -9,7 +9,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
-import java.util.Comparator;
 
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -18,7 +17,6 @@ import javax.swing.Timer;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldComparator;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -28,7 +26,6 @@ import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
@@ -413,38 +410,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             if (table.getSelected().size() > 0) {
                 updatePreview(table.getSelected().get(0), true);
             }
-        }
-    }
-
-    /**
-     * We should implement a faster method than the one below, but this one doesn't
-     * work currently.
-     * @param e The KeyEvent
-     */
-    public void keyTyped_(KeyEvent e) {
-        //System.out.println(e.getKeyChar()+" "+table.getSortingColumn());
-        if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())) {
-            int sortingColumn = table.getSortingColumn(0);
-            if (sortingColumn < 0)
-                return;
-            Comparator<BibtexEntry> comp = table.getComparatorForColumn(sortingColumn);
-            int piv = 1;
-            while (((sortingColumn = table.getSortingColumn(piv)) >= 0)
-                && ((comp = table.getComparatorForColumn(sortingColumn)) != null)
-                && !(comp instanceof FieldComparator)) {
-                piv++;
-            }
-            if ((comp == null) || !(comp instanceof FieldComparator))
-                return;
-
-            // Ok, after all of this we should have either found a field name to go by
-            String field = ((FieldComparator)comp).getFieldName();
-            System.out.println(String.valueOf(e.getKeyChar())+" "+field);
-            SortedList<BibtexEntry> list = table.getSortedForTable();
-            BibtexEntry testEntry = new BibtexEntry("0");
-            testEntry.setField(field, String.valueOf(e.getKeyChar()));
-            int i = list.sortIndex(testEntry);
-            System.out.println(i);
         }
     }
 

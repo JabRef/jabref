@@ -1,9 +1,6 @@
 package net.sf.jabref.imports;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -41,8 +38,20 @@ public class MedlineImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String str;
+        int i=0;
+        while (((str = in.readLine()) != null) && (i < 50)) {
+
+			if (str.toLowerCase().indexOf("<pubmedarticle>") >= 0)
+				return true;
+
+            i++;
+        }
+
+		return false;
     }
 
     /**

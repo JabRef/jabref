@@ -7,14 +7,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import net.sf.jabref.OutputPrinter;
+
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * 
@@ -46,7 +47,7 @@ public class SPIRESFetcher implements EntryFetcher {
 	public String constructUrl(String key) {
 		String identifier = "";
 		try {
-			identifier = URLEncoder.encode((String) key, "UTF-8");
+			identifier = URLEncoder.encode(key, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
@@ -72,7 +73,7 @@ public class SPIRESFetcher implements EntryFetcher {
 		if (key.matches("^\\w*-\\w*[ /].*"))
 			cmd = "eprint";
 		try {
-			key = URLEncoder.encode((String) key, "UTF-8");
+			key = URLEncoder.encode(key, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 		}
 		StringBuffer sb = new StringBuffer("http://").append(spiresHost)

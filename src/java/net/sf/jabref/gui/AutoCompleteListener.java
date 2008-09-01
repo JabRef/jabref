@@ -51,20 +51,22 @@ public class AutoCompleteListener extends KeyAdapter {
         else if (lastShownCompletion < 0)
             lastShownCompletion = lastCompletions.length-1;
         String sno = (String)(lastCompletions[lastShownCompletion]);
-        toSetIn = sno.substring(lastBeginning.length());
+        toSetIn = sno.substring(lastBeginning.length()-1);
         StringBuffer alltext = new StringBuffer(comp.getText());
         int deletedChars = comp.getSelectionEnd() - comp.getSelectionStart();
         alltext.delete(comp.getSelectionStart(), comp.getSelectionEnd());
         int cp = comp.getCaretPosition() - deletedChars;
-        alltext.insert(cp, toSetIn);
+        alltext.insert(cp, toSetIn.substring(1));
         //Util.pr(alltext.toString());
         comp.setText(alltext.toString());
-        comp.setCaretPosition(cp+toSetIn.length());
+        comp.setCaretPosition(cp+toSetIn.length()-1);
         comp.select(cp, cp + sno.length() - lastBeginning.length());
         lastCaretPosition = comp.getCaretPosition();
+        //System.out.println("ToSetIn: '"+toSetIn+"'");
     }
 
     public void keyTyped(KeyEvent e) {
+        
         char ch = e.getKeyChar();
         if (Character.isLetter(ch)) {
             JTextComponent comp = (JTextComponent) e.getSource();
@@ -75,15 +77,28 @@ public class AutoCompleteListener extends KeyAdapter {
                 if (toSetIn.length() > 0) {
                     int cp = comp.getCaretPosition();
                     //comp.setCaretPosition(cp+1-toSetIn.);
-                    //Util.pr(cp-toSetIn.length()+" - "+cp);
+                    //System.out.println(cp-toSetIn.length()+" - "+cp);
                     comp.select(cp + 1 - toSetIn.length(), cp);
                     lastBeginning = lastBeginning + ch;
 
                     e.consume();
                     lastCaretPosition = comp.getCaretPosition();
 
-                    //Util.pr("'"+toSetIn+"'");
+                    //System.out.println("Added char: '"+toSetIn+"'");
+                    //System.out.println("LastBeginning: '"+lastBeginning+"'");
 
+                    lastCompletions = findCompletions(lastBeginning, comp);
+                    lastShownCompletion = 0;
+                    for (int i = 0; i < lastCompletions.length; i++) {
+                        Object lastCompletion = lastCompletions[i];
+                        //System.out.println("Completion["+i+"] = "+lastCompletion);
+                        if (((String)lastCompletion).endsWith(toSetIn)) {
+                            lastShownCompletion = i;
+                            break;
+                        }
+
+                    }
+                    //System.out.println("Index now: "+lastShownCompletion);
                     if (toSetIn.length() < 2)
                         toSetIn = null;
                     return;
@@ -94,8 +109,7 @@ public class AutoCompleteListener extends KeyAdapter {
                     (ch != toSetIn.charAt(1)))) {
                 // User discontinues the word that was suggested.
                 lastBeginning = lastBeginning + ch;
-                Object[] completed =
-                        completer.complete(lastBeginning);
+                Object[] completed = findCompletions(lastBeginning, comp);
                 if ((completed != null) && (completed.length > 0)) {
                     lastShownCompletion = 0;
                     lastCompletions = completed;
@@ -124,7 +138,9 @@ public class AutoCompleteListener extends KeyAdapter {
             if (currentword == null)
                 return;
             currentword.append(ch);
-            Object[] completed = completer.complete(currentword.toString());
+
+            Object[] completed = findCompletions(currentword.toString(), comp);
+
             int no = 0; // We use the first word in the array of completions.
             if ((completed != null) && (completed.length > 0)) {
                 lastShownCompletion = 0;
@@ -152,6 +168,21 @@ public class AutoCompleteListener extends KeyAdapter {
     }
 
 
+    protected Object[] findCompletions(String beginning, JTextComponent comp) {
+        Object[] completed;
+        if (completer.isNameField()) {
+            int nameStatus = findNamePositionStatus(comp);
+            if (nameStatus == ANY_NAME)
+                completed = completer.complete(beginning);
+            else if (nameStatus == FIRST_NAME)
+                completed = completer.completeName(beginning, false);
+            else
+                completed = completer.completeName(beginning, true);
+        }
+        else
+            completed = completer.complete(beginning);
+        return completed;
+    }
 
     protected StringBuffer getCurrentWord(JTextComponent comp) {
         StringBuffer res = new StringBuffer();
@@ -177,5 +208,24 @@ public class AutoCompleteListener extends KeyAdapter {
         }
 
         return res;
+    }
+
+    final static int ANY_NAME = 0, FIRST_NAME = 1, LAST_NAME = 2;
+    protected int findNamePositionStatus(JTextComponent comp) {
+        String upToCaret;
+        try {
+            upToCaret = comp.getText(0, comp.getCaretPosition());
+            // Clip off evertyhing up to and including the last " and " before:
+            upToCaret = upToCaret.substring(upToCaret.lastIndexOf(" and ")+1);
+            int commaIndex = upToCaret.indexOf(',');
+            if (commaIndex < 0)
+                return ANY_NAME;
+            else
+                return FIRST_NAME;
+            
+        } catch (BadLocationException ex) {
+            return ANY_NAME;
+        }
+
     }
 }

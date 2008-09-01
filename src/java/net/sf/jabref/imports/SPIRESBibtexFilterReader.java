@@ -1,10 +1,9 @@
 package net.sf.jabref.imports;
 
-import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.FilterReader;
 import java.io.IOException;
-import java.util.regex.Matcher;
+import java.io.Reader;
 
 /**
  * 

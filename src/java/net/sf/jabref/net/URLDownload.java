@@ -18,18 +18,35 @@ import javax.swing.ProgressMonitorInputStream;
 public class URLDownload {  
     
     private URL source;
+    private URLConnection con = null;
     private File dest;
     private Component parent;
+    private String mimeType = null;
 
     public URLDownload(Component _parent, URL _source, File _dest) {
         source = _source;
         dest = _dest;
         parent = _parent;
     }
-    
-    public void download() throws IOException {
-        URLConnection con = source.openConnection();
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void openConnectionOnly() throws IOException {
+        con = source.openConnection();
         con.setRequestProperty("User-Agent", "Jabref");
+        mimeType = con.getContentType();
+    }
+
+    public void download() throws IOException {
+
+        if (con == null) {
+            con = source.openConnection();
+            con.setRequestProperty("User-Agent", "Jabref");
+            mimeType = con.getContentType();
+        }
+
     	InputStream input = new BufferedInputStream(con.getInputStream());
         OutputStream output =  new BufferedOutputStream(new FileOutputStream(dest));
      

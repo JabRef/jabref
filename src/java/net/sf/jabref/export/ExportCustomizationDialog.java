@@ -66,6 +66,7 @@ public class ExportCustomizationDialog extends JDialog {
          old[0] = ecd.name();
          old[1] = ecd.layoutFile();
          old[2] = ecd.extension();
+         Globals.prefs.customExports.store();
          table.revalidate();
          table.repaint();
          ExportFormats.initAllExports();

@@ -1,0 +1,14 @@
+<bibo:Article rdf:about="http://dx.doi.org/\format[XMLChars]{\doi}">
+
+\begin{title}    <dc:title>\format[XMLChars]{\title}</dc:title>\end{title}
+\begin{year}    <dc:date>\year</dc:date>\end{year}
+\begin{journal}    <dcterms:isPartOf><bibo:Journal><dc:title>\format[XMLChars]{\journal}</dc:title></bibo:Journal></dcterms:isPartOf>\end{journal}
+\begin{volume}    <bibo:volume>\format[XMLChars]{\volume}</bibo:volume>\end{volume}
+\begin{doi}    <bibo:doi>\format[XMLChars]{\doi}</bibo:doi>\end{doi}
+
+
+\begin{author}
+   \format[XMLChars,CreateBibORDFAuthors]{\author}
+\end{author}
+
+</bibo:Article>

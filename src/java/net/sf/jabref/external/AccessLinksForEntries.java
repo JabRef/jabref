@@ -158,10 +158,10 @@ public class AccessLinksForEntries {
     }
 
 
-    public static class CopyLinkedFiles extends BaseAction {
+    public static class SaveWithLinkedFiles extends BaseAction {
         private BasePanel panel;
 
-        public CopyLinkedFiles(BasePanel panel) {
+        public SaveWithLinkedFiles(BasePanel panel) {
 
             this.panel = panel;
         }
@@ -202,6 +202,7 @@ public class AccessLinksForEntries {
             });
             t.start();
 
+            
         }
     }
 

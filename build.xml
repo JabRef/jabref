@@ -47,7 +47,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.4b" />
+	<property name="jabref.version" value="2.4" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
@@ -180,13 +180,13 @@
 	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
+		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
 		</javac>
-		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
 			<src path="${java.dir}" />
 			<include name="**/JabRefMain.java" />
 		</javac>
@@ -206,7 +206,7 @@
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
 
-		<javac srcdir="${osx.dir}" debug="on" destdir="${build.classes}" target="1.5">
+		<javac srcdir="${osx.dir}" debug="off" destdir="${build.classes}" target="1.5">
 		</javac>
 	</target>
 

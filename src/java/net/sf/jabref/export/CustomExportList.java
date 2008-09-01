@@ -19,31 +19,34 @@ public class CustomExportList extends TreeSet<String[]> {
 
 	private TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
 	private Object[] array;
-	JabRefPreferences prefs;
+
 
 	public CustomExportList(JabRefPreferences prefs_, Comparator<String[]> comp) {
 		super(comp);
-		prefs = prefs_;
-		readPrefs();
-		sort();
+		//readPrefs();
+		//sort();
 	}
 
 	public TreeMap<String, ExportFormat> getCustomExportFormats() {
-		return formats;
+        formats.clear();
+        readPrefs();
+        sort();
+        return formats;
 	}
 
 	private void readPrefs() {
-		int i = 0;
-		String[] s = null;
-		while ((s = prefs.getStringArray("customExportFormat" + i)) != null) {
-			ExportFormat format = createFormat(s);
+        formats.clear();
+        int i = 0;
+		String[] s;
+		while ((s = Globals.prefs.getStringArray("customExportFormat" + i)) != null) {
+            ExportFormat format = createFormat(s);
 			formats.put(format.getConsoleName(), format);
 			super.add(s);
 			i++;
 		}
 	}
 
-	private ExportFormat createFormat(String[] s) {
+    private ExportFormat createFormat(String[] s) {
 		String lfFileName;
 		if (s[1].endsWith(".layout"))
 			lfFileName = s[1].substring(0, s[1].length() - 7);

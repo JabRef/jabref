@@ -24,34 +24,16 @@
  */
 package net.sf.jabref;
 
+import com.jgoodies.looks.FontPolicies;
+import com.jgoodies.looks.FontPolicy;
+import com.jgoodies.looks.FontSet;
+import com.jgoodies.looks.FontSets;
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
-
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.InputMap;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.LookAndFeel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-
-import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.IExportFormat;
-import net.sf.jabref.export.SaveException;
-import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.*;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.ImportInspectionCommandLine;
 import net.sf.jabref.imports.OpenDatabaseAction;
@@ -65,12 +47,16 @@ import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
-import com.jgoodies.looks.FontPolicies;
-import com.jgoodies.looks.FontPolicy;
-import com.jgoodies.looks.FontSet;
-import com.jgoodies.looks.FontSets;
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -734,6 +720,14 @@ lastEdLoop:
 
             //Util.pr(": Showing frame");
             jrf.setVisible(true);
+            // If we are set to remember the window location, we also remember the maximised
+            // state. This needs to be set after the window has been made visible, so we
+            // do it here:
+             if (Globals.prefs.getBoolean("rememberWindowLocation") &&
+                     Globals.prefs.getBoolean("windowMaximised")) {
+                 jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
+             }
+
 
             // TEST TEST TEST TEST TEST TEST
             startSidePanePlugins(jrf);

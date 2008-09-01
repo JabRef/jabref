@@ -1,6 +1,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.Globals;
 
 /**
  * Used to fix [ 1588028 ] export HTML table doi url.
@@ -24,11 +25,24 @@ public class DOICheck implements LayoutFormatter {
 		if (fieldText.length() == 0){
 			return fieldText;
 		}
+
+		/*
+		* Author: mark-schenk
+		* If DOI is only number, or doi:number, add the required http://dx.doi.org/ prefix
+		*/
 		
-		if (fieldText.startsWith("10")){
-			return "http://dx.doi.org/" + fieldText;
+		// Remove possible 'doi:'
+		if (fieldText.matches("^doi:/*.*")){
+			fieldText = fieldText.replaceFirst("^doi:/*", "");
+			fieldText = Globals.DOI_LOOKUP_PREFIX + fieldText;
+			return fieldText;
 		}
-		
+		// If starts with '10.'
+		if (fieldText.startsWith("10.")) {
+			fieldText = Globals.DOI_LOOKUP_PREFIX + fieldText;
+			return fieldText;
+		}
+
 		return fieldText;
 	}
 }

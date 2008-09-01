@@ -84,7 +84,14 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     }
     builder.appendSeparator(Globals.lang("Remote operation"));
     builder.nextLine();
+    builder.append(new JPanel());    
+    builder.append(new JLabel("<html>"+Globals.lang("This feature lets new files be opened or imported into an "
+        +"already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
+        +"is useful when you open a file in JabRef<br>from your web browser."
+        +"<BR>Note that this will prevent you from running more than one instance of JabRef at a time.")+"</html>"));
+    builder.nextLine();
     builder.append(new JPanel());
+
     JPanel p = new JPanel();
     p.add(useRemoteServer);
     p.add(remoteServerPort);

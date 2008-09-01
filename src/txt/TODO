@@ -9,14 +9,14 @@ Chris:
   
 Morten:
 
+* Documentation export formatters
+
 * Enable "Open spires entry" ("openSpires" action)? Think about better integration of this?
   Look into which viewer is used.
 * Merge patch for entry types (see patch for IEEEXploreFetcher)
 * [OK?] Improve duplicate check.
 * Add "Copy all externally linked files for this set of entries"-feature.
   Basic functionality in AccessLinksForEntries.
-* Strange bug: when editing a field in entry editor, then clicking an entry of different type
-   in the table, current entry is stored, but the selection drops back to the first entry.
 * Problem setting today with Microba calendar.
 
 * [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.

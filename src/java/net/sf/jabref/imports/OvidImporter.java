@@ -51,12 +51,26 @@ public class OvidImporter extends ImportFormat {
     public String getCLIId() {
       return "ovid";
     }
-    
+
+    static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-    return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String str;
+        int i=0;
+        while (((str = in.readLine()) != null) && (i < 50)) {
+
+			if (ovidPattern.matcher(str).find())
+				return true;
+
+            i++;
+        }
+
+		return false;
     }
 
     /**
@@ -70,7 +84,7 @@ public class OvidImporter extends ImportFormat {
     String line;
     while ((line = in.readLine()) != null){
         if (line.length() > 0 && line.charAt(0) != ' '){
-        sb.append("__NEWFIELD__");
+            sb.append("__NEWFIELD__");
         }
         sb.append(line);
         sb.append('\n');

@@ -583,6 +583,161 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             }
         };
 
+     public static final BibtexEntryType PERIODICAL =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Periodical";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[]
+                {
+                    "editor", "language", "series", "volume", "number", "organization", "month", "note", "url"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return new String[]
+                {
+                    "title", "year"
+                };
+            }
+
+            public String describeRequiredFields()
+            {
+                return "TITLE and YEAR";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
+            {
+                return entry.allFieldsPresent(new String[]
+                    {
+                        "title", "year", "bibtexkey"
+                    }, database);
+            }
+        };
+
+     public static final BibtexEntryType PATENT =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Patent";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[]
+                {
+                    "author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled", "month", "monthfiled", "note", "url"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return new String[]
+                {
+                    "nationality", "number", "year", "yearfiled"
+                };
+            }
+
+            public String describeRequiredFields()
+            {
+                return "NATIONALITY, NUMBER, YEAR or YEARFILED";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
+            {
+                return entry.allFieldsPresent(new String[]
+                    {
+                        "number", "bibtexkey"
+                    }, database) &&
+                ((entry.getField("year") != null) ||
+                (entry.getField("yearfiled") != null));
+            }
+        };
+
+   public static final BibtexEntryType STANDARD =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Standard";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[]
+                {
+                    "author", "language", "howpublished", "type", "number", "revision", "address", "month", "year", "note", "url"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return new String[]
+                {
+                    "title", "organization", "institution"
+                };
+            }
+
+            public String describeRequiredFields()
+            {
+                return "TITLE, ORGANIZATION or INSTITUTION";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
+            {
+                return entry.allFieldsPresent(new String[]
+                    {
+                        "title", "bibtexkey"
+                    }, database) &&
+                ((entry.getField("organization") != null) ||
+                (entry.getField("institution") != null));
+            }
+        };
+
+    public static final BibtexEntryType ELECTRONIC =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Electronic";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[]
+                {
+                    "author", "month", "year", "title", "language", "howpublished", "organization", "address", "note", "url"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return null;
+            }
+
+            public String describeRequiredFields()
+            {
+                return "None";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
+            {
+                return entry.allFieldsPresent(new String[]
+                    {
+                        "bibtexkey"
+                    }, database) &&
+                ((entry.getField("howpublished") != null) ||
+                (entry.getField("note") != null) ||
+                (entry.getField("url") != null));
+            }
+        };
 
     public static final BibtexEntryType MISC =
         new BibtexEntryType()
@@ -665,8 +820,9 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 
     public String[] getGeneralFields() {
         return new String[]
-	    {"crossref", "keywords", "doi", "url",
-	     "citeseerurl", "pdf", "abstract", "comment"};
+	    {"crossref", "keywords", "doi", "url", "file",
+	     "citeseerurl", "pdf", "abstract", "comment",
+         "owner", "timestamp", "review", };
     }
 
     public abstract String describeRequiredFields();
@@ -704,7 +860,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 	ALL_TYPES.put("book", BOOK);
 	ALL_TYPES.put("booklet", BOOKLET);
 	ALL_TYPES.put("incollection", INCOLLECTION);
-        ALL_TYPES.put("conference", CONFERENCE);
+    ALL_TYPES.put("conference", CONFERENCE);
 	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
 	ALL_TYPES.put("proceedings", PROCEEDINGS);
 	ALL_TYPES.put("manual", MANUAL);
@@ -712,8 +868,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 	ALL_TYPES.put("phdthesis", PHDTHESIS);
 	ALL_TYPES.put("techreport", TECHREPORT);
 	ALL_TYPES.put("unpublished", UNPUBLISHED);
-        ALL_TYPES.put("misc", MISC);
-        ALL_TYPES.put("other", OTHER);
+	ALL_TYPES.put("patent", PATENT);
+	ALL_TYPES.put("standard", STANDARD);
+	ALL_TYPES.put("electronic", ELECTRONIC);
+	ALL_TYPES.put("periodical", PERIODICAL);
+    ALL_TYPES.put("misc", MISC);
+    ALL_TYPES.put("other", OTHER);
 
 	// We need a record of the standard types, in case the user wants
 	// to remove a customized version. Therefore we clone the map.

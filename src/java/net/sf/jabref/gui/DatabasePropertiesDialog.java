@@ -66,6 +66,11 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.append(fileDir);
         builder.append(browseFile);
         builder.nextLine();
+        builder.appendSeparator(Globals.lang("Override legacy file fields"));
+		builder.append(new JLabel("<html>"+Globals.lang("Note that these settings are used for the legacy "
+			+"<b>pdf</b> and <b>ps</b> fields only.<br>For most users, setting the <b>Main file directory</b> "
+			+"above should be sufficient.")+"</html>"), 3);
+		builder.nextLine();
         builder.append(Globals.lang("PDF directory"));
         builder.append(pdfDir);
         builder.append(browsePdf);

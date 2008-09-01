@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.MainTableFormat;
+
 import java.util.Comparator;
 
 /**
@@ -21,9 +23,10 @@ import java.util.Comparator;
  */
 public class FieldComparator implements Comparator<BibtexEntry> {
 
-	String field;
+	private String[] field;
+    private String fieldName;
 
-	boolean isNameField, isTypeHeader, isYearField, isMonthField, isNumeric;
+    boolean isNameField, isTypeHeader, isYearField, isMonthField, isNumeric;
 
 	int multiplier;
 
@@ -32,14 +35,15 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 	}
 
 	public FieldComparator(String field, boolean reversed) {
-		this.field = field;
+        this.fieldName = field;
+        this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
 		multiplier = reversed ? -1 : 1;
-		isTypeHeader = field.equals(GUIGlobals.TYPE_HEADER);
-
-		isNameField = (field.equals("author") || field.equals("editor"));
-		isYearField = field.equals("year");
-		isMonthField = field.equals("month");
-        isNumeric = BibtexFields.isNumeric(field);
+		isTypeHeader = this.field[0].equals(GUIGlobals.TYPE_HEADER);
+        isNameField = (this.field[0].equals("author")
+                || this.field[0].equals("editor"));
+		isYearField = this.field[0].equals("year");
+		isMonthField = this.field[0].equals("month");
+        isNumeric = BibtexFields.isNumeric(this.field[0]);
     }
 
 	public int compare(BibtexEntry e1, BibtexEntry e2) {
@@ -53,8 +57,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
 			// If the field is author or editor, we rearrange names so they are
 			// sorted according to last name.
-			f1 = e1.getField(field);
-			f2 = e2.getField(field);
+			f1 = getField(e1);
+			f2 = getField(e2);
 		}
 
 		/*
@@ -144,12 +148,21 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 		return result * localMultiplier;
 	}
 
-	/**
+    private Object getField(BibtexEntry entry) {
+        for (int i = 0; i < field.length; i++) {
+            Object o = entry.getField(field[i]);
+            if (o != null)
+                return o;
+        }
+        return null;
+    }
+
+    /**
 	 * Returns the field this Comparator compares by.
 	 * 
 	 * @return The field name.
 	 */
 	public String getFieldName() {
-		return field;
+		return fieldName;
 	}
 }

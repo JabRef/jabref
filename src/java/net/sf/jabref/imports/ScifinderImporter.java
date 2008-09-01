@@ -37,8 +37,20 @@ public class ScifinderImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-    return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String str;
+        int i=0;
+        while (((str = in.readLine()) != null) && (i < 50)) {
+
+			if (str.trim().equals("START_RECORD"))
+				return true;
+
+            i++;
+        }
+
+		return false;
     }
 
     /**

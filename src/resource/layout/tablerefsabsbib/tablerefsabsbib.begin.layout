@@ -8,12 +8,10 @@
 // QuickSearch script for JabRef HTML export 
 // Version: 2.0
 //
-// Copyright (c) 2006-2007, Mark Schenk
+// Copyright (c) 2006-2008, Mark Schenk
 //
-// Permission to use, copy, modify, and distribute this software for any
-// purpose with or without fee is hereby granted, provided that the above
-// copyright notice and this permission notice appear in all copies.
-//
+// This software is distributed under a Creative Commons Attribution 3.0 License
+// http://creativecommons.org/licenses/by/3.0/
 
 // Some features:
 // + optionally searches Abstracts and Reviews
@@ -22,10 +20,7 @@
 //   e.g. for any entry ending with 'symmetry', type:  symmetry$
 //   e.g. for all reftypes that are books: ^book$, or ^article$
 //   e.g. for entries by either John or Doe, type john|doe
-// + easy toggling of Abstract/Review
-
-// Acknowledgements:
-// + incorporates speed improvements suggested by Jean-Luc Falcone
+// + easy toggling of Abstract/Review/BibTeX
 
 // Search settings
 var searchAbstract = true;
@@ -52,13 +47,19 @@ function initSearch() {
 
 	// split all rows into entryRows and infoRows (e.g. abstract, review, bibtex)
 	entryRows = new Array();
-	infoRows = new Array();
+	infoRows = new Array(); absRows = new Array(); revRows = new Array();
 
 	for (var i=0, k=0, j=0; i<allRows.length;i++) {
-		if (allRows[i].className.indexOf('entry') != -1) {
+		if (allRows[i].className.match(/entry/)) {
 			entryRows[j++] = allRows[i];
 		} else {
-			infoRows[k++] = allRows[i];		
+			infoRows[k++] = allRows[i];
+			// check for abstract/review
+			if (allRows[i].className.match(/abstract/)) {
+				absRows.push(allRows[i]);
+			} else if (allRows[i].className.match(/review/)) {
+				revRows.push(allRows[i]);
+			}
 		}
 	}
 
@@ -66,6 +67,8 @@ function initSearch() {
 	numRows = allRows.length;
 	numEntries = entryRows.length;
 	numInfo = infoRows.length;
+	numAbs = absRows.length;
+	numRev = revRows.length;
 
 	//find the query field
 	qsfield = document.getElementById('qsfield');
@@ -76,6 +79,9 @@ function initSearch() {
 	//find statistics location
 	stats = document.getElementById('stat');
 	setStatistics(-1);
+
+	// creates the appropriate search settings
+	createQSettingsDialog();
 
 	// shows the searchfield
 	document.getElementById('qs').style.display = 'block';
@@ -256,36 +262,64 @@ function redoQS(){
 	quickSearch(qsfield);
 }
 
-// Search Settings
+// Create Search Settings
 
 function toggleQSettingsDialog() {
 
 	var qssettings = document.getElementById('qssettings');
-
+	
 	if(qssettings.className.indexOf('active')==-1) {
 		qssettings.className = 'active';
 
-		var absCheckBox = document.getElementById('searchabs');
-		var revCheckBox = document.getElementById('searchrev');
-		if(searchAbstract == true) { absCheckBox.checked = 'checked'; }
-		if(searchReview == true) { revCheckBox.checked = 'checked'; }
+		if(absCheckBox && searchAbstract == true) { absCheckBox.checked = 'checked'; }
+		if(revCheckBox && searchReview == true) { revCheckBox.checked = 'checked'; }
 
 	} else {
 		qssettings.className= '';
 	}
 }
 
-function toggleQSetting(setting) {
-
-	if(setting=='abs') { searchAbstract = !searchAbstract; }
-	if(setting=='rev') { searchReview = !searchReview; }
-
-	redoQS()
+function createQSettingsDialog(){
+	var qssettingslist = document.getElementById('qssettings').getElementsByTagName('ul')[0];
+	
+	if(numAbs!=0) {
+		var x = document.createElement('input');
+		x.id = "searchAbs";
+		x.type = "checkbox";
+		x.onclick = toggleQSetting;
+		var y = qssettingslist.appendChild(document.createElement('li')).appendChild(document.createElement('label'));
+		y.appendChild(x);
+		y.appendChild(document.createTextNode('search abstracts'));		
+	}
+	if(numRev!=0) {
+		var x = document.createElement('input');
+		x.id = "searchRev";
+		x.type = "checkbox";		
+		x.onclick = toggleQSetting;
+		var y = qssettingslist.appendChild(document.createElement('li')).appendChild(document.createElement('label'));		
+		y.appendChild(x);		
+		y.appendChild(document.createTextNode('search reviews'));
+	}
+		
+	// global variables
+	absCheckBox = document.getElementById('searchAbs');
+	revCheckBox = document.getElementById('searchRev');
+	
+	// show search settings
+	if(absCheckBox||revCheckBox) {
+		document.getElementById('qssettings').style.display = 'block';
+	}
 }
+
+function toggleQSetting() {
+	if(this.id=='searchAbs') { searchAbstract = !searchAbstract; }
+	if(this.id=='searchRev') { searchReview = !searchReview; }
+	redoQS()
+} 
 -->
 </script>
 <style type="text/css">
-body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; }
+body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; color: #2E2E2E; }
 
 #qs { width: auto; border-style: solid; border-color: gray; border-width: 1px 1px 0px 1px; padding: 0.5em 0.5em; display:none; position:relative; }
 #qs form { padding: 0px; margin: 0px; }
@@ -298,7 +332,8 @@ th, td { border: 1px gray solid; padding: 0.5em; vertical-align: top;  }
 td { text-align: left; vertical-align: top; }
 th { background-color: #EFEFEF; }
 
-td a, td a:hover { color: navy; font-weight: bold; }
+td a { color: navy; text-decoration: none; }
+td a:hover  { text-decoration: underline; }
 
 tr.noshow { display: none;}
 
@@ -310,10 +345,19 @@ tr.bibtex pre { width: 100%; overflow: auto;}
 
 p.infolinks { margin: 0.5em 0em 0em 0em; padding: 0px; }
 
-#qssettings { padding: 0.5em; position: absolute; top: 0.2em; right: 0.2em; border: 1px gray solid; background-color: white; display: block; }
+#qssettings { padding: 0.5em; position: absolute; top: 0.2em; right: 0.2em; border: 1px gray solid; background-color: white; display: none; }
 #qssettings p { font-weight: bold; cursor: pointer; }
 #qssettings ul { display: none; list-style-type: none; padding-left: 0; margin: 0; }
 #qssettings.active ul { display: block; }
+
+@media print {
+	p.infolinks, #qssettings, #qs { display: none !important; }
+	table { border-width: 0px; }
+	tr { page-break-inside: avoid; }
+	tr > * + * + * + * + * {display: none; }
+	thead tr::before { content: "Reference"; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-weight: bold; text-align: center; display: table-cell; background-color: #EFEFEF; }
+	tr[id]::before { content: attr(id); display: table-cell; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-style: italic; }
+}
 </style>
 </head>
 <body>
@@ -323,10 +367,7 @@ p.infolinks { margin: 0.5em 0em 0em 0em; padding: 0px; }
 	<p>QuickSearch: <input type="text" name="qsfield" id="qsfield" autocomplete="off" title="Allows plain text as well as RegExp searches" /><input type="button" onclick="clearQS()" value="clear" />&nbsp; Number of matching entries: <span id="stat">0</span>.</p>
 	<div id="qssettings">
 		<p onclick="toggleQSettingsDialog()">Search Settings</p>
-		<ul>
-		<li><label><input type="checkbox" id="searchabs" onclick="toggleQSetting('abs')"> search abstract</label></li>
-		<li><label><input type="checkbox" id="searchrev" onclick="toggleQSetting('rev')"> search review</label></li>
-		</ul>
+		<ul></ul>
 	</div>
 	</form>
 </div>

@@ -369,4 +369,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		}
 		return sb.toString();
 	}
+
+    public String getTypeId() {
+        return ID;
+    }
 }

@@ -34,7 +34,8 @@ import net.sf.jabref.SearchRule;
  * A group of BibtexEntries.
  */
 public abstract class AbstractGroup {
-	/** The group's name (every type of group has one). */
+
+    /** The group's name (every type of group has one). */
 	protected String m_name;
 
 	/**
@@ -44,7 +45,9 @@ public abstract class AbstractGroup {
 	 */
 	protected int m_context = INDEPENDENT;
 
-	public AbstractGroup(String name, int context) {
+    public abstract String getTypeId();
+
+    public AbstractGroup(String name, int context) {
 		m_name = name;
 		setHierarchicalContext(context);
 	}

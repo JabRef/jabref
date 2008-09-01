@@ -66,8 +66,8 @@ public class IsiImporter extends ImportFormat {
 		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
 		String str;
-
-        while ((str = in.readLine()) != null) {
+        int i=0;
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
 			/**
 			 * The following line gives false positives for RIS files, so it
@@ -78,7 +78,9 @@ public class IsiImporter extends ImportFormat {
 			 */
 			if (isiPattern.matcher(str).find())
 				return true;
-		}
+
+            i++;
+        }
 
 		return false;
 	}

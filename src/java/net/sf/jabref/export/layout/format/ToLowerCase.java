@@ -25,7 +25,7 @@ package net.sf.jabref.export.layout.format;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
- * Remove brackets formatter.
+ * Convert the contents to lower case.
  * 
  * @author $author$
  * @version $Revision$

@@ -1,8 +1,8 @@
-<dt><em>\format[ToLowerCase]{\bibtextype}</em><a name="\bibtexkey">\begin{bibtexkey} (\bibtexkey)</a>\end{bibtexkey}</dt>
-\begin{author}<dd>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}</dd>\end{author}\begin{editor}
-<dd>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{title}
-<dd>\format[HTMLChars]{\title}</dd>\end{title}\begin{chapter}
-<dd>\format[HTMLChars]{\chapter}</dd>\end{chapter}\begin{journal}
-<dd><em>\format[HTMLChars]{\journal},</em></dd>\end{journal}
-<dd>\begin{school}<em>\format[HTMLChars]{\school}, </em>\end{school}\begin{institution}<em>\format[HTMLChars]{\institution}, </em>\end{institution}\begin{publisher}<em>\format[HTMLChars]{\publisher}, </em>\end{publisher}\begin{year}<b>\year</b>\end{year}\begin{volume}<i>, \volume</i>\end{volume}\begin{pages}, \format[FormatPagesForHTML]{\pages}\end{pages}</dd>
+<dt>\format[ToLowerCase]{\bibtextype}\begin{bibtexkey}<a name="\bibtexkey">(\bibtexkey)</a>\end{bibtexkey}</dt>
+\begin{author}<dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,NoSpaceBetweenAbbreviations,HTMLChars]{\author}</dd>\end{author}\begin{title}
+<dd><i>\format[HTMLChars]{\title}</i></dd>\end{title}\begin{editor}
+<dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{booktitle}
+<dd>\format[HTMLChars]{\booktitle}</dd>\end{booktitle}\begin{chapter}
+<dd>Chapter \format[HTMLChars]{\chapter}</dd>\end{chapter}
+<dd>\begin{journal}\format[HTMLChars]{\journal}, \end{journal}\begin{school}\format[HTMLChars]{\school}, \end{school}\begin{institution}\format[HTMLChars]{\institution}, \end{institution}\begin{publisher}\format[HTMLChars]{\publisher}, \end{publisher}\begin{howpublished}\format[HTMLChars]{\howpublished}, \end{howpublished}\begin{year}<b>\year</b>\end{year}\begin{volume}, Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}</dd>
 

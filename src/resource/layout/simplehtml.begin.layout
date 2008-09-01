@@ -6,6 +6,10 @@
 <style type="text/css">
 body { font-size: 12px; font-family: Arial, sans-serif; }
 dt { margin-top: 1em; font-weight: bold; }
+@media print {
+	dt { page-break-after: avoid; }
+	dd { page-break-before: avoid; }
+}
 </style>
 </head>
 <body>

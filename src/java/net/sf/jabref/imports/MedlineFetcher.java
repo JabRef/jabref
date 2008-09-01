@@ -96,7 +96,7 @@ public class MedlineFetcher implements EntryFetcher {
                     result.addID(idMatcher.group(1));
                 }
                 Matcher retMaxMatcher = retMaxPattern.matcher(inLine);
-                if (idMatcher.find()) {
+                if (retMaxMatcher.find()) {
                     result.retmax = Integer.parseInt(retMaxMatcher.group(1));
                 }
                 Matcher retStartMatcher = retStartPattern.matcher(inLine);

@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +14,7 @@
    inkscape:export-filename="/home/alver/jabref_head/jabref/src/images/jabref_splash-2.2.png"
    sodipodi:docname="splash-2.4.svg"
    sodipodi:docbase="/home/alver/jabref_trunk/src/images"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    sodipodi:version="0.32"
    id="svg2138"
    height="1052.3622047"
@@ -22,6 +22,13 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2140">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective2595" />
     <linearGradient
        id="linearGradient2974">
       <stop
@@ -127,10 +134,10 @@
        r="135.88549" />
   </defs>
   <sodipodi:namedview
-     inkscape:window-y="0"
-     inkscape:window-x="114"
+     inkscape:window-y="25"
+     inkscape:window-x="0"
      inkscape:window-height="949"
-     inkscape:window-width="1280"
+     inkscape:window-width="1279"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
      inkscape:cy="677.8697"
@@ -141,7 +148,8 @@
      borderopacity="1.0"
      bordercolor="#666666"
      pagecolor="#ffffff"
-     id="base" />
+     id="base"
+     showgrid="false" />
   <metadata
      id="metadata2143">
     <rdf:RDF>
@@ -160,7 +168,7 @@
     <rect
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        y="170.36218"
        x="77.500000"
        height="432.00000"
@@ -175,13 +183,13 @@
        xlink:href="splashBackground.png"
        x="79"
        y="172.36218"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        inkscape:export-xdpi="75"
        inkscape:export-ydpi="75" />
     <flowRoot
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        style="opacity:1.0000000;fill:#635578;fill-opacity:1.0000000;stroke:#b5b5c7;stroke-width:0.48137558;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000"
        transform="matrix(1.875133,0.000000,0.000000,2.542210,-129.6969,-372.8897)"
        id="flowRoot2189"
@@ -202,7 +210,7 @@
     </flowRoot>    <flowRoot
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        transform="matrix(0.972246,0,0,1.325301,6.054966,-126.1181)"
        style="font-size:12px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;fill:#797580;fill-opacity:1;font-family:Bitstream Vera Sans"
        id="flowRoot3076"
@@ -217,10 +225,10 @@
    id="rect3080" />
       </flowRegion><flowPara
          id="flowPara1339">This program is distributed under the terms of the General Public License.</flowPara><flowPara
-         id="flowPara1341">Copyright (2003-2007) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
+         id="flowPara1341">Copyright (2003-2008) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        transform="scale(0.853347,1.171856)"
        sodipodi:linespacing="100%"
        id="text2179"
@@ -236,7 +244,7 @@
        id="g2867"
        transform="matrix(1.14435,0,0,1.103688,-34.88143,-26.75429)"
        style="fill:#3d3d5f;fill-opacity:1;stroke:url(#radialGradient2889);stroke-width:1.99301183;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        inkscape:export-xdpi="75"
        inkscape:export-ydpi="75">
       <path
@@ -264,7 +272,7 @@
        id="text2911"
        sodipodi:linespacing="100%"
        transform="scale(0.917932,1.089405)"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
+       inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"
        inkscape:export-xdpi="75"
        inkscape:export-ydpi="75"><tspan
          sodipodi:role="line"
@@ -272,21 +280,5 @@
          x="462.20135"
          y="426.2529"
          style="font-size:119.00263214px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#727888;stroke-width:1.80000031;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;font-family:Bitstream Vera Sans">2.4</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:60.00003052px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;opacity:0.50630433;fill:#fb0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="371.30304"
-       y="599.84717"
-       id="text2290"
-       sodipodi:linespacing="100%"
-       transform="matrix(0.973594,-0.2282865,0.2282865,0.973594,0,0)"
-       inkscape:export-filename="/home/alver/jabref_trunk/src/images/splash.png"
-       inkscape:export-xdpi="75"
-       inkscape:export-ydpi="75"><tspan
-         sodipodi:role="line"
-         id="tspan2292"
-         x="371.30304"
-         y="599.84717"
-         style="font-weight:bold">beta</tspan></text>
   </g>
 </svg>

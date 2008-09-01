@@ -16,13 +16,14 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 12, 2005
- * Time: 7:37:48 PM
- * To change this template use File | Settings | File Templates.
+ * Class defining the contents and column headers of the main table.
  */
 public class MainTableFormat implements TableFormat<BibtexEntry> {
+
+    // Character separating field names that are to be used in sequence as
+    // fallbacks for a single column (e.g. "author/editor" to use editor where
+    // author is not set):
+    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     public static final String[]
             PDF = {"pdf", "ps"}
@@ -34,11 +35,11 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     BasePanel panel;
 
-    String[] columns; // Contains the current column names.
+    private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
     private HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
-    int[] nameCols = null;
+    int[][] nameCols = null;
     boolean namesAsIs, abbr_names, namesNatbib, namesFf, namesLf, namesLastOnly, showShort;
 
     public MainTableFormat(BasePanel panel) {
@@ -57,13 +58,25 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
         else // try to find an alternative fieldname (for display)
         {
-          String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
+            String[] fld = columns[col - padleft];
+            StringBuilder sb = new StringBuilder();
+            for (int i=0; i<fld.length; i++) {
+                if (i > 0)
+                    sb.append('/');
+                String disName = BibtexFields.getFieldDisplayName(fld[i]);
+                if (disName != null)
+                    sb.append(disName);
+                else
+                    sb.append(Util.nCase(fld[i]));
+            }
+            return sb.toString();
+          /*String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
           if ( disName != null)
           {
             return disName ;
-          }
+          } */
         }
-        return Util.nCase(columns[col - padleft]);
+        //return Util.nCase(columns[col - padleft]);
     }
 
     /**
@@ -86,14 +99,15 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      */
     public int getColumnIndex(String colName) {
         for (int i=0; i<columns.length; i++) {
-            if (columns[i].equalsIgnoreCase(colName))
+            // TODO: is the following line correct with [0] ?
+            if (columns[i][0].equalsIgnoreCase(colName))
                 return i+padleft;
         }
         return -1;
     }
 
     public Object getColumnValue(BibtexEntry be, int col) {
-        Object o;
+        Object o = null;
         String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
         if (col == 0) {
             o = "#";// + (row + 1);
@@ -112,29 +126,47 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
             } else
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
-        } else if (columns[col - padleft].equals(GUIGlobals.TYPE_HEADER)) {
-            o = be.getType().getName();
         } else {
+            String[] fld = columns[col - padleft];
+            // Go through the fields until we find one with content:
+            int j = 0;
+            for (int i = 0; i < fld.length; i++) {
+                if (fld[i].equals(GUIGlobals.TYPE_HEADER))
+                    o = be.getType().getName();
+                else
+                    o = be.getField(fld[i]);
+                if (o != null) {
+                    j = i;
+                    break;
+                }
+            }
 
-            o = be.getField(columns[col - padleft]);
             for (int i = 0; i < nameCols.length; i++) {
-                if (col - padleft == nameCols[i]) {
-                    if (o == null) {
-                        return null;
-                    }
-                    if (namesAsIs) return o;
-                    if (namesNatbib) o = AuthorList.fixAuthor_Natbib((String) o);
-                    else if (namesLastOnly) o = AuthorList.fixAuthor_lastNameOnlyCommas((String) o, false);
-                    else if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names, false);
-                    else if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names, false);
-
-                    return o;
+                if ((col - padleft == nameCols[i][0]) && (nameCols[i][1] == j)) {
+                    return formatName(o);
                 }
             }
 
 
         }
 
+        return o;
+    }
+
+    /**
+     * Format a name field for the table, according to user preferences.
+     * @param o The contents of the name field.
+     * @return The formatted name field.
+     */
+    public Object formatName(Object o) {
+        if (o == null) {
+            return null;
+        }
+        if (namesAsIs) return o;
+        if (namesNatbib) o = AuthorList.fixAuthor_Natbib((String) o);
+        else if (namesLastOnly) o = AuthorList.fixAuthor_lastNameOnlyCommas((String) o, false);
+        else if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names, false);
+        else if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names, false);
         return o;
     }
 
@@ -147,8 +179,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public void updateTableFormat() {
 
         // Read table columns from prefs:
-        columns = Globals.prefs.getStringArray("columnNames");
-
+        String[] colSettings = Globals.prefs.getStringArray("columnNames");
+        columns = new String[colSettings.length][];
+        for (int i=0; i<colSettings.length; i++) {
+            String[] fields = colSettings[i].split(COL_DEFINITION_FIELD_SEPARATOR);
+            columns[i] = new String[fields.length];
+            for (int j = 0; j < fields.length; j++) {
+                columns[i][j] = fields[j];
+            }
+        }
+        
         // Read name format options:
         showShort = Globals.prefs.getBoolean("showShort");        //MK:
         namesNatbib = Globals.prefs.getBoolean("namesNatbib");    //MK:
@@ -163,30 +203,34 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         iconCols.clear();
         int coln = 1;
         if (Globals.prefs.getBoolean("fileColumn"))
-            iconCols.put(new Integer(coln++), FILE);
+            iconCols.put(coln++, FILE);
         if (Globals.prefs.getBoolean("pdfColumn"))
-            iconCols.put(new Integer(coln++), PDF);
+            iconCols.put(coln++, PDF);
         if (Globals.prefs.getBoolean("urlColumn"))
-            iconCols.put(new Integer(coln++), URL_);
+            iconCols.put(coln++, URL_);
         if (Globals.prefs.getBoolean("citeseerColumn"))
-            iconCols.put(new Integer(coln++), CITESEER);
+            iconCols.put(coln++, CITESEER);
 
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();
 
-        // Set up the int[] nameCols, to mark which columns should be
+        // Set up the int[][] nameCols, to mark which columns should be
         // treated as lists of names. This is to provide a correct presentation
         // of names as efficiently as possible.
-        Vector<Integer> tmp = new Vector<Integer>(2, 1);
+        // Each subarray contains the column number (before padding) and the
+        // subfield number in case a column has fallback fields.
+        Vector<int[]> tmp = new Vector<int[]>(2, 1);
         for (int i = 0; i < columns.length; i++) {
-            if (columns[i].equals("author")
-                    || columns[i].equals("editor")) {
-                tmp.add(new Integer(i));
+            for (int j = 0; j < columns[i].length; j++) {
+                if (columns[i][j].equals("author")
+                    || columns[i][j].equals("editor")) {
+                    tmp.add(new int[] {i, j});
+                }
             }
         }
-        nameCols = new int[tmp.size()];
+        nameCols = new int[tmp.size()][];
         for (int i = 0; i < nameCols.length; i++) {
-            nameCols[i] = tmp.elementAt(i).intValue();
+            nameCols[i] = tmp.elementAt(i);
         }
     }
 

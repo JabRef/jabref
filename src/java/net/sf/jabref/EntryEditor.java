@@ -1111,7 +1111,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         // See if we need to update an AutoCompleter instance:
                         AutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
                         if (aComp != null)
-                            aComp.addAll(toSet);
+                            aComp.addAll(toSet, entry);
 
                         // Add an UndoableFieldChange to the baseframe's
                         // undoManager.
@@ -1120,13 +1120,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         updateSource();
                         panel.markBaseChanged();
 
-                        // TODO: is this a safe solution to keep selection on
-                        // entry?
-                        SwingUtilities.invokeLater(new Runnable() {
+                        // TODO: removed the following to avoid the problem of selection dropping
+                        // TODO: back when clicking a different entry. But what was the purpose of this code?
+                        /*SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 panel.highlightEntry(entry);
                             }
-                        });
+                        });*/
 
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals

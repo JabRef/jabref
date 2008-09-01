@@ -153,7 +153,7 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
-        btnConnect.addActionListener( new ActionListener() {
+        ActionListener connectAction = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 String errorMessage = checkInput();
@@ -163,12 +163,18 @@ public class DBConnectDialog extends JDialog {
                     setVisible(false);
                     setConnectToDB(true);
                 } else {
-                    JOptionPane.showMessageDialog(null, errorMessage, 
+                    JOptionPane.showMessageDialog(null, errorMessage,
                             "Input Error", JOptionPane.ERROR_MESSAGE);
                 }
 
             }
-        });
+        };
+
+        btnConnect.addActionListener(connectAction);
+        txtDatabase.addActionListener(connectAction);
+        txtServerHostname.addActionListener(connectAction);
+        txtUsername.addActionListener(connectAction);
+        pwdPassword.addActionListener(connectAction);
 
         btnCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

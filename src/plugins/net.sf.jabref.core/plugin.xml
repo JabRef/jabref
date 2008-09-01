@@ -50,6 +50,15 @@
 		<parameter id="description"
 			value="Fetch Entries from IEEE Xplore." />
 	</extension>
+
+	<extension id="ACMDigitalLibraryFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.ACMDigitalLibraryFetcher" />
+		<parameter id="name" value="ACM Digital Library Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from ACM Digital Library." />
+	</extension>
 	
 	<extension id="CiteSeerFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">

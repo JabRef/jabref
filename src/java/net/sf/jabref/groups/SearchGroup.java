@@ -148,7 +148,11 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		}
 	}
 
-	/**
+    public String getTypeId() {
+        return ID;
+    }
+
+    /**
 	 * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
 	 */
 	public SearchRule getSearchRule() {

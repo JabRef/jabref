@@ -23,7 +23,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
     JButton editFileTypes;
     ItemListener regExpListener;
 
-	JCheckBox useRegExpComboBox;
+	JRadioButton useRegExpComboBox;
     JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key")),
         matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
@@ -48,19 +48,10 @@ public class ExternalTab extends JPanel implements PrefsTab {
         editFileTypes = new JButton(Globals.lang("Manage external file types"));
 
         regExpTextField = new JTextField(30);
-        useRegExpComboBox = new JCheckBox(Globals.lang("Use Regular Expression Search"));
+        useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
 		regExpListener = new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				regExpTextField.setEditable(useRegExpComboBox.isSelected());
-				if (useRegExpComboBox.isSelected()) {
-					regExpTextField.setText(Globals.prefs
-						.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
-				} else {
-					Globals.prefs.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY,
-						regExpTextField.getText());
-					regExpTextField.setText(Globals.prefs
-						.get(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY));
-				}
 			}
 		};
 		useRegExpComboBox.addItemListener(regExpListener);
@@ -70,6 +61,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         ButtonGroup bg = new ButtonGroup();
         bg.add(matchExactKeyOnly);
         bg.add(matchStartsWithKey);
+        bg.add(useRegExpComboBox);
 
         BrowseAction browse;
 
@@ -95,7 +87,29 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.append(new JButton(browse));
 		builder.nextLine();
 
-        pan = new JPanel();
+
+		builder.append(new JPanel());
+        builder.append(matchStartsWithKey, 3);
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(matchExactKeyOnly, 3);
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(useRegExpComboBox);
+		builder.append(regExpTextField);
+		HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
+			Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
+		builder.append(helpAction.getIconButton());
+		builder.nextLine();
+
+		builder.appendSeparator(Globals.lang("Legacy file fields"));
+		pan = new JPanel();
+		builder.append(pan);		
+		builder.append(new JLabel("<html>"+Globals.lang("Note that these settings are used for the legacy "
+			+"<b>pdf</b> and <b>ps</b> fields only.<br>For most users, setting the <b>Main file directory</b> "
+			+"above should be sufficient.")+"</html>"), 5);
+		builder.nextLine();
+		pan = new JPanel();
 		builder.append(pan);
 		lab = new JLabel(Globals.lang("Main PDF directory") + ":");
 		builder.append(lab);
@@ -112,40 +126,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		browse = new BrowseAction(_frame, psDir, true);
 		builder.append(new JButton(browse));
 		builder.nextLine();
-
-		builder.append(new JPanel());
-        builder.append(matchStartsWithKey, 3);
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(matchExactKeyOnly, 3);
-        //builder.append(useRegExpComboBox);
-		//builder.append(regExpTextField);
-		/*HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-			Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
-		builder.append(helpAction.getIconButton());*/
-		builder.nextLine();
-
 		builder.appendSeparator(Globals.lang("External programs"));
 
-		/*builder.nextLine();
-		lab = new JLabel(Globals.lang("Path to PDF viewer") + ":");
-		builder.append(pan);
-		builder.append(lab);
-		builder.append(pdf);
-		browse = new BrowseAction(_frame, pdf, false);
-		if (Globals.ON_WIN)
-			browse.setEnabled(false);
-		builder.append(new JButton(browse));
-		builder.nextLine();
-		lab = new JLabel(Globals.lang("Path to PS viewer") + ":");
-		builder.append(pan);
-		builder.append(lab);
-		builder.append(ps);
-		browse = new BrowseAction(_frame, ps, false);
-		if (Globals.ON_WIN)
-			browse.setEnabled(false);
-		builder.append(new JButton(browse));
-		*/
 		builder.nextLine();
 		lab = new JLabel(Globals.lang("Path to HTML viewer") + ":");
 		builder.append(pan);
@@ -232,10 +214,10 @@ public class ExternalTab extends JPanel implements PrefsTab {
         citeCommand.setText(_prefs.get("citeCommand"));
 
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
-		useRegExpComboBox.setSelected(_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY));
-		regExpListener.itemStateChanged(null);
 
-        if (_prefs.getBoolean("autolinkExactKeyOnly"))
+        if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
+            useRegExpComboBox.setSelected(true);
+        else if (_prefs.getBoolean("autolinkExactKeyOnly"))
             matchExactKeyOnly.setSelected(true);
         else
             matchStartsWithKey.setSelected(true);

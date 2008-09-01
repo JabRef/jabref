@@ -1,5 +1,43 @@
 package net.sf.jabref.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableColumnModel;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.EntryComparator;
+import net.sf.jabref.FieldComparator;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.GeneralRenderer;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.Util;
+import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -9,17 +47,8 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileMenuItem;
 
-import javax.swing.*;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.io.IOException;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -29,7 +58,7 @@ import java.io.IOException;
  */
 public class SearchResultsDialog {
     private JabRefFrame frame;
-    private String title;
+
     private JDialog diag;
     private String[] fields = new String[]{
             "author", "title", "year", "journal"
@@ -41,7 +70,7 @@ public class SearchResultsDialog {
 
     protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    private EventTableModel model;
+    private EventTableModel<BibtexEntry> model;
     private EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
     private SortedList<BibtexEntry> sortedEntries;
     private HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
@@ -63,7 +92,7 @@ public class SearchResultsDialog {
         preview = new PreviewPanel(null, new MetaData(), Globals.prefs.get("preview1"));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel(sortedEntries,
+        model = new EventTableModel<BibtexEntry>(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
@@ -233,7 +262,7 @@ public class SearchResultsDialog {
             // A double click on an entry should highlight the entry in its BasePanel:
             if (e.getClickCount() == 2) {
                 // Get the selected entry:
-                BibtexEntry toShow = (BibtexEntry)model.getElementAt(row);
+                BibtexEntry toShow = model.getElementAt(row);
                 // Look up which BasePanel it belongs to:
                 BasePanel p = entryHome.get(toShow);
                 // Show the correct tab in the main window:
@@ -348,7 +377,7 @@ public class SearchResultsDialog {
      * TableFormat for the table shown in the dialog. Handles the display of entry
      * fields and icons for linked files and urls.
      */
-    public class EntryTableFormat implements AdvancedTableFormat {
+    public class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
 
         public int getColumnCount() {
             return PAD+fields.length;
@@ -360,8 +389,7 @@ public class SearchResultsDialog {
             else return "";
         }
 
-        public Object getColumnValue(Object ob, int column) {
-            BibtexEntry entry = (BibtexEntry)ob;
+        public Object getColumnValue(BibtexEntry entry, int column) {
             if (column < PAD) {
                 Object o;
                 switch (column) {
@@ -387,18 +415,27 @@ public class SearchResultsDialog {
                         return null;
                 }
             }
-            else
-                return entry.getField(fields[column-PAD]);
+            else {
+                String field = fields[column-PAD];
+                if (field.equals("author") || field.equals("editor")) {
+                    // For name fields, tap into a MainTableFormat instance and use
+                    // the same name formatting as is used in the entry table:
+                    if (frame.basePanel() != null)
+                        return frame.basePanel().tableFormat.formatName
+                                (entry.getField(field));
+                }
+                return entry.getField(field);
+            }
         }
 
-        public Class getColumnClass(int i) {
+        public Class<?> getColumnClass(int i) {
             if (i < PAD)
                 return JLabel.class;
             else
                 return String.class;
         }
 
-        public Comparator getColumnComparator(int i) {
+        public Comparator<?> getColumnComparator(int i) {
             return null;
         }
     }

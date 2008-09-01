@@ -26,10 +26,7 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.CardLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -48,6 +45,7 @@ import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -182,16 +180,19 @@ class GroupDialog extends JDialog {
                 // ... for buttons panel
                 FormLayout layoutBP = new FormLayout("pref, 4dlu, pref", "p");
                 layoutBP.setColumnGroups(new int[][] { { 1, 3 } });
-                DefaultFormBuilder builderBP = new DefaultFormBuilder(layoutBP);
-                builderBP.append(m_ok);
-                builderBP.add(m_cancel);
+                ButtonBarBuilder builderBP = new ButtonBarBuilder();
+                builderBP.addGlue();
+                builderBP.addGridded(m_ok);
+                builderBP.addGridded(m_cancel);
+                builderBP.addGlue();
+                builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
                 // create layout
                 FormLayout layoutAll = new FormLayout(
                                 "right:pref, 4dlu, fill:600px, 4dlu, fill:pref",
                                 "p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, p, "
                                                 + "0dlu, p, 0dlu, p, 3dlu, p, 3dlu, "
-                                                + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, , 9dlu, p");
+                                                + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
                 DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
                 builderAll.setDefaultDialogBorder();
@@ -246,12 +247,13 @@ class GroupDialog extends JDialog {
                 builderAll.nextLine();
                 builderAll.nextLine();
                 CellConstraints cc = new CellConstraints();
-                builderAll.add(builderBP.getPanel(), cc.xyw(builderAll.getColumn(),
-                                builderAll.getRow(), 5, "center, fill"));
+                //builderAll.add(builderBP.getPanel(), cc.xyw(builderAll.getColumn(),
+                //                builderAll.getRow(), 5, "center, fill"));
 
                 Container cp = getContentPane();
-                cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-                cp.add(builderAll.getPanel());
+                //cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+                cp.add(builderAll.getPanel(), BorderLayout.CENTER);
+                cp.add(builderBP.getPanel(), BorderLayout.SOUTH);
                 pack();
                 setResizable(false);
                 updateComponents();

@@ -163,7 +163,8 @@
         <li><code>HTMLChars</code>&nbsp;: remplace les
         caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
         &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
-        repr&eacute;sentation HTML.</li>
+        repr&eacute;sentation HTML, et traduit les commandes LaTeX
+        \emph, \textit, \textbf dans leurs &eacute;quivalents HTML.</li>
 
         <li><code>HTMLParagraphs</code>&nbsp;: interpr&egrave;te
         deux retours-chariot cons&eacute;cutifs (comme \n \n) comme
@@ -196,38 +197,52 @@
 
         <li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le
         contenu des champs author/editor en mettant les
-        pr&eacute;noms en premier et des virgules comme
-        s&eacute;parateurs.</li>
-
-        <li><code>AuthorFirstAbbrLastCommas</code>&nbsp;: &agrave;
-        documenter.</li>
-
-        <li><code>AuthorFirstAbbrLastOxfordCommas</code>&nbsp;:
-        &agrave; documenter.</li>
+        pr&eacute;noms en premier, des virgules comme
+        s&eacute;parateurs et "and" entre les deux derniers noms.</li>
 
         <li><code>AuthorFirstLastOxfordCommas</code>&nbsp;:
-        &agrave; documenter.</li>
+        similaire &agrave; <code>AuthorFirstLastCommas</code>,
+        except&eacute; que le "and" entre les deux derniers noms
+        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
+
+        <li><code>AuthorFirstAbbrLastCommas</code>&nbsp;: formate le
+        contenu des champs author/editor en mettant les
+        pr&eacute;noms abrégés en premier, des virgules comme
+        s&eacute;parateurs et "and" entre les deux derniers noms.</li>
+
+        <li><code>AuthorFirstAbbrLastOxfordCommas</code>&nbsp;:
+        similaire &agrave; <code>AuthorFirstAbbrLastCommas</code>,
+        except&eacute; que le "and" entre les deux derniers noms
+        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
 
         <li><code>AuthorLastFirst</code>&nbsp;: formate le contenu
-        des champs author/editor en mettant le nom de famille en
+        des champs author/editor en mettant les noms de famille en
         premier.</li>
 
         <li><code>AuthorAbbreviator</code> ou <code>AuthorLastFirstAbbreviator</code>&nbsp;:
         abr&egrave;ge les pr&eacute;noms de tous les auteurs. Ce formateur renvoie les noms avec
-        le nom propre en premier. Faire suivre ce formateur d'AuthorFirstFirst pour
-        avoir les noms abr&eacute;g&eacute;s avec les initiales en premier.
-
-        <li><code>AuthorLastFirstCommas</code>&nbsp;: &agrave;
-        documenter.</li>
+        le nom propre en premier. Faire suivre ce formateur d'<code>AuthorFirstFirst</code> pour
+        avoir les noms abr&eacute;g&eacute;s avec les initiales en premier.</li>
+        
+        <li><code>AuthorLastFirstCommas</code>&nbsp;: formate le contenu
+        des champs author/editor en mettant les noms de famille en
+        premier, des virgules comme s&eacute;parateurs et "and"
+        entre les deux derniers noms.</li> 
 
         <li><code>AuthorLastFirstOxfordCommas</code>&nbsp;:
-        &agrave; documenter.</li>
+        similaire &agrave; <code>AuthorLastFirstCommas</code>,
+        except&eacute; que le "and" entre les deux derniers noms
+        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
 
-        <li><code>AuthorLastFirstAbbrCommas</code>&nbsp;: &agrave;
-        documenter.</li>
-
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code>&nbsp;:
-        &agrave; documenter.</li>
+        <li><code>AuthorLastFirstAbbrCommas</code>&nbsp;: formate le
+        contenu des champs author/editor en mettant les noms en premier suivis
+        du pr&eacute;nom abrégé, en utilisant des virgules comme
+        s&eacute;parateurs et "and" entre les deux derniers noms.</li> 
+ 
+        <li><code>AuthorLastFirstAbbrCommas</code>&nbsp;: 
+        similaire &agrave; <code>AuthorLastFirstAbbrCommas</code>,
+        except&eacute; que le "and" entre les deux derniers noms
+        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
 
         <li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and"
         par ";" entre les premiers noms et par "&amp;" entre les
@@ -285,8 +300,7 @@
         <li><code>RemoveBracketsAddComma</code>&nbsp;: &agrave;
         documenter.</li>
 
-        <li><code>RemoveWhitespace</code>&nbsp;: &agrave;
-        documenter.</li>
+        <li><code>RemoveWhitespace</code>&nbsp;: supprime tous les caractères espace.</li>
 
         <li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes
         les commandes LaTeX comme <code>\em</code>,
@@ -303,18 +317,20 @@
         <li><code>ToLowerCase</code>&nbsp;: bascule tous les
         caract&egrave;res en minuscules.</li>
 
-        <li><code>CompositeFormat</code>&nbsp;: &agrave;
-        documenter.</li>
+        <li><code>ToUpperCase</code>&nbsp;: bascule tous les
+        caract&egrave;res en majuscules.</li>
 
-        <li><code>GetOpenOfficeType</code>&nbsp;: &agrave;
-        documenter.</li>
+        <li><code>GetOpenOfficeType</code>&nbsp;: renvoie le num&eacute;ro
+        utilis&eacute; par le syst&egrave;me bibliographique d'OpenOffice.org
+        (versions 1.x et 2.x) pour d&eacute;finir le type
+        de cette &eacute;e.</li>
 
-        <li><code>RTFChars</code>&nbsp;: &agrave; documenter.</li>
+        <li><code>RTFChars</code>&nbsp;: remplace les
+        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
+        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
+        repr&eacute;sentation RTF, et traduit les commandes LaTeX
+        \emph, \textit, \textbf dans leurs &eacute;quivalents RTF.</li>
 
-        <li><code>ResolvePDF</code>&nbsp;: &agrave;
-        documenter.</li>
-
-    <li></li>
     </ul>
 
     <p>Si aucun des formateurs disponibles ne peut faire ce que
@@ -499,7 +515,7 @@
     collection des fichiers gabarit soumis ou de les ajouter
     &agrave; la s&eacute;rie des filtres d'exportation standard ou
     des formateurs.</p>
-    
+
     <p>A partir de JabRef 2.4b1 vous pouvez aussi empaqueter votre
     format d'exportation ("ExportFormat") ou formateur de gabarit
     ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le

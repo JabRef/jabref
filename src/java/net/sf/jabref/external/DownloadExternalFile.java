@@ -31,6 +31,7 @@ public class DownloadExternalFile {
     private String bibtexKey;
     private FileListEntryEditor editor;
     private boolean downloadFinished = false;
+    private boolean dontShowDialog = false;
 
     public DownloadExternalFile(JabRefFrame frame, MetaData metaData, String bibtexKey) {
 
@@ -47,6 +48,7 @@ public class DownloadExternalFile {
      */
     public void download(final DownloadCallback callback) throws IOException {
 
+        dontShowDialog = false;
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
 
@@ -56,40 +58,65 @@ public class DownloadExternalFile {
         // First of all, start the download itself in the background to a temporary file:
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
+        //long time = System.currentTimeMillis();
+        URL url = null;
+        URLDownload udl = null;
+        try {
+            url = new URL(res);
+            udl = new URLDownload(frame, url, tmp);
+            // TODO: what if this takes long time?
+            // TODO: stop editor dialog if this results in an error:
+            udl.openConnectionOnly(); // Read MIME type
+        } catch (MalformedURLException ex1) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"), Globals
+                .lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
+                    + ex.getMessage(), Globals.lang("Download file"),
+                    JOptionPane.ERROR_MESSAGE);
+            Globals.logger("Error while downloading " + "'" + res + "'");
+            return;
+        }
+        final URL urlF = url;
+        final URLDownload udlF = udl;
+        //System.out.println("Time: "+(System.currentTimeMillis()-time));
         (new Thread() {
             public void run() {
 
                 try {
-
-                    URL url = new URL(res);
-                    URLDownload udl = new URLDownload(frame, url, tmp);
-                    try {
-                        udl.download();
-                    } catch (IOException e2) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
-                                + e2.getMessage(), Globals.lang("Download file"),
-                                JOptionPane.ERROR_MESSAGE);
-                        Globals.logger("Error while downloading " + url.toString());
-                        return;
-                    }
-
-                    // Download finished: call the method that stops the progress bar etc.:
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            downloadFinished();
-                        }
-                    });
-
-
-                } catch (MalformedURLException e1) {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"), Globals
-                            .lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                    udlF.download();
+                } catch (IOException e2) {
+                    dontShowDialog = true;
+                    if ((editor != null) && (editor.isVisible()))
+                        editor.setVisible(false);
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
+                            + e2.getMessage(), Globals.lang("Download file"),
+                            JOptionPane.ERROR_MESSAGE);
+                    Globals.logger("Error while downloading " + "'" + urlF.toString()+ "'");
+                    return;
                 }
+
+                // Download finished: call the method that stops the progress bar etc.:
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        downloadFinished();
+                    }
+                });
             }
         }).start();
 
+        ExternalFileType suggestedType = null;
+        if (udl.getMimeType() != null) {
+            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(udl.getMimeType());
+            /*if (suggestedType != null)
+                System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/
+        }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix = getSuffix(res);
+        // If we didn't find a file type from the MIME type, try based on extension:
+        if (suggestedType == null)
+            suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
         String suggestedName = bibtexKey != null ? getSuggestedFileName(res, suffix) : "";
         String fDirectory = getFileDirectory(res);
         if (fDirectory.trim().equals(""))
@@ -97,8 +124,8 @@ public class DownloadExternalFile {
         final String directory = fDirectory;
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
-        FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getPath() : "",
-                Globals.prefs.getExternalFileTypeByExt(suffix));
+        FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getCanonicalPath() : "",
+                suggestedType);
         editor = new FileListEntryEditor(frame, entry, true, false, metaData);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
@@ -121,7 +148,10 @@ public class DownloadExternalFile {
                     return true;
             }
         });
-        editor.setVisible(true);
+        if (!dontShowDialog) // If an error occured with the URL, this flag may have been set
+            editor.setVisible(true);
+        else
+            return;
         // Editor closed. Go on:
         if (editor.okPressed()) {
             File toFile = directory != null ? expandFilename(directory, entry.getLink())

@@ -38,15 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.FieldNameLabel;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.undo.NamedCompound;
@@ -352,8 +344,14 @@ public class FileListEditor extends JTable implements FieldEditor,
                     extensions.add(type.getExtension());
                 }
                 // Run the search operation:
-                Map<BibtexEntry, java.util.List<File>> result =
-                        Util.findAssociatedFiles(entries, extensions, dirs);
+                Map<BibtexEntry, java.util.List<File>> result;
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                    String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
+                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                }
+                else
+                    result = Util.findAssociatedFiles(entries, extensions, dirs);
+
 
                 // Iterate over the entries:
                 for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
@@ -364,13 +362,13 @@ public class FileListEditor extends JTable implements FieldEditor,
                         tableModel.setContent(oldVal);
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
-			f = relativizePath(f, dirs);
+			            f = relativizePath(f, dirs);
                         boolean alreadyHas = false;
-			//System.out.println("File: "+f.getPath());
+			            //System.out.println("File: "+f.getPath());
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
-			    //System.out.println("Comp: "+existingEntry.getLink());
-			    if (new File(existingEntry.getLink()).equals(f)) {
+                            //System.out.println("Comp: "+existingEntry.getLink());
+                            if (new File(existingEntry.getLink()).equals(f)) {
                                 alreadyHas = true;
                                 break;
                             }
@@ -379,7 +377,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                             int index = f.getPath().lastIndexOf('.');
                             if ((index >= 0) && (index < f.getPath().length()-1)) {
                                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
-                                    (f.getPath().substring(index+1));
+                                    (f.getPath().substring(index+1).toLowerCase());
                                 FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
                                 tableModel.addEntry(tableModel.getRowCount(), flEntry);
                             } else {
@@ -456,8 +454,13 @@ public class FileListEditor extends JTable implements FieldEditor,
                     extensions.add(type.getExtension());
                 }
                 // Run the search operation:
-                Map<BibtexEntry, java.util.List<File>> result =
-                        Util.findAssociatedFiles(entries, extensions, dirs);
+                Map<BibtexEntry, java.util.List<File>> result;
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                    String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
+                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                }
+                else
+                    result = Util.findAssociatedFiles(entries, extensions, dirs);
 
                 // Iterate over the entries:
                 for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {

@@ -19,6 +19,8 @@ import net.sf.jabref.Util;
  */
 public class SixpackImporter extends ImportFormat {
 
+    final String SEPARATOR = new String(new char[] { 0, 48 });
+
     /**
      * Return the name of this import format.
      */
@@ -37,8 +39,19 @@ public class SixpackImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+	    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String str;
+        int i=0;
+        while (((str = in.readLine()) != null) && (i < 50)) {
+
+			if (str.indexOf(SEPARATOR) >= 0)
+				return true;
+
+            i++;
+        }
+
+		return false;
     }
 
     /**
@@ -47,7 +60,7 @@ public class SixpackImporter extends ImportFormat {
      */
     public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 
-	final String SEPARATOR = new String(new char[] { 0, 48 });
+
 	HashMap<String, String> fI = new HashMap<String, String>();
 	fI.put("id", "bibtexkey");
 	fI.put("au", "author");

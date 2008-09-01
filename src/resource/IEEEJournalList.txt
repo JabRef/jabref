@@ -117,6 +117,8 @@ in 1989 JRA became RA
 in August 2004, RA split into ASE and RO
 IEEE Transactions on Robotics and Automation=#IEEE_J_RA#
 IEEE Transactions on Robotics=#IEEE_J_RO#
+Aaron Chen: "," missing
+IEEE Transactions on Systems, Man and Cybernetics=#IEEE_J_SMC#
 IEEE Transactions on Systems, Man, and Cybernetics=#IEEE_J_SMC#
 IEEE Transactions on Systems, Man, and Cybernetics, Part A: Systems and Humans=#IEEE_J_SMCA#
 IEEE Transactions on Systems, Man, and Cybernetics, Part B: Cybernetics=#IEEE_J_SMCB#
@@ -195,6 +197,8 @@ IEEE Transactions on Electrical Insulation=#IEEE_J_EI#
 mechanical
 IEEE/ASME Transactions on Mechatronics=#IEEE_J_MECH#
 IEEE/ASME Journal of Microelectromechanical Systems=#IEEE_J_MEMS#
+Aaron Chen: IEEE/ASME missing (Thanks to Adam Schofield)
+Journal of Microelectromechanical Systems=#IEEE_J_MEMS#
 
 
 

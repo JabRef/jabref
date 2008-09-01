@@ -142,7 +142,8 @@
     <ul>
         <li><code>HTMLChars</code> : replaces TeX-specific special
         characters (e.g. {\^a} or {\"{o}}) with their HTML
-        representations.</li>
+        representations, and translates LaTeX commands \emph, \textit,
+        \textbf into HTML equivalents.</li>
 
         <li><code>HTMLParagraphs</code> : interprets two
         consecutive newlines (e.g. \n \n) as the beginning of a new
@@ -169,18 +170,21 @@
         <li><code>AuthorFirstFirst</code> : formats author/editor
         fields with the first names first.</li>
 
-        <li><code>AuthorFirstFirstCommas</code> : formats
-        author/editor fields with the first names first, and
-        deliminated by commas.</li>
+        <li><code>AuthorFirstFirstCommas</code> or <code>AuthorFirstLastCommas</code>
+        : formats author/editor fields with the first names first, delimited by
+        commas, with "and" between the last two names.</li>
 
-        <li><code>AuthorFirstAbbrLastCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorFirstLastOxfordCommas</code> : similar
+        to <code>AuthorFirstLastCommas</code>, except that the "and"
+        between the last two names is preceded by a comma.</li>
 
-        <li><code>AuthorFirstAbbrLastOxfordCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorFirstAbbrLastCommas</code> : formats
+        author/editor fields with abbreviated first names first, delimited by
+        commas, with "and" between the last two names.</li>
 
-        <li><code>AuthorFirstLastOxfordCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorFirstAbbrLastOxfordCommas</code> : similar
+        to <code>AuthorFirstAbbrLastCommas</code>, except that the "and"
+        between the last two names is preceded by a comma.</li>
 
         <li><code>AuthorLastFirst</code> : formats author/editor
         fields with the last names first.</li>
@@ -190,17 +194,21 @@
         returns names with the last name first. Follow this formatter with
         AuthorFirstFirst to get abbreviated names with the initials first.</li>
 
-        <li><code>AuthorLastFirstCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorLastFirstCommas</code> : formats
+        author/editor fields with the last names first, delimited by
+        commas, with "and" between the last two names.</li>
 
-        <li><code>AuthorLastFirstOxfordCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorLastFirstOxfordCommas</code> : similar
+        to <code>AuthorLastFirstCommas</code>, except that the "and"
+        between the last two names is preceded by a comma.</li>
 
-        <li><code>AuthorLastFirstAbbrCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorLastFirstAbbrCommas</code> : formats
+        author/editor fields with last names first and abbreviated first names
+        last, delimited by commas, with "and" between the last two names.</li>
 
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : to be
-        documented.</li>
+        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : similar
+        to <code>AuthorLastFirstAbbrCommas</code>, except that the "and"
+        between the last two names is preceded by a comma.</li>
 
         <li><code>AuthorAndsReplacer</code> : replaces "and"
         between names with ";", and "&amp;" between the last
@@ -256,7 +264,7 @@
         <li><code>RemoveBracketsAddComma</code> : to be
         documented.</li>
 
-        <li><code>RemoveWhitespace</code> : to be documented.</li>
+        <li><code>RemoveWhitespace</code> : removes all whitespace characters.</li>
 
         <li><code>RemoveLatexCommands</code> : removes LaTeX
         commands like <code>\em</code>, <code>\textbf</code>, etc.
@@ -272,15 +280,17 @@
         <li><code>ToLowerCase</code> : turns all characters into
         lower case.</li>
 
-        <li><code>CompositeFormat</code> : to be documented.</li>
+        <li><code>ToUpperCase</code> : turns all characters into
+        upper case.</li>
 
-        <li><code>GetOpenOfficeType</code> : to be documented.</li>
+        <li><code>GetOpenOfficeType</code> : returns the number used by the OpenOffice.org
+            bibliography system (versions 1.x and 2.x) to denote the type of this entry.</li>
 
-        <li><code>RTFChars</code> : to be documented.</li>
+        <li><code>RTFChars</code> : replaces TeX-specific special
+        characters (e.g. {\^a} or {\"{o}}) with their RTF
+        representations, and translates LaTeX commands \emph, \textit,
+        \textbf into RTF equivalents.</li>
 
-        <li><code>ResolvePDF</code> : to be documented.</li>
-
-    <li></li>
     </ul>
 
     <p>If none of the available formatters can do what you want to

@@ -27,21 +27,93 @@
 
 package net.sf.jabref;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import net.sf.jabref.export.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import net.sf.jabref.export.ExpandEndnoteFilters;
+import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.SaveAllAction;
+import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.imports.*;
+import net.sf.jabref.gui.DatabasePropertiesDialog;
+import net.sf.jabref.gui.EntryCustomizationDialog2;
+import net.sf.jabref.gui.GenFieldsCustomizer;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.SortTabsAction;
+import net.sf.jabref.imports.CiteSeerFetcher;
+import net.sf.jabref.imports.EntryFetcher;
+import net.sf.jabref.imports.GeneralFetcher;
+import net.sf.jabref.imports.ImportCustomizationDialog;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormats;
+import net.sf.jabref.imports.ImportMenuItem;
+import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.journals.ManageJournalsAction;
-import net.sf.jabref.label.*;
+import net.sf.jabref.label.ArticleLabelRule;
+import net.sf.jabref.label.BookLabelRule;
+import net.sf.jabref.label.IncollectionLabelRule;
+import net.sf.jabref.label.InproceedingsLabelRule;
+import net.sf.jabref.label.LabelMaker;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
+import net.sf.jabref.sql.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -49,17 +121,9 @@ import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.*;
-import java.util.List;
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * The main window of the application.
@@ -142,6 +206,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       editEntry = new GeneralAction("edit", "Edit entry",
                                Globals.lang("Edit entry"),
                                prefs.getKey("Edit entry")),
+      focusTable = new GeneralAction("focusTable", "Focus entry table",
+                Globals.lang("Move the keyboard focus to the entry table"),
+                prefs.getKey("Focus entry table")),
       save = new GeneralAction("save", "Save database",
                                Globals.lang("Save database"),
                                prefs.getKey("Save database")),
@@ -295,8 +362,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     dbExport = new GeneralAction("dbExport", "Export to external SQL database",
          Globals.lang("Export to external SQL database"), 
-          GUIGlobals.getIconUrl("dbExport") );
-
+          GUIGlobals.getIconUrl("dbExport") ),
+    dbImport = new DbImportAction(this).getAction();
+            
     PushToApplicationButton pushExternalButton;
 
     CiteSeerFetcher citeSeerFetcher;
@@ -376,16 +444,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             int posX = prefs.getInt("posX");
             int posY = prefs.getInt("posY");
             
-            // 
+            //
             // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            // 
+            //
             // Do not put a window outside the screen if the preference values are wrong.
             //
             // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
             // googled on forums.java.sun.com graphicsenvironment second screen java
             //
             if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1){
-            
+
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
                 int height = (int) dim.getHeight();
@@ -584,11 +652,12 @@ public JabRefPreferences prefs() {
               //basePanel().runCommand("save");
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(basePanel());
                 saveAction.runCommand();
-                if (saveAction.isCancelled() || !saveAction.isSuccess())
+                if (saveAction.isCancelled() || !saveAction.isSuccess()) {
                     // The action was either cancelled or unsuccessful.
                     // Break!
                     output(Globals.lang("Unable to save database"));
                     close = false;
+                }
             }
             catch (Throwable ex) {
               // Something prevented the file
@@ -610,6 +679,7 @@ public JabRefPreferences prefs() {
       prefs.putInt("posY", JabRefFrame.this.getLocation().y);
       prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
       prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
+      prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();
@@ -1080,6 +1150,7 @@ public JabRefPreferences prefs() {
       file.add(exportAll);
       file.add(exportSelected);
       file.add(dbConnect);
+      file.add(dbImport);
       file.add(dbExport);
 
       file.addSeparator();
@@ -1116,6 +1187,7 @@ public JabRefPreferences prefs() {
       edit.addSeparator();
       edit.add(selectAll);
       mb.add(edit);
+      view.add(focusTable);
       view.add(nextTab);
       view.add(prevTab);
       view.add(sortTabs);
@@ -1392,7 +1464,7 @@ public JabRefPreferences prefs() {
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
             abbreviateMedline, unabbreviate, exportAll, exportSelected,
-            importCurrent, saveAll, dbConnect, dbExport}));
+            importCurrent, saveAll, dbConnect, dbExport, focusTable}));
         
         openDatabaseOnlyActions.addAll(fetcherActions);
 
@@ -1471,6 +1543,13 @@ public JabRefPreferences prefs() {
       addTab(bp, file, raisePanel);
       return bp;
   }
+
+    public BasePanel addTab(BibtexDatabase db, File file, MetaData meta, String encoding, boolean raisePanel) {
+        BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
+        addTab(bp, file, raisePanel);
+        return bp;
+    }
+
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
         tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
@@ -1563,6 +1642,7 @@ public JabRefPreferences prefs() {
                             // The action either not cancelled or unsuccessful.
                             // Break! 
                             close = false;
+                        
                     } catch (Throwable ex) {
                         // Something prevented the file
                         // from being saved. Break!!!
@@ -1599,7 +1679,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        addTab(database, null, null, Globals.prefs.get("defaultEncoding"), true);
+        addTab(database, null, (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"), true);
         output(Globals.lang("New database created."));
     }
   }
@@ -1778,7 +1858,7 @@ class FetchCiteSeerAction
           BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database
                                         null,                     // file
-                                        null, Globals.prefs.get("defaultEncoding"));                     // meta data
+                                        (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"));                     // meta data
           tabbedPane.add( Globals.lang( GUIGlobals.untitledTitle ), bp ) ;
           tabbedPane.setSelectedComponent( bp ) ;
           output( Globals.lang( "New database created." ) ) ;
@@ -1845,8 +1925,6 @@ class FetchCiteSeerAction
      *            Name of the file where the import came from.
      * @param openInNew
      *            Should the entries be imported into a new database?
-     * @param callBack
-     *            The callback for the ImportInspectionDialog to use.
      */
     public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
         String filename, final boolean openInNew) {

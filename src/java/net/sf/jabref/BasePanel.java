@@ -51,9 +51,7 @@ import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.sql.DBConnectDialog;
-import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.SQLutil;
+import net.sf.jabref.sql.*;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 
@@ -69,7 +67,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.sql.Connection;
 import java.util.*;
 import java.util.List;
 
@@ -121,6 +118,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //EntryTableModel tableModel = null;
     //public EntryTable entryTable = null;
     public MainTable mainTable = null;
+    public MainTableFormat tableFormat = null;
     public FilterList<BibtexEntry> searchFilterList = null, groupFilterList = null;
 
     public RightClickMenu rcm;
@@ -189,31 +187,43 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      HashMap<String, String> meta, String encoding) {
-
-        this.encoding = encoding;
-       // System.out.println(encoding);
-     //super(JSplitPane.HORIZONTAL_SPLIT, true);
-      this.sidePaneManager = Globals.sidePaneManager;
-      this.frame = frame;
-      database = db;
-      if (meta != null)
-        parseMetaData(meta);
-      else {
-        metaData = new MetaData();
-        metaData.initializeNewDatabase();   
-      }
-      setupActions();
-      setupMainPanel();
-
-      metaData.setFile(file);
-
-      // Register so we get notifications about outside changes to the file.
-      if (file != null)
-        try {
-          fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
-              file);
-        } catch (IOException ex) {
+        this.database = db;
+        if (meta != null)
+            parseMetaData(meta);
+        else {
+            metaData = new MetaData();
+            metaData.initializeNewDatabase();
         }
+        init(frame, db, file, metaData, encoding);
+    }
+
+    public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
+                     MetaData metaData, String encoding) {
+        init(frame, db, file, metaData, encoding);
+    }
+
+    private void init(JabRefFrame frame, BibtexDatabase db, File file,
+                      MetaData metaData, String encoding) {
+        this.encoding = encoding;
+        this.metaData = metaData;
+        // System.out.println(encoding);
+        //super(JSplitPane.HORIZONTAL_SPLIT, true);
+        this.sidePaneManager = Globals.sidePaneManager;
+        this.frame = frame;
+        database = db;
+
+        setupActions();
+        setupMainPanel();
+
+        metaData.setFile(file);
+
+        // Register so we get notifications about outside changes to the file.
+        if (file != null)
+            try {
+                fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
+                        file);
+            } catch (IOException ex) {
+            }
     }
 
     public boolean isBaseChanged(){
@@ -260,10 +270,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("undo", undoAction);
         actions.put("redo", redoAction);
 
+        actions.put("focusTable", new BaseAction() {
+            public void action() throws Throwable {
+                new FocusRequester(mainTable);
+            }
+        });
+        
         // The action for opening an entry editor.
         actions.put("edit", new BaseAction() {
             public void action() {
-                selectionListener.editSignalled();
+                /*System.out.println(Globals.focusListener.getFocused().getClass().getName());
+                if (Globals.focusListener.getFocused() instanceof FieldEditor)
+                    new FocusRequester(mainTable);
+                else*/
+                    selectionListener.editSignalled();
             }
                 /*
                   if (isShowingEditor()) {
@@ -295,7 +315,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             });
 
 
-        actions.put("test", new BaseAction () {
+        actions.put("test", new AccessLinksForEntries.SaveWithLinkedFiles(this));
+                /*new BaseAction () {
                 public void action() throws Throwable {
 
                     SearchResultsDialog diag = new SearchResultsDialog(frame, "Test");
@@ -311,7 +332,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     // Z3950Connection conn = new Z3950Connection();
                     // conn.doSearch();
-                    /*
+
                     ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
                     BibtexEntry[] sel = getSelectedEntries();
                     for (int i = 0; i < sel.length; i++) {
@@ -351,9 +372,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     //ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
                     //efte.setVisible(true);
 
-                    */
+
                 }
-            });
+            });*/
 
 
         // The action for saving a database.
@@ -637,65 +658,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 
         // action for collecting database strings from user
-        actions.put("dbConnect", new BaseAction() {
-
-            public void action () {
-
-                DBStrings dbs = metaData.getDBStrings();
-
-                // init DB strings if necessary
-                if (! dbs.isInitialized()) {
-                    dbs.initialize();
-                }
-
-                // show connection dialog
-                DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                Util.placeDialog(dbd, BasePanel.this );
-                dbd.setVisible(true);
-
-                // connnect to database to test DBStrings
-                if (dbd.getConnectToDB()) {
-
-                    dbs = dbd.getDBStrings();
-
-                    try {
-
-                        frame.output(Globals.lang("Establishing SQL connection..."));
-                        Connection conn = SQLutil.connectToDB(dbs);
-                        conn.close();
-                        dbs.isConfigValid(true);
-                        frame.output(Globals.lang("SQL connection established."));
-
-                    } catch (Exception ex) {
-
-                        String errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
-                        dbs.isConfigValid(false);
-
-                        String preamble = "Could not connect to SQL database for the following reason:";
-                        frame.output(Globals.lang(preamble)
-                                + "  " +  errorMessage);
-
-                        JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
-                            + "\n" + errorMessage, Globals.lang("Connect to SQL database"),
-                            JOptionPane.ERROR_MESSAGE);
-                       
-                    } finally {
-
-                        metaData.setDBStrings(dbs);
-                        dbd.dispose();
-
-                    }
-
-                }
-
-            }
-
-        });
+        actions.put("dbConnect", new DbConnectAction(this));
 
 
         // action for exporting database to external SQL database
         actions.put("dbExport", new AbstractWorker () {
-           
+
             String errorMessage = null;
             boolean connectToDB = false;
 
@@ -782,13 +750,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
                         + "\n" + errorMessage, Globals.lang("Export to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
-                   
+
                     errorMessage = null;
 
                 }
             }
 
         });
+
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
@@ -1001,7 +970,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
                         String field = "ps";
+
                         if ((bes != null) && (bes.length == 1)) {
+                            FileListEntry entry = null;
+                            FileListTableModel tm = new FileListTableModel();
+                            tm.setContent(bes[0].getField("file"));
+                            for (int i=0; i< tm.getRowCount(); i++) {
+                                FileListEntry flEntry = tm.getEntry(i);
+                                if (flEntry.getType().getName().toLowerCase().equals("pdf")
+                                    || flEntry.getType().getName().toLowerCase().equals("ps")) {
+                                    entry = flEntry;
+                                    break;
+                                }
+                            }
+                            if (entry != null) {
+                                try {
+                                    Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                                    output(Globals.lang("External viewer called") + ".");
+                                } catch (IOException e) {
+                                    output(Globals.lang("Could not open link"));
+                                    e.printStackTrace();
+                                }
+                                return;
+                            }
+                            // If we didn't find anything in the "file" field, check "ps" and "pdf" fields:
                             Object link = bes[0].getField("ps");
                             if (bes[0].getField("pdf") != null) {
                                 link = bes[0].getField("pdf");
@@ -1011,6 +1003,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if (link != null) {
                                 filepath = link.toString();
                             } else {
+                                /*   The search can lead to an unexpected 100% CPU usage which is perceived
+                                     as a bug, if the search incidentally starts at a directory with lots
+                                     of stuff below. I don't think the search is really important - we should
+                                     rather concentrate on handling the explicit links well.
 
                                 // see if we can fall back to a filename based on the bibtex key
                                 String basefile;
@@ -1033,7 +1029,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                             }
                                         }
                                     }
-                                }
+                                } */
                             }
 
 
@@ -1080,7 +1076,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 (frame(), bes[0], "",
                                 flEntry.getLink(), flEntry.getType().getIcon(),
                                 metaData(), flEntry.getType());
-                            item.actionPerformed(null);
+                            item.openLink();
                         } else
                             output(Globals.lang("No entries or multiple entries selected."));
                     }
@@ -1603,7 +1599,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         groupFilterList = new FilterList<BibtexEntry>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
         searchFilterList = new FilterList<BibtexEntry>(groupFilterList, NoSearchMatcher.INSTANCE);
         //final SortedList sortedList = new SortedList(searchFilterList, null);
-        MainTableFormat tableFormat = new MainTableFormat(this);
+        tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         //EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);

@@ -3,7 +3,48 @@
       This is done by adding a file named "<filtername>.formatters". This file defines
       one formatter on each line, with each line containing the name of the formatter and
       the formatter definition, separated by a colon (:).
+2.4 - Added mappings for some special characters that need to be sanitized when generating
+      BibTeX keys.
+    - Added ACM Digital Library fetcher by Aaron Chen.
+    - Added new entry types (conference, patent, standard, electronic).
+    - Improvements to IEEEXplore fetcher.
+    - Added explanatory text to indicate that "ps" and "pdf" files are legacy features.
+    - Fixed unexpected behaviour of "Open PDF or PS" menu item - now looks in "file" field,
+      and does not launch search for external files.
+    - Fixed bug 1827568: 'Save database' might not store current edit in entry editor.
+    - Fixed bug 2027944: updating custom export definitions requires restart.
+2.4b2
+    - Opening external files on Linux now uses "xdg-open" as application if no other is specified
+      for the file type. xdg-open should be available to call the appropriate application according
+      to the user's settings on all freedesktop compliant Linux distributions.
+    - Download external file now attempts to determine file type based on MIME type, using
+      file extension as fallback.
+    - Changed the way names are handled under autocompletion. Last and first names are
+      now indexed separately.
+    - A table column can now be set up with fallback fields used if the main field is
+      empty. Fallback fields are set in Options -> Preferences -> Main table columns by
+      setting a column to "field1/field2/...". The fields will be checked in succession
+      until a non-empty value has been found or al fields have been checked. For instance,
+      specifying "author/editor" will result in a column displaying the author field where,
+      set, and the editor field for entries with an empty author field.
+    - Added special handling of autocompletion for the "crossref" field - now indexes
+      words from the BibTeX key field instead of the "crossref" field. Added crossref
+      to the default fields using autocompletion.
+    - Added menu item and shortcut (ctrl shift E) to shift focus to the entry table.
+    - Main window now remembers maximisation state from last time.
+    - Improved SQL export feature so the complete information about groups, strings and preamble
+      is included. Added SQL import feature supporting the same database schema.
+    - Added new implementation of regular expression file search that can handler multiple files
+      and file types. Added regexp search as a third option for autolink feature.
+    - Added support for BibO RDF format, contributed by Egon Willighagen.
+    - Fixed bug in autocompletion; continuing writing the suggested word after cycling
+      through alternatives would give wrong result in editor.
+    - Fixed bug where selection would jump back if an entry of different type was selected
+      by mouse click while editing a field of the current entry.
+    - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
+>>>>>>> .merge-right.r2733
 2.4b
+    - Added Export to SQL database feature. Supports MySQL.
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
       refuse to save the database when the file has been externally modified, until the
       changes have been reviewed and partly or completely accepted.

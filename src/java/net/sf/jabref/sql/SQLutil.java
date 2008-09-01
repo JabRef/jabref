@@ -9,15 +9,21 @@
 
 package net.sf.jabref.sql;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -25,12 +31,18 @@ import java.util.Set;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
-import net.sf.jabref.Globals;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.KeywordGroup;
+import net.sf.jabref.groups.SearchGroup;
 
 /**
  *
@@ -138,6 +150,68 @@ public class SQLutil {
      *          The output (PrintStream or Connection) object to which the DML should be sent
      * @param dml
      *          The DML statements to be processed
+     * @return the result of the statement
+     */
+    private static Object processDMLWithResults ( Object out, String dml)
+                            throws SQLException {
+
+        if ( out instanceof PrintStream) {
+            // TODO: how to handle the PrintStream case?
+            PrintStream fout = (PrintStream) out;
+            fout.println(dml);
+            return null;
+        }
+
+        if ( out instanceof Connection) {
+            Connection conn = (Connection) out;
+            return execDMLWithResults(conn, dml);
+        }
+
+        return null;
+    }
+
+    private static String processDMLWithSingleResult ( Connection conn, String query) throws SQLException {
+        Object res = execDMLWithResults(conn, query);
+        if (res instanceof Statement) {
+            Statement st = (Statement)res;
+            ResultSet rs = st.getResultSet();
+            rs.next();
+            String returned = rs.getString(1);
+            st.close();
+            return returned;
+        }
+        else return null;
+    }
+
+    /**
+     * Utility method for executing DML
+     *
+     * @param conn
+     *          The DML Connection object that will execute the SQL
+     * @param dml
+     *          The DML statements to be executed
+     */
+    public static Statement execDMLWithResults(Connection conn, String dml) throws SQLException {
+        // System.out.println(dml); // remove
+        Statement stmnt = conn.createStatement();
+        stmnt.executeQuery(dml);
+        SQLWarning warn = stmnt.getWarnings();
+        if (warn!=null) {
+            //TODO handle SQL warnings
+            System.out.println(warn.toString());
+            System.out.println("("+dml+")");
+        }
+        return stmnt;
+    }
+
+
+    /**
+     * Utility method for processing DML with proper output
+     *
+     * @param out
+     *          The output (PrintStream or Connection) object to which the DML should be sent
+     * @param dml
+     *          The DML statements to be processed
      */
     private static void processDML ( Object out, String dml) 
                             throws SQLException {
@@ -160,7 +234,7 @@ public class SQLutil {
      *
      * @param conn
      *          The DML Connection object that will execute the SQL
-     * @param sql
+     * @param dml
      *          The DML statements to be executed
      */
     public static void execDML(Connection conn, String dml) throws SQLException {
@@ -203,6 +277,7 @@ public class SQLutil {
             fields = uniqueInsert(fields, val.getGeneralFields());
             fields = uniqueInsert(fields, val.getUtilityFields());
         }
+        //fields = uniqueInsert(fields, new String[] {"owner", "timestamp"});
 
         // create comma separated list of field names
         fieldstr = "";
@@ -261,8 +336,11 @@ public class SQLutil {
         if (outfile.exists())
             outfile.delete();
 
+        BufferedOutputStream writer = null;
+        writer = new BufferedOutputStream( new FileOutputStream( outfile ) );
         PrintStream fout = null;
-        fout = new PrintStream(outfile);
+        fout = new PrintStream( writer );
+
 
         exportDatabase_worker(dbtype, database, metaData, keySet, fout);
 
@@ -270,6 +348,222 @@ public class SQLutil {
 
     }
 
+    public static Object[] importDatabase(Set<String> keySet,
+                                      DBStrings dbStrings)
+        throws Exception {
+
+                DBTYPE dbtype = getDBType(dbStrings);
+
+        Object[] result = null;
+        Connection conn = null;
+
+        try {
+
+            conn = SQLutil.connectToDB(dbStrings);
+
+            // conn.setAutoCommit(false);
+
+            result = importDatabase_worker(dbtype, keySet, conn);
+
+            /*if (!conn.getAutoCommit()) {
+                conn.commit();
+                conn.setAutoCommit(true);
+            }*/
+
+            conn.close();
+
+        } catch (SQLException ex) {
+
+            throw ex;
+        }
+
+        return result;
+    }
+
+     private static Object[] importDatabase_worker (DBTYPE dbtype,
+            Set<String> keySet, Connection conn) throws Exception {
+
+         BibtexDatabase database = new BibtexDatabase();
+
+         // Find entry type IDs and their mappings to type names:
+         HashMap<String, BibtexEntryType> types = new HashMap<String, BibtexEntryType>();
+         Object res = processDMLWithResults(conn,"SELECT entry_types_id,label FROM entry_types;");
+         if (res instanceof Statement) {
+             Statement statement = (Statement)res;
+             ResultSet rs = statement.getResultSet();
+             while ( rs.next()) {
+                types.put(rs.getString(1), BibtexEntryType.getType(rs.getString(2)));
+             }
+             statement.close();
+         }
+         for (Iterator<String> iterator = types.keySet().iterator(); iterator.hasNext();) {
+             iterator.next();
+         }
+
+          // Read the column names from the entry table:
+         res = processDMLWithResults(conn, "SHOW columns FROM entries;");
+         ArrayList<String> colNames = new ArrayList<String>();
+         if (res instanceof Statement) {
+             Statement statement = (Statement)res;
+             ResultSet rs = statement.getResultSet();
+             boolean started = false;
+             while ( rs.next()) {
+                if (started)
+                    colNames.add(rs.getString(1));
+                 else if (rs.getString(1).equals("cite_key"))
+                    started = true;
+             }
+             statement.close();
+         }
+
+         // Read the entries and create BibtexEntry instances:
+         HashMap<String,BibtexEntry> entries = new HashMap<String, BibtexEntry>();
+         res = processDMLWithResults(conn, "SELECT * FROM entries;");
+         if (res instanceof Statement) {
+             Statement statement = (Statement)res;
+             ResultSet rs = statement.getResultSet();
+             while ( rs.next()) {
+                 String id = rs.getString("entries_id");
+                 BibtexEntry entry = new BibtexEntry(Util.createNeutralId(),
+                         types.get(rs.getString(3)));
+                 entry.setField(BibtexFields.KEY_FIELD, rs.getString("cite_key"));
+                 for (Iterator<String> iterator = colNames.iterator(); iterator.hasNext();) {
+                     String col = iterator.next();
+                     String value = rs.getString(col);
+                     if (value != null)
+                        entry.setField(col, value);
+                     //System.out.println("col: "+col+": "+rs.getString(col));
+                 }
+                 entries.put(id, entry);
+                 database.insertEntry(entry);
+             }
+             statement.close();
+         }
+
+         // Import strings and preamble:
+         res = processDMLWithResults(conn, "SELECT * FROM strings;");
+         if (res instanceof Statement) {
+             Statement statement = (Statement)res;
+             ResultSet rs = statement.getResultSet();
+             while ( rs.next()) {
+                 String label = rs.getString("label"), content = rs.getString("content");
+                 if (label.equals("@PREAMBLE")) {
+                     database.setPreamble(content);
+                 }
+                 else {
+                     BibtexString string = new BibtexString(Util.createNeutralId(), label, content);
+                     database.addString(string);
+                 }
+             }
+             statement.close();
+         }
+
+         MetaData metaData = new MetaData();
+         metaData.initializeNewDatabase();
+
+         // Read the groups tree:
+         importGroupsTree(dbtype, metaData, entries, conn);
+
+         return new Object[] {database, metaData};
+
+     }
+
+    public static void importGroupsTree(DBTYPE dbtype, MetaData metaData, HashMap<String,BibtexEntry> entries,
+                                        Connection conn) throws SQLException {
+        Object res = processDMLWithResults(conn, "SELECT * FROM groups ORDER BY groups_id;");
+        if (res instanceof Statement) {
+            Statement statement = (Statement)res;
+            ResultSet rs = statement.getResultSet();
+            GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
+            // Create a lookup map for finding the parent to add each group to:
+            HashMap<String, GroupTreeNode> groups = new HashMap<String, GroupTreeNode>();
+            LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<GroupTreeNode, String>();
+            
+            while ( rs.next()) {
+                AbstractGroup group = null;
+                String typeId = findGroupTypeName(rs.getString("group_types_id"), conn);
+                if (typeId.equals(AllEntriesGroup.ID)) {
+                    // register the id of the root node:
+                    groups.put(rs.getString("groups_id"), rootNode);
+                }
+                else if (typeId.equals(ExplicitGroup.ID)) {
+                    group = new ExplicitGroup(rs.getString("label"),
+                            rs.getInt("hierarchical_context"));
+                }
+                else if (typeId.equals(KeywordGroup.ID)) {
+                    System.out.println("Keyw: "+ rs.getBoolean("case_sensitive"));
+                    group = new KeywordGroup(rs.getString("label"),
+                            Util.unquote(rs.getString("search_field"), '\\'),
+                            Util.unquote(rs.getString("search_expression"), '\\'),
+                            rs.getBoolean("case_sensitive"), rs.getBoolean("reg_exp"),
+                            rs.getInt("hierarchical_context"));
+                }
+                else if (typeId.equals(SearchGroup.ID)) {
+                    System.out.println("Search: "+ rs.getBoolean("case_sensitive"));
+                    group = new SearchGroup(rs.getString("label"),
+                            Util.unquote(rs.getString("search_expression"), '\\'),
+                            rs.getBoolean("case_sensitive"), rs.getBoolean("reg_exp"),
+                            rs.getInt("hierarchical_context"));
+                }
+
+                if (group != null) {
+                    GroupTreeNode node = new GroupTreeNode(group);
+                    parentIds.put(node, rs.getString("parent_id"));
+                    groups.put(rs.getString("groups_id"), node);
+                }
+            }
+            statement.close();
+
+            // Ok, we have collected a map of all groups and their parent IDs,
+            // and another map of all group IDs and their group nodes.
+            // Now we need to build the groups tree:
+            for (Iterator<GroupTreeNode> i=parentIds.keySet().iterator(); i.hasNext();) {
+                GroupTreeNode node = i.next();
+                String parentId = parentIds.get(node);
+                // Look up the parent:
+                GroupTreeNode parent = groups.get(parentId);
+                if (parent == null) {
+                    // TODO: missing parent
+                }
+                else {
+                    parent.add(node);
+                }
+            }
+
+            // If we have explicit groups, set up group membership:
+            res = processDMLWithResults(conn, "SELECT * FROM entry_group;");
+            if (res instanceof Statement) {
+                statement = (Statement)res;
+                rs = statement.getResultSet();
+                while ( rs.next()) {
+                    String entryId = rs.getString("entries_id"),
+                            groupId = rs.getString("groups_id");
+                    GroupTreeNode node = groups.get(groupId);
+                    if ((node != null) && (node.getGroup() instanceof ExplicitGroup)) {
+                        ExplicitGroup group = (ExplicitGroup)node.getGroup();
+                        group.addEntry(entries.get(entryId));
+                    } else {
+                        // TODO: unable to find explicit group with the given id
+                    }
+                }
+                statement.close();
+            }
+
+            // Finally, set the groups tree for the metadata:
+            metaData.setGroups(rootNode);
+        }
+    }
+
+    /**
+     * Look up the group type name from the type ID in the database.
+     * @param groupId The database's groups id
+     * @param conn The database connection
+     * @return The name (JabRef type id) of the group type.
+     * @throws SQLException
+     */
+    public static String findGroupTypeName(String groupId, Connection conn) throws SQLException {
+        return processDMLWithSingleResult(conn, "SELECT label FROM group_types WHERE group_types_id=\""+groupId+"\";");
+    }
 
     /**
      * Accepts the BibtexDatabase and MetaData, generates the DML required to
@@ -351,9 +645,16 @@ public class SQLutil {
         // populate entries table
         dmlPopTab_FD(entries,out);
 
-		GroupTreeNode gtn = metaData.getGroups();
+        // populate strings table:
+        dmlPopTab_ST(database,out);
 
-		// populate groups table
+        GroupTreeNode gtn = metaData.getGroups();
+
+        // populate group_types table
+        dmlPopTab_GT(out);
+
+
+        // populate groups table
         dmlPopTab_GP(gtn,out);
         
 		// populate entry_group table
@@ -385,6 +686,8 @@ public class SQLutil {
                 // drop tables
                 processDML(out,"DROP TABLE IF EXISTS entry_types;");
                 processDML(out,"DROP TABLE IF EXISTS entries;");
+                processDML(out,"DROP TABLE IF EXISTS strings;");
+                processDML(out,"DROP TABLE IF EXISTS group_types;");
                 processDML(out,"DROP TABLE IF EXISTS groups;");
                 processDML(out,"DROP TABLE IF EXISTS entry_group;");
 
@@ -480,17 +783,36 @@ public class SQLutil {
 			+  Util.getMinimumIntegerDigits()
 		    + ")   DEFAULT NULL, \n"
             + "entry_types_id  INTEGER         DEFAULT NULL, \n"
-            + "cite_key        VARCHAR(30)     DEFAULT NULL, \n"
+            + "cite_key        VARCHAR(100)     DEFAULT NULL, \n"
             + dml2
             + ",\n"
             + "PRIMARY KEY (entries_id), \n"
             + "FOREIGN KEY (entry_types_id) REFERENCES entry_type(entry_types_id) \n"
             + ");");
-           
+
+        processDML(out,"CREATE TABLE strings ( \n"
+            + "strings_id      INTEGER         NOT NULL AUTO_INCREMENT, \n"
+			+ "label      VARCHAR(100)  DEFAULT NULL, \n"
+		    + "content    VARCHAR(200)  DEFAULT NULL, \n"
+            + "PRIMARY KEY (strings_id) \n"
+            + ");");
+
+        processDML(out,"CREATE TABLE group_types ( \n"
+                 + "group_types_id  INTEGER     NOT NULL AUTO_INCREMENT, \n"
+                 + "label   VARCHAR(100)    DEFAULT NULL, \n"
+                 + "PRIMARY KEY (group_types_id) \n"
+                 + ");" );
+
         processDML(out,"CREATE TABLE groups ( \n"
             + "groups_id       INTEGER         NOT NULL AUTO_INCREMENT, \n"
-            + "label           VARCHAR(100)     DEFAULT NULL, \n"
-            + "parent_id       INTEGER          DEFAULT NULL, \n"
+            + "group_types_id  INTEGER         DEFAULT NULL, \n"
+            + "label           VARCHAR(100)    DEFAULT NULL, \n"
+            + "parent_id       INTEGER         DEFAULT NULL, \n"
+            + "search_field       VARCHAR(100)          DEFAULT NULL, \n"
+            + "search_expression  VARCHAR(200)          DEFAULT NULL, \n"
+            + "case_sensitive  BOOL          DEFAULT NULL, \n"
+            + "reg_exp BOOL DEFAULT NULL, \n"
+            + "hierarchical_context INTEGER DEFAULT NULL, \n"
             + "PRIMARY KEY (groups_id) \n"
             + ");");
            
@@ -532,17 +854,28 @@ public class SQLutil {
 			+  Util.getMinimumIntegerDigits()
 		    + ")   DEFAULT NULL, "
             + "entry_types_id  INTEGER         DEFAULT NULL, "
-            + "cite_key        VARCHAR(30)     DEFAULT NULL, "
+            + "cite_key        VARCHAR(100)     DEFAULT NULL, "
             + dml2
             + ")");
           
         processDML(out,"ALTER TABLE entries ADD CONSTRAINT entries_fk "
                      + "FOREIGN KEY (\"entry_types_id\") REFERENCES \"entry_type\" (\"entry_types_id\")");
 
+        processDML(out,"CREATE TABLE group_types ( "
+            + "group_types_id INT  NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
+            + "label LONG VARCHAR"
+            + ")" );
+
         processDML(out,"CREATE TABLE groups ( "
             + "groups_id       INTEGER         NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
-            + "label           VARCHAR(100)     DEFAULT NULL, "
-            + "parent_id       INTEGER          DEFAULT NULL  "
+            + "group_types_id  INTEGER         DEFAULT NULL, "
+            + "label           VARCHAR(100)    DEFAULT NULL, "
+            + "parent_id       INTEGER         DEFAULT NULL  "
+            + "search_field       VARCHAR(100)          DEFAULT NULL, "
+            + "search_expression  VARCHAR(200)          DEFAULT NULL, "
+            + "case_sensitive  BOOL          DEFAULT NULL, "
+            + "reg_exp BOOL DEFAULT NULL"
+            + "hierarchical_context INTEGER DEFAULT NULL, "
             + ")");
            
         processDML(out,"CREATE TABLE entry_group ( "
@@ -560,6 +893,26 @@ public class SQLutil {
 
     }
 
+    /**
+     * Generates the DML required to populate the group_types table with
+     * JabRef data.
+     *
+     * @param out
+     *  The output (PrintSream or Connection) object to which the DML should be written.
+     * @throws SQLException
+     */
+    private static void dmlPopTab_GT( Object out) throws SQLException{
+        String[] typeNames = new String[] {
+                AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
+        for (int i = 0; i < typeNames.length; i++) {
+            String typeName = typeNames[i];
+            String insert = "INSERT INTO group_types (label) VALUES (\""+typeName+"\");";
+            // handle DML according to output type
+            processDML(out, insert);
+        }
+
+
+    }
      /**
      * Generates the DML required to populate the entry_types table with jabref
      * data.
@@ -687,6 +1040,30 @@ public class SQLutil {
 
     }
 
+    private static void dmlPopTab_ST(BibtexDatabase database, Object out)
+                            throws SQLException {
+
+        String insert = "INSERT INTO strings (label, content) VALUES (";
+
+        // Insert preamble as a string:
+        if (database.getPreamble() != null) {
+            String dml = insert + "\"@PREAMBLE\", "
+                    + "\""+Util.quote(database.getPreamble(), "\"", '\\')+"\""
+                    + ");";
+            processDML(out, dml);
+        }
+
+        Set<String> keys = database.getStringKeySet();
+        for (Iterator<String> iterator = keys.iterator(); iterator.hasNext();) {
+            String key = iterator.next();
+            BibtexString string = database.getString(key);
+            String dml = insert + "\""+Util.quote(string.getName(), "\"", '\\')+"\", "
+                    + "\""+Util.quote(string.getContent(), "\"", '\\')+"\""
+                    + ");";
+            processDML(out, dml);
+        }
+    }
+
      /**
      * Generates the DML required to populate the groups table with jabref
      * data, and writes this DML to the output file.
@@ -717,10 +1094,39 @@ public class SQLutil {
 	private static int dmlPopTab_GP_worker (GroupTreeNode cursor, int parentID,
             int ID, Object out) throws SQLException{
 
+        AbstractGroup group = cursor.getGroup();
+        String searchField = null, searchExpr = null, caseSensitive = null, reg_exp = null;
+        int hierContext = group.getHierarchicalContext();
+        if (group instanceof KeywordGroup) {
+            searchField = ((KeywordGroup)group).getSearchField();
+            searchExpr = ((KeywordGroup)group).getSearchExpression();
+            caseSensitive = ((KeywordGroup)group).isCaseSensitive() ? "1" : "0";
+            reg_exp = ((KeywordGroup)group).isRegExp() ? "1" : "0";
+        }
+        else if (group instanceof SearchGroup) {
+            searchExpr = ((SearchGroup)group).getSearchExpression();
+            caseSensitive = ((SearchGroup)group).isCaseSensitive() ? "1" : "0";
+            reg_exp = ((SearchGroup)group).isRegExp() ? "1" : "0";
+        }
+
+        // Protect all quotes in the group descriptions:
+        if (searchField != null)
+            searchField = Util.quote(searchField, "\"", '\\');
+        if (searchExpr != null)
+            searchExpr = Util.quote(searchExpr, "\"", '\\');
+
         // handle DML according to output type
-        processDML(out, "INSERT INTO groups (groups_id, label, parent_id) " 
+        processDML(out, "INSERT INTO groups (groups_id, label, parent_id, group_types_id, search_field, "
+            +"search_expression, case_sensitive, reg_exp, hierarchical_context) "
 				      + "VALUES (" + ID + ", \"" + cursor.getGroup().getName() 
-				      + "\", " + parentID + ");");
+				      + "\", " + parentID
+                      +", (SELECT group_types_id FROM group_types where label=\""+group.getTypeId()+"\")"
+                      +", "+(searchField != null ? "\""+searchField+"\"" : "NULL")
+                      +", "+(searchExpr != null ? "\""+searchExpr+"\"" : "NULL")
+                      +", "+(caseSensitive != null ? "\""+caseSensitive+"\"" : "NULL")
+                      +", "+(reg_exp != null ? "\""+reg_exp+"\"" : "NULL")
+                      +", "+hierContext
+                      + ");");
 
 		// recurse on child nodes (depth-first traversal)
 	    int myID = ID;

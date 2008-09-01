@@ -195,7 +195,7 @@ public class ExternalFileTypeEditor extends JDialog {
     class AddListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "new");
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new");
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -248,7 +248,7 @@ public class ExternalFileTypeEditor extends JDialog {
     class FileTypeTableModel extends AbstractTableModel {
 
         public int getColumnCount() {
-            return 4;
+            return 5;
         }
 
         public int getRowCount() {
@@ -264,6 +264,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 case 2:
                     return Globals.lang("Extension");
                 case 3:
+                    return Globals.lang("MIME type");
+                case 4:
                     return Globals.lang("Application");
                 default:
                     return null;
@@ -286,6 +288,8 @@ public class ExternalFileTypeEditor extends JDialog {
                 case 2:
                     return type.getExtension();
                 case 3:
+                    return type.getMimeType();
+                case 4:
                     return type.getOpenWith();
                 default:
                     return null;

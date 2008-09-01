@@ -142,7 +142,6 @@ public class ImportFormatReader {
     public List<BibtexEntry> importFromFile(ImportFormat importer, String filename) throws IOException {
         List<BibtexEntry> result = null;
         InputStream stream = null;
-
         try {
             File file = new File(filename);
             stream = new FileInputStream(file);
@@ -154,6 +153,7 @@ public class ImportFormatReader {
 
             result = importer.importEntries(stream);
         } finally {
+
             try {
                 if (stream != null)
                     stream.close();
@@ -450,6 +450,7 @@ public class ImportFormatReader {
         for (ImportFormat imFo : getImportFormats()) {
 
             try {
+
                 List<BibtexEntry> entries = importFromFile(imFo, filename);
 
                 if (entries != null)
@@ -470,17 +471,21 @@ public class ImportFormatReader {
 		
 		if (result != null)
 			return result;
-		
-		// Finally, if all else fails, see if it is a BibTeX file:
-		ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-			Globals.prefs.get("defaultEncoding"));
-		if ((pr.getDatabase().getEntryCount() > 0)
-			|| (pr.getDatabase().getStringCount() > 0)) {
-			pr.setFile(new File(filename));
-			
-			return new Pair<String, ParserResult>(BIBTEX_FORMAT, pr);
-		}
 
-		return null;
+      // Finally, if all else fails, see if it is a BibTeX file:
+      try {
+          ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+                  Globals.prefs.get("defaultEncoding"));
+          if ((pr.getDatabase().getEntryCount() > 0)
+                  || (pr.getDatabase().getStringCount() > 0)) {
+              pr.setFile(new File(filename));
+
+              return new Pair<String, ParserResult>(BIBTEX_FORMAT, pr);
+          }
+      } catch (RuntimeException ex) {
+          return null;
+      }
+
+      return null;
 	}
 }

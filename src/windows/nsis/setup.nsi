@@ -20,9 +20,9 @@ RequestExecutionLevel user
 # general definitions
 ; you only need to change this section for new releases
 ; you only need to change this section for new releases
-VIProductVersion "2.3.0.0" ; file version for the installer in the scheme "x.x.x.x"
+VIProductVersion "2.4.0.0" ; file version for the installer in the scheme "x.x.x.x"
 !ifndef VERSION
-	!define VERSION "2.3"
+	!define VERSION "2.4"
 !endif
 Name "JabRef ${VERSION}"
 !define REGKEY "SOFTWARE\JabRef"

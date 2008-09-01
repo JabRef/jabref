@@ -266,4 +266,8 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 		public Set<BibtexEntry> getEntries(){
 			return m_entries;
 		}
+
+    public String getTypeId() {
+        return ID;
+    }
 }

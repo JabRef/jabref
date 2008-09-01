@@ -45,7 +45,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     }
 
     public boolean openLink() {
-        
+
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {

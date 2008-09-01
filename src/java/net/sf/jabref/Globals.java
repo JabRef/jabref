@@ -1053,7 +1053,24 @@ public class Globals {
 		UNICODE_CHARS.put("\u012B", "i");
 		UNICODE_CHARS.put("\u012C", "I");
 		UNICODE_CHARS.put("\u012D", "i");
-		// UNICODE_CHARS.put("\u0100", "");
+        UNICODE_CHARS.put("\u0147", "N");
+        UNICODE_CHARS.put("\u0148", "n");
+        UNICODE_CHARS.put("\u0160", "S");
+        UNICODE_CHARS.put("\u0161", "s");
+        UNICODE_CHARS.put("\u017D", "Z");
+        UNICODE_CHARS.put("\u017E", "z");
+        UNICODE_CHARS.put("\u0158", "R");
+        UNICODE_CHARS.put("\u0159", "r");
+        UNICODE_CHARS.put("\u0164", "T");
+        UNICODE_CHARS.put("\u008C", "AE"); // doesn't work?
+        UNICODE_CHARS.put("\u016E", "U");
+        UNICODE_CHARS.put("\u016F", "u");
+
+        UNICODE_CHARS.put("\u0178", "Y");
+        UNICODE_CHARS.put("\u0153", "ae");
+        UNICODE_CHARS.put("\u00FE", ""); // thorn character
+        
+        // UNICODE_CHARS.put("\u0100", "");
 
 		RTFCHARS.put("`a", "\\'e0");
 		RTFCHARS.put("`e", "\\'e8");

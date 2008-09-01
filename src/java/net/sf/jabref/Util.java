@@ -39,7 +39,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -192,11 +191,7 @@ public class Util {
 	 * top.
 	 */
 	public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-		Dimension ds = diag.getSize(), df = win.getSize();
-		Point pf = win.getLocation();
-		diag.setLocation(new Point(Math.max(0, pf.x + (df.width - ds.width) / 2), Math.max(0, pf.y
-			+ (df.height - ds.height) / 2)));
-
+        diag.setLocationRelativeTo(win);
 	}
 
 	/**
@@ -496,7 +491,7 @@ public class Util {
 	public static void openExternalViewer(MetaData metaData, String link, String fieldName)
 		throws IOException {
 
-		if (fieldName.equals("ps") || fieldName.equals("pdf")) {
+        if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
             // Find the default directory for this field type:
 			String dir = metaData.getFileDirectory(fieldName);
@@ -684,7 +679,6 @@ public class Util {
 	public static boolean openExternalFileAnyFormat(MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
-
         boolean httpLink = link.toLowerCase().startsWith("http");
 
         // For other platforms we'll try to find the file type:
@@ -695,13 +689,10 @@ public class Util {
 		int pos = name.lastIndexOf('.');
 		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
 			.trim().toLowerCase() : null;
-
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
-
 		// Include the standard "file" directory:
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-
         // Include the directory of the bib file:
         String[] dirs;
         if (metaData.getFile() != null) {
@@ -719,7 +710,7 @@ public class Util {
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
 		if ((httpLink || file.exists()) && (fileType != null)) {
-			// Open the file:
+            // Open the file:
 			try {
                 String filePath = httpLink ? link : file.getPath();
                 if (Globals.ON_MAC) {
@@ -735,7 +726,13 @@ public class Util {
                     } else
                         openFileOnWindows(filePath, true);
 				} else {
-                    String[] openWith = fileType.getOpenWith().split(" ");
+                    // Use the given app if specified, and the universal "xdg-open" otherwise:
+                    String[] openWith;
+                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+                        openWith = fileType.getOpenWith().split(" ");
+                    else
+                        openWith = new String[] {"xdg-open"};
+                    
                     String[] cmdArray = new String[openWith.length+1];
                     System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
                     cmdArray[cmdArray.length-1] = filePath;
@@ -796,7 +793,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
     else if (answer == JOptionPane.YES_OPTION) {
         // User wants to define the new file type. Show the dialog:
-        ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "new");
+        ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new");
         ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
         editor.setVisible(true);
         if (editor.okPressed()) {
@@ -928,7 +925,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		 */
 		if (!directory.endsWith(System.getProperty("file.separator")))
 			directory += System.getProperty("file.separator");
-		String found = findInDir(key, directory, off);
+		String found = findInDir(key, directory, off, 0);
 		if (found != null)
 			return found.substring(directory.length());
 		else
@@ -1586,8 +1583,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         return file;
     }
 
-	private static String findInDir(String key, String dir, OpenFileFilter off) {
-		File f = new File(dir);
+	private static String findInDir(String key, String dir, OpenFileFilter off, int count) {
+        if (count > 20)
+            return null; // Make sure an infinite loop doesn't occur.
+        File f = new File(dir);
 		File[] all = f.listFiles();
 		if (all == null)
 			return null; // An error occured. We may not have
@@ -1604,7 +1603,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 					return curFile.getPath();
 
 			} else if (curFile.isDirectory()) {
-				String found = findInDir(key, curFile.getPath(), off);
+				String found = findInDir(key, curFile.getPath(), off, count+1);
 				if (found != null)
 					return found;
 			}
@@ -1622,8 +1621,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     	for (Map.Entry<String, AutoCompleter> entry : autoCompleters.entrySet()){
     		String field = entry.getKey();
             AutoCompleter comp = entry.getValue();
-
-            comp.addAll(be.getField(field));
+            comp.addAll(be.getField(field), be);
         }
     }
 
@@ -2604,6 +2602,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
 
     private static String encodeString(String s) {
+        if (s == null)
+            return null;
         StringBuilder sb = new StringBuilder();
         for (int i=0; i<s.length(); i++) {
             char c = s.charAt(i);
@@ -2649,7 +2649,32 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		
 		return Character.toUpperCase(string.charAt(0)) + string.substring(1);
 	}
-	
-	
+
+
+    /**
+     * Run an AbstractWorker's methods using Spin features to put each method
+     * on the correct thread.
+     * @param worker The worker to run.
+     * @throws Throwable 
+     */
+    public static void runAbstractWorker(AbstractWorker worker) throws Throwable {
+        // This part uses Spin's features:
+        Worker wrk = worker.getWorker();
+        // The Worker returned by getWorker() has been wrapped
+        // by Spin.off(), which makes its methods be run in
+        // a different thread from the EDT.
+        CallBack clb = worker.getCallBack();
+
+        worker.init(); // This method runs in this same thread, the EDT.
+        // Useful for initial GUI actions, like printing a message.
+
+        // The CallBack returned by getCallBack() has been wrapped
+        // by Spin.over(), which makes its methods be run on
+        // the EDT.
+        wrk.run(); // Runs the potentially time-consuming action
+        // without freezing the GUI. The magic is that THIS line
+        // of execution will not continue until run() is finished.
+        clb.update(); // Runs the update() method on the EDT.
+    }
 	
 }
