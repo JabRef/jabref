@@ -3,6 +3,8 @@
       This is done by adding a file named "<filtername>.formatters". This file defines
       one formatter on each line, with each line containing the name of the formatter and
       the formatter definition, separated by a colon (:).
+    - Changed table selection coloring so entries that are grayed out or marked can be
+      distinguished from normal entries when selected.
 2.4 - Added mappings for some special characters that need to be sanitized when generating
       BibTeX keys.
     - Added ACM Digital Library fetcher by Aaron Chen.
@@ -42,7 +44,6 @@
     - Fixed bug where selection would jump back if an entry of different type was selected
       by mouse click while editing a field of the current entry.
     - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
->>>>>>> .merge-right.r2733
 2.4b
     - Added Export to SQL database feature. Supports MySQL.
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
