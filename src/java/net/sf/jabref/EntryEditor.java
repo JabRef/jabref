@@ -678,7 +678,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         updateAllFields();
         validateAllFields();
         updateSource();
-        panel.showing = be;
+        panel.newEntryShowing(be);
 
     }
 

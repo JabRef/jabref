@@ -296,7 +296,7 @@ public class LayoutEntry {
 	public static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName){
 		if (pluginLayoutFormatter == null){
 			pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
-			
+            System.out.println("Loading from plugin: "+formatterName);
 			JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
 			if (plugin != null){
 				for (LayoutFormatterExtension e : plugin.getLayoutFormatterExtensions()){

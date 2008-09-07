@@ -231,6 +231,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                prefs.getKey("Undo")),
       redo = new GeneralAction("redo", "Redo", Globals.lang("Redo"),
                                prefs.getKey("Redo")),
+      forward = new GeneralAction("forward", "Forward", Globals.lang("Forward"),
+              prefs.getKey("Forward")),
+      back = new GeneralAction("back", "Back", Globals.lang("Back"),
+              prefs.getKey("Back")),
       /*cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
          GUIGlobals.cutIconFile,
          prefs.getKey("Cut")),*/
@@ -1187,6 +1191,8 @@ public JabRefPreferences prefs() {
       edit.addSeparator();
       edit.add(selectAll);
       mb.add(edit);
+      view.add(back);
+      view.add(forward);
       view.add(focusTable);
       view.add(nextTab);
       view.add(prevTab);
@@ -1360,6 +1366,9 @@ public JabRefPreferences prefs() {
     tlb.addAction(undo);
     tlb.addAction(redo);
 
+    tlb.addSeparator();
+    tlb.addAction(back);
+    tlb.addAction(forward);
     tlb.addSeparator();
     tlb.addAction(newEntryAction);
     tlb.addAction(editEntry);

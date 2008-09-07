@@ -109,6 +109,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     UndoAction undoAction = new UndoAction();
     RedoAction redoAction = new RedoAction();
 
+    private List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>(),
+        nextEntries = new ArrayList<BibtexEntry>();
+
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
 
@@ -123,7 +126,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public RightClickMenu rcm;
 
-    BibtexEntry showing = null;
+    BibtexEntry sho_wing = null;
     // To indicate which entry is currently shown.
     public HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
     // To contain instantiated entry editors. This is to save time
@@ -1365,6 +1368,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("autoSetFile", new SynchronizeFileField(this));
         actions.put("upgradeLinks", new UpgradeExternalLinks(this));
 
+        actions.put("back", new BaseAction() {
+            public void action() throws Throwable {
+                  
+            }
+        });
+        actions.put("forward", new BaseAction() {
+            public void action() throws Throwable {
+
+            }
+        });
     }
 
     /**
@@ -1874,14 +1887,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void showEntry(final BibtexEntry be) {
-        if (showing == be) {
+
+        if (getShowing() == be) {
             if (splitPane.getBottomComponent() == null) {
                 // This is the special occasion when showing is set to an
                 // entry, but no entry editor is in fact shown. This happens
                 // after Preferences dialog is closed, and it means that we
                 // must make sure the same entry is shown again. We do this by
                 // setting showing to null, and recursively calling this method.
-                showing = null;
+                newEntryShowing(null);
                 showEntry(be);
             } else {
               // The correct entry is already being shown. Make sure the editor
@@ -1896,11 +1910,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         EntryEditor form;
         int divLoc = -1;
         String visName = null;
-        if (showing != null) {
+        if (getShowing() != null) {
             visName = ((EntryEditor)splitPane.getBottomComponent()).
                 getVisiblePanelName();
         }
-        if (showing != null)
+        if (getShowing() != null)
             divLoc = splitPane.getDividerLocation();
 
         if (entryEditors.containsKey(be.getType().getName())) {
@@ -1932,7 +1946,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //new FocusRequester(form);
         //form.requestFocus();
 
-        showing = be;
+        newEntryShowing(be);
         setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
@@ -1992,6 +2006,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mode = SHOWING_EDITOR;
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
+        if (editor.getEntry() != getShowing())
+            newEntryShowing(editor.getEntry());
         if (oldSplitterLocation > 0)
             splitPane.setDividerLocation(oldSplitterLocation);
         if (adjustSplitter) {
@@ -2089,7 +2105,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (mode == SHOWING_EDITOR) {
             if (currentEditor.getType() != currentEditor.getEntry().getType()) {
                 // The entry has changed type, so we must get a new editor.
-                showing = null;
+                newEntryShowing(null);
                 EntryEditor newEditor = getEntryEditor(currentEditor.getEntry());
                 showEntryEditor(newEditor);
             } else {
@@ -2407,7 +2423,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 
   public void setEntryEditorEnabled(boolean enabled) {
-    if ((showing != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
+    if ((getShowing() != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
           EntryEditor ed = (EntryEditor)splitPane.getBottomComponent();
           if (ed.isEnabled() != enabled)
             ed.setEnabled(enabled);
@@ -2565,6 +2581,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setSaving(boolean saving) {
         this.saving = saving;
+    }
+
+    public BibtexEntry getShowing() {
+        return sho_wing;
+    }
+
+    public void newEntryShowing(BibtexEntry entry) {
+        sho_wing = entry;
+        System.out.println("entryShowing");
     }
 
 }
