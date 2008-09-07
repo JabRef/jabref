@@ -858,7 +858,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Write XMP", "ctrl F4");
         defKeyBinds.put("New file link", "ctrl N");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");
-
+        defKeyBinds.put("Back", "ctrl alt LEFT");
+        defKeyBinds.put("Forward", "ctrl alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");
         defKeyBinds.put("Import into new database", "ctrl shift I");
     }

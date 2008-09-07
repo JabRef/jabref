@@ -104,6 +104,21 @@ public class MainTable extends JTable {
         refreshSorting();
         setWidths();
 
+
+        InputMap im = getInputMap(WHEN_FOCUSED);
+        im.put(Globals.prefs.getKey("Back"), "back");
+        im.put(Globals.prefs.getKey("Forward"), "forward");
+        ActionMap am = getActionMap();
+        am.put("back", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                MainTable.this.panel.runCommand("back");
+            }
+        });
+        am.put("forward", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                MainTable.this.panel.runCommand("forward");
+            }
+        });
     }
 
     public void refreshSorting() {

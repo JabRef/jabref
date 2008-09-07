@@ -232,9 +232,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       redo = new GeneralAction("redo", "Redo", Globals.lang("Redo"),
                                prefs.getKey("Redo")),
       forward = new GeneralAction("forward", "Forward", Globals.lang("Forward"),
-              prefs.getKey("Forward")),
+              "right", prefs.getKey("Forward")),
       back = new GeneralAction("back", "Back", Globals.lang("Back"),
-              prefs.getKey("Back")),
+              "left", prefs.getKey("Back")),
       /*cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
          GUIGlobals.cutIconFile,
          prefs.getKey("Cut")),*/
@@ -505,7 +505,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     highlightAll
                         .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
                     Globals.focusListener.setFocused(bp.mainTable);
-
+                    // Set correct enabled state for Back and Forward actions:
+                    bp.setBackAndForwardEnabledState();
                     new FocusRequester(bp.mainTable);
                 }
             }

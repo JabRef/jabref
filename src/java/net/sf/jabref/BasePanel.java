@@ -126,7 +126,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public RightClickMenu rcm;
 
-    BibtexEntry sho_wing = null;
+    BibtexEntry showing = null;
+
+    // Variable to prevent erroneous update of back/forward histories at the time
+    // when a Back or Forward operation is being processed:
+    private boolean backOrForwardInProgress = false;
+
     // To indicate which entry is currently shown.
     public HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
     // To contain instantiated entry editors. This is to save time
@@ -1370,12 +1375,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("back", new BaseAction() {
             public void action() throws Throwable {
-                  
+                back();
             }
         });
         actions.put("forward", new BaseAction() {
             public void action() throws Throwable {
-
+                forward();
             }
         });
     }
@@ -2584,12 +2589,71 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public BibtexEntry getShowing() {
-        return sho_wing;
+        return showing;
     }
 
+    /**
+     * Update the pointer to the currently shown entry in all cases where the user has
+     * moved to a new entry, except when using Back and Forward commands. Also updates
+     * history for Back command, and clears history for Forward command.
+     * @param entry The entry that is now to be shown.
+     */
     public void newEntryShowing(BibtexEntry entry) {
-        sho_wing = entry;
-        System.out.println("entryShowing");
+        // If this call is the result of a Back or Forward operation, we must take
+        // care not to make any history changes, since the necessary changes will
+        // already have been done in the back() or forward() method:
+        if (backOrForwardInProgress) {
+            showing = entry;
+            backOrForwardInProgress = false;
+            setBackAndForwardEnabledState();
+            return;
+        }
+        nextEntries.clear();
+        if (entry != showing) {
+            // Add the entry we are leaving to the history:
+            if (showing != null) {
+                previousEntries.add(showing);
+                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE)
+                    previousEntries.remove(0);
+            }
+            showing = entry;
+            setBackAndForwardEnabledState();
+        }
+        
     }
 
+    /**
+     * Go back (if there is any recorded history) and update the histories for
+     * the Back and Forward commands.
+     */
+    private void back() {
+        if (previousEntries.size() > 0) {
+            BibtexEntry toShow = previousEntries.get(previousEntries.size()-1);
+            previousEntries.remove(previousEntries.size()-1);
+            // Add the entry we are going back from to the Forward history:
+            if (showing != null)
+                nextEntries.add(showing);
+            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
+            //showEntry(toShow);
+            highlightEntry(toShow);
+        }
+    }
+
+    private void forward() {
+        if (nextEntries.size() > 0) {
+            BibtexEntry toShow = nextEntries.get(nextEntries.size()-1);
+            nextEntries.remove(nextEntries.size()-1);
+            // Add the entry we are going forward from to the Back history:
+            if (showing != null)
+                previousEntries.add(showing);
+            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
+            //showEntry(toShow);
+            highlightEntry(toShow);
+        }
+    }
+
+    public void setBackAndForwardEnabledState() {
+        frame.back.setEnabled(previousEntries.size() > 0);
+        frame.forward.setEnabled(nextEntries.size() > 0);
+    }
 }

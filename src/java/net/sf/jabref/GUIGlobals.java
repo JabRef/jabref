@@ -194,6 +194,8 @@ public class GUIGlobals {
         STANDARD_EDITOR=1,
         FILE_LIST_EDITOR=2;
 
+    public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
+
     public static final String FILE_FIELD = "file";
 
     public static final double
