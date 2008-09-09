@@ -26,7 +26,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	private JComboBox priSort, secSort, terSort;
 
-	private JTextField priField, secField, terField;
+	private JTextField priField, secField, terField, numericFields;
 
 	/**
 	 * Customization of external program paths.
@@ -72,6 +72,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		priField = new JTextField(10);
 		secField = new JTextField(10);
 		terField = new JTextField(10);
+
+        numericFields = new JTextField(30);
 
 		priSort.insertItemAt(Globals.lang("<select>"), 0);
 		secSort.insertItemAt(Globals.lang("<select>"), 0);
@@ -185,6 +187,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		builder.append(pan);
 		builder.append(floatMarked);
 		builder.nextLine();
+        builder.append(pan);
+        builder2 = new DefaultFormBuilder(new FormLayout("left:pref, 8dlu, fill:pref",""));
+        builder2.append(Globals.lang("Sort the following fields as numeric fields")+":");
+        builder2.append(numericFields);
+        builder.append(builder2.getPanel(), 5);
+        builder.nextLine();
 		builder.appendSeparator(Globals.lang("General"));
 		builder.append(pan);
 		builder.append(autoResizeMode);
@@ -242,6 +250,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		abbrNames.setEnabled(!namesNatbib.isSelected());
 		lastNamesOnly.setEnabled(!namesNatbib.isSelected());
 		noAbbrNames.setEnabled(!namesNatbib.isSelected());
+
+        String numF = _prefs.get("numericFields");
+        if (numF == null)
+            numericFields.setText("");
+        else
+            numericFields.setText(numF);
 	}
 
 	/**
@@ -276,6 +290,18 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 		_prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
 		// updatefont
+
+        String oldVal = _prefs.get("numericFields");
+        String newVal = numericFields.getText().trim();
+        if (newVal.length() == 0)
+            newVal = null;
+        if (((newVal != null) && (oldVal == null))
+                || ((newVal == null) && (oldVal != null))
+                || ((newVal != null) && !newVal.equals(oldVal))) {
+            _prefs.put("numericFields", newVal);
+            BibtexFields.setNumericFieldsFromPrefs();
+        }
+
 	}
 
 	public boolean readyToClose() {

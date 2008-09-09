@@ -1,5 +1,6 @@
 2.5?
     - Added Back and Forward actions, for switching between recently edited BibTeX entries.
+    - Added option under "Entry table" to designate fields as numeric for sorting purposes.
     - Added possibility for custom export filters to define their own name formatters.
       This is done by adding a file named "<filtername>.formatters". This file defines
       one formatter on each line, with each line containing the name of the formatter and

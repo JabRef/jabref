@@ -47,6 +47,7 @@ package net.sf.jabref ;
 
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.HashSet;
 
 import net.sf.jabref.util.TXMLReader;
 
@@ -231,7 +232,39 @@ public class BibtexFields
     PUBLIC_FIELDS = pFields.toArray(new String[pFields.size()]);
     // sort the entries
     java.util.Arrays.sort( PUBLIC_FIELDS );
+
   }
+
+    /**
+     * Read the "numericFields" string array from preferences, and activate numeric
+     * sorting for all fields listed in the array. If an unknown field name is included,
+     * add a field descriptor for the new field.
+     */
+    public static void setNumericFieldsFromPrefs() {
+        String[] numFields = Globals.prefs.getStringArray("numericFields");
+        if (numFields == null)
+            return;
+        // Build a Set of field names for the fields that should be sorted numerically:
+        HashSet<String> nF = new HashSet<String>();
+        for (int i = 0; i < numFields.length; i++) {
+            nF.add(numFields[i]);
+        }
+        // Look through all registered fields, and activate numeric sorting if necessary:
+        for (String fieldName : runtime.fieldSet.keySet()) {
+            BibtexSingleField field = runtime.fieldSet.get(fieldName);
+            if (!field.isNumeric() && nF.contains(fieldName)) {
+                field.setNumeric(nF.contains(fieldName));
+            }
+            nF.remove(fieldName); // remove, so we clear the set of all standard fields.
+        }
+        // If there are fields left in nF, these must be non-standard fields. Add descriptors for them:
+        for (String fieldName : nF) {
+            BibtexSingleField field = new BibtexSingleField(fieldName, false);
+            field.setNumeric(true);
+            runtime.fieldSet.put(fieldName, field);
+        }
+
+    }
 
 
   /** insert a field into the internal list */
@@ -419,7 +452,7 @@ public class BibtexFields
   // --------------------------------------------------------------------------
   // a container class for all properties of a bibtex-field
   // --------------------------------------------------------------------------
-  private class BibtexSingleField
+  private static class BibtexSingleField
   {
     private static final int
         STANDARD       = 0x01,  // it is a standard bibtex-field

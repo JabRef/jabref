@@ -371,10 +371,9 @@ public class JabRefPreferences {
         defaults.put("importInspectionDialogHeight", new Integer(650));
         defaults.put("searchDialogWidth", new Integer(650));
         defaults.put("searchDialogHeight", new Integer(500));
-
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
-
         defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
+        defaults.put("numericFields", "mittnum;author");
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

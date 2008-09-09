@@ -98,6 +98,9 @@ public class JabRef {
 		 * 
 		 * Plug-ins are activated on the first call to their getInstance method.
 		 */
+
+        // Update which fields should be treated as numeric, based on preferences:
+        BibtexFields.setNumericFieldsFromPrefs();
 		
 		/* Build list of Import and Export formats */
 		Globals.importFormatReader.resetImportFormats();
@@ -105,7 +108,7 @@ public class JabRef {
 		ExportFormats.initAllExports();
 		
 		// Read list(s) of journal names and abbreviations:
-		Globals.initializeJournalNames();
+        Globals.initializeJournalNames();
 
 		// Check for running JabRef
 		if (Globals.prefs.getBoolean("useRemoteServer")) {
