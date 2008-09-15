@@ -47,7 +47,6 @@ public class DownloadExternalFile {
      *                 is complete.
      */
     public void download(final DownloadCallback callback) throws IOException {
-
         dontShowDialog = false;
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
@@ -55,22 +54,39 @@ public class DownloadExternalFile {
         if (res == null || res.trim().length() == 0)
             return;
 
-        // First of all, start the download itself in the background to a temporary file:
-        final File tmp = File.createTempFile("jabref_download", "tmp");
-        tmp.deleteOnExit();
-        //long time = System.currentTimeMillis();
         URL url = null;
-        URLDownload udl = null;
         try {
             url = new URL(res);
-            udl = new URLDownload(frame, url, tmp);
-            // TODO: what if this takes long time?
-            // TODO: stop editor dialog if this results in an error:
-            udl.openConnectionOnly(); // Read MIME type
         } catch (MalformedURLException ex1) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"), Globals
                 .lang("Download file"), JOptionPane.ERROR_MESSAGE);
             return;
+        }
+
+        download(url, callback);
+    }
+
+
+    /**
+     * Start a download.
+     *
+     * @param callback The object to which the filename should be reported when download
+     *                 is complete.
+     */
+    public void download(URL url, final DownloadCallback callback) throws IOException {
+
+        String res = url.toString();
+        URLDownload udl = null;
+
+        // First of all, start the download itself in the background to a temporary file:
+        final File tmp = File.createTempFile("jabref_download", "tmp");
+        tmp.deleteOnExit();
+        //long time = System.currentTimeMillis();
+        try {
+            udl = new URLDownload(frame, url, tmp);
+            // TODO: what if this takes long time?
+            // TODO: stop editor dialog if this results in an error:
+            udl.openConnectionOnly(); // Read MIME type
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
                     + ex.getMessage(), Globals.lang("Download file"),
@@ -108,6 +124,7 @@ public class DownloadExternalFile {
 
         ExternalFileType suggestedType = null;
         if (udl.getMimeType() != null) {
+            System.out.println("mimetype:"+udl.getMimeType());
             suggestedType = Globals.prefs.getExternalFileTypeByMimeType(udl.getMimeType());
             /*if (suggestedType != null)
                 System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/

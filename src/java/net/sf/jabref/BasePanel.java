@@ -323,66 +323,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             });
 
 
-        actions.put("test", new AccessLinksForEntries.SaveWithLinkedFiles(this));
-                /*new BaseAction () {
-                public void action() throws Throwable {
-
-                    SearchResultsDialog diag = new SearchResultsDialog(frame, "Test");
-                    diag.setVisible(true);
-                    List<BibtexEntry> list = new ArrayList<BibtexEntry>();
-                    BibtexEntry[] entries = getSelectedEntries();
-                    for (int i = 0; i < entries.length; i++) {
-                        BibtexEntry entry = entries[i];
-                        list.add(entry);
-                    }
-                    diag.addEntries(list, BasePanel.this);
-
-
-                    // Z3950Connection conn = new Z3950Connection();
-                    // conn.doSearch();
-
-                    ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
-                    BibtexEntry[] sel = getSelectedEntries();
-                    for (int i = 0; i < sel.length; i++) {
-                        BibtexEntry bibtexEntry = sel[i];
-                        entries.add(bibtexEntry);
-                    }
-                    final List<FileListEntry> links =
-                            AccessLinksForEntries.getExternalLinksForEntries(entries);
-                    for (Iterator<FileListEntry> iterator = links.iterator(); iterator.hasNext();) {
-                        FileListEntry entry = iterator.next();
-                        System.out.println("Link: "+entry.getLink());
-                    };
-
-                    final JProgressBar prog = new JProgressBar();
-                    prog.setIndeterminate(true);
-                    final JDialog diag = new JDialog(frame, false);
-                    diag.getContentPane().add(prog, BorderLayout.CENTER);
-                    diag.pack();
-                    diag.setLocationRelativeTo(frame);
-                    diag.setVisible(true);
-                    Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            AccessLinksForEntries.copyExternalLinksToDirectory(links,
-                                new File("/home/alver/tmp"), metaData, prog, false,
-                                    new ActionListener() {
-                                        public void actionPerformed(ActionEvent actionEvent) {
-                                            diag.dispose();
-                                        }
-                                    });
-                        }
-                    });
-                    t.start();
-                    
-                    //CheckBoxFileChooser cb = new CheckBoxFileChooser(new File(""), "Selected only");
-                    //cb.showSaveDialog(frame);
-
-                    //ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
-                    //efte.setVisible(true);
-
-
-                }
-            });*/
+        actions.put("test",// new AccessLinksForEntries.SaveWithLinkedFiles(this));
+                new FindFullTextAction(this));
 
 
         // The action for saving a database.
@@ -1383,6 +1325,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 forward();
             }
         });
+        
+        actions.put("downloadFullText", new FindFullTextAction(this));
     }
 
     /**
@@ -2656,4 +2600,5 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.back.setEnabled(previousEntries.size() > 0);
         frame.forward.setEnabled(nextEntries.size() > 0);
     }
+
 }

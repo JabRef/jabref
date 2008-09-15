@@ -367,7 +367,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     dbExport = new GeneralAction("dbExport", "Export to external SQL database",
          Globals.lang("Export to external SQL database"), 
           GUIGlobals.getIconUrl("dbExport") ),
-    dbImport = new DbImportAction(this).getAction();
+    dbImport = new DbImportAction(this).getAction(),
+    downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
+            "Follow DOI or URL link and try to locate PDF full text document");
             
     PushToApplicationButton pushExternalButton;
 
@@ -1172,7 +1174,7 @@ public JabRefPreferences prefs() {
       file.add(close);
       file.add(quit);
       mb.add(file);
-      edit.add(test);
+      //edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();
@@ -1225,7 +1227,7 @@ public JabRefPreferences prefs() {
       tools.add(replaceAll);
       tools.add(new MassSetFieldAction(this));
       tools.add(makeKeyAction);
-
+      tools.add(downloadFullText);
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
       checkAndFix.add(dupliCheck);
@@ -1521,6 +1523,10 @@ public JabRefPreferences prefs() {
             previousTabCount = tabCount;
             setEnabled(openDatabaseOnlyActions, tabCount > 0);
             setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+        }
+        if (tabCount == 0) {
+            back.setEnabled(false);
+            forward.setEnabled(false);
         }
     }
 
