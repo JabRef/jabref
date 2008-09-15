@@ -142,7 +142,8 @@
     <ul>
         <li><code>HTMLChars</code> : ersetzt TeX-spezifische
         Sonderzeichen (z.B. {\^a} oder {\"{o}}) durch ihre
-        HTML-Entsprechungen.</li>
+        HTML-Entsprechungen und &uuml;bersetzt die LaTeX-Befehle
+        \emph, \textit, \textbf in ihre HTML-Entsprechungen.</li>
 
         <li><code>HTMLParagraphs</code> : interpretiert zwei
         aufeinanderfolgende Zeilenumbr&uuml;che (z.B. \n \n) als
@@ -170,18 +171,23 @@
         <li><code>AuthorFirstFirst</code> : formatiert die Felder
         author/editor mit den Vornamen zuerst.</li>
 
-        <li><code>AuthorFirstFirstCommas</code> : formatiert die
-        Felder author/editor mit den Vornamen zuerst und abgetrennt
+        <li><code>AuthorFirstFirstCommas</code> oder <code>AuthorFirstLastCommas</code> :
+        formatiert die Felder author/editor mit den Vornamen zuerst und abgetrennt
         durch Kommas.</li>
 
-        <li><code>AuthorFirstAbbrLastCommas</code> : Dokumentation
-        folgt.</li>
+        <li><code>AuthorFirstLastOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorFirstLastCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
 
-        <li><code>AuthorFirstAbbrLastOxfordCommas</code> :
-        Dokumentation folgt.</li>
+        <li><code>AuthorFirstAbbrLastCommas</code> : formatiert die
+        Felder author/editor mit abgek&uuml;rzten Vornamen, abgetrennt durch
+        Kommas, mit einem "and" zwischen den letzten beiden Namen.</li>
 
-        <li><code>AuthorFirstLastOxfordCommas</code> :
-        Dokumentation folgt.</li>
+        <li><code>AuthorFirstAbbrLastOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorFirstAbbrLastCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
 
         <li><code>AuthorLastFirst</code> : formatiert die Felder
         author/editor mit den Nachnamen zuerst.</li>
@@ -191,17 +197,24 @@
         Nachnamen zuerst aus. Wenn Sie abgek&uuml;rzte Namen mit vorangestellten Initialen
         wollen, wenden Sie anschlie&szlig;end den Formatierer <code>AuthorFirstFirst</code> an.
 
-        <li><code>AuthorLastFirstCommas</code> : Dokumentation
-        folgt.</li>
+        <li><code>AuthorLastFirstCommas</code> : formatiert die Felder
+        author/editor mit den Nachnamen zuerst, abgetrennt durch Kommas,
+        mit einem "and" zwischen den letzten beiden Namen.</li>
 
-        <li><code>AuthorLastFirstOxfordCommas</code> :
-        Dokumentation folgt.</li>
+        <li><code>AuthorLastFirstOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorLastFirstCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
 
-        <li><code>AuthorLastFirstAbbrCommas</code> : Dokumentation
-        folgt.</li>
+        <li><code>AuthorLastFirstAbbrCommas</code> : formatiert die Felder
+        author/editor mit Nachnamen zuerst und abgek&uuml;rzten Vornamen,
+        abgetrennt durch Kommas, mit einem "and" zwischen den letzten
+        beiden Namen.</li>
 
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code> :
-        Dokumentation folgt.</li>
+        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorLastFirstAbbrCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
 
         <li><code>AuthorAndsReplacer</code> : ersetzt "and"
         zwischen den Namen durch ";", zwischen den letzten beiden
@@ -227,11 +240,34 @@
         zwischen mehreren abgek&uuml;rzten Vornamen werden
         gel&ouml;scht.</li>
 
+        <li><code>FileLink(Dateityp)</code> : wenn kein Argument angegeben
+        wird, gibt dieser Formatierer den ersten externen Dateityp aus, der
+        in dem Feld "file" angegeben ist.
+        <p>Dieser Formatierer nimmt den Namen eines Dateityps als optionales
+        Argument, das in Klammern nach dem Namen des Formatierers angegeben
+        wird. Zum Beispiel wird mit <code>\format[FileLink(pdf)]{\file}</code>
+        der Dateityp <code>pdf</code> als Argument angegeben. Wenn ein Argument
+        mitgegeben wird, w&auml;hlt der Formatierer den ersten Dateilink des
+        entsprechenden Typs. Im Beispiel wird der Pfad zum ersten PDF-Link
+        ausgegeben.</p></li>
+
         <li><code>FormatPagesForHTML</code> : ersetzt "--" durch
         "-".</li>
 
         <li><code>FormatPagesForXML</code> : ersetzt "--" durch
         einen XML en-dash (Gedanken- bzw. Bis-Strich).</li>
+
+        <li><code>Replace(regexp,ersetzedurch)</code> : f&uuml;hrt eine Ersetzung
+        mit einem Regul&auml;ren Ausdruck durch. Um diesen Formatierer zu
+        benutzen, muss ein zweiteiliges Argument mitgegeben werden. Die Teile
+        werden durch ein Komma getrennt. Will man ein Komma ausgeben lassen,
+        muss man es maskieren: \,
+        <p>Der erste Teil ist der Regul&auml;re Ausdruck, nach dem gesucht wird.
+        Er wird normal geschrieben, ohne Backslashes (\) zu maskieren.
+        Eine Beschreibung von Regul&auml;ren Ausdr&uuml;cken ist hier zu finden:<br>
+        http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html</p>
+        <p>Der zweite Teil ist der Text, der f&uuml;r alle Treffer eingesetzt
+        werden soll.</li>
 
         <li><code>RemoveBrackets</code> : entfernt alle
         geschweiften Klammern "{" oder "}".</li>
@@ -239,11 +275,10 @@
         <li><code>RemoveBracketsAddComma</code> : Dokumentation
         folgt.</li>
 
-        <li><code>RemoveWhitespace</code> : Dokumentation
-        folgt.</li>
+        <li><code>RemoveWhitespace</code> : l&ouml;scht alle Leerzeichen.</li>
 
         <li><code>RemoveLatexCommands</code> : entfernt LaTeX
-        Kommandos wie <code>\em</code>, <code>\textbf</code> etc.
+        Kommandos wie <code>\emph</code>, <code>\textbf</code> etc.
         Zusammen mit <code>HTMLChars</code> oder
         <code>XMLChars</code> sollte dieser Formatierer zuletzt
         aufgerufen werden.</li>
@@ -257,15 +292,19 @@
         <li><code>ToLowerCase</code> : macht aus allen Buchstaben
         Kleinbuchstaben.</li>
 
-        <li><code>CompositeFormat</code> : Dokumentation
-        folgt.</li>
+        <li><code>ToUpperCase</code> : macht aus allen Buchstaben
+        Gro&szlig;buchstaben.</li>
 
-        <li><code>GetOpenOfficeType</code> : Dokumentation
-        folgt.</li>
+        <li><code>GetOpenOfficeType</code> : gibt die Nummer wieder,
+        die vom bibliographischen System von OpenOffice.org (Versionen
+        1.x und 2.x) benutzt wird, um den Typ dieses Eintrags zu
+        bezeichnen.</li>
 
-        <li><code>RTFChars</code> : Dokumentation folgt.</li>
+        <li><code>RTFChars</code> : ersetzt alle TeX-spezifischen
+        Sonderzeichen (z.B. {\^a} oder {\"{o}}) durch ihre
+        RTF-Entsprechung und &uuml;bersetzt LaTeX-Befehle wie \emph, \textit,
+        \textbf in ihre RTF-Entsprechungen.</li>
 
-        <li><code>ResolvePDF</code> : Dokumentation folgt.</li>
     </ul>
 
     <p>Falls keiner der verf&uuml;gbaren Formatierer das Ergebnis

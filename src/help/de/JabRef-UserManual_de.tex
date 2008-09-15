@@ -11,9 +11,10 @@
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
 \usepackage{xspace}
+\usepackage{pdfsync}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%14.\,09.\,2008
+\newcommand{\versiondate}{in Bearb.}%15.\,09.\,2008
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -31,7 +32,6 @@
 \usepackage{graphicx}
 \usepackage{setspace}
 \usepackage{amssymb}
-\usepackage{soul}
 \usepackage{hanging}
 
 \makeatletter
@@ -95,7 +95,7 @@
 }
 
 %%% version number
-\newcommand{\versionnr}{\texorpdfstring{2.3.1}{2.3.1}} %
+\newcommand{\versionnr}{\texorpdfstring{2.4}{2.4}} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref~\versionnr}
 %%% BibTeX logo
@@ -154,7 +154,7 @@
 
 %%%%% Other stuff %%%%%
 \deffootnote{1.5em}{1em}{\makebox[1.5em][l]{\thefootnotemark}}
-%\usepackage{microtype} % micro typography
+\usepackage{microtype} % micro typography
 
 %%%%% Mini TOCs %%%%%
 \usepackage{minitoc}
@@ -644,7 +644,7 @@ was interpretiert wird als String mit dem Namen \texttt{jan} gefolgt
 von \texttt{1997}. Vergleichen Sie dazu auch die Hinweise zum \nameref{StringEditorHelp}.
 
 
-\subsection{Eintrags"=Editor}
+\subsection{\texorpdfstring{Eintrags"=Editor}{Eintrags-Editor}}
 
 \label{EntryEditorHelp}
 
@@ -1316,7 +1316,7 @@ oder wenn Sie sich merken wollen, welche Artikel oder Bücher Sie noch
 einmal genauer ansehen müssen.
 
 
-\subsection{String"=Editor}
+\subsection{\texorpdfstring{String"=Editor}{String-Editor}}
 \label{StringEditorHelp}
 
 \begin{quote}
@@ -1367,8 +1367,8 @@ wird.
 Die Abkürzung von Zeitschriftentiteln können Sie vom Eintragseditor oder vom Menü \menu{Extras} aus ein- und ausschalten. Im Eintragseditor benutzen Sie dazu den Button \menu{Abkürzung an-/abschalten} neben dem \emph{Journal}-Feld. Es wird zwischen drei Modi hin- und hergeschaltet:
 \begin{itemize}
     \item Kompletter Name, z.\,B. ">Aquacultural Engineering"<
-    \item \caps{ISO}-Abkürzung, z.\,B. ">Aquacult. Eng."<
-    \item \caps{MEDLINE}-Abkürzung, z.\,B. ">Aquacult Eng"<
+    \item \textls{ISO}-Abkürzung, z.\,B. ">Aquacult. Eng."<
+    \item \textls{MEDLINE}-Abkürzung, z.\,B. ">Aquacult Eng"<
 \end{itemize}
 Falls der Zeitschriftentitel sich nicht in Ihren Zeitschriftenlisten findet, wird das Feld nicht verändert.
 
@@ -1659,7 +1659,7 @@ klicken Sie auf die Schaltfläche \menu{Übernehmen}. Nun erstellt
 \jabref den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
 hat.
 
-\subsection{Links zu PDF- und PS"=Dateien, URLs und DOIs}
+\subsection{Links zu PDF- und \texorpdfstring{PS"=Dateien}{PS-Dateien}, URLs und DOIs}
 \label{ExternalFiles}
 
 \tip[Anmerkung: ]{Ab \jabref 2.3 gibt es ein verbessertes System für Links zu externen Dateien; siehe dazu den Abschnitt ">\nameref{FileLinks}"<.}
@@ -1770,7 +1770,7 @@ Für jeden Datei"=Link muss ein Dateityp gewählt werden, damit das richtige Progr
 
 Ein Dateityp besteht aus einem Namen, einem graphischen Icon, einer Dateierweiterung und einer Anwendung zum Öffnen der Dateien. Wenn Sie Windows benutzen, können Sie den Namen der Anwendung weglassen, wenn Sie das Standardprogramm verwenden wollen.
 
-\subsubsection{Datei"=Links zu einem Eintrag hinzufügen}
+\subsubsection{\texorpdfstring{Datei"=Links}{Datei-Links} zu einem Eintrag hinzufügen}
 
 Wenn bei den Allgemeinen Feldern (siehe Abschnitt~\ref{GeneralFields}) das Feld \texttt{file} eingetragen ist, können Sie die Liste der externen Links im \nameref{EntryEditorHelp} bearbeiten. Der Editor hat dann Schaltflächen zum Einfügen, Bearbeiten, Löschen und Sortieren der Links.
 
@@ -2259,7 +2259,7 @@ enthält, sowie einen zweiten Tab namens >>Zusammenfassung<< mit
 den Feldern \emph{abstract} und \emph{annote}.
 
 
-\subsection{Automatische Erstellung von \bibtex{}"=Keys}
+\subsection{Automatische Erstellung von \texorpdfstring{\bibtex{}"=Keys}{BibTeX-Keys}}
 \label{LabelPatterns}
 \begin{quote}
 \emph{Unter \menu{Optionen \msep{} Einstellungen \msep{} BibTeX"=Key"=Muster} 
@@ -2511,55 +2511,110 @@ abhängen:
 
 \begin{labeling}{MMMM}
 \item [\texttt{HTMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie
-\texttt{\{\textbackslash{}\textasciicircum{}a\}} oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}}
-durch ihre HTML-Entsprechungen.
-\item [\texttt{HTMLParagraphs}]interpretiert zwei aufeinanderfolgende Zeilenumbrüche (z.\,B. \lstinline{\n \n}) als Beginn eines neuen Absatzes und erstellt dementsprechend Absatz-HTML-Tags.
-\item [\texttt{XMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie \texttt{\{\textbackslash{}\textasciicircum{}a\}}
-oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}} durch ihre XML-Entsprechungen.
+       \texttt{\{\textbackslash{}\textasciicircum{}a\}} oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}}
+       durch ihre HTML"=Entsprechungen und übersetzt die \LaTeX"=Befehle \lstinline{\emph}, 
+       \lstinline{\textit}, \lstinline{\textbf} in ihre HTML"=Entsprechungen.
+\item [\texttt{HTMLParagraphs}]interpretiert zwei aufeinanderfolgende Zeilenumbrüche 
+       (z.\,B. \lstinline{\n\n}) als Beginn eines neuen Absatzes und erstellt dementsprechend
+       Absatz-HTML-Tags.
+\item [\texttt{XMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie       
+       \texttt{\{\textbackslash{}\textasciicircum{}a\}}
+       oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}} durch ihre XML-Entsprechungen.
 \item [\texttt{CreateDocBookAuthors}]formatiert das author-Feld im DocBook-Stil.
 \item [\texttt{CreateDocBookEditors}]\emph{Dokumentation folgt.}
-\item [\texttt{CurrentDate}]gibt das aktuelle Datum aus. Ohne Argument gibt dieser Formatierer das aktuelle Datum im Format ">JJJJ.MM.TT HH:MM:SS Z"< (Datum, Zeit und Zeitzone) aus. Mit einem anderen Format-String als Argument kann das Datum angepasst werden. So ergibt \lstinline{\format[CurrentDate]}\texttt{\{}\lstinline{yyyy.MM.dd}\texttt{\}} nur das Datum, z.\,B. ">2005.11.30"<.
+\item [\texttt{CurrentDate}]gibt das aktuelle Datum aus. Ohne Argument gibt dieser Formatierer 
+       das aktuelle Datum im Format ">JJJJ.MM.TT HH:MM:SS Z"< (Datum, Zeit und Zeitzone) aus.
+       Mit einem anderen Format-String als Argument kann das Datum angepasst werden. So ergibt
+       \lstinline{\format[CurrentDate]}\texttt{\{}\lstinline{yyyy.MM.dd}\texttt{\}} nur das 
+       Datum, z.\,B. ">2005.11.30"<.
 \item [\texttt{AuthorFirstFirst}]formatiert die Felder \emph{author}/\emph{editor}
-mit den Vornamen zuerst.
-\item [\texttt{AuthorFirstFirstCommas}]formatiert die Felder \emph{author}/\emph{editor}
-mit den Vornamen zuerst und abgetrennt durch Kommas.
-\item [\texttt{AuthorFirstAbbrLastCommas}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorFirstAbbrLastOxfordCommas}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorFirstLastOxfordCommas}]\emph{Dokumentation folgt.}
+       mit den Vornamen zuerst.
+\item [\texttt{AuthorFirstFirstCommas} oder \texttt{AuthorFirstLastCommas}]formatiert die Felder
+       \emph{author}/\emph{editor} mit den Vornamen zuerst und abgetrennt durch Kommas.
+\item [\texttt{AuthorFirstLastOxfordCommas}] ist ähnlich wie \lstinline{AuthorFirstLastCommas}, 
+       außer dass das ">and"< zwischen den letzten beiden Namen durch ein Komma eingeleitet
+       wird.
+\item [\texttt{AuthorFirstAbbrLastCommas}]formatiert die
+       Felder \emph{author}/\emph{editor} mit abgekürzten Vornamen, abgetrennt durch
+       Kommas, mit einem ">and"< zwischen den letzten beiden Namen.
+\item [\texttt{AuthorFirstAbbrLastOxfordCommas}]ähnlich wie \texttt{AuthorFirstAbbrLastCommas}, 
+       außer dass das ">and"< zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
 \item [\texttt{AuthorLastFirst}]formatiert die Felder \emph{author}/\emph{editor}
-mit den Nachnamen zuerst.
+       mit den Nachnamen zuerst.
 \item [\texttt{AuthorLastFirstAbbreviator}]kürzt die Vornamen aller Autoren.
-Dieser Formatierer kann nur angewendet werden, wenn \texttt{AuthorLastFirst}
-bereits benutzt wurde.
-\item [\texttt{AuthorLastFirstCommas}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorLastFirstOxfordCommas}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorLastFirstAbbrCommas}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorLastFirstAbbrOxfordCommas}]\emph{Dokumentation folgt.}
+       Dieser Formatierer kann nur angewendet werden, wenn \texttt{AuthorLastFirst}
+       bereits benutzt wurde.
+\item [\texttt{AuthorLastFirstCommas}]formatiert die Felder
+       \emph{author}/\emph{editor} mit den Nachnamen zuerst, abgetrennt durch Kommas,
+       mit einem ">and"< zwischen den letzten beiden Namen.
+\item [\texttt{AuthorLastFirstOxfordCommas}]ähnlich wie
+        \texttt{AuthorLastFirstCommas}, außer dass das ">and"<
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
+\item [\texttt{AuthorLastFirstAbbrCommas}]formatiert die Felder
+        \emph{author}/\emph{editor} mit Nachnamen zuerst und abgekürzten Vornamen,
+        abgetrennt durch Kommas, mit einem ">and"< zwischen den letzten
+        beiden Namen.
+\item [\texttt{AuthorLastFirstAbbrOxfordCommas}]ähnlich wie
+        \texttt{AuthorLastFirstAbbrCommas}, außer dass das ">and"<
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
 \item [\texttt{AuthorAndsReplacer}]ersetzt >>and<< zwischen den Namen
-durch >>;<<, zwischen den letzten beiden Autoren steht >>\&<<.
+       durch >>;<<, zwischen den letzten beiden Autoren steht >>\&<<.
 \item [\texttt{AuthorAndsCommaReplacer}]ersetzt >>and<< zwischen den
-Namen durch ein Komma (,) sowie >>\&<< zwischen den beiden letzten.
-\item [\texttt{AuthorOrgSci}]Der erste Autor erscheint als "Nachname, Vorname", alle anderen als "Vorname Nachname". Vornamen werden abgekürzt.
+       Namen durch ein Komma (,) sowie >>\&<< zwischen den beiden letzten.
+\item [\texttt{AuthorOrgSci}]Der erste Autor erscheint als "Nachname, Vorname", 
+       alle anderen als "Vorname Nachname". Vornamen werden abgekürzt.
 \item [\texttt{AuthorAbbreviator}]\emph{Dokumentation folgt.}
-\item [\texttt{AuthorNatBib}]formatiert Autorennamen im Natbib-Stil, also nur mit Nachnamen; zwei Autoren werden durch ein ">and"< voneinander getrennt, bei mehr als zwei Autoren wird der erste angegeben, gefolgt von ">et al."<
-\item [\texttt{NoSpaceBetweenAbbreviations}]Leerzeichen zwischen mehreren abgekürzten Vornamen werden gelöscht.
+\item [\texttt{AuthorNatBib}]formatiert Autorennamen im Natbib-Stil, also nur mit Nachnamen;
+       zwei Autoren werden durch ein ">and"< voneinander getrennt, bei mehr als zwei 
+       Autoren wird der erste angegeben, gefolgt von ">et al."<
+\item [\texttt{NoSpaceBetweenAbbreviations}]Leerzeichen zwischen mehreren abgekürzten 
+       Vornamen werden gelöscht.
+\item [\texttt{FileLink(Dateityp)}] Wenn kein Argument angegeben
+        wird, gibt dieser Formatierer den ersten externen Dateityp aus, der
+        in dem Feld ">file"< angegeben ist. Dieser Formatierer nimmt den Namen 
+        eines Dateityps als optionales
+        Argument, das in Klammern nach dem Namen des Formatierers angegeben
+        wird. So wird etwa mit \texttt{\textbackslash format[FileLink(pdf)]\{%
+        \textbackslash file\}}
+        der Dateityp \lstinline{pdf} als Argument angegeben. Wenn ein Argument
+        mitgegeben wird, wählt der Formatierer den ersten Dateilink des
+        entsprechenden Typs. Im Beispiel wird der Pfad zum ersten PDF"=Link
+        ausgegeben.
 \item [\texttt{FormatPagesForHTML}]ersetzt >>\texttt{-{}-}<< durch >>\texttt{-}<<.
 \item [\texttt{FormatPagesForXML}]ersetzt >>\texttt{-{}-}<< durch einen
-XML en-dash (>>--<<).
+       XML en-dash (>>--<<).
+\item [\texttt{Replace(regexp,ersetzedurch)}]führt eine Ersetzung
+       mit einem Regulären Ausdruck durch. Um diesen Formatierer zu
+       benutzen, muss ein zweiteiliges Argument mitgegeben werden. Die Teile
+       werden durch ein Komma getrennt. Will man ein Komma ausgeben lassen,
+       muss man es maskieren (\lstinline{\,}).
+       Der erste Teil ist der Reguläre Ausdruck, nach dem gesucht wird.
+       Er wird normal geschrieben, ohne Backslashes (\lstinline{\}) zu maskieren.\footnote{%
+       Eine Beschreibung von Regulären Ausdrücken ist hier zu finden:
+       \url{http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html}.}
+       Der zweite Teil ist der Text, der für alle Treffer eingesetzt werden soll.
 \item [\texttt{RemoveBrackets}]entfernt alle geschweiften Klammern (>>\{<<
-und >>\}<<).
+       und >>\}<<).
 \item [\texttt{RemoveBracketsAddComma}]\emph{Dokumentation folgt.}
-\item [\texttt{RemoveWhitespace}]\emph{Dokumentation folgt.}
-\item [\texttt{RemoveLatexCommands}]entfernt \LaTeX{} Kommandos wie \texttt{\textbackslash{}em},
-\texttt{\textbackslash{}textbf} etc. Zusammen mit \texttt{HTMLChars}
-oder \texttt{XMLChars} sollte dieser Formatierer zuletzt aufgerufen
-werden.
-\item [\texttt{RemoveTilde}]ersetzt das Tilde-Zeichen (\lstinline{~}), das in \LaTeX\ als festes Leerzeichen dient, durch ein normales Leerzeichen. Nützlich in Kombination mit dem Namens"=Formatierer (siehe Abschnitt \nameref{NameFormatter}).
+\item [\texttt{RemoveWhitespace}]löscht alle Leerzeichen.
+\item [\texttt{RemoveLatexCommands}]entfernt \LaTeX-Befehle wie \lstinline{\emph},
+       \lstinline{\textbf} etc. Zusammen mit \texttt{HTMLChars}
+       oder \texttt{XMLChars} sollte dieser Formatierer zuletzt aufgerufen
+       werden.
+\item [\texttt{RemoveTilde}]ersetzt das Tilde-Zeichen (\lstinline{~}), das in \LaTeX\ als festes
+       Leerzeichen dient, durch ein normales Leerzeichen. Nützlich in Kombination mit dem
+       Namens"=Formatierer (siehe Abschnitt \nameref{NameFormatter}).
 \item [\texttt{ToLowerCase}]macht aus allen Buchstaben Kleinbuchstaben.
-\item [\texttt{CompositeFormat}]\emph{Dokumentation folgt.}
-\item [\texttt{GetOpenOfficeType}]\emph{Dokumentation folgt.}
-\item [\texttt{RTFChars}]\emph{Dokumentation folgt.}
-\item [\texttt{ResolvePDF}]\emph{Dokumentation folgt.}
+\item [\texttt{ToUpperCase}]macht aus allen Buchstaben Großbuchstaben.
+\item [\texttt{GetOpenOfficeType}]gibt die Nummer wieder,
+        die vom bibliographischen System von OpenOffice.org (Versionen
+        1.x und 2.x) benutzt wird, um den Typ dieses Eintrags zu
+        bezeichnen.
+\item [\texttt{RTFChars}]ersetzt alle \TeX-spezifischen
+        Sonderzeichen (z.B. \texttt{\{\textbackslash\^{}a\}} oder 
+        \texttt{\{\textbackslash \textquotedbl\{o\}\}}) durch ihre
+        RTF"=Entsprechung und übersetzt \LaTeX-Befehle wie \lstinline{\emph}, 
+        \lstinline{\textit}, \lstinline{\textbf} in ihre RTF"=Entsprechungen.
 \end{labeling}
 Falls keiner der verfügbaren Formatierer das Ergebnis erzielt, das
 Sie erreichen möchten, können Sie Ihren eigenen Formatierer hinzufügen,
@@ -2570,7 +2625,7 @@ mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
 muss der Formatierer in ihrem classpath sein, wenn Sie \jabref
 starten.
 
-\paragraph{Eigene Namens"=Formatierer verwenden}
+\paragraph{Eigene \texorpdfstring{Namens"=Formatierer}{Namens-Formatierer} verwenden}
 \label{NameFormatter}
 
 Mit \jabref~2.2 ist es jetzt möglich, eigene Namens"=Formatierer zu definieren. Dazu wird die Syntax der Bibliographie"=Stile (bst) verwendet. Das erlaubt äußerste Flexibilität, ist allerdings aufwändig in der Schreibweise.
@@ -3036,8 +3091,9 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
-\item Abschnitt ">\nameref{Export-OOo}"< aktualisiert
+\item Abschnitte ">\nameref{Export-OOo}"< und ">\nameref{CustomExports}"< aktualisiert
 \item Abschnitte ">\nameref{search-regular-expressions}"< und ">\nameref{kommandozeilenoptionen}"< ergänzt
+\item Versionsnummer (2.4) angepasst
 \item Kleinere Änderungen
 \end{revhist}
 
