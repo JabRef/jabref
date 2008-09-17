@@ -7,9 +7,7 @@ import net.sf.jabref.net.URLDownload;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.net.URLConnection;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -33,6 +31,7 @@ public class FindFullText {
 
     public FindFullText() {
         finders.add(new ScienceDirectPdfDownload());
+        finders.add(new SpringerLinkPdfDownload());
     }
 
     public FindResult findFullText(BibtexEntry entry) {
@@ -64,7 +63,6 @@ public class FindFullText {
     }
 
     private FindResult lookForFullTextAtURL(String urlText) {
-        String pageText = null;
         try {
             URL url = new URL(urlText);
             url = resolveRedirects(url, 0);
@@ -72,14 +70,9 @@ public class FindFullText {
             for (FullTextFinder finder : finders) {
                 if (finder.supportsSite(url)) {
                     domainKnown = true;
-                    if (pageText == null)
-                        try {
-                            pageText = loadPage(url);
-                        } catch (IOException ex) {
-                            return new FindResult(IO_EXCEPTION, url);
-                        }
-                    URL result = finder.findFullTextURL(url, pageText);
+                    URL result = finder.findFullTextURL(url);
                     if (result != null) {
+                        
                         // Check the MIME type of this URL to see if it is a PDF. If not,
                         // it could be because the user doesn't have access:
                         try {
@@ -91,6 +84,8 @@ public class FindFullText {
                                 return new FindResult(result, url);
                             }
                             else {
+                                udl = new URLDownload(null, result, new File("page.html"));
+                                udl.download();
                                 return new FindResult(WRONG_MIME_TYPE, url);
                             }
                         } catch (IOException ex) {
@@ -109,7 +104,7 @@ public class FindFullText {
             e.printStackTrace();
 
         } catch (IOException e) {
-
+          e.printStackTrace();
         }
 
         return null;
@@ -122,7 +117,7 @@ public class FindFullText {
      * @param url The url to start with.
      * @param redirectCount The number of previous redirects. We will follow a maximum of 5 redirects.
      * @return the final URL, or the initial one in case there is no redirect.
-     * @throws IOException
+     * @throws IOException for connection error
      */
     private URL resolveRedirects(URL url, int redirectCount) throws IOException {
         URLConnection uc = url.openConnection();
@@ -134,8 +129,17 @@ public class FindFullText {
             String location = huc.getHeaderField("location");
             huc.disconnect();
             if ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP) && (redirectCount < 5)) {
-                System.out.println(location);
-                return resolveRedirects(new URL(location), redirectCount+1);
+                //System.out.println(responseCode);
+                //System.out.println(location);
+                try {
+                    URL newUrl = new URL(location);
+                    return resolveRedirects(newUrl, redirectCount+1);
+                } catch (MalformedURLException ex) {
+                    return url; // take the previous one, since this one didn't make sense.
+                    // TODO: this could be caused by location being a relative link, but this would just give
+                    // the default page in the case of www.springerlink.com, not the article page. Don't know why.
+                }
+
             }
             else return url;
 
@@ -143,17 +147,31 @@ public class FindFullText {
         else return url;
     }
 
-    public String loadPage(URL url) throws IOException {
+    public static String loadPage(URL url) throws IOException {
         Reader in = null;
+        URLConnection uc;
+        HttpURLConnection huc = null;
         try {
-            in = new InputStreamReader(url.openStream());
-            StringBuilder sb = new StringBuilder();
-            int c;
-            while ((c = in.read()) != -1)
-                sb.append((char)c);
-            return sb.toString();
+            uc = url.openConnection();
+            if (uc instanceof HttpURLConnection) {
+                huc = (HttpURLConnection)uc;
+                huc.setInstanceFollowRedirects(false);
+                huc.connect();
+
+                in = new InputStreamReader(huc.getInputStream());
+                StringBuilder sb = new StringBuilder();
+                int c;
+                while ((c = in.read()) != -1)
+                    sb.append((char)c);
+                return sb.toString();
+            }
+            else
+                return null; // TODO: are other types of connection (https?) relevant?
         } finally {
-            try { if (in != null) in.close(); } catch (IOException ex) { ex.printStackTrace(); }
+            try {
+                if (in != null) in.close();
+                if (huc != null) huc.disconnect();
+            } catch (IOException ex) { ex.printStackTrace(); }
         }
 
     }
@@ -173,5 +191,17 @@ public class FindFullText {
             this.status = status;
             this.host = originalUrl.getHost();
         }
+    }
+
+
+    public static void dumpToFile(String text, File f) {
+         try {
+             FileWriter fw = new FileWriter(f);
+             fw.write(text);
+             fw.close();
+         } catch (IOException e) {
+             e.printStackTrace();
+
+         }
     }
 }

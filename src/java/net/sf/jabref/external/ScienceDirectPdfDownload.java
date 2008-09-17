@@ -2,10 +2,7 @@ package net.sf.jabref.external;
 
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.io.StringReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
 
 /**
  * FullTextFinder implementation that attempts to find PDF url from a Sciencedirect article page.
@@ -24,7 +21,8 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
 
 
 
-    public URL findFullTextURL(URL url, String pageSource) {
+    public URL findFullTextURL(URL url) throws IOException {
+        String pageSource = FindFullText.loadPage(url);
         //System.out.println(pageSource);
         int index = pageSource.indexOf("PDF (");
         //System.out.println(index);
@@ -37,10 +35,8 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
                 int endIndex = leading.indexOf("\"", index+9);
 
                 try {
-                    // System.out.println(leading.substring(index+9, endIndex));
-                    URL pdfUrl = new URL(/*BASE_URL+*/leading.substring(index+9, endIndex));
-                    //System.out.println(pdfUrl.toString());
-                    return pdfUrl;
+                    return new URL(/*BASE_URL+*/leading.substring(index+9, endIndex));
+                    
                 } catch (MalformedURLException e) {
                     return null;
                 }

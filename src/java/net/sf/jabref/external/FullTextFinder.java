@@ -1,6 +1,7 @@
 package net.sf.jabref.external;
 
 import java.net.URL;
+import java.io.IOException;
 
 /**
  * This interface is used for classes that try to resolve a full-text PDF url from an article
@@ -11,6 +12,7 @@ public interface FullTextFinder {
     /**
      * Report whether this FullTextFinder works for the site providing the given URL.
      *
+     * @param url The url to check.
      * @return true if the site is supported, false otherwise. If the site might be supported,
      *   it is best to return true.
      */
@@ -21,8 +23,8 @@ public interface FullTextFinder {
      * full text for this article.
      *
      * @param url The URL to the article's web page.
-     * @param pageSource The contents of the article's web page.
      * @return The fulltext PDF URL, if found, or null if not found.
+     * @throws java.io.IOException
      */
-    public URL findFullTextURL(URL url, String pageSource);
+    public URL findFullTextURL(URL url) throws IOException;
 }
