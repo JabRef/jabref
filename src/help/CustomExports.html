@@ -138,6 +138,11 @@
     which depend on the others:</p>
 
     <ul>
+
+        <li><code>FormatChars</code> : replaces TeX-specific special
+        characters (e.g. {\^a} or {\"{o}}) with their Unicode
+        representations.</li>
+
         <li><code>HTMLChars</code> : replaces TeX-specific special
         characters (e.g. {\^a} or {\"{o}}) with their HTML
         representations, and translates LaTeX commands \emph, \textit,
@@ -244,6 +249,14 @@
 
         <li><code>FormatPagesForXML</code> : replaces "--" with an
         XML en-dash.</li>
+
+        <li><code>FirstPage</code> : returns the first page from the "pages" field, if set.
+            For instance, if the pages field is set to "345-360" or "345--360",
+            this formatter will return "345".</li>
+
+        <li><code>LastPage</code> : returns the last page from the "pages" field, if set.
+            For instance, if the pages field is set to "345-360" or "345--360",
+            this formatter will return "360".</li>
 
     <li><code>Replace(regexp,replacewith)</code> : does a regular expression replacement.
         To use this formatter, a two-part argument must be given. The parts are
