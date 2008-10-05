@@ -158,6 +158,11 @@
 
 
     <ul>
+        <li><code>FormatChars</code>&nbsp;: remplace les 
+        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
+        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
+        repr&eacute;sentation Unicode.</li>
+
         <li><code>HTMLChars</code>&nbsp;: remplace les
         caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
         &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
@@ -261,11 +266,11 @@
         le premier nom suivi de "et al." s'il y en a plus de
         deux.</li>
 
-        <li><code>NoSpaceBetweenAbbreviations</code> : Les espaces
+        <li><code>NoSpaceBetweenAbbreviations</code>&nbsp;: Les espaces
         entre les initiales des pr&eacute;noms sont
         supprim&eacute;s.</li>
 
-        <li><code>FileLink(TypeDeFichier)</code> : sans argument, ce formateur renvoie
+        <li><code>FileLink(TypeDeFichier)</code>&nbsp;: sans argument, ce formateur renvoie
         le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
         &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).
         <p>Ce formateur prend comme argument optionnel l'extension du type de fichier externe
@@ -281,6 +286,14 @@
         <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par
         un tiret XML.</li>
 
+        <li><code>FirstPage</code>&nbsp;: renvoie la premi&egrave;re page du champ "pages", si initialis&eacute;.
+        Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
+        ce formatteur renverra "345".</li>
+
+        <li><code>LastPage</code>&nbsp;: renvoie la derni&egrave;re page du champ "pages", si initialis&eacute;.
+        Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
+        ce formatteur renverra "360".</li>
+        
         <li><code>Replace(ExpReg,RemplaceAvec)</code>&nbsp;: effectue le remplacement d'une expression r&eacute;guli&egrave;re.
         Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni. Les parties sont
         s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
