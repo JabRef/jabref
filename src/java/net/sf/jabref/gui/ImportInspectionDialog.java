@@ -21,7 +21,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -405,7 +422,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
      * Removes all selected entries from the table. Synchronizes on this.entries
      * to prevent conflict with addition of new entries.
      */
-    @SuppressWarnings("unchecked")
     public void removeSelectedEntries() {
         int row = glTable.getSelectedRow();
         List<Object> toRemove = new ArrayList<Object>();

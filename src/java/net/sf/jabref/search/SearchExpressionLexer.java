@@ -22,7 +22,7 @@ import antlr.TokenStreamIOException;
 import antlr.TokenStreamRecognitionException;
 import antlr.collections.impl.BitSet;
 
-@SuppressWarnings({"unchecked", "unused", "null"})
+@SuppressWarnings({"unchecked", "unused"})
 public class SearchExpressionLexer extends antlr.CharScanner implements SearchExpressionLexerTokenTypes, TokenStream
  {
 public SearchExpressionLexer(InputStream in) {

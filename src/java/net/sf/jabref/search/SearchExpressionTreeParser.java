@@ -11,7 +11,7 @@ import antlr.NoViableAltException;
 import antlr.RecognitionException;
 import antlr.collections.AST;
 
-@SuppressWarnings({"unchecked", "unused", "null"})
+@SuppressWarnings({"unused"})
 public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes
  {
 

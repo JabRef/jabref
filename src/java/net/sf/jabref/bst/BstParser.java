@@ -16,7 +16,7 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.antlr.runtime.tree.TreeAdaptor;
 
-@SuppressWarnings({"unused", "unchecked", "null"})
+@SuppressWarnings({"unused", "unchecked"})
 public class BstParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "IDLIST", "STACK", "ENTRY", "COMMANDS", "STRINGS", "INTEGERS", "FUNCTION", "MACRO", "STRING", "READ", "EXECUTE", "ITERATE", "REVERSE", "SORT", "IDENTIFIER", "INTEGER", "QUOTED", "LETTER", "NUMERAL", "WS", "LINE_COMMENT", "'{'", "'}'", "'<'", "'>'", "'='", "'+'", "'-'", "':='", "'*'"
@@ -173,7 +173,6 @@ public class BstParser extends Parser {
 
     // $ANTLR start commands
     // Bst.g:16:1: commands : ( STRINGS^^ idList | INTEGERS^^ idList | FUNCTION^^ id stack | MACRO^^ id '{'! STRING '}'! | READ^^ | EXECUTE^^ '{'! function '}'! | ITERATE^^ '{'! function '}'! | REVERSE^^ '{'! function '}'! | ENTRY^^ idList0 idList0 idList0 | SORT^^ );
-    @SuppressWarnings("unused")
     public commands_return commands() throws RecognitionException {   
         commands_return retval = new commands_return();
         retval.start = input.LT(1);

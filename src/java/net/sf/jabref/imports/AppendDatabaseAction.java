@@ -8,7 +8,17 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BaseAction;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.MergeDialog;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.ExplicitGroup;
@@ -86,7 +96,6 @@ public class AppendDatabaseAction extends BaseAction {
         }
     }
 
-    @SuppressWarnings("unchecked")
 	public static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
                                 boolean importEntries, boolean importStrings,
                                 boolean importGroups, boolean importSelectorWords)

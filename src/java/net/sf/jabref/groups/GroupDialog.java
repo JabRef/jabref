@@ -26,7 +26,11 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -35,18 +39,33 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.FieldContentSelector;
+import net.sf.jabref.FieldTextField;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -246,7 +265,7 @@ class GroupDialog extends JDialog {
                 builderAll.appendSeparator();
                 builderAll.nextLine();
                 builderAll.nextLine();
-                CellConstraints cc = new CellConstraints();
+                //CellConstraints cc = new CellConstraints();
                 //builderAll.add(builderBP.getPanel(), cc.xyw(builderAll.getColumn(),
                 //                builderAll.getRow(), 5, "center, fill"));
 

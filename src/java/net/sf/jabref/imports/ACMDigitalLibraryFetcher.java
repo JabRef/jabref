@@ -6,24 +6,31 @@
 package net.sf.jabref.imports;
 
 //import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.ImportInspectionDialog;
-//import net.sf.jabref.journals.JournalAbbreviations;
-
-import javax.swing.*;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.awt.BorderLayout;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
-import java.io.*;
-//import java.text.NumberFormat;
-//import java.text.ParseException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
-import java.util.ArrayList;
-import java.awt.*;
-//import java.awt.event.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -226,8 +233,8 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
 				BufferedReader in = new BufferedReader(new InputStreamReader(bibtexUrl.openStream()));
 				ParserResult result = BibtexParser.parse(in);
 				in.close();
-				Collection item = result.getDatabase().getEntries();
-				BibtexEntry entry = (BibtexEntry)item.iterator().next();
+				Collection<BibtexEntry> item = result.getDatabase().getEntries();
+				BibtexEntry entry = item.iterator().next();
 				if (abs == true) {
 					Matcher absMatch = absPattern.matcher(page);
 					if (absMatch.find()) {
