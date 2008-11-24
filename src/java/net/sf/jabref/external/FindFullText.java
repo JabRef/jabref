@@ -1,17 +1,20 @@
 package net.sf.jabref.external;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.net.URLDownload;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
-import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
-
-import sun.net.www.protocol.http.HttpURLConnection;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
