@@ -30,7 +30,7 @@ public class PluginBasedExportFormat extends ExportFormat {
 		String displayName = extension.getDisplayName();
 		String layoutFilename = extension.getLayoutFilename();
 		String fileExtension = extension.getExtension();
-
+        String encoding = extension.getEncoding();
 		if ("".equals(fileExtension) || "".equals(displayName)
 			|| "".equals(consoleName) || "".equals(layoutFilename)) {
 			Globals.logger("Could not load extension " + extension.getId());
@@ -38,13 +38,16 @@ public class PluginBasedExportFormat extends ExportFormat {
 		}
 
 		return new PluginBasedExportFormat(displayName, consoleName,
-			layoutFilename, fileExtension, extension);
+			layoutFilename, fileExtension, encoding, extension);
 	}
 
 	public PluginBasedExportFormat(String displayName, String consoleName,
-		String layoutFileName, String fileExtension,
+		String layoutFileName, String fileExtension, String encoding,
 		ExportFormatTemplateExtension extension) {
 		super(displayName, consoleName, layoutFileName, null, fileExtension);
+        // Set the overriding encoding, if the plugin supplied one:
+        if (encoding != null)
+            setEncoding(encoding);
 		this.extension = extension;
 	}
 

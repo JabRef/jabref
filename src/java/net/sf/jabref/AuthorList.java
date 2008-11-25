@@ -385,9 +385,16 @@ public class AuthorList {
 			if (von_start < 0) { // no 'von part'
 				last_part_end = tokens.size();
 				last_part_start = tokens.size() - TOKEN_GROUP_LENGTH;
+				int index = tokens.size() - 2 * TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
+				if (index > 0) {
+					Character ch = (Character)tokens.elementAt(index);
+					if (ch.charValue() == '-')
+						last_part_start -= TOKEN_GROUP_LENGTH;
+				}
 				first_part_end = last_part_start;
-				if (first_part_end > 0)
+				if (first_part_end > 0) {
 					first_part_start = 0;
+				}
 			} else { // 'von part' is present
 				if (last_start >= 0) {
 					last_part_end = tokens.size();
@@ -429,6 +436,17 @@ public class AuthorList {
 				von_part_start = 0;
 			}
 		}
+
+        if ((first_part_start == -1) && (last_part_start == -1) && (von_part_start != -1)) {
+            // There is no first or last name, but we have a von part. This is likely
+            // to indicate a single-entry name without an initial capital letter, such
+            // as "unknown".
+            // We make the von part the last name, to facilitate handling by last-name formatters:
+            last_part_start = von_part_start;
+            last_part_end = von_part_end;
+            von_part_start = -1;
+            von_part_end = -1;
+        }
 
 		// Third step: do actual splitting, construct Author object
 		return new Author((first_part_start < 0 ? null : concatTokens(first_part_start,
@@ -552,12 +570,13 @@ public class AuthorList {
 			if (c == '\\')
 				current_backslash = token_end;
 			if (braces_level == 0)
-				if (c == ',' || c == '~' || /* c=='-' || */Character.isWhitespace(c))
+				if (c == ',' || c == '~' || c=='-' || Character.isWhitespace(c))
 					break;
 			// Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to
 			// prevent
 			// problems with names like Bailey-Jones getting broken up and
 			// sorted wrong.
+			// Aaron Chen 14 Sep 2008: Enable hyphen check for first names like Chang-Chin
 			token_end++;
 		}
 		if (token_abbr < 0)
@@ -643,7 +662,6 @@ public class AuthorList {
 	 * @return formatted list of authors.
 	 */
 	public String getAuthorsLastOnly(boolean oxfordComma) {
-
 		int abbrInt = (oxfordComma ? 0 : 1);
 
 		// Check if we've computed this before:
@@ -744,7 +762,6 @@ public class AuthorList {
 	 * @return formatted list of authors.
 	 */
 	public String getAuthorsLastFirstAnds(boolean abbreviate) {
-
 		int abbrInt = (abbreviate ? 0 : 1);
 		// Check if we've computed this before:
 		if (authorLastFirstAnds[abbrInt] != null)
@@ -1001,7 +1018,7 @@ public class AuthorList {
 		 * @return last name of the author (may consist of several tokens)
 		 */
 		public String getLast() {
-			return last_part;
+            return last_part;
 		}
 
 		/**

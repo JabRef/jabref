@@ -43,7 +43,7 @@ public class RightClickMenu extends JPopupMenu
     MetaData metaData;
     JMenu groupAddMenu = new JMenu(Globals.lang("Add to group")),
         groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
-        groupMoveMenu = new JMenu("Assign exclusively to group"), // JZTODO lyrics
+        groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")), // JZTODO lyrics
         typeMenu = new JMenu(Globals.lang("Change entry type"));
     JCheckBoxMenuItem
         floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),

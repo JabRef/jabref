@@ -31,15 +31,28 @@ import java.awt.Color;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.CannotUndoException;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
 	protected String fieldName;
-
 	protected JLabel label;
+
+    //protected UndoManager undo = new UndoManager();
+
 
 	public FieldTextField(String fieldName_, String content, boolean changeColorOnFocus) {
 		super(content);
+
+        // Listen for undo and redo events
+        /*getDocument().addUndoableEditListener(new UndoableEditListener() {
+            public void undoableEditHappened(UndoableEditEvent evt) {
+                undo.addEdit(evt.getEdit());
+            }
+        });*/
 
         updateFont();
 
@@ -65,7 +78,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
 		label.addMouseListener(popMenu);
 	}
 
-	public void append(String text) {
+    public void append(String text) {
 		setText(getText() + text);
 	}
 
@@ -111,4 +124,35 @@ public class FieldTextField extends JTextField implements FieldEditor {
 		replaceSelection(textToInsert);
 	}
 
+
+    public boolean hasUndoInformation() {
+        return false;//undo.canUndo();
+    }
+
+    public void undo() {
+        /*try {
+            if (undo.canUndo()) {
+                undo.undo();
+            }
+        } catch (CannotUndoException e) {
+        }*/
+    }
+
+    public boolean hasRedoInformation() {
+        return false;//undo.canRedo();
+    }
+
+    public void redo() {
+        /*try {
+            if (undo.canRedo()) {
+                undo.redo();
+            }
+        } catch (CannotUndoException e) {
+        }*/
+
+    }
+
+    public void addUndoableEditListener(UndoableEditListener listener) {
+        getDocument().addUndoableEditListener(listener);
+    }
 }

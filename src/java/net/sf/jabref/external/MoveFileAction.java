@@ -41,7 +41,15 @@ public class MoveFileAction extends AbstractAction {
 
         // Get an absolute path representation:
         String dir = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-        File file = Util.expandFilename(ln, new String[]{dir});
+        if ((dir == null) || (dir.trim().length() == 0) || !(new File(dir)).exists()) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("File_directory_is_not_set_or_does_not_exist!"),
+                    Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        File file = new File(ln);
+        if (!file.isAbsolute()) {
+            file = Util.expandFilename(ln, new String[]{dir});
+        }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;

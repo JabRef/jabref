@@ -48,11 +48,13 @@ public class RisImporter extends ImportFormat {
         pat2 = Pattern.compile("A1  - .*"),
         pat3 = Pattern.compile("A2  - .*");
 
+
     String str;
     while ((str = in.readLine()) != null){
         if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find())
             return true;
     }
+
     return false;
     }
 
@@ -71,11 +73,15 @@ public class RisImporter extends ImportFormat {
     }
     String[] entries = sb.toString().split("ER  -");
 
+    for (int i = 0; i < entries.length; i++){
 
-    for (int i = 0; i < entries.length - 1; i++){
+        if (entries[i].trim().length() == 0)
+            continue;
+        
             String type = "", author = "", editor = "", startPage = "", endPage = "",
                 comment = "";
             HashMap<String, String> hm = new HashMap<String, String>();
+
 
         String[] fields = entries[i].split("\n");
 
@@ -114,16 +120,12 @@ public class RisImporter extends ImportFormat {
             else if (lab.equals("T2") || lab.equals("T3") || lab.equals("BT")) {
                 hm.put("booktitle", val);
             }
-            else if (lab.equals("AU")){
+            else if (lab.equals("AU") || lab.equals("A1")) {
                 if (author.equals("")) // don't add " and " for the first author
                     author = val;
                 else author += " and " + val;
             }
-	        else if (lab.equals("A1")){
-	           	if (!author.equals(""))
-	           		author = val;
-	        }
-            else if (lab.equals("A2")){
+	        else if (lab.equals("A2")){
                 if (editor.equals("")) // don't add " and " for the first editor
                     editor = val;
                 else editor += " and " + val;
@@ -136,8 +138,12 @@ public class RisImporter extends ImportFormat {
             }
 
             else if (lab.equals("SP")) startPage = val;
-            else if (lab.equals("PB"))
-                hm.put("publisher", val);
+            else if (lab.equals("PB")) {
+                if (type.equals("phdthesis"))
+                    hm.put("school", val);
+                else
+                    hm.put("publisher", val);
+            }
             else if (lab.equals("AD") || lab.equals("CY"))
                 hm.put("address", val);
             else if (lab.equals("EP")) endPage = val;

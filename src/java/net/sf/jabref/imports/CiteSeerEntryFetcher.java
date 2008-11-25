@@ -111,7 +111,7 @@ public class CiteSeerEntryFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return "Fetch CiteSeer by ID";
+        return Globals.menuTitle("Fetch CiteSeer by ID");
     }
 
     public void stopFetching() {

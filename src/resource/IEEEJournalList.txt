@@ -21,6 +21,7 @@ IEEE Transactions on Vehicular Communications=#IEEE_J_VC#
 
 circuits, signals, systems, audio and controls
 IEEE Signal Processing Letters=#IEEE_J_SPL#
+IEEE Transactions on Acoustics, Speech and Signal Processing=#IEEE_J_ASSP#
 IEEE Transactions on Acoustics, Speech, and Signal Processing=#IEEE_J_ASSP#
 IEEE Transactions on Audio=#IEEE_J_AU#
 IEEE Transactions on Audio and Electroacoustics=#IEEE_J_AUEA#
@@ -37,6 +38,8 @@ IEEE Transactions on Control Systems Technology=#IEEE_J_CST#
 IEEE Transactions on Signal Processing=#IEEE_J_SP#
 IEEE Transactions on Sonics and Ultrasonics=#IEEE_J_SU#
 IEEE Transactions on Speech and Audio Processing=#IEEE_J_SAP#
+IEEE Journal of Selected Topics in Signal Processing=#IEEE_J_STSP#
+IEEE Systems Journal=#IEEE_J_SYST#
 IEEE Transactions on Ultrasonics Engineering=#IEEE_J_UE#
 Aaron Chen: "," missing
 IEEE Transactions on Ultrasonics, Ferroelectrics and Frequency Control=#IEEE_J_UFFC#
@@ -94,7 +97,9 @@ IEEE Transactions on Information Forensics and Security=#IEEE_J_IFS#
 IEEE Transactions on Mobile Computing=#IEEE_J_MC#
 IEEE/ACM Transactions on Networking=#IEEE_J_NET#
 IEEE Transactions on Neural Networks=#IEEE_J_NN#
+IEEE Transactions on Network and Service Management=#IEEE_J_NSM#
 IEEE Transactions on Parallel and Distributed Systems=#IEEE_J_PDS#
+IEEE Transactions on Services Computing=#IEEE_J_SC#
 IEEE Transactions on Software Engineering=#IEEE_J_SE#
 
 
@@ -110,6 +115,7 @@ IEEE Transactions on Visualization and Computer Graphics=#IEEE_J_VCG#
 cybernetics, ergonomics, robots, man-machine, and automation
 IEEE Transactions on Automation Science and Engineering=#IEEE_J_ASE#
 IEEE Journal of Robotics and Automation=#IEEE_J_JRA#
+IEEE Transactions on Haptics=#IEEE_J_H#
 IEEE Transactions on Human Factors in Electronics=#IEEE_J_HFE#
 IEEE Transactions on Man-Machine Systems=#IEEE_J_MMS#
 IEEE Transactions on Pattern Analysis and Machine Intelligence=#IEEE_J_PAMI#
@@ -132,6 +138,7 @@ IEEE Transactions on Geoscience Electronics=#IEEE_J_GE#
 IEEE Transactions on Geoscience and Remote Sensing=#IEEE_J_GRS#
 IEEE Geoscience and Remote Sensing Letters=#IEEE_J_GRSL#
 IEEE Journal of Oceanic Engineering=#IEEE_J_OE#
+IEEE Journal of Selected Topics on Applied Observations and Remote Sensing=#IEEE_J_STARS#
 
 
 
@@ -141,6 +148,7 @@ Proceedings of the IEEE=#IEEE_J_PROC#
 IEEE Transactions on Education=#IEEE_J_EDU#
 IEEE Transactions on Engineering Management=#IEEE_J_EM#
 IEEE Transactions on Engineering Writing and Speech=#IEEE_J_EWS#
+IEEE Transactions on Learning Technologies=#IEEE_J_LT#
 IEEE Transactions on Professional Communication=#IEEE_J_PC#
 
 
@@ -203,6 +211,7 @@ Journal of Microelectromechanical Systems=#IEEE_J_MEMS#
 
 
 medical and biological
+IEEE Transactions on Biomedical Circuits and Systems=#IEEE_J_BCAS#
 IEEE Transactions on Biomedical Engineering=#IEEE_J_BME#
 Note: The B-ME journal later dropped the hyphen and became the BME.
 IEEE Transactions on Bio-Medical Engineering=#IEEE_J_B-ME#
@@ -213,6 +222,7 @@ IEEE Transactions on Medical Electronics=#IEEE_J_ME#
 IEEE Transactions on Medical Imaging=#IEEE_J_MI#
 IEEE Transactions on NanoBioscience=#IEEE_J_NB#
 IEEE Transactions on Neural Systems and Rehabilitation Engineering=#IEEE_J_NSRE#
+IEEE Reviews in Biomedical Engineering=#IEEE_J_RBME#
 IEEE Transactions on Rehabilitation Engineering=#IEEE_J_RE#
 
 
@@ -291,13 +301,16 @@ IEEE Engineering in Medicine and Biology Magazine=#IEEE_M_EMB#
 IEEE Engineering Management Review=#IEEE_M_EMR#
 IEEE Expert=#IEEE_M_EXP#
 IEEE Industry Applications Magazine=#IEEE_M_IA#
+IEEE Industrial Electronics Magazine=#IEEE_M_IE#
 IEEE Instrumentation and Measurement Magazine=#IEEE_M_IM#
 IEEE Intelligent Systems=#IEEE_M_IS#
+IEEE Intelligent Transportation Systems Magazine=#IEEE_M_ITS#
 IEEE Internet Computing=#IEEE_M_IC#
 IEEE IT Professional=#IEEE_M_ITP#
 IEEE Micro=#IEEE_M_MICRO#
 IEEE Microwave Magazine=#IEEE_M_MW#
 IEEE Multimedia=#IEEE_M_MM#
+IEEE Nanotechnology Magazine=#IEEE_M_NANO#
 IEEE Network=#IEEE_M_NET#
 IEEE Personal Communications Magazine=#IEEE_M_PCOM#
 IEEE Potentials=#IEEE_M_POT#

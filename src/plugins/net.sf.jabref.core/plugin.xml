@@ -51,13 +51,13 @@
 			value="Fetch Entries from IEEE Xplore." />
 	</extension>
 
-	<extension id="ACMDigitalLibraryFetcher" plugin-id="net.sf.jabref.core"
+	<extension id="ACMPortalFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
-			value="net.sf.jabref.imports.ACMDigitalLibraryFetcher" />
-		<parameter id="name" value="ACM Digital Library Entry Fetcher" />
+			value="net.sf.jabref.imports.ACMPortalFetcher" />
+		<parameter id="name" value="ACM Portal Entry Fetcher" />
 		<parameter id="description"
-			value="Fetch Entries from ACM Digital Library." />
+			value="Fetch Entries from ACM Portal." />
 	</extension>
 	
 	<extension id="CiteSeerFetcher" plugin-id="net.sf.jabref.core"
@@ -168,6 +168,8 @@
 		<parameter-def type="resource" id="dir" />
 		<!-- file extension this export format should use -->
 		<parameter-def type="string" id="extension" />
+        <!-- character encoding override, if needed -->
+        <parameter-def type="string" id="encoding" multiplicity="none-or-one" />
 	</extension-point>
 
     <extension-point id="PushToApplication">

@@ -33,6 +33,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.CannotUndoException;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea. Used for
@@ -56,13 +60,20 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 
 	final static Pattern indent = Pattern.compile("\\s+.*");
 
-	final boolean antialias = Globals.prefs.getBoolean("antialias");
+    //protected UndoManager undo = new UndoManager();
 
 	public FieldTextArea(String fieldName_, String content) {
 		super(content);
 
+        // Listen for undo and redo events
+        /*getDocument().addUndoableEditListener(new UndoableEditListener() {
+            public void undoableEditHappened(UndoableEditEvent evt) {
+                undo.addEdit(evt.getEdit());
+            }
+        });*/
+
         updateFont();
-                
+
 		// Add the global focus listener, so a menu item can see if this field
 		// was focused when an action was called.
 		addFocusListener(Globals.focusListener);
@@ -133,65 +144,36 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 		}
 	}
 
-	// public void keyPressed(KeyEvent event) {
-	// int keyCode = event.getKeyCode();
-	// if (keyCode == KeyEvent.VK_ENTER) {
-	// // Consume; we will handle this ourselves:
-	// event.consume();
-	// autoWrap();
-	//
-	// }
-	//
-	// }
-	//
-	// private void autoWrap() {
-	// int pos = getCaretPosition();
-	// int posAfter = pos + 1;
-	// StringBuffer sb = new StringBuffer(getText());
-	// // First insert the line break:
-	// sb.insert(pos, '\n');
-	//
-	// // We want to investigate the beginning of the last line:
-	// // int end = sb.length();
-	//
-	// // System.out.println("."+sb.substring(0, pos)+".");
-	//
-	// // Find 0 or the last line break before our current position:
-	// int idx = sb.substring(0, pos).lastIndexOf("\n") + 1;
-	// String prevLine = sb.substring(idx, pos);
-	// if (bull.matcher(prevLine).matches()) {
-	// int id = findFirstNonWhitespace(prevLine);
-	// if (id >= 0) {
-	// sb.insert(posAfter, prevLine.substring(0, id));
-	// posAfter += id;
-	// }
-	// } else if (indent.matcher(prevLine).matches()) {
-	// int id = findFirstNonWhitespace(prevLine);
-	// if (id >= 0) {
-	// sb.insert(posAfter, prevLine.substring(0, id));
-	// posAfter += id;
-	// }
-	// }
-	// /*
-	// * if (prevLine.startsWith(" ")) { sb.insert(posAfter, " "); posAfter++; }
-	// */
-	//
-	// setText(sb.toString());
-	// setCaretPosition(posAfter);
-	// }
-	//
-	// private int findFirstNonWhitespace(String s) {
-	// for (int i = 0; i < s.length(); i++) {
-	// if (!Character.isWhitespace(s.charAt(i)))
-	// return i;
-	// }
-	// return -1;
-	// }
-	//
-	// public void keyReleased(KeyEvent event) {
-	//
-	// }
-	//
-	// public void keyTyped(KeyEvent event) {
-	// }
+
+    public boolean hasUndoInformation() {
+        return false;//undo.canUndo();
+    }
+
+    public void undo() {
+        /*try {
+            if (undo.canUndo()) {
+                undo.undo();
+            }
+        } catch (CannotUndoException e) {
+        } */
+
+    }
+
+    public boolean hasRedoInformation() {
+        return false;//undo.canRedo();
+    }
+
+    public void redo() {
+        /*try {
+            if (undo.canRedo()) {
+                undo.redo();
+            }
+        } catch (CannotUndoException e) {
+        }*/
+
+    }
+
+    public void addUndoableEditListener(UndoableEditListener listener) {
+        getDocument().addUndoableEditListener(listener);
+    }
 }

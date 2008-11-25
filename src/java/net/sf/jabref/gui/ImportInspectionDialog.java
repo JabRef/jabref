@@ -1466,4 +1466,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         }
 
     }
+
+    public void toFront() {
+        super.toFront();
+    }
 }

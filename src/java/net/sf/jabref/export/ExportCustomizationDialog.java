@@ -13,6 +13,8 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventTableModel;
 
 /**
  * <p>Title: </p>
@@ -48,9 +50,7 @@ public class ExportCustomizationDialog extends JDialog {
        if (ecd.okPressed()) {
          String[] newFormat = new String[] {ecd.name(), ecd.layoutFile(), ecd.extension() };
          Globals.prefs.customExports.addFormat(newFormat);
-         table.revalidate();
-         table.repaint();
-         ExportFormats.initAllExports();
+         Globals.prefs.customExports.store();
        }
      }
     });
@@ -59,29 +59,30 @@ public class ExportCustomizationDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         int row = table.getSelectedRow();
         if (row == -1) return;
-       String[] old = Globals.prefs.customExports.getElementAt(row);
+        String[] old = Globals.prefs.customExports.getSortedList().get(row);
        CustomExportDialog ecd = new CustomExportDialog(frame, old[0], old[1], old[2]);
        ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
        if (ecd.okPressed()) {
          old[0] = ecd.name();
          old[1] = ecd.layoutFile();
          old[2] = ecd.extension();
-         Globals.prefs.customExports.store();
          table.revalidate();
          table.repaint();
-         ExportFormats.initAllExports();
+         Globals.prefs.customExports.store();
        }
      }
     });
 
     remove.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        int row = table.getSelectedRow();
-        if (row == -1) return;
-        Globals.prefs.customExports.remove(row);
-        table.revalidate();
-        table.repaint();
-        ExportFormats.initAllExports();
+        int[] rows = table.getSelectedRows();
+          if (rows.length == 0) return;
+          String[][] entries = new String[rows.length][];
+          for (int i=0; i<rows.length; i++)
+            entries[i] = Globals.prefs.customExports.getSortedList().get(rows[i]);
+          for (int i=0; i<rows.length; i++)
+            Globals.prefs.customExports.remove(entries[i]);
+          Globals.prefs.customExports.store();
       }
     });
 
@@ -96,7 +97,7 @@ public class ExportCustomizationDialog extends JDialog {
     help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
                                           "Help"));
 
-    ExportTableModel tableModel = new ExportTableModel();
+    EventTableModel tableModel = new EventTableModel(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
     table = new JTable(tableModel);
     TableColumnModel cm = table.getColumnModel();
     cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
@@ -139,13 +140,14 @@ public class ExportCustomizationDialog extends JDialog {
     new FocusRequester(table);
   }
 
-  class ExportTableModel extends AbstractTableModel {
-    public int getColumnCount() {
-      return 3;
-    }
+  class ExportTableFormat implements TableFormat<String[]> {
 
-    public int getRowCount() {
-      return Globals.prefs.customExports.size();
+      public Object getColumnValue(String[] strings, int i) {
+          return strings[i];
+      }
+
+      public int getColumnCount() {
+      return 3;
     }
 
     public String getColumnName(int col) {
@@ -157,11 +159,6 @@ public class ExportCustomizationDialog extends JDialog {
         default:
           return Globals.lang("File extension");
       }
-    }
-
-    public Object getValueAt(int rowIndex, int columnIndex) {
-      String[] s = Globals.prefs.customExports.getElementAt(rowIndex);
-      return s[columnIndex];
     }
 
   }

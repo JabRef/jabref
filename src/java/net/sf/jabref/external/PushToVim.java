@@ -25,7 +25,7 @@ public class PushToVim implements PushToApplication {
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
-        return Globals.menuTitle("Insert selected citations into Vim") ;
+        return Globals.lang("Insert selected citations into Vim") ;
     }
 
     public String getApplicationName() {
@@ -52,7 +52,7 @@ public class PushToVim implements PushToApplication {
         citeCommand.setText(Globals.prefs.get("citeCommandVim"));
         return settings;
     }
-
+    
     public void storeSettings() {
         Globals.prefs.put("vim", vimPath.getText());
         Globals.prefs.put("vimServer", vimServer.getText());

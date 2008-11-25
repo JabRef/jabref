@@ -9,6 +9,11 @@ Chris:
   
 Morten:
 
+* Plugins like SVN plugin might need hooks for performing actions before a database is
+  closed, and may need the ability to cancel the closing, and to avoid questions about
+  saving changes.
+* Revisions merged into trunk after 2.4 release: 2620-2733
+
 * Documentation export formatters
 
 * Enable "Open spires entry" ("openSpires" action)? Think about better integration of this?

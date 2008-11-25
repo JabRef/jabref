@@ -1,11 +1,10 @@
 /* Aaron Chen
  * 08-28-2007
- * ACM Digital Library support
+ * ACM Portal support
  */
 
 package net.sf.jabref.imports;
 
-//import net.sf.jabref.net.URLDownload;
 import java.awt.BorderLayout;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -39,53 +38,31 @@ import net.sf.jabref.OutputPrinter;
  * Time: 1:09:32 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ACMDigitalLibraryFetcher implements EntryFetcher {
+public class ACMPortalFetcher implements EntryFetcher {
 
 	ImportInspector dialog = null;
 	OutputPrinter status;
     HTMLConverter htmlConverter = new HTMLConverter();
-//	JournalAbbreviations journalAbbrev = new JournalAbbreviations("/resource/AcmRisJournalList.txt");
     private String terms;
     String startUrl = "http://portal.acm.org/";
     String searchUrlPart = "results.cfm?query=";
     String searchUrlPartII = "&dl=";
-    String endUrl = "&coll=ACM&short=1";//&start=";
-    private int perPage = 20, hits = 0, unparseable = 0, parsed = 0;
+    String endUrl = "&coll=Portal&short=1";//&start=";
+
+    private static final int MAX_FETCH = 50; // 20 when short=0
+    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     private JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
-    private JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide"));
-    
-    
+    private JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
     private JCheckBox fetchAstracts = new JCheckBox(Globals.lang("Include abstracts"), false);
     private boolean fetchingAbstracts = false;
     private boolean acmOrGuide = false;
-//    private static final int MAX_ABSTRACT_FETCH = 5;
-    private static final int MAX_FETCH = 20;
 
-    //Pattern hitsPattern = Pattern.compile("Your search matched <strong>(\\d+)</strong>");
-    Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+.*,*\\d+.*)</b> of.*");
-    Pattern maxHitsPattern = Pattern.compile(".*<td>Results \\d+ - \\d+ of (\\d+,*\\d+)</td>.*");
+    Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b> of.*");
+    Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
     Pattern risPattern = Pattern.compile(".*(popBibTex.cfm.*)','BibTex'.*");
     Pattern absPattern = Pattern.compile(".*ABSTRACT</A></span>\\s+<p class=\"abstract\">\\s+(.*)");
     
-    Pattern entryPattern1 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s*"
-                +"(.+)?\\s?(\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
-    Pattern entryPattern2 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s+.*Issue (\\d+).*,&nbsp;\\s*"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
-
-    Pattern entryPattern3 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s+Volume (.+),&nbsp;\\s+Issue (\\d+),&nbsp;" +
-                    "\\s+Part (\\d+),&nbsp;\\s*" //"[\\s-\\d]+"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
-    Pattern entryPattern4 = Pattern.compile(".*<strong>(.+)</strong><br>\\s+(.+)<br>"
-                    +"\\s+<A href='(.+)'>(.+)</A><br>\\s*" //[\\s-\\da-z]+"
-                    +"(.+)? (\\d\\d\\d\\d)\\s+Page\\(s\\):.*");
-
     Pattern fullCitationPattern =
         Pattern.compile("<A HREF=\"(citation.cfm.*)\" class.*");
 
@@ -101,7 +78,6 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
         pan.add(fetchAstracts, BorderLayout.NORTH);
         pan.add(acmButton, BorderLayout.CENTER);
         pan.add(guideButton, BorderLayout.SOUTH);
-        
 
         return pan;
     }
@@ -118,26 +94,29 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
         String address = makeUrl(0);
         try {
             URL url = new URL(address);
-            // Fetch the search page and put the contents in a String:
-            //String page = getResultsFromFile(new File("/home/alver/div/temp.txt"));
-            //URLDownload ud = new URLDownload(new JPanel(), url, new File("/home/alver/div/temp.txt"));
-            //ud.download();
 
             //dialog.setVisible(true);
             String page = getResults(url);
             //System.out.println(address);
             hits = getNumberOfHits(page, "Found", hitsPattern);
+			int index = page.indexOf("Found");
+			if (index >= 0) {
+            	page = page.substring(index + 5);
+				index = page.indexOf("Found");
+				if (index >= 0)
+            		page = page.substring(index);
+			}
             //System.out.println(page);
             //System.out.printf("Hit %d\n", hits);
             
             if (hits == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
-                        Globals.lang("Search ACM Digital Library"), JOptionPane.INFORMATION_MESSAGE);
+                        Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
-            int maxHits = getNumberOfHits(page, "<td>Results", maxHitsPattern);
+            int maxHits = getNumberOfHits(page, "Results", maxHitsPattern);
             //System.out.printf("maxHit %d\n", maxHits);
             //String page = getResultsFromFile(new File("/home/alver/div/temp50.txt"));
 
@@ -151,7 +130,7 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
                 status.showMessage(Globals.lang("%0 entries found. To reduce server load, "
                         +"only %1 will be downloaded.",
                                 new String[] {String.valueOf(hits), String.valueOf(MAX_FETCH)}),
-                        Globals.lang("Search ACM Digital Library"), JOptionPane.INFORMATION_MESSAGE);
+                        Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 hits = MAX_FETCH;
             }
         
@@ -173,17 +152,16 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
 
                 parse(dialog, page, 0, 1+firstEntry);
                 firstEntry += perPage;
-
             }
             return true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            status.showMessage(Globals.lang("Connection to ACM Digital Library failed"),
-                    Globals.lang("Search ACM Digital Library"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Globals.lang("Connection to ACM Portal failed"),
+                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
         	status.showMessage(Globals.lang(e.getMessage()),
-                    Globals.lang("Search ACM Digital Library"), JOptionPane.ERROR_MESSAGE);
+                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
         return false;
@@ -198,7 +176,6 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
         else
         	sb.append("GUIDE");
         sb.append(endUrl);
-        //sb.append(String.valueOf(startIndex));
         return sb.toString();
     }
 
@@ -212,7 +189,7 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
             && (shouldContinue)) {
             if (entry.getField("title") != null) {
                 dialog.addEntry(entry);
-                dialog.setProgress(parsed+unparseable, hits);
+                dialog.setProgress(parsed + unparseable, hits);
                 parsed++;
             }
             entryNumber++;
@@ -220,7 +197,7 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
         }
     }
 
-    private BibtexEntry parseEntryRis(String fullCitation, boolean abs)
+    private BibtexEntry parseEntryBibTeX(String fullCitation, boolean abs)
         throws IOException
     {
         URL url;
@@ -239,21 +216,9 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
 					Matcher absMatch = absPattern.matcher(page);
 					if (absMatch.find()) {
 						String absBlock = absMatch.group(1);
-						/*
-						absBlock = absBlock.replaceAll("<i>", "\\$");
-						absBlock = absBlock.replaceAll("</i><sub>", "_");
-						absBlock = absBlock.replaceAll("<sub>", "_");
-						absBlock = absBlock.replaceAll("</i>", "\\$");
-						absBlock = absBlock.replaceAll("</sub>", "");
-						absBlock = absBlock.replaceAll("</?p.*>", "");
-						*/
-						//absBlock = absBlock.replaceAll("&gt;", ">");
-						//absBlock = absBlock.replaceAll("&lt;", "<");
-						//absBlock = absBlock.replaceAll("&#(\\d+);", "\\\\u$1");
-						
 						entry.setField("abstract", convertHTMLChars(absBlock).trim());
 					} else {
-						//System.out.println("No abstract matched.");
+						System.out.println("No abstract matched.");
 						//System.out.println(page);
 					}
 				}
@@ -291,7 +256,7 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
 				fullCitationPattern.matcher(text);
 			if (fullCitation.find()) {
 				try {
-					entry = parseEntryRis(fullCitation.group(1), fetchingAbstracts);
+					entry = parseEntryBibTeX(fullCitation.group(1), fetchingAbstracts);
 				} catch (IOException e) {
 					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 				}
@@ -326,15 +291,16 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
      */
     private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
-        if (ind < 0)
+        if (ind < 0) {
+        	System.out.println(page);
             throw new IOException(Globals.lang("Could not parse number of hits"));
+        }
         String substring = page.substring(ind, Math.min(ind + 42, page.length()));
         Matcher m = pattern.matcher(substring);
         if (!m.find()) {
         	System.out.println("Unmatched!");
-        	//System.out.println(substring);
-        }
-        if (m.groupCount() >= 1) {
+        	System.out.println(substring);
+        } else {
             try {
             	// get rid of ,
             	String number = m.group(1);
@@ -392,7 +358,7 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
     }
 
 	public String getTitle() {
-	    return Globals.menuTitle("Search ACM Digital Library");
+	    return Globals.menuTitle("Search ACM Portal");
 	}
 	
 	
@@ -401,11 +367,11 @@ public class ACMDigitalLibraryFetcher implements EntryFetcher {
 	}
 	
 	public String getHelpPage() {
-	    return "ACMDigitalLibraryHelp.html";
+	    return "ACMPortalHelp.html";
 	}
 	
 	public String getKeyName() {
-	    return "Search ACM Digital Library";
+	    return "Search ACM Portal";
 	}
 	
 	// This method is called by the dialog when the user has cancelled the import.

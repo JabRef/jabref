@@ -14,7 +14,7 @@ public class FormatChars implements LayoutFormatter {
     public static HashMap<String, String> CHARS = new HashMap<String, String>();
 
     static {
-        CHARS.put("`A", "À"); // #192
+		CHARS.put("`A", "À"); // #192
 		CHARS.put("'A", "Á"); // #193
 		CHARS.put("^A", "Â"); // #194
 		CHARS.put("~A", "Ã"); // #195
@@ -416,3 +416,4 @@ public class FormatChars implements LayoutFormatter {
 		}
 	}
 }
+

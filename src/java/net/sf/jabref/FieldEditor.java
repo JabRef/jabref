@@ -32,6 +32,7 @@ import java.awt.Container;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.event.UndoableEditListener;
 
 
 /**
@@ -93,4 +94,15 @@ public interface FieldEditor {
 	 * @return
 	 */
 	public String getSelectedText();
+
+
+    public boolean hasUndoInformation();
+
+    public void undo();
+
+    public boolean hasRedoInformation();
+
+    public void redo();
+
+    public void addUndoableEditListener(UndoableEditListener listener);
 }

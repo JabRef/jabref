@@ -235,9 +235,12 @@ public class FileActions
 			if (types.size() > 0) {
 				for (Iterator<String> i = types.keySet().iterator(); i
 					.hasNext();) {
-					CustomEntryType tp = (CustomEntryType) types.get(i.next());
-					tp.save(fw);
-					fw.write(Globals.NEWLINE);
+                    BibtexEntryType type = types.get(i.next());
+                    if (type instanceof CustomEntryType) {
+                        CustomEntryType tp = (CustomEntryType)type;
+                        tp.save(fw);
+                        fw.write(Globals.NEWLINE);
+                    }
 				}
 
 			}

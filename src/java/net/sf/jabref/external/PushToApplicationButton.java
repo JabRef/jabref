@@ -44,7 +44,6 @@ public class PushToApplicationButton implements ActionListener {
     private MenuAction mAction = new MenuAction();
     private JPopupMenu optPopup = new JPopupMenu();
     private JMenuItem settings = new JMenuItem(Globals.lang("Settings"));
-    private boolean settingsOkPressed = false;
 
     /**
      * Set up the current available choices:
@@ -113,11 +112,13 @@ public class PushToApplicationButton implements ActionListener {
                 PushToApplication toApp = pushActions.get(selected);
                 JPanel options = toApp.getSettingsPanel();
                 if (options != null) {
-                    showSettingsDialog(toApp, options);
+                    showSettingsDialog(frame, toApp, options);
                 }
 
             }
         });
+
+        buildPopupMenu();
     }
 
     /**
@@ -129,6 +130,7 @@ public class PushToApplicationButton implements ActionListener {
         for (PushToApplication application : pushActions){
             JMenuItem item = new JMenuItem(application.getApplicationName(),
                     application.getIcon());
+            item.setToolTipText(application.getTooltip());
             item.addActionListener(new PopupItemActionListener(j));
             popup.add(item);
             j++;
@@ -145,6 +147,7 @@ public class PushToApplicationButton implements ActionListener {
         pushButton.setIcon(toApp.getIcon());
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
+
         Globals.prefs.put("pushToApplication", toApp.getName());
         mAction.setTitle(toApp.getApplicationName());
     }
@@ -154,7 +157,7 @@ public class PushToApplicationButton implements ActionListener {
      * @return The component.
      */
     public Component getComponent() {
-        return comp;
+       return comp;
     }
 
     public Action getMenuAction() {
@@ -173,8 +176,22 @@ public class PushToApplicationButton implements ActionListener {
         action.actionPerformed(new ActionEvent(toApp, 0, "push"));
     }
 
-    private void showSettingsDialog(PushToApplication toApp, JPanel options) {
-        final JDialog diag = new JDialog(frame, Globals.lang("Settings"), true);
+    static class BooleanHolder {
+        public BooleanHolder(boolean value) {
+            this.value = value;
+        }
+        public boolean value;
+    }
+
+    public static void showSettingsDialog(Object parent, PushToApplication toApp, JPanel options) {
+        
+        final BooleanHolder okPressed = new BooleanHolder(false);
+        JDialog dg;
+        if (parent instanceof JDialog)
+            dg = new JDialog((JDialog)parent, Globals.lang("Settings"), true);
+        else
+            dg = new JDialog((JFrame)parent, Globals.lang("Settings"), true);
+        final JDialog diag = dg;
         options.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -188,7 +205,7 @@ public class PushToApplicationButton implements ActionListener {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                settingsOkPressed = true;
+                okPressed.value = true;
                 diag.dispose();
             }
         });
@@ -206,14 +223,16 @@ public class PushToApplicationButton implements ActionListener {
                 diag.dispose();
             }
         });
-        settingsOkPressed = false;
         diag.pack();
-        diag.setLocationRelativeTo(frame);
+        if (parent instanceof JDialog)
+            diag.setLocationRelativeTo((JDialog)parent);
+        else
+            diag.setLocationRelativeTo((JFrame)parent);
         // Show the dialog:
         diag.setVisible(true);
         // If the user pressed Ok, ask the PushToApplication implementation
         // to store its settings:
-        if (settingsOkPressed) {
+        if (okPressed.value) {
             toApp.storeSettings();
         }
     }

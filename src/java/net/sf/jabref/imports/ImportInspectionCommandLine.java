@@ -49,4 +49,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
         }
         return null;
     }
+
+    public void toFront() {
+    }
 }

@@ -49,6 +49,9 @@ public class ExportFormats {
                 "endnote", ".txt"));
         putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
             "openoffice", ".csv"));
+        ExportFormat ef = new ExportFormat(Globals.lang("RIS"), "ris", "ris", "ris", ".ris");
+        ef.encoding = "UTF-8";
+        putFormat(ef);
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
@@ -243,6 +246,7 @@ public class ExportFormats {
                                         finFile.getPath(), frame
                                     .basePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
+                                ex.printStackTrace();
                                 if (ex.getMessage()==null ) {
                                     errorMessage = ex.toString();
                                 } else {

@@ -31,6 +31,7 @@ package net.sf.jabref;
 
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.Locale;
 
 public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 {
@@ -886,7 +887,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
      */
     public static BibtexEntryType getType(String name) {
 	//Util.pr("'"+name+"'");
-	Object o = ALL_TYPES.get(name.toLowerCase());
+	Object o = ALL_TYPES.get(name.toLowerCase(Locale.US));
 	if (o == null)
 	    return null;
 	else return (BibtexEntryType)o;

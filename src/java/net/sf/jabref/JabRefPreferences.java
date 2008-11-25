@@ -138,13 +138,13 @@ public class JabRefPreferences {
 			defaults.put("pdfviewer", "cmd.exe /c start /b");
 			defaults.put("psviewer", "cmd.exe /c start /b");
 			defaults.put("htmlviewer", "cmd.exe /c start /b");
-			defaults.put("lookAndFeel", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
+			defaults.put("lookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         } else {
 			defaults.put("pdfviewer", "evince");
 			defaults.put("psviewer", "gv");
-			defaults.put("htmlviewer", "mozilla");
+			defaults.put("htmlviewer", "firefox");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
 		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
@@ -157,7 +157,7 @@ public class JabRefPreferences {
         defaults.put("sizeY", new Integer(680));
         defaults.put("windowMaximised", Boolean.FALSE);
         defaults.put("rememberWindowLocation", Boolean.TRUE);
-        defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_OFF));
+        defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
@@ -374,6 +374,7 @@ public class JabRefPreferences {
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
         defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
+        defaults.put("runAutomaticFileSearch", Boolean.FALSE);
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
@@ -386,7 +387,7 @@ public class JabRefPreferences {
 
         restoreKeyBindings();
 
-        customExports = new CustomExportList(this, new ExportComparator());
+        customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
 
         //defaults.put("oooWarning", Boolean.TRUE);
@@ -397,6 +398,7 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
+        defaults.put("useIEEEAbrv", Boolean.TRUE);
     }
     
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
@@ -850,7 +852,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
         defKeyBinds.put("Search IEEEXplore", "F8");
-        defKeyBinds.put("Search ACM Digital Library", "ctrl shift F8");
+        defKeyBinds.put("Search ACM Portal", "ctrl shift F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Search JSTOR", "shift F9");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");

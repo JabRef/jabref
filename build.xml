@@ -47,7 +47,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.4" />
+	<property name="jabref.version" value="2.4.3" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
@@ -108,7 +108,7 @@
 	<fileset id="jarsFileset" dir="${lib.dir}">
 		<include name="antlr.jar" />
 		<include name="antlr-3.0b5.jar" />
-		<include name="looks-2.0.4.jar" />
+		<include name="looks-2.2.0.jar" />
 		<include name="forms-1.1.0.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.7.0_java15.jar" />
@@ -248,6 +248,7 @@
 			</fileset>
 			<manifest>
 				<attribute name="Main-Class" value="net.sf.jabref.JabRefMain" />
+                <attribute name="Class-Path" value="." />
 			</manifest>
 		</jar>
 

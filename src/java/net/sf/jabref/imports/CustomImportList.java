@@ -99,7 +99,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     }
     
     public URL getBasePathUrl() throws MalformedURLException {
-      return getBasePath().toURL();
+      return getBasePath().toURI().toURL();
     }
     
     public String[] getAsStringArray() {

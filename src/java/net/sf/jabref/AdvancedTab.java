@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.remote.RemoteListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -20,7 +21,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel pan = new JPanel(),
         lnf = new JPanel();
     JLabel lab;
-    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac;
+    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, useIEEEAbrv;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -39,6 +40,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
     useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
     useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
+    useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -105,6 +107,12 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.append(new JPanel());
     builder.append(useNativeFileDialogOnMac);
     //}
+	// IEEE
+    builder.nextLine();
+    builder.appendSeparator(Globals.lang("Search IEEEXplore"));
+    builder.nextLine();
+    builder.append(new JPanel());
+    builder.append(useIEEEAbrv);
 
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -122,13 +130,17 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
     oldPort = _prefs.getInt("remoteServerPort");
     remoteServerPort.setText(String.valueOf(oldPort));
-        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
+    useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
+    useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
     }
 
     public void storeSettings() {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
         _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
+        _prefs.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
+        if (useIEEEAbrv.isSelected())
+        	Globals.journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
         try {
             int port = Integer.parseInt(remoteServerPort.getText());
             if (port != oldPort) {

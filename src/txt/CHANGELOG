@@ -5,7 +5,61 @@
       This is done by adding a file named "<filtername>.formatters". This file defines
       one formatter on each line, with each line containing the name of the formatter and
       the formatter definition, separated by a colon (:).
-2.4 - Added mappings for some special characters that need to be sanitized when generating
+    - Added ":(x)" modifier to key generator, specifying that the arbitrary string x
+      should be used as a fallback value if the value returned by the field marker is empty.
+    - Added ":upper" modifier to key generator, to force uppercase for a field marker.
+    - Added buttons in External programs tab in Preferences for modifying settings for
+      "Push to"-features, and removed obsolete fields.
+    - Added support for DOI field in Endnote importer.
+    - Cosmetic change to the entry type label to the left in the entry editor.
+    - Changed name handling so a single-entry name without a capital initial letter, such as
+      "unknown", will be treated as a solitary last name rather than a von particle.
+    - Changed table selection coloring so entries that are grayed out or marked can be
+      distinguished from normal entries when selected.
+    - Changed handling of "affiliation" in Medline import - now makes sure to escape
+      # characters before storing.
+    - Modified ACM portal fetcher due to web site changes.
+    - Improvements to IEEEXplore fetcher - better handling of month and page fields.
+    - Changed behaviour of source panel when an entry contains imbalanced # characters -
+      the panel can now show the entry in its invalid form, allowing the user to fix the problem.
+    - Fixed bug in HTMLConverter.
+    - Fixed NullPointerException in key generator for incomplete names.
+    - Fixed bug in removing custom export filters.
+    - Fixed bug 2225371: restart is no longer required after adding a new custom export filter. 
+    - Fixed bug in "Move/rename file" feature in file field editor with regard to undefined
+      file directory.
+    - Fixed bug in Ris importer.
+    - Fixed NullPointerException in Endnote importer.
+2.4.2
+    - Added missing layout formatters FirstPagd LastPage.
+    - Fixed a bug regarding ParamLayoutFormatter loaded from plugin.
+    - Fixed crash during initalization of journal abbreviation list.
+    - Added option to have JabRef search for external file when "Open file" function is chosen
+      for an entry without any linked files. This is similar to what was always done in
+      JabRef 2.3.1 and earlier. 
+    - Improved regular expression file search, so the regular expression can contain field
+      markers as used for BibTeX key generation in addition to just regular fields. It is
+      no longer possible to call arbitrary layout formatters, but the modifiers "upper",
+      "lower" and "abbr" (for case conversion and abbreviation) can be used.
+    - Ris importer now imports PB as "school" instead of "publisher" for THES entries.
+    - Fixed bug 2157664: Current edit is now treated as an undoable edit in itself.
+2.4.1
+    - Fixed bug: layout formatter arguments were not set when using a ParamLayoutFormatter
+      loaded from plugin.
+    - Fixed bug: when abbreviating first names, for authors with first names connected
+      with "-", only the first letter is shown.
+    - Enhanced ExportFormatTemplate plugins with an optional property "encoding" which
+      overrides the default encoding with the given one.
+    - Fixed menu colors under Windows Vista.
+    - Fixed bug 2137771: Missing file extension when downloading.
+    - Fixed bug 2105329: Ensure that newly added entry is visible in table.
+    - Fixed bug 1908222: Preference "Fit table horizontally on screen" doesn't work
+    - Fixed bug 2119059: Handling of the A1 tag in the RIS format.
+    - Added missing help file for ACM digital library fetcher.
+    - Added option for whether to use IEEE LaTeX journal abbreviation list.
+    - Added tooltip to menu items in push-to-application popup menu.
+2.4
+    - Added mappings for some special characters that need to be sanitized when generating
       BibTeX keys.
     - Added ACM Digital Library fetcher by Aaron Chen.
     - Added new entry types (conference, patent, standard, electronic).

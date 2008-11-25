@@ -21,7 +21,6 @@ import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.PreviewPrefsTab;
 import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileMenuItem;
@@ -69,9 +68,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 				.get("preview0")),
 			new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
 				.get("preview1")) };
-		BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
-		previewPanel[0].setEntry(testEntry);
-		previewPanel[1].setEntry(testEntry);
+		//BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
+		//previewPanel[0].setEntry(testEntry);
+		//previewPanel[1].setEntry(testEntry);
 	}
 
     public void updatePreviews() {
@@ -112,6 +111,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 // Show the new editor unless it was already visible:
                 if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
                     panel.showEntryEditor(newEditor);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            table.ensureVisible(table.getSelectedRow());
+                        }
+                    });
+
                 }
             } else {
                 // Either nothing or a preview was shown. Update the preview.
@@ -353,7 +358,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 if (o != null) {
                     menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String)o, (String)o,
                             GUIGlobals.getTableIcon(iconType[i]).getIcon(),
-                            panel.metaData()));
+                            panel.metaData(), iconType[i]));
                     count++;
                 }
             }

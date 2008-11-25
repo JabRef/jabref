@@ -135,7 +135,8 @@ public class EntryEditorTab {
                 ta = new FileListEditor(frame, bPanel.metaData(), fields[i], null, parent);
             else
                 ta = new FieldTextArea(fields[i], null);
-
+            //ta.addUndoableEditListener(bPanel.undoListener);
+            
             JComponent ex = parent.getExtra(fields[i], ta);
             setupJTextComponent(ta.getTextComponent());
 
@@ -169,6 +170,7 @@ public class EntryEditorTab {
 		if (addKeyField) {
 			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, parent
 				.getEntry().getField(BibtexFields.KEY_FIELD), true);
+            //tf.addUndoableEditListener(bPanel.undoListener);
 			setupJTextComponent(tf);
 
 			editors.put("bibtexkey", tf);
@@ -259,7 +261,9 @@ public class EntryEditorTab {
 			while (i.hasNext()) {
 				FieldEditor editor = i.next();
 				Object content = entry.getField(editor.getFieldName());
-				editor.setText((content == null) ? "" : content.toString());
+                String toSet = (content == null) ? "" : content.toString();
+                if (!toSet.equals(editor.getText()))
+				    editor.setText(toSet);
 			}
 			this.entry = entry;
 		} finally {

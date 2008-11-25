@@ -27,6 +27,9 @@ public class ExportFormat implements IExportFormat {
 	String lfFileName;
 	String directory;
 	String extension;
+    String encoding = null; // If this value is set, it will be used to override
+      // the default encoding for the basePanel.
+
 	FileFilter fileFilter;
 	boolean customExport = false;
 
@@ -85,7 +88,16 @@ public class ExportFormat implements IExportFormat {
 		return displayName;
 	}
 
-	/**
+    /**
+     * Set an encoding which will be used in preference to the default value
+     * obtained from the basepanel.
+     * @param encoding The name of the encoding to use.
+     */
+    protected void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    /**
 	 * This method should return a reader from which the given layout file can
 	 * be read.
 	 * 
@@ -142,8 +154,21 @@ public class ExportFormat implements IExportFormat {
             final MetaData metaData, final String file,
 		final String encoding, Set<String> entryIds) throws Exception {
 
-		File outFile = new File(file);
-		SaveSession ss = getSaveSession(encoding, outFile);
+        File outFile = new File(file);
+        SaveSession ss = null;
+        if (this.encoding != null) {
+            try {
+                ss = getSaveSession(this.encoding, outFile);
+            } catch (IOException ex) {
+                // Perhaps the overriding encoding doesn't work?
+                // We will fall back on the default encoding.
+                ex.printStackTrace();
+
+            }
+        }
+		if (ss == null)
+		    ss = getSaveSession(encoding, outFile);
+        
 		VerifyingWriter ps = ss.getWriter();
 
         Layout beginLayout = null;

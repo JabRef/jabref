@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.UndoableEditListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
@@ -720,4 +721,21 @@ public class FileListEditor extends JTable implements FieldEditor,
         }
 
     }
+
+    public boolean hasUndoInformation() {
+        return false;
+    }
+
+    public void undo() {
+    }
+
+    public boolean hasRedoInformation() {
+        return false;
+    }
+
+    public void redo() {
+    }
+
+    public void addUndoableEditListener(UndoableEditListener listener) {
+    }    
 }

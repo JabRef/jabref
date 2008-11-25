@@ -192,8 +192,10 @@ public class MedlineHandler extends DefaultHandler
 			}
 			if(!pii.equals(""))
 			    b.setField("pii",pii);
-            if(!affiliation.equals(""))
-                b.setField("institution",affiliation);
+            if(!affiliation.equals("")) {
+                b.setField("institution",affiliation.replaceAll("#", "\\\\#"));
+            }
+
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
             // Older references do not have doi entries, but every
             // medline entry has a unique pubmed ID (aka primary ID).

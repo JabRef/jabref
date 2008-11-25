@@ -6,6 +6,9 @@ import java.util.TreeMap;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.BasicEventList;
 
 /**
  * This class handles user defined custom export formats. They are initially
@@ -15,33 +18,41 @@ import net.sf.jabref.JabRefPreferences;
  * export formats are written to Preferences.
  */
 
-public class CustomExportList extends TreeSet<String[]> {
+public class CustomExportList {
 
-	private TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
+    private EventList<String[]> list;
+    private SortedList<String[]> sorted;
+    private TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
 	private Object[] array;
 
-
-	public CustomExportList(JabRefPreferences prefs_, Comparator<String[]> comp) {
-		super(comp);
-		//readPrefs();
-		//sort();
-	}
+    public CustomExportList(Comparator<String[]> comp) {
+	    list = new BasicEventList<String[]>();
+        sorted = new SortedList<String[]>(list, comp);
+    }
 
 	public TreeMap<String, ExportFormat> getCustomExportFormats() {
         formats.clear();
         readPrefs();
-        sort();
         return formats;
 	}
 
+    public int size() {
+        return list.size();
+    }
+
+    public EventList<String[]> getSortedList() {
+        return sorted;
+    }
+
 	private void readPrefs() {
         formats.clear();
+        list.clear();
         int i = 0;
 		String[] s;
 		while ((s = Globals.prefs.getStringArray("customExportFormat" + i)) != null) {
             ExportFormat format = createFormat(s);
 			formats.put(format.getConsoleName(), format);
-			super.add(s);
+			list.add(s);
 			i++;
 		}
 	}
@@ -63,34 +74,30 @@ public class CustomExportList extends TreeSet<String[]> {
 	}
 
 	public void addFormat(String[] s) {
-		super.add(s);
+		list.add(s);
 		ExportFormat format = createFormat(s);
 		formats.put(format.getConsoleName(), format);
-		sort();
 	}
 
-	public void remove(int pos) {
-		String[] toRemove = (String[]) array[pos];
-		formats.remove(toRemove[0]);
-		super.remove(array[pos]);
-		sort();
-	}
+	public void remove(String[] toRemove) {
 
-	public void sort() {
-		array = toArray();
+        ExportFormat format = createFormat(toRemove);
+        formats.remove(format.getConsoleName());
+        list.remove(toRemove);
+        
 	}
 
 	public void store() {
 
-		if (array.length == 0)
+		if (list.size() == 0)
 			purge(0);
 		else {
-			for (int i = 0; i < array.length; i++) {
+			for (int i = 0; i < list.size(); i++) {
 				// System.out.println(i+"..");
 				Globals.prefs.putStringArray("customExportFormat" + i,
-					(String[]) (array[i]));
+					list.get(i));
 			}
-			purge(array.length);
+			purge(list.size());
 		}
 	}
 

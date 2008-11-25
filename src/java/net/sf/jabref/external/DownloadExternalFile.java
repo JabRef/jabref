@@ -130,11 +130,17 @@ public class DownloadExternalFile {
                 System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
-        String suffix = getSuffix(res);
-        // If we didn't find a file type from the MIME type, try based on extension:
-        if (suggestedType == null)
+        String suffix;
+        if (suggestedType != null) {
+            suffix = suggestedType.getExtension();   
+        }
+        else {
+            // If we didn't find a file type from the MIME type, try based on extension:
+            suffix = getSuffix(res);
             suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
-        String suggestedName = bibtexKey != null ? getSuggestedFileName(res, suffix) : "";
+        }
+
+        String suggestedName = bibtexKey != null ? getSuggestedFileName(suffix) : "";
         String fDirectory = getFileDirectory(res);
         if (fDirectory.trim().equals(""))
             fDirectory = null;
@@ -239,7 +245,7 @@ public class DownloadExternalFile {
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
 
-    public String getSuggestedFileName(String res, String suffix) {
+    public String getSuggestedFileName(String suffix) {
         
         String plannedName = bibtexKey;
         if (suffix.length() > 0)
@@ -266,7 +272,7 @@ public class DownloadExternalFile {
      * This gives the extension for most reasonably named links.
      *
      * @param link The link
-     * @return The suffix, excluding the dot (e.g. ".pdf")
+     * @return The suffix, excluding the dot (e.g. "pdf")
      */
     public String getSuffix(final String link) {
         String strippedLink = link;

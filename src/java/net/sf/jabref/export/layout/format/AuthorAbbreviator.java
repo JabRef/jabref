@@ -42,7 +42,6 @@ public class AuthorAbbreviator implements LayoutFormatter {
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
 	public String format(String fieldText) {
-
         AuthorList list = AuthorList.getAuthorList(fieldText);
         return list.getAuthorsLastFirstAnds(true);
         

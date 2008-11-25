@@ -5,6 +5,8 @@ package net.sf.jabref.labelPattern;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
@@ -133,35 +135,14 @@ public class LabelPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     // String modifier = null;
-                    String[] parts = val.split(":");
-                    
+                    String[] parts = parseFieldMarker(val);//val.split(":");
+
                     String label = makeLabel(_entry, parts[0]);
                     
                     // apply modifier if present
                     if (parts.length > 1)
-                        for (int j = 1; j < parts.length; j++) {
-                            String modifier = parts[j];
-
-                            if (modifier.equals("lower")) {
-                                label = label.toLowerCase();
-                            } else if (modifier.equals("abbr")) {
-                                // Abbreviate - that is,
-                                // System.out.println(_sbvalue.toString());
-                                StringBuffer abbr = new StringBuffer();
-                                String[] words = label.toString().replaceAll("[\\{\\}']","")
-                                        .split("[ \r\n\"]");
-                                for (int word = 0; word < words.length; word++)
-                                    if (words[word].length() > 0)
-                                        abbr.append(words[word].charAt(0));
-                                label = abbr.toString();
-  
-                            } else {
-                                Globals
-                                    .logger("Key generator warning: unknown modifier '"
-                                        + modifier + "'.");
-                            }
-                        }
-
+                        label = applyModifiers(label, parts, 1);
+                    
                     _sb.append(label);
 
                 } else {
@@ -230,6 +211,48 @@ public class LabelPatternUtil {
         /** End of edit, Morten Alver 2004.02.04.  */
     }
 
+    /**
+     * Applies modifiers to a label generated based on a field marker.
+     * @param label The generated label.
+     * @param parts String array containing the modifiers.
+     * @param offset The number of initial items in the modifiers array to skip.
+     * @return The modified label.
+     */
+    public static String applyModifiers(String label, String[] parts, int offset) {
+        if (parts.length > offset)
+            for (int j = offset; j < parts.length; j++) {
+                String modifier = parts[j];
+
+                if (modifier.equals("lower")) {
+                    label = label.toLowerCase();
+                } else if (modifier.equals("upper")) {
+                    label = label.toUpperCase();
+                } else if (modifier.equals("abbr")) {
+                    // Abbreviate - that is,
+                    // System.out.println(_sbvalue.toString());
+                    StringBuffer abbr = new StringBuffer();
+                    String[] words = label.toString().replaceAll("[\\{\\}']","")
+                            .split("[ \r\n\"]");
+                    for (int word = 0; word < words.length; word++)
+                        if (words[word].length() > 0)
+                            abbr.append(words[word].charAt(0));
+                    label = abbr.toString();
+
+                } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
+                    // Alternate text modifier in parentheses. Should be inserted if
+                    // the label is empty:
+                    if (label.equals("") && (modifier.length() > 2))
+                        return modifier.substring(1, modifier.length()-1);
+
+                } else {
+                    Globals
+                        .logger("Key generator warning: unknown modifier '"
+                            + modifier + "'.");
+                }
+            }
+        return label;
+    }
+
     public static String makeLabel(BibtexEntry _entry, String val) {
 
         try {
@@ -266,34 +289,43 @@ public class LabelPatternUtil {
                 }
                 // Last author's last name
                 else if (val.equals("authorLast")) {
-                   return lastAuthor(authString);
+                    return lastAuthor(authString);
                 } else if (val.equals("authorIni")) {
-                    return oneAuthorPlusIni(authString);
+                    String s = oneAuthorPlusIni(authString);
+                    return s == null ? "" : s;
                 } else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(authString, num);
+                    String s = authIniN(authString, num);
+                    return s == null ? "" : s;
                 } else if (val.equals("auth.auth.ea")) {
-                    return authAuthEa(authString);
+                    String s = authAuthEa(authString);
+                    return s == null ? "" : s;
                 } else if (val.equals("auth.etal")) {
-                    return authEtal(authString);
+                    String s = authEtal(authString);
+                    return s == null ? "" : s;
                 } else if (val.equals("authshort")) {
-                    return authshort(authString);
+                    String s = authshort(authString);
+                    return s == null ? "" : s;
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authN_M(authString, Integer.parseInt(nums[0]),
+                    String s = authN_M(authString, Integer.parseInt(nums[0]),
                         Integer.parseInt(nums[1]) - 1);
+                    return s == null ? "" : s;
                 } else if (val.matches("auth\\d+")) {
                     // authN. First N chars of the first author's last
                     // name.
 
                     int num = Integer.parseInt(val.substring(4));
                     String fa = firstAuthor(authString);
+                    if (fa == null)
+                        return "";
                     if (num > fa.length())
                         num = fa.length();
                     return fa.substring(0, num);
                 } else if (val.matches("authors\\d+")) {
-                    return NAuthors(authString, Integer.parseInt(val
+                    String s = NAuthors(authString, Integer.parseInt(val
                         .substring(7)));
+                    return s == null ? "" : s;
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
@@ -308,22 +340,27 @@ public class LabelPatternUtil {
                     return allAuthors(_entry.getField("editor").toString());
                 // Last author's last name
                 } else if (val.equals("editorLast")) {
-                   return lastAuthor(_entry.getField("editor").toString());
+                    return lastAuthor(_entry.getField("editor").toString());
                 } else if (val.equals("editorIni")) {
-                    return oneAuthorPlusIni(_entry.getField("editor")
+                    String s = oneAuthorPlusIni(_entry.getField("editor")
                         .toString());
+                    return s == null ? "" : s;
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(_entry.getField("editor").toString(), num);
+                    String s = authIniN(_entry.getField("editor").toString(), num);
+                    return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authN_M(_entry.getField("editor").toString(),
+                    String s = authN_M(_entry.getField("editor").toString(),
                         Integer.parseInt(nums[0]),
                         Integer.parseInt(nums[1]) - 1);
+                    return s == null ? "" : s;
                 } else if (val.equals("edtr.edtr.ea")) {
-                    return authAuthEa(_entry.getField("editor").toString());
+                    String s = authAuthEa(_entry.getField("editor").toString());
+                    return s == null ? "" : s;
                 } else if (val.equals("edtrshort")) {
-                    return authshort(_entry.getField("editor").toString());
+                    String s = authshort(_entry.getField("editor").toString());
+                    return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
@@ -331,6 +368,8 @@ public class LabelPatternUtil {
                     int num = Integer.parseInt(val.substring(4));
                     String fa = firstAuthor(_entry.getField("editor")
                         .toString());
+                    if (fa == null)
+                        return "";
                     if (num > fa.length())
                         num = fa.length();
                     return fa.substring(0, num);
@@ -479,6 +518,7 @@ public class LabelPatternUtil {
      * @param authorField
      *            a <code>String</code>
      * @return the surname of an author/editor or "" if no author was found
+     *    This method is guaranteed to never return null.
      * 
      * @throws NullPointerException
      *             if authorField == null
@@ -487,9 +527,37 @@ public class LabelPatternUtil {
         AuthorList al = AuthorList.getAuthorList(authorField);
         if (al.size() == 0)
             return "";
-        return al.getAuthor(0).getLast();
+        String s = al.getAuthor(0).getLast();
+        return s != null ? s : "";
+
     }
 
+    /**
+     * Gets the von part and the last name of the first author/editor
+     *
+     * @param authorField
+     *            a <code>String</code>
+     * @return the von part and surname of an author/editor or "" if no author was found.
+     *  This method is guaranteed to never return null.
+     *
+     * @throws NullPointerException
+     *             if authorField == null
+     */
+    public static String firstAuthorVonAndLast(String authorField) {
+        AuthorList al = AuthorList.getAuthorList(authorField);
+        if (al.size() == 0)
+            return "";
+        String s = al.getAuthor(0).getVon();
+        StringBuilder sb = new StringBuilder();
+        if (s != null) {
+            sb.append(s);
+            sb.append(' ');
+        }
+        s = al.getAuthor(0).getLast();
+        if (s != null)
+            sb.append(s);
+        return sb.toString();
+    }
 
     /**
      * Gets the last name of the last author/editor
@@ -805,5 +873,42 @@ public class LabelPatternUtil {
         else 
             return String.valueOf(result);
     }
+
+    /**
+         * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
+         * as well as escaped colons and parentheses.
+         * @param arg The argument string.
+         * @return An array of strings representing the parts of the marker
+         */
+        public static String[] parseFieldMarker(String arg) {
+            List<String> parts = new ArrayList<String>();
+            StringBuilder current = new StringBuilder();
+            boolean escaped = false;
+            int inParenthesis = 0;
+            for (int i=0; i<arg.length(); i++) {
+                if ((arg.charAt(i) == ':') && !escaped && (inParenthesis == 0)) {
+                    parts.add(current.toString());
+                    current = new StringBuilder();
+                } else if ((arg.charAt(i) == '(') && !escaped) {
+                    inParenthesis++;
+                    current.append(arg.charAt(i));
+                } else if ((arg.charAt(i) == ')') && !escaped && (inParenthesis > 0)) {
+                    inParenthesis--;
+                    current.append(arg.charAt(i));
+                } else if (arg.charAt(i) == '\\') {
+                    if (escaped) {
+                        escaped = false;
+                        current.append(arg.charAt(i));
+                    } else
+                        escaped = true;
+                } else if (escaped) {
+                    current.append(arg.charAt(i));
+                    escaped = false;
+                } else
+                    current.append(arg.charAt(i));
+            }
+            parts.add(current.toString());
+            return parts.toArray(new String[parts.size()]);
+        }
 
 }

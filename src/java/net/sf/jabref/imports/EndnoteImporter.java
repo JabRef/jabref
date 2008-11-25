@@ -87,6 +87,7 @@ public class EndnoteImporter extends ImportFormat {
         Type = "";
         editor = "";
         artnum = "";
+
         boolean IsEditedBook = false;
         String[] fields = entries[i].trim().substring(1).split("\n%");
         //String lastPrefix = "";
@@ -161,6 +162,7 @@ public class EndnoteImporter extends ImportFormat {
         else if (prefix.equals("V")) hm.put("volume", val);
         else if (prefix.equals("N")) hm.put("number", val);
         else if (prefix.equals("U")) hm.put("url", val);
+        else if (prefix.equals("R")) hm.put("doi", val);
         else if (prefix.equals("O")) {
 	    // Notes may contain Article number
 	    if (val.startsWith("Artn")) {
@@ -192,7 +194,7 @@ public class EndnoteImporter extends ImportFormat {
         if (!author.equals("")) hm.put("author", fixAuthor(author));
         if (!editor.equals("")) hm.put("editor", fixAuthor(editor));
         //if pages missing and article number given, use the article number
-        if (hm.get("pages").equals("-") && !artnum.equals(""))
+        if ((hm.get("pages") == null) || hm.get("pages").equals("-") && !artnum.equals(""))
             hm.put("pages", artnum);
 
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals

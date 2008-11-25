@@ -120,6 +120,7 @@ public class BibtexFields
     add( new BibtexSingleField( "series", true, GUIGlobals.SMALL_W  ) ) ;
     add( new BibtexSingleField( "title", true, 400 ) ) ;
     add( new BibtexSingleField( "type", true, GUIGlobals.SMALL_W  ) ) ;
+    add( new BibtexSingleField( "language", true, GUIGlobals.SMALL_W  ) ) ;
     add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
     add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ).setNumeric(true) ) ;
 

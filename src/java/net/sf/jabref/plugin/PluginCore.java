@@ -121,8 +121,8 @@ public class PluginCore {
              */
             String[] jarLocationsToSearch = new String[] {
                 "/plugins/net.sf.jabref.core/",
-                "/plugins/net.sf.jabref.export.misq/" };
-
+                "/plugins/net.sf.jabref.export.misq/"};
+                
             // Collection locations
             for (String jarLocation : jarLocationsToSearch) {
                 PluginLocation location = getLocationInsideJar(jarLocation,

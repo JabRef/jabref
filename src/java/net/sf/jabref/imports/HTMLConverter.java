@@ -15,16 +15,18 @@ public class HTMLConverter implements LayoutFormatter {
 
         if (text == null)
             return null;
-
+        text = text.replaceAll("&ldquo;", "``");
+        text = text.replaceAll("&rdquo;", "''");
+        text = text.replaceAll("&lsquo;", "`");
+        text = text.replaceAll("&rsquo;", "'");
         StringBuffer sb = new StringBuffer();
-
         for (int i=0; i<text.length(); i++) {
 
             int c = text.charAt(i);
 
             if (c == '&') {
                 i = readHtmlChar(text, sb, i);
-                sb.append((char)c);
+                //sb.append((char)c);
             } else if (c == '<') {
                 i = readTag(text, sb, i);
             } else
@@ -42,8 +44,9 @@ public class HTMLConverter implements LayoutFormatter {
         // Have just read the < character that starts the tag.
         int index = text.indexOf(';', position);
         if ((index > position) && (index-position < MAX_CHAR_LENGTH)) {
-            System.out.println("Removed code: "+text.substring(position, index));
-            return index+1; // Just skip the tag.
+        	//String code = text.substring(position, index);
+            //System.out.println("Removed code: "+text.substring(position, index));
+            return index; // Just skip the tag.
         } else return position; // Don't do anything.
     }
 
@@ -51,8 +54,8 @@ public class HTMLConverter implements LayoutFormatter {
         // Have just read the < character that starts the tag.
         int index = text.indexOf('>', position);
         if ((index > position) && (index-position < MAX_TAG_LENGTH)) {
-            System.out.println("Removed tag: "+text.substring(position, index));
-            return index+1; // Just skip the tag.
+            //System.out.println("Removed tag: "+text.substring(position, index));
+            return index; // Just skip the tag.
         } else return position; // Don't do anything.
     }
 }

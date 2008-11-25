@@ -102,6 +102,7 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1219,9 +1220,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	}
 
 	/**
-	 * Accepts a string like [author:toLowerCase("escapedstring"),toUpperCase],
-	 * whereas the first string signifies the bibtex-field to get while the
-	 * others are the names of layouters that will be applied.
+	 * Accepts a string like [author:lower] or [title:abbr] or [auth],
+	 * whereas the first part signifies the bibtex-field to get, or the key generator
+     * field marker to use, while the others are the modifiers that will be applied.
 	 *
 	 * @param fieldAndFormat
 	 * @param entry
@@ -1251,21 +1252,19 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		String fieldValue = BibtexDatabase.getResolvedField(beforeColon, entry, database);
 
+        // If no field value was found, try to interpret it as a key generator field marker:
+        if (fieldValue == null)
+            fieldValue =  LabelPatternUtil.makeLabel(entry, beforeColon);
+
 		if (fieldValue == null)
 			return null;
 
 		if (afterColon == null || afterColon.length() == 0)
 			return fieldValue;
 
-		try {
-			LayoutFormatter[] formatters = LayoutEntry.getOptionalLayout(afterColon, "");
-			for (int i = 0; i < formatters.length; i++) {
-				fieldValue = formatters[i].format(fieldValue);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
+        String[] parts = afterColon.split(":");
+        fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
+        
 		return fieldValue;
 	}
 

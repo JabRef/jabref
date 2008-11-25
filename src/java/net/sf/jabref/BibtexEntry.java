@@ -36,10 +36,7 @@ import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import net.sf.jabref.export.FieldFormatter;
 
@@ -339,7 +336,7 @@ public class BibtexEntry
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@"+_type.getName().toUpperCase()+"{");
+        out.write("@"+_type.getName().toUpperCase(Locale.US)+"{");
 
         String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);

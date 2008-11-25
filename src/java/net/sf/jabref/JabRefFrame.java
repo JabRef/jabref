@@ -903,6 +903,13 @@ public JabRefPreferences prefs() {
     return (BasePanel) tabbedPane.getSelectedComponent();
   }
 
+    /**
+     * @return the BasePanel count.
+     */
+    public int baseCount() {
+        return tabbedPane.getComponentCount();
+    }
+    
   /**
    * handle the color of active and inactive JTabbedPane tabs
    */
@@ -1577,6 +1584,21 @@ public JabRefPreferences prefs() {
         }
     }
 
+    /**
+     * Signal closing of the current tab. Standard warnings will be given if the
+     * database has been changed.
+     */
+    public void closeCurrentTab() {
+        closeDatabaseAction.actionPerformed(null);
+    }
+
+    /**
+     * Close the current tab without giving any warning if the database has been changed.
+     */
+    public void closeCurrentTabNoWarning() {
+        closeDatabaseAction.close();
+    }
+
   class SelectKeysAction
       extends AbstractAction {
     public SelectKeysAction() {
@@ -1669,15 +1691,19 @@ public JabRefPreferences prefs() {
             }
 
             if (close) {
-                basePanel().cleanUp();
-                tabbedPane.remove(basePanel());
-                if (tabbedPane.getTabCount() > 0) {
-                    markActiveBasePanel();
-                }
-                updateEnabledState(); // Man, this is what I call a bug that this is not called.
-                output(Globals.lang("Closed database") + ".");
-                System.gc(); // Test
+                close();
             }
+        }
+
+        public void close() {
+            basePanel().cleanUp();
+            tabbedPane.remove(basePanel());
+            if (tabbedPane.getTabCount() > 0) {
+                markActiveBasePanel();
+            }
+            updateEnabledState(); // Man, this is what I call a bug that this is not called.
+            output(Globals.lang("Closed database") + ".");
+            System.gc(); // Test
         }
     }
 

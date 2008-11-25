@@ -168,7 +168,7 @@ public class UrlDragDrop implements DropTargetListener {
                     frame.output(Globals.lang("Downloading..."));
                     udl.download();
                     frame.output(Globals.lang("Download completed"));
-                    feditor.setText(file.toURL().toString());
+                    feditor.setText(file.toURI().toURL().toString());
                     editor.updateField(feditor);
 
                 }catch (IOException ioex){

@@ -115,13 +115,13 @@ public class UtilTest extends TestCase {
 
 		assertEquals("AAAA", Util.checkLegalKey("AA AA"));
 		assertEquals("SPECIALCHARS", Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
-		assertEquals("AeaeaAAA", Util.checkLegalKey("ÄäáÀÁÂ"));
+		assertEquals("AeaeaAAA", Util.checkLegalKey("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
 		assertEquals("", Util.checkLegalKey("\n\t\r"));
 	}
 
 	public void testReplaceSpecialCharacters() {
-		// Shouldn't German Ä be resolved to Ae
-		assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ÄäáÀÁÂ"));
+		// Shouldn't German ï¿½ be resolved to Ae
+		assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
 		assertEquals("Hallo Arger", Util.replaceSpecialCharacters("Hallo Arger"));
 	}
 
@@ -230,9 +230,9 @@ public class UtilTest extends TestCase {
 		
 		assertEquals(null, Util.getFieldAndFormat("[:]", entry, database));
 		
-		assertEquals(null, Util.getFieldAndFormat("[:ToLowerCase]", entry, database));
+		assertEquals(null, Util.getFieldAndFormat("[:lower]", entry, database));
 		
-		assertEquals("eric von hippel and georg von krogh", Util.getFieldAndFormat("[author:net.sf.jabref.export.layout.format.ToLowerCase]", entry, database));
+		assertEquals("eric von hippel and georg von krogh", Util.getFieldAndFormat("[author:lower]", entry, database));
 		
 		assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey]", entry, database));
 		

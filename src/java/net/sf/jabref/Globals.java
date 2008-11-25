@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.event.UndoableEditListener;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.imports.ImportFormatReader;
@@ -177,7 +178,7 @@ public class Globals {
     }
 
 	public static GlobalFocusListener focusListener = new GlobalFocusListener();
-
+    
 	public static JabRefPreferences prefs = null;
 
 	public static HelpDialog helpDiag = null;
@@ -196,7 +197,7 @@ public class Globals {
     // Instantiate logger:
     // TODO: Doesn't work in Java 5:
     // private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private static Logger logger = Logger.global;
+    private static Logger logger = Logger.getLogger("global");
 
     /**
 	 * true if we have unix newlines
@@ -562,9 +563,13 @@ public class Globals {
 
 	public static String SPECIAL_COMMAND_CHARS = "\"`^~'c";
 
-	public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>(), HTMLCHARS = new HashMap<String, String>(),
-		XML_CHARS = new HashMap<String, String>(), ASCII2XML_CHARS = new HashMap<String, String>(), UNICODE_CHARS = new HashMap<String, String>(),
-		RTFCHARS = new HashMap<String, String>(), URL_CHARS = new HashMap<String,String>();
+	public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>();
+	public static HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
+	public static HashMap<String, String> XML_CHARS = new HashMap<String, String>();
+	public static HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
+	public static HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
+	public static HashMap<String, String> RTFCHARS = new HashMap<String, String>();
+	public static HashMap<String, String> URL_CHARS = new HashMap<String,String>();
 
 	static {
 
@@ -1053,21 +1058,131 @@ public class Globals {
 		UNICODE_CHARS.put("\u012B", "i");
 		UNICODE_CHARS.put("\u012C", "I");
 		UNICODE_CHARS.put("\u012D", "i");
-        UNICODE_CHARS.put("\u0147", "N");
-        UNICODE_CHARS.put("\u0148", "n");
-        UNICODE_CHARS.put("\u0160", "S");
-        UNICODE_CHARS.put("\u0161", "s");
-        UNICODE_CHARS.put("\u017D", "Z");
-        UNICODE_CHARS.put("\u017E", "z");
-        UNICODE_CHARS.put("\u0158", "R");
-        UNICODE_CHARS.put("\u0159", "r");
-        UNICODE_CHARS.put("\u0164", "T");
+		UNICODE_CHARS.put("\u012E", "I");
+		UNICODE_CHARS.put("\u012F", "i");
+		UNICODE_CHARS.put("\u0130", "I");
+		UNICODE_CHARS.put("\u0131", "i");
+		UNICODE_CHARS.put("\u0132", "IJ");
+		UNICODE_CHARS.put("\u0133", "ij");
+		UNICODE_CHARS.put("\u0134", "J");
+		UNICODE_CHARS.put("\u0135", "j");
+		UNICODE_CHARS.put("\u0136", "K");
+		UNICODE_CHARS.put("\u0137", "k");
+		UNICODE_CHARS.put("\u0138", "k");
+		UNICODE_CHARS.put("\u0139", "L");
+		UNICODE_CHARS.put("\u013A", "l");
+		UNICODE_CHARS.put("\u013B", "L");
+		UNICODE_CHARS.put("\u013C", "l");
+		UNICODE_CHARS.put("\u013D", "L");
+		UNICODE_CHARS.put("\u013E", "l");
+		UNICODE_CHARS.put("\u013F", "L");
+		UNICODE_CHARS.put("\u0140", "l");
+		UNICODE_CHARS.put("\u0141", "L");
+		UNICODE_CHARS.put("\u0142", "l");
+		UNICODE_CHARS.put("\u0143", "N");
+		UNICODE_CHARS.put("\u0144", "n");
+		UNICODE_CHARS.put("\u0145", "N");
+		UNICODE_CHARS.put("\u0146", "n");
+		UNICODE_CHARS.put("\u0147", "N");
+		UNICODE_CHARS.put("\u0148", "n");
+		UNICODE_CHARS.put("\u0149", "n");
+		UNICODE_CHARS.put("\u014A", "N");
+		UNICODE_CHARS.put("\u014B", "n");
+		UNICODE_CHARS.put("\u014C", "O");
+		UNICODE_CHARS.put("\u014D", "o");
+		UNICODE_CHARS.put("\u014E", "O");
+		UNICODE_CHARS.put("\u014F", "o");
+		UNICODE_CHARS.put("\u0150", "Oe");
+		UNICODE_CHARS.put("\u0151", "oe");
+		UNICODE_CHARS.put("\u0152", "OE");
+		UNICODE_CHARS.put("\u0153", "oe");
+		UNICODE_CHARS.put("\u0154", "R");
+		UNICODE_CHARS.put("\u0155", "r");
+		UNICODE_CHARS.put("\u0156", "R");
+		UNICODE_CHARS.put("\u0157", "r");
+		UNICODE_CHARS.put("\u0158", "R");
+		UNICODE_CHARS.put("\u0159", "r");
+		UNICODE_CHARS.put("\u015A", "S");
+		UNICODE_CHARS.put("\u015B", "s");
+		UNICODE_CHARS.put("\u015C", "S");
+		UNICODE_CHARS.put("\u015D", "s");
+		UNICODE_CHARS.put("\u015E", "S");
+		UNICODE_CHARS.put("\u015F", "s");
+		UNICODE_CHARS.put("\u0160", "S");
+		UNICODE_CHARS.put("\u0161", "s");
+		UNICODE_CHARS.put("\u0162", "T");
+		UNICODE_CHARS.put("\u0163", "t");
+		UNICODE_CHARS.put("\u0164", "T");
+		UNICODE_CHARS.put("\u0165", "t");
+		UNICODE_CHARS.put("\u0166", "T");
+		UNICODE_CHARS.put("\u0167", "t");
+		UNICODE_CHARS.put("\u0168", "U");
+		UNICODE_CHARS.put("\u0169", "u");
+		UNICODE_CHARS.put("\u016A", "U");
+		UNICODE_CHARS.put("\u016B", "u");
+		UNICODE_CHARS.put("\u016C", "U");
+		UNICODE_CHARS.put("\u016D", "u");
+		UNICODE_CHARS.put("\u016E", "UU");
+		UNICODE_CHARS.put("\u016F", "uu");
+		UNICODE_CHARS.put("\u0170", "Ue");
+		UNICODE_CHARS.put("\u0171", "ue");
+		UNICODE_CHARS.put("\u0172", "U");
+		UNICODE_CHARS.put("\u0173", "u");
+		UNICODE_CHARS.put("\u0174", "W");
+		UNICODE_CHARS.put("\u0175", "w");
+		UNICODE_CHARS.put("\u0176", "Y");
+		UNICODE_CHARS.put("\u0177", "y");
+		UNICODE_CHARS.put("\u0178", "Y");
+		UNICODE_CHARS.put("\u0179", "Z");
+		UNICODE_CHARS.put("\u017A", "z");
+		UNICODE_CHARS.put("\u017B", "Z");
+		UNICODE_CHARS.put("\u017C", "z");
+		UNICODE_CHARS.put("\u017D", "Z");
+		UNICODE_CHARS.put("\u017E", "z");
+		UNICODE_CHARS.put("\u1EBC", "E");
+		UNICODE_CHARS.put("\u1EBD", "e");
+		UNICODE_CHARS.put("\u1EF8", "Y");
+		UNICODE_CHARS.put("\u1EF9", "y");
+		UNICODE_CHARS.put("\u01CD", "A");
+		UNICODE_CHARS.put("\u01CE", "a");
+		UNICODE_CHARS.put("\u01CF", "I");
+		UNICODE_CHARS.put("\u01D0", "i");
+		UNICODE_CHARS.put("\u01D1", "O");
+		UNICODE_CHARS.put("\u01D2", "o");
+		UNICODE_CHARS.put("\u01D3", "U");
+		UNICODE_CHARS.put("\u01D4", "u");
+		UNICODE_CHARS.put("\u0232", "Y");
+		UNICODE_CHARS.put("\u0233", "y");
+		UNICODE_CHARS.put("\u01EA", "O");
+		UNICODE_CHARS.put("\u01EB", "o");
+		UNICODE_CHARS.put("\u1E0C", "D");
+		UNICODE_CHARS.put("\u1E0D", "d");
+		UNICODE_CHARS.put("\u1E24", "H");
+		UNICODE_CHARS.put("\u1E25", "h");
+		UNICODE_CHARS.put("\u1E36", "L");
+		UNICODE_CHARS.put("\u1E37", "l");
+		UNICODE_CHARS.put("\u1E38", "L");
+		UNICODE_CHARS.put("\u1E39", "l");
+		UNICODE_CHARS.put("\u1E42", "M");
+		UNICODE_CHARS.put("\u1E43", "m");
+		UNICODE_CHARS.put("\u1E46", "N");
+		UNICODE_CHARS.put("\u1E47", "n");
+		UNICODE_CHARS.put("\u1E5A", "R");
+		UNICODE_CHARS.put("\u1E5B", "r");
+		UNICODE_CHARS.put("\u1E5C", "R");
+		UNICODE_CHARS.put("\u1E5D", "r");
+		UNICODE_CHARS.put("\u1E62", "S");
+		UNICODE_CHARS.put("\u1E63", "s");
+		UNICODE_CHARS.put("\u1E6C", "T");
+		UNICODE_CHARS.put("\u1E6D", "t");
+		UNICODE_CHARS.put("\u00CF", "I");
+		
+		
         UNICODE_CHARS.put("\u008C", "AE"); // doesn't work?
         UNICODE_CHARS.put("\u016E", "U");
         UNICODE_CHARS.put("\u016F", "u");
 
         UNICODE_CHARS.put("\u0178", "Y");
-        UNICODE_CHARS.put("\u0153", "ae");
         UNICODE_CHARS.put("\u00FE", ""); // thorn character
         
         // UNICODE_CHARS.put("\u0100", "");
@@ -1351,7 +1466,10 @@ public class Globals {
 	}
 
 	public static void initializeJournalNames() {
-		journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
+		if (prefs.getBoolean("useIEEEAbrv"))
+			journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
+        else
+            journalAbbrev = new JournalAbbreviations();
 
 		// Read external lists, if any (in reverse order, so the upper lists
 		// override the lower):

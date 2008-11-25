@@ -34,4 +34,9 @@ public interface ImportInspector {
      */
     void addEntry(BibtexEntry entry);
 
+
+    /**
+     * If this is a graphical dialog, bring it to the front.
+     */
+    void toFront();
 }

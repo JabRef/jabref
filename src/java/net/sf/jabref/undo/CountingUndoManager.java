@@ -29,6 +29,7 @@ package net.sf.jabref.undo;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
+import javax.swing.event.UndoableEditEvent;
 
 import net.sf.jabref.BasePanel;
 
@@ -39,13 +40,14 @@ public class CountingUndoManager extends UndoManager {
     private BasePanel panel = null;
 
     public CountingUndoManager(BasePanel basePanel) {
-	super();
-	panel = basePanel;
+    	super();
+	    panel = basePanel;
     }
 
+
     public synchronized boolean addEdit(UndoableEdit edit) {
-	current++;
-	return super.addEdit(edit);
+	    current++;
+        return super.addEdit(edit);
     }
     
     public synchronized void undo() throws CannotUndoException {

@@ -56,6 +56,8 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 
 import javax.swing.*;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.event.UndoableEditEvent;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -108,7 +110,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public CountingUndoManager undoManager = new CountingUndoManager(this);
     UndoAction undoAction = new UndoAction();
     RedoAction redoAction = new RedoAction();
-
+    
     private List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>(),
         nextEntries = new ArrayList<BibtexEntry>();
 
@@ -953,33 +955,76 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if (link != null) {
                                 filepath = link.toString();
                             } else {
-                                /*   The search can lead to an unexpected 100% CPU usage which is perceived
-                                     as a bug, if the search incidentally starts at a directory with lots
-                                     of stuff below. I don't think the search is really important - we should
-                                     rather concentrate on handling the explicit links well.
+                                if (Globals.prefs.getBoolean("runAutomaticFileSearch")) {
 
-                                // see if we can fall back to a filename based on the bibtex key
-                                String basefile;
-                                Object key = bes[0].getField(BibtexFields.KEY_FIELD);
-                                if (key != null) {
-                                    basefile = key.toString();
-                                    final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-                                    final String sep = System.getProperty("file.separator");
-                                    String dir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-                                    if ((dir != null) && (dir.length() > 0)) {
-                                        if (dir.endsWith(sep)) {
-                                            dir = dir.substring(0, dir.length() - sep.length());
-                                        }
-                                        for (int i = 0; i < types.length; i++) {
-                                            String found = Util.findPdf(basefile, types[i].getExtension(),
-                                                    dir, new OpenFileFilter("." + types[i].getExtension()));
-                                            if (found != null) {
-                                                filepath = dir + sep + found;
-                                                break;
+                                     /*  The search can lead to an unexpected 100% CPU usage which is perceived
+                                         as a bug, if the search incidentally starts at a directory with lots
+                                         of stuff below. It is now disabled by default. */
+
+                                    // see if we can fall back to a filename based on the bibtex key
+                                    final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+                                    entries.add(bes[0]);
+                                    ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+                                    ArrayList<File> dirs = new ArrayList<File>();
+                                    if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD) != null)
+                                        dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
+                                    Collection<String> extensions = new ArrayList<String>();
+                                    for (int i = 0; i < types.length; i++) {
+                                        final ExternalFileType type = types[i];
+                                        extensions.add(type.getExtension());
+                                    }
+                                    // Run the search operation:
+                                    Map<BibtexEntry, java.util.List<File>> result;
+                                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                                        String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
+                                        result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                                    }
+                                    else
+                                        result = Util.findAssociatedFiles(entries, extensions, dirs);
+                                    if (result.get(bes[0]) != null) {
+                                        List<File> res = result.get(bes[0]);
+                                        if (res.size() > 0) {
+                                            filepath = res.get(0).getPath();
+                                            int index = filepath.lastIndexOf('.');
+                                            if ((index >= 0) && (index < filepath.length()-1)) {
+                                                String extension = filepath.substring(index+1);
+                                                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension);
+                                                if (type != null) {
+                                                    try {
+                                                        Util.openExternalFileAnyFormat(metaData, filepath, type);
+                                                        output(Globals.lang("External viewer called") + ".");
+                                                        return;
+                                                    } catch (IOException ex) {
+                                                        output(Globals.lang("Error") + ": " + ex.getMessage());
+                                                    }
+                                                }
                                             }
+
+                                            // TODO: add code for opening the file
                                         }
                                     }
-                                } */
+                                    /*String basefile;
+                                    Object key = bes[0].getField(BibtexFields.KEY_FIELD);
+                                    if (key != null) {
+                                        basefile = key.toString();
+                                        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+                                        final String sep = System.getProperty("file.separator");
+                                        String dir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                                        if ((dir != null) && (dir.length() > 0)) {
+                                            if (dir.endsWith(sep)) {
+                                                dir = dir.substring(0, dir.length() - sep.length());
+                                            }
+                                            for (int i = 0; i < types.length; i++) {
+                                                String found = Util.findPdf(basefile, types[i].getExtension(),
+                                                        dir, new OpenFileFilter("." + types[i].getExtension()));
+                                                if (found != null) {
+                                                    filepath = dir + sep + found;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }*/
+                                }
                             }
 
 
@@ -2334,6 +2379,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     class UndoAction extends BaseAction {
         public void action() {
             try {
+                JComponent focused = Globals.focusListener.getFocused();
+                if ((focused != null) && (focused instanceof FieldEditor) && (focused.hasFocus())) {
+                    // User is currently editing a field:
+                    // Check if it is the preamble:
+                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
+                        preambleEditor.storeCurrentEdit();
+                    }
+                    else
+                        storeCurrentEdit();
+                }
                 String name = undoManager.getUndoPresentationName();
                 undoManager.undo();
                 markBaseChanged();
@@ -2350,8 +2405,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     class RedoAction extends BaseAction {
+
         public void action() {
             try {
+
+                JComponent focused = Globals.focusListener.getFocused();
+                if ((focused != null) && (focused instanceof FieldEditor) && (focused.hasFocus())) {
+                    // User is currently editing a field:
+                    storeCurrentEdit();
+                }
+
                 String name = undoManager.getRedoPresentationName();
                 undoManager.redo();
                 markBaseChanged();
@@ -2600,5 +2663,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.back.setEnabled(previousEntries.size() > 0);
         frame.forward.setEnabled(nextEntries.size() > 0);
     }
+
 
 }

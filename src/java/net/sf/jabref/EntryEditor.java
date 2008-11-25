@@ -495,12 +495,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             StringWriter sw = new StringWriter(200);
 
             try {
-                entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
+                LatexFieldFormatter formatter = new LatexFieldFormatter();
+                formatter.setNeverFailOnHashes(true);
+                entry.write(sw, formatter, false);
 
                 String srcString = sw.getBuffer().toString();
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
             } catch (IOException ex) {
+                System.out.println("Her");
                 source.setText(ex.getMessage() + "\n\n" + 
                                         Globals.lang("Correct the entry, and "
                     + "reopen editor to display/edit source."));
@@ -898,7 +901,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             g2.setFont(GUIGlobals.typeNameFont);
             FontMetrics fm = g2.getFontMetrics();
             int width = fm.stringWidth(label);
-            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.rotate(-Math.PI / 2, 0, 0);
             g2.drawString(label, -width - 7, 28);
         }
@@ -1055,6 +1058,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     // fe.setLabelColor(GUIGlobals.nullFieldColor);
                     fe.setBackground(GUIGlobals.validFieldBackground);
 
+                if (fe.getTextComponent().hasFocus())
+                    fe.setBackground(GUIGlobals.activeEditor);
                 updateSource();
                 panel.markBaseChanged();
             }
@@ -1120,14 +1125,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         updateSource();
                         panel.markBaseChanged();
 
-                        // TODO: removed the following to avoid the problem of selection dropping
-                        // TODO: back when clicking a different entry. But what was the purpose of this code?
-                        /*SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                panel.highlightEntry(entry);
-                            }
-                        });*/
-
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
                             .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
@@ -1138,6 +1135,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     // We set the field and label color.
                     fe.setBackground(GUIGlobals.validFieldBackground);
                 }
+                if (fe.getTextComponent().hasFocus())
+                    fe.setBackground(GUIGlobals.activeEditor);
             } else if ((source.isEditable())
                 && (!source.getText().equals(lastSourceStringAccepted))) {
                 boolean accepted = storeSource(true);

@@ -46,7 +46,6 @@ public class RegExpFileSearch {
     public static Map<BibtexEntry, java.util.List<File>> findFilesForSet(Collection<BibtexEntry> entries,
                  Collection<String> extensions, List<File> directories, String regExp) {
 
-
         Map<BibtexEntry, java.util.List<File>> res = new HashMap<BibtexEntry, List<File>>();
         for (BibtexEntry entry : entries) {
             res.put(entry, findFiles(entry, extensions, directories, regExp));
@@ -73,7 +72,6 @@ public class RegExpFileSearch {
                     sb.append("|");
         }
         String extensionRegExp = "("+sb.toString()+")";
-
 
         return findFile(entry, null, directories, regularExpression, extensionRegExp, true);
     }

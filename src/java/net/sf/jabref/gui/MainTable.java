@@ -61,6 +61,8 @@ public class MainTable extends JTable {
     public MainTable(MainTableFormat tableFormat, EventList<BibtexEntry> list, JabRefFrame frame,
                      BasePanel panel) {
         super();
+
+        setAutoResizeMode(Globals.prefs.getInt("autoResizeMode"));
         this.tableFormat = tableFormat;
         this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
@@ -181,8 +183,10 @@ public class MainTable extends JTable {
         return pane;
     }
 
-    public TableCellRenderer getCellRenderer(int row, int column) {
+    
 
+    public TableCellRenderer getCellRenderer(int row, int column) {
+        
         int score = -3;
         TableCellRenderer renderer = defRenderer;
 
@@ -457,6 +461,8 @@ public class MainTable extends JTable {
 
         defRenderer = new GeneralRenderer(Globals.prefs.getColor("tableBackground"),
                 Globals.prefs.getColor("tableText"));
+        Color sel = defRenderer.getTableCellRendererComponent
+                (new JTable(), "", true, false, 0, 0).getBackground();
         reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"));
         optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"));
         incRenderer = new IncompleteRenderer();
@@ -465,11 +471,18 @@ public class MainTable extends JTable {
         grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"));
         veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"));
         grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
-            Globals.prefs.getColor("grayedOutText"));
+            Globals.prefs.getColor("grayedOutText"), mixColors(Globals.prefs.getColor("grayedOutBackground"),
+                sel));
         veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
-                Globals.prefs.getColor("veryGrayedOutText"));
+                Globals.prefs.getColor("veryGrayedOutText"), mixColors(Globals.prefs.getColor("veryGrayedOutBackground"),
+                sel));
         markedRenderer = new GeneralRenderer(Globals.prefs.getColor("markedEntryBackground"),
-                Globals.prefs.getColor("tableText"));
+                Globals.prefs.getColor("tableText"), mixColors(Globals.prefs.getColor("markedEntryBackground"), sel));
+    }
+
+    private static Color mixColors(Color one, Color two) {
+        return new Color((one.getRed()+two.getRed())/2, (one.getGreen()+two.getGreen())/2,
+                (one.getBlue()+two.getBlue())/2);
     }
 
     static class IncompleteRenderer extends GeneralRenderer {

@@ -1,9 +1,8 @@
 package net.sf.jabref;
 
-import java.awt.Color;
+import java.awt.*;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
@@ -11,15 +10,52 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
 
+    Color background, selBackground = null;
+
     public GeneralRenderer(Color c) {
         super();
+        this.background = c;
         setBackground(c);
     }
 
 
+    /**
+     * Renderer with specified foreground and background colors, and default selected
+     * background color.
+     * @param c Foreground color
+     * @param fg Background color
+     */
     public GeneralRenderer(Color c, Color fg) {
         this(c);
+        this.background = c;
         setForeground(fg);
+    }
+
+    /**
+     * Renderer with specified foreground, background and selected background colors
+     * @param c Foreground color
+     * @param fg Unselected background color
+     * @param sel Selected background color
+     */
+    public GeneralRenderer(Color c, Color fg, Color sel) {
+        this(c);
+        this.background = c;
+        setForeground(fg);
+        this.selBackground = sel;
+    }
+
+    public Component getTableCellRendererComponent(JTable table, Object o, boolean isSelected,
+                                                   boolean hasFocus, int row, int column) {
+        if (selBackground == null)
+            return super.getTableCellRendererComponent(table, o, isSelected, hasFocus, row, column);
+        else {
+            Component c = super.getTableCellRendererComponent(table, o, isSelected, hasFocus, row, column);
+            if (isSelected)
+                c.setBackground(selBackground);
+            else
+                c.setBackground(background);
+            return c;
+        }
     }
 
     public void firePropertyChange(String propertyName, boolean old, boolean newV) {}

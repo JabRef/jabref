@@ -134,41 +134,25 @@
     in the "journal" field after replacing all whitespace by underscores).
     </p>
 
+    <h2>Built-in export formatters</h2>
+
     <p>JabRef provides the following set of formatters, some of
     which depend on the others:</p>
 
     <ul>
 
-        <li><code>FormatChars</code> : replaces TeX-specific special
-        characters (e.g. {\^a} or {\"{o}}) with their Unicode
-        representations.</li>
+        <li><code>AuthorAbbreviator</code> or <code>AuthorLastFirstAbbreviator</code>
+            : abbreviates first and middle names of all authors. This formatter
+        returns names with the last name first. Follow this formatter with
+        AuthorFirstFirst to get abbreviated names with the initials first.</li>
 
-        <li><code>HTMLChars</code> : replaces TeX-specific special
-        characters (e.g. {\^a} or {\"{o}}) with their HTML
-        representations, and translates LaTeX commands \emph, \textit,
-        \textbf into HTML equivalents.</li>
+        <li><code>AuthorAndsCommaReplacer</code> : replaces "and"
+        between names with ",", and "&amp;" between the last
+        two.</li>
 
-        <li><code>HTMLParagraphs</code> : interprets two
-        consecutive newlines (e.g. \n \n) as the beginning of a new
-        paragraph and creates paragraph-html-tags accordingly.</li>
-
-        <li><code>XMLChars</code> : replaces TeX-specific special
-        characters (e.g. {\^a} or {\"{o}}) with their XML
-        representations.</li>
-
-        <li><code>CreateDocBookAuthors</code> : formats the author
-        field in DocBook style.</li>
-
-        <li><code>CreateDocBookEditors</code> : to be
-        documented.</li>
-
-        <li><code>CurrentDate</code> : outputs the current date.
-        With no argument, this formatter outputs the current date
-        and time in the format "yyyy.MM.dd hh:mm:ss z" (date, time
-        and time zone). By giving a different format string as
-        argument, the date format can be customized. E.g.
-        <code>\format[CurrentDate]{yyyy.MM.dd}</code> will give the
-        date only, e.g. 2005.11.30.</li>
+        <li><code>AuthorAndsReplacer</code> : replaces "and"
+        between names with ";", and "&amp;" between the last
+        two.</li>
 
         <li><code>AuthorFirstFirst</code> : formats author/editor
         fields with the first names first.</li>
@@ -192,10 +176,13 @@
         <li><code>AuthorLastFirst</code> : formats author/editor
         fields with the last names first.</li>
 
-        <li><code>AuthorAbbreviator</code> or <code>AuthorLastFirstAbbreviator</code>
-            : abbreviates first and middle names of all authors. This formatter
-        returns names with the last name first. Follow this formatter with
-        AuthorFirstFirst to get abbreviated names with the initials first.</li>
+        <li><code>AuthorLastFirstAbbrCommas</code> : formats
+        author/editor fields with last names first and abbreviated first names
+        last, delimited by commas, with "and" between the last two names.</li>
+
+        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : similar
+        to <code>AuthorLastFirstAbbrCommas</code>, except that the "and"
+        between the last two names is preceded by a comma.</li>
 
         <li><code>AuthorLastFirstCommas</code> : formats
         author/editor fields with the last names first, delimited by
@@ -205,44 +192,43 @@
         to <code>AuthorLastFirstCommas</code>, except that the "and"
         between the last two names is preceded by a comma.</li>
 
-        <li><code>AuthorLastFirstAbbrCommas</code> : formats
-        author/editor fields with last names first and abbreviated first names
-        last, delimited by commas, with "and" between the last two names.</li>
-
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : similar
-        to <code>AuthorLastFirstAbbrCommas</code>, except that the "and"
-        between the last two names is preceded by a comma.</li>
-
-        <li><code>AuthorAndsReplacer</code> : replaces "and"
-        between names with ";", and "&amp;" between the last
-        two.</li>
-
-        <li><code>AuthorAndsCommaReplacer</code> : replaces "and"
-        between names with ",", and "&amp;" between the last
-        two.</li>
-
-        <li><code>AuthorOrgSci</code> : first author is in "last,
-        first" all others in "first last". First names are
-        abbreviated.</li>
-
         <li><code>AuthorNatBib</code> : formats author names in
         NatBib style, with last names only, separating names by
         "and" if there are two authors, and giving the first author
         followed by "et al." if there are more than two
         authors.</li>
 
-        <li><code>NoSpaceBetweenAbbreviations</code> : spaces
-        between multiple abbreviated first names are removed.</li>
+        <li><code>AuthorOrgSci</code> : first author is in "last,
+        first" all others in "first last". First names are
+        abbreviated.</li>
+
+        <li><code>CreateDocBookAuthors</code> : formats the author
+        field in DocBook style.</li>
+
+        <li><code>CreateDocBookEditors</code> : to be
+        documented.</li>
+
+        <li><code>CurrentDate</code> : outputs the current date.
+        With no argument, this formatter outputs the current date
+        and time in the format "yyyy.MM.dd hh:mm:ss z" (date, time
+        and time zone). By giving a different format string as
+        argument, the date format can be customized. E.g.
+        <code>\format[CurrentDate]{yyyy.MM.dd}</code> will give the
+        date only, e.g. 2005.11.30.</li>
 
         <li><code>FileLink(filetype)</code> : if no argument is given, this formatter outputs
-            the first external file link encoded in the field. To work, the formatter must
-            be supplied with the contents of the "file" field.
-            <p>This formatter takes the name of an external file type as an optional argument,
-                specified in parentheses after the formatter name. For instance,
-                <code>\format[FileLink(pdf)]{\file}</code> specifies <code>pdf</code> as an
-                argument. When an argument is given, the formatter selects the first file
-                link of the specified type. In the example, the path to the first PDF link will
-                be output.</p></li>
+        the first external file link encoded in the field. To work, the formatter must
+        be supplied with the contents of the "file" field.
+        <p>This formatter takes the name of an external file type as an optional argument,
+        specified in parentheses after the formatter name. For instance,
+        <code>\format[FileLink(pdf)]{\file}</code> specifies <code>pdf</code> as an
+        argument. When an argument is given, the formatter selects the first file
+        link of the specified type. In the example, the path to the first PDF link will
+        be output.</p></li>
+
+        <li><code>FirstPage</code> : returns the first page from the "pages" field, if set.
+            For instance, if the pages field is set to "345-360" or "345--360",
+            this formatter will return "345".</li>
 
         <li><code>FormatPagesForHTML</code> : replaces "--" with
         "-".</li>
@@ -250,32 +236,30 @@
         <li><code>FormatPagesForXML</code> : replaces "--" with an
         XML en-dash.</li>
 
-        <li><code>FirstPage</code> : returns the first page from the "pages" field, if set.
-            For instance, if the pages field is set to "345-360" or "345--360",
-            this formatter will return "345".</li>
+        <li><code>GetOpenOfficeType</code> : returns the number used by the OpenOffice.org
+        bibliography system (versions 1.x and 2.x) to denote the type of this entry.</li>
+
+        <li><code>HTMLChars</code> : replaces TeX-specific special
+        characters (e.g. {\^a} or {\"{o}}) with their HTML
+        representations, and translates LaTeX commands \emph, \textit,
+        \textbf into HTML equivalents.</li>
+
+        <li><code>HTMLParagraphs</code> : interprets two
+        consecutive newlines (e.g. \n \n) as the beginning of a new
+        paragraph and creates paragraph-html-tags accordingly.</li>
 
         <li><code>LastPage</code> : returns the last page from the "pages" field, if set.
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "360".</li>
 
-    <li><code>Replace(regexp,replacewith)</code> : does a regular expression replacement.
-        To use this formatter, a two-part argument must be given. The parts are
-        separated by a comma. To indicate the comma character, use an escape
-        sequence: \,<br>&nbsp;<br>
-        The first part is the regular expression to search for. The regular expression
-        is written normally, without extra escape sequences for backslashes. A description
-        of Java regular expressions can be found at:<br>
-        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
-         <br>&nbsp;<br>
-        The second part is the text to replace all matches with.</li>
+        <li><code>NoSpaceBetweenAbbreviations</code> : spaces
+        between multiple abbreviated first names are removed.</li>
 
         <li><code>RemoveBrackets</code> : removes all curly
         brackets "{" or "}".</li>
 
         <li><code>RemoveBracketsAddComma</code> : to be
         documented.</li>
-
-        <li><code>RemoveWhitespace</code> : removes all whitespace characters.</li>
 
         <li><code>RemoveLatexCommands</code> : removes LaTeX
         commands like <code>\em</code>, <code>\textbf</code>, etc.
@@ -288,21 +272,107 @@
         Useful in combination with the NameFormatter discussed in
         the next section.</li>
 
-        <li><code>ToLowerCase</code> : turns all characters into
-        lower case.</li>
+        <li><code>RemoveWhitespace</code> : removes all whitespace characters.</li>
 
-        <li><code>ToUpperCase</code> : turns all characters into
-        upper case.</li>
-
-        <li><code>GetOpenOfficeType</code> : returns the number used by the OpenOffice.org
-            bibliography system (versions 1.x and 2.x) to denote the type of this entry.</li>
+        <li><code>Replace(regexp,replacewith)</code> : does a regular expression replacement.
+        To use this formatter, a two-part argument must be given. The parts are
+        separated by a comma. To indicate the comma character, use an escape
+        sequence: \,<br>&nbsp;<br>
+        The first part is the regular expression to search for. The regular expression
+        is written normally, without extra escape sequences for backslashes. A description
+        of Java regular expressions can be found at:<br>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+         <br>&nbsp;<br>
+        The second part is the text to replace all matches with.</li>
 
         <li><code>RTFChars</code> : replaces TeX-specific special
         characters (e.g. {\^a} or {\"{o}}) with their RTF
         representations, and translates LaTeX commands \emph, \textit,
         \textbf into RTF equivalents.</li>
 
+        <li><code>ToLowerCase</code> : turns all characters into
+        lower case.</li>
+
+        <li><code>ToUpperCase</code> : turns all characters into
+        upper case.</li>
+
+        <li><code>WrapContent</code> : This formatter outputs the input value after adding a
+        prefix and a postfix, as long as the input value is non-empty. If the input value
+        is empty, an empty string is output (the prefix and postfix are not output in this case).
+        The formatter requires an argument containing the prefix and postix separated
+        by a comma. To include the comma character in either, use an escape sequence
+        (\,).</li>
+
+        <li><code>WrapFileLinks</code> : See below.</li>
+
+        <li><code>XMLChars</code> : replaces TeX-specific special
+        characters (e.g. {\^a} or {\"{o}}) with their XML
+        representations.</li>
+
+
+
     </ul>
+
+    <h3>The <code>WrapFileLinks</code> formatter</h3>
+
+    This formatter iterates over all file links, or all file links of a specified
+    type, outputting a format string given as the first argument. The format string
+    can contain a number of escape sequences indicating file link information to
+    be inserted into the string.
+    <p/>
+    This formatter can take an optional second argument specifying the name of a file
+    type. If specified, the iteration will only include those files with a file type
+    matching the given name (case-insensitively). If specified as an empty argument,
+    all file links will be included.
+    <p/>
+    After the second argument, pairs of additional arguments can be added in order to
+    specify regular expression replacements to be done upon the inserted link information
+    before insertion into the output string. A non-paired argument will be ignored.
+    In order to specify replacements without filtering on file types, use an empty second
+    argument.
+    <p/>
+    The escape sequences for embedding information are as follows:
+    <p/>
+    \i   : This inserts the iteration index (starting from 1), and can be useful if
+    the output list of files should be enumerated.<br>
+    \p   : This inserts the file path of the file link.<br>
+    \f   : This inserts the name of the file link's type.<br>
+    \x   : This inserts the file's extension, if any.<br>
+    \d   : This inserts the file link's description, if any.<br>
+    <p/>
+    For instance, an entry could contain a file link to the file "/home/john/report.pdf"
+    of the "PDF" type with description "John's final report".
+    <p/>
+    Using the WrapFileLinks formatter with the following argument:
+    <p/>
+    \format[WrapFileLinks(\i. \d (\p))]{\file}
+    <p/>
+    would give the following output:<br>
+    <pre>1. John's final report (/home/john/report.pdf)</pre>
+    <p/>
+    If the entry contained a second file link to the file "/home/john/draft.txt" of the
+    "Text file" type with description 'An early "draft"', the output would be as follows:<br>
+    <pre>1. John's final report (/home/john/report.pdf)</pre>
+    <pre>2. An early "draft" (/home/john/draft.txt)</pre>
+    <p/>
+    If the formatter was called with a second argument, the list would be filtered.
+    For instance:<br>
+    <pre>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</pre>
+    <p/>
+    would show only the text file:<br>
+    <pre>1. An early "draft" (/home/john/draft.txt)</pre>
+    <p/>
+    If we wanted this output to be part of an XML styled output, the quotes in the
+    file description could cause problems. Adding two additional arguments to translate
+    the quotes into XML characters solves this:<br>
+    \format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
+    <p/>
+    would give the following output:<br>
+    <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
+    <p/>Additional pairs of replacements could be added.
+
+    
+    <h3>Custom formatters</h3>
 
     <p>If none of the available formatters can do what you want to
     achieve, you can add your own by implementing the
@@ -318,7 +388,7 @@
     <h2><a name="NameFormatter"
        id="NameFormatter">Using Custom Name Formatters</a></h2>
 
-    <p>With JabRef 2.2 it is now possible to define custom name
+    <p>From JabRef 2.2, it is possible to define custom name
     formatters using the bibtex-sty-file syntax. This allows
     ultimate flexibility, but is a cumbersome to write</p>
 

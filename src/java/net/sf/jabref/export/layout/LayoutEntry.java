@@ -311,7 +311,18 @@ public class LayoutEntry {
 				}
 			}
 		}
-		return pluginLayoutFormatter.get(formatterName);
+        // We need to make a new instance of this LayoutFormatter, in case it is a
+        // parameter-accepting layout formatter:
+        if (pluginLayoutFormatter.containsKey(formatterName)) {
+            Class<? extends LayoutFormatter> c = pluginLayoutFormatter.get(formatterName).getClass();
+            try {
+                return c.getConstructor().newInstance();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            return pluginLayoutFormatter.get(formatterName);
+        }
+        else return null;
 	}
 	
 	public static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
@@ -395,6 +406,13 @@ public class LayoutEntry {
 			// Last load from plug-ins
 			LayoutFormatter f = getLayoutFormatterFromPlugins(className);
 			if (f != null) {
+                // If this formatter accepts an argument, check if we have one, and
+                // set it if so:
+                if (f instanceof ParamLayoutFormatter) {
+                    if (strings.length >= 2) {
+                        ((ParamLayoutFormatter)f).setArgument(strings[1]);
+                    }
+                }
 				results.add(f);
 				continue;
 			}

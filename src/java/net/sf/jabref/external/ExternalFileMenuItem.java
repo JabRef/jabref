@@ -21,6 +21,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     final MetaData metaData;
     ExternalFileType fileType;
     final JabRefFrame frame;
+    private String fieldName = null;
 
     public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
                                 String link, Icon icon,
@@ -36,29 +37,39 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     }
 
     public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
-                                String link, Icon icon, MetaData metaData) {
-        this(frame, entry, name, link, icon, metaData, null);
+                                String link, Icon icon, MetaData metaData, String fieldName) {
+        this(frame, entry, name, link, icon, metaData, (ExternalFileType)null);
+        this.fieldName = fieldName;
     }
 
     public void actionPerformed(ActionEvent e) {
-        openLink();
+        boolean success = openLink();
+        if (!success) {
+            frame.output(Globals.lang("Unable to open link."));
+        }
     }
 
     public boolean openLink() {
-
+        frame.output(Globals.lang("External viewer called") + ".");
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
-                // We don't already know the file type, so we try to deduce it from the extension:
-                File file = new File(link);
-                // We try to check the extension for the file:
-                String name = file.getName();
-                int pos = name.indexOf('.');
-                String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
-                    .trim().toLowerCase() : null;
-                // Now we know the extension, check if it is one we know about:
-                type = Globals.prefs.getExternalFileTypeByExt(extension);
-                fileType = type;
+                if (this.fieldName != null) {
+                    Util.openExternalViewer(frame.basePanel().metaData(), link, fieldName);
+                    return true;
+                }
+                else {
+                    // We don't already know the file type, so we try to deduce it from the extension:
+                    File file = new File(link);
+                    // We try to check the extension for the file:
+                    String name = file.getName();
+                    int pos = name.indexOf('.');
+                    String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
+                        .trim().toLowerCase() : null;
+                    // Now we know the extension, check if it is one we know about:
+                    type = Globals.prefs.getExternalFileTypeByExt(extension);
+                    fileType = type;
+                }
             }
 
             if (type instanceof UnknownExternalFileType)

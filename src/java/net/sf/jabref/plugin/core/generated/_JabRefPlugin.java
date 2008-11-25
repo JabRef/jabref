@@ -72,6 +72,11 @@ public abstract class _JabRefPlugin extends Plugin {
             return getStringParameter("extension");
         }
   
+  	     
+              public String getEncoding(){
+            return getStringParameter("encoding");
+        }
+  
       }
 
 	public List<ExportFormatExtension> getExportFormatExtensions(){
