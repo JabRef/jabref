@@ -428,7 +428,7 @@ public class BibtexParser {
 		skipWhitespace();
 		// Util.pr("Now the contents");
 		consume('=');
-		String content = parseFieldContent();
+		String content = parseFieldContent(name);
 		// Util.pr("Now I'm going to consume a }");
 		consume('}', ')');
 		// Util.pr("Finished string parsing.");
@@ -464,7 +464,7 @@ public class BibtexParser {
 				c = (char) peek();
 				if (Character.isWhitespace(c) || (c == '{') || (c == '\"')) {
 					String fieldName = ex.getMessage().trim().toLowerCase();
-					String cont = parseFieldContent();
+					String cont = parseFieldContent(fieldName);
 					result.setField(fieldName, cont);
 				} else {
 					if (key != null)
@@ -509,7 +509,7 @@ public class BibtexParser {
 		// Util.pr("Field: _"+key+"_");
 		skipWhitespace();
 		consume('=');
-		String content = parseFieldContent();
+		String content = parseFieldContent(key);
 		// Now, if the field in question is set up to be fitted automatically
 		// with braces around
 		// capitals, we should remove those now when reading the field:
@@ -535,7 +535,7 @@ public class BibtexParser {
 		}
 	}
 
-	private String parseFieldContent() throws IOException {
+	private String parseFieldContent(String key) throws IOException {
 		skipWhitespace();
 		StringBuffer value = new StringBuffer();
 		int c = '.';
@@ -567,7 +567,7 @@ public class BibtexParser {
 				// of brackets inside of a field, so we need to count the
 				// brackets to know when the string is finished.
 				StringBuffer text = parseBracketedTextExactly();
-				value.append(fieldContentParser.format(text));
+				value.append(fieldContentParser.format(text, key));
 
 			} else if (Character.isDigit((char) c)) { // value is a number
 
@@ -622,6 +622,15 @@ public class BibtexParser {
 		return value.toString();
 
 	}
+
+	/**
+	 * Originalinhalt nach parseFieldContent(String) verschoben.
+	 * @return
+	 * @throws IOException
+	 */
+//	private String parseFieldContent() throws IOException {
+//		return parseFieldContent(null);
+//	}
 
 	/**
 	 * Check if a string at any point has had more ending braces (}) than

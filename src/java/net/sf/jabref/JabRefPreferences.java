@@ -80,7 +80,7 @@ public class JabRefPreferences {
         keyBinds = new HashMap<String, String>(),
         defKeyBinds = new HashMap<String, String>();
     private HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
-    private HashSet<String> nonWrappableFields = new HashSet<String>(4);
+    private HashSet<String> nonWrappableFields = new HashSet<String>(5);
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
@@ -338,7 +338,7 @@ public class JabRefPreferences {
         defaults.put("doNotResolveStringsFor", "url");
         defaults.put("resolveStringsAllFields", Boolean.FALSE);
         defaults.put("putBracesAroundCapitals","");//"title;journal;booktitle;review;abstract");
-        defaults.put("nonWrappableFields", "pdf;ps;url;doi");
+        defaults.put("nonWrappableFields", "pdf;ps;url;doi;file");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.TRUE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);

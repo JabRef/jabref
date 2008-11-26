@@ -266,6 +266,7 @@ public class BibtexParserTest extends TestCase {
 				"d = {a \n \n b},"
 			+ "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
 			+ "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
+			+ "file = {Bemerkung:H:\\bla\\ups  sala.pdf:PDF}, \n"
 			+ "}");
 		
 		assertEquals("canh05", e.getCiteKey());
@@ -279,5 +280,53 @@ public class BibtexParserTest extends TestCase {
 		// I think the last \n is a bug in the parser...
 		assertEquals("Hallo World this is\nnot \nan \n exercise . \n\n", e.getField("title"));
 		assertEquals("Hallo World this isnot an exercise . ", e.getField("tabs"));
+	}
+	
+	/**
+	 * Test for [2022983]
+	 * 
+	 * @author Uwe Kuehn
+	 * @author Andrei Haralevich
+	 */
+	public void testFileNaming(){
+		BibtexEntry e = BibtexParser.singleFromString("@article{canh05," 
+			+ "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
+			+ "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
+			+ "file = {Bemerkung:H:\\bla\\ups  sala.pdf:PDF}, \n"
+			+ "}");
+		
+		assertEquals("Bemerkung:H:\\bla\\ups  sala.pdf:PDF", e.getField("file"));
+	}
+	
+	/**
+	 * Test for [2022983]
+	 * 
+	 * @author Uwe Kuehn
+	 * @author Andrei Haralevich
+	 */
+	public void testFileNaming1(){
+		BibtexEntry e = BibtexParser.singleFromString("@article{canh05," 
+			+ "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
+			+ "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
+			+ "file = {Bemerkung:H:\\bla\\ups  \tsala.pdf:PDF}, \n"
+			+ "}");
+		
+		assertEquals("Bemerkung:H:\\bla\\ups  sala.pdf:PDF", e.getField("file"));
+	}
+	
+	/**
+	 * Test for [2022983]
+	 * 
+	 * @author Uwe Kuehn
+	 * @author Andrei Haralevich
+	 */
+	public void testFileNaming3(){
+		BibtexEntry e = BibtexParser.singleFromString("@article{canh05," 
+			+ "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
+			+ "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
+			+ "file = {Bemerkung:H:\\bla\\ups \n\tsala.pdf:PDF}, \n"
+			+ "}");
+		
+		assertEquals("Bemerkung:H:\\bla\\ups  sala.pdf:PDF", e.getField("file"));
 	}
 }

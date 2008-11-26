@@ -1,6 +1,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.GUIGlobals;
 
 
 /**
@@ -12,11 +13,13 @@ public class FieldContentParser {
 
     /**
      * Performs the reformatting
-     * @param content StringBuffer containing the field to format.
+     * @param content StringBuffer containing the field to format. key contains field name according to field
+     *  was edited by Kuehn/Havalevich
      * @return The formatted field content. NOTE: the StringBuffer returned may
      * or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer content) {
+	public StringBuffer format(StringBuffer content, String key) {
+
         /*System.out.println("Content: '"+content+"'");
         byte[] bt = content.toString().getBytes();
         for (int i = 0; i < bt.length; i++) {
@@ -107,7 +110,14 @@ public class FieldContentParser {
                 //if ((content.length()>i+2) && (content.charAt(i+1)==' ')) {
                 if ((i>0) && (content.charAt(i-1)==' ')) {
                     // We have two spaces in a row. Don't include this one.
-                    content.deleteCharAt(i);
+                	
+                	// Yes, of course we have, but in Filenames it is nessary to have all spaces. :-)
+                	// This is the reason why the next lines are required
+                	if(key != null && key.equals(GUIGlobals.FILE_FIELD)){
+                		i++;
+                	}
+                	else
+                		content.deleteCharAt(i);
                 }
                 else
                     i++;
@@ -120,6 +130,16 @@ public class FieldContentParser {
         }
         
         return content;
+	}
+
+    /**
+     * Performs the reformatting
+     * @param content StringBuffer containing the field to format.
+     * @return The formatted field content. NOTE: the StringBuffer returned may
+     * or may not be the same as the argument given.
+     */
+    public StringBuffer format(StringBuffer content) { 
+    	return format(content, null);
     }
 
     /**
