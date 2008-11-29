@@ -87,6 +87,8 @@ public class BibtexParser {
 	private FieldContentParser fieldContentParser = new FieldContentParser();
 
 	private ParserResult _pr;
+	
+	private static final Integer LOOKAHEAD = 64;
 
 	public BibtexParser(Reader in) {
 
@@ -96,7 +98,7 @@ public class BibtexParser {
 		if (Globals.prefs == null) {
 			Globals.prefs = JabRefPreferences.getInstance();
 		}
-		_in = new PushbackReader(in);
+		_in = new PushbackReader(in, LOOKAHEAD);
 	}
 
 	/**
@@ -682,7 +684,126 @@ public class BibtexParser {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Tries to restore the key
+	 * 
+	 * @return rest of key on success, otherwise empty string
+	 * @throws IOException
+	 *             on Reader-Error
+	 */
+    private String fixKey() throws IOException {
+        StringBuilder key = new StringBuilder();
+        int lookahead_used = 0;
+        char currentChar;
 
+        // Find a char which ends key (','&&'\n') or entryfield ('='):
+        do {
+            currentChar = (char) read();
+            key.append(currentChar);
+            lookahead_used++;
+        } while ((currentChar != ',' && currentChar != '\n' && currentChar != '=')
+                && (lookahead_used < LOOKAHEAD));
+
+        // Consumed a char too much, back into reader and remove from key:
+        unread(currentChar);
+        key.deleteCharAt(key.length() - 1);
+
+        // Restore if possible:
+        switch (currentChar) {
+            case '=':
+
+                // Get entryfieldname, push it back and take rest as key
+                key = key.reverse();
+
+                boolean matchedAlpha = false;
+                for (int i = 0; i < key.length(); i++) {
+                    currentChar = key.charAt(i);
+
+                    /// Skip spaces:
+                    if (!matchedAlpha && currentChar == ' ') {
+                        continue;
+                    }
+                    matchedAlpha = true;
+
+                    // Begin of entryfieldname (e.g. author) -> push back:
+                    unread(currentChar);
+                    if (currentChar == ' ' || currentChar == '\n') {
+
+                        /*
+                         * found whitespaces, entryfieldname completed -> key in
+                         * keybuffer, skip whitespaces
+                         */
+                        StringBuilder newKey = new StringBuilder();
+                        for (int j = i; j < key.length(); j++) {
+                            currentChar = key.charAt(j);
+                            if (!Character.isWhitespace(currentChar)) {
+                                newKey.append(currentChar);
+                            }
+                        }
+
+                        // Finished, now reverse newKey and remove whitespaces:
+                        _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key.",
+                                String.valueOf(line)));
+                        key = newKey.reverse();
+                    }
+                }
+                break;
+
+            case ',':
+
+                _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
+                        String.valueOf(line)));
+
+            case '\n':
+
+                _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
+                        String.valueOf(line)));
+
+                break;
+
+            default:
+
+                // No more lookahead, give up:
+                unreadBuffer(key);
+                return "";
+        }
+
+        return removeWhitespaces(key).toString();
+    }
+
+	/**
+	 * removes whitespaces from <code>sb</code>
+	 * 
+	 * @param sb
+	 * @return
+	 */
+	private StringBuilder removeWhitespaces(StringBuilder sb) {
+		StringBuilder newSb = new StringBuilder();
+		char current;
+		for (int i = 0; i < sb.length(); ++i) {
+			current = sb.charAt(i);
+			if (!Character.isWhitespace(current))
+				newSb.append(current);
+		}
+		return newSb;
+	}
+
+	/**
+	 * pushes buffer back into input
+	 * 
+	 * @param sb
+	 * @throws IOException
+	 *             can be thrown if buffer is bigger than LOOKAHEAD
+	 */
+	private void unreadBuffer(StringBuilder sb) throws IOException {
+		for (int i = sb.length() - 1; i >= 0; --i) {
+			unread(sb.charAt(i));
+		}
+	}
+	
+	
 	/**
 	 * This method is used to parse the bibtex key for an entry.
 	 */
@@ -712,8 +833,8 @@ public class BibtexParser {
 					// the end of
 					// the key. Possibly the comma is missing, so we try to
 					// return what we
-					// have found, as the key.
-					return token.toString();
+					// have found, as the key and try to restore the rest in fixKey().
+					return token.toString()+fixKey();
 				} else if (c == ',') {
 					unread(c);
 					return token.toString();

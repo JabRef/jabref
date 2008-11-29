@@ -130,13 +130,36 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // one or more bibtex results, it's best to gather them in a
 			// BibtexDatabase.
             bibtexResult = mergeImportResults(imports);
+            
+            
+            /* show parserwarnings, if any. */
+			for (Pair<String, ParserResult> p : imports) {
+				ParserResult pr = p.v;
+				if (pr.hasWarnings()) {
+					if (Globals.prefs
+							.getBoolean("displayKeyWarningDialogAtStartup")
+							&& pr.hasWarnings()) {
+						String[] wrns = pr.warnings();
+						StringBuffer wrn = new StringBuffer();
+						for (int j = 0; j < wrns.length; j++)
+							wrn.append(j + 1).append(". ").append(wrns[j])
+									.append("\n");
+						if (wrn.length() > 0)
+							wrn.deleteCharAt(wrn.length() - 1);
+						JOptionPane.showMessageDialog(frame, wrn.toString(),
+								Globals.lang("Warnings"),
+								JOptionPane.WARNING_MESSAGE);
+					}
+				}
+			}
         }
 
         public void update() {
             if (!fileOk)
                 return;
 
-            // TODO: undo is not handled properly here, except for the entries added by
+            // TODO: undo is not handled properly here, except for the entries
+			// added by
             //  the import inspection dialog.
             if (bibtexResult != null) {
                 if (!openInNew) {
