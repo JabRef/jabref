@@ -25,6 +25,8 @@
     - Improvements to IEEEXplore fetcher - better handling of month and page fields.
     - Changed behaviour of source panel when an entry contains imbalanced # characters -
       the panel can now show the entry in its invalid form, allowing the user to fix the problem.
+    - Improved handling of PDF files without XMP metadata - other metadata will now be retained.
+      Patch submitted by Felix Langner.
     - Fixed bug in parsing file field - double spaces in file names would be reduced to single
       spaces, breaking the file link. Fix submitted by Uwe Kuehn.
     - Fixed bug in HTMLConverter.

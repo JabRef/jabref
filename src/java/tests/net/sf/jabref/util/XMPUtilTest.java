@@ -632,7 +632,7 @@ public class XMPUtilTest extends TestCase {
 		writeManually(pdfFile, bibtexXPacket(s));
 
 		// Nothing there yet, but should not crash
-		assertEquals(0, XMPUtil.readXMP(pdfFile).size());
+		assertNull(XMPUtil.readXMP(pdfFile));
 
 		s = " <rdf:Description rdf:about=''"
 				+ "  xmlns:xmp='http://ns.adobe.com/xap/1.0/'>"

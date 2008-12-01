@@ -125,35 +125,34 @@ public class XMPUtil {
 
 			XMPMetadata meta = getXMPMetadata(document);
 
-			// If we did not find any metadata, there is nothing to return.
-			if (meta == null)
-				return null;
+			// If we did not find any XMP metadata, search for non XMP metadata
+			if (meta != null) {
 
-			List<XMPSchema> schemas = meta
-					.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-
-			Iterator<XMPSchema> it = schemas.iterator();
-			while (it.hasNext()) {
-				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
-
-				result.add(bib.getBibtexEntry());
+        			List<XMPSchema> schemas = meta
+        					.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+        
+        			Iterator<XMPSchema> it = schemas.iterator();
+        			while (it.hasNext()) {
+        				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
+        
+        				result.add(bib.getBibtexEntry());
+        			}
+        
+        			// If we did not find anything have a look if a Dublin Core exists
+        			if (result.size() == 0) {
+        				schemas = meta
+        						.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+        				it = schemas.iterator();
+        				while (it.hasNext()) {
+        					XMPSchemaDublinCore dc = (XMPSchemaDublinCore) it.next();
+        
+        					BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
+        
+        					if (entry != null)
+        						result.add(entry);
+        				}
+        			}
 			}
-
-			// If we did not find anything have a look if a Dublin Core exists
-			if (result.size() == 0) {
-				schemas = meta
-						.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-				it = schemas.iterator();
-				while (it.hasNext()) {
-					XMPSchemaDublinCore dc = (XMPSchemaDublinCore) it.next();
-
-					BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
-
-					if (entry != null)
-						result.add(entry);
-				}
-			}
-
 			if (result.size() == 0) {
 				BibtexEntry entry = getBibtexEntryFromDocumentInformation(document
 						.getDocumentInformation());
@@ -165,6 +164,9 @@ public class XMPUtil {
 			if (document != null)
 				document.close();
 		}
+		
+		// return null, if no metadata was found
+		if (result.size()==0) return null;
 		return result;
 	}
 
