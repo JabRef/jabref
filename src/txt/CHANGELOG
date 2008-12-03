@@ -5,6 +5,8 @@
       This is done by adding a file named "<filtername>.formatters". This file defines
       one formatter on each line, with each line containing the name of the formatter and
       the formatter definition, separated by a colon (:).
+    - Added menu items for increasing/decreasing table font size, with shortcut keys Ctrl-plus and
+      Ctrl-minus.
     - Added ":(x)" modifier to key generator, specifying that the arbitrary string x
       should be used as a fallback value if the value returned by the field marker is empty.
     - Added ":upper" modifier to key generator, to force uppercase for a field marker.

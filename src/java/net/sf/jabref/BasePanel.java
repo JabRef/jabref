@@ -1596,6 +1596,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
     }
 
+    public void updateTableFont() {
+        mainTable.updateFont();
+    }
+
     public void createMainTable() {
         //Comparator comp = new FieldComparator("author");
 

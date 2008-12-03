@@ -27,14 +27,7 @@
 
 package net.sf.jabref;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -369,7 +362,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
           GUIGlobals.getIconUrl("dbExport") ),
     dbImport = new DbImportAction(this).getAction(),
     downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
-            "Follow DOI or URL link and try to locate PDF full text document");
+            "Follow DOI or URL link and try to locate PDF full text document"),
+    increaseFontSize = new IncreaseTableFontSizeAction(),
+    decreseFontSize = new DecreaseTableFontSizeAction();
             
     PushToApplicationButton pushExternalButton;
 
@@ -1207,6 +1202,9 @@ public JabRefPreferences prefs() {
       view.add(nextTab);
       view.add(prevTab);
       view.add(sortTabs);
+      view.addSeparator();
+      view.add(increaseFontSize);
+      view.add(decreseFontSize);
       view.addSeparator();
       view.add(toggleGroups);
       view.add(togglePreview);
@@ -2487,6 +2485,42 @@ class SaveSessionAction
             propertiesDialog.setPanel(basePanel());
             Util.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
+        }
+    }
+
+    class IncreaseTableFontSizeAction extends MnemonicAwareAction {
+        public IncreaseTableFontSizeAction() {
+            putValue(NAME, "Increase table font size");
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Increase table font size"));
+        }
+        public void actionPerformed(ActionEvent event) {
+            int currentSize = GUIGlobals.CURRENTFONT.getSize();
+            Font newFont = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+                    currentSize+1);
+            GUIGlobals.CURRENTFONT = newFont;
+            Globals.prefs.putInt("fontSize", currentSize+1);
+            for (int i=0; i<baseCount(); i++) {
+                baseAt(i).updateTableFont();
+            }
+        }
+    }
+
+    class DecreaseTableFontSizeAction extends MnemonicAwareAction {
+        public DecreaseTableFontSizeAction() {
+            putValue(NAME, "Decrease table font size");
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Decrease table font size"));
+        }
+        public void actionPerformed(ActionEvent event) {
+            int currentSize = GUIGlobals.CURRENTFONT.getSize();
+            if (currentSize < 2 )
+                return;
+            Font newFont = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+                    currentSize-1);
+            GUIGlobals.CURRENTFONT = newFont;
+            Globals.prefs.putInt("fontSize", currentSize-1);
+            for (int i=0; i<baseCount(); i++) {
+                baseAt(i).updateTableFont();
+            }
         }
     }
 
