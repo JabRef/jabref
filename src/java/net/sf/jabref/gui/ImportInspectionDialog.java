@@ -697,7 +697,14 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
 
                 // Set owner/timestamp if options are enabled:
                 Util.setAutomaticFields(selected, Globals.prefs.getBoolean("overwriteOwner"),
-                    Globals.prefs.getBoolean("overwriteTimeStamp"));
+                    Globals.prefs.getBoolean("overwriteTimeStamp"), Globals.prefs.getBoolean("markImportedEntries"));
+
+
+                // Check if we should unmark entries before adding the new ones:
+                if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting"))
+                    for (BibtexEntry entry : panel.database().getEntries()) {
+                        Util.unmarkEntry(entry, panel.database(), ce);
+                    }
 
                 for (Iterator<BibtexEntry> i = selected.iterator(); i.hasNext();) {
                     BibtexEntry entry = i.next();

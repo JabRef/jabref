@@ -10,6 +10,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.PersistenceTableColumnListener;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -152,6 +155,16 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         builder.append(button); builder.nextLine();
         builder.append(pan); 
         //builder.append(lab);
+        
+        // chechbox to (de-)activate PersistenceTableColumnListener
+        JCheckBox listenerCheckbox = new JCheckBox(
+                new ActivateMainTableColumnHeaderListenerAction());
+        builder.append(listenerCheckbox);
+        listenerCheckbox.setSelected(
+                _prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY));
+        builder.nextLine();
+        builder.append(pan);
+        
         builder.nextLine();
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -261,6 +274,55 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         }
     }
+
+    /**
+     * @author Daniel Waeber
+     * @author Fabian Bieker
+     *
+     */
+    class ActivateMainTableColumnHeaderListenerAction extends AbstractAction {
+        
+        // This action gets triggered, when a user wants to use the
+        // PersistenceTableColumnListener ("Save Database Column Headers"),
+        // to avoid losing the current state of the gui table column headers.
+        final private UpdateWidthsAction updateWitdhs;
+		
+        public ActivateMainTableColumnHeaderListenerAction() {
+			super(Globals.lang("Save Modifications to Database Column Headers"));
+			updateWitdhs = new UpdateWidthsAction();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			Object source = e.getSource();
+			if (source == null
+					|| !(source instanceof JCheckBox)) {
+				return;
+			}
+			
+			boolean selected = ((JCheckBox) source).isSelected();
+			_prefs.putBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
+					selected);
+			
+			if (selected) {
+				updateWitdhs.actionPerformed(e);
+			}
+			
+			// add & remove ChangeListener for all databases/mainTables
+			for(int i=0; i<frame.baseCount(); i++){
+			    
+			    MainTable table = frame.baseAt(i).mainTable;
+			    
+			    TableColumnModel columnModel = table.getColumnModel();
+			    PersistenceTableColumnListener columnListener = table.getTableColumnListener();
+			    
+			    if (selected) {
+			        columnModel.addColumnModelListener(columnListener);
+			    } else {
+			        columnModel.removeColumnModelListener(columnListener);
+			    }
+			}
+		}
+	}
 
  
     /**

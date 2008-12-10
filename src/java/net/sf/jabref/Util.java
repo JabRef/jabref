@@ -1634,8 +1634,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 *            List of bibtex entries
 	 */
 	public static void setAutomaticFields(Collection<BibtexEntry> bibs,
-             boolean overwriteOwner, boolean overwriteTimestamp) {
-		
+             boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
+
 
 		String timeStampField = Globals.prefs.get("timeStampField");
 
@@ -1644,8 +1644,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"),
                 globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
 
-        // Do not need to do anything if both options are disabled
-		if (!(globalSetOwner || globalSetTimeStamp))
+        // Do not need to do anything if all options are disabled
+		if (!(globalSetOwner || globalSetTimeStamp || markEntries))
 			return;
 
         // Iterate through all entries
@@ -1656,6 +1656,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                 (overwriteTimestamp || (curEntry.getField(timeStampField)==null));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
 				timestamp);
+            if (markEntries)
+                Util.markEntry(curEntry, new NamedCompound(""));
 		}
 
 	}

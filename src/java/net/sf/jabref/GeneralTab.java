@@ -25,7 +25,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     defSort, ctrlClick, useOwner, overwriteOwner,
     keyDuplicateWarningDialog, keyEmptyWarningDialog,
     confirmDelete, allowEditing, memoryStick, useImportInspector,
-    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp;
+    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp,
+    markImportedEntries, unmarkAllEntriesBeforeImporting;
 
     private JTextField defOwnerField, timeStampFormat, timeStampField;
     JabRefPreferences _prefs;
@@ -59,7 +60,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
 
         useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
-        useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported.")); 
+        useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported."));
+        markImportedEntries = new JCheckBox(Globals.lang("Mark entries imported into an existing database"));
+        unmarkAllEntriesBeforeImporting = new JCheckBox(Globals.lang("Unmark all entries before importing new entries into an existing database"));
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
@@ -132,6 +135,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
         hlp.setPreferredSize(new Dimension(24, 24));
         builder.append(hlp);
         builder.nextLine();
+
+        builder.append(markImportedEntries, 13);
+        builder.nextLine();
+        builder.append(unmarkAllEntriesBeforeImporting, 13);
+        builder.nextLine();
         JLabel lab;
         lab = new JLabel(Globals.lang("Language") + ":");
         builder.append(lab, 3);
@@ -167,6 +175,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setSelected(_prefs.getBoolean("warnAboutDuplicatesInInspection"));
         useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
         inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
+        markImportedEntries.setSelected(_prefs.getBoolean("markImportedEntries"));
+        unmarkAllEntriesBeforeImporting.setSelected(_prefs.getBoolean("unmarkAllEntriesBeforeImporting"));
 
         String enc = _prefs.get("defaultEncoding");
         for (int i = 0; i < Globals.ENCODINGS.length; i++) {
@@ -216,6 +226,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
         _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());
+        _prefs.putBoolean("markImportedEntries", markImportedEntries.isSelected());
+        _prefs.putBoolean("unmarkAllEntriesBeforeImporting", unmarkAllEntriesBeforeImporting.isSelected());
+
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
             _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString());

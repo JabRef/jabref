@@ -125,6 +125,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 			}
 
+
+
             // Ok, done. Then try to gather in all we have found. Since we might
 			// have found
             // one or more bibtex results, it's best to gather them in a
@@ -183,7 +185,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     } else {
                         boolean generateKeys = Globals.prefs.getBoolean("generateKeysAfterInspection");
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
-                        
+
+                        // Check if we should unmark entries before adding the new ones:
+                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting"))
+                            for (BibtexEntry entry : toAddTo.getEntries()) {
+                                Util.unmarkEntry(entry, toAddTo, ce);
+                            }
+
+
                         for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()){
                             try {
                                 // Check if the entry is a duplicate of an existing one:
@@ -247,7 +256,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         }
     }
 
-    public static ParserResult mergeImportResults(List<Pair<String, ParserResult>> imports) {
+    public ParserResult mergeImportResults(List<Pair<String, ParserResult>> imports) {
         BibtexDatabase database = new BibtexDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
@@ -290,7 +299,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 				// set timestamp and owner
 				Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
-                        Globals.prefs.getBoolean("overwriteTimeStamp")); // set timestamp and owner
+                        Globals.prefs.getBoolean("overwriteTimeStamp"),
+                        !openInNew && Globals.prefs.getBoolean("markImportedEntries")); // set timestamp and owner
 
                 for (BibtexEntry entry : entries){
 					database.insertEntry(entry);

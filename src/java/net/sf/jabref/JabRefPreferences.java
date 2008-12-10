@@ -55,6 +55,7 @@ import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
@@ -176,6 +177,8 @@ public class JabRefPreferences {
         defaults.put("terDescending", Boolean.FALSE);
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths","75;280;400;60;100;100;100;100");
+        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY, 
+        		new Boolean(PersistenceTableColumnListener.DEFAULT_ENABLED));
         defaults.put("xmpPrivacyFilters", "pdf;timestamp;keywords;owner;note;review");
         defaults.put("useXmpPrivacyFilter", Boolean.FALSE);
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
@@ -342,6 +345,8 @@ public class JabRefPreferences {
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.TRUE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
+        defaults.put("markImportedEntries", Boolean.TRUE);
+        defaults.put("unmarkAllEntriesBeforeImporting", Boolean.TRUE);
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
         defaults.put("useTimeStamp", Boolean.TRUE);
         defaults.put("overwriteTimeStamp", Boolean.FALSE);

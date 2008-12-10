@@ -7,6 +7,8 @@
       the formatter definition, separated by a colon (:).
     - Added menu items for increasing/decreasing table font size, with shortcut keys Ctrl-plus and
       Ctrl-minus.
+    - Added options to automatically mark entries imported into an existing database, and to unmark
+      previously marked entries when importing.
     - Added ":(x)" modifier to key generator, specifying that the arbitrary string x
       should be used as a fallback value if the value returned by the field marker is empty.
     - Added ":upper" modifier to key generator, to force uppercase for a field marker.
@@ -40,7 +42,7 @@
     - Fixed bug in Ris importer.
     - Fixed NullPointerException in Endnote importer.
 2.4.2
-    - Added missing layout formatters FirstPagd LastPage.
+    - Added missing layout formatters FirstPage and LastPage.
     - Fixed a bug regarding ParamLayoutFormatter loaded from plugin.
     - Fixed crash during initalization of journal abbreviation list.
     - Added option to have JabRef search for external file when "Open file" function is chosen

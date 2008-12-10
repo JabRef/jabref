@@ -1196,7 +1196,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   if (tidialog.okPressed())
                   {
                       Util.setAutomaticFields(Arrays.asList(new BibtexEntry[] {bibEntry}),
-                              false, false);
+                              false, false, false);
                     insertEntry(bibEntry) ;
                   }
                 }
@@ -1533,7 +1533,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
                 list.add(be);
-                Util.setAutomaticFields(list, true, true);
+                Util.setAutomaticFields(list, true, true, false);
 
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));

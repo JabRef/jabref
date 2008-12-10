@@ -43,6 +43,9 @@ public class MainTable extends JTable {
     private Comparator<BibtexEntry> searchComparator, groupComparator,
             markingComparator = new IsMarkedComparator();
     private Matcher<BibtexEntry> searchMatcher, groupMatcher;
+    
+    // needed to activate/deactivate the listener
+    private final PersistenceTableColumnListener tableColumnListener;
 
     // Constants used to define how a cell should be rendered.
     public static final int REQUIRED = 1, OPTIONAL = 2,
@@ -105,8 +108,13 @@ public class MainTable extends JTable {
         setupComparatorChooser();
         refreshSorting();
         setWidths();
-
-
+        
+        this.tableColumnListener =  new PersistenceTableColumnListener(this);
+        if (Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
+        	getColumnModel().addColumnModelListener(this.tableColumnListener );
+        }
+        
+        this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
     }
 
     public void refreshSorting() {
@@ -566,6 +574,11 @@ public class MainTable extends JTable {
         else
             return (l.get(number)).intValue();
     }
+    
+    public PersistenceTableColumnListener getTableColumnListener() {
+		return tableColumnListener;
+	}
+
 
     /**
      * Returns the List of entries sorted by a user-selected term. This is the

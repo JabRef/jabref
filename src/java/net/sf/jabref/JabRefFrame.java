@@ -2025,7 +2025,7 @@ class FetchCiteSeerAction
 
     // Set owner and timestamp fields:
     Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean("overwriteOwner"),
-            Globals.prefs.getBoolean("overwriteTimeStamp"));
+            Globals.prefs.getBoolean("overwriteTimeStamp"), Globals.prefs.getBoolean("markImportedEntries"));
 
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.
