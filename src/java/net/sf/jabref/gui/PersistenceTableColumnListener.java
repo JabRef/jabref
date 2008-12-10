@@ -53,7 +53,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
 		for (int i = 0; i < columnCount; i++) {
 			final String name = mainTable.getColumnName(i);
-			if (name == null || name.equals("")) {
+            if (name == null || name.equals("")) {
 				continue;
 			} else if (name.equals("#")) { // TODO: get "#" from prefs?
 				ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
