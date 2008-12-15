@@ -7,6 +7,9 @@
       the formatter definition, separated by a colon (:).
     - Added menu items for increasing/decreasing table font size, with shortcut keys Ctrl-plus and
       Ctrl-minus.
+    - Columns can now be resized and reordered in the table, and the settings will be saved.
+      Table columns interface in Preferences was improved by adding buttons to move columns.
+      Patches contributed by Fabian Bieker.
     - Added options to automatically mark entries imported into an existing database, and to unmark
       previously marked entries when importing.
     - Added ":(x)" modifier to key generator, specifying that the arbitrary string x

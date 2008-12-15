@@ -3,15 +3,12 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.PersistenceTableColumnListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -79,9 +76,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
                 }
                 public Class<?> getColumnClass(int column) {
-                    if (column == 0) 
+                    if (column == 0)
                     	return String.class;
-                    else 
+                    else
                     	return Integer.class;
                 }
                 public boolean isCellEditable(int row, int col) {
@@ -137,9 +134,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         //tlb.setLayout(gbl);
         AddRowAction ara = new AddRowAction();
         DeleteRowAction dra = new DeleteRowAction();
+        MoveRowUpAction moveUp = new MoveRowUpAction();
+        MoveRowDownAction moveDown = new MoveRowDownAction();
         tlb.setBorder(null);
         tlb.add(ara);
         tlb.add(dra);
+        tlb.addSeparator();
+        tlb.add(moveUp);
+        tlb.add(moveDown);
         //tlb.addSeparator();
         //tlb.add(new UpdateWidthsAction());
         tabPanel.add(tlb, BorderLayout.EAST);
@@ -151,20 +153,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 //						+"to match the current widths in your table")+")</HTML>");
 //        lab = new JLabel("<HTML>("+Globals.lang("this_button_will_update") +")</HTML>") ;
         builder.append(pan);
-        JButton button = new JButton(new UpdateWidthsAction());
-        builder.append(button); builder.nextLine();
-        builder.append(pan); 
-        //builder.append(lab);
-        
-        // chechbox to (de-)activate PersistenceTableColumnListener
-        JCheckBox listenerCheckbox = new JCheckBox(
-                new ActivateMainTableColumnHeaderListenerAction());
-        builder.append(listenerCheckbox);
-        listenerCheckbox.setSelected(
-                _prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY));
-        builder.nextLine();
+        JButton buttonWidth = new JButton(new UpdateWidthsAction());
+        JButton buttonOrder = new JButton(new UpdateOrderAction());
+        builder.append(buttonWidth);builder.nextLine();
         builder.append(pan);
-        
+        builder.append(buttonOrder);builder.nextLine();
+        builder.append(pan);
+        //builder.append(lab);
         builder.nextLine();
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -237,6 +232,120 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }
     }
 
+    abstract class AbstractMoveRowAction extends AbstractAction {
+		public AbstractMoveRowAction(String string, ImageIcon image) {
+			super(string, image);
+		}
+
+		protected void swap(int i, int j) {
+			if (i < 0 || i >= tableRows.size())
+				return;
+			if (j < 0 || j >= tableRows.size())
+				return;
+			TableRow tmp = tableRows.get(i);
+			tableRows.set(i, tableRows.get(j));
+			tableRows.set(j, tmp);
+		}
+	}
+
+	class MoveRowUpAction extends AbstractMoveRowAction {
+		public MoveRowUpAction() {
+			super("Up", GUIGlobals.getImage("up"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Move up"));
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			int selected[] = colSetup.getSelectedRows();
+			Arrays.sort(selected);
+			// first element (#) not inside tableRows
+			// don't move if a selected element is at bounce
+			if (selected.length > 0 && selected[0] > 1) {
+				boolean newSelected[] = new boolean[colSetup.getRowCount()];
+				for (int i : selected) {
+					swap(i - 1, i - 2);
+					newSelected[i - 1] = true;
+				}
+				// select all and remove unselected
+				colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
+				for (int i = 0; i < colSetup.getRowCount(); i++) {
+					if (!newSelected[i])
+						colSetup.removeRowSelectionInterval(i, i);
+				}
+				colSetup.revalidate();
+				colSetup.repaint();
+				tableChanged = true;
+			}
+		}
+	}
+
+	class MoveRowDownAction extends AbstractMoveRowAction {
+		public MoveRowDownAction() {
+			super("Down", GUIGlobals.getImage("down"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Down up"));
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			int selected[] = colSetup.getSelectedRows();
+			Arrays.sort(selected);
+			final int last = selected.length - 1;
+			boolean newSelected[] = new boolean[colSetup.getRowCount()];
+			// don't move if a selected element is at bounce
+			if (selected.length > 0 && selected[last] < tableRows.size()) {
+				for (int i = last; i >= 0; i--) {
+					swap(selected[i] - 1, selected[i]);
+					newSelected[selected[i] + 1] = true;
+				}
+				// select all and remove unselected
+				colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
+				for (int i = 0; i < colSetup.getRowCount(); i++) {
+					if (!newSelected[i])
+						colSetup.removeRowSelectionInterval(i, i);
+				}
+				colSetup.revalidate();
+				colSetup.repaint();
+				tableChanged = true;
+			}
+		}
+	}
+
+	class UpdateOrderAction extends AbstractAction {
+		public UpdateOrderAction() {
+			super(Globals.lang("Update to current column order"));
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			BasePanel panel = frame.basePanel();
+			if (panel == null) {
+				return;
+			}
+			// idea: sort elements according to value stored in hash, keep
+			// everything not inside hash/mainTable as it was
+			final HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+			// first element (#) not inside tableRows
+			for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
+				String name = panel.mainTable.getColumnName(i);
+				if (name != null && name.length() != 0) {
+					map.put(name.toLowerCase(), i);
+				}
+			}
+			Collections.sort(tableRows, new Comparator<TableRow>() {
+				public int compare(TableRow o1, TableRow o2) {
+					Integer n1 = map.get(o1.name);
+					Integer n2 = map.get(o2.name);
+					if (n1 == null || n2 == null) {
+						return 0;
+					}
+					return n1.compareTo(n2);
+				}
+			});
+
+			colSetup.revalidate();
+			colSetup.repaint();
+			tableChanged = true;
+		}
+	}
+
     class UpdateWidthsAction extends AbstractAction {
         public UpdateWidthsAction() {
           //super(Globals.lang("Update to current column widths"));
@@ -275,56 +384,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }
     }
 
-    /**
-     * @author Daniel Waeber
-     * @author Fabian Bieker
-     *
-     */
-    class ActivateMainTableColumnHeaderListenerAction extends AbstractAction {
-        
-        // This action gets triggered, when a user wants to use the
-        // PersistenceTableColumnListener ("Save Database Column Headers"),
-        // to avoid losing the current state of the gui table column headers.
-        final private UpdateWidthsAction updateWitdhs;
-		
-        public ActivateMainTableColumnHeaderListenerAction() {
-			super(Globals.lang("Save Modifications to Database Column Headers"));
-			updateWitdhs = new UpdateWidthsAction();
-		}
 
-		public void actionPerformed(ActionEvent e) {
-			Object source = e.getSource();
-			if (source == null
-					|| !(source instanceof JCheckBox)) {
-				return;
-			}
-			
-			boolean selected = ((JCheckBox) source).isSelected();
-			_prefs.putBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
-					selected);
-			
-			if (selected) {
-				updateWitdhs.actionPerformed(e);
-			}
-			
-			// add & remove ChangeListener for all databases/mainTables
-			for(int i=0; i<frame.baseCount(); i++){
-			    
-			    MainTable table = frame.baseAt(i).mainTable;
-			    
-			    TableColumnModel columnModel = table.getColumnModel();
-			    PersistenceTableColumnListener columnListener = table.getTableColumnListener();
-			    
-			    if (selected) {
-			        columnModel.addColumnModelListener(columnListener);
-			    } else {
-			        columnModel.removeColumnModelListener(columnListener);
-			    }
-			}
-		}
-	}
-
- 
     /**
      * Store changes to table preferences. This method is called when
      * the user clicks Ok.
