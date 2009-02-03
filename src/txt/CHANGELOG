@@ -1,4 +1,5 @@
 2.5?
+    - Added rename option to Set/clear field dialog, to move contents from one field to another.
     - Added Back and Forward actions, for switching between recently edited BibTeX entries.
     - Added option under "Entry table" to designate fields as numeric for sorting purposes.
     - Added possibility for custom export filters to define their own name formatters.

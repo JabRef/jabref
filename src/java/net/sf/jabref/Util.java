@@ -2403,6 +2403,38 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		return ce;
 	}
 
+    /**
+     * Move contents from one field to another for a Collection of entries.
+     * @param entries The entries to do this operation for.
+     * @param field The field to move contents from.
+     * @param newField The field to move contents into.
+     * @param overwriteValues If true, overwrites any existing values in the new field.
+     *          If false, makes no change for entries with existing value in the new field.
+     * @return A CompoundEdit for the entire operation.
+     */
+    public static UndoableEdit massRenameField(Collection<BibtexEntry> entries, String field,
+                String newField, boolean overwriteValues) {
+        NamedCompound ce = new NamedCompound(Globals.lang("Rename field"));
+		for (BibtexEntry entry : entries){
+			String valToMove = entry.getField(field);
+            // If there is no value, do nothing:
+            if ((valToMove == null) || (valToMove.length() == 0))
+                continue;
+            // If we are not allowed to overwrite values, check if there is a
+			// nonempy value already for this entry for the new field:
+            String valInNewField = entry.getField(newField);
+            if (!overwriteValues && (valInNewField != null) && (valInNewField.length() > 0))
+                continue;
+
+			entry.setField(newField, valToMove);
+            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField,valToMove));
+            entry.clearField(field);
+            ce.addEdit(new UndoableFieldChange(entry, field, valToMove, null));
+		}
+		ce.end();
+		return ce;
+    }
+
 	/**
 	 * Make a list of supported character encodings that can encode all
 	 * characters in the given String.

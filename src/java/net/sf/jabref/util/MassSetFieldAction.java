@@ -28,22 +28,26 @@ import com.jgoodies.forms.layout.FormLayout;
 public class MassSetFieldAction extends MnemonicAwareAction {
     private JabRefFrame frame;
     private JDialog diag;
-    private JRadioButton all, selected, clear, set;
-    private JTextField field, text;
+    private JRadioButton all, selected, clear, set, rename;
+    private JTextField field, text, renameTo;
     private JButton ok, cancel;
     boolean cancelled = true;
     private JCheckBox overwrite;
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(NAME, "Set/clear fields");
+        putValue(NAME, "Set/clear/rename fields");
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Globals.lang("Set/clear fields"), true);
+        diag = new JDialog(frame, Globals.lang("Set/clear/rename fields"), true);
 
         field = new JTextField();
         text = new JTextField();
+        text.setEnabled(false);
+        renameTo = new JTextField();
+        renameTo.setEnabled(false);
+
         ok = new JButton(Globals.lang("Ok"));
         cancel = new JButton(Globals.lang("Cancel"));
 
@@ -51,15 +55,26 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         selected = new JRadioButton(Globals.lang("Selected entries"));
         clear = new JRadioButton(Globals.lang("Clear fields"));
         set = new JRadioButton(Globals.lang("Set fields"));
+        rename = new JRadioButton(Globals.lang("Rename field to:"));
+        rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are setting, not clearing:
                 text.setEnabled(set.isSelected());
-                // Overwrite protection makes no sense if we are clearing the field:
-                overwrite.setEnabled(set.isSelected());
             }
         });
-
+        clear.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                // Overwrite protection makes no sense if we are clearing the field:
+                overwrite.setEnabled(!clear.isSelected());
+            }
+        });
+        rename.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                // Entering a text is only relevant if we are renaming
+                renameTo.setEnabled(rename.isSelected());
+            }
+        });
         overwrite = new JCheckBox(Globals.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(all);
@@ -67,6 +82,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bg = new ButtonGroup();
         bg.add(clear);
         bg.add(set);
+        bg.add(rename);
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:100dlu", ""));
         builder.appendSeparator(Globals.lang("Field name"));
@@ -83,6 +99,9 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.append(text);
         builder.nextLine();
         builder.append(clear);
+        builder.nextLine();
+        builder.append(rename);
+        builder.append(renameTo);
         builder.nextLine();
         builder.append(overwrite, 3);
 
@@ -127,7 +146,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         else
             all.setSelected(true);
         // Make sure one of the following ones is selected:
-        if (!set.isSelected() && !clear.isSelected())
+        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected())
             set.setSelected(true);
     }
 
@@ -157,11 +176,20 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             toSet = null;
         String[] fields = getFieldNames(field.getText().trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
-        for (int i = 0; i < fields.length; i++) {
-            ce.addEdit(Util.massSetField(entryList, fields[i],
-                            set.isSelected() ? toSet : null,
-                            overwrite.isSelected()));
-
+        if (rename.isSelected()) {
+            if (fields.length > 1) {
+                // TODO: message: can only rename a single field
+            }
+            else {
+                ce.addEdit(Util.massRenameField(entryList, fields[0], renameTo.getText(),
+                        overwrite.isSelected()));
+            }
+        } else {
+            for (int i = 0; i < fields.length; i++) {
+                ce.addEdit(Util.massSetField(entryList, fields[i],
+                        set.isSelected() ? toSet : null,
+                        overwrite.isSelected()));
+            }
         }
         ce.end();
         bp.undoManager.addEdit(ce);
