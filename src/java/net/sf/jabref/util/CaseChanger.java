@@ -19,8 +19,11 @@ package net.sf.jabref.util;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import net.sf.jabref.Util;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.HashSet;
 
 /**
  * 
@@ -50,6 +53,7 @@ public class CaseChanger {
 	 */
 	private final static Pattern UF_PATTERN = Pattern.compile("\\b\\w");
 
+
 	// private final static Matcher UF_MATCHER =
 	// // Pattern.compile("(?i)\\b\\w").matcher("");
 	// Pattern.compile("\\b\\w").matcher("");
@@ -58,6 +62,14 @@ public class CaseChanger {
 	private final static int numModes = 4;
 
 	private final static String[] modeNames = { "lower", "UPPER", "Upper first", "Upper Each First" };
+
+    private final static HashSet<String> notToCapitalize = new HashSet<String>();
+
+    static {
+        notToCapitalize.add("of");
+        notToCapitalize.add("and");
+        notToCapitalize.add("the");
+    }
 
 	/**
 	 * Gets the name of a case changing mode
@@ -106,6 +118,24 @@ public class CaseChanger {
 	 * @return casechanged string
 	 */
 	public static String changeCase(String input, int mode) {
+        return changeCase(input, mode, false);
+    }
+
+    /**
+	 * Changes the case of the specified string
+	 *
+	 * @param input
+	 *            String to change
+	 * @param mode
+	 *            by default one of LOWER, UPPER, UPPER_FIRST or
+	 *            UPPER_EACH_FIRST
+     * @param skipSmallWords
+     *            In UPPER_EACH_FIRST mode, do not capitalize words like of, the, and,
+     *            unless at the start of the string.
+	 * @return casechanged string
+	 */
+	public static String changeCase(String input, int mode, boolean skipSmallWords) {
+
 		switch (mode) {
 		case UPPER:
 			return input.toUpperCase();
@@ -115,6 +145,7 @@ public class CaseChanger {
 			String s = input.toLowerCase();
 
 			Matcher matcher = UF_PATTERN.matcher(s);
+
 			if (matcher.find()) {
 				return matcher.replaceFirst(matcher.group(0).toUpperCase());
 			} else {
@@ -123,19 +154,21 @@ public class CaseChanger {
 		}
 		case UPPER_EACH_FIRST: {
 			String s = input.toLowerCase();
-			StringBuffer sb = new StringBuffer();
 			boolean found = false;
-			Matcher matcher = UF_PATTERN.matcher(s);
-			while (matcher.find()) {
-				matcher.appendReplacement(sb, matcher.group(0).toUpperCase());
-				found = true;
-			}
-			if (found) {
-				matcher.appendTail(sb);
-				return sb.toString();
-			} else {
-				return input;
-			}
+            String[] words = s.split("\\s+");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < words.length; i++) {
+                String word = words[i];
+                if ((i == 0) || !skipSmallWords || !notToCapitalize.contains(word))
+                    sb.append(Util.nCase(word));
+                else
+                    sb.append(word);
+                if (i < words.length-1)
+                    sb.append(" ");
+
+            }
+            return sb.toString();
+			
 		}
 		default:
 			return input;

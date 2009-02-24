@@ -1,4 +1,6 @@
 2.5?
+    - Modified ISI importer so the words "of", "and" and "the" will not be capitalized in the title,
+      journal or publisher fields.
     - Added rename option to Set/clear field dialog, to move contents from one field to another.
     - Added Back and Forward actions, for switching between recently edited BibTeX entries.
     - Added option under "Entry table" to designate fields as numeric for sorting purposes.

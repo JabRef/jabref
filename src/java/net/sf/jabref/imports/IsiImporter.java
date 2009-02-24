@@ -127,9 +127,8 @@ public class IsiImporter extends ImportFormat {
 			if (map.containsKey(subsup[i])) {
 
 				String s = map.get(subsup[i]);
-
-				if (s.toUpperCase().equals(s)) {
-					s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
+                if (s.toUpperCase().equals(s)) {
+                    s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST, true);
 					map.put(subsup[i], s);
 				}
 			}
