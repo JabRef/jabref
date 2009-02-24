@@ -119,6 +119,15 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         ok.addActionListener(new ActionListener() {
            public void actionPerformed(ActionEvent e) {
+               // Check if the user tries to rename multiple fields:
+               if (rename.isSelected()) {
+                    String[] fields = getFieldNames(field.getText());
+                   if (fields.length > 1) {
+                       JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
+                               "", JOptionPane.ERROR_MESSAGE);
+                       return; // Do not close the dialog.
+                   }
+               }
                 cancelled = false;
                 diag.dispose();
             }
