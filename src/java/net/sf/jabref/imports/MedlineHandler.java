@@ -45,14 +45,15 @@ public class MedlineHandler extends DefaultHandler
 		inInitials = false,			inMedlinePgn = false,
 		inMedlineID = false,		inURL=false,
 		inIssue = false,			inPubDate = false,
-		inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
+        inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
 		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,
-        inAffiliation=false, inMeshHeader=false, inQualifierName=false;
+        inAffiliation=false, inMeshHeader=false, inQualifierName=false,
+        inLanguage=false, inPst=false;
     String title="", journal="", keywords ="",author="",
 		lastName="",year="",forename="", abstractText="", affiliation="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
-		pubmedid="",doi="",pii="", majorTopic = "", minorTopics = "";
+		pubmedid="",doi="",pii="", majorTopic = "", minorTopics = "", language = "", pst= "";
     ArrayList<String> authors=new ArrayList<String>();
     TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum=0;
@@ -77,6 +78,8 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("MedlineTA")){inJournal=true;journal="";} //journal name
 		else if(localName.equals("Month") && inPubDate==true){inMonth=true;}
 		else if(localName.equals("Volume")){inVolume=true;}
+        else if(localName.equals("Language")){inLanguage=true;}
+        else if(localName.equals("PublicationStatus")){inPst=true;}
 		else if(localName.equals("AuthorList")){
 			inAuthorList=true;
 			authors.clear();}
@@ -180,6 +183,8 @@ public class MedlineHandler extends DefaultHandler
                         // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
 			if (!page.equals("")) b.setField("pages",fixPageRange(page));
 			if (!volume.equals("")) b.setField("volume",volume);
+            if (!language.equals("")) b.setField("language",language);
+            if (!pst.equals("")) b.setField("medline-pst", pst);
 			if (!abstractText.equals("")) b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
 			if (!keywords.equals("")) b.setField("keywords",keywords);
 			if (!month.equals("")) b.setField("month",month);
@@ -219,7 +224,7 @@ public class MedlineHandler extends DefaultHandler
             pubmedid="";
             majorTopic = "";
             minorTopics = "";
-            month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
+            month="";volume="";language="";pst="";lastname="";initials="";number="";page="";medlineID="";url="";
 			MedlineDate="";
             descriptors.clear();
         }
@@ -232,6 +237,8 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("MedlineTA")){inJournal=false;} //journal name
 		else if(localName.equals("Month")){inMonth=false;}
 		else if(localName.equals("Volume")){inVolume=false;}
+        else if(localName.equals("Language")){inLanguage=false;}
+        else if(localName.equals("PublicationStatus")){inPst=false;}
 		else if(localName.equals("AuthorList")){
 			author = join( authors.toArray(), " and " );
 			inAuthorList = false;
@@ -285,6 +292,8 @@ public class MedlineHandler extends DefaultHandler
 		else if(inJournal){journal += new String(data,start,length);}
 		else if(inMonth){month += new String(data,start,length);}
 		else if(inVolume){volume += new String(data,start,length);}
+        else if(inLanguage){language += new String(data,start,length).toLowerCase();}
+        else if(inPst){pst += new String(data,start,length);}
 		else if(inLastName){lastname += new String(data,start,length);}
 		else if(inInitials){initials += new String(data,start,length);}
 		else if(inIssue){number += new String(data,start,length);}

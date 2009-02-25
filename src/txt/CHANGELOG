@@ -21,6 +21,8 @@
     - Added buttons in External programs tab in Preferences for modifying settings for
       "Push to"-features, and removed obsolete fields.
     - Added support for DOI field in Endnote importer.
+    - Added support for language and publication status fields in Medline import (publication status
+      stored in "medline-pst" field).
     - Improved handling of invalid BibTeX keys containing white space. Parser will now try to
       piece together the key and avoid disturbing the continued parsing. Patch submitted by
       Stephan Lau.
