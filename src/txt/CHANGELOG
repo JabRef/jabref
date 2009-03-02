@@ -23,6 +23,7 @@
     - Added support for DOI field in Endnote importer.
     - Added support for language and publication status fields in Medline import (publication status
       stored in "medline-pst" field).
+    - Enabled cookie handling for downloading full-text articles.
     - Improved handling of invalid BibTeX keys containing white space. Parser will now try to
       piece together the key and avoid disturbing the continued parsing. Patch submitted by
       Stephan Lau.

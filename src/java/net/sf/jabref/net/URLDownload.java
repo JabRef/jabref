@@ -8,6 +8,8 @@ import java.awt.Component;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 
 import javax.swing.ProgressMonitorInputStream;
 
@@ -23,10 +25,23 @@ public class URLDownload {
     private Component parent;
     private String mimeType = null;
 
+    private CookieHandler cm;
+
     public URLDownload(Component _parent, URL _source, File _dest) {
         source = _source;
         dest = _dest;
         parent = _parent;
+
+        try {
+            // This should set up JabRef to receive cookies properly
+            if ((cm = CookieHandler.getDefault()) == null) {
+                cm = new CookieManager();
+                CookieHandler.setDefault(cm);
+            }
+        } catch (SecurityException e) {
+            // Setting or getting the system default cookie handler is forbidden
+            // In this case cookie handling is not possible.
+        }
     }
 
     public String getMimeType() {
