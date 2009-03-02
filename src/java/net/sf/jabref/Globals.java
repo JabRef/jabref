@@ -1205,7 +1205,7 @@ public class Globals {
 		RTFCHARS.put("\"a", "\\'e4");
 		RTFCHARS.put("\"e", "\\'eb");
 		RTFCHARS.put("\"i", "\\'ef");
-		RTFCHARS.put("\"o", "\\'f6");
+        RTFCHARS.put("\"o", "\\'f6");
 		RTFCHARS.put("\"u", "\\u252u");
 		RTFCHARS.put("~n", "\\'f1");
 		RTFCHARS.put("`A", "\\'c0");
@@ -1270,7 +1270,9 @@ public class Globals {
 		// According to ISO 8859-1 the "\times" symbol should be placed here
 		// (#215).
 		// Omitting this, because it is a mathematical symbol.
-		RTFCHARS.put("O", "\\u216O"); // "Oslash"
+		//RTFCHARS.put("O", "\\u216O"); // "Oslash"
+        RTFCHARS.put("O", "\\'d8");
+        RTFCHARS.put("o", "\\'f8");
 		// RTFCHARS.put("`U", "\\u217"); // "Ugrave" exists in standard
 		// codepage
 		RTFCHARS.put("'U", "\\u218U"); // "Uacute"
@@ -1321,7 +1323,7 @@ public class Globals {
 		// According to ISO 8859-1 the "\div" symbol should be placed here
 		// (#247).
 		// Omitting this, because it is a mathematical symbol.
-		RTFCHARS.put("o", "\\u248o"); // "oslash"
+		//RTFCHARS.put("o", "\\u248o"); // "oslash"
 		// RTFCHARS.put("`u", "\\u249"); // "ugrave" exists in standard
 		// codepage
 		RTFCHARS.put("'u", "\\u250u"); // "uacute"
