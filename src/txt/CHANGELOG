@@ -42,6 +42,7 @@
       Patch submitted by Felix Langner.
     - Fixed bug in parsing file field - double spaces in file names would be reduced to single
       spaces, breaking the file link. Fix submitted by Uwe Kuehn.
+    - Fixed NullPointerException when downloading external file and file directory is undefined.
     - Fixed bug in HTMLConverter.
     - Fixed NullPointerException in key generator for incomplete names.
     - Fixed bug in removing custom export filters.

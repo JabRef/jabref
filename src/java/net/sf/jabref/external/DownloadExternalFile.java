@@ -142,7 +142,7 @@ public class DownloadExternalFile {
 
         String suggestedName = bibtexKey != null ? getSuggestedFileName(suffix) : "";
         String fDirectory = getFileDirectory(res);
-        if (fDirectory.trim().equals(""))
+        if ((fDirectory != null) && fDirectory.trim().equals(""))
             fDirectory = null;
         final String directory = fDirectory;
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
