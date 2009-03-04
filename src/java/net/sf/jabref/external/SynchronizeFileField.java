@@ -32,6 +32,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
     Object[] brokenLinkOptions =
             {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
+                    Globals.lang("Remove all broken links"),
                     Globals.lang("Quit synchronization")};
 
     private boolean goOn = true, autoSet = true, checkExisting = true;
@@ -134,6 +135,7 @@ public class SynchronizeFileField extends AbstractWorker {
         //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
+            boolean removeAllBroken = false;
             mainLoop:
             for (int i = 0; i < sel.length; i++) {
                 panel.frame().setProgressBarValue(progress++);
@@ -156,26 +158,39 @@ public class SynchronizeFileField extends AbstractWorker {
                         // Get an absolute path representation:
                         File file = Util.expandFilename(flEntry.getLink(), new String[]{dir, "."});
                         if ((file == null) || !file.exists()) {
-                            int answer = JOptionPane.showOptionDialog(panel.frame(),
-                                Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                        new String[]{flEntry.getLink(), sel[i].getCiteKey()}),
-                                Globals.lang("Broken link"),
-                                JOptionPane.YES_NO_CANCEL_OPTION,
-                                JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
+                            int answer;
+                            if (!removeAllBroken) {
+                                answer = JOptionPane.showOptionDialog(panel.frame(),
+                                    Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
+                                            new String[]{flEntry.getLink(), sel[i].getCiteKey()}),
+                                    Globals.lang("Broken link"),
+                                    JOptionPane.YES_NO_CANCEL_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
+                            }
+                            else {
+                                answer = 2; // We should delete this link.
+                            }
                             switch (answer) {
                                 case 1:
                                     // Assign new file.
                                     FileListEntryEditor flEditor = new FileListEntryEditor
                                             (panel.frame(), flEntry, false, true, panel.metaData());
-                                    flEditor.setVisible(true);
+                                    flEditor.setVisible(true, true);
                                     break;
                                 case 2:
-                                    // Clear field
+                                    // Clear field:
                                     tableModel.removeEntry(j);
                                     deleted = true; // Make sure we don't investigate this link further.
                                     j--; // Step back in the iteration, because we removed an entry.
                                     break;
                                 case 3:
+                                    // Clear field:
+                                    tableModel.removeEntry(j);
+                                    deleted = true; // Make sure we don't investigate this link further.
+                                    j--; // Step back in the iteration, because we removed an entry.
+                                    removeAllBroken = true; // Notify for further cases.
+                                    break;
+                                case 4:
                                     // Cancel
                                     break mainLoop;
                             }
@@ -218,7 +233,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
                                         (panel.frame(), flEntry, false, true, panel.metaData());
-                                editor.setVisible(true);
+                                editor.setVisible(true, false);
                             }
                         }
                     }

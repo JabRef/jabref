@@ -105,7 +105,7 @@ public class DownloadExternalFile {
                 } catch (IOException e2) {
                     dontShowDialog = true;
                     if ((editor != null) && (editor.isVisible()))
-                        editor.setVisible(false);
+                        editor.setVisible(false, false);
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
                             + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -172,7 +172,7 @@ public class DownloadExternalFile {
             }
         });
         if (!dontShowDialog) // If an error occured with the URL, this flag may have been set
-            editor.setVisible(true);
+            editor.setVisible(true, false);
         else
             return;
         // Editor closed. Go on:

@@ -251,7 +251,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         if (row == -1)
             row = 0;
         FileListEntry entry = new FileListEntry("", initialLink, null);
-        if (editListEntry(entry))
+        if (editListEntry(entry, true))
             tableModel.addEntry(row, entry);
         entryEditor.updateField(this);
     }
@@ -285,13 +285,19 @@ public class FileListEditor extends JTable implements FieldEditor,
         setRowSelectionInterval(toIdx, toIdx);
     }
 
-    private boolean editListEntry(FileListEntry entry) {
+    /**
+     * Open an editor for this entry.
+     * @param entry The entry to edit.
+     * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
+     * @return true if the edit was accepted, false if it was cancelled.
+     */
+    private boolean editListEntry(FileListEntry entry, boolean openBrowse) {
         if (editor == null) {
             editor = new FileListEntryEditor(frame, entry, false, true, metaData);
         }
         else
             editor.setEntry(entry);
-        editor.setVisible(true);
+        editor.setVisible(true, openBrowse);
         if (editor.okPressed())
             tableModel.fireTableDataChanged();
         entryEditor.updateField(this);
@@ -574,7 +580,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                 int row = rowAtPoint(e.getPoint());
                 if (row >= 0) {
                     FileListEntry entry = tableModel.getEntry(row);
-                    editListEntry(entry);
+                    editListEntry(entry, false);
                 }
             }
             else if (e.isPopupTrigger())

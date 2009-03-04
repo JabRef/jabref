@@ -836,7 +836,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         }
 
         FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
-        editor.setVisible(true);
+        editor.setVisible(true, false);
         if (editor.okPressed()) {
             // Store the changes and add an undo edit:
             String newValue = tModel.getStringRepresentation();

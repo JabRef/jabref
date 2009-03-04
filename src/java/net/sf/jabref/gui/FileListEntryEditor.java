@@ -1,10 +1,7 @@
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +50,8 @@ public class FileListEntryEditor {
     private AbstractAction okAction;
     private FileListEntry entry;
     private MetaData metaData;
-    private boolean okPressed = false, okDisabledExternally = false;
+    private boolean okPressed = false, okDisabledExternally = false,
+            openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
                                boolean showOpenButton, MetaData metaData) {
@@ -90,8 +88,8 @@ public class FileListEntryEditor {
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(Globals.lang("Link"));
         builder.append(link);
-        BrowseListener browse = new BrowseListener(frame, link);
-        JButton browseBut = new JButton(Globals.lang("Browse"));
+        final BrowseListener browse = new BrowseListener(frame, link);
+        final JButton browseBut = new JButton(Globals.lang("Browse"));
         browseBut.addActionListener(browse);
         builder.append(browseBut);
         if (showOpenButton)
@@ -162,7 +160,23 @@ public class FileListEntryEditor {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
         Util.placeDialog(diag, frame);
+        diag.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent event) {
+                if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
+                    dontOpenBrowseUntilDisposed = true;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            browse.actionPerformed(new ActionEvent(browseBut, 0, ""));
+                        }
+                    });
+                }
+            }
 
+            @Override
+            public void windowClosed(WindowEvent event) {
+                dontOpenBrowseUntilDisposed = false;
+            }
+        });
         setValues(entry);
     }
 
@@ -214,7 +228,8 @@ public class FileListEntryEditor {
         setValues(entry);
     }
 
-    public void setVisible(boolean visible) {
+    public void setVisible(boolean visible, boolean openBrowse) {
+        openBrowseWhenShown = openBrowse;
         if (visible)
             okPressed = false;
         diag.setVisible(visible);
