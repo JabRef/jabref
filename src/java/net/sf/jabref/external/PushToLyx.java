@@ -23,13 +23,20 @@ public class PushToLyx implements PushToApplication {
         couldNotFindPipe = false;
         couldNotWrite = false;
 
-
-        final File lyxpipe = new File( Globals.prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-        if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-            couldNotFindPipe = true;
-            return;
+        String lyxpipeSetting = Globals.prefs.get("lyxpipe");
+        if (!lyxpipeSetting.endsWith(".in"))
+            lyxpipeSetting = lyxpipeSetting+".in";
+        File lp = new File(lyxpipeSetting); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+        if( !lp.exists() || !lp.canWrite()){
+            // See if it helps to append ".in":
+            lp = new File(lyxpipeSetting+".in");
+            if( !lp.exists() || !lp.canWrite()){
+                couldNotFindPipe = true;
+                return;
+            }
         }
 
+        final File lyxpipe = lp;
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
