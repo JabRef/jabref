@@ -26,7 +26,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 	public static final String ACTIVATE_PREF_KEY = 
 	    "ActivatePersistenceTableColumnListener";
 
-	public static final boolean DEFAULT_ENABLED = false;
+	public static final boolean DEFAULT_ENABLED = true;
 
 	private static final String simpleClassName = 
 	    PersistenceTableColumnListener.class.getSimpleName();
@@ -46,7 +46,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 	 * update columns names and their width, store it in the global prefs.
 	 */
 	private void updateColumnPrefs() {
-		final int columnCount = mainTable.getColumnCount();
+        final int columnCount = mainTable.getColumnCount();
 		Vector<String> storedColumns = new Vector<String>(columnCount - 1);
 		Vector<String> columnsWidths = new Vector<String>(columnCount - 1);
 		int ncWidth = -1;

@@ -94,17 +94,14 @@ public class MainTable extends JTable {
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
         setGridColor(Globals.prefs.getColor("gridColor"));
 
-
-        
         this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
 
         comparatorChooser = new MyTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
-        // TODO: this doesn't work after applying comparatorChooser:
         this.tableColumnListener =  new PersistenceTableColumnListener(this);
-        if (Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
-        	getColumnModel().addColumnModelListener(this.tableColumnListener );
+        if (true) {//Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
+            getColumnModel().addColumnModelListener(this.tableColumnListener );
         }
 
         // TODO: Figure out, whether this call is needed.
