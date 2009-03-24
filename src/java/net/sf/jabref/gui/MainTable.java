@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
@@ -287,6 +289,27 @@ public class MainTable extends JTable {
         return getSelected().toArray(BE_ARRAY);
     }
 
+    public List<Boolean> getCurrentSortOrder() {
+        List<Boolean> order = new ArrayList<Boolean>();
+        List<Integer> sortCols = comparatorChooser.getSortingColumns();
+        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
+            int i = iterator.next();
+            order.add(comparatorChooser.isColumnReverse(i));
+        }
+        return order;
+    }
+
+    public List<String> getCurrentSortFields() {
+        List<Integer> sortCols = comparatorChooser.getSortingColumns();
+        List<String> fields = new ArrayList<String>();
+        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
+            int i =  iterator.next();
+            fields.add(tableFormat.getColumnName(i).toLowerCase());
+        }
+        return fields;
+    }
+
+
     /**
      * This method sets up what Comparators are used for the various table columns.
      * The ComparatorChooser enables and disables such Comparators as the user clicks
@@ -314,6 +337,7 @@ public class MainTable extends JTable {
             comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase()));
         }
 
+
         // Set initial sort columns:
 
         // Default sort order:
@@ -330,6 +354,39 @@ public class MainTable extends JTable {
             }
         }
         sortedForTable.getReadWriteLock().writeLock().unlock();
+
+        // Add action listener so we can remember the sort order:
+        comparatorChooser.addSortActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                // Get the information about the current sort order:
+                List<String> fields = getCurrentSortFields(); 
+                List<Boolean> order = getCurrentSortOrder();
+                // Update preferences:
+                int count = Math.min(fields.size(), order.size());
+                if (count >= 1) {
+                    Globals.prefs.put("priSort", fields.get(0));
+                    Globals.prefs.putBoolean("priDescending", order.get(0));
+                }
+                if (count >= 2) {
+                    Globals.prefs.put("secSort", fields.get(1));
+                    Globals.prefs.putBoolean("secDescending", order.get(1));
+                }
+                else {
+                    Globals.prefs.put("secSort", "");
+                    Globals.prefs.putBoolean("secDescending", false);
+                }
+                if (count >= 3) {
+                    Globals.prefs.put("terSort", fields.get(2));
+                    Globals.prefs.putBoolean("terDescending", order.get(2));
+                }
+                else {
+                    Globals.prefs.put("terSort", "");
+                    Globals.prefs.putBoolean("terDescending", false);
+                }
+            }
+
+        });
+
 
     }
 

@@ -1,4 +1,6 @@
 2.5?
+    - Table sort order set by clicking and Ctrl-clicking table columns is now immediately set
+      as default sort order in preferences.
     - Changed LyX pipe setting so it works whether ".in" is included or omitted.
     - Modified ISI importer so the words "of", "and" and "the" will not be capitalized in the title,
       journal or publisher fields.
