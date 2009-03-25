@@ -286,6 +286,8 @@ public class LabelPatternUtil {
                     return firstAuthor(authString);
                 } else if (val.equals("authors")) {
                     return allAuthors(authString);
+                } else if (val.equals("authorsAlpha")) {
+                	return authorsAlpha(authString);
                 }
                 // Last author's last name
                 else if (val.equals("authorLast")) {
@@ -592,6 +594,47 @@ public class LabelPatternUtil {
             i++;
         }
         return author;
+    }
+    
+    /**
+     * Returns the authors according to the BibTeX-alpha-Style
+     * @param authorField string containing the value of the author field
+     * @return the initials of all authornames
+     */
+    private static String authorsAlpha(String authorField) {
+    	String authors = "";
+    	
+    	String fixedAuthors = AuthorList.fixAuthor_lastNameOnlyCommas(authorField, false);
+    	
+    	// drop the "and" before the last author
+    	// -> makes processing easier
+    	fixedAuthors = fixedAuthors.replace(" and ", ", ");
+    	
+    	String[] tokens = fixedAuthors.split(",");
+    	int max = (tokens.length > 4 ? 3 : tokens.length);
+    	if (max==1) {
+			String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").trim().split(" ");
+			// take first letter of any "prefixes" (e.g. van der Aalst -> vd) 
+			for (int j=0; j<firstAuthor.length-1; j++) {
+				authors = authors.concat(firstAuthor[j].substring(0,1));
+			}
+			// append last part of last name completely
+			authors = authors.concat(firstAuthor[firstAuthor.length-1].substring(0,3));
+    	} else {
+    		for (int i = 0; i < max; i++) {
+    			// replace all whitespaces by " "
+    			// split the lastname at " "
+    			String[] curAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
+    			for (int j=0; j<curAuthor.length; j++) {
+    				// use first character of each part of lastname
+    				authors = authors.concat(curAuthor[j].substring(0, 1));
+    			}
+    		}
+    		if (tokens.length > 4) {
+    			authors = authors.concat("+");
+    		}
+    	}
+    	return authors;
     }
 
     /**
