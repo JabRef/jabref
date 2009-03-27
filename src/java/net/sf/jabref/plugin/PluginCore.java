@@ -39,6 +39,8 @@ public class PluginCore {
 
     static PluginManager singleton;
 
+    static File userPluginDir = new File(System.getProperty("user.home")+"/.jabref/plugins");
+
     static PluginLocation getLocationInsideJar(String context, String manifest) {
         URL jar = PluginCore.class
             .getResource(Util.joinPath(context, manifest));
@@ -80,9 +82,11 @@ public class PluginCore {
             DefaultPluginsCollector collector = new DefaultPluginsCollector();
             ExtendedProperties ep = new ExtendedProperties();
 
+
             List<File> directoriesToSearch = new LinkedList<File>();
             directoriesToSearch.add(new File("./src/plugins"));
             directoriesToSearch.add(new File("./plugins"));
+            directoriesToSearch.add(userPluginDir);
 
             try {
                 File parent = new File(PluginCore.class.getProtectionDomain()
