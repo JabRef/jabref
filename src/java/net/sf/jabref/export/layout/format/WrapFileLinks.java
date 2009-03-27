@@ -34,7 +34,9 @@ import java.io.IOException;
  * <p/>
  * \i   : This inserts the iteration index (starting from 1), and can be useful if
  * the output list of files should be enumerated.
- * \p   : This inserts the file path of the file link.
+ * \p   : This inserts the file path of the file link. Relative links below your file directory
+ *        will be expanded to their absolute path.
+ * \r   : This inserts the file path without expanding relative links.
  * \f   : This inserts the name of the file link's type.
  * \x   : This inserts the file's extension, if any.
  * \d   : This inserts the file link's description, if any.
@@ -128,7 +130,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                                 dir = Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory");
 
                             File f = Util.expandFilename(flEntry.getLink(), new String[]{dir});
-
                             /*
                              * Stumbled over this while investigating
                              *
@@ -144,6 +145,18 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             } else {
                                 sb.append(replaceStrings(flEntry.getLink()));
                             }
+
+                            break;
+                        case RELATIVE_FILE_PATH:
+                            if (flEntry.getLink() == null)
+                                break;
+
+                            /*
+                             * Stumbled over this while investigating
+                             *
+                             * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+                             */
+                            sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
 
                             break;
                         case FILE_EXTENSION:
@@ -183,7 +196,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     // Define codes for the various escape sequences that can be inserted:
     public static final int STRING = 0, ITERATION_COUNT = 1, FILE_PATH = 2, FILE_TYPE = 3,
-            FILE_EXTENSION = 4, FILE_DESCRIPTION = 5;
+            FILE_EXTENSION = 4, FILE_DESCRIPTION = 5, RELATIVE_FILE_PATH = 6;
 
     // Define which escape sequences give what results:
     final static Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
@@ -191,6 +204,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     static {
         ESCAPE_SEQ.put('i', ITERATION_COUNT);
         ESCAPE_SEQ.put('p', FILE_PATH);
+        ESCAPE_SEQ.put('r', RELATIVE_FILE_PATH);
         ESCAPE_SEQ.put('f', FILE_TYPE);
         ESCAPE_SEQ.put('x', FILE_EXTENSION);
         ESCAPE_SEQ.put('d', FILE_DESCRIPTION);

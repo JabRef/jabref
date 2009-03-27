@@ -1,4 +1,8 @@
 2.5?
+    - Added \r marker to WrapFileLinks formatter that outputs file links without expanding
+      relative links.
+    - Added [authorAlpha] key marker that formats authors according to the "alpha" BibTeX style.
+      Patch submitted by Oliver Kopp.
     - Table sort order set by clicking and Ctrl-clicking table columns is now immediately set
       as default sort order in preferences.
     - Changed LyX pipe setting so it works whether ".in" is included or omitted.
