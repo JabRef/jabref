@@ -47,31 +47,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -104,6 +80,7 @@ import net.sf.jabref.label.IncollectionLabelRule;
 import net.sf.jabref.label.InproceedingsLabelRule;
 import net.sf.jabref.label.LabelMaker;
 import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.PluginInstallerAction;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.sql.DbImportAction;
@@ -258,7 +235,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
-      copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
+      copyKey = new GeneralAction("copyKey", "Copy BibTeX key", 
+            prefs.getKey("Copy BibTeX key")),
       //"Put a BibTeX reference to the selected entries on the clipboard",
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
                                       //"Put a BibTeX reference to the selected entries on the clipboard",
@@ -364,7 +342,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
             "Follow DOI or URL link and try to locate PDF full text document"),
     increaseFontSize = new IncreaseTableFontSizeAction(),
-    decreseFontSize = new DecreaseTableFontSizeAction();
+    decreseFontSize = new DecreaseTableFontSizeAction(),
+    installPlugin = new PluginInstallerAction(this);
             
     PushToApplicationButton pushExternalButton;
 
@@ -1176,7 +1155,7 @@ public JabRefPreferences prefs() {
       file.add(close);
       file.add(quit);
       mb.add(file);
-      //edit.add(test);
+      edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();
@@ -1314,7 +1293,8 @@ public JabRefPreferences prefs() {
       }
       });*/
 
-      pluginMenu.setEnabled(false);
+      pluginMenu.add(installPlugin);
+      //pluginMenu.setEnabled(false);
       mb.add(pluginMenu);
 
 
@@ -1347,7 +1327,9 @@ public JabRefPreferences prefs() {
 
 
     public void addPluginMenuItem(JMenuItem item) {
-        pluginMenu.add(item);
+        if (pluginMenu.getComponentCount() == 1)
+            pluginMenu.add(new JSeparator(JSeparator.HORIZONTAL), 0);
+        pluginMenu.add(item, 0);
         pluginMenu.setEnabled(true);
     }
 

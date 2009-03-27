@@ -1,6 +1,8 @@
 package net.sf.jabref.plugin;
 
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Globals;
 
 import javax.swing.*;
 import java.net.URL;
@@ -19,21 +21,104 @@ import java.util.Collections;
  */
 public class PluginInstaller {
 
-    public static void checkInstalledVersion(String filename) {
+    public static final int
+        SUCCESS = 0,
+        UNABLE_TO_CREATE_DIR = 1,
+        UNABLE_TO_COPY_FILE = 2;
+
+    public static final int
+        NO_VERSIONS_INSTALLED = 0,
+        NEWER_VERSION_INSTALLED = 1,
+        SAME_VERSION_INSTALLED = 2,
+        OLDER_VERSION_INSTALLED = 3;
+
+    public static void installPlugin(JabRefFrame frame, URL source) {
+        String fileName = (new File(source.getFile())).getName();
+        if (!PluginCore.userPluginDir.exists()) {
+            boolean created = PluginCore.userPluginDir.mkdirs();
+            if (!created) {
+                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to create plugin directory")
+                    +" ("+PluginCore.userPluginDir.getPath()+").", Globals.lang("Plugin installer"),
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        int status = checkInstalledVersion(fileName);
+        int result;
+        switch (status) {
+            case NO_VERSIONS_INSTALLED:
+                result = copyPlugin(frame, source, fileName);
+                if (result == SUCCESS)
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Plugin installed successfully. You must restart JabRef to load the new plugin."),
+                            Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
+                else {
+                    String reason;
+                    if (result == UNABLE_TO_COPY_FILE)
+                        reason = Globals.lang("Unable to copy file");
+                    else
+                        reason = Globals.lang("Unable to create user plugin directory")
+                            +" ("+PluginCore.userPluginDir.getPath()+").";
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Plugin installation failed.")+" "+reason,
+                            Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case SAME_VERSION_INSTALLED:
+                JOptionPane.showMessageDialog(frame, Globals.lang("The same version of this plugin is already installed."),
+                        Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case NEWER_VERSION_INSTALLED:
+                JOptionPane.showMessageDialog(frame, Globals.lang("A newer version of this plugin is already installed."),
+                        Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case OLDER_VERSION_INSTALLED:
+                result = copyPlugin(frame, source, fileName);
+                if (result == SUCCESS) {
+                    int answer = JOptionPane.showConfirmDialog(frame,
+                            Globals.lang("One or more older versions of this plugin is installed. Delete old versions?"),
+                            Globals.lang("Plugin installer"), JOptionPane.YES_NO_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        System.out.println("implement delete old");
+                    }
+                }
+                else {
+                    String reason;
+                    if (result == UNABLE_TO_COPY_FILE)
+                        reason = Globals.lang("Unable to copy file");
+                    else
+                        reason = Globals.lang("Unable to create user plugin directory")
+                            +" ("+PluginCore.userPluginDir.getPath()+").";
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Plugin installation failed.")+" "+reason,
+                            Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+                }
+        }
+    }
+
+    /**
+     * Check the status of the named plugin - whether an older, the same or a
+     * newer version is already installed.
+     * @param filename The filename of the plugin.
+     * @return an integer indicating the status
+     */
+    public static int checkInstalledVersion(String filename) {
         String[] nav = getNameAndVersion(filename);
         VersionNumber vn = new VersionNumber(nav[1]);
-        System.out.println("Name: '"+nav[0]+"'");
-        System.out.println("Version: '"+nav[1]+"'");
         List<VersionNumber> versions = getInstalledVersions(nav[0]);
-        System.out.println("Installed versions:");
         for (Iterator<VersionNumber> stringIterator = versions.iterator(); stringIterator.hasNext();) {
 
             System.out.println(stringIterator.next().toString());
         }
         boolean hasSame = versions.size() > 0 && (vn.compareTo(versions.get(0)) == 0);
         boolean hasNewer = versions.size() > 0 && (vn.compareTo(versions.get(0)) > 0);
-        System.out.println("Has same? "+hasSame);
-        System.out.println("Has newer? "+hasNewer);
+
+        if (versions.size() == 0) {
+            return NO_VERSIONS_INSTALLED;
+        }
+        if (hasNewer)
+            return NEWER_VERSION_INSTALLED;
+        if (hasSame)
+            return SAME_VERSION_INSTALLED;
+
+        return OLDER_VERSION_INSTALLED;
     }
 
     /**
@@ -42,21 +127,28 @@ public class PluginInstaller {
      * @param source The local or remote location to copy the plugin from.
      * @return true if the install was successful
      */
-    public static boolean installPlugin(JFrame frame, URL source, String destFileName) {
+    public static int copyPlugin(JFrame frame, URL source, String destFileName) {
         if (destFileName == null)
             destFileName = source.getFile();
-        System.out.println("Destination name: '"+destFileName+"'");
+        if (!PluginCore.userPluginDir.exists()) {
+            boolean created = PluginCore.userPluginDir.mkdirs();
+            if (!created) {
+                return UNABLE_TO_CREATE_DIR;
+            }
+        }
         File destFile = new File(PluginCore.userPluginDir, destFileName);
         URLDownload ud = new URLDownload(frame, source, destFile);
 
         try {
             ud.download();
-            return true;
+            return SUCCESS;
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return UNABLE_TO_COPY_FILE;
         }
     }
+
+
 
     /**
      * Based on a plugin name, find all versions that are already present
@@ -68,7 +160,6 @@ public class PluginInstaller {
 
         String[] files = PluginCore.userPluginDir.list(new FilenameFilter() {
             public boolean accept(File file, String s) {
-                System.out.println(":: "+s);
                 return s.startsWith(pluginName) && s.endsWith(".jar");
             }
         });
