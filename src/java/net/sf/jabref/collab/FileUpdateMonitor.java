@@ -62,6 +62,11 @@ public class FileUpdateMonitor extends Thread {
       try {
         sleep(WAIT);
       } catch (InterruptedException ex) {
+    	  /*  the (?) correct way to interrupt threads, according to
+    	   *  http://www.roseindia.net/javatutorials/shutting_down_threads_cleanly.shtml
+    	   */
+    	  Thread.currentThread().interrupt(); // very important
+    	  break;
       }
     }
   }
