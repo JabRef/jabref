@@ -77,7 +77,16 @@ public class PluginInstaller {
                             Globals.lang("One or more older versions of this plugin is installed. Delete old versions?"),
                             Globals.lang("Plugin installer"), JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
-                        System.out.println("implement delete old");
+                        boolean success = deleteOlderVersions(fileName);
+                        if (success) {
+                            JOptionPane.showMessageDialog(frame,
+                                    Globals.lang("Old versions deleted successfully."),
+                                    Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(frame,
+                                    Globals.lang("Deletion of old versions failed."),
+                                    Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
                 else {
@@ -103,10 +112,7 @@ public class PluginInstaller {
         String[] nav = getNameAndVersion(filename);
         VersionNumber vn = new VersionNumber(nav[1]);
         List<VersionNumber> versions = getInstalledVersions(nav[0]);
-        for (Iterator<VersionNumber> stringIterator = versions.iterator(); stringIterator.hasNext();) {
-
-            System.out.println(stringIterator.next().toString());
-        }
+        
         boolean hasSame = versions.size() > 0 && (vn.compareTo(versions.get(0)) == 0);
         boolean hasNewer = versions.size() > 0 && (vn.compareTo(versions.get(0)) > 0);
 
@@ -119,6 +125,24 @@ public class PluginInstaller {
             return SAME_VERSION_INSTALLED;
 
         return OLDER_VERSION_INSTALLED;
+    }
+
+
+    public static boolean deleteOlderVersions(String filename) {
+        String[] nav = getNameAndVersion(filename);
+        if (nav == null)
+            return false;
+        boolean success = true;
+        VersionNumber num = new VersionNumber(nav[1]);
+        List<VersionNumber> versions = getInstalledVersions(nav[0]);
+        for (Iterator<VersionNumber> iterator = versions.iterator(); iterator.hasNext();) {
+            VersionNumber versionNumber = iterator.next();
+            if (num.compareTo(versionNumber) < 0) {
+                String file = buildFileName(nav[0], versionNumber.toString());
+                success = (new File(file)).delete() && success;
+            }
+        }
+        return success;
     }
 
     /**

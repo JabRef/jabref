@@ -1328,8 +1328,8 @@ public JabRefPreferences prefs() {
 
     public void addPluginMenuItem(JMenuItem item) {
         if (pluginMenu.getComponentCount() == 1)
-            pluginMenu.add(new JSeparator(JSeparator.HORIZONTAL), 0);
-        pluginMenu.add(item, 0);
+            pluginMenu.addSeparator();
+        pluginMenu.add(item);
         pluginMenu.setEnabled(true);
     }
 
