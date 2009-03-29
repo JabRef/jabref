@@ -1,5 +1,8 @@
 package net.sf.jabref.plugin;
 
+import net.sf.jabref.plugin.*;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Globals;
@@ -127,7 +130,16 @@ public class PluginInstaller {
         return OLDER_VERSION_INSTALLED;
     }
 
-
+    /**
+     * Delete the given plugin.
+     * @param plugin Name and version information for the plugin to delete.
+     * @return true if deletion is successful, false otherwise.
+     */
+    public static boolean deletePlugin(NameAndVersion plugin) {
+        String file = buildFileName(plugin.name, plugin.version.toString());
+        return (new File(file)).delete();
+    }
+    
     public static boolean deleteOlderVersions(String filename) {
         String[] nav = getNameAndVersion(filename);
         if (nav == null)
@@ -231,7 +243,46 @@ public class PluginInstaller {
     public static String buildFileName(String name, String version) {
         return PluginCore.userPluginDir+"/"+name+"-"+version+".jar";
     }
-
+    
+    /**
+     * Build a list of installed plugins.
+     * @return a list of plugin names and version numbers.
+     */
+    public static EventList<NameAndVersion> findInstalledPlugins() {
+        String[] files = PluginCore.userPluginDir.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+        EventList<NameAndVersion> plugins = new BasicEventList<NameAndVersion>();
+        for (int i=0; i<files.length; i++) {
+            String[] nav = getNameAndVersion(files[i]);
+            if (nav != null) {
+                plugins.add(new NameAndVersion(nav[0], new VersionNumber(nav[1])));
+            }
+        }
+        return plugins;
+    }
+    
+  
+    public static class NameAndVersion implements Comparable {
+        String name;
+        VersionNumber version;
+        
+        public NameAndVersion(String name, VersionNumber version) {
+            this.name = name;
+            this.version = version;
+        }
+        
+        public int compareTo(Object o) {
+            NameAndVersion oth = (NameAndVersion)o;
+            if (!name.equals(oth.name))
+                return name.compareTo(oth.name);
+            else
+                return version.compareTo(oth.version);
+        }
+    }
+            
     static class VersionNumber implements Comparable {
         List<Integer> digits;
         public VersionNumber(String number) {
