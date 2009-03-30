@@ -160,7 +160,8 @@ public class GUIGlobals {
 	journalAbbrHelp = "JournalAbbreviations.html",
 	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
 	nameFormatterHelp = "CustomExports.html#NameFormatter",
-	previewHelp = "PreviewHelp.html";
+	previewHelp = "PreviewHelp.html",
+        pluginHelp = "Plugin.html";
 
 //	Colors.
 	public static Color

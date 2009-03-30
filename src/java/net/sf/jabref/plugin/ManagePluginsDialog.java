@@ -24,10 +24,13 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
 
@@ -44,11 +47,20 @@ public class ManagePluginsDialog {
     private TableFormat tableFormat;
     private JButton close = new JButton(Globals.lang("Close")),
             install = new JButton(Globals.lang("Install plugin")),
-            remove = new JButton(Globals.lang("Delete"));
+            remove = new JButton(Globals.lang("Delete")),
+            help = new JButton(Globals.lang("Help"));
+    
     
     public ManagePluginsDialog(JabRefFrame frame) {
         this.frame = frame;
         diag = new JDialog(frame, Globals.lang("Plugin manager"), false);
+        help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.pluginHelp, "Help"));
+        
+        JLabel lab = new JLabel
+                (Globals.lang("Plugins installed in your user plugin directory (%0) are listed below:",
+                PluginCore.userPluginDir.getPath()));
+        lab.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        diag.getContentPane().add(lab, BorderLayout.NORTH);
         
         table = new JTable();
         buildList();
@@ -59,8 +71,10 @@ public class ManagePluginsDialog {
         b.addGlue();
         b.addGridded(install);
         b.addGridded(remove);
-        b.addRelatedGap();
         b.addGridded(close);
+        b.addRelatedGap();
+        b.addGridded(help);
+        
         b.addGlue();
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(b.getPanel(), BorderLayout.SOUTH);
@@ -139,6 +153,7 @@ public class ManagePluginsDialog {
             } else {
                 try {
                     PluginInstaller.installPlugin(frame, new URL("file://"+f.getPath()));
+                    buildList();
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

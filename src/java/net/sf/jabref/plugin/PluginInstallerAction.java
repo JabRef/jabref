@@ -22,7 +22,7 @@ public class PluginInstallerAction extends MnemonicAwareAction {
 
     public PluginInstallerAction(JabRefFrame frame) {
         this.frame = frame;
-        putValue(NAME, Globals.menuTitle("Install plugin"));
+        putValue(NAME, Globals.menuTitle("Manage plugins"));
     }
     
     public void actionPerformed(ActionEvent actionEvent) {
