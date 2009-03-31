@@ -47,6 +47,7 @@ public class ManagePluginsDialog {
     private TableFormat tableFormat;
     private JButton close = new JButton(Globals.lang("Close")),
             install = new JButton(Globals.lang("Install plugin")),
+            download = new JButton(Globals.lang("Download plugin")),
             remove = new JButton(Globals.lang("Delete")),
             help = new JButton(Globals.lang("Help"));
     
@@ -70,6 +71,7 @@ public class ManagePluginsDialog {
         ButtonBarBuilder b = new ButtonBarBuilder();
         b.addGlue();
         b.addGridded(install);
+        b.addGridded(download);
         b.addGridded(remove);
         b.addGridded(close);
         b.addRelatedGap();
@@ -84,6 +86,12 @@ public class ManagePluginsDialog {
         install.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 installPlugin();
+            }
+        });
+        
+        download.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                downloadPlugin();
             }
         });
         
@@ -134,6 +142,9 @@ public class ManagePluginsDialog {
         tableFormat = new PluginTableFormat();
         EventTableModel tableModel = new EventTableModel(plugins, tableFormat);
         table.setModel(tableModel);
+        table.getColumnModel().getColumn(0).setPreferredWidth(200);
+        table.getColumnModel().getColumn(1).setPreferredWidth(50);
+        table.getColumnModel().getColumn(2).setPreferredWidth(50);
     }
     
     public void setVisible(boolean visible) {
@@ -152,8 +163,7 @@ public class ManagePluginsDialog {
                         Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
-                    PluginInstaller.installPlugin(frame, new URL("file://"+f.getPath()));
-                    buildList();
+                    installFromURL(new URL("file://"+f.getPath()));
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
@@ -161,25 +171,52 @@ public class ManagePluginsDialog {
         }
 
     }
+
+    public void downloadPlugin() {
+        String url = JOptionPane.showInputDialog(Globals.lang("Enter download URL"));
+        if (url == null)
+            return;
+        try {
+            installFromURL(new URL(url));
+        } catch (MalformedURLException e) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"),
+                    Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void installFromURL(URL url) {
+        PluginInstaller.installPlugin(frame, url);
+        buildList();
+    }
     
     class PluginTableFormat implements TableFormat<NameAndVersion> {
 
         public int getColumnCount() {
-            return 2;
+            return 3;
         }
 
         public String getColumnName(int col) {
             if (col == 0)
                 return Globals.lang("Plugin name");
-            else
+            else if (col == 1)
                 return Globals.lang("Version");
+            else return Globals.lang("Status");
         }
 
         public Object getColumnValue(NameAndVersion nav, int col) {
             if (col == 0)
                 return nav.name;
-            else
-                return nav.version.toString();
+            else if (col == 1) {
+                if (!nav.version.equals(PluginInstaller.VersionNumber.ZERO))
+                    return nav.version.toString();
+                else return Globals.lang("Unknown");
+            }
+            else {
+                int status = nav.getStatus();
+                if (status == 0)
+                    return Globals.lang("Not loaded");
+                else return Globals.lang("Loaded");
+            }
         }
         
     }

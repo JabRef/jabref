@@ -75,6 +75,7 @@ public class PluginCore {
 
         PluginManager result = objectFactory.createManager();
 
+        
         /*
          * Now find plug-ins! Check directories and jar.
          */
