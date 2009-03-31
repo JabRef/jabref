@@ -249,12 +249,15 @@ public class PluginInstaller {
      * @return a list of plugin names and version numbers.
      */
     public static EventList<NameAndVersion> findInstalledPlugins() {
+	EventList<NameAndVersion> plugins = new BasicEventList<NameAndVersion>();
+	if (!PluginCore.userPluginDir.exists())
+		return plugins;
         String[] files = PluginCore.userPluginDir.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(".jar");
             }
         });
-        EventList<NameAndVersion> plugins = new BasicEventList<NameAndVersion>();
+        
         for (int i=0; i<files.length; i++) {
             String[] nav = getNameAndVersion(files[i]);
             if (nav != null) {
