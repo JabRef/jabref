@@ -102,9 +102,9 @@ public class MainTable extends JTable {
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener =  new PersistenceTableColumnListener(this);
-        if (true) {//Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
+        /*if (Globals.prefs.getBoolean(PersistenceTableColumnListener.ACTIVATE_PREF_KEY)) {
             getColumnModel().addColumnModelListener(this.tableColumnListener );
-        }
+        }*/
 
         // TODO: Figure out, whether this call is needed.
         getSelected();
