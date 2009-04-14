@@ -89,6 +89,7 @@ public class JabRef {
 		System.getProperties().put("proxySet", "true");
 
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
+        Globals.startBackgroundTasks();
 		Globals.prefs = prefs;
 		Globals.setLanguage(prefs.get("language"), "");
 

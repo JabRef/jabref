@@ -3,6 +3,7 @@ package net.sf.jabref.export;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
 
 import javax.swing.*;
@@ -281,7 +282,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         String chosenFile = null;
         File f = null;
         while (f == null) {
-            chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                     JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
                 cancelled = true;

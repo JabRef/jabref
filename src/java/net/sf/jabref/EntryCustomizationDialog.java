@@ -25,6 +25,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.FileDialogs;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -298,7 +300,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 
 	exportTypes.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    String filename = Globals.getNewFile
+		    String filename = FileDialogs.getNewFile
 			(parent, new File(System.getProperty("user.home")),
 			 ".txt", JFileChooser.SAVE_DIALOG, false);
 		    if (filename == null) 
@@ -333,7 +335,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 
 	importTypes.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    String filename = Globals.getNewFile
+		    String filename = FileDialogs.getNewFile
 			(parent, new File(System.getProperty("user.home")),
 			 ".txt", JFileChooser.OPEN_DIALOG, false);
 		    if (filename == null) 

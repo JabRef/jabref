@@ -26,6 +26,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
@@ -84,7 +85,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         boolean fileOk = false;
 
         public void init() {
-            filenames = Globals.getMultipleFiles(frame,
+            filenames = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get("workingDirectory")),
                     (importer != null ? importer.getExtensions() : null), true);
 

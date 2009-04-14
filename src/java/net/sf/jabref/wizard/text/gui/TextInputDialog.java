@@ -68,6 +68,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
@@ -627,7 +628,7 @@ public class TextInputDialog
       try
       {
         String chosen = null ;
-        chosen = Globals.getNewFile( _frame, null, null,
+        chosen = FileDialogs.getNewFile( _frame, null, null,
                                      ".txt",
                                      JFileChooser.OPEN_DIALOG, false ) ;
         if ( chosen != null )

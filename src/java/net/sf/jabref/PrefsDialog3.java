@@ -43,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -166,7 +167,7 @@ public class PrefsDialog3 extends JDialog {
 		importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
 		exportPrefs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String filename = Globals.getNewFile(frame, new File(System
+				String filename = FileDialogs.getNewFile(frame, new File(System
 					.getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
 				if (filename == null)
 					return;
@@ -192,7 +193,7 @@ public class PrefsDialog3 extends JDialog {
 
 		importPrefs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String filename = Globals.getNewFile(frame, new File(System
+				String filename = FileDialogs.getNewFile(frame, new File(System
 					.getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
 				if (filename == null)
 					return;

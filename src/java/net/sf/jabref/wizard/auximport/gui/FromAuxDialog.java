@@ -73,6 +73,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -414,7 +415,7 @@ public class FromAuxDialog
     public void actionPerformed( ActionEvent e )
     {
       String chosen = null ;
-      chosen = Globals.getNewFile( _frame,
+      chosen = FileDialogs.getNewFile( _frame,
               new File( comp.getText() ),
                                    ".aux",
                                    JFileChooser.OPEN_DIALOG, false ) ;

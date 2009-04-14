@@ -40,6 +40,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -116,9 +117,9 @@ public class ImportCustomizationDialog extends JDialog {
     addFromFolderButton.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
        CustomImportList.Importer importer = prefs.customImports.new Importer();
-       importer.setBasePath( Globals.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
+       importer.setBasePath( FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
            Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false) );
-       String chosenFileStr = Globals.getNewFile(frame, importer.getBasePath(), ".class",
+       String chosenFileStr = FileDialogs.getNewFile(frame, importer.getBasePath(), ".class",
            Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
        if (chosenFileStr != null) {
          try {
@@ -144,7 +145,7 @@ public class ImportCustomizationDialog extends JDialog {
 
     addFromJarButton.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
-       String basePath = Globals.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
+       String basePath = FileDialogs.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
            Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
        ZipFile zipFile = null;
        if (basePath != null) {

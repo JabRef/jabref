@@ -3,6 +3,7 @@ package net.sf.jabref.external;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEditor;
 import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileDialogs;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -91,7 +92,7 @@ public class MoveFileAction extends AbstractAction {
                     chosenFile = sb.toString();
                     System.out.println(chosenFile);
                 } else {
-                    chosenFile = Globals.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
+                    chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
                 }
                 if (chosenFile == null) {
                     return; // cancelled

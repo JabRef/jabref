@@ -31,6 +31,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.UrlDragDrop;
 import net.sf.jabref.Util;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.XMPUtil;
 
@@ -212,7 +213,7 @@ public class ExternalFilePanel extends JPanel {
 				dir = Globals.prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
 		}
 
-		String chosenFile = Globals.getNewFile(frame, new File(dir), "." + fieldName,
+		String chosenFile = FileDialogs.getNewFile(frame, new File(dir), "." + fieldName,
 			JFileChooser.OPEN_DIALOG, false);
 
 		if (chosenFile != null) {

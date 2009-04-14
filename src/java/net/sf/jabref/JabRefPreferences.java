@@ -649,9 +649,9 @@ public class JabRefPreferences {
       }
       else {
         if ((ks.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-          return KeyStroke.getKeyStroke(keyCode, Globals.SHORTCUT_MASK+KeyEvent.SHIFT_MASK);
+          return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask()+KeyEvent.SHIFT_MASK);
         }
-        return KeyStroke.getKeyStroke(keyCode, Globals.SHORTCUT_MASK);
+        return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask());
       }
     }
 

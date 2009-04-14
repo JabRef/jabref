@@ -39,6 +39,7 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
+import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -121,7 +122,7 @@ class CustomExportDialog extends JDialog {
         browse.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             File directory = new File(Globals.prefs.get("exportWorkingDirectory"));
-            String chosenStr = Globals.getNewFile(parent, directory, ".layout",
+            String chosenStr = FileDialogs.getNewFile(parent, directory, ".layout",
                                              JFileChooser.OPEN_DIALOG, false);
             if (chosenStr == null) return;
             File chosen = new File(chosenStr);

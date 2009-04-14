@@ -19,6 +19,7 @@ import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.MergeDialog;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.ExplicitGroup;
@@ -51,7 +52,7 @@ public class AppendDatabaseAction extends BaseAction {
         Util.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = Globals.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")),
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")),
                     null, false);
           //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
           //                                       null, JFileChooser.OPEN_DIALOG, false);

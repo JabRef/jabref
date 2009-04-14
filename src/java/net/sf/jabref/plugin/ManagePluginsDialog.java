@@ -32,6 +32,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
 
 /**
@@ -152,7 +153,7 @@ public class ManagePluginsDialog {
     }
     
     public void installPlugin() {
-        String filename = Globals.getNewFile(frame, new File(System.getProperty("user.home")),
+        String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
             ".jar", JFileChooser.OPEN_DIALOG, false);
         if (filename == null)
             return;

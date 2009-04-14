@@ -18,6 +18,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -144,7 +145,7 @@ public class ManageJournalsPanel extends JPanel{
                 File old = null;
                 if (!newNameTf.getText().equals(""))
                     old = new File(newNameTf.getText());
-                String name = Globals.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
+                String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
                 if (name != null) {
                     if ((old != null) && (tableModel.getRowCount() > 0)) {
                     }
@@ -158,7 +159,7 @@ public class ManageJournalsPanel extends JPanel{
                 File old = null;
                 if (!personalFile.getText().equals(""))
                     old = new File(personalFile.getText());
-                String name = Globals.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
+                String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
                 if (name != null) {
                     if ((old != null) && (tableModel.getRowCount() > 0)) {
                     }
@@ -391,7 +392,7 @@ public class ManageJournalsPanel extends JPanel{
             File toFile;
             try {
                 URL url = new URL(chosen);
-                String toName = Globals.getNewFile(frame, new File(System.getProperty("user.home")),
+                String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
                         null, JFileChooser.SAVE_DIALOG, false);
                 if (toName == null)
                     return;
@@ -420,10 +421,10 @@ public class ManageJournalsPanel extends JPanel{
         public void actionPerformed(ActionEvent e) {
             String chosen = null;
             if (dir)
-                chosen = Globals.getNewDir(frame, new File(comp.getText()), Globals.NONE,
+                chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
                         JFileChooser.OPEN_DIALOG, false);
             else
-                chosen = Globals.getNewFile(frame, new File(comp.getText()), Globals.NONE,
+                chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
                         JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

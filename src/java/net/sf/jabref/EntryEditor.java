@@ -49,7 +49,7 @@ import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.gui.AutoCompleter;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -402,7 +402,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     if (dir.equals(""))
                         dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
 
-                    String chosenFile = Globals.getNewFile(frame, new File(dir), "." + fieldName,
+                    String chosenFile = FileDialogs.getNewFile(frame, new File(dir), "." + fieldName,
                         JFileChooser.OPEN_DIALOG, false);
 
                     if (chosenFile != null) {

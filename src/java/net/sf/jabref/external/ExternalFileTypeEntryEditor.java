@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -231,7 +232,7 @@ public class ExternalFileTypeEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get("fileWorkingDirectory"));
             }
-            String chosen = Globals.getNewFile(/*parent*/null, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(/*parent*/null, initial, Globals.NONE,
                 JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

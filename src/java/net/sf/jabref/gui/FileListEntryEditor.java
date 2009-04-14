@@ -302,7 +302,7 @@ public class FileListEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get("fileWorkingDirectory"));
             }
-            String chosen = Globals.getNewFile(parent, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(parent, initial, Globals.NONE,
                 JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

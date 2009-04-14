@@ -16,6 +16,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Worker;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.util.ResourceExtractor;
 import spin.Spin;
 
@@ -39,7 +40,7 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
     
     public void actionPerformed(ActionEvent e) {
         
-        String filename = Globals.getNewFile(frame, new File(System.getProperty("user.home")), ".zip",
+        String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".zip",
                 JFileChooser.SAVE_DIALOG, false); 
         
         if (filename == null)
