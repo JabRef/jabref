@@ -502,12 +502,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          */
         JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
     	if (jabrefPlugin != null){
-    		for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
-    			EntryFetcher fetcher = ext.getEntryFetcher();
-    			if (fetcher != null){
-    				fetchers.add(fetcher);
-    			}
-    		}
+                for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
+                    try {
+                            EntryFetcher fetcher = ext.getEntryFetcher();
+                            if (fetcher != null){
+                                    fetchers.add(fetcher);
+                            }
+                    } catch (ClassCastException ex) {
+                        PluginCore.getManager().disablePlugin(ext.getDeclaringPlugin().getDescriptor());
+                        ex.printStackTrace();
+                    }
+                } 
     	}
         
         citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);

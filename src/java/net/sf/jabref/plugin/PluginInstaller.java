@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.HashMap;
 import org.java.plugin.registry.PluginDescriptor;
 
 /**
@@ -41,7 +42,8 @@ public class PluginInstaller {
 
     public static final int
         NOT_LOADED = 0,
-        LOADED = 1;
+        LOADED = 1,
+        BAD = 2;
     
     public static void installPlugin(JabRefFrame frame, URL source) {
         String fileName = (new File(source.getFile())).getName();
@@ -311,11 +313,11 @@ public class PluginInstaller {
             }
         });
         
-        List<String> urls = new ArrayList<String>();
+        HashMap<String,PluginDescriptor> urls = new HashMap<String,PluginDescriptor>();
         Collection<PluginDescriptor> descriptors =
                 PluginCore.getManager().getRegistry().getPluginDescriptors();
         for (PluginDescriptor desc : descriptors) {
-            urls.add(desc.getLocation().getFile());
+            urls.put(desc.getLocation().getFile(), desc);
         }
         
         for (int i=0; i<files.length; i++) {
@@ -323,9 +325,14 @@ public class PluginInstaller {
             if (nav != null) {
                 VersionNumber vn = nav[1] != null ? new VersionNumber(nav[1]) : null;
                 NameAndVersion nameAndVersion = new NameAndVersion(nav[0], vn);
-                for (String loc : urls) {
-                    if (loc.indexOf(nav[0]) >= 0)
-                        nameAndVersion.setStatus(LOADED);
+                for (String loc : urls.keySet()) {
+                    if (loc.indexOf(nav[0]) >= 0) {
+                        if (!PluginCore.getManager().isPluginEnabled(urls.get(loc)))
+                            nameAndVersion.setStatus(BAD);
+                        else
+                            nameAndVersion.setStatus(LOADED);
+                        
+                    }
                 }
                 plugins.add(nameAndVersion);
             }

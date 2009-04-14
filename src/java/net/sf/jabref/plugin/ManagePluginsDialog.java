@@ -215,7 +215,10 @@ public class ManagePluginsDialog {
                 int status = nav.getStatus();
                 if (status == 0)
                     return Globals.lang("Not loaded");
-                else return Globals.lang("Loaded");
+                else if (status == 1)
+                    return Globals.lang("Loaded");
+                else
+                    return Globals.lang("Error");
             }
         }
         
