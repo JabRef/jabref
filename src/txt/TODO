@@ -29,19 +29,3 @@ Morten:
 * [OK? Extension fields only] MODS exports "file" in raw form.
 * [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
 * [POSTPONE] Fix Save/Export file dialog stuff
-* [POSTPONE] Look up Vista problem with opening file chooser:
-    Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException:
-    3184
-       at sun.awt.shell.Win32ShellFolder2.getFileChooserIcon(Unknown Source)
-       at sun.awt.shell.Win32ShellFolderManager2.get(Unknown Source)
-       at sun.awt.shell.ShellFolder.get(Unknown Source)
-       at com.sun.java.swing.plaf.windows.WindowsLookAndFeel$LazyWindowsIcon.createVal
-    ue(Unknown Source)
-       at javax.swing.UIDefaults.getFromHashtable(Unknown Source)
-       at javax.swing.UIDefaults.get(Unknown Source)
-       at javax.swing.MultiUIDefaults.get(Unknown Source)
-       at javax.swing.UIDefaults.getIcon(Unknown Source)
-       at javax.swing.UIManager.getIcon(Unknown Source)
-       at javax.swing.plaf.basic.BasicFileChooserUI.installIcons(Unknown Source)
-
-

@@ -1,4 +1,4 @@
-2.5?
+2.5b
     - Added \r marker to WrapFileLinks formatter that outputs file links without expanding
       relative links.
     - Added [authorAlpha] key marker that formats authors according to the "alpha" BibTeX style.
