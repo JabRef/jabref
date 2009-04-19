@@ -86,12 +86,10 @@ features you want included in JabRef, tell us!
 JabRef homepage:
 http://jabref.sourceforge.net
 
-You can always get the very latest version of the program from our CVS
+You can always get the very latest version of the program from our SVN
 repository; instructions for downloading are found on the
-homepage. Note that the CVS version may contain untested features, or
-have other stability issues. Unless you're feeling extremely lucky, go
-for the version in the HEAD branch of the module 'jabref'.
-
+homepage. Note that the SVN version may contain untested features, or
+have other stability issues.
 
 Bug submission and Open Discussions and Help forums are found at:
 http://sourceforge.net/projects/jabref
