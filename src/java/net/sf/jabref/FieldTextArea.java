@@ -89,6 +89,8 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 		label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
 		setBackground(GUIGlobals.validFieldBackground);
 
+        //setFont(new Font("Times", Font.PLAIN, 10));
+
 		FieldTextMenu popMenu = new FieldTextMenu(this);
 		this.addMouseListener(popMenu);
 		label.addMouseListener(popMenu);

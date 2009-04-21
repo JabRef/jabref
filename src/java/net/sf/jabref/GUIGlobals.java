@@ -246,9 +246,9 @@ public class GUIGlobals {
         LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
         //LANGUAGES.put("Español", "es"); // Not complete
-        LANGUAGES.put("Polski", "pl");
+        //LANGUAGES.put("Polski", "pl");
 	LANGUAGES.put("Turkish", "tr");
-        LANGUAGES.put("Chinese", "zh");
+        LANGUAGES.put("Simplified Chinese", "zh");
 	}
 
 	/**
