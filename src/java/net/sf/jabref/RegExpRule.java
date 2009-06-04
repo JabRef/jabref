@@ -32,12 +32,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.sf.jabref.export.layout.format.RemoveBrackets;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 public class RegExpRule implements SearchRule {
 
     final boolean m_caseSensitiveSearch;
-    static RemoveBrackets removeBrackets = new RemoveBrackets();
+    //static RemoveBrackets removeBrackets = new RemoveBrackets();
+    static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
     public RegExpRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;

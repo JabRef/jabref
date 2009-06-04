@@ -1,3 +1,7 @@
+2.6?
+    - Modified search algorithms so LaTeX commands are removed before search. For instance, this
+      means that the value "test \textit{case}" now matches the search string "test case".
+
 2.5b
     - Added Simplified Chinese translation.
     - Added simple plugin manager.

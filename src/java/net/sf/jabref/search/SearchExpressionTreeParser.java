@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 import antlr.MismatchedTokenException;
 import antlr.NoViableAltException;
 import antlr.RecognitionException;
@@ -15,7 +16,11 @@ import antlr.collections.AST;
 public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes
  {
 
-	private static final int MATCH_EXACT = 0;
+    // Formatter used on every field before searching. Removes Latex commands that
+    // may interfere with the search:
+    static RemoveLatexCommands removeLatexCommands = new RemoveLatexCommands();
+
+    private static final int MATCH_EXACT = 0;
 	private static final int MATCH_CONTAINS = 1;
 	private static final int MATCH_DOES_NOT_CONTAIN = 2;
 
@@ -24,7 +29,7 @@ public class SearchExpressionTreeParser extends antlr.TreeParser       implement
 
     private static final int PSEUDOFIELD_TYPE = 1;
 
-    public int apply(AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
+     public int apply(AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
 		this.bibtexEntry = bibtexEntry;
 		// specification of fields to search is done in the search expression itself
 		this.searchKeys = bibtexEntry.getAllFields().toArray();
@@ -174,7 +179,8 @@ public SearchExpressionTreeParser() {
 								default: // regular field
 									if (!fieldSpec.matcher(searchKeys[i].toString()).matches())
 										continue;
-									content = bibtexEntry.getField(searchKeys[i].toString());
+									content = removeLatexCommands.format(
+                                            bibtexEntry.getField(searchKeys[i].toString()));
 							}
 			noSuchField = false;
 							if (content == null)

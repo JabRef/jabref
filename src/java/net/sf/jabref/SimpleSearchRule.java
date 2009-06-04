@@ -28,12 +28,13 @@ package net.sf.jabref;
 
 import java.util.Map;
 
-import net.sf.jabref.export.layout.format.RemoveBrackets;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 public class SimpleSearchRule implements SearchRule {
 
     final boolean m_caseSensitiveSearch;
-    static RemoveBrackets removeBrackets = new RemoveBrackets();
+    //static RemoveBrackets removeBrackets = new RemoveBrackets();
+    static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
     public SimpleSearchRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;

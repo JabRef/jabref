@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.SearchRule;
-import net.sf.jabref.export.layout.format.RemoveBrackets;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 /**
  * Search rule for simple search.
@@ -17,8 +17,8 @@ public class BasicSearch implements SearchRule {
     private boolean caseSensitive;
     private boolean regExp;
     Pattern[] pattern;
-    static RemoveBrackets removeBrackets = new RemoveBrackets();
-
+    //static RemoveBrackets removeLatexCommands = new RemoveBrackets();
+    static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
     public BasicSearch(boolean caseSensitive, boolean regExp) {
 
