@@ -88,6 +88,15 @@
 			value="Fetch Entries from OAI2 Archives like ArXiv." />
 	</extension>
 
+	<extension id="ADSFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.ADSFetcher" />
+		<parameter id="name" value="ADS Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from ADS." />
+	</extension>
+
 	<extension id="SPIRESFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
