@@ -90,6 +90,7 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.UnknownExternalFileType;
@@ -2709,5 +2710,38 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         // of execution will not continue until run() is finished.
         clb.update(); // Runs the update() method on the EDT.
     }
-	
+
+    /**
+     * This method checks whether there is a lock file for the given file. If
+     * there is, it waits for 500 ms. This is repeated until the lock is gone
+     * or we have waited the maximum number of times.
+     *
+     * @param file The file to check the lock for.
+     * @param maxWaitCount The maximum number of times to wait.
+     * @return true if the lock file is gone, false if it is still there.
+     */
+    public static boolean waitForFileLock(File file, int maxWaitCount) {
+        // Check if the file is locked by another JabRef user:
+        int lockCheckCount = 0;
+        while (Util.hasLockFile(file)) {
+
+            System.out.println("File locked... waiting");
+            if (lockCheckCount++ == maxWaitCount) {
+                System.out.println("Giving up wait.");
+                return false;
+            }
+            try { Thread.sleep(500); } catch (InterruptedException ex) {}
+        }
+        return true;
+    }
+
+    /**
+     * Check whether a lock file exists for this file.
+     * @param file The file to check.
+     * @return true if a lock file exists, false otherwise.
+     */
+    public static boolean hasLockFile(File file) {
+        File lock = new File(file.getPath()+ SaveSession.LOCKFILE_SUFFIX);
+        return lock.exists();
+    }
 }

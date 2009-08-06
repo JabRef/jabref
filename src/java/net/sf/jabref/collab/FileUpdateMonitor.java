@@ -91,6 +91,20 @@ public class FileUpdateMonitor extends Thread {
 	}
     }
 
+    /**
+     * Change the stored timestamp for the given file. If the timestamp equals
+     * the file's timestamp on disk, after this call the file will appear to
+     * have been modified. Used if a file has been modified, and the change
+     * scan fails, in order to ensure successive checks.
+     * @param handle the handle to the correct file.
+     */
+    public void perturbTimestamp(String handle) {
+        Object o = entries.get(handle);
+        if (o == null)
+            return;
+        ((Entry)o).timeStamp--;
+    }
+
   /**
    * Removes a listener from the monitor.
    * @param handle String The handle for the listener to remove.

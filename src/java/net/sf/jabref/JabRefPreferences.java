@@ -380,6 +380,9 @@ public class JabRefPreferences {
         defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
         defaults.put("runAutomaticFileSearch", Boolean.FALSE);
+
+        defaults.put("useLockFiles", Boolean.TRUE);
+
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

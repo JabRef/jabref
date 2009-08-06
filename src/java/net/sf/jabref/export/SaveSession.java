@@ -26,17 +26,21 @@ import java.nio.charset.UnsupportedCharsetException;
  */
 public class SaveSession {
 
+    public static final String LOCKFILE_SUFFIX = ".lock";
+    
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
+
     File file, tmp, backupFile;
     String encoding;
-    boolean backup;
+    boolean backup, useLockFile;
     VerifyingWriter writer;
 
     public SaveSession(File file, String encoding, boolean backup) throws IOException,
         UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
+        useLockFile = Globals.prefs.getBoolean("useLockFiles");
         this.backup = backup;
         this.encoding = encoding;
         writer = new VerifyingWriter(new FileOutputStream(tmp), encoding);
@@ -64,6 +68,15 @@ public class SaveSession {
             }
         }
         try {
+            if (useLockFile) {
+                try {
+                    createLockFile();
+                } catch (IOException ex) {
+                    System.err.println("Error when creating lock file");
+                    ex.printStackTrace();
+                }
+            }
+
             Util.copyFile(tmp, file, true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
@@ -71,6 +84,15 @@ public class SaveSession {
             // repeating the action will have a different result.
             // On the other hand, our temporary file should still be clean, and won't be deleted.
             throw new SaveException(Globals.lang("Save failed while committing changes")+": "+ex2.getMessage());
+        } finally {
+            if (useLockFile) {
+                try {
+                    deleteLockFile();
+                } catch (IOException ex) {
+                    System.err.println("Error when deleting lock file");
+                    ex.printStackTrace();
+                }
+            }
         }
 
         tmp.delete();
@@ -78,6 +100,43 @@ public class SaveSession {
 
     public void cancel() throws IOException {
         tmp.delete();
+    }
+
+
+    /**
+     * Check if a lock file exists, and create it if it doesn't.
+     * @return true if the lock file already existed
+     * @throws IOException if something happens during creation.
+     */
+    private boolean createLockFile() throws IOException {
+        File lock = new File(file.getPath()+LOCKFILE_SUFFIX);
+        if (lock.exists()) {
+            return true;
+        }
+        FileOutputStream out = new FileOutputStream(lock);
+        out.write(0);
+        try {
+            out.close();
+        } catch (IOException ex) {
+            System.err.println("Error when creating lock file");
+            ex.printStackTrace();
+        }
+        lock.deleteOnExit();
+        return false;
+    }
+
+    /**
+     * Check if a lock file exists, and delete it if it does.
+     * @return true if the lock file existed, false otherwise.
+     * @throws IOException if something goes wrong.
+     */
+    private boolean deleteLockFile() throws IOException {
+        File lock = new File(file.getPath()+LOCKFILE_SUFFIX);
+        if (!lock.exists()) {
+            return false;
+        }
+        lock.delete();
+        return true;
     }
 
     public File getTemporaryFile() {

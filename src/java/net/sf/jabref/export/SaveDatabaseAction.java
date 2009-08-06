@@ -22,7 +22,7 @@ import java.util.Vector;
 public class SaveDatabaseAction extends AbstractWorker {
     private BasePanel panel;
     private JabRefFrame frame;
-    private boolean success = false, cancelled = false;
+    private boolean success = false, cancelled = false, fileLockedError = false;
 
     public SaveDatabaseAction(BasePanel panel) {
 
@@ -34,10 +34,12 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void init() throws Throwable {
         success = false;
         cancelled = false;
+        fileLockedError = false;
         if (panel.getFile() == null)
             saveAs();
         else {
 
+            // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
 
                 String[] opts = new String[]{Globals.lang("Review changes"), Globals.lang("Save"),
@@ -61,6 +63,12 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     (new Thread(new Runnable() {
                         public void run() {
+
+                            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+                                // TODO: GUI handling of the situation when the externally modified file keeps being locked.
+                                System.err.println("File locked, this will be trouble.");
+                            }
+
                             ChangeScanner scanner = new ChangeScanner(panel.frame(), panel);
                             scanner.changeScan(panel.getFile());
                             try {
@@ -118,7 +126,11 @@ public class SaveDatabaseAction extends AbstractWorker {
             frame.output(Globals.lang("Saved database") + " '"
                     + panel.getFile().getPath() + "'.");
         } else if (!cancelled) {
-            frame.output(Globals.lang("Save failed"));
+            if (fileLockedError) {
+                // TODO: user should have the option to override the lock file.
+                frame.output(Globals.lang("Could not save, file locked by another JabRef instance."));
+            } else
+                frame.output(Globals.lang("Save failed"));
         }
     }
 
@@ -136,19 +148,25 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            // Now save the database:
-            success = saveDatabase(panel.getFile(), false, panel.getEncoding());
+            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+                success = false;
+                fileLockedError = true;
+            }
+            else {
+                // Now save the database:
+                success = saveDatabase(panel.getFile(), false, panel.getEncoding());
 
-            //Util.pr("Testing resolve string... BasePanel line 237");
-            //Util.pr("Resolve aq: "+database.resolveString("aq"));
-            //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
+                //Util.pr("Testing resolve string... BasePanel line 237");
+                //Util.pr("Resolve aq: "+database.resolveString("aq"));
+                //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
 
-            try {
-                Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
-            } catch (IllegalArgumentException ex) {
-                // This means the file has not yet been registered, which is the case
-                // when doing a "Save as". Maybe we should change the monitor so no
-                // exception is cast.
+                try {
+                    Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
+                } catch (IllegalArgumentException ex) {
+                    // This means the file has not yet been registered, which is the case
+                    // when doing a "Save as". Maybe we should change the monitor so no
+                    // exception is cast.
+                }
             }
             panel.setSaving(false);
             if (success) {

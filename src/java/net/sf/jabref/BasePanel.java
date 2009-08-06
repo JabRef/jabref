@@ -2478,6 +2478,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	  };
 
       // Test: running scan automatically in background
+      if ((BasePanel.this.getFile() != null) &&
+              !Util.waitForFileLock(BasePanel.this.getFile(), 10)) {
+          // The file is locked even after the maximum wait. Do nothing.
+          System.err.println("File updated externally, but change scan failed because the file is locked.");
+          // Perturb the stored timestamp so successive checks are made:
+          Globals.fileUpdateMonitor.perturbTimestamp(getFileMonitorHandle());
+          return;
+      }
+
       scanner.changeScan(BasePanel.this.getFile());
       try {
 	  scanner.join();

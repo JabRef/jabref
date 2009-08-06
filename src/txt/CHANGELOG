@@ -1,7 +1,10 @@
 2.6?
     - Modified search algorithms so LaTeX commands are removed before search. For instance, this
       means that the value "test \textit{case}" now matches the search string "test case".
-
+    - Can now create lock file while writing a bib file. The lock file is checked before
+      saving, and before scanning an externally changed file, in order to avoid reading an
+      unfinished file.
+      TODO: test lock file before opening a bib file 
 2.5b
     - Added Simplified Chinese translation.
     - Added simple plugin manager.
