@@ -1369,6 +1369,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
 
         public EntryTable(TableModel model) {
             super(model);
+            getTableHeader().setReorderingAllowed(false);
         }
 
         public TableCellRenderer getCellRenderer(int row, int column) {

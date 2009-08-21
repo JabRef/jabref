@@ -109,7 +109,6 @@ public class PrefsDialog3 extends JDialog {
 			PrefsTab tab = it.next();
 			names[i++] = tab.getTabName(); 
 			main.add((Component) tab, tab.getTabName());
-            //comps.add((Component)tab); // for debug only
         }
 
 		upper.setBorder(BorderFactory.createEtchedBorder());

@@ -420,8 +420,9 @@ public class MSBibEntry {
 
 		if (bibtex.getField("author") != null)
 			authors = getAuthors(bibtex.getField("author").toString());
-		
-		
+        if (bibtex.getField("editor") != null)
+            editors = getAuthors(bibtex.getField("editor").toString());
+        
 		if(FORMATXML)
 		{
 			title = format(title);
@@ -519,7 +520,7 @@ public class MSBibEntry {
 		interviewers = getSpecificAuthors("Interviewer",authorsElem,_bcol);
 		interviewees = getSpecificAuthors("Interviewee",authorsElem,_bcol);
 		inventors = getSpecificAuthors("Inventor",authorsElem,_bcol);
-		counsels = getSpecificAuthors("Counsel",authorsElem,_bcol);		
+		counsels = getSpecificAuthors("Counsel",authorsElem,_bcol);
 	}
 
 	protected List<PersonName> getAuthors(String authors) {

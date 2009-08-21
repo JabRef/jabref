@@ -40,10 +40,15 @@ public class ParserResult {
     private BibtexDatabase base;
     private HashMap<String, String> metaData;
     private HashMap<String, BibtexEntryType> entryTypes;
+
+
     private File file = null;
     private ArrayList<String> warnings = new ArrayList<String>();
+    private String errorMessage = null;
     private String encoding = null; // Which encoding was used?
 
+    private boolean postponedAutosaveFound = false;
+    private boolean invalid = false;
 
     private String jabrefVersion = null; // Which JabRef version wrote the file, if any?
     private int jabrefMajorVersion = 0, jabrefMinorVersion = 0; // Numeric version representation
@@ -163,4 +168,27 @@ public class ParserResult {
       return s;
     }
 
+    public boolean isPostponedAutosaveFound() {
+        return postponedAutosaveFound;
+    }
+
+    public void setPostponedAutosaveFound(boolean postponedAutosaveFound) {
+        this.postponedAutosaveFound = postponedAutosaveFound;
+    }
+
+    public boolean isInvalid() {
+        return invalid;
+    }
+
+    public void setInvalid(boolean invalid) {
+        this.invalid = invalid;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 }

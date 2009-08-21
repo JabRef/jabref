@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Base class for export formats based on templates.
@@ -179,14 +177,15 @@ public class ExportFormat implements IExportFormat {
         // Set a global field, so all layouts have access to the custom name formatters: 
         Globals.prefs.customExportNameFormatters = customNameFormatters;
 
-        // Print header
+        ArrayList<String> missingFormatters = new ArrayList<String>(1);
 
-		try {
+        // Print header
+        try {
 			reader = getReader(lfFileName + ".begin.layout");
 			LayoutHelper layoutHelper = new LayoutHelper(reader);
 			beginLayout = layoutHelper
 				.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-			reader.close();
+            reader.close();
 		} catch (IOException ex) {
 			// If an exception was cast, export filter doesn't have a begin
 			// file.
@@ -194,6 +193,7 @@ public class ExportFormat implements IExportFormat {
 		// Write the header
 		if (beginLayout != null) {
 			ps.write(beginLayout.doLayout(database, encoding));
+            missingFormatters.addAll(beginLayout.getMissingFormatters());
 		}
 
 		/*
@@ -213,9 +213,16 @@ public class ExportFormat implements IExportFormat {
 		Layout defLayout = layoutHelper
 			.getLayoutFromText(Globals.FORMATTER_PACKAGE);
 		reader.close();
+        if (defLayout != null) {
+            missingFormatters.addAll(defLayout.getMissingFormatters());
+            System.out.println(defLayout.getMissingFormatters());
+        }
 		HashMap<String, Layout> layouts = new HashMap<String, Layout>();
 		Layout layout;
+
+        ExportFormats.entryNumber = 0;
 		for (BibtexEntry entry : sorted) {
+            ExportFormats.entryNumber++; // Increment entry counter.
 			// Get the layout
 			String type = entry.getType().getName().toLowerCase();
 			if (layouts.containsKey(type))
@@ -229,6 +236,9 @@ public class ExportFormat implements IExportFormat {
 						.getLayoutFromText(Globals.FORMATTER_PACKAGE);
 					layouts.put(type, layout);
 					reader.close();
+                    if (layout != null)
+                        missingFormatters.addAll(layout.getMissingFormatters());
+
 				} catch (IOException ex) {
 					// The exception indicates that no type-specific layout
 					// exists, so we
@@ -259,10 +269,22 @@ public class ExportFormat implements IExportFormat {
 		// Write footer
 		if (endLayout != null) {
 			ps.write(endLayout.doLayout(database, encoding));
+            missingFormatters.addAll(endLayout.getMissingFormatters());
 		}
 
         // Clear custom name formatters:
         Globals.prefs.customExportNameFormatters = null;
+
+        if (missingFormatters.size() > 0) {
+            StringBuilder sb = new StringBuilder("The following formatters could not be found").
+                    append(": ");
+            for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
+                sb.append(i.next());
+                if (i.hasNext())
+                    sb.append(", ");
+            }
+            System.err.println(sb.toString());
+        }
 
         finalizeSaveSession(ss);
 	}

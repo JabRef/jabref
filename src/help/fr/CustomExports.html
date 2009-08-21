@@ -153,6 +153,101 @@
     le formateur <b>Replace</b> avec l'argument <b>\s,_</b> (ce qui remplace
     tous les espaces par des soulignets dans le champ "field").</p>
 
+
+    <p>See below for a list of built-in export formatters.</p>
+
+
+    <h3>Les sorties conditionnelles</h3>
+
+    <p>Certaines informations dans les sorties ne prennent de sens
+    que si un certain champ est utilis&eacute;. Par exemple, disons
+    que l'on veuille faire suivre le nom de l'&eacute;diteur par le
+    texte <code>(Ed.)</code>. Cela peut &ecirc;tre
+    r&eacute;alis&eacute; avec le code suivant&nbsp;:</p>
+
+    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
+    (Ed.)</code></p>
+
+    <p>Cependant, si le champs <code>editor</code> n'a pas
+    &eacute;t&eacute; renseign&eacute; - il n'a pas de sens pour
+    l'entr&eacute;e export&eacute;e - le texte <code>(Ed.)</code>
+    doit &ecirc;tre ignor&eacute;. Cela peut &ecirc;tre
+    effectu&eacute; en utilisant les commandes <code>\begin</code>
+    et <code>\end</code>&nbsp;:</p>
+
+    <p><code>\begin{editor}<br />
+    \format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)<br />
+     \end{editor}</code></p>
+
+    <p>Les commandes <code>\begin</code> et <code>\end</code>
+    assure que le texte contenu entre les deux commandes ne sera
+    imprim&eacute; que si et seulement si le champ
+    sp&eacute;cifi&eacute; entre accolades est renseign&eacute;
+    dans l'entr&eacute;e que l'on veut exporter.</p>
+
+    <p>Un bloc conditionnel peut aussi d&eacute;pendre de plus d'un champ. Dans ce cas,
+    le contenu du bloc est imprim&eacute; uniquement si tous les champs sont d&eacute;finis. Pour cr&eacute;er
+    un tel bloc, donnez simplement la liste des champs s&eacute;par&eacute;s par des points-virgules. Par exemple,
+    pour imprimer du texte uniquement si &agrave; la fois les champs <code>year</code> et <code>month</code> sont renseign&eacute;s, utilisez
+    un bloc tel que celui-ci&nbsp;:</p>
+
+    <p><code>\begin{year;month}Month: \format[HTMLChars]{\month}\end{year;month}</code></p>
+
+    <p>qui imprimera "Month: " plus le contenu du champ <code>month</code>, mais
+    seulement si le champ <code>year</code> est lui-aussi d&eacute;fini.</p>
+
+    <p><b>Note&nbsp;:</b> L'utilisation des commandes
+    <code>\begin</code> et <code>\end</code> est une mani&egrave;re
+    astucieuse de cr&eacute;er des gabarits qui sont communs
+    &agrave; une grande vari&eacute;t&eacute; d'entr&eacute;es.</p>
+
+
+    <h3>Les sorties group&eacute;es</h3>
+
+    <p>Si vous d&eacute;sirez s&eacute;parer vos entr&eacute;es en
+    groupes bas&eacute;s sur un certain champ, vous pouvez utiliser
+    les commandes de sorties group&eacute;es. La sortie
+    group&eacute;e est assez similaire aux sorties conditionnelles,
+    except&eacute; que le texte sp&eacute;cifi&eacute; n'est
+    imprim&eacute; que si le champ indiqu&eacute; dans les
+    accolades change de valeur.</p>
+
+    <p>Par exemple, on suppose que l'on d&eacute;sire faire des
+    groupes &agrave; partir de mots-clefs. Avant l'exportation, on
+    s'assure que les entr&eacute;es sont tri&eacute;es selon les
+    mots-clefs. Ensuite, on utilise les commandes suivantes pour
+    les grouper par mot-clefs&nbsp;:</p>
+    
+    <p><code>\begingroup{keywords}New Category:
+    \format[HTMLChars]{\keywords}<br />
+     \endgroup{keywords}</code></p>
+
+    <h2>Partage de votre travail</h2>
+
+    <p>Avec les fichiers gabarit externes, il est relativement
+    simple de partager des formats d'exportation entre
+    utilisateurs. Si vous &eacute;crivez un filtre d'exportation
+    pour un format non support&eacute; par JabRef, ou si vous
+    am&eacute;liorez un filtre d&eacute;j&agrave; existant, nous
+    vous encourageons &agrave; d&eacute;poser votre travail sur
+    notre page SourceForge.net. La m&ecirc;me chose est possible
+    pour les nouvelles classes de formateur que vous avez
+    &eacute;crites. Nous serons heureux de distribuer une
+    collection des fichiers gabarit soumis ou de les ajouter
+    &agrave; la s&eacute;rie des filtres d'exportation standard ou
+    des formateurs.</p>
+
+    <p>A partir de JabRef 2.4b1 vous pouvez aussi empaqueter votre
+    format d'exportation ("ExportFormat") ou formateur de gabarit
+    ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
+    faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
+    utilisateurs afin qu'ils utilisent votre format d'exportation.
+    Pour un example, t&eacute;l&eacute;charger le source de JabRef et jeter un
+    oeil au r&eacute;pertoire <code>src/plugins/</code>. N'h&eacute;sitez pas
+    &agrave; participer aux forums sur Sourceforge, puisque nous ne disposons
+    pas encore d'une documentation volumineuse.</p>
+
+
     <h2>Formateurs d'exportation inclus</h2>
 
     <p>JabRef fournit la s&eacute;rie suivante de formateurs, certains
@@ -220,6 +315,14 @@
         similaire &agrave; <code>AuthorLastFirstCommas</code>,
         except&eacute; que le "and" entre les deux derniers noms
         est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
+
+        <li><code>AuthorLF_FF</code>&nbsp;: formate
+        les champs author/editor avec le nom de famille en premier pour le
+        premier auteur et le pr&eacute;nom en premier pour les auteurs restants.
+        Renvoie les noms sépar&eacute;s par des "and".</li>
+
+        <li><code>AuthorLF_FFAbbr</code>&nbsp;: comme <code>AuthorLF_FF</code>,
+        mais abr&egrave;ge les pr&eacute;noms.</li>
 
         <li><code>AuthorNatBib</code>&nbsp;: Formats des noms
         d'auteurs dans le style NatBib, avec les noms propres
@@ -295,7 +398,12 @@
         <li><code>NoSpaceBetweenAbbreviations</code>&nbsp;: Les espaces
         entre les initiales des pr&eacute;noms sont
         supprim&eacute;s.</li>
-        
+                
+        <li><code>Number</code>&nbsp;: renvoie la s&eacute;quence de nombres &agrave; base de 1 de l'entr&eacute;e actuelle dans
+        l'exportation actuelle. Ce formatteur peut &ecirc;tre utilis&eacute; pour faire une liste num&eacute;rot&eacute;e d'entr&eacute;es. Le
+        num&eacute;ro de s&eacute;quence d&eacute;pend de la place de l'entr&eacute;e actuelle dans l'ordre de tri actuel, pas du
+        nombre d'appels de ce formatteur.</li>
+
         <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les
         accolades "{" ou "}".</li>
 
@@ -553,84 +661,6 @@
     <p>Si quelqu'un souhaite &eacute;crire un meilleur didacticiel
     sur ce sujet, envoyez un courriel sur l'une des listes de
     diffusion de JabRef&nbsp;!</p>
-
-    <h3>Les sorties conditionnelles</h3>
-
-    <p>Certaines informations dans les sorties ne prennent de sens
-    que si un certain champ est utilis&eacute;. Par exemple, disons
-    que l'on veuille faire suivre le nom de l'&eacute;diteur par le
-    texte <code>(Ed.)</code>. Cela peut &ecirc;tre
-    r&eacute;alis&eacute; avec le code suivant&nbsp;:</p>
-
-    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
-    (Ed.)</code></p>
-
-    <p>Cependant, si le champs <code>editor</code> n'a pas
-    &eacute;t&eacute; renseign&eacute; - il n'a pas de sens pour
-    l'entr&eacute;e export&eacute;e - le texte <code>(Ed.)</code>
-    doit &ecirc;tre ignor&eacute;. Cela peut &ecirc;tre
-    effectu&eacute; en utilisant les commandes <code>\begin</code>
-    et <code>\end</code>&nbsp;:</p>
-
-    <p><code>\begin{editor}<br />
-    \format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)<br />
-     \end{editor}</code></p>
-
-    <p>Les commandes <code>\begin</code> et <code>\end</code>
-    assure que le texte contenu entre les deux commandes ne sera
-    imprim&eacute; que si et seulement si le champ
-    sp&eacute;cifi&eacute; entre accolades est renseign&eacute;
-    dans l'entr&eacute;e que l'on veut exporter.</p>
-
-    <p><b>Note&nbsp;:</b> L'utilisation des commandes
-    <code>\begin</code> et <code>\end</code> est une mani&egrave;re
-    astucieuse de cr&eacute;er des gabarits qui sont communs
-    &agrave; une grande vari&eacute;t&eacute; d'entr&eacute;es.</p>
-
-    <h3>Les sorties group&eacute;es</h3>
-
-    <p>Si vous d&eacute;sirez s&eacute;parer vos entr&eacute;es en
-    groupes bas&eacute;s sur un certain champ, vous pouvez utiliser
-    les commandes de sorties group&eacute;es. La sortie
-    group&eacute;e est assez similaire aux sorties conditionnelles,
-    except&eacute; que le texte sp&eacute;cifi&eacute; n'est
-    imprim&eacute; que si le champ indiqu&eacute; dans les
-    accolades change de valeur.</p>
-
-    <p>Par exemple, on suppose que l'on d&eacute;sire faire des
-    groupes &agrave; partir de mots-clefs. Avant l'exportation, on
-    s'assure que les entr&eacute;es sont tri&eacute;es selon les
-    mots-clefs. Ensuite, on utilise les commandes suivantes pour
-    les grouper par mot-clefs&nbsp;:</p>
-
-    <p><code>\begingroup{keywords}New Category:
-    \format[HTMLChars]{\keywords}<br />
-     \endgroup{keywords}</code></p>
-
-    <h2>Partage de votre travail</h2>
-
-    <p>Avec les fichiers gabarit externes, il est relativement
-    simple de partager des formats d'exportation entre
-    utilisateurs. Si vous &eacute;crivez un filtre d'exportation
-    pour un format non support&eacute; par JabRef, ou si vous
-    am&eacute;liorez un filtre d&eacute;j&agrave; existant, nous
-    vous encourageons &agrave; d&eacute;poser votre travail sur
-    notre page SourceForge.net. La m&ecirc;me chose est possible
-    pour les nouvelles classes de formateur que vous avez
-    &eacute;crites. Nous serons heureux de distribuer une
-    collection des fichiers gabarit soumis ou de les ajouter
-    &agrave; la s&eacute;rie des filtres d'exportation standard ou
-    des formateurs.</p>
-
-    <p>A partir de JabRef 2.4b1 vous pouvez aussi empaqueter votre
-    format d'exportation ("ExportFormat") ou formateur de gabarit
-    ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
-    faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
-    utilisateurs afin qu'ils utilisent votre format d'exportation.
-    Pour un example, t&eacute;l&eacute;charger le source de JabRef et jeter un
-    oeil au r&eacute;pertoire <code>src/plugins/</code>. N'h&eacute;sitez pas
-    &agrave; participer aux forums sur Sourceforge, puisque nous ne disposons
-    pas encore d'une documentation volumineuse.</p>
 
 </body>
 </html>

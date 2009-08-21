@@ -104,7 +104,7 @@ All_subgroups_(recursively)=所有子分组(递归地)
 Allow_editing_in_table_cells=Allow_editing_in_table_cells
 An_Error_occurred_while_fetching_from_OAI2_source_(%0)\:=当从_OAI2_源_(%0)_抓取时发生了一个错误:
 An_Exception_ocurred_while_accessing_'%0'=当访问_'%0'_时发生了一个异常
-An_SAXException_ocurred_while_parsing_'%0':=当解析'%0'时发生了一个_SAXException:
+An_SAXException_ocurred_while_parsing_'%0'\:=当解析'%0'时发生了一个_SAXException:
 
 and=和
 and_inside_the_JabRef-jar\:=和_JabRef-jar_中\:
@@ -516,7 +516,6 @@ Do_not_show_splash_window_at_startup=不显示启动画面
 Do_not_show_these_options_in_the_future=以后不要再显示这些选项
 
 Do_not_wrap_the_following_fields_when_saving=保存时不要对下列域添加换行符
-Do_not_write_the_following_fields_to_XMP_Metadata:=不要将以下域写入_XMP_元数据:
 Do_not_write_the_following_fields_to_XMP_Metadata\:=不要将以下域写入_XMP_元数据:
 
 Do_you_want_JabRef_to_do_the_following_operations?=您希望_JabRef_做以下操作吗？
@@ -730,7 +729,7 @@ File_'%0'_not_found=无法找到文件_'%0'
 
 File_changed=File_changed
 File_directory=文件目录
-File_directory_is_'%0':=文件目录是_'%0':
+File_directory_is_'%0'\:=文件目录是_'%0':
 
 File_directory_is_not_set_or_does_not_exist!=文件目录未设置或该目录不存在！
 File_download=文件下载
@@ -1486,8 +1485,6 @@ Save_failed_during_backup_creation=保存失败，无法创建备份
 
 Save_failed_while_committing_changes=保存失败，无法提交修改
 
-Save_in_default_table_sort_order=以缺省的列表排序顺序保存
-
 Save_ordered_by_author/editor/year=以“作者/编辑/年份”顺序保存
 Save_selected_as_...=选中记录另存为...
 
@@ -1954,7 +1951,7 @@ You_must_set_both_BibTeX_key_and_%0_directory=您必须设置_BibTeX_键值和%0
 Your_new_key_bindings_have_been_stored.=您的热键绑定已经被存储。
 
 
-The_following_fetchers_are_available:=下面列出的是可用的抓取器:
+The_following_fetchers_are_available\:=下面列出的是可用的抓取器:
 Could_not_find_fetcher_'%0'=无法找到抓取器_'%0'
 Running_Query_'%0'_with_fetcher_'%1'.=使用抓取器'%1'执行请求'%0'
 Please_wait!=请稍候！
@@ -2064,3 +2061,58 @@ Remove_all_broken_links=移除所有失效链接
 
 Cannot_use_port_%0_for_remote_operation;_another_application_may_be_using_it._Try_specifying_another_port.=无法使用端口_%0_进行远程操作;该端口可能被其它应用程序占用，请使用其它端口。
 Highlight_groups_that_contain_entries_contained_in_any_currently_selected_group=高亮显示与当前选中分组有重叠记录的分组
+
+Looking_for_full_text_document...=
+Follow_DOI_or_URL_link_and_try_to_locate_PDF_full_text_document=
+Unable_to_find_full_text_article._No_search_algorithm_defined_for_the_'%0'_web_site.=
+Found_pdf_link,_but_received_the_wrong_MIME_type._This_could_indicate_that_you_don't_have_access_to_the_fulltext_article.=
+
+Autosave=
+Prompt_before_recovering_a_database_from_an_autosave_file=
+Autosave_interval_(minutes)=
+Do_you_want_to_recover_the_database_from_the_autosave_file?=
+Recover_from_autosave=
+%0_warnings=
+
+Save_in_current_table_sort_order=
+Export_in_current_table_sort_order=
+Export_ordered_by_author/editor/year=
+Export_entries_in_their_original_order=
+Error_opening_file_'%0'.=
+Autosave_of_file_'%0'=
+Error_opening_autosave_of_'%0'._Trying_to_load_'%0'_instead.=
+
+A_newer_version_of_this_plugin_is_already_installed.=
+Could_not_determine_version_of_=
+Delete_plugin=
+Delete_plugins=
+Delete_the_%0_selected_plugins?=
+Delete_the_selected_plugin?=
+Download_plugin=
+Enter_download_URL=
+Install_anyway?=
+Install_plugin=
+Loaded=
+Not_loaded=
+Old_plugin_versions_will_be_deleted_next_time_JabRef_starts_up.=
+Old_versions_deleted_successfully.=
+One_or_more_older_versions_of_this_plugin_is_installed._Delete_old_versions?=
+Plugin_installation_failed.=
+Plugin_installed_successfully._You_must_restart_JabRef_to_load_the_new_plugin.=
+Plugin_installer=
+Plugin_manager=
+Plugin_name=
+Plugin_will_be_deleted_next_time_JabRef_starts_up.=
+Plugins_installed_in_other_locations\:=
+Plugins_installed_in_your_user_plugin_directory_(%0)\:=
+Plugins_will_be_deleted_next_time_JabRef_starts_up.=
+The_same_version_of_this_plugin_is_already_installed.=
+Unable_to_copy_file=
+Unable_to_create_plugin_directory=
+Unable_to_create_user_plugin_directory=
+Unknown=
+Version=
+Formatter_not_found\:_%0=
+The_following_formatters_could_not_be_found=
+
+Clear_inputarea=

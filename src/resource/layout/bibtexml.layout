@@ -31,6 +31,6 @@
 \begin{comment}    <bibtex:comment>\format[XMLChars]{\comment}</bibtex:comment>\end{comment}
 \begin{note}    <bibtex:note>\format[XMLChars]{\note}</bibtex:note>\end{note}
 \begin{key}    <bibtex:key>\format[XMLChars]{\key}</bibtex:key>\end{key}
-\begin{file}\format[XMLChars,WrapFileLinks(    <bibtex:nstandard name="file" type="\x" description="\d">\p</bibtex:nstandard>\n)]{\file}\end{file}
+\begin{file}\format[WrapFileLinks(    <bibtex:nstandard name="file" type="\x" description="\d">\p</bibtex:nstandard>\n)]{\file}\end{file}
   </bibtex:\format[ToLowerCase]{\bibtextype}>
 </bibtex:entry>

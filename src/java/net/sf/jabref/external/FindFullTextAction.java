@@ -21,7 +21,7 @@ public class FindFullTextAction extends AbstractWorker {
     }
 
     public void init() throws Throwable {
-        basePanel.output("Looking for full text document...");
+        basePanel.output(Globals.lang("Looking for full text document..."));
     }
 
     public void run() {

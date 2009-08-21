@@ -171,6 +171,11 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.setSaving(false);
             if (success) {
                 panel.undoManager.markUnchanged();
+
+                if (!AutoSaveManager.deleteAutoSaveFile(panel)) {
+                    System.out.println("Deletion of autosave file failed");
+                } else
+                    System.out.println("Deleted autosave file (if it existed)");
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:
@@ -189,7 +194,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         try {
             if (!selectedOnly)
                 session = FileActions.saveDatabase(panel.database(), panel.metaData(), file,
-                        Globals.prefs, false, false, encoding);
+                        Globals.prefs, false, false, encoding, false);
             else
                 session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, panel.getSelectedEntries(), encoding);

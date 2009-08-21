@@ -51,11 +51,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.export.ExpandEndnoteFilters;
-import net.sf.jabref.export.ExportCustomizationDialog;
-import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.export.SaveAllAction;
-import net.sf.jabref.export.SaveDatabaseAction;
+import net.sf.jabref.export.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
@@ -127,6 +123,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     JMenuBar mb = new JMenuBar();
     JMenu pluginMenu = subMenu("Plugins");
+    boolean addedToPluginMenu = false;
 
     GridBagLayout gbl = new GridBagLayout();
 
@@ -339,8 +336,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          Globals.lang("Export to external SQL database"), 
           GUIGlobals.getIconUrl("dbExport") ),
     dbImport = new DbImportAction(this).getAction(),
-    downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
-            "Follow DOI or URL link and try to locate PDF full text document"),
+    //downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
+    //        Globals.lang("Follow DOI or URL link and try to locate PDF full text document")),
     increaseFontSize = new IncreaseTableFontSizeAction(),
     decreseFontSize = new DecreaseTableFontSizeAction(),
     installPlugin = new PluginInstallerAction(this);
@@ -693,6 +690,10 @@ public JabRefPreferences prefs() {
       prefs.customExports.store();
       prefs.customImports.store();
       BibtexEntryType.saveCustomEntryTypes(prefs);
+
+      // Clear autosave files:
+      if (Globals.autoSaveManager != null)
+        Globals.autoSaveManager.clearAutoSaves();
 
       // Let the search interface store changes to prefs.
       // But which one? Let's use the one that is visible.
@@ -1216,7 +1217,7 @@ public JabRefPreferences prefs() {
       tools.add(replaceAll);
       tools.add(new MassSetFieldAction(this));
       tools.add(makeKeyAction);
-      tools.add(downloadFullText);
+      //tools.add(downloadFullText);
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
       checkAndFix.add(dupliCheck);
@@ -1299,6 +1300,7 @@ public JabRefPreferences prefs() {
       });*/
 
       pluginMenu.add(installPlugin);
+
       //pluginMenu.setEnabled(false);
       mb.add(pluginMenu);
 
@@ -1332,10 +1334,11 @@ public JabRefPreferences prefs() {
 
 
     public void addPluginMenuItem(JMenuItem item) {
-        if (pluginMenu.getComponentCount() == 1)
+        if (!addedToPluginMenu) {
             pluginMenu.addSeparator();
+            addedToPluginMenu = true;
+        }
         pluginMenu.add(item);
-        pluginMenu.setEnabled(true);
     }
 
   private void createToolBar() {
@@ -1681,8 +1684,10 @@ public JabRefPreferences prefs() {
         }
 
         public void close() {
-            basePanel().cleanUp();
-            tabbedPane.remove(basePanel());
+            BasePanel pan = basePanel();
+            pan.cleanUp();
+            AutoSaveManager.deleteAutoSaveFile(pan); // Delete autosave
+            tabbedPane.remove(pan);
             if (tabbedPane.getTabCount() > 0) {
                 markActiveBasePanel();
             }

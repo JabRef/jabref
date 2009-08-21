@@ -208,6 +208,8 @@ public class JabRefPreferences {
         defaults.put("incrementS", Boolean.FALSE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
         defaults.put("saveInOriginalOrder", Boolean.FALSE);
+        defaults.put("exportInStandardOrder", Boolean.TRUE);
+        defaults.put("exportInOriginalOrder", Boolean.FALSE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
@@ -296,6 +298,7 @@ public class JabRefPreferences {
         defaults.put("warnBeforeOverwritingKey", Boolean.TRUE);
         defaults.put("confirmDelete", Boolean.TRUE);
         defaults.put("grayOutNonHits", Boolean.TRUE);
+        defaults.put("floatSearch", Boolean.TRUE);
         defaults.put("showSearchInDialog", Boolean.FALSE);
         defaults.put("searchAllBases", Boolean.FALSE);
         defaults.put("defaultLabelPattern", "[auth][year]");
@@ -380,9 +383,13 @@ public class JabRefPreferences {
         defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
         defaults.put("runAutomaticFileSearch", Boolean.FALSE);
-
         defaults.put("useLockFiles", Boolean.TRUE);
+        defaults.put("autoSave", Boolean.TRUE);
+        defaults.put("autoSaveInterval", 5);
+        defaults.put("promptBeforeUsingAutosave", Boolean.TRUE);
 
+        defaults.put("deletePlugins", "");
+        
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

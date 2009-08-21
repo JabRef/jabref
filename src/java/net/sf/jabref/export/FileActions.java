@@ -152,12 +152,14 @@ public class FileActions
      */
     public static SaveSession saveDatabase(BibtexDatabase database,
 		MetaData metaData, File file, JabRefPreferences prefs,
-		boolean checkSearch, boolean checkGroup, String encoding)
+		boolean checkSearch, boolean checkGroup, String encoding, boolean suppressBackup)
 		throws SaveException {
     	
 		TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>();
 		
 		boolean backup = prefs.getBoolean("backup");
+        if (suppressBackup)
+            backup = false;
 
 		SaveSession session;
 		BibtexEntry exceptionCause = null;
@@ -447,7 +449,9 @@ public class FileActions
 	public static List<BibtexEntry> getSortedEntries(BibtexDatabase database, Set<String> keySet, boolean isSaveOperation) {
         FieldComparatorStack<BibtexEntry> comparatorStack = null;
 
-        if (Globals.prefs.getBoolean("saveInOriginalOrder")) {
+        boolean inOriginalOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInOriginalOrder") :
+            Globals.prefs.getBoolean("exportInOriginalOrder");
+        if (inOriginalOrder) {
             // Sort entries based on their creation order, utilizing the fact
             // that IDs used for entries are increasing, sortable numbers.
             List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
@@ -459,8 +463,9 @@ public class FileActions
             String pri, sec, ter;
             boolean priD, secD, terD = false;
 
-
-            if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
+            boolean inStandardOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInStandardOrder") :
+                Globals.prefs.getBoolean("exportInStandardOrder");
+            if (!inStandardOrder) {
                 // The setting is to save according to the current table order.
                 pri = Globals.prefs.get("priSort");
                 sec = Globals.prefs.get("secSort");
@@ -469,6 +474,7 @@ public class FileActions
                 priD = Globals.prefs.getBoolean("priDescending");
                 secD = Globals.prefs.getBoolean("secDescending");
                 terD = Globals.prefs.getBoolean("terDescending");
+
             } else {
                 // The setting is to save in standard order: author, editor, year
                 pri = "author";
@@ -478,7 +484,7 @@ public class FileActions
                 secD = false;
                 terD = true;
             }
-
+            
             List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
             if (isSaveOperation)
                 comparators.add(new CrossRefEntryComparator());

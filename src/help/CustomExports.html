@@ -134,6 +134,85 @@
     in the "journal" field after replacing all whitespace by underscores).
     </p>
 
+    <p>See below for a list of built-in export formatters.</p>
+
+    <h3>Conditional output</h3>
+
+    <p>Some static output might only make
+    sense if a specific field is set. For instance, say we want to
+    follow the editor names with the text <code>(Ed.)</code>. This
+    can be done with the following text:</p>
+
+    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
+    (Ed.)</code></p>
+
+    <p>However, if the <code>editor</code> field has not been set -
+    it might not even make sense for the entry being exported - the
+    <code>(Ed.)</code> would be left hanging. This can be prevented
+    by instead using the <code>\begin</code> and <code>\end</code>
+    commands:</p>
+
+    <p><code>\begin{editor}<br />
+    \format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)<br />
+     \end{editor}</code></p>
+
+    <p>The <code>\begin</code> and <code>\end</code> commands make
+    sure the text in between is printed if and only if the field
+    referred in the curly braces is defined for the entry being
+    exported.</p>
+
+    <p>A conditional block can also be dependent on more than one field. In this case
+    the contents of the block are printed only if all the fields are defined. To make
+    such a block, simply give the list of fields separated by semicolons. For instance,
+    to output text only if both <code>year</code> and <code>month</code> are set, use
+    a block like the following:</p>
+
+    <p><code>\begin{year;month}Month: \format[HTMLChars]{\month}\end{year;month}</code></p>
+
+    <p>which will print "Month: " plus the contents of the <code>month</code> field, but
+    only if also the <code>year</code> field is defined.</p>
+
+    <p><b>Note:</b> Use of the <code>\begin</code> and
+    <code>\end</code> commands is a key to creating layout files
+    that work well with a variety of entry types.</p>
+
+    <h3>Grouped output</h3>
+
+    <p>If you wish to separate your entries
+    into groups based on a certain field, use the grouped output
+    commands. Grouped output is very similar to conditional output,
+    except that the text in between is printed only if the field
+    referred in the curly braces has changed value.</p>
+
+    <p>For example, let's assume I wish to group by keyword. Before
+    exporting the file, make sure you have sorted your entries
+    based on keyword. Now use the following commands to group by
+    keyword:</p>
+
+    <p><code>\begingroup{keywords}New Category:
+    \format[HTMLChars]{\keywords}<br />
+     \endgroup{keywords}</code></p>
+
+    <h2>Sharing your work</h2>
+
+    <p>With external layout files, it's
+    fairly simple to share custom export formats between users. If
+    you write an export filter for a format not supported by
+    JabRef, or an improvement over an existing one, we encourage
+    you to post your work on our SourceForge.net page. The same
+    goes for formatter classes that you write. We'd be happy to
+    distribute a collection of submitted layout files, or to add to
+    the selection of standard export filters and formatters.</p>
+
+    <p>Starting with JabRef 2.4b1 you can also package your
+	ExportFormat or LayoutFormatter as a plug-in. If you do so,
+	you can provide a single zip-file to other user to make use
+	of your ExportFormat. For an example download the JabRef
+	source release and have a look at the directory
+	<code>src/plugins/</code>. Don't hesitate to stop by the
+	forums on Sourceforge, since we don't have extensive documentation, yet.</p>
+
+
     <h2>Built-in export formatters</h2>
 
     <p>JabRef provides the following set of formatters, some of
@@ -192,6 +271,14 @@
         to <code>AuthorLastFirstCommas</code>, except that the "and"
         between the last two names is preceded by a comma.</li>
 
+        <li><code>AuthorLF_FF</code> : formats
+        author/editor fields with last name first for the first author,
+        and the first name first for the remaining authors. Returns
+        names delimited with "and".</li>
+
+        <li><code>AuthorLF_FFAbbr</code> : same as <code>AuthorLF_FF</code>,
+        but abbreviates first names.</li>
+                
         <li><code>AuthorNatBib</code> : formats author names in
         NatBib style, with last names only, separating names by
         "and" if there are two authors, and giving the first author
@@ -255,8 +342,12 @@
         <li><code>NoSpaceBetweenAbbreviations</code> : spaces
         between multiple abbreviated first names are removed.</li>
 
-        <li><code>RemoveBrackets</code> : removes all curly
-        brackets "{" or "}".</li>
+        <li><code>Number</code> : outputs the 1-based sequence number of the current entry in the
+        current export. This formatter can be used to make a numbered list of entries. The
+        sequence number depends on the current entry's place in the current sort order, not on
+        the number of calls to this formatter.</li>
+
+        <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".</li>
 
         <li><code>RemoveBracketsAddComma</code> : to be
         documented.</li>
@@ -371,7 +462,7 @@
     <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
     <p/>Additional pairs of replacements could be added.
 
-    
+
     <h3>Custom formatters</h3>
 
     <p>If none of the available formatters can do what you want to
@@ -475,71 +566,6 @@
 
     <p>If somebody would like to write a better tutorial about
     this: Write a mail to one of the JabRef mailinglists!</p>
-
-    <h3>Conditional output</h3>
-
-    <p>Some static output might only make
-    sense if a specific field is set. For instance, say we want to
-    follow the editor names with the text <code>(Ed.)</code>. This
-    can be done with the following text:</p>
-
-    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
-    (Ed.)</code></p>
-
-    <p>However, if the <code>editor</code> field has not been set -
-    it might not even make sense for the entry being exported - the
-    <code>(Ed.)</code> would be left hanging. This can be prevented
-    by instead using the <code>\begin</code> and <code>\end</code>
-    commands:</p>
-
-    <p><code>\begin{editor}<br />
-    \format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)<br />
-     \end{editor}</code></p>
-
-    <p>The <code>\begin</code> and <code>\end</code> commands make
-    sure the text in between is printed if and only if the field
-    referred in the curly braces is defined for the ently being
-    exported.</p>
-
-    <p><b>Note:</b> Use of the <code>\begin</code> and
-    <code>\end</code> commands is a key to creating layout files
-    that work well with a variety of entry types.</p>
-
-    <h3>Grouped output</h3>
-
-    <p>If you wish to separate your entries
-    into groups based on a certain field, use the grouped output
-    commands. Grouped output is very similar to conditional output,
-    except that the text in between is printed only if the field
-    referred in the curly braces has changed value.</p>
-
-    <p>For example, let's assume I wish to group by keyword. Before
-    exporting the file, make sure you have sorted your entries
-    based on keyword. Now use the following commands to group by
-    keyword:</p>
-
-    <p><code>\begingroup{keywords}New Category:
-    \format[HTMLChars]{\keywords}<br />
-     \endgroup{keywords}</code></p>
-
-    <h2>Sharing your work</h2>
-
-    <p>With external layout files, it's
-    fairly simple to share custom export formats between users. If
-    you write an export filter for a format not supported by
-    JabRef, or an improvement over an existing one, we encourage
-    you to post your work on our SourceForge.net page. The same
-    goes for formatter classes that you write. We'd be happy to
-    distribute a collection of submitted layout files, or to add to
-    the selection of standard export filters and formatters.</p>
-
-    <p>Starting with JabRef 2.4b1 you can also package your
-	ExportFormat or LayoutFormatter as a plug-in. If you do so,
-	you can provide a single zip-file to other user to make use
-	of your ExportFormat. For an example download the JabRef
-	source release and have a look at the directory
-	<code>src/plugins/</code>. Don't hesitate to stop by the
-	forums on Sourceforge, since we don't have extensive documentation, yet.</p>
 
 
 </body>

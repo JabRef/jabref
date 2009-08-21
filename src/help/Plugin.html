@@ -5,11 +5,18 @@
 
     <h1>JabRef Plugin System</h1>
 
-    <p>Starting with 2.4b1, JabRef can be extended using a plugin system which was 
-    build using Java Plugin Framework (JPF).</p>
+    <p>Starting with version 2.4, JabRef can be extended using a plugin system which was 
+    built using Java Plugin Framework (JPF).</p>
 
-    <p>To <i>use plugins</i> simply put the jar file of the plugin in a folder called <code>plugins</code> in the
-    folder where the JabRef.jar is located. When starting up, JabRef will print a list of all plugins loaded.</p>
+    <p>To use a plugin, it needs to be put in one of the directories where JabRef looks for plugins.
+    One such directory is the one called <code>plugins</code> below the directory where the JabRef
+    jar file is located. Another is the user plugin directory, <code>~/.jabref/plugins</code> under
+    Linux or OS X and <code>.jabref/plugins</code> under your user home directory under Windows.</p>
+
+    <p>The simplest way of installing plugins is through the <i>Plugin manager</i>, accessed from
+    the <i>Plugins</i> menu. The plugin manager lists all plugins installed in your user plugin
+    directory, and allows you to both delete installed plugins and install new ones.
+    </p>
     
     <h2>How to write a plugin</h2>
     

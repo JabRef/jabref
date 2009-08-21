@@ -151,8 +151,14 @@ public class RisImporter extends ImportFormat {
                         hm.put("issn", val);
             else if (lab.equals("VL")) hm.put("volume", val);
             else if (lab.equals("IS")) hm.put("number", val);
-            else if (lab.equals("N2") || lab.equals("AB")) hm
-                                       .put("abstract", val);
+            else if (lab.equals("N2") || lab.equals("AB")) {
+                String oldAb = hm.get("abstract");
+                if (oldAb == null)
+                    hm.put("abstract", val);
+                else
+                    hm.put("abstract", oldAb+"\n"+val);
+            }
+
             else if (lab.equals("UR")) hm.put("url", val);
             else if ((lab.equals("Y1") || lab.equals("PY")) && val.length() >= 4) {
                         String[] parts = val.split("/");

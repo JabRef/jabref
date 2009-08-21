@@ -161,7 +161,9 @@ public class GUIGlobals {
 	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
 	nameFormatterHelp = "CustomExports.html#NameFormatter",
 	previewHelp = "PreviewHelp.html",
-        pluginHelp = "Plugin.html";
+    pluginHelp = "Plugin.html",
+    autosaveHelp = "Autosave.html";
+
 
 //	Colors.
 	public static Color

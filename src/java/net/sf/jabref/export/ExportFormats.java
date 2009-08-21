@@ -27,7 +27,11 @@ public class ExportFormats {
 
 	private static Map<String,IExportFormat> exportFormats = new TreeMap<String,IExportFormat>();
 
+    // Global variable that is used for counting output entries when exporting:
+    public static int entryNumber = 0;
+
     public static void initAllExports() {
+
         exportFormats.clear();
 
         // Initialize Build-In Export Formats

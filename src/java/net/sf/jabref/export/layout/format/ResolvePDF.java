@@ -18,7 +18,7 @@ public class ResolvePDF implements LayoutFormatter {
 	public String format(String field) {
 
         // Search in the standard PDF directory:
-        /* TODO: oops, this part is not sufficient. We need access to the
+        /* Oops, this part is not sufficient. We need access to the
           database's metadata in order to check if the database overrides
           the standard file directory */
         String dir = Globals.prefs.get("pdfDirectory");

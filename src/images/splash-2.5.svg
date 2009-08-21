@@ -135,8 +135,8 @@
   </defs>
   <sodipodi:namedview
      inkscape:window-y="25"
-     inkscape:window-x="0"
-     inkscape:window-height="949"
+     inkscape:window-x="50"
+     inkscape:window-height="768"
      inkscape:window-width="1280"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
@@ -225,7 +225,7 @@
    id="rect3080" />
       </flowRegion><flowPara
          id="flowPara1339">This program is distributed under the terms of the General Public License.</flowPara><flowPara
-         id="flowPara1341">Copyright (2003-2008) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
+         id="flowPara1341">Copyright (2003-2009) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
        inkscape:export-filename="/home/alver/jabref_beta/src/images/splash.png"

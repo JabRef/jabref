@@ -159,7 +159,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private void buildGUI(){
 
 	    JPanel pan = new JPanel();
-	    JScrollPane sp = new JScrollPane(pan);	
+	    JScrollPane sp = new JScrollPane(pan);
+        sp.setPreferredSize(new Dimension(100,100));
 	    sp.setBorder(BorderFactory.createEmptyBorder());
 	    pan.setLayout(gbl);
 	    setLayout(gbl);	    

@@ -265,6 +265,8 @@ public class IsiImporter extends ImportFormat {
 					hm.put("volume", value);
 				else if (beg.equals("PU"))
 					hm.put("publisher", value);
+                else if (beg.equals("DI"))
+                    hm.put("doi", value);
 				else if (beg.equals("PD")) {
 
 					String month = parseMonth(value);

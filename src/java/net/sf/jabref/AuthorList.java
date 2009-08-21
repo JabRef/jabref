@@ -123,7 +123,9 @@ public class AuthorList {
 
 	private String[] authorsFirstFirst = new String[4], authorsLastOnly = new String[2],
 	authorLastFirstAnds = new String[2], 
-	authorsLastFirst = new String[4];
+	authorsLastFirst = new String[4],
+    authorsLastFirstFirstLast = new String[2];
+
 
 	// The following variables are used only during parsing
 
@@ -779,6 +781,25 @@ public class AuthorList {
 		authorLastFirstAnds[abbrInt] = res.toString();
 		return authorLastFirstAnds[abbrInt];
 	}
+
+	public String getAuthorsLastFirstFirstLastAnds(boolean abbreviate) {
+		int abbrInt = (abbreviate ? 0 : 1);
+		// Check if we've computed this before:
+		if (authorsLastFirstFirstLast[abbrInt] != null)
+			return authorsLastFirstFirstLast[abbrInt];
+
+		StringBuffer res = new StringBuffer();
+		if (size() > 0) {
+            res.append(getAuthor(0).getLastFirst(abbreviate));
+			for (int i = 1; i < size(); i++) {
+				res.append(" and ");
+				res.append(getAuthor(i).getFirstLast(abbreviate));
+			}
+		}
+
+		authorsLastFirstFirstLast[abbrInt] = res.toString();
+		return authorsLastFirstFirstLast[abbrInt];
+	}    
 
 	/**
 	 * Returns the list of authors separated by commas with first names before

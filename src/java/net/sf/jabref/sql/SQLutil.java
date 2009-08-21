@@ -1024,7 +1024,12 @@ public class SQLutil {
                 dml = dml + ", ";
                 val = entry.getField(fields.get(i));
                 if (val != null) {
-                    dml = dml + "\"" + val.replaceAll("\"", "\\\\\"") + "\"";
+                    //escape slashes and quotes for MySQL
+                	val = val.replace("\\", "\\\\");
+                	val = val.replace("\"", "\\\"");
+                	val = val.replace("\'", "\\\'");
+                	val = val.replace("`", "\\`");
+                	dml = dml + "\"" + val + "\"";
                 } else {
                     dml = dml + "NULL";
                 }

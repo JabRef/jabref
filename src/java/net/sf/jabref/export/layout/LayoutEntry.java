@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.plugin.NameFormat;
+import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtension;
@@ -58,6 +59,8 @@ public class LayoutEntry {
 
 	private String classPrefix;
 
+    private ArrayList<String> invalidFormatter = null;
+
 	// ~ Constructors
 	// ///////////////////////////////////////////////////////////
 
@@ -81,6 +84,17 @@ public class LayoutEntry {
 				text = v.get(0).trim();
 
 				option = getOptionalLayout(v.get(1), classPrefix);
+                // See if there was an undefined formatter:
+                for (int i = 0; i < option.length; i++) {
+                    if (option[i] instanceof NotFoundFormatter) {
+                        String notFound = ((NotFoundFormatter)option[i]).getNotFound();
+                        
+                        if (invalidFormatter == null)
+                            invalidFormatter = new ArrayList<String>();
+                        invalidFormatter.add(notFound);
+                    }
+                }
+
 			}
 		}
 	}
@@ -146,8 +160,15 @@ public class LayoutEntry {
 		for (int i = 0; i < tmpEntries.size(); i++) {
 			layoutEntries[i] = tmpEntries.get(i);
 
-			// System.out.println(layoutEntries[i].text);
-		}
+            // Note if one of the entries has an invalid formatter:
+            if (layoutEntries[i].isInvalidFormatter()) {
+                if (invalidFormatter == null)
+                    invalidFormatter = new ArrayList<String>(1);
+                invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
+            }
+
+        }
+		
 	}
 
 	public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
@@ -159,8 +180,19 @@ public class LayoutEntry {
 			return BibtexDatabase.getResolvedField(text, bibtex, database);
 		case LayoutHelper.IS_FIELD_START:
 		case LayoutHelper.IS_GROUP_START: {
-			String field = BibtexDatabase.getResolvedField(text, bibtex, database);
-
+            String field;
+            if (type == LayoutHelper.IS_GROUP_START)
+                field = BibtexDatabase.getResolvedField(text, bibtex, database);
+            else {
+                String[] parts = text.split(";");
+                field = null;
+                for (int i = 0; i < parts.length; i++) {
+                    field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
+                    if (field == null)
+                        break;
+                }
+            }
+			
 			if ((field == null)
 				|| ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper
 					.getCurrentGroup())))) {
@@ -296,8 +328,7 @@ public class LayoutEntry {
 	public static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName){
 		if (pluginLayoutFormatter == null){
 			pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
-            System.out.println("Loading from plugin: "+formatterName);
-			JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
+            JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
 			if (plugin != null){
 				for (LayoutFormatterExtension e : plugin.getLayoutFormatterExtensions()){
 					LayoutFormatter formatter = e.getLayoutFormatter();
@@ -418,11 +449,20 @@ public class LayoutEntry {
 			}
 
 			// If not found throw exception...
-			throw new Exception(Globals.lang("Formatter not found") + ": "
-					+ className);
+            //return new LayoutFormatter[] {new NotFoundFormatter(className)};
+            results.add(new NotFoundFormatter(className));
+			//throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
 		}
 
 		return results.toArray(new LayoutFormatter[] {});
 	}
 
+
+    public boolean isInvalidFormatter() {
+        return invalidFormatter != null;
+    }
+
+    public ArrayList<String> getInvalidFormatters() {
+        return invalidFormatter;
+    }
 }

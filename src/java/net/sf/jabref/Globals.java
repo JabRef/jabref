@@ -54,6 +54,7 @@ import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.util.ErrorConsole;
 import net.sf.jabref.util.TBuildInfo;
+import net.sf.jabref.export.AutoSaveManager;
 
 public class Globals {
 
@@ -176,7 +177,9 @@ public class Globals {
     }
 
 	public static GlobalFocusListener focusListener;
-    
+
+    public static AutoSaveManager autoSaveManager = null;
+
 	public static JabRefPreferences prefs = null;
 
 	public static HelpDialog helpDiag = null;
@@ -217,8 +220,29 @@ public class Globals {
 
         fileUpdateMonitor = new FileUpdateMonitor();
         fileUpdateMonitor.start();
+
+
     }
 
+    /**
+     * Initialize and start the autosave manager.
+     * @param frame The main frame.
+     */
+    public static void startAutoSaveManager(JabRefFrame frame) {
+        autoSaveManager = new AutoSaveManager(frame);
+        autoSaveManager.startAutoSaveTimer();        
+    }
+
+    /**
+     * Stop the autosave manager if it has been started.
+     */
+    public static void stopAutoSaveManager() {
+        if (autoSaveManager != null) {
+            autoSaveManager.stopAutoSaveTimer();
+            autoSaveManager.clearAutoSaves();
+            autoSaveManager = null;
+        }
+    }
 
 	public static void logger(String s) {
 		logger.info(s);

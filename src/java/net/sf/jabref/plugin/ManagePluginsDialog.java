@@ -6,32 +6,27 @@
 package net.sf.jabref.plugin;
 
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import java.awt.BorderLayout;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import java.util.Iterator;
+import javax.swing.*;
+
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
 
@@ -43,9 +38,9 @@ public class ManagePluginsDialog {
 
     private JabRefFrame frame;
     private JDialog diag;
-    private SortedList<NameAndVersion> plugins;
-    private JTable table;
-    private TableFormat tableFormat;
+    private SortedList<NameAndVersion> plugins, pluginsOther;
+    private JTable table, tableOther;
+    private TableFormat tableFormat, tableFormatOther;
     private JButton close = new JButton(Globals.lang("Close")),
             install = new JButton(Globals.lang("Install plugin")),
             download = new JButton(Globals.lang("Download plugin")),
@@ -57,17 +52,35 @@ public class ManagePluginsDialog {
         this.frame = frame;
         diag = new JDialog(frame, Globals.lang("Plugin manager"), false);
         help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.pluginHelp, "Help"));
-        
+        JPanel pan = new JPanel();
+        pan.setLayout(new BorderLayout());
+
         JLabel lab = new JLabel
-                (Globals.lang("Plugins installed in your user plugin directory (%0) are listed below:",
+                (Globals.lang("Plugins installed in your user plugin directory (%0):",
                 PluginCore.userPluginDir.getPath()));
         lab.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        diag.getContentPane().add(lab, BorderLayout.NORTH);
-        
+        pan.add(lab, BorderLayout.NORTH);
+
+        // Table for user dir plugins:
         table = new JTable();
+        // Table for other plugiuns
+        tableOther = new JTable();
+        tableOther.setRowSelectionAllowed(false);
+        tableOther.setColumnSelectionAllowed(false);
+        tableOther.setCellSelectionEnabled(false);
         buildList();
-        
-        diag.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 200));
+        tableOther.setPreferredScrollableViewportSize(new Dimension(500, 100));
+        pan.add(new JScrollPane(table), BorderLayout.CENTER);
+        diag.getContentPane().add(pan, BorderLayout.NORTH);
+        pan = new JPanel();
+        pan.setLayout(new BorderLayout());
+        lab = new JLabel(Globals.lang("Plugins installed in other locations:"));
+        lab.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        pan.add(lab, BorderLayout.NORTH);
+        pan.add(new JScrollPane(tableOther), BorderLayout.CENTER);
+
+        diag.getContentPane().add(pan, BorderLayout.CENTER);
         
         ButtonBarBuilder b = new ButtonBarBuilder();
         b.addGlue();
@@ -134,15 +147,40 @@ public class ManagePluginsDialog {
                 PluginInstaller.NameAndVersion nav = plugins.get(sel[i]);
                 success = PluginInstaller.deletePlugin(nav) & success;
             }
+            if (!success) {
+
+                JOptionPane.showMessageDialog(frame, sel.length > 1 ?
+                        Globals.lang("Plugins will be deleted next time JabRef starts up.")
+                        : Globals.lang("Plugin will be deleted next time JabRef starts up."),
+                        sel.length > 1 ? Globals.lang("Delete plugins") : Globals.lang("Delete plugin"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
             buildList();
         }
     }
     
     private void buildList() {
         plugins = new SortedList<NameAndVersion>(PluginInstaller.findInstalledPlugins());
+        // Move those plugins that are not installed in the user plugin dir to another list:
+        EventList<NameAndVersion> outsideUserDir = new BasicEventList<NameAndVersion>();
+        for (Iterator<NameAndVersion> i = plugins.iterator(); i.hasNext();) {
+            NameAndVersion nav = i.next();
+            if (!nav.inUserDirectory) {
+                outsideUserDir.add(nav);
+                i.remove();
+            }
+        }
+        pluginsOther = new SortedList<NameAndVersion>(outsideUserDir);
+        tableFormatOther = new PluginTableFormat();
+        EventTableModel tableModel = new EventTableModel(pluginsOther, tableFormatOther);
+        tableOther.setModel(tableModel);
+        tableOther.getColumnModel().getColumn(0).setPreferredWidth(200);
+        tableOther.getColumnModel().getColumn(1).setPreferredWidth(50);
+        tableOther.getColumnModel().getColumn(2).setPreferredWidth(50);
+
         tableFormat = new PluginTableFormat();
-        EventTableModel tableModel = new EventTableModel(plugins, tableFormat);
-        table.setModel(tableModel);
+        EventTableModel tableModelOther = new EventTableModel(plugins, tableFormat);
+        table.setModel(tableModelOther);
         table.getColumnModel().getColumn(0).setPreferredWidth(200);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
         table.getColumnModel().getColumn(2).setPreferredWidth(50);
@@ -163,11 +201,7 @@ public class ManagePluginsDialog {
                 JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+".",
                         Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
             } else {
-                try {
-                    installFromURL(new URL("file://"+f.getPath()));
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                installFromFile(f);
             }
         }
 
@@ -186,7 +220,26 @@ public class ManagePluginsDialog {
     }
     
     public void installFromURL(URL url) {
-        PluginInstaller.installPlugin(frame, url);
+        try {
+            File tmpFile = File.createTempFile("jabref-plugin", ".jar");
+            tmpFile.deleteOnExit();
+            URLDownload ud = new URLDownload(frame, url, tmpFile);
+            ud.download();
+            String path = url.getPath();
+            int pos = path.lastIndexOf('/');
+            if ((pos >= 0) && (pos < path.length()-1))
+                path = path.substring(pos+1);
+            PluginInstaller.installPlugin(frame, tmpFile, path);
+            tmpFile.delete();
+            buildList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    public void installFromFile(File file) {
+        PluginInstaller.installPlugin(frame, file, null);
         buildList();
     }
     

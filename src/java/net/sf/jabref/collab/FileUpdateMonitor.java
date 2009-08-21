@@ -227,7 +227,8 @@ public class FileUpdateMonitor extends Thread {
     // Globals.prefs.get("tempDir")
     //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());
     try {
-	f = File.createTempFile("jabref", null);
+	    f = File.createTempFile("jabref", null);
+        f.deleteOnExit();
 	//System.out.println(f.getPath());
     } catch (IOException ex) {
 	ex.printStackTrace();

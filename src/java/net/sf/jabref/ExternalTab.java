@@ -36,15 +36,15 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		_frame = frame;
 		setLayout(new BorderLayout());
 
-		psDir = new JTextField(30);
-		pdfDir = new JTextField(30);
-        fileDir = new JTextField(30);
-        pdf = new JTextField(30);
-		ps = new JTextField(30);
-		html = new JTextField(30);
+		psDir = new JTextField(25);
+		pdfDir = new JTextField(25);
+        fileDir = new JTextField(25);
+        pdf = new JTextField(25);
+		ps = new JTextField(25);
+		html = new JTextField(25);
 		editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
-        regExpTextField = new JTextField(30);
+        regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
 		regExpListener = new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -63,7 +63,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         BrowseAction browse;
 
 		FormLayout layout = new FormLayout(
-			"1dlu, 8dlu, left:pref, 4dlu, fill:170dlu, 4dlu, fill:pref","");
+			"1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref","");
 
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
@@ -99,7 +99,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.append(helpAction.getIconButton());
 		builder.nextLine();
         builder.append(new JPanel());
-        builder.append(runAutoFileSearch);
+        builder.append(runAutoFileSearch, 3);
         builder.nextLine();
 		builder.appendSeparator(Globals.lang("Legacy file fields"));
 		pan = new JPanel();

@@ -218,7 +218,7 @@ class SearchManager2 extends SidePaneComponent
     // Select the last used mode of search:
     if (Globals.prefs.getBoolean("incrementS"))
         increment.setSelected(true);
-    else if (Globals.prefs.getBoolean("grayOutNonHits"))
+    else if (Globals.prefs.getBoolean("floatSearch"))
         floatSearch.setSelected(true);
     else if (Globals.prefs.getBoolean("showSearchInDialog"))
         showResultsInDialog.setSelected(true);
@@ -320,7 +320,7 @@ class SearchManager2 extends SidePaneComponent
         Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
         Globals.prefs.putBoolean("incrementS", increment.isSelected());
         Globals.prefs.putBoolean("selectS", select.isSelected());
-        Globals.prefs.putBoolean("grayOutNonHits", floatSearch.isSelected());
+        Globals.prefs.putBoolean("floatSearch", floatSearch.isSelected());
         Globals.prefs.putBoolean("caseSensitiveSearch",
                  caseSensitive.isSelected());
         Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());

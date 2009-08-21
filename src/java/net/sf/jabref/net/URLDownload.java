@@ -9,7 +9,6 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.CookieHandler;
-import java.net.CookieManager;
 
 import javax.swing.ProgressMonitorInputStream;
 
@@ -35,7 +34,7 @@ public class URLDownload {
         try {
             // This should set up JabRef to receive cookies properly
             if ((cm = CookieHandler.getDefault()) == null) {
-                cm = new CookieManager();
+                cm = new CookieHandlerImpl();
                 CookieHandler.setDefault(cm);
             }
         } catch (SecurityException e) {

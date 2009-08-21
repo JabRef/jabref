@@ -1429,7 +1429,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         try {
             if (!selectedOnly)
                 session = FileActions.saveDatabase(database, metaData, file,
-                                           Globals.prefs, false, false, encoding);
+                                           Globals.prefs, false, false, encoding, false);
             else
                 session = FileActions.savePartOfDatabase(database, metaData, file,
                                                Globals.prefs, mainTable.getSelectedEntries(), encoding);

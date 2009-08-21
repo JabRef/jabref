@@ -20,6 +20,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
+import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 
@@ -142,40 +143,79 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     public void openIt(File file, boolean raisePanel) {
         if ((file != null) && (file.exists())) {
+            File fileToLoad = file;
             frame.output(Globals.lang("Opening") + ": '" + file.getPath() + "'");
-            try {
+            boolean tryingAutosave = false;
+            boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
+            if (autoSaveFound && !Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
+                // We have found a newer autosave, and the preferences say we should load
+                // it without prompting, so we replace the fileToLoad:
+                fileToLoad = AutoSaveManager.getAutoSaveFile(file);
+                tryingAutosave = true;
+            } else if (autoSaveFound) {
+                // We have found a newer autosave, but we are not allowed to use it without
+                // prompting.
+                int answer = JOptionPane.showConfirmDialog(null,"<html>"+
+                        Globals.lang("An autosave file was found for this database. This could indicate "
+                            +"that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
+                        +Globals.lang("Do you want to recover the database from the autosave file?")+"</html>",
+                        Globals.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.YES_OPTION) {
+                    fileToLoad = AutoSaveManager.getAutoSaveFile(file);
+                    tryingAutosave = true;
+                }
+            }
+
+            boolean done = false;
+            while (!done) {
                 String fileName = file.getPath();
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
-                final ParserResult pr = loadDatabase(file, encoding);
-
-                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
-                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file" + " '" + fileName + "'"),
-                            Globals.lang("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-
-                    return;
+                ParserResult pr;
+                String errorMessage = null;
+                try {
+                    pr = loadDatabase(fileToLoad, encoding);
+                } catch (Exception ex) {
+                    //ex.printStackTrace();
+                    errorMessage = ex.getMessage();
+                    pr = null;
                 }
+                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                    //Util.showQuickErrorDialog(frame, Globals.lang("Open database"), exception);
+
+                    String message = "<html>"+errorMessage+"<p>"+
+                            (tryingAutosave ? Globals.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())
+                            : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)+"</html>";
+                    JOptionPane.showMessageDialog(null, message, Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+
+                    if (tryingAutosave) {
+                        tryingAutosave = false;
+                        fileToLoad = file;
+                    }
+                    else
+                        done = true;
+                    continue;
+                } else done = true;
 
                 final BasePanel panel = addNewDatabase(pr, file, raisePanel);
-                
+                if (tryingAutosave)
+                    panel.markNonUndoableBaseChanged();
+
                 // After adding the database, go through our list and see if
                 // any post open actions need to be done. For instance, checking
                 // if we found new entry types that can be imported, or checking
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
+                final ParserResult prf = pr;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        performPostOpenActions(panel, pr, true);
+                        performPostOpenActions(panel, prf, true);
                     }
                 });
-
-
-            } catch (Exception ex) {
-                //ex.printStackTrace();
-                Util.showQuickErrorDialog(frame, Globals.lang("Open database"), ex);
             }
+
+            
         }
     }
 

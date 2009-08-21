@@ -26,6 +26,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.export.layout;
 
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -43,6 +45,8 @@ public class Layout
     //~ Instance fields ////////////////////////////////////////////////////////
 
     private LayoutEntry[] layoutEntries;
+
+    private ArrayList<String> missingFormatters = new ArrayList<String>();
 
     //~ Constructors ///////////////////////////////////////////////////////////
 
@@ -129,6 +133,10 @@ public class Layout
         for (int i = 0; i < tmpEntries.size(); i++)
         {
             layoutEntries[i] = tmpEntries.get(i);
+            // Note if one of the entries has an invalid formatter:
+            if (layoutEntries[i].isInvalidFormatter()) {
+                missingFormatters.addAll(layoutEntries[i].getInvalidFormatters());
+            }
 
             //System.out.println(layoutEntries[i].text);
         }
@@ -209,6 +217,10 @@ public class Layout
         return sb.toString();
     }
     // added section - end (arudert)
+
+    public ArrayList<String> getMissingFormatters() {
+        return missingFormatters;
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////
 //  END OF FILE.

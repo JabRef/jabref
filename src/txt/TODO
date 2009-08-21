@@ -18,7 +18,6 @@ Morten:
 
 * Enable "Open spires entry" ("openSpires" action)? Think about better integration of this?
   Look into which viewer is used.
-* [OK?] Improve duplicate check.
 * Add "Copy all externally linked files for this set of entries"-feature.
   Basic functionality in AccessLinksForEntries.
 * Problem setting today with Microba calendar.

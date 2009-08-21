@@ -9,24 +9,26 @@ import net.sf.jabref.Globals;
 
 import javax.swing.*;
 import java.net.URL;
-import java.io.File;
-import java.io.IOException;
-import java.io.FilenameFilter;
+import java.net.MalformedURLException;
+import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.jar.JarFile;
+
 import org.java.plugin.registry.PluginDescriptor;
+import org.java.plugin.registry.PluginRegistry;
+import org.java.plugin.registry.ManifestProcessingException;
+import org.java.plugin.registry.ManifestInfo;
+import org.java.plugin.registry.xml.PluginRegistryImpl;
 
 /**
  *
  */
 public class PluginInstaller {
 
+    public static final String PLUGIN_XML_FILE = "plugin.xml";
     public static final int
         SUCCESS = 0,
         UNABLE_TO_CREATE_DIR = 1,
@@ -44,9 +46,10 @@ public class PluginInstaller {
         NOT_LOADED = 0,
         LOADED = 1,
         BAD = 2;
-    
-    public static void installPlugin(JabRefFrame frame, URL source) {
-        String fileName = (new File(source.getFile())).getName();
+
+
+    public static void installPlugin(JabRefFrame frame, File file, String targetFileName) {
+        String fileName = targetFileName != null ? targetFileName : file.getName();
         if (!PluginCore.userPluginDir.exists()) {
             boolean created = PluginCore.userPluginDir.mkdirs();
             if (!created) {
@@ -56,11 +59,11 @@ public class PluginInstaller {
                 return;
             }
         }
-        int status = checkInstalledVersion(fileName);
+        int status = checkInstalledVersion(file);
         int result;
         switch (status) {
             case NO_VERSIONS_INSTALLED:
-                result = copyPlugin(frame, source, fileName);
+                result = copyPlugin(frame, file, fileName);
                 if (result == SUCCESS)
                     JOptionPane.showMessageDialog(frame, Globals.lang("Plugin installed successfully. You must restart JabRef to load the new plugin."),
                             Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
@@ -84,21 +87,21 @@ public class PluginInstaller {
                         Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
                 break;
             case OLDER_VERSION_INSTALLED:
-                result = copyPlugin(frame, source, fileName);
+                result = copyPlugin(frame, file, fileName);
                 if (result == SUCCESS) {
                     int answer = JOptionPane.showConfirmDialog(frame,
                             Globals.lang("One or more older versions of this plugin is installed. Delete old versions?"),
                             Globals.lang("Plugin installer"), JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
-                        boolean success = deleteOlderVersions(fileName);
+                        boolean success = deleteOlderVersions(file);
                         if (success) {
                             JOptionPane.showMessageDialog(frame,
                                     Globals.lang("Old versions deleted successfully."),
                                     Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(frame,
-                                    Globals.lang("Deletion of old versions failed."),
-                                    Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+                                    Globals.lang("Old plugin versions will be deleted next time JabRef starts up."),
+                                    Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
                 }
@@ -118,13 +121,12 @@ public class PluginInstaller {
             //    break;
             case UNKNOWN_VERSION:
                 JLabel lab = new JLabel("<html>"+Globals.lang("Unable to determine plugin name and "
-                        +"version from filename."
-                        +" File name convention is '[plugin name]-[version].jar'.")
+                        +"version. This may not be a valid JabRef plugin.")
                         +"<br>"+Globals.lang("Install anyway?")+"</html>");
                 int answer = JOptionPane.showConfirmDialog(frame, lab,
                         Globals.lang("Plugin installer"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    result = copyPlugin(frame, source, fileName);
+                    result = copyPlugin(frame, file, fileName);
                     if (result == SUCCESS)
                         JOptionPane.showMessageDialog(frame, Globals.lang("Plugin installed successfully. You must restart JabRef to load the new plugin."),
                                 Globals.lang("Plugin installer"), JOptionPane.INFORMATION_MESSAGE);
@@ -147,23 +149,25 @@ public class PluginInstaller {
     /**
      * Check the status of the named plugin - whether an older, the same or a
      * newer version is already installed.
-     * @param filename The filename of the plugin.
+     * @param f The plugin file.
      * @return an integer indicating the status
      */
-    public static int checkInstalledVersion(String filename) {
-        String[] nav = getNameAndVersion(filename);
+    public static int checkInstalledVersion(File f) {
+        String[] nav = getNameAndVersion(f);
         if (nav == null)
             return UNKNOWN_VERSION;
-        
+
         VersionNumber vn = new VersionNumber(nav[1]);
-        List<VersionNumber> versions = getInstalledVersions(nav[0]);
-        
-        boolean hasSame = versions.size() > 0 && (vn.compareTo(versions.get(0)) == 0);
-        boolean hasNewer = versions.size() > 0 && (vn.compareTo(versions.get(0)) > 0);
+        Map<VersionNumber, File> versions = getInstalledVersions(nav[0]);
 
         if (versions.size() == 0) {
             return NO_VERSIONS_INSTALLED;
         }
+        VersionNumber thenum = versions.keySet().iterator().next();
+        boolean hasSame = vn.compareTo(thenum) == 0;
+        boolean hasNewer = vn.compareTo(thenum) > 0;
+
+
         if (hasNewer)
             return NEWER_VERSION_INSTALLED;
         if (hasSame)
@@ -178,27 +182,45 @@ public class PluginInstaller {
      * @return true if deletion is successful, false otherwise.
      */
     public static boolean deletePlugin(NameAndVersion plugin) {
-        String file = buildFileName(plugin.name, 
-                plugin.version.equals(VersionNumber.ZERO) ? null : plugin.version.toString());
-        return (new File(file)).delete();
+        /*String file = buildFileName(plugin.name,
+                plugin.version.equals(VersionNumber.ZERO) ? null : plugin.version.toString());*/
+        return deletePluginFile(plugin.file);
     }
     
-    public static boolean deleteOlderVersions(String filename) {
-        String[] nav = getNameAndVersion(filename);
+    public static boolean deleteOlderVersions(File f) {
+        String[] nav = getNameAndVersion(f);
         if (nav == null)
             return false;
         boolean success = true;
         VersionNumber num = new VersionNumber(nav[1]);
-        List<VersionNumber> versions = getInstalledVersions(nav[0]);
-        for (Iterator<VersionNumber> iterator = versions.iterator(); iterator.hasNext();) {
+        Map<VersionNumber, File> versions = getInstalledVersions(nav[0]);
+        for (Iterator<VersionNumber> iterator = versions.keySet().iterator(); iterator.hasNext();) {
             VersionNumber versionNumber = iterator.next();
             if (num.compareTo(versionNumber) < 0) {
                 String vnString = versionNumber.equals(VersionNumber.ZERO) ? null : versionNumber.toString();
-                String file = buildFileName(nav[0], vnString);
-                success = (new File(file)).delete() && success;
+                File file = versions.get(versionNumber);//buildFileName(nav[0], vnString);
+                success = deletePluginFile(file);//file).delete() && success;
             }
         }
         return success;
+    }
+
+    /**
+     * This method deletes a plugin file. If deletion fails - typically happens
+     * on Windows due to file locking - the file is scheduled for deletion on
+     * the next startup.
+     *
+     * @param f The file to delete.
+     * @return true if deletion was successful, false if scheduled for later.
+     */
+    public static boolean deletePluginFile(File f) {
+        boolean success = f.delete();
+        if (success)
+            return true;
+        else {
+            schedulePluginForDeletion(f.getPath());
+            return false;
+        }
     }
 
     /**
@@ -228,33 +250,108 @@ public class PluginInstaller {
         }
     }
 
+    public static int copyPlugin(JFrame frame, File source, String destFileName) {
+        if (destFileName == null)
+            destFileName = source.getName();
+        if (!PluginCore.userPluginDir.exists()) {
+            boolean created = PluginCore.userPluginDir.mkdirs();
+            if (!created) {
+                return UNABLE_TO_CREATE_DIR;
+            }
+        }
+        File destFile = new File(PluginCore.userPluginDir, destFileName);
+        BufferedInputStream in = null;
+        BufferedOutputStream out = null;
+        try {
+            in = new BufferedInputStream(new FileInputStream(source));
+            out = new BufferedOutputStream(new FileOutputStream(destFile));
+            byte[] buf = new byte[1024];
+            int count;
+            while ((count = in.read(buf, 0, buf.length)) > 0) {
+                out.write(buf, 0, count);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return UNABLE_TO_COPY_FILE;
+        } finally {
+            if (in != null) try {
+                in.close();
+            } catch (IOException ex) {
+                return UNABLE_TO_COPY_FILE;
+            }
+            if (out != null) try {
+                out.close();
+            } catch (IOException ex) {
+                return UNABLE_TO_COPY_FILE;
+            }
+        }
+        return SUCCESS;
+    }
+
 
 
     /**
      * Based on a plugin name, find all versions that are already present
      * in the user plugin directory.
      * @param pluginName The name of the plugin.
-     * @return A list of versions already present.
+     * @return A map of versions already present, linking to the file containing each.
      */
-    public static List<VersionNumber> getInstalledVersions(final String pluginName) {
+    public static Map<VersionNumber, File> getInstalledVersions(final String pluginName) {
 
         String[] files = PluginCore.userPluginDir.list(new FilenameFilter() {
             public boolean accept(File file, String s) {
-                return s.startsWith(pluginName) && s.endsWith(".jar");
+                return s.endsWith(".jar");
             }
         });
-        List<VersionNumber> versions = new ArrayList<VersionNumber>();
+        Map<VersionNumber, File> versions = new TreeMap<VersionNumber, File>();
         for (int i = 0; i < files.length; i++) {
             String file = files[i];
-            String[] nav = getNameAndVersion(file);
+            File f = new File(PluginCore.userPluginDir,file);
+            String[] nav = getNameAndVersion(f);
             if (nav != null) {
-                VersionNumber vn = new VersionNumber(nav[1]);
-                versions.add(vn);
+                if (nav[0].equals(pluginName)) {
+                    VersionNumber vn = new VersionNumber(nav[1]);
+                    versions.put(vn, f);
+                }
             }
                 
         }
-        Collections.sort(versions);
+
         return versions;
+    }
+
+    /**
+     * Add the given filename to the list of plugins to be deleted on the next
+     * JabRef startup.
+     *
+     * @param filename The path to the file to delete.
+     */
+    public static void schedulePluginForDeletion(String filename) {
+        String[] oldValues = Globals.prefs.getStringArray("deletePlugins");
+        String[] newValues = oldValues == null ? new String[1] : new String[oldValues.length+1];
+        if (oldValues != null) for (int i=0; i<oldValues.length; i++) {
+            newValues[i] = oldValues[i];
+        }
+        newValues[newValues.length-1] = filename;
+        Globals.prefs.putStringArray("deletePlugins", newValues);
+    }
+
+    /**
+     * Delete the given files. Refuses to delete files outside the user plugin directory.
+     * This method throws no errors is the files don't exist or deletion failed.
+     * @param filenames An array of names of the files to be deleted.
+     */
+    public static void deletePluginsOnStartup(String[] filenames) {
+        for (int i = 0; i < filenames.length; i++) {
+            String s = filenames[i];
+            File f = new File(s);
+            if (f.getParentFile().equals(PluginCore.userPluginDir)) {
+            //if (s.startsWith(PluginCore.userPluginDir.getPath())) {
+                boolean success = f.delete();
+            }
+            else
+                System.out.println("File outside of user plugin dir: "+s);
+        }
     }
 
 
@@ -262,42 +359,77 @@ public class PluginInstaller {
     static Pattern pluginFilePatternNoVersion = Pattern.compile("(.*).jar");
 
     /**
-     * Try to split up a plugin file name in order to find the plugin name and
-     * the version number. The file name is expected to be on the format
-     * [plugin name]-[version number].jar
+     * Look inside a jar file, find the plugin.xml file, and use it to determine the name
+     * and version of the plugin.
      *
-     * @param filename The plugin file name.
+     * @param f The file to investigate.
      * @return A string array containing the plugin name in the first element and
      *   the version number in the second, or null if the filename couldn't be
      *   interpreted.
      *
      */
-    public static String[] getNameAndVersion(String filename) {
-        Matcher m = pluginFilePattern.matcher(filename);
-        if (m.matches()) {
-            return new String[] {m.group(1), m.group(2)};
-        }
-        m = pluginFilePatternNoVersion.matcher(filename);
-        if (m.matches()) {
-            return new String[] {m.group(1), "0"}; // unknown version is set to 0
-        }
-        else
+    public static String[] getNameAndVersion(File f) {
+
+        try {
+            File temp = unpackPluginXML(f);
+            if (temp == null)
+                return null; // Couldn't find the plugin.xml file
+            ManifestInfo mi = PluginCore.getManager().getRegistry().
+                    readManifestInfo(temp.toURI().toURL());
+            temp.delete();
+            return new String[] {mi.getId(), mi.getVersion().toString()};
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
             return null;
+        } catch (ManifestProcessingException e) {
+            return null; // Couldn't make sense of the plugin.xml
+        }
+
     }
 
     /**
-     * Make a File pointing to a file with the correct name in the user
-     * plugin directory.
-     * @param name The plugin name.
-     * @param version The plugin version.
-     * @return the correct File.
+     * Take the name of a jar file and extract the plugin.xml file, if possible,
+     * to a temporary file.
+     * @param f The jar file to extract from.
+     * @return a temporary file to which the plugin.xml file has been copied.
      */
-    public static String buildFileName(String name, String version) {
-        if (version != null)
-            return PluginCore.userPluginDir+"/"+name+"-"+version+".jar";
-        else
-            return PluginCore.userPluginDir+"/"+name+".jar";
+    public static File unpackPluginXML(File f) {
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            JarFile jar = new JarFile(f);
+            ZipEntry entry = jar.getEntry(PLUGIN_XML_FILE);
+            if (entry == null) {
+                return null;
+            }
+            File dest = File.createTempFile("jabref_plugin", ".xml");
+            dest.deleteOnExit();
+            
+            in = new BufferedInputStream(jar.getInputStream(entry));
+            out = new BufferedOutputStream(new FileOutputStream(dest));
+            byte[] buffer = new byte[2048];
+            for (;;)  {
+                int nBytes = in.read(buffer);
+                if (nBytes <= 0) break;
+                out.write(buffer, 0, nBytes);
+            }
+            out.flush();
+            return dest;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        } finally {
+                try {
+                    if (out != null) out.close();
+                    if (in != null) in.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
+        }
     }
+
     
     /**
      * Build a list of installed plugins.
@@ -317,25 +449,49 @@ public class PluginInstaller {
         Collection<PluginDescriptor> descriptors =
                 PluginCore.getManager().getRegistry().getPluginDescriptors();
         for (PluginDescriptor desc : descriptors) {
-            urls.put(desc.getLocation().getFile(), desc);
+            if ((desc.getPluginClassName()==null) || !desc.getPluginClassName()
+                    .equals("net.sf.jabref.plugin.core.JabRefPlugin")) {
+                urls.put(desc.getId(), desc);
+            }
         }
         
         for (int i=0; i<files.length; i++) {
-            String[] nav = getNameAndVersion(files[i]);
+            File file = new File(PluginCore.userPluginDir, files[i]);
+            String[] nav = getNameAndVersion(file);
             if (nav != null) {
                 VersionNumber vn = nav[1] != null ? new VersionNumber(nav[1]) : null;
-                NameAndVersion nameAndVersion = new NameAndVersion(nav[0], vn);
-                for (String loc : urls.keySet()) {
+                NameAndVersion nameAndVersion = new NameAndVersion(nav[0], vn, true,
+                        file);
+                for (Iterator<String> it = urls.keySet().iterator(); it.hasNext();) {
+                    String loc = it.next();
                     if (loc.indexOf(nav[0]) >= 0) {
+                        PluginDescriptor desc = urls.get(loc);
+                        //System.out.println("Accounted for: "+desc.getId()+" "+desc.getVersion().toString());
                         if (!PluginCore.getManager().isPluginEnabled(urls.get(loc)))
                             nameAndVersion.setStatus(BAD);
                         else
                             nameAndVersion.setStatus(LOADED);
-                        
+                        it.remove();
                     }
                 }
                 plugins.add(nameAndVersion);
             }
+        }
+
+        for (String url : urls.keySet()) {
+            PluginDescriptor desc = urls.get(url);
+            File location =  new File(desc.getLocation().getFile());
+            if (location.getPath().indexOf(PluginCore.userPluginDir.getPath()) >= 0)
+                continue; // This must be a loaded user dir plugin that's been deleted.
+            //System.out.println("File: "+desc.getLocation().getFile());
+            NameAndVersion nameAndVersion = new NameAndVersion(desc.getId(),
+                    new VersionNumber(desc.getVersion().toString()), false,
+                   location);
+            if (!PluginCore.getManager().isPluginEnabled(urls.get(url)))
+                nameAndVersion.setStatus(BAD);
+            else
+                nameAndVersion.setStatus(LOADED);
+            plugins.add(nameAndVersion);
         }
         return plugins;
     }
@@ -345,10 +501,15 @@ public class PluginInstaller {
         String name;
         VersionNumber version;
         int status = 0;
+        boolean inUserDirectory;
+        File file;
         
-        public NameAndVersion(String name, VersionNumber version) {
+        public NameAndVersion(String name, VersionNumber version, boolean inUserDirectory,
+                              File file) {
             this.name = name;
             this.version = version;
+            this.inUserDirectory = inUserDirectory;
+            this.file = file;
         }
         
         public int compareTo(Object o) {

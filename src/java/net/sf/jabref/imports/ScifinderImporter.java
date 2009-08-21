@@ -62,6 +62,9 @@ public class ScifinderImporter extends ImportFormat {
     StringBuffer sb = new StringBuffer();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     String str;
+    String number = "";
+    String country = "";
+    String kindcode = "";
     while ((str = in.readLine()) != null){
         sb.append(str);
     }
@@ -80,8 +83,8 @@ public class ScifinderImporter extends ImportFormat {
             if (tmp.length > 1){//==2
             if (tmp[0].equals("Author")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
             else if (tmp[0].equals("Title")) hm.put("title", tmp[1]);
-
             else if (tmp[0].equals("Journal Title")) hm.put("journal", tmp[1]);
+
 
             else if (tmp[0].equals("Volume")) hm.put("volume", tmp[1]);
             else if (tmp[0].equals("Page")) hm.put("pages", tmp[1]);
@@ -89,11 +92,20 @@ public class ScifinderImporter extends ImportFormat {
             else if (tmp[0].equals("Abstract")) hm.put("abstract", tmp[1]);
             else if (tmp[0].equals("Supplementary Terms")) hm.put("keywords",
                                           tmp[1]);
+            else if (tmp[0].equals("Inventor Name")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
+            else if (tmp[0].equals("Patent Assignee")) hm.put("institution", tmp[1]);
+            else if (tmp[0].equals("Patent Kind Code")) kindcode = " " + tmp[1];
+            else if (tmp[0].equals("Patent Country")) country = tmp[1] + " ";
+            else if (tmp[0].equals("Patent Number")) number = tmp[1];
+            else if (tmp[0].equals("Priority Application Date")) hm.put("number", country + number + kindcode);
+
             else if (tmp[0].equals("Document Type")) {
                                 if (tmp[1].startsWith("Journal") || tmp[1].startsWith("Review"))
                                     Type = "article";
                                 else if (tmp[1].equals("Dissertation"))
                                     Type = "phdthesis";
+                                else if (tmp[1].equals("Patent"))
+                                    Type = "patent";
                                 else
                                     Type = tmp[1];
                         }
@@ -110,5 +122,4 @@ public class ScifinderImporter extends ImportFormat {
     return bibitems;
     }
 }
-
 

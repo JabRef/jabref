@@ -34,12 +34,10 @@ import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
 import net.sf.jabref.export.*;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.ImportInspectionCommandLine;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.imports.*;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.SidePanePlugin;
+import net.sf.jabref.plugin.PluginInstaller;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
@@ -54,16 +52,17 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
+
+import spin.Spin;
 
 /**
  * JabRef Main Class - The application gets started here.
  *
  */
 public class JabRef {
-    
+
 	public static JabRef singleton;
     public static RemoteListener remoteListener = null;
     public JabRefFrame jrf;
@@ -74,7 +73,9 @@ public class JabRef {
 
     StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine;
     BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
-    
+
+    public static final int MAX_DIALOG_WARNINGS = 10;
+
     public static void main(String[] args) {
         new JabRef(args);
     }
@@ -89,6 +90,14 @@ public class JabRef {
 		System.getProperties().put("proxySet", "true");
 
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
+
+        // See if there are plugins scheduled for deletion:
+        if (prefs.hasKey("deletePlugins") && (prefs.get("deletePlugins").length() > 0)) {
+            String[] toDelete = prefs.getStringArray("deletePlugins");
+            PluginInstaller.deletePluginsOnStartup(toDelete);
+            prefs.put("deletePlugins", "");
+        }
+
         Globals.startBackgroundTasks();
 		Globals.prefs = prefs;
 		Globals.setLanguage(prefs.get("language"), "");
@@ -265,7 +274,7 @@ public class JabRef {
                 boolean bibExtension = leftOver[i].toLowerCase().endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension)
-                    pr = openBibFile(leftOver[i]);
+                    pr = openBibFile(leftOver[i], false);
 
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     // We will try to import this file. Normally we
@@ -280,6 +289,8 @@ public class JabRef {
                         ParserResult res = importToOpenBase(leftOver[i]);
                         if (res != null)
                             loaded.add(res);
+                        else
+                            loaded.add(ParserResult.INVALID_FORMAT);
                     }
                 }
                 else
@@ -325,7 +336,7 @@ public class JabRef {
                             System.out.println(Globals.lang("Saving") + ": " + data[0]);
                             SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
                                 new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
-                                false, false, Globals.prefs.get("defaultEncoding"));
+                                false, false, Globals.prefs.get("defaultEncoding"), false);
                             // Show just a warning message if encoding didn't work for all characters:
                             if (!session.getWriter().couldEncodeAll())
                                 System.err.println(Globals.lang("Warning")+": "+
@@ -418,7 +429,7 @@ public class JabRef {
                                     + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                     new File(subName), Globals.prefs, false, false,
-                                    Globals.prefs.get("defaultEncoding"));
+                                    Globals.prefs.get("defaultEncoding"), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll())
                                     System.err.println(Globals.lang("Warning")+": "+
@@ -664,7 +675,7 @@ public class JabRef {
             if (!blank.isInvoked() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
                 // How to handle errors in the databases to open?
                 String[] names = Globals.prefs.getStringArray("lastEdited");
-lastEdLoop: 
+                lastEdLoop: 
                 for (int i = 0; i < names.length; i++) {
                     File fileToOpen = new File(names[i]);
 
@@ -676,17 +687,16 @@ lastEdLoop:
                     }
 
                     if (fileToOpen.exists()) {
-                        ParserResult pr = openBibFile(names[i]);
+                        ParserResult pr = openBibFile(names[i], false);
 
                         if (pr != null) {
 
-			    if (pr == ParserResult.INVALID_FORMAT) {
-				System.out.println(Globals.lang("Error opening file")+" '"+fileToOpen.getPath()+"'");
-			    }
-			    else
-				loaded.add(pr);
+                            if (pr.isInvalid()) {
+                                System.out.println(Globals.lang("Error opening file")+" '"+fileToOpen.getPath()+"'");
+                            }
+                            loaded.add(pr);
 
-			}
+                        }
                     }
                 }
             }
@@ -700,12 +710,28 @@ lastEdLoop:
             jrf = new JabRefFrame();
 
             // Add all loaded databases to the frame:
-	    boolean first = true;
+            
+	        boolean first = true;
+            List<File> postponed = new ArrayList<File>();
+            List<ParserResult> failed = new ArrayList<ParserResult>();
             if (loaded.size() > 0) {
-                for (ParserResult pr : loaded){
-		            jrf.addTab(pr.getDatabase(), pr.getFile(),
-                            pr.getMetaData(), pr.getEncoding(), first);
-                    first = false;
+                for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();){
+                    ParserResult pr = i.next();
+                    if (pr.isInvalid()) {
+
+                        failed.add(pr);
+                        i.remove();
+                    }
+                    else if (!pr.isPostponedAutosaveFound()) {
+                        jrf.addTab(pr.getDatabase(), pr.getFile(),
+                                pr.getMetaData(), pr.getEncoding(), first);
+                        first = false;
+                    }
+                    else {
+                        i.remove();
+                        postponed.add(pr.getFile());
+
+                    }
                 }
             }
 
@@ -722,6 +748,11 @@ lastEdLoop:
                 +"is an early beta version. Do not use it without backing up your files!"),
                     Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
 
+
+            // Start auto save timer:
+            if (Globals.prefs.getBoolean("autoSave"))
+                Globals.startAutoSaveManager(jrf);
+
             //Util.pr(": Showing frame");
             jrf.setVisible(true);
             // If we are set to remember the window location, we also remember the maximised
@@ -736,14 +767,26 @@ lastEdLoop:
             // TEST TEST TEST TEST TEST TEST
             startSidePanePlugins(jrf);
 
+            for (ParserResult pr : failed) {
+                String message = "<html>"+Globals.lang("Error opening file '%0'.", pr.getFile().getName())
+                    +"<p>"+pr.getErrorMessage()+"</html>";
+
+                JOptionPane.showMessageDialog(jrf, message, Globals.lang("Error opening file"),
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
             for (int i = 0; i < loaded.size(); i++) {
                 ParserResult pr = loaded.elementAt(i);
                 if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
-                    StringBuffer wrn = new StringBuffer();
-                    for (int j = 0; j<wrns.length; j++)
+                    StringBuilder wrn = new StringBuilder();
+                    for (int j = 0; j<Math.min(MAX_DIALOG_WARNINGS, wrns.length); j++)
                         wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
-                    if (wrn.length() > 0)
+                    if (wrns.length > MAX_DIALOG_WARNINGS) {
+                        wrn.append("... ");
+                        wrn.append(Globals.lang("%0 warnings", String.valueOf(wrns.length)));
+                    }
+                    else if (wrn.length() > 0)
                         wrn.deleteCharAt(wrn.length() - 1);
                     jrf.showBaseAt(i);
                     JOptionPane.showMessageDialog(jrf, wrn.toString(),
@@ -764,6 +807,13 @@ lastEdLoop:
             }
 
             //Util.pr(": Finished adding panels");
+
+            // If any database loading was postponed due to an autosave, schedule them
+            // for handing now:
+            if (postponed.size() > 0) {
+                AutosaveStartupPrompter asp = new AutosaveStartupPrompter(jrf, postponed);
+                SwingUtilities.invokeLater(asp);
+            }
 
             if (loaded.size() > 0) {
                 jrf.tabbedPane.setSelectedIndex(0);
@@ -792,15 +842,31 @@ lastEdLoop:
         }
     }
 
-    public static ParserResult openBibFile(String name) {
+    public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
         System.out.println(Globals.lang("Opening") + ": " + name);
-
+        File file = new File(name);
         try {
-            File file = new File(name);
+
+            if (!ignoreAutosave) {
+                boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
+                if (autoSaveFound) {
+                    // We have found a newer autosave. Make a note of this, so it can be
+                    // handled after startup:
+                    ParserResult postp = new ParserResult(null, null, null);
+                    postp.setPostponedAutosaveFound(true);
+                    postp.setFile(file);
+                    return postp;
+                }
+            }
             String encoding = Globals.prefs.get("defaultEncoding");
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-            if (pr == null)
-                return ParserResult.INVALID_FORMAT;
+            if (pr == null) {
+                pr = new ParserResult(null, null, null);
+                pr.setFile(file);
+                pr.setInvalid(true);
+                return pr;
+
+            }
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();
@@ -810,13 +876,13 @@ lastEdLoop:
             }
             return pr;
         } catch (Throwable ex) {
-            //System.err.println(Globals.lang("Error opening file")+" '"+ name+"':
-            // "+ex.getMessage());
-            System.err.println(Globals.lang("Error opening file") + ": "
-                + ex.getMessage());
+            ParserResult pr = new ParserResult(null, null, null);
+            pr.setFile(file);
+            pr.setInvalid(true);
+            pr.setErrorMessage(ex.getMessage());
+            return pr;
         }
 
-        return null;
     }
 
     public static ParserResult importFile(String argument){

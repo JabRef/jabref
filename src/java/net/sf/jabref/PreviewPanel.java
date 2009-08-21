@@ -15,6 +15,7 @@ import javax.swing.event.HyperlinkListener;
 
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
+import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.util.DocumentPrinter;
 
 /**
@@ -283,6 +284,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 	public void update() {
 
 		StringBuffer sb = new StringBuffer();
+        ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 		if (entry != null)
 			sb.append(layout.doLayout(entry, database));
 		previewPane.setText(sb.toString());
