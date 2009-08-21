@@ -101,6 +101,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     // The action which generates a bibtexkey for this entry.
     public GenerateKeyAction generateKeyAction;
 
+    public AutoSetFileAction autoLink = new AutoSetFileAction();
+
     public AbstractAction writeXmp;
 
     SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
@@ -262,6 +264,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         am.put("store", storeFieldAction);
         im.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
         am.put("generateKey", generateKeyAction);
+        im.put(prefs.getKey("Automatically link files"), "autoLink");
+        am.put("autoLink", autoLink);
         im.put(prefs.getKey("Entry editor, previous entry"), "prev");
         am.put("prev", prevEntryAction);
         im.put(prefs.getKey("Entry editor, next entry"), "next");
@@ -286,6 +290,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         tlb.addSeparator();
         
         tlb.add(generateKeyAction);
+        tlb.add(autoLink);
 
         tlb.add(writeXmp);
 
@@ -1397,4 +1402,27 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
 
+    class AutoSetFileAction extends AbstractAction {
+        public AutoSetFileAction() {
+            putValue(SMALL_ICON, GUIGlobals.getImage("autoGroup"));
+            putValue(SHORT_DESCRIPTION, Globals.lang("Automatically set file links for this entry")
+                    +" (Alt-F)");
+        }
+
+        public void actionPerformed(ActionEvent event) {
+            JDialog diag = new JDialog(frame, true);
+            final FileListTableModel tableModel = new FileListTableModel();
+            tableModel.setContent(entry.getField(GUIGlobals.FILE_FIELD));
+            FileListEditor.autoSetLinks(entry, tableModel, panel.metaData(), new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getID() > 0) {
+                        entry.setField(GUIGlobals.FILE_FIELD, tableModel.getStringRepresentation());
+                        frame.output(Globals.lang("Finished autosetting external links."));
+                    }
+                    else frame.output(Globals.lang("Finished autosetting external links.")
+                        +" "+Globals.lang("No files found."));
+                }
+            }, diag);
+        }
+    }
 }

@@ -206,7 +206,26 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         }
     }
 
-     public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
+        // First find the column on which the user has clicked.
+        final int col = table.columnAtPoint(e.getPoint()),
+                row = table.rowAtPoint(e.getPoint());
+
+        // Check if the user has clicked on an icon cell to open url or pdf.
+        final String[] iconType = table.getIconTypeForColumn(col);
+        
+        // Check if the user has right-clicked. If so, open the right-click menu.
+        if (e.isPopupTrigger()) {
+            if (iconType == null)
+                processPopupTrigger(e, row);
+            else
+                showIconRightClickMenu(e, row, iconType);
+
+            return;
+        }
+    }
+
+    public void mouseClicked(MouseEvent e) {
          
         // First find the column on which the user has clicked.
         final int col = table.columnAtPoint(e.getPoint()),
@@ -222,15 +241,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         // Check if the user has clicked on an icon cell to open url or pdf.
         final String[] iconType = table.getIconTypeForColumn(col);
 
-        // Check if the user has right-clicked. If so, open the right-click menu.
-        if (e.isPopupTrigger()) {
-            if (iconType == null)
-                processPopupTrigger(e, row);
-            else
-                showIconRightClickMenu(e, row, iconType);
-
-            return;
-        }
 
          // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
          // on mouseReleased. Therefore we need to avoid taking action at this point, because
@@ -381,9 +391,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
 
-    public void mouseClicked(MouseEvent e) {
 
-    }
 
     public void mouseEntered(MouseEvent e) {
 

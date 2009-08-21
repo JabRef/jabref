@@ -261,17 +261,21 @@ public class FileListEntryEditor {
 	// See if we should trim the file link to be relative to the file directory:
 	try {
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        System.out.println("filedir = '"+fileDir+"'");
         if ((fileDir == null) ||(fileDir.equals(""))) {
             entry.setLink(link.getText().trim());
         } else {
             String canPath = (new File(fileDir)).getCanonicalPath();
             File fl = new File(link.getText().trim());
-            String flPath = fl.getCanonicalPath();
-            if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
-                entry.setLink(relFileName);
-            } else
-                entry.setLink(link.getText().trim());
+            if (fl.isAbsolute()) {
+                String flPath = fl.getCanonicalPath();
+                if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
+                    String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
+                    entry.setLink(relFileName);
+                } else
+                    entry.setLink(link.getText().trim());
+            }
+            else entry.setLink(link.getText().trim());
         }
     } catch (java.io.IOException ex)
 	{ 

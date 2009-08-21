@@ -22,12 +22,10 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.datatransfer.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,7 +45,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
@@ -107,8 +107,15 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * This method is called when dragging stuff *from* the table.
 	 */
 	public Transferable createTransferable(JComponent c) {
-		/* so we can assume it will never be called if entryTable==null: */
-		return new TransferableEntrySelection(entryTable.getSelectedEntries());
+        if (!draggingFile) {
+            /* so we can assume it will never be called if entryTable==null: */
+            return new TransferableEntrySelection(entryTable.getSelectedEntries());
+        }
+        else {
+            draggingFile = false;
+            return (new TransferableFileLinkSelection
+                    (panel, entryTable.getSelectedEntries()));//.getTransferable();
+        }
 	}
 
 	/**
@@ -189,10 +196,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 		// nope, never heard of this type
 		return false;
 	}
+    boolean draggingFile = false;
 
 	public void exportAsDrag(JComponent comp, InputEvent e, int action) {
-		// action is always LINK
-        /* TODO: add support for dragging file link from table icon into other apps
+		/* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
             MouseEvent me = (MouseEvent)e;
             int col = entryTable.columnAtPoint(me.getPoint());
@@ -204,8 +211,9 @@ public class EntryTableTransferHandler extends TransferHandler {
             // We have an icon column:
             if (res == MainTableFormat.FILE) {
                 System.out.println("dragging file");
+                draggingFile = true;
             }
-        }*/
+        }
         super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
 	}
 
@@ -222,7 +230,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 	// add-ons -----------------------
 
 	protected boolean handleDropTransfer(String dropStr, final int dropRow) throws IOException {
-		if (dropStr.startsWith("file:")) {
+        if (dropStr.startsWith("file:")) {
 			// This appears to be a dragged file link and not a reference
 			// format. Check if we can map this to a set of files:
 			if (handleDraggedFilenames(dropStr, dropRow))

@@ -883,6 +883,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Increase table font size", "ctrl PLUS");
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
 
+        defKeyBinds.put("Automatically link files", "alt F");
     }
 
     private String getNextUnit(Reader data) throws IOException {

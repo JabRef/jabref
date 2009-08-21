@@ -4,6 +4,8 @@
     - Can now create lock file while writing a bib file. The lock file is checked before
       saving, and before scanning an externally changed file, in order to avoid reading an
       unfinished file.
+    - Added support for dragging a file link from the file column to another application.
+    - Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.
     - Improved ISI import filter so DOI information is included.
     - Fixed bug: gray out / hide setting in groups panel is overridden on startup
       by search mode selection. Added separate prefs key for the groups setting.
