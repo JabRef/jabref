@@ -172,6 +172,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
+
+                if (!Util.waitForFileLock(file, 10)) {
+                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file")
+                        +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance."),
+                        Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    // TODO: offer an option to "steal" the locked file?
+                    return;
+                }
                 ParserResult pr;
                 String errorMessage = null;
                 try {
@@ -182,7 +190,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     pr = null;
                 }
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
-                    //Util.showQuickErrorDialog(frame, Globals.lang("Open database"), exception);
+                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + " '" + fileName + "'",
+                            Globals.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
 
                     String message = "<html>"+errorMessage+"<p>"+
                             (tryingAutosave ? Globals.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())

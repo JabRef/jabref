@@ -184,6 +184,11 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.setUpdatedExternally(false);
             }
         } catch (SaveException ex2) {
+            if (ex2 == SaveException.FILE_LOCKED) {
+                success =false;
+                fileLockedError = true;
+                return;
+            }
             ex2.printStackTrace();
         }
     }
@@ -205,6 +210,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                     Globals.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } catch (SaveException ex) {
+            if (ex == SaveException.FILE_LOCKED) {
+                throw ex;
+            }
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:

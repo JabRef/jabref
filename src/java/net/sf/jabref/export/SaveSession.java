@@ -70,7 +70,12 @@ public class SaveSession {
         try {
             if (useLockFile) {
                 try {
-                    createLockFile();
+                    if (createLockFile()) {
+                        // Oops, the lock file already existed. Try to wait it out:
+                        if (!Util.waitForFileLock(file, 10))
+                            throw SaveException.FILE_LOCKED;
+
+                    }
                 } catch (IOException ex) {
                     System.err.println("Error when creating lock file");
                     ex.printStackTrace();

@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.export;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 
 /**
@@ -36,6 +37,9 @@ import net.sf.jabref.BibtexEntry;
 public class SaveException extends Exception
 {
     //~ Instance fields ////////////////////////////////////////////////////////
+
+    public static final SaveException FILE_LOCKED = new SaveException
+            (Globals.lang("Could not save, file locked by another JabRef instance."));
 
     private BibtexEntry entry;
     private int status;

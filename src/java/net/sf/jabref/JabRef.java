@@ -293,7 +293,7 @@ public class JabRef {
                             loaded.add(ParserResult.INVALID_FORMAT);
                     }
                 }
-                else
+                else if (pr != ParserResult.FILE_LOCKED)
                     loaded.add(pr);
 
             }
@@ -482,10 +482,6 @@ public class JabRef {
             fetchCommand.split(":").length != 2) {
             System.out.println(Globals.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Globals.lang("The following fetchers are available:"));
-            for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
-                .getEntryFetcherExtensions()) {
-                System.out.println("  " + e.getId().replaceAll("Fetcher", "").toLowerCase());
-            }
             return null;
         }
 
@@ -691,10 +687,11 @@ public class JabRef {
 
                         if (pr != null) {
 
-                            if (pr.isInvalid()) {
+                            if (pr == ParserResult.INVALID_FORMAT) {
                                 System.out.println(Globals.lang("Error opening file")+" '"+fileToOpen.getPath()+"'");
                             }
-                            loaded.add(pr);
+                            else if (pr != ParserResult.FILE_LOCKED)
+                                loaded.add(pr);
 
                         }
                     }
@@ -858,6 +855,13 @@ public class JabRef {
                     return postp;
                 }
             }
+
+            if (!Util.waitForFileLock(file, 10)) {
+                System.out.println(Globals.lang("Error opening file")+" '"+name+"'. "+
+                    "File is locked by another JabRef instance.");
+                return ParserResult.FILE_LOCKED;
+            }
+
             String encoding = Globals.prefs.get("defaultEncoding");
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null) {
