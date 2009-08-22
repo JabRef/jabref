@@ -57,6 +57,8 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import com.jgoodies.looks.Options;
+import com.jgoodies.looks.HeaderStyle;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
@@ -249,7 +251,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     private void setupToolBar() {
+        JPanel leftPan = new JPanel();
+        leftPan.setLayout(new BorderLayout());
         tlb = new JToolBar(JToolBar.VERTICAL);
+        //tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+        tlb.setBorder(null);
+        tlb.setRollover(true);
 
         tlb.setMargin(new Insets(0, 0, 0, 2));
 
@@ -279,13 +286,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
         tlb.setFloatable(false);
 
+        // Add actions (and thus buttons)
+        JButton closeBut = new JButton(closeAction);
+        closeBut.setText(null);
+        closeBut.setBorder(null);
+        leftPan.add(closeBut, BorderLayout.NORTH);
+
         // Create type-label
         typeLabel = new TypeLabel(entry.getType().getName());
-        
-        // Add actions (and thus buttons)
-        tlb.add(closeAction);
+        leftPan.add(typeLabel, BorderLayout.CENTER);
 
-        tlb.add(typeLabel);
+        //tlb.add(typeL);
 
         tlb.addSeparator();
         
@@ -309,7 +320,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         for (int i = 0; i < comps.length; i++)
             ((JComponent) comps[i]).setOpaque(false);
 
-        add(tlb, BorderLayout.WEST);
+        leftPan.add(tlb, BorderLayout.SOUTH);
+        add(leftPan, BorderLayout.WEST);
     }
 
     /**
@@ -878,10 +890,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
 
-    private class TypeLabel extends JPanel {
-        private String label;
+    private class TypeLabel extends JLabel {
         public TypeLabel(String type) {
-            label = type;
+            super(type+" ");
+            setUI(new VerticalLabelUI(false));
+            setForeground(GUIGlobals.validFieldColor);
+            setHorizontalAlignment(RIGHT);
+            setFont(GUIGlobals.typeNameFont);
             addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     boolean ctrlClick = prefs.getBoolean("ctrlClick");
@@ -900,15 +915,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             });
         }
 
-        public void paint(Graphics g) {
+        public void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g;
-            g2.setColor(GUIGlobals.validFieldColor);
-            g2.setFont(GUIGlobals.typeNameFont);
-            FontMetrics fm = g2.getFontMetrics();
-            int width = fm.stringWidth(label);
+            //g2.setColor(GUIGlobals.validFieldColor);
+            //g2.setFont(GUIGlobals.typeNameFont);
+            //FontMetrics fm = g2.getFontMetrics();
+            //int width = fm.stringWidth(label);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.rotate(-Math.PI / 2, 0, 0);
-            g2.drawString(label, -width - 7, 28);
+            super.paintComponent(g2);
+            //g2.rotate(-Math.PI / 2, 0, 0);
+            //g2.drawString(label, -width - 7, 28);
         }
     }
 
