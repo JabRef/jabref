@@ -7,6 +7,8 @@
     - Added support for dragging a file link from the file column to another application.
     - Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.
     - Improved ISI import filter so DOI information is included.
+    - Fixed bug in handling of LaTeX character sequences - now sequences with = as command
+      character (e.g. "\={A}") are recognized.
     - Fixed bug: gray out / hide setting in groups panel is overridden on startup
       by search mode selection. Added separate prefs key for the groups setting.
       Fix suggested by Igor L. Chernyavsky.

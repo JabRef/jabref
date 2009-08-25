@@ -410,7 +410,7 @@ public class Globals {
 	}
 
 
-    public static String SPECIAL_COMMAND_CHARS = "\"`^~'c";
+    public static String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
 	public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>();
 	public static HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
