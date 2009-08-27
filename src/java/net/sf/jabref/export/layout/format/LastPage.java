@@ -16,7 +16,10 @@ public class LastPage implements LayoutFormatter {
 		String[] pageParts = s.split("[\\-]+");
 		if (pageParts.length == 2)
             return pageParts[1];
-        else return "";
+        // If we didn't get two parts, it may be that only the number of pages is given.
+        // Return the first part:
+        else return pageParts[0];
+        //else return "";
 
     }
 }
