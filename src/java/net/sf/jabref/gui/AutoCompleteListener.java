@@ -4,11 +4,13 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 /**
  * Created by Morten O. Alver, 16 Feb. 2007
  */
-public class AutoCompleteListener extends KeyAdapter {
+public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
 
     AutoCompleter completer;
@@ -18,12 +20,27 @@ public class AutoCompleteListener extends KeyAdapter {
     protected Object[] lastCompletions = null;
     protected int lastShownCompletion = 0;
 
+    // This field is set if the focus listener should call another focus listener
+    // after finishing. This is needed because the autocomplete listener must
+    // run before the focus listener responsible for storing the current edit.
+    protected FocusListener nextFocusListener = null;
+
     // These variables keep track of the situation from time to time.
 
     public AutoCompleteListener(AutoCompleter completer) {
         this.completer = completer;
     }
 
+    /**
+     * This method is used if the focus listener should call another focus listener
+     * after finishing. This is needed because the autocomplete listener must
+     * run before the focus listener responsible for storing the current edit.
+     *
+     * @param listener The listener to call.
+     */
+    public void setNextFocusListener(FocusListener listener) {
+        this.nextFocusListener = listener;
+    }
 
     public void keyPressed(KeyEvent e) {
         if ((toSetIn != null) && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
@@ -227,5 +244,26 @@ public class AutoCompleteListener extends KeyAdapter {
             return ANY_NAME;
         }
 
+    }
+
+    public void focusGained(FocusEvent event) {
+        if (nextFocusListener != null)
+            nextFocusListener.focusGained(event);
+    }
+
+    public void focusLost(FocusEvent event) {
+        if (lastCompletions != null) {
+            JTextComponent comp = (JTextComponent)event.getSource();
+            int selStart = comp.getSelectionStart();
+            String text = comp.getText();
+            comp.setText(text.substring(0, selStart) + text.substring(comp.getSelectionEnd()));
+            comp.setCaretPosition(selStart);
+            lastCompletions = null;
+            lastShownCompletion = 0;
+            lastCaretPosition = -1;
+            toSetIn = null;
+        }
+        if (nextFocusListener != null)
+            nextFocusListener.focusLost(event);
     }
 }

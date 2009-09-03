@@ -9,6 +9,8 @@
     - Added support for dragging a file link from the file column to another application.
     - Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.
     - Improved ISI import filter so DOI information is included.
+    - Fixed bug in autocompleter. Current suggested completion would be added to the field
+      if the user closed the entry editor or mouse clicked on another field.
     - Fixed problem with exporting to some MySql versions. Patch by François Dorin. 
     - Fixed bug in handling of LaTeX character sequences - now sequences with = as command
       character (e.g. "\={A}") are recognized.

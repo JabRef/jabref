@@ -138,13 +138,14 @@ public class EntryEditorTab {
             //ta.addUndoableEditListener(bPanel.undoListener);
             
             JComponent ex = parent.getExtra(fields[i], ta);
-            setupJTextComponent(ta.getTextComponent());
 
             // Add autocompleter listener, if required for this field:
             AutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
+            AutoCompleteListener acl = null;
             if (autoComp != null) {
-                ta.getTextComponent().addKeyListener(new AutoCompleteListener(autoComp));
+                acl = new AutoCompleteListener(autoComp);
             }
+            setupJTextComponent(ta.getTextComponent(), acl);
 
             // Store the editor for later reference:
             editors.put(fields[i], ta);
@@ -171,7 +172,7 @@ public class EntryEditorTab {
 			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, parent
 				.getEntry().getField(BibtexFields.KEY_FIELD), true);
             //tf.addUndoableEditListener(bPanel.undoListener);
-			setupJTextComponent(tf);
+			setupJTextComponent(tf, null);
 
 			editors.put("bibtexkey", tf);
 			/*
@@ -308,9 +309,23 @@ public class EntryEditorTab {
 	 * 
 	 * @param component
 	 */
-	public void setupJTextComponent(final JComponent component) {
+	public void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
 
-		component.addFocusListener(fieldListener);
+        // Here we add focus listeners to the component. The funny code is because we need
+        // to guarantee that the AutoCompleteListener - if used - is called before fieldListener
+        // on a focus lost event. The AutoCompleteListener is responsible for removing any
+        // current suggestion when focus is lost, and this must be done before fieldListener
+        // stores the current edit. Swing doesn't guarantee the order of execution of event
+        // listeners, so we handle this by only adding the AutoCompleteListener and telling
+        // it to call fieldListener afterwards. If no AutoCompleteListener is used, we
+        // add the fieldListener normally.
+        if (acl != null) {
+            component.addKeyListener(acl);
+            component.addFocusListener(acl);
+            acl.setNextFocusListener(fieldListener);
+        }
+        else
+		    component.addFocusListener(fieldListener);
 
 		InputMap im = component.getInputMap(JComponent.WHEN_FOCUSED);
 		ActionMap am = component.getActionMap();
