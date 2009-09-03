@@ -776,18 +776,19 @@ public class SQLutil {
             + ", \n"
             + "PRIMARY KEY (entry_types_id) \n"
             + ");" );
-           
+           			
         processDML(out,"CREATE TABLE entries ( \n"
             + "entries_id      INTEGER         NOT NULL AUTO_INCREMENT, \n"
 			+ "jabref_eid      VARCHAR("
 			+  Util.getMinimumIntegerDigits()
 		    + ")   DEFAULT NULL, \n"
-            + "entry_types_id  INTEGER         DEFAULT NULL, \n"
+            + "entry_types_id  INT UNSIGNED         DEFAULT NULL, \n"
             + "cite_key        VARCHAR(100)     DEFAULT NULL, \n"
             + dml2
             + ",\n"
             + "PRIMARY KEY (entries_id), \n"
-            + "FOREIGN KEY (entry_types_id) REFERENCES entry_type(entry_types_id) \n"
+			+ "INDEX(entry_types_id), \n"
+            + "FOREIGN KEY (entry_types_id) REFERENCES entry_types(entry_types_id) \n"
             + ");");
 
         processDML(out,"CREATE TABLE strings ( \n"
@@ -819,7 +820,9 @@ public class SQLutil {
         processDML(out,"CREATE TABLE entry_group ( \n"
             + "entries_id       INTEGER        NOT NULL AUTO_INCREMENT, \n"
             + "groups_id        INTEGER        DEFAULT NULL, \n"
-            + "FOREIGN KEY (entries_id) REFERENCES entry_fields(entries_id), \n"
+			+ "INDEX(entries_id), \n"
+			+ "INDEX(groups_id), \n"
+            + "FOREIGN KEY (entries_id) REFERENCES entries(entries_id), \n"
             + "FOREIGN KEY (groups_id)  REFERENCES groups(groups_id) \n"
             + ");");
 
@@ -859,7 +862,7 @@ public class SQLutil {
             + ")");
           
         processDML(out,"ALTER TABLE entries ADD CONSTRAINT entries_fk "
-                     + "FOREIGN KEY (\"entry_types_id\") REFERENCES \"entry_type\" (\"entry_types_id\")");
+                     + "FOREIGN KEY (\"entry_types_id\") REFERENCES \"entry_types\" (\"entry_types_id\")");
 
         processDML(out,"CREATE TABLE group_types ( "
             + "group_types_id INT  NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
