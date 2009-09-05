@@ -3,6 +3,7 @@
     - Modified LastPage formatter so it returns the number when only the number of pages is given.
     - Modified search algorithms so LaTeX commands are removed before search. For instance, this
       means that the value "test \textit{case}" now matches the search string "test case".
+    - Changed default table font family to "SansSerif".
     - Can now create lock file while writing a bib file. The lock file is checked before
       saving, and before scanning an externally changed file, in order to avoid reading an
       unfinished file.

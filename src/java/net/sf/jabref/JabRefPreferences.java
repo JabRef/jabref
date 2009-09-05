@@ -261,7 +261,7 @@ public class JabRefPreferences {
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(8));
-        defaults.put("fontFamily", "Times");
+        defaults.put("fontFamily", "SansSerif");
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));
         defaults.put("overrideDefaultFonts", Boolean.FALSE);
