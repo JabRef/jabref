@@ -21,6 +21,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
 import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 
@@ -173,12 +174,28 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
 
-                if (!Util.waitForFileLock(file, 10)) {
-                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file")
-                        +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance."),
-                        Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                    // TODO: offer an option to "steal" the locked file?
-                    return;
+                if (Util.hasLockFile(file)) {
+                    long modTime = Util.getLockFileTimeStamp(file);
+                    if ((modTime != -1) && (System.currentTimeMillis() - modTime
+                            > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                        // The lock file is fairly old, so we can offer to "steal" the file:
+                        int answer = JOptionPane.showConfirmDialog(null, "<html>"+Globals.lang("Error opening file")
+                            +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance.")
+                            +"<p>"+Globals.lang("Do you want to override the file lock?"),
+                            Globals.lang("File locked"), JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            Util.deleteLockFile(file);
+                        }
+                        else return;
+                    }
+                    else if (!Util.waitForFileLock(file, 10)) {
+                        JOptionPane.showMessageDialog(null, Globals.lang("Error opening file")
+                            +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance."),
+                            Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+
                 }
                 ParserResult pr;
                 String errorMessage = null;

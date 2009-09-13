@@ -27,7 +27,9 @@ import java.nio.charset.UnsupportedCharsetException;
 public class SaveSession {
 
     public static final String LOCKFILE_SUFFIX = ".lock";
-    
+    // The age in ms of a lockfile before JabRef will offer to "steal" the locked file:
+    public static final long LOCKFILE_CRITICAL_AGE = 60000;
+
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
 

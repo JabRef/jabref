@@ -2744,4 +2744,28 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         File lock = new File(file.getPath()+ SaveSession.LOCKFILE_SUFFIX);
         return lock.exists();
     }
+
+    /**
+     * Find the lock file's last modified time, if it has a lock file.
+     * @param file The file to check.
+     * @return the last modified time if lock file exists, -1 otherwise.
+     */
+    public static long getLockFileTimeStamp(File file) {
+        File lock = new File(file.getPath()+ SaveSession.LOCKFILE_SUFFIX);
+        return lock.exists() ? lock.lastModified() : -1;
+    }
+
+        /**
+     * Check if a lock file exists, and delete it if it does.
+     * @return true if the lock file existed, false otherwise.
+     * @throws IOException if something goes wrong.
+     */
+    public static boolean deleteLockFile(File file) {
+        File lock = new File(file.getPath()+SaveSession.LOCKFILE_SUFFIX);
+        if (!lock.exists()) {
+            return false;
+        }
+        lock.delete();
+        return true;
+    }
 }
