@@ -73,6 +73,7 @@ public class ScifinderImporter extends ImportFormat {
     HashMap<String, String> hm = new HashMap<String, String>();
     for (int i = 1; i < entries.length; i++){
         String[] fields = entries[i].split("FIELD ");
+        String journal = null;
         String Type = "";
         hm.clear(); // reset
         for (int j = 0; j < fields.length; j++)
@@ -83,7 +84,9 @@ public class ScifinderImporter extends ImportFormat {
             if (tmp.length > 1){//==2
             if (tmp[0].equals("Author")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
             else if (tmp[0].equals("Title")) hm.put("title", tmp[1]);
-            else if (tmp[0].equals("Journal Title")) hm.put("journal", tmp[1]);
+            else if (tmp[0].equals("Journal Title")) {
+                journal = tmp[1];
+            }
 
 
             else if (tmp[0].equals("Volume")) hm.put("volume", tmp[1]);
@@ -92,7 +95,7 @@ public class ScifinderImporter extends ImportFormat {
             else if (tmp[0].equals("Abstract")) hm.put("abstract", tmp[1]);
             else if (tmp[0].equals("Supplementary Terms")) hm.put("keywords",
                                           tmp[1]);
-            else if (tmp[0].equals("Inventor Name")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
+            else if (tmp[0].equals("Inventor Name") && (tmp[1].trim().length() > 0)) hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
             else if (tmp[0].equals("Patent Assignee")) hm.put("institution", tmp[1]);
             else if (tmp[0].equals("Patent Kind Code")) kindcode = " " + tmp[1];
             else if (tmp[0].equals("Patent Country")) country = tmp[1] + " ";
@@ -106,6 +109,8 @@ public class ScifinderImporter extends ImportFormat {
                                     Type = "phdthesis";
                                 else if (tmp[1].equals("Patent"))
                                     Type = "patent";
+                                else if (tmp[1].startsWith("Conference"))
+                                    Type = "conference";
                                 else
                                     Type = tmp[1];
                         }
@@ -116,6 +121,12 @@ public class ScifinderImporter extends ImportFormat {
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here
         b.setField(hm);
+        if (journal != null) {
+            if (Type.equals("conference"))
+                b.setField("booktitle", journal);
+            else
+                b.setField("journal", journal);
+        }
         bibitems.add(b);
 
     }
