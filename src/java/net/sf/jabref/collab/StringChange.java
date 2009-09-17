@@ -15,9 +15,12 @@ public class StringChange extends Change {
 
   InfoPane tp = new InfoPane();
   JScrollPane sp = new JScrollPane(tp);
+    private BibtexString tmpString;
 
-  public StringChange(BibtexString string, String label, String mem, String tmp, String disk) {
-    name = Globals.lang("Modified string")+": '"+label+"'";
+    public StringChange(BibtexString string, BibtexString tmpString, String label,
+                      String mem, String tmp, String disk) {
+        this.tmpString = tmpString;
+        name = Globals.lang("Modified string")+": '"+label+"'";
     this.string = string;
     this.label = label;
     this.mem = mem;
@@ -46,10 +49,12 @@ public class StringChange extends Change {
     tp.setText(sb.toString());
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
     if (string != null) {
       string.setContent(disk);
       undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
+        // Update tmp databse:
+
     } else {
       // The string was removed or renamed locally. We guess that it was removed.
 	String newId = Util.createNeutralId();
@@ -61,6 +66,15 @@ public class StringChange extends Change {
 	    Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
 	}
     }
+
+      // Update tmp database:
+      if (tmpString != null) {
+          tmpString.setContent(disk);
+      }
+      else {
+          BibtexString bs = new BibtexString(Util.createNeutralId(), label, disk);
+          secondary.addString(bs);
+      }
   }
 
 

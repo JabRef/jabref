@@ -12,9 +12,12 @@ public class StringNameChange extends Change {
 
   BibtexString string;
   String mem, tmp, disk, content;
+    private BibtexString tmpString;
 
-  public StringNameChange(BibtexString string, String mem, String tmp, String disk, String content) {
-    name = Globals.lang("Renamed string")+": '"+tmp+"'";
+    public StringNameChange(BibtexString string, BibtexString tmpString,
+                          String mem, String tmp, String disk, String content) {
+        this.tmpString = tmpString;
+        name = Globals.lang("Renamed string")+": '"+tmp+"'";
     this.string = string;
     this.content = content;
     this.mem = mem;
@@ -23,7 +26,7 @@ public class StringNameChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     if (panel.database().hasStringLabel(disk)) {
       // The name to change to is already in the database, so we can't comply.
@@ -46,6 +49,16 @@ public class StringNameChange extends Change {
         Globals.logger("Error: could not add string '"+bs.getName()+"': "+ex.getMessage());
       }
     }
+
+      // Update tmp database:
+      if (tmpString != null) {
+          tmpString.setName(disk);
+      }
+      else {
+          String newId = Util.createNeutralId();
+	      BibtexString bs = new BibtexString(newId, disk, content);
+          secondary.addString(bs);
+      }
   }
 
 

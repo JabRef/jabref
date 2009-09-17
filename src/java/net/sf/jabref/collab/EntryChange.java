@@ -51,15 +51,15 @@ public class EntryChange extends Change {
       if ((tmp != null) && (disk != null)) {
         if (!tmp.equals(disk)) {
           // Modified externally.
-          add(new FieldChange(field, memEntry, mem, tmp, disk));
+          add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
         }
       } else if ((tmp == null) && (disk != null) && !disk.equals("")) {
         // Added externally.
-        add(new FieldChange(field, memEntry, mem, tmp, disk));
+        add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
       } else if ((disk == null) && (tmp != null) && !tmp.equals("")
                  && (mem != null) && !mem.equals("")) {
         // Deleted externally and not locally.
-        add(new FieldChange(field, memEntry, mem, tmp, disk));
+        add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
       }
 
       //Util.pr("Field: "+fld.next());
@@ -67,14 +67,14 @@ public class EntryChange extends Change {
   }
 
   
-public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
 	@SuppressWarnings("unchecked")
     Enumeration<Change> e = children();
     for (; e.hasMoreElements();) {
       Change c = e.nextElement();
       if (c.isAcceptable() && c.isAccepted())
-        c.makeChange(panel, undoEdit);
+        c.makeChange(panel, secondary, undoEdit);
     }
 
     /*panel.database().removeEntry(memEntry.getId());
@@ -93,13 +93,14 @@ public void makeChange(BasePanel panel, NamedCompound undoEdit) {
 
   class FieldChange extends Change {
 
-    BibtexEntry entry;
+    BibtexEntry entry, tmpEntry;
     String field, inMem, onTmp, onDisk;
     InfoPane tp = new InfoPane();
     JScrollPane sp = new JScrollPane(tp);
 
-    public FieldChange(String field, BibtexEntry memEntry, String inMem, String onTmp, String onDisk) {
+    public FieldChange(String field, BibtexEntry memEntry, BibtexEntry tmpEntry, String inMem, String onTmp, String onDisk) {
       entry = memEntry;
+      this.tmpEntry = tmpEntry;
       name = field;
       this.field = field;
       this.inMem = inMem;
@@ -117,6 +118,8 @@ public void makeChange(BasePanel panel, NamedCompound undoEdit) {
 
       if ((inMem != null) && !inMem.equals(""))
           text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + " ").append(inMem);
+      if ((onTmp != null) && !onTmp.equals(""))
+          text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + " ").append(onTmp);
       else {
         // No value in memory.
         /*if ((onTmp != null) && !onTmp.equals(inMem))
@@ -127,10 +130,11 @@ public void makeChange(BasePanel panel, NamedCompound undoEdit) {
       tp.setText(text.toString());
     }
 
-    public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+    public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
       //System.out.println(field+" "+onDisk);
       entry.setField(field, onDisk);
       undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
+      tmpEntry.setField(field, onDisk);
     }
 
     JComponent description() {

@@ -2,6 +2,8 @@ package net.sf.jabref.collab;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
 import net.sf.jabref.undo.NamedCompound;
@@ -57,8 +59,10 @@ public abstract class Change extends DefaultMutableTreeNode {
   * Perform the change. This method is responsible for adding a proper undo edit to
   * the NamedCompound, so the change can be undone.
   * @param panel BasePanel The tab where the database lives.
+  * @param secondary BibtexDatabase The "tmp" database for which the change
+  *   should also be made.
   * @param undoEdit NamedCompound The compound to hold the undo edits.
   */
-  abstract void makeChange(BasePanel panel, NamedCompound undoEdit);
+  abstract void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit);
 
 }

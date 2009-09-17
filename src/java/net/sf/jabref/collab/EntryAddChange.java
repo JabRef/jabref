@@ -22,9 +22,10 @@ public class EntryAddChange extends Change {
     sp = new JScrollPane(pp);
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
       diskEntry.setId(Util.createNeutralId());
       panel.database().insertEntry(diskEntry);
+      secondary.insertEntry(diskEntry);
       undoEdit.addEdit(new UndoableInsertEntry(panel.database(), diskEntry, panel));
   }
 

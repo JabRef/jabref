@@ -3,10 +3,7 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
-import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 
@@ -35,7 +32,7 @@ public class StringAddChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     if (panel.database().hasStringLabel(string.getName())) {
       // The name to change to is already in the database, so we can't comply.
@@ -49,7 +46,12 @@ public class StringAddChange extends Change {
     } catch (KeyCollisionException ex) {
       Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
     }
-
+    try {
+        secondary.addString(new BibtexString(Util.createNeutralId(), string.getName(),
+                string.getContent()));
+    } catch (KeyCollisionException ex) {
+        Globals.logger("Error: could not add string '"+string.getName()+"' to tmp database: "+ex.getMessage());
+    }
   }
 
 

@@ -6,6 +6,7 @@ import javax.swing.JScrollPane;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveString;
 
@@ -15,10 +16,12 @@ public class StringRemoveChange extends Change {
 
   InfoPane tp = new InfoPane();
   JScrollPane sp = new JScrollPane(tp);
+    private BibtexString tmpString;
 
 
-  public StringRemoveChange(BibtexString string, BibtexString inMem) {
-    name = Globals.lang("Removed string")+": '"+string.getName()+"'";
+    public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
+        this.tmpString = tmpString;
+        name = Globals.lang("Removed string")+": '"+string.getName()+"'";
     this.string = string;
     this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
@@ -36,7 +39,7 @@ public class StringRemoveChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     try {
       panel.database().removeString(inMem.getId());
@@ -45,6 +48,8 @@ public class StringRemoveChange extends Change {
       Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
     }
 
+      // Update tmp database:
+      secondary.removeString(tmpString.getId());
   }
 
 

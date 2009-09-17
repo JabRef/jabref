@@ -34,9 +34,10 @@ public class EntryDeleteChange extends Change {
     sp = new JScrollPane(pp);
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
     panel.database().removeEntry(memEntry.getId());
     undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
+    secondary.removeEntry(tmpEntry.getId());
   }
 
   JComponent description() {

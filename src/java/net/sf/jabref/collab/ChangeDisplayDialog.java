@@ -13,11 +13,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 
 public class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
-  DefaultMutableTreeNode root;
+    private BibtexDatabase secondary;
+    DefaultMutableTreeNode root;
   JTree tree;
   JPanel infoPanel = new JPanel(),
       buttonPanel = new JPanel(),
@@ -30,9 +32,16 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
   JComponent infoShown = null;
     private boolean okPressed = false;
 
-  public ChangeDisplayDialog(JFrame owner, final BasePanel panel, final DefaultMutableTreeNode root) {
+  public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
+                             BibtexDatabase secondary, final DefaultMutableTreeNode root) {
     super(owner, Globals.lang("External changes"), true);
-    this.root = root;
+      this.secondary = secondary;
+
+      // Just to be sure, put in an empty secondary base if none is given:
+      if (secondary == null) {
+          this.secondary = new BibtexDatabase();
+      }
+      this.root = root;
     tree = new JTree(root);
     tree.addTreeSelectionListener(this);
     JSplitPane pane = new JSplitPane();
@@ -77,7 +86,7 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
         for (; enumer.hasMoreElements();) {
           Change c = (Change)enumer.nextElement();
           if (c.isAcceptable() && c.isAccepted())
-            c.makeChange(panel, ce);
+            c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
         }
         ce.end();
         panel.undoManager.addEdit(ce);

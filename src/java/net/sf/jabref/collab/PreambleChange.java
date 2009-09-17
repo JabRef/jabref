@@ -5,6 +5,7 @@ import javax.swing.JScrollPane;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoablePreambleChange;
 
@@ -36,9 +37,10 @@ public class PreambleChange extends Change {
       tp.setText(text.toString());
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
     panel.database().setPreamble(disk);
     undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
+      secondary.setPreamble(disk);
   }
 
   JComponent description() {

@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sf.jabref.*;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
@@ -20,8 +25,8 @@ public class ChangeScanner extends Thread {
     final double MATCH_THRESHOLD = 0.4;
     final String[] sortBy = new String[] {"year", "author", "title" };
     File f;
-    BibtexDatabase inMem;
-    MetaData mdInMem;
+    BibtexDatabase inMem, inTemp = null;
+    MetaData mdInMem, mdInTemp;
     BasePanel panel;
     JabRefFrame frame;
 
@@ -58,8 +63,8 @@ public class ChangeScanner extends Thread {
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
             Globals.prefs.get("defaultEncoding"));
-            BibtexDatabase inTemp = pr.getDatabase();
-            MetaData mdInTemp = new MetaData(pr.getMetaData(),inTemp);
+            inTemp = pr.getDatabase();
+            mdInTemp = new MetaData(pr.getMetaData(),inTemp);
             // Parse the modified file.
             pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
             BibtexDatabase onDisk = pr.getDatabase();
@@ -80,7 +85,7 @@ public class ChangeScanner extends Thread {
             EntrySorter sInMem = inMem.getSorter(comp);
 
             // Start looking at changes.
-
+            scanMetaData(mdInMem, mdInTemp, mdOnDisk);
             scanPreamble(inMem, inTemp, onDisk);
             scanStrings(inMem, inTemp, onDisk);
 
@@ -95,6 +100,7 @@ public class ChangeScanner extends Thread {
         }
     }
 
+
     public boolean changesFound() {
         return changes.getChildCount() > 0;
     }
@@ -103,10 +109,14 @@ public class ChangeScanner extends Thread {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, changes);
+                    ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
                     Util.placeDialog(dial, frame);
                     dial.setVisible(true); // dial.show(); -> deprecated since 1.5
                     fup.scanResultsResolved(dial.isOkPressed());
+                    if (dial.isOkPressed()) {
+                        // Overwrite the temp database:
+                        storeTempDatabase();
+                    }
                 }
             });
 
@@ -116,6 +126,60 @@ public class ChangeScanner extends Thread {
             fup.scanResultsResolved(true);
         }
     }
+
+    private void storeTempDatabase() {
+        new Thread(new Runnable() {
+            public void run() {
+                System.out.println("Storing temp database");
+                try {
+                    SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
+                        Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
+                        false, false, panel.getEncoding(), true);
+                    ss.commit();
+                    System.out.println("done");
+                } catch (SaveException ex) {
+                    System.out.println("Problem updating tmp file after accepting external changes");
+                }
+
+
+            }
+        }).start();
+    }
+
+    private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
+        MetaDataChange mdc = new MetaDataChange(inMem, inTemp);
+        ArrayList<String> handledOnDisk = new ArrayList<String>();
+        // Loop through the metadata entries of the "tmp" database, looking for
+        // matches
+        for (Iterator i = inTemp.iterator(); i.hasNext();) {
+            String key = (String)i.next();
+            // See if the key is missing in the disk database:
+            Vector<String> vod = onDisk.getData(key);
+            if (vod == null) {
+                mdc.insertMetaDataRemoval(key);
+            }
+            else {
+                // Both exist. Check if they are different:
+                Vector<String> vit = inTemp.getData(key);
+                if (!vod.equals(vit))
+                    mdc.insertMetaDataChange(key, vod);
+                // Remember that we've handled this one:
+                handledOnDisk.add(key);
+            }
+        }
+
+        // See if there are unhandled keys in the disk database:
+        for (Iterator i = onDisk.iterator(); i.hasNext();) {
+            String key = (String)i.next();
+            if (!handledOnDisk.contains(key)) {
+                mdc.insertMetaDataAddition(key, onDisk.getData(key));
+            }
+        }
+
+        if (mdc.getChangeCount() > 0)
+            changes.add(mdc);
+    }
+
 
     private void scanEntries(EntrySorter mem, EntrySorter tmp, EntrySorter disk) {
 
@@ -129,7 +193,7 @@ public class ChangeScanner extends Thread {
         HashSet<String> used = new HashSet<String>(disk.getEntryCount());
         HashSet<Integer> notMatched = new HashSet<Integer>(tmp.getEntryCount());
 
-        // Loop through the entries of the "mem" database, looking for exact matches in the "disk" one.
+        // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
         mainLoop: for (piv1=0; piv1<tmp.getEntryCount(); piv1++) {
@@ -323,11 +387,11 @@ public class ChangeScanner extends Thread {
                             // But they have nonmatching contents, so we've found a change.
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                             if (mem != null)
-                                changes.add(new StringChange(mem, tmp.getName(),
+                                changes.add(new StringChange(mem, tmp, tmp.getName(),
                                 mem.getContent(),
                                 tmp.getContent(), disk.getContent()));
                             else
-                                changes.add(new StringChange(null, tmp.getName(), null, tmp.getContent(), disk.getContent()));
+                                changes.add(new StringChange(null, tmp, tmp.getName(), null, tmp.getContent(), disk.getContent()));
                         }
                         used.add(diskId);
                         //if (j==piv2)
@@ -370,7 +434,7 @@ public class ChangeScanner extends Thread {
                                 }
                             }
 
-                            changes.add(new StringNameChange(bsMem, bsMem.getName(),
+                            changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(),
                             tmp.getName(), disk.getName(),
                             tmp.getContent()));
                             i.remove();
@@ -389,7 +453,7 @@ public class ChangeScanner extends Thread {
                 BibtexString tmp = onTmp.getString(nmId);
                 BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                 if (mem != null) { // The removed string is not removed from the mem version.
-                    changes.add(new StringRemoveChange(tmp, mem));
+                    changes.add(new StringRemoveChange(tmp, tmp, mem));
                 }
             }
         }
@@ -434,12 +498,12 @@ public class ChangeScanner extends Thread {
             return;
         if ((groupsTmp != null && groupsDisk == null)
                 || (groupsTmp == null && groupsDisk != null)) {
-            changes.add(new GroupChange(groupsDisk));
+            changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }
         if (groupsTmp.equals(groupsDisk))
             return;
-        changes.add(new GroupChange(groupsDisk));
+        changes.add(new GroupChange(groupsDisk, groupsTmp));
         return;
 
 //
