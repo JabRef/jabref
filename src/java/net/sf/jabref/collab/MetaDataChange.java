@@ -32,7 +32,7 @@ public class MetaDataChange extends Change {
         this.md = md;
         this.mdSecondary = mdSecondary;
 
-        tp.setText("<html>Metadata change</html>");
+        tp.setText("<html>"+Globals.lang("Metadata change")+"</html>");
     }
 
     public int getChangeCount() {
@@ -52,10 +52,12 @@ public class MetaDataChange extends Change {
     }
 
     JComponent description() {
-        StringBuilder sb = new StringBuilder("<html>");
+        StringBuilder sb = new StringBuilder("<html>"+Globals.lang("Changes have been made to the following metadata elements")+":<p>");
         for (Iterator<MetaDataChangeUnit> iterator = changes.iterator(); iterator.hasNext();) {
             MetaDataChangeUnit unit = iterator.next();
-            switch (unit.type) {
+            sb.append("<br>&nbsp;&nbsp;");
+            sb.append(unit.key);
+            /*switch (unit.type) {
                 case ADD:
                     sb.append("<p>Added: "+unit.key);
                     break;
@@ -65,7 +67,7 @@ public class MetaDataChange extends Change {
                 case MODIFY:
                     sb.append("<p>Modified: "+unit.key);
                     break;
-            }
+            }*/
         }
         sb.append("</html>");
         tp.setText(sb.toString());
