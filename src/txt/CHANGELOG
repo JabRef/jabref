@@ -1,4 +1,4 @@
-2.6?
+2.6b
     - Added pages information to several entry types in Endnote export.
     - Modified LastPage formatter so it returns the number when only the number of pages is given.
     - Modified search algorithms so LaTeX commands are removed before search. For instance, this
@@ -50,7 +50,6 @@
     - Added autosave feature.
     - Fixed bug in file link handling in BibTeXML export.
     - Improved handling of patents in Scifinder import.
->>>>>>> .merge-right.r3046
 2.5b
     - Added Simplified Chinese translation.
     - Added simple plugin manager.

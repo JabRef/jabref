@@ -5,6 +5,66 @@
 
   <h1>Revision history</h1>
 
+    <h3>Version 2.6beta</h3>
+
+    <ul>
+        <li>Added pages information to several entry types in Endnote export.</li>
+        <li>Modified LastPage formatter so it returns the number when only the number of pages is given.</li>
+        <li>Modified search algorithms so LaTeX commands are removed before search. For instance, this
+            means that the value "test \textit{case}" now matches the search string "test case".</li>
+        <li>Changed default table font family to "SansSerif".</li>
+        <li>Can now create lock file while writing a bib file. The lock file is checked before
+            saving, and before scanning an externally changed file, in order to avoid reading an
+            unfinished file.</li>
+        <li>Added support for dragging a file link from the file column to another application.</li>
+        <li>Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.</li>
+        <li>Improved ISI import filter so DOI information is included.</li>
+        <li>Fixed bug: metadata changes would not be detected as external changes to a database.</li>
+        <li>Fixed bug: when accepting external changes and not saving before new changes are
+            detected, the previously accepted changes would also be listed.</li>
+        <li>Fixed bug in Scifinder import where an empty Inventor field could overwrite the
+            author field.</li>
+        <li>Fixed bug in autocompleter. Current suggested completion would be added to the field
+            if the user closed the entry editor or mouse clicked on another field.</li>
+        <li>Fixed problem with exporting to some MySql versions. Patch by François Dorin.</li>
+        <li>Fixed bug in handling of LaTeX character sequences - now sequences with = as command
+            character (e.g. "\={A}") are recognized.</li>
+        <li>Fixed bug: gray out / hide setting in groups panel is overridden on startup
+            by search mode selection. Added separate prefs key for the groups setting.
+            Fix suggested by Igor L. Chernyavsky.</li>
+        <li>Fixed bug: cookie manager installed by Download button in file field editor throws
+            an exception when trying to fetch from Medline.</li>
+        <li>Fixed bug: temporary files don't get deleted on shutdown.</li>
+        <li>Disabled table column reordering in import inspection window, since a user reported
+            problems when using this.</li>
+        <li>Changed years from 2008 to 2009 in splash image.</li>
+    </ul>
+    <h3>Version 2.5 (June 22nd, 2009)</h3>
+    <ul>
+        <li>Modified export layout procedure so missing formatters can be reported in the error
+          output. Export now succeeds with warnings added where formatters are missing.</li>
+        <li>Conditional blocks (\begin{field}...\end{field}) in layout files can now be given a
+          semicolon-separated list of fields as argument. All fields must then be set for output
+          to be given.</li>
+        <li>Changed RIS import so multiple abstract fields in an entry are concatenated.</li>
+        <li>Added quoting of some special characters in SQL export, based on Kyle Crabtree's patch.</li>
+        <li>Fixed bug in MS Office 2007 XML export - editor names missing.</li>
+        <li>Fixed bug in plugin manager that prevented the "Download plugin" button from working.</li>
+        <li>Fixed bug in plugin manager routine that checks for installed versions of a plugin.</li>
+        <li>Fixed bug in startup that could show warnings multiple times when loading
+          from autosave files.</li>
+    </ul>
+    <h3>Version 2.5beta 2 (May 19th, 2009)</h3>
+    <ul>
+        <li>Plugin manager now handles plugin versions correctly based on the version number in their
+          plugin.xml file.</li>
+        <li>Added formatter "Number" that outputs a sequence number for the current entry in the current
+          export operation. This formatter can be used to produce a numbered list of entries.</li>
+        <li>Added autosave feature.</li>
+        <li>Fixed bug in file link handling in BibTeXML export.</li>
+        <li>Improved handling of patents in Scifinder import.</li>
+    </ul>
+
     <h3>Version 2.5beta (April 21st, 2009)</h3>
 
     <ul>
