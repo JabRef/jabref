@@ -1,0 +1,1 @@
+\begin{address}\format[FormatChars]{\address}. \end{address}\begin{title}\format[FormatChars]{\title}. \end{title}\begin{journal}\format[FormatChars]{\journal}, \end{journal}\begin{year}\format[FormatChars]{\year}.\end{year}\begin{number}núm. \format[FormatChars]{\number}, \end{number}\begin{pages}p. \format[FormatChars]{\pages}.\end{pages}

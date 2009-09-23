@@ -1,0 +1,1 @@
+\begin{author}\format[FormatChars,Iso690NamesAuthors]{\author}. \end{author}\begin{title}"\format[FormatChars]{\title}". \end{title}\begin{type}[\format[FormatChars]{\type}]. \end{type}\begin{year}\format[FormatChars]{\year}, \end{year}\begin{note}\format[FormatChars]{\note}. \end{note}
