@@ -19,7 +19,7 @@
 
     <p>You can fully customize which fields should be regarded as
     required and optional for each type of entry, and which fields
-    appear in the General fields tab. See
+    appear in the General fields tabs. See
     <a href="CustomEntriesHelp.html">Customizing entry types</a>
     for more information about this.</p>
 
@@ -64,18 +64,14 @@
     unknown to JabRef, these will be visible in the source
     panel.</p>
 
-    <p><strong>Tip:</strong> the <i>pdf</i> and <i>url</i> fields
-    support Drag and Drop operations. You can drop there an url
-    from your browser. either a link to a pdf file (that JabRef can
-    download for you) or you can keep the link.</p>
-
     <h2>Field consistency checking</h2>
 
     <p>When the contents of a field
     is changed, JabRef checks if the new contents are acceptable.
     For field types that are used by <em>bibtex</em>, the contents
     are checked with respect to the use of the '#' character. The
-    hash symbol is <em>only</em> to be used in pairs, wrapping the
+    hash symbol is <em>only</em> to be used in pairs (except in escaped
+    form, '\#'), wrapping the
     name of a <em>bibtex</em> string that is referenced. Note that
     JabRef does not check if the referenced string actually exists
     (this is not trivial, since the <em>bibtex</em> style you use
