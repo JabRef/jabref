@@ -51,6 +51,9 @@ public class LayoutEntry {
 
 	private LayoutFormatter[] option;
 
+    // Formatter to be run after other formatters:
+    private LayoutFormatter postFormatter = null;
+
 	private String text;
 
 	private LayoutEntry[] layoutEntries;
@@ -171,6 +174,10 @@ public class LayoutEntry {
 		
 	}
 
+    public void setPostFormatter(LayoutFormatter formatter) {
+        this.postFormatter = formatter;
+    }
+
 	public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
 
 		switch (type) {
@@ -271,6 +278,10 @@ public class LayoutEntry {
 				}
 			}
 
+            // If a post formatter has been set, call it:
+            if (postFormatter != null)
+                fieldEntry = postFormatter.format(fieldEntry);
+
 			return fieldEntry;
 		}
         case LayoutHelper.IS_ENCODING_NAME: {
@@ -311,6 +322,9 @@ public class LayoutEntry {
 					field = option[i].format(field);
 				}
 			}
+            // If a post formatter has been set, call it:
+            if (postFormatter != null)
+                field = postFormatter.format(field);
 
 			return field;
 		} else if (type == LayoutHelper.IS_ENCODING_NAME) {

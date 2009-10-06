@@ -142,6 +142,13 @@ public class Layout
         }
     }
 
+    public void setPostFormatter(LayoutFormatter formatter) {
+        for (int i = 0; i < layoutEntries.length; i++) {
+            LayoutEntry layoutEntry = layoutEntries[i];
+            layoutEntry.setPostFormatter(formatter);
+        }
+    }
+
     /**
      * Returns the processed bibtex entry. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
