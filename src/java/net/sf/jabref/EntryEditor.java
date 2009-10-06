@@ -53,10 +53,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.undo.UndoableKeyChange;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.undo.*;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.HeaderStyle;
 
@@ -737,6 +734,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // oldKey = entry.getCiteKey(),
             newKey = nu.getCiteKey();
             boolean anyChanged = false;
+            boolean changedType = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = newKey == null || newKey.equals("");
 
@@ -772,6 +770,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 }
             }
 
+            // See if the user has changed the entry type:
+            if (nu.getType() != entry.getType()) {
+                compound.addEdit(new UndoableChangeType(entry,
+                      entry.getType(), nu.getType()));
+                entry.setType(nu.getType());
+                anyChanged = true;
+                changedType = true;
+            }
             compound.end();
 
             if (!anyChanged)
@@ -793,10 +799,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             }
 
             lastSourceStringAccepted = source.getText();
-            updateAllFields();
-            lastSourceAccepted = true;
-            updateSource = true;
-
+            if (!changedType) {
+                updateAllFields();
+                lastSourceAccepted = true;
+                updateSource = true;
+            }
+            else {
+                panel.updateEntryEditorIfShowing();
+            }
             // TODO: does updating work properly after source stored?
             // panel.tableModel.remap();
             // panel.entryTable.repaint();

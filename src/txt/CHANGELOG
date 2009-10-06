@@ -10,6 +10,7 @@
     - Added support for dragging a file link from the file column to another application.
     - Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.
     - Improved ISI import filter so DOI information is included.
+    - Fixed bug: editing source doesn't allow change of entry type.
     - Fixed bug: metadata changes would not be detected as external changes to a database.
     - Fixed bug: when accepting external changes and not saving before new changes are
       detected, the previously accepted changes would also be listed.
