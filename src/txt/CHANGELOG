@@ -1,6 +1,7 @@
     - Added support for postformatter in Layout. The postformatter will be run after
       the formatters called from a layout.
     - Fixed bug: editing source doesn't allow change of entry type.
+    - RTFChars formatter now converts --- to \emdash and -- to \endash.
 
 2.6b
     - Added pages information to several entry types in Endnote export.

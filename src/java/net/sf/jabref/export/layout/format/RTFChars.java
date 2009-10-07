@@ -14,7 +14,9 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  *   
  *   3.) Replace emph and textit and textbf with their RTF replacements.
  *   
- *   4.) Take special care to save all unicode characters correctly. 
+ *   4.) Take special care to save all unicode characters correctly.
+ *
+ *   5.) Replace --- by \emdash and -- by \endash.
  * 
  * @author $Author$
  * @version $Revision$ ($Date$)
@@ -150,7 +152,7 @@ public class RTFChars implements LayoutFormatter {
 				sb.append("\\u").append((long) c).append('?');
 		}
 
-		return sb.toString();
+		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}");
 	}
 
 	private IntAndString getPart(String text, int i) {
