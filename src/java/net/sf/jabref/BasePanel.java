@@ -1791,6 +1791,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         addJournalListToAutoCompleter();
+        addContentSelectorValuesToAutoCompleters();
+    }
+
+    /**
+     * For all fields with both autocompletion and content selector, add content selector
+     * values to the autocompleter list:
+     */
+    public void addContentSelectorValuesToAutoCompleters() {
+        for (String field : autoCompleters.keySet()) {
+            AutoCompleter ac = autoCompleters.get(field);
+            if (metaData.getData(Globals.SELECTOR_META_PREFIX + field) != null) {
+                Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + field);
+                if (items != null) {
+                    Iterator<String> i = items.iterator();
+                    while (i.hasNext())
+                        ac.addWord(i.next());
+                }
+            }
+        }
     }
 
     /**

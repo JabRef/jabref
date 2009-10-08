@@ -1,5 +1,6 @@
-    - Improved autocompletion for the "journal" field. Will now autocomplete on entries in
-      the current journal abbreviations list.
+    - Improved autocompletion. All fields with autocompletion which have content selectors will now
+      autocomplete on content selector values. For the "journal" field, the autocompleter will now
+      additionally use entries from the current journal abbreviations list.
     - Added support for postformatter in Layout. The postformatter will be run after
       the formatters called from a layout.
     - Fixed bug: editing source doesn't allow change of entry type.

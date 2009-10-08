@@ -292,6 +292,8 @@ public class ContentSelectorDialog2 extends JDialog {
 	else {
 	    panel.rebuildAllEntryEditors();
 	}
+    panel.addContentSelectorValuesToAutoCompleters();
+        
     }
 
     /**
