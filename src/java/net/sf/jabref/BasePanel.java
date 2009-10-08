@@ -1789,6 +1789,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()){
             Util.updateCompletersForEntry(autoCompleters, entry);
         }
+
+        addJournalListToAutoCompleter();
+    }
+
+    /**
+     * If an autocompleter exists for the "journal" field, add all
+     * journal names in the journal abbreviation list to this autocompleter.
+     */
+    public void addJournalListToAutoCompleter() {
+        if (autoCompleters.containsKey("journal")) {
+            AutoCompleter ac = autoCompleters.get("journal");
+            Set<String> journals = Globals.journalAbbrev.getJournals().keySet();
+            for (String journal : journals)
+                ac.addWord(journal);
+        }
+
+
     }
 
 

@@ -373,6 +373,12 @@ public class ManageJournalsPanel extends JPanel{
 
         Globals.initializeJournalNames();
 
+        // Update the autocompleter for the "journal" field in all base panels,
+        // so added journal names are available:
+        for (int i=0; i<frame.baseCount(); i++) {
+            frame.baseAt(i).addJournalListToAutoCompleter();
+        }
+
     }
 
     class DownloadAction extends AbstractAction {
