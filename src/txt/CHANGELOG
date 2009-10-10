@@ -1,3 +1,4 @@
+    - Modified launcher script for Windows installer to give higher heap size limit.
     - Improved autocompletion. All fields with autocompletion which have content selectors will now
       autocomplete on content selector values. For the "journal" field, the autocompleter will now
       additionally use entries from the current journal abbreviations list.

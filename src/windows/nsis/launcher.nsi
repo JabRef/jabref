@@ -33,7 +33,7 @@ Section ""
   Call GetParameters
   Pop $R1
 
-  StrCpy $R0 '"$R0" -jar "${JARFILE}" $R1'
+  StrCpy $R0 '"$R0" -Xms32m -Xmx512m -jar "${JARFILE}" $R1'
  
   SetOutPath $EXEDIR
   Exec "$R0"
