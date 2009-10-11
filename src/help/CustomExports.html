@@ -303,6 +303,11 @@
         <code>\format[CurrentDate]{yyyy.MM.dd}</code> will give the
         date only, e.g. 2005.11.30.</li>
 
+        <li><code>Default</code> : takes a single argument, which serves as a default value.
+        If the string to format is non-empty, it is output without changes. If it is empty,
+        the default value is output. For instance, <code>\format[Default(unknown)]{\year}</code>
+        will output the entry's year if set, and "unknown" if no year is set.</li>
+
         <li><code>FileLink(filetype)</code> : if no argument is given, this formatter outputs
         the first external file link encoded in the field. To work, the formatter must
         be supplied with the contents of the "file" field.

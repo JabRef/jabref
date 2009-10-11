@@ -1,3 +1,5 @@
+    - Added export formatter "Default" which takes a single argument. Outputs the string to format
+      unchanged if it is non-empty, otherwise outputs the argument.
     - Modified launcher script for Windows installer to give higher heap size limit.
     - Improved autocompletion. All fields with autocompletion which have content selectors will now
       autocomplete on content selector values. For the "journal" field, the autocompleter will now
@@ -65,7 +67,7 @@
     - Added ~/.jabref/plugins as user-specific plugin directory.
     - Added \r marker to WrapFileLinks formatter that outputs file links without expanding
       relative links.
-    - Added [authorAlpha] key marker that formats authors according to the "alpha" BibTeX style.
+    - Added [authorsAlpha] key marker that formats authors according to the "alpha" BibTeX style.
       Patch submitted by Oliver Kopp.
     - Table sort order set by clicking and Ctrl-clicking table columns is now immediately set
       as default sort order in preferences.
