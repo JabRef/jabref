@@ -10,7 +10,7 @@
 %V \volume
 %6
 %N \number
-%P \pages
+%P \format[FormatPagesForHTML]{\pages}
 %& 
 %Y 
 %S 

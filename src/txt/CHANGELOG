@@ -7,6 +7,7 @@
       on the entire field up to the cursor rather than just looking at the last word only.
     - Added support for postformatter in Layout. The postformatter will be run after
       the formatters called from a layout.
+    - Modified Endnote export filter so "--" gets converted to "-" in the "pages" field.
     - Fixed bug: editing source doesn't allow change of entry type.
     - RTFChars formatter now converts --- to \emdash and -- to \endash.
 

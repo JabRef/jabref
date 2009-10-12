@@ -10,7 +10,7 @@
 %V 
 %6
 %N 
-%P \pages
+%P \format[FormatPagesForHTML]{\pages}
 %& 
 %Y 
 %S 
