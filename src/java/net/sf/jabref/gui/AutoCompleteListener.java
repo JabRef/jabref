@@ -207,19 +207,27 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
         try {
             upToCaret = comp.getText(0, comp.getCaretPosition());
-            if ((comp.getCaretPosition() < comp.getText().length())
-                    && !Character.isWhitespace(comp.getText().charAt(comp.getCaretPosition())))
-                return null;
-            boolean found = false;
-            int piv = upToCaret.length() - 1;
-            while (!found && (piv >= 0)) {
-                if (Character.isWhitespace(upToCaret.charAt(piv)))
-                    found = true;
-                else piv--;
+            // We now have the text from the start of the field up to the caret position.
+            // In most fields, we are only interested in the currently edited word, so we
+            // seek from the caret backward to the closest space:
+            if (!completer.isSingleUnitField()) {
+                if ((comp.getCaretPosition() < comp.getText().length())
+                        && !Character.isWhitespace(comp.getText().charAt(comp.getCaretPosition())))
+                    return null;
+                boolean found = false;
+                int piv = upToCaret.length() - 1;
+                while (!found && (piv >= 0)) {
+                    if (Character.isWhitespace(upToCaret.charAt(piv)))
+                        found = true;
+                    else piv--;
+                }
+                //if (piv < 0)
+                //piv = 0;
+                res.append(upToCaret.substring(piv + 1));
             }
-            //if (piv < 0)
-            //piv = 0;
-            res.append(upToCaret.substring(piv + 1));
+            // For fields such as "journal" it is more reasonable to try to complete on the entire
+            // text field content, so we skip the searching and keep the entire part up to the caret:
+            else res.append(upToCaret);
             //Util.pr("AutoCompListener: "+res.toString());
         } catch (BadLocationException ex) {
         }

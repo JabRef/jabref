@@ -3,7 +3,8 @@
     - Modified launcher script for Windows installer to give higher heap size limit.
     - Improved autocompletion. All fields with autocompletion which have content selectors will now
       autocomplete on content selector values. For the "journal" field, the autocompleter will now
-      additionally use entries from the current journal abbreviations list.
+      additionally use entries from the current journal abbreviations list, and will also complete
+      on the entire field up to the cursor rather than just looking at the last word only.
     - Added support for postformatter in Layout. The postformatter will be run after
       the formatters called from a layout.
     - Fixed bug: editing source doesn't allow change of entry type.

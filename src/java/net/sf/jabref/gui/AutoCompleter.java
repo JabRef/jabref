@@ -41,6 +41,10 @@ public class AutoCompleter {
         return nameField;
     }
 
+    public boolean isSingleUnitField() {
+        return entireField;
+    }
+
     public void addWord(String word) {
         if (word.length() >= SHORTEST_WORD)
             words.add(word);
