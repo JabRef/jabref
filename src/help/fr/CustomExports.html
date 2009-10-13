@@ -349,6 +349,15 @@
         date peut-&ecirc;tre adapt&eacute;. Par exemple,
         <code>\format[CurrentDate]{yyyy.MM.dd}</code> renverra
         uniquement la date, comme par exemple 2005.11.30.</li>
+        
+        <li><code>Default</code>&nbsp;: prend un seul argument, qui sert comme
+        valeur par d&eacute;faut. Si la cha&icirc;ne &agrave; formatter
+        n'est pas vide, elle est renvoy&eacute;e sans changement.
+        Si elle est vide, la valeur par d&eacute;faut est renvoy&eacute;e.
+        Par exemple,
+        <code>\format[Default(unknown)]{\year}</code>
+        renverra l'ann&eacute;e de l'entr&eacute;e si elle existe,
+        et "unknown" si l'ann&eacute;e n'est pas pr&eacute;cis&eacute;e.</li>
        
         <li><code>FileLink(TypeDeFichier)</code>&nbsp;: sans argument, ce formateur renvoie
         le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
