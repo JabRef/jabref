@@ -288,28 +288,31 @@ public class CsaImporter extends ImportFormat {
                     Type = null;
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
-                    if (types[0].equals("article") ||
-                        types[0].equals("journal article")) {
-                        Type = "article";
-                    } else if (types[0].equals("dissertation")) {
-                        Type = "phdthesis";
-                    } else {
-                        for (int ii = 0; ii < types.length; ++ii) {
-                            if (types[ii].equals("conference")) {
-                                Type = "inproceedings";
-                                break;
-                            } else if (types[ii].equals("book monograph") &&
-                                       Type == null) {
-                                Type = "book";
-                            } else if (types[ii].equals("report") &&
-                                       Type == null) {
-                                Type = "techreport";
-                            }
-                        }
-                        if (Type == null) {
-                            Type = "misc";
+                    for (int ii = 0; ii < types.length; ++ii) {
+                        if ((types[ii].indexOf("article")>=0) ||
+                            (types[ii].indexOf("journal article")>=0)) {
+                            Type = "article";
+                            break;
+                        } else if (types[ii].equals("dissertation")) {
+                            Type = "phdthesis";
+                            break;
+                        } else if (types[ii].equals("conference")) {
+                            Type = "inproceedings";
+                            break;
+                        } else if (types[ii].equals("book monograph") &&
+                                   Type == null) {
+                            Type = "book";
+                            break;
+                        } else if (types[ii].equals("report") &&
+                                   Type == null) {
+                            Type = "techreport";
+                            break;
                         }
                     }
+                    if (Type == null) {
+                        Type = "misc";
+                    }
+
                 }
 
                 String ftype = null;
@@ -317,8 +320,11 @@ public class CsaImporter extends ImportFormat {
                     ftype = "abstract";
                 else if (fabbr.equals("AF"))
                     ftype = "affiliation";
-                else if (fabbr.equals("AU"))
+                else if (fabbr.equals("AU")) {
                     ftype = "author";
+                    if (fstr.indexOf(";") >= 0)
+                        fstr = fstr.replaceAll("; ", " and ");
+                }
                 else if (fabbr.equals("CA"))
                     ftype = "organization";
                 else if (fabbr.equals("DE"))
