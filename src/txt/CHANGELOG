@@ -8,6 +8,8 @@
     - Added support for postformatter in Layout. The postformatter will be run after
       the formatters called from a layout.
     - Modified Endnote export filter so "--" gets converted to "-" in the "pages" field.
+    - Changed keyword groups so they will match on whole words only. E.g. a keyword group for the
+      keyword "can" will no longer match the keyword "scanner".
     - Fixed bug: editing source doesn't allow change of entry type.
     - RTFChars formatter now converts --- to \emdash and -- to \endash.
 

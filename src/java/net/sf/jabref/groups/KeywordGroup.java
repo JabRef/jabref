@@ -62,8 +62,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 
 	protected void compilePattern() throws IllegalArgumentException,
 			PatternSyntaxException {
-		m_pattern = m_caseSensitive ? Pattern.compile(m_searchExpression)
-				: Pattern.compile(m_searchExpression, Pattern.CASE_INSENSITIVE);
+		m_pattern = m_caseSensitive ? Pattern.compile("\\b"+m_searchExpression+"\\b")
+				: Pattern.compile("\\b"+m_searchExpression+"\\b", Pattern.CASE_INSENSITIVE);
 	}
 
 	/**
@@ -239,10 +239,32 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		if (m_regExp)
 			return m_pattern.matcher(content).find();
 		if (m_caseSensitive)
-			return content.indexOf(m_searchExpression) >= 0;
-		content = content.toLowerCase();
-		return content.indexOf(m_searchExpression.toLowerCase()) >= 0;
+			return containsWord(m_searchExpression, content);
+		return containsWord(m_searchExpression.toLowerCase(), content.toLowerCase());
 	}
+
+    /**
+     * Look for the given non-regexp string in another string, but check whether a
+     * match concerns a complete word, not part of a word.
+     * @param word The word to look for.
+     * @param text The string to look in.
+     * @return true if the word was found, false otherwise.
+     */
+    private static boolean containsWord(String word, String text) {
+        int piv = 0;
+        while (piv < text.length()) {
+            int ind = text.indexOf(word, piv);
+            if (ind < 0)
+                return false;
+            // Found a match. See if it is a complete word:
+            if (((ind == 0) || !Character.isLetterOrDigit(text.charAt(ind-1))) &&
+                ((ind+word.length() == text.length()) || !Character.isLetterOrDigit(text.charAt(ind+word.length())))) {
+                return true;
+            }
+            else piv = ind+1;
+        }
+        return false;
+    }
 
 	/**
 	 * Removes matches of searchString in the entry's field. This is only
