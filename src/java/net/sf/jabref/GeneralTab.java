@@ -23,7 +23,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     private JCheckBox
     defSort, ctrlClick, useOwner, overwriteOwner,
-    keyDuplicateWarningDialog, keyEmptyWarningDialog,
+    keyDuplicateWarningDialog, keyEmptyWarningDialog, enforceLegalKeys,
     confirmDelete, allowEditing, memoryStick, useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp,
     markImportedEntries, unmarkAllEntriesBeforeImporting;
@@ -57,6 +57,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
             +"the field set, overwrite."));
         keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
         keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
+        enforceLegalKeys = new JCheckBox(Globals.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
 
         useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
@@ -109,6 +110,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(keyDuplicateWarningDialog, 13);
         builder.nextLine();
         builder.append(keyEmptyWarningDialog, 13);
+        builder.nextLine();
+        builder.append(enforceLegalKeys, 13);
         builder.nextLine();
         builder.append(memoryStick, 13);
         
@@ -165,6 +168,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         overwriteTimeStamp.setSelected(_prefs.getBoolean("overwriteTimeStamp"));
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
+        enforceLegalKeys.setSelected(_prefs.getBoolean("enforceLegalBibtexKey"));
         memoryStick.setSelected(_prefs.getBoolean("memoryStickMode"));
         confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
         defOwnerField.setText(_prefs.get("defaultOwner"));
@@ -205,6 +209,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("overwriteTimeStamp", overwriteTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
+        _prefs.putBoolean("enforceLegalBibtexKey", enforceLegalKeys.isSelected());
         if (_prefs.getBoolean("memoryStickMode") && !memoryStick.isSelected()){
             JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode" +
             		" rename or remove the jabref.xml file in the same folder as JabRef."),

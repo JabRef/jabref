@@ -1,5 +1,7 @@
     - Added export formatter "Default" which takes a single argument. Outputs the string to format
       unchanged if it is non-empty, otherwise outputs the argument.
+    - Added option under Options -> Preferences -> General for disabling the strict enforcing of
+      correct BibTeX keys. Disabling this makes it possible to use e.g. umlaut characters in keys.
     - Modified launcher script for Windows installer to give higher heap size limit.
     - Improved autocompletion. All fields with autocompletion which have content selectors will now
       autocomplete on content selector values. For the "journal" field, the autocompleter will now

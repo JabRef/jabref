@@ -316,7 +316,21 @@ public class Util {
 	public static String checkLegalKey(String key) {
 		if (key == null)
 			return null;
-		StringBuffer newKey = new StringBuffer();
+        if (!Globals.prefs.getBoolean("enforceLegalBibtexKey")) {
+            // User doesn't want us to enforce legal characters. We must still look
+            // for whitespace and some characters such as commas, since these would
+            // interfere with parsing:
+            StringBuilder newKey = new StringBuilder();
+            for (int i = 0; i < key.length(); i++) {
+                char c = key.charAt(i);
+                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"')
+                    && (c != '}') && (c != ','))
+                    newKey.append(c);
+            }
+            return newKey.toString();
+
+        }
+		StringBuilder newKey = new StringBuilder();
 		for (int i = 0; i < key.length(); i++) {
 			char c = key.charAt(i);
 			if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"')

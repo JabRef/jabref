@@ -390,6 +390,8 @@ public class JabRefPreferences {
 
         defaults.put("deletePlugins", "");
         
+        defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
+
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
