@@ -7,8 +7,7 @@
 (\number)
 \end{number}
 \begin{editor}
-, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RTFChars]{\editor}, ed.,
-\end{editor}
+, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RTFChars]{\editor}, ed., \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}

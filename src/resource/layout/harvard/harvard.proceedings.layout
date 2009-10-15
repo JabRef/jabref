@@ -2,8 +2,7 @@
 \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
 \end{author}
 \begin{editor}
-\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}, ed.
-\end{editor}
+\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}, ed., \end{editor}
  (\year), 
 }{\\i \format[RTFChars]{\title}}{
 \begin{volume}

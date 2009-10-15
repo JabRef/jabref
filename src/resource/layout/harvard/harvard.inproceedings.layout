@@ -2,8 +2,7 @@
 \format[RTFChars]{\title}
 , }{\\i in }{
 \begin{editor}
-\format[RTFChars,AuthorFirstFirst,AuthorAndsReplacer]{\editor}, ed.,
-\end{editor}
+\format[RTFChars,AuthorFirstFirst,AuthorAndsReplacer]{\editor}, ed., \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}

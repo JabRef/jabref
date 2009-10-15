@@ -13,6 +13,8 @@
     - Changed keyword groups so they will match on whole words only. E.g. a keyword group for the
       keyword "can" will no longer match the keyword "scanner".
     - Improved entry type determination and author parsing for some varieties of CSA files.
+    - Minor change to Harvard RTF export. Added space after "ed.", and added editor to output for
+      inbook entries.
     - Fixed bug: editing source doesn't allow change of entry type.
     - RTFChars formatter now converts --- to \emdash and -- to \endash.
 
