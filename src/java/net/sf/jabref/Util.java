@@ -418,9 +418,9 @@ public class Util {
 		return out.toString();// .replaceAll("\n", "\n\t");
 	}
 
-	public static HashSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field,
+	public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field,
 		String deliminator) {
-		HashSet<String> res = new HashSet<String>();
+		TreeSet<String> res = new TreeSet<String>();
 		
 		for (String s : db.getKeySet()){
 			BibtexEntry be = db.getEntryById(s);
@@ -429,7 +429,7 @@ public class Util {
 				String fieldValue = o.toString().trim();
 				StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
 				while (tok.hasMoreTokens())
-					res.add(tok.nextToken().trim());
+					res.add(nCase(tok.nextToken().trim()));
 			}
 		}
 		return res;
@@ -449,8 +449,8 @@ public class Util {
 	 *            a <code>String</code> value
 	 * @return a <code>HashSet</code> value
 	 */
-	public static HashSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
-		HashSet<String> res = new HashSet<String>();
+	public static TreeSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
+		TreeSet<String> res = new TreeSet<String>();
 		StringTokenizer tok;
 		for (String s : db.getKeySet()){
 			BibtexEntry be = db.getEntryById(s);
@@ -458,11 +458,41 @@ public class Util {
 			if (o != null) {
 				tok = new StringTokenizer(o.toString(), remove, false);
 				while (tok.hasMoreTokens())
-					res.add(tok.nextToken());
+					res.add(nCase(tok.nextToken().trim()));
 			}
 		}
 		return res;
 	}
+
+
+    /**
+     * Finds all authors' last names in all the given fields for the given database.
+     * @param db The database.
+     * @param fields The fields to look in.
+     * @return a set containing the names.
+     */
+    public static Set<String> findAuthorLastNames(BibtexDatabase db, List<String> fields) {
+		Set<String> res = new TreeSet<String>();
+		for (String s : db.getKeySet()){
+			BibtexEntry be = db.getEntryById(s);
+            for (String field : fields) {
+                String val = be.getField(field);
+                if ((val != null) && (val.length() > 0)) {
+                    AuthorList al = AuthorList.getAuthorList(val);
+                    for (int i=0; i<al.size(); i++) {
+                        AuthorList.Author a = al.getAuthor(i);
+                        String lastName = a.getLast();
+                        if ((lastName != null) && (lastName.length() > 0))
+                            res.add(lastName);
+                    }
+                }
+
+            }
+		}
+
+		return res;
+	}
+    
 
 	/**
 	 * Takes a String array and returns a string with the array's elements

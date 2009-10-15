@@ -33,6 +33,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -43,6 +46,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -53,6 +59,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
+    JRadioButton
+        keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field")),
+        authors = new JRadioButton(Globals.lang("Generate groups for author last names")),
+        editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
     JCheckBox nd = new JCheckBox(Globals.lang(
     		"Use the following delimiter character(s)")
             + ":"); // JZTODO lyrics
@@ -93,18 +103,35 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
                         new ExplicitGroup(Globals.lang("Automatically created groups"),
                         		AbstractGroup.INCLUDING));
-                HashSet<String> hs = null;
-                if (nd.isSelected()) {
-                    hs = Util
-                            .findDeliminatedWordsInField(panel.getDatabase(),
-                                    field().toLowerCase().trim(), deliminator
-                                            .getText());
-                } else {
-                    hs = Util.findAllWordsInField(panel.getDatabase(), field()
-                            .toLowerCase().trim(), remove());
+                Set<String> hs = null;
+                String field = field();
+                if (keywords.isSelected()) {
+                    if (nd.isSelected()) {
+                        hs = Util
+                                .findDeliminatedWordsInField(panel.getDatabase(),
+                                        field().toLowerCase().trim(), deliminator
+                                                .getText());
+                    } else {
+                        hs = Util.findAllWordsInField(panel.getDatabase(),
+                                field().toLowerCase().trim(), remove());
+
+                    }
                 }
+                else if (authors.isSelected()) {
+                    List<String> fields = new ArrayList<String>(2);
+                    fields.add("author");
+                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    field = "author";
+                }
+                else if (editors.isSelected()) {
+                    List<String> fields = new ArrayList<String>(2);
+                    fields.add("editor");
+                    hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
+                    field = "editor";
+                }
+
                 for (String keyword : hs){
-                    KeywordGroup group = new KeywordGroup(keyword, field(),
+                    KeywordGroup group = new KeywordGroup(keyword, field,
                             keyword, false, false, AbstractGroup.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
@@ -140,8 +167,42 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(frame.prefs().getKey("Close dialog"), "close");
         am.put("close", cancelAction);
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(keywords);
+        bg.add(authors);
+        bg.add(editors);
+        keywords.setSelected(true);
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout
+                ("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:0dlu", ""), main);
+        b.append(keywords, 5);
+        b.nextLine();
+        b.append(new JPanel());
+        b.append(Globals.lang("Field to group by")+":");
+        b.append(field);
+        b.nextLine();
+        b.append(new JPanel());
+        b.append(Globals.lang("Characters to ignore")+":");
+        b.append(remove);
+        b.nextLine();
+        b.append(new JPanel());
+        b.append(nd);
+        b.append(deliminator);
+        b.nextLine();
+        b.append(authors, 5);
+        b.nextLine();
+        b.append(editors, 5);
+        b.nextLine();
+        
+        ButtonBarBuilder bb = new ButtonBarBuilder(opt);
+        bb.addGlue();
+        bb.addGridded(ok);
+        bb.addGridded(cancel);
+        bb.addGlue();
+
+
         // Layout starts here.
-        main.setLayout(gbl);
+        /*main.setLayout(gbl);
         opt.setLayout(gbl);
         main.setBorder(BorderFactory.createTitledBorder(BorderFactory
                 .createEtchedBorder(), Globals.lang("Group properties")));
@@ -186,12 +247,14 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         con.anchor = GridBagConstraints.WEST;
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(cancel, con);
-        opt.add(cancel);
+        opt.add(cancel);*/
+        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        opt.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(opt, BorderLayout.SOUTH);
         // pack();
         updateComponents();
-        setSize(400, 200);
+        pack();
         Util.placeDialog(this, frame);
     }
 
