@@ -194,7 +194,7 @@ public class EndnoteImporter extends ImportFormat {
         if (!author.equals("")) hm.put("author", fixAuthor(author));
         if (!editor.equals("")) hm.put("editor", fixAuthor(editor));
         //if pages missing and article number given, use the article number
-        if ((hm.get("pages") == null) || hm.get("pages").equals("-") && !artnum.equals(""))
+        if (((hm.get("pages") == null) || hm.get("pages").equals("-")) && !artnum.equals(""))
             hm.put("pages", artnum);
 
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
