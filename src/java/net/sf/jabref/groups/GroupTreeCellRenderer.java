@@ -22,8 +22,7 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -42,6 +41,9 @@ import net.sf.jabref.Util;
  * @author jzieren
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
+
+    public static final int MAX_DISPLAYED_LETTERS = 35;
+
     /** The cell over which the user is currently dragging */
     protected Object highlight1Cell = null;
     protected Object[] highlight2Cells = null;
@@ -69,6 +71,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (group == null || !(c instanceof JLabel))
             return c; // sanity check
         JLabel label = (JLabel) c;
+
         if (highlightBorderCell != null && highlightBorderCell == value)
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         else
@@ -94,6 +97,9 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 }
             }
         }
+        String name = group.getName();
+        if (name.length() > MAX_DISPLAYED_LETTERS)
+            name = name.substring(0, MAX_DISPLAYED_LETTERS-2)+"...";
         StringBuffer sb = new StringBuffer();
         sb.append("<html>");
         if (red)
@@ -102,7 +108,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             sb.append("<u>");
         if (italics)
             sb.append("<i>");
-        sb.append(Util.quoteForHTML(group.getName()));
+        sb.append(Util.quoteForHTML(name));
         if (italics)
             sb.append("</i>");
         if (underline)
@@ -111,6 +117,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             sb.append("</font>");
         sb.append("</html>");
         final String text = sb.toString();
+
         if (!label.getText().equals(text))
             label.setText(text);
         label.setToolTipText("<html>" + group.getShortDescription() + "</html>");

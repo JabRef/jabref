@@ -17,6 +17,8 @@
     - Improved entry type determination and author parsing for some varieties of CSA files.
     - Minor change to Harvard RTF export. Added space after "ed.", and added editor to output for
       inbook entries.
+    - Set limit to the number of displayed characters in group names in groups tree in order to
+      avoid group panel width problems.
     - Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.
     - Fixed bug: editing source doesn't allow change of entry type.
     - RTFChars formatter now converts --- to \emdash and -- to \endash.
