@@ -123,8 +123,17 @@ public class FileActions
         }
 
         fw.write("@STRING{" + bs.getName() + " = ");
-        if (!bs.getContent().equals(""))
-            fw.write((new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING));
+        if (!bs.getContent().equals("")) {
+            try {
+                String formatted = (new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING);
+                fw.write(formatted);
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException(
+                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n" +
+                        Globals.lang("Before saving, please edit any strings containing the # character."));
+            }
+
+        }
         else
             fw.write("{}");
 
