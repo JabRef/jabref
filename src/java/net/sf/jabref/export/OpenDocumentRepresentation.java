@@ -31,9 +31,11 @@ import ca.odell.glazedlists.SortedList;
  */
 public class OpenDocumentRepresentation {
     protected Collection<BibtexEntry> entries;
+    private BibtexDatabase database;
 
     @SuppressWarnings("unchecked")
-	public OpenDocumentRepresentation(BibtexDatabase bibtex, Set<String> keySet) {
+	public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
+        this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
         comparators.add(new FieldComparator("author"));
@@ -45,10 +47,10 @@ public class OpenDocumentRepresentation {
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null)
-            entryList.addAll(bibtex.getEntries());
+            entryList.addAll(database.getEntries());
         else {
             for (String key : keySet)
-                entryList.add(bibtex.getEntryById(key));
+                entryList.add(database.getEntryById(key));
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
@@ -181,8 +183,8 @@ public class OpenDocumentRepresentation {
     }
 
     protected String getField(BibtexEntry e, String field) {
-        Object o = e.getField(field);
-        return o == null ? "" : o.toString();
+        String s = BibtexDatabase.getResolvedField(field, e, database);
+        return s == null ? "" : s;
     }
 
     protected void addTableCell(Document doc, Element parent, String content) {

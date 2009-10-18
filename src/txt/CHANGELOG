@@ -21,6 +21,7 @@
       avoid group panel width problems.
     - Fixed error message when a # in a BibTeX string prevents saving. No longer states that the
       problem is in an entry, but specifies that it is in a string.
+    - Fixed bug: ODS export doesn't resolve BibTeX strings.
     - Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.
     - Fixed bug: editing source doesn't allow change of entry type.
     - RTFChars formatter now converts --- to \emdash and -- to \endash.

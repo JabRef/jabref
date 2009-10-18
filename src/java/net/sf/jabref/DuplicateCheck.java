@@ -25,16 +25,18 @@ public class DuplicateCheck {
         // The check if they have the same required fields:
         String[] fields = one.getType().getRequiredFields();
 
-        float req;
-        if (fields == null)
-            req = 1;
+        float req, reqWeight = 2;
+        if (fields == null) {
+            req = 0;
+            reqWeight = 0;
+        }
         else
             req = compareFieldSet(fields, one, two);
         fields = one.getType().getOptionalFields();
 
         if (fields != null) {
             float opt = compareFieldSet(fields, one, two);
-            return (2 * req + opt) / 3 >= Globals.duplicateThreshold;
+            return (reqWeight * req + opt) / (1 + reqWeight) >= Globals.duplicateThreshold;
         } else {
             return (req >= Globals.duplicateThreshold);
         }
