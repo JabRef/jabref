@@ -527,11 +527,11 @@ public class FileListEditor extends JTable implements FieldEditor,
     public static File relativizePath(File f, ArrayList<File> dirs) {
 	String pth = f.getPath();
 	for (File dir : dirs) {
-	    if (pth.startsWith(dir.getPath())) {
-		String subs = pth.substring(dir.getPath().length());
-		if ((subs.length() > 0) && ((subs.charAt(0) == '/') || (subs.charAt(0) == '\\')))
-		    subs = subs.substring(1);
-	    return new File(subs);	    
+	    if ((dir.getPath().length() > 0) && pth.startsWith(dir.getPath())) {
+            String subs = pth.substring(dir.getPath().length());
+            if ((subs.length() > 0) && ((subs.charAt(0) == '/') || (subs.charAt(0) == '\\')))
+                subs = subs.substring(1);
+            return new File(subs);
 	    }
 	}
 	return f;

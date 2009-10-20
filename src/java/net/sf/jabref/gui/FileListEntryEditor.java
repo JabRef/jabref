@@ -261,7 +261,6 @@ public class FileListEntryEditor {
 	// See if we should trim the file link to be relative to the file directory:
 	try {
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        System.out.println("filedir = '"+fileDir+"'");
         if ((fileDir == null) ||(fileDir.equals(""))) {
             entry.setLink(link.getText().trim());
         } else {

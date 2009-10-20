@@ -19,6 +19,8 @@
       inbook entries.
     - Set limit to the number of displayed characters in group names in groups tree in order to
       avoid group panel width problems.
+    - Fixed bug: adding external file link leads to relative path from root directory if file
+      directory is set to an empty string.
     - Fixed error message when a # in a BibTeX string prevents saving. No longer states that the
       problem is in an entry, but specifies that it is in a string.
     - Fixed bug: ODS export doesn't resolve BibTeX strings.
