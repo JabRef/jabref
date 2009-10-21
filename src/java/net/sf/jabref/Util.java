@@ -725,8 +725,11 @@ public class Util {
 	public static boolean openExternalFileAnyFormat(MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
-        boolean httpLink = link.toLowerCase().startsWith("http");
-
+        boolean httpLink = link.toLowerCase().startsWith("http:")
+                || link.toLowerCase().startsWith("ftp:");
+        if (link.toLowerCase().startsWith("file://"))
+                link = link.substring(7);
+        
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
 
