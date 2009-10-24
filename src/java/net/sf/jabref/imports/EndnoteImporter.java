@@ -162,7 +162,12 @@ public class EndnoteImporter extends ImportFormat {
         else if (prefix.equals("V")) hm.put("volume", val);
         else if (prefix.equals("N")) hm.put("number", val);
         else if (prefix.equals("U")) hm.put("url", val);
-        else if (prefix.equals("R")) hm.put("doi", val);
+        else if (prefix.equals("R")) {
+            String doi = val;
+            if (doi.startsWith("doi:"))
+                doi = doi.substring(4);
+            hm.put("doi", doi);
+        }
         else if (prefix.equals("O")) {
 	    // Notes may contain Article number
 	    if (val.startsWith("Artn")) {
