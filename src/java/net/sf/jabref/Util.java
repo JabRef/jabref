@@ -138,6 +138,8 @@ public class Util {
 
 	final static NumberFormat idFormat;
 
+    public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+
 	static {
 		idFormat = NumberFormat.getInstance();
 		idFormat.setMinimumIntegerDigits(8);
@@ -725,10 +727,14 @@ public class Util {
 	public static boolean openExternalFileAnyFormat(MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
-        boolean httpLink = link.toLowerCase().startsWith("http:")
-                || link.toLowerCase().startsWith("ftp:");
-        if (link.toLowerCase().startsWith("file://"))
-                link = link.substring(7);
+
+        boolean httpLink = remoteLinkPattern.matcher(link.toLowerCase()).matches();
+        //boolean httpLink = link.toLowerCase().startsWith("http:")
+        //        || link.toLowerCase().startsWith("ftp:");
+        if (link.toLowerCase().startsWith("file://")) {
+            httpLink = false;
+            link = link.substring(7);
+        }
         
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
