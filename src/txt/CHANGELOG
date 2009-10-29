@@ -19,7 +19,9 @@
       inbook entries.
     - Set limit to the number of displayed characters in group names in groups tree in order to
       avoid group panel width problems.
-    - Changed file link handling so ftp:// and file:// links can be opened.
+    - Changed file link handling so all remote links classified as URL can be opened through
+      the browser. Setting a different file type manually makes JabRef call a remote link using
+      the handler application instead.
     - Modified Endnote/refer import filter to strip "doi:" from the %R field.
     - Fixed bug: switching entry editor between entries of different type may result in switching
       of entry editor tabs.

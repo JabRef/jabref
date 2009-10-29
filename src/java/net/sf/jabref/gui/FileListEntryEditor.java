@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -52,6 +53,8 @@ public class FileListEntryEditor {
     private MetaData metaData;
     private boolean okPressed = false, okDisabledExternally = false,
             openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
+
+    public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
                                boolean showOpenButton, MetaData metaData) {
@@ -183,6 +186,16 @@ public class FileListEntryEditor {
     private void checkExtension() {
         if ((types.getSelectedIndex() == -1) &&
                 (link.getText().trim().length() > 0)) {
+
+            // Check if this looks like a remote link:
+            if (remoteLinkPattern.matcher(link.getText()).matches()) {
+                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("html");
+                if (type != null) {
+                    types.setSelectedItem(type);
+                    return;
+                }
+            }
+
             // Try to guess the file type:
             String theLink = link.getText().trim();
             int index = theLink.lastIndexOf('.');

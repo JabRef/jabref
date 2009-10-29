@@ -51,9 +51,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
@@ -78,14 +76,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
@@ -104,6 +95,7 @@ import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.net.URLDownload;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -724,17 +716,31 @@ public class Util {
 	 *            The file name.
      * @return false if the link couldn't be resolved, true otherwise.
 	 */
-	public static boolean openExternalFileAnyFormat(MetaData metaData, String link,
-                                                 ExternalFileType fileType) throws IOException {
+	public static boolean openExternalFileAnyFormat(final MetaData metaData, String link,
+                                                 final ExternalFileType fileType) throws IOException {
 
+        boolean httpLink = false;
 
-        boolean httpLink = remoteLinkPattern.matcher(link.toLowerCase()).matches();
-        //boolean httpLink = link.toLowerCase().startsWith("http:")
-        //        || link.toLowerCase().startsWith("ftp:");
-        if (link.toLowerCase().startsWith("file://")) {
-            httpLink = false;
+        if (remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
+            httpLink = true;
+        }
+        /*if (link.toLowerCase().startsWith("file://")) {
             link = link.substring(7);
         }
+        final String ln = link;
+        if (remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
+            (new Thread(new Runnable() {
+                public void run() {
+                    openRemoteExternalFile(metaData, ln, fileType);
+                }
+            })).start();
+
+            return true;
+        }*/
+
+        //boolean httpLink = link.toLowerCase().startsWith("http:")
+        //        || link.toLowerCase().startsWith("ftp:");
+
         
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
@@ -829,6 +835,34 @@ public class Util {
 		}
 
 
+    }
+
+
+    public static void openRemoteExternalFile(final MetaData metaData,
+                                              final String link, final ExternalFileType fileType) {
+        File temp = null;
+        try {
+            temp = File.createTempFile("jabref-link", "."+fileType.getExtension());
+            temp.deleteOnExit();
+            System.out.println("Downloading to '"+temp.getPath()+"'");
+            URLDownload ud = new URLDownload(null, new URL(link), temp);
+            ud.download();
+            System.out.println("Done");
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        final String ln = temp.getPath();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    openExternalFileAnyFormat(metaData, ln, fileType);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
 public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
