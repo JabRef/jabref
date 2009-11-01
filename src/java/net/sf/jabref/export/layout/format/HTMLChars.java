@@ -12,7 +12,8 @@ public class HTMLChars implements LayoutFormatter {
 
 	public String format(String field) {
 		int i;
-		field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>");
+		field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>")
+                .replaceAll("\\n", "<br>");
 
 		StringBuffer sb = new StringBuffer();
 		StringBuffer currentCommand = null;

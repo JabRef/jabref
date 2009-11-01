@@ -23,6 +23,8 @@
       the browser. Setting a different file type manually makes JabRef call a remote link using
       the handler application instead.
     - Modified Endnote/refer import filter to strip "doi:" from the %R field.
+    - Modified HTML conversion so single newline is displayed in the preview (and HTML exports) as
+      <br>, while multiple newlines are displayed as <p>.
     - Fixed bug: switching entry editor between entries of different type may result in switching
       of entry editor tabs.
     - Fixed bug: adding external file link leads to relative path from root directory if file
