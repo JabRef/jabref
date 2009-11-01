@@ -180,7 +180,7 @@
 	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
+		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
