@@ -9,12 +9,15 @@ Chris:
   
 Morten:
 
+* Look into whether incremental search could be made more persistent when search panel loses focus.
+* Fix handling of Jr particle in names.
+* Problem: when looking at group with hiding non-hits, newly created entry doesn't appear in entry editor.
+* Improve handling of SO field in CSA import (csaresults-12.txt).
+
 * Plugins like SVN plugin might need hooks for performing actions before a database is
   closed, and may need the ability to cancel the closing, and to avoid questions about
   saving changes.
 * Revisions merged into trunk after 2.4 release: 2620-2733
-
-* Documentation export formatters
 
 * Enable "Open spires entry" ("openSpires" action)? Think about better integration of this?
   Look into which viewer is used.
@@ -25,6 +28,5 @@ Morten:
 * [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.
   - workaround is to autodisable native file dialog for dir selection.
 
-* [OK? Extension fields only] MODS exports "file" in raw form.
 * [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
 * [POSTPONE] Fix Save/Export file dialog stuff
