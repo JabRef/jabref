@@ -1,3 +1,7 @@
+    - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
+      messed up after the metadata comment in a bib file.
+    - Search dialog now automatically previews first hit, and hides preview if there are no hits. 
+2.6b2
     - Added export formatter "Default" which takes a single argument. Outputs the string to format
       unchanged if it is non-empty, otherwise outputs the argument.
     - Added option under Options -> Preferences -> General for disabling the strict enforcing of

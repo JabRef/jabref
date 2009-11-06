@@ -150,6 +150,14 @@ public class SearchResultsDialog {
         diag.setVisible(visible);
     }
 
+    public void selectFirstEntry() {
+        if (entryTable.getRowCount() > 0)
+            entryTable.setRowSelectionInterval(0,0);
+        else {
+            contentPane.setDividerLocation(1.0f);
+        }
+    }
+
     /**
      * Remove all entries from the table.
      */

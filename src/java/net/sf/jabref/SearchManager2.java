@@ -472,6 +472,7 @@ class SearchManager2 extends SidePaneComponent
                             searchDialog.addEntry(entry, p);
                     }
                 }
+                searchDialog.selectFirstEntry();
                 searchDialog.setVisible(true);
             }
 
@@ -492,6 +493,7 @@ class SearchManager2 extends SidePaneComponent
                     if (entry.isSearchHit())
                         searchDialog.addEntry(entry, panel);
                 }
+                searchDialog.selectFirstEntry();
                 searchDialog.setVisible(true);
             }
             else if (hideSearch.isSelected()) {

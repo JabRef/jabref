@@ -206,10 +206,11 @@ public class MetaData implements Iterable<String> {
                     sb.append(Util.quote(orderedData.elementAt(j), ";", '\\')).append(";");
                 }
                 sb.append("}");
-                sb.append(Globals.NEWLINE);
-                sb.append(Globals.NEWLINE);
             }
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
+            
             out.write(sb.toString());
         }
         // write groups if present. skip this if only the root node exists 
