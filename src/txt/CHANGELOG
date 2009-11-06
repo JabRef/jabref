@@ -1,3 +1,4 @@
+    - Reworked author and editor handling in Docbook export. Added Docbook XML header.
     - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
       messed up after the metadata comment in a bib file.
     - Search dialog now automatically previews first hit, and hides preview if there are no hits. 

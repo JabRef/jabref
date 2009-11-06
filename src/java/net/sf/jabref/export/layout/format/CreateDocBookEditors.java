@@ -21,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout.format;
 
+import net.sf.jabref.AuthorList;
 
 
 /**
@@ -36,32 +37,11 @@ public class CreateDocBookEditors extends CreateDocBookAuthors
     public String format(String fieldText)
     {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
-
-        StringBuffer sb = new StringBuffer(100);
-        //fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
-
-        if (fieldText.indexOf(" and ") == -1)
-        {
-          sb.append("<editor>");
-          singleAuthor(sb, fieldText);
-          sb.append("</editor>");
-        }
-        else
-        {
-            String[] names = fieldText.split(" and ");
-            for (int i=0; i<names.length; i++)
-            {
-              sb.append("<editor>");
-              singleAuthor(sb, names[i]);
-              sb.append("</editor>");
-              if (i < names.length -1)
-                sb.append("\n       ");
-            }
-        }
-
-        fieldText = sb.toString();
-
-        return fieldText;
+        StringBuilder sb = new StringBuilder(100);
+        AuthorList al = AuthorList.getAuthorList(fieldText);
+        addBody(sb, al, "editor");
+        return sb.toString();
+        
     }
 
 }

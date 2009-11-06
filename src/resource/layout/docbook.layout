@@ -1,8 +1,9 @@
 <biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
    <authorgroup>
-\begin{author}       \format[XMLChars,CreateDocBookAuthors]{\author} \end{author}
+\begin{author}       \format[CreateDocBookAuthors]{\author} \end{author}
+\begin{editor}       \format[CreateDocBookEditors]{\editor} \end{editor}
    </authorgroup>
-<citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
+   <citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
 \begin{journal}   <citetitle pubwork="journal">\format[XMLChars]{\journal}</citetitle>\end{journal}
 \begin{publisher}   <publisher>
       <publishername>\format[XMLChars]{\publisher}</publishername>

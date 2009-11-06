@@ -39,15 +39,25 @@ public class CreateDocBookAuthors implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    static XMLChars xc = new XMLChars();
+
     public String format(String fieldText)
     {
+
+        StringBuilder sb = new StringBuilder(100);
+
+        AuthorList al = AuthorList.getAuthorList(fieldText);
+
+        addBody(sb, al, "author");
+        return sb.toString();
+        
         //		<author><firstname>L.</firstname><surname>Xue</surname></author>
         //     <author><firstname>F.</firstname><othername role="mi">L.</othername><surname>Stahura</surname></author>
         //     <author><firstname>J.</firstname><othername role="mi">W.</othername><surname>Godden</surname></author>
         //     <author><firstname>J.</firstname><surname>Bajorath</surname></author>
 
-        StringBuffer sb = new StringBuffer(100);
 
+        /*
         if (fieldText.indexOf(" and ") == -1)
         {
           sb.append("<author>");
@@ -71,17 +81,48 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
         fieldText = sb.toString();
 
-        return fieldText;
+        return fieldText;*/
+    }
+
+    public void addBody(StringBuilder sb, AuthorList al, String tagName) {
+        for (int i=0; i<al.size(); i++) {
+            sb.append("<"+tagName+">");
+            AuthorList.Author a = al.getAuthor(i);
+            if ((a.getFirst() != null) && (a.getFirst().length() > 0)) {
+                sb.append("<firstname>");
+                sb.append(xc.format(a.getFirst()));
+                sb.append("</firstname>");
+            }
+            if ((a.getVon() != null) && (a.getVon().length() > 0)) {
+                sb.append("<othername>");
+                sb.append(xc.format(a.getVon()));
+                sb.append("</othername>");
+            }
+            if ((a.getLast() != null) && (a.getLast().length() > 0)) {
+                sb.append("<lastname>");
+                sb.append(xc.format(a.getLast()));
+                if ((a.getJr() != null) && (a.getJr().length() > 0)) {
+                    sb.append(" "+xc.format(a.getJr()));
+                }
+                sb.append("</lastname>");
+            }
+
+            if (i < al.size()-1)
+                sb.append("</"+tagName+">\n       ");
+            else
+                sb.append("</"+tagName+">");
+        }
     }
 
     /**
      * @param sb
-     * @param fieldText
+     * @param author
      */
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
         Vector<String> v = new Vector<String>();
+
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
         WSITools.tokenize(v, authorMod, " \n\r");
