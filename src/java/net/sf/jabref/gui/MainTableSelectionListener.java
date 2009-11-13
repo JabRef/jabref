@@ -97,7 +97,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             }
         }
 
-
         if (newSelected != null) {
 
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
@@ -107,14 +106,15 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 // An entry is currently being edited.
                 EntryEditor oldEditor = panel.getCurrentEditor();
                 String visName = null;
-                if (oldEditor != null)
+                if (oldEditor != null) {
                     visName = oldEditor.getVisiblePanelName();
-        
+                    oldEditor.setMovingToDifferentEntry();
+                }
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
                 // Show the new editor unless it was already visible:
                 if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
-
+                    
                     if (visName != null)
                         newEditor.setVisiblePanel(visName);
                     panel.showEntryEditor(newEditor);
@@ -123,8 +123,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                             table.ensureVisible(table.getSelectedRow());
                         }
                     });
-
                 }
+
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {

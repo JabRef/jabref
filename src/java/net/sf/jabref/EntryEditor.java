@@ -136,8 +136,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     Logger logger = Logger.getLogger(EntryEditor.class.getName());
 
-    boolean updateSource = true; // This can be set to false to stop the
-                                    // source
+    boolean updateSource = true; // This can be set to false to stop the source
+    boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
 
     List<Object> tabs = new ArrayList<Object>();
 
@@ -622,6 +622,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      *            an <code>int</code> value
      */
     private void scrollTo(int row) {
+        movingToDifferentEntry = true;
         panel.mainTable.setRowSelectionInterval(row, row);
         panel.mainTable.ensureVisible(row);
     }
@@ -900,6 +901,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
 
+    public void setMovingToDifferentEntry() {
+        movingToDifferentEntry = true;
+    }
+
     private class TypeLabel extends JLabel {
         public TypeLabel(String type) {
             super(type+" ");
@@ -1038,6 +1043,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
 
         public void actionPerformed(ActionEvent e) {
+            boolean movingAway = movingToDifferentEntry;
+            movingToDifferentEntry = false;
 
             if (e.getSource() instanceof FieldTextField) {
                 // Storage from bibtex key field.
@@ -1174,6 +1181,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
                 if (accepted) {
                 }
+            }
+
+            // Make sure we scroll to the entry if it moved in the table:
+            if (!movingAway && isShowing()) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final int row = panel.mainTable.findEntry(entry);
+                        if (row >= 0) {
+                            panel.mainTable.setRowSelectionInterval(row, row);
+                            panel.mainTable.ensureVisible(row);
+                        }
+                    }
+                });
             }
         }
     }
