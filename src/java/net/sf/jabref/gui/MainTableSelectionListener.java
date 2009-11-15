@@ -44,6 +44,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
 
+    private boolean enabled = true;
+
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
@@ -60,6 +62,10 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         this.tableRows = table.getTableRows();
         instantiatePreviews();
         this.preview = previewPanel[activePreview];
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     private void instantiatePreviews() {
@@ -83,6 +89,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     public void listChanged(ListEvent<BibtexEntry> e) {
+        if (!enabled) {
+            return;
+        }
         EventList<BibtexEntry> selected = e.getSourceList();
         Object newSelected = null;
         while (e.next()) {
@@ -108,10 +117,13 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 String visName = null;
                 if (oldEditor != null) {
                     visName = oldEditor.getVisiblePanelName();
-                    oldEditor.setMovingToDifferentEntry();
                 }
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
+
+                if ((oldEditor != null))// && (oldEditor != newEditor))
+                    oldEditor.setMovingToDifferentEntry();
+
                 // Show the new editor unless it was already visible:
                 if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
                     

@@ -2414,6 +2414,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         selectionListener.setPreviewActive(enabled);
     }
 
+    public void setSelectionListenerEnabled(boolean enabled) {
+        selectionListener.setEnabled(enabled);
+    }
 
     class UndoAction extends BaseAction {
         public void action() {

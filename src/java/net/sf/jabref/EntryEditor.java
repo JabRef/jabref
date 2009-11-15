@@ -517,8 +517,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
             } catch (IOException ex) {
-                System.out.println("Her");
-                source.setText(ex.getMessage() + "\n\n" + 
+                source.setText(ex.getMessage() + "\n\n" +
                                         Globals.lang("Correct the entry, and "
                     + "reopen editor to display/edit source."));
                 source.setEditable(false);
@@ -814,6 +813,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // panel.refreshTable();
             panel.markBaseChanged();
 
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final int row = panel.mainTable.findEntry(entry);
+                    if (row >= 0) {
+                        if (panel.mainTable.getSelectedRowCount() == 0)
+                            panel.mainTable.setRowSelectionInterval(row, row);
+                        panel.mainTable.ensureVisible(row);
+                    }
+                }
+            });
+            
             return true;
         } catch (Throwable ex) {
             // ex.printStackTrace();
@@ -1183,13 +1193,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 }
             }
 
-            // Make sure we scroll to the entry if it moved in the table:
+            // Make sure we scroll to the entry if it moved in the table.
+            // Should only be done if this editor is currently showing:
+            //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
             if (!movingAway && isShowing()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         final int row = panel.mainTable.findEntry(entry);
                         if (row >= 0) {
-                            panel.mainTable.setRowSelectionInterval(row, row);
+                            if (panel.mainTable.getSelectedRowCount() == 0)
+                                panel.mainTable.setRowSelectionInterval(row, row);
                             panel.mainTable.ensureVisible(row);
                         }
                     }
