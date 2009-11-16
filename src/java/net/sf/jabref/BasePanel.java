@@ -1538,7 +1538,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
                 output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
                        +Globals.lang("entry")+".");
-                mainTable.findEntry(be);
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
@@ -1548,7 +1547,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     mode = WILL_SHOW_EDITOR;
                 }
 
-                highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
+                int row = mainTable.findEntry(be);
+                if (row >= 0)
+                    highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
+                else {
+                    // The entry is not visible in the table, perhaps due to a filtering search
+                    // or group selection. Show the entry editor anyway:
+                    showEntry(be);
+                }
 
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));

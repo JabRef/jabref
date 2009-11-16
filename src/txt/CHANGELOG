@@ -1,6 +1,8 @@
     - Table will now scroll to keep the currently edited entry visible if an edit leads to
       the entry getting sorted to a different position.
     - Reworked author and editor handling in Docbook export. Added Docbook XML header.
+    - Fixed bug: entry editor doesn't appear when new entry is added while a filtering search or
+      group selection is active.
     - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
       messed up after the metadata comment in a bib file.
     - Search dialog now automatically previews first hit, and hides preview if there are no hits. 
