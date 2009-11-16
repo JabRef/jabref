@@ -83,14 +83,20 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
         NamedCompound ce = new NamedCompound(Globals.lang("Merged external changes"));
         @SuppressWarnings("unchecked")
         Enumeration enumer = root.children();
+        boolean anyDisabled = false;
         for (; enumer.hasMoreElements();) {
-          Change c = (Change)enumer.nextElement();
-          if (c.isAcceptable() && c.isAccepted())
-            c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
+            Change c = (Change)enumer.nextElement();
+            boolean allAccepted = false;
+            if (c.isAcceptable() && c.isAccepted())
+                allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
+
+            if (!allAccepted)
+                anyDisabled = true;
         }
         ce.end();
         panel.undoManager.addEdit(ce);
-        panel.markBaseChanged();
+        if (anyDisabled)
+            panel.markBaseChanged();
         panel.setUpdatedExternally(false);
         dispose();
         okPressed = true;

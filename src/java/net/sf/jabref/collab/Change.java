@@ -62,7 +62,8 @@ public abstract class Change extends DefaultMutableTreeNode {
   * @param secondary BibtexDatabase The "tmp" database for which the change
   *   should also be made.
   * @param undoEdit NamedCompound The compound to hold the undo edits.
+  * @return true if all changes were made, false if not all were accepted.
   */
-  abstract void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit);
+  abstract boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit);
 
 }

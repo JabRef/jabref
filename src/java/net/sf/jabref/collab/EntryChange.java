@@ -67,14 +67,15 @@ public class EntryChange extends Change {
   }
 
   
-public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-
-	@SuppressWarnings("unchecked")
+public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    @SuppressWarnings("unchecked")
+    boolean allAccepted = true;
     Enumeration<Change> e = children();
     for (; e.hasMoreElements();) {
-      Change c = e.nextElement();
-      if (c.isAcceptable() && c.isAccepted())
-        c.makeChange(panel, secondary, undoEdit);
+        Change c = e.nextElement();
+        if (c.isAcceptable() && c.isAccepted())
+            c.makeChange(panel, secondary, undoEdit);
+        else allAccepted = false;
     }
 
     /*panel.database().removeEntry(memEntry.getId());
@@ -82,6 +83,8 @@ public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound 
       diskEntry.setId(Util.createNeutralId());
     } catch (KeyCollisionException ex) {}
     panel.database().removeEntry(memEntry.getId());*/
+
+    return allAccepted;
   }
 
   JComponent description() {
@@ -130,11 +133,12 @@ public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound 
       tp.setText(text.toString());
     }
 
-    public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
       //System.out.println(field+" "+onDisk);
       entry.setField(field, onDisk);
       undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
       tmpEntry.setField(field, onDisk);
+      return true;
     }
 
     JComponent description() {

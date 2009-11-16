@@ -32,7 +32,7 @@ public class StringAddChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     if (panel.database().hasStringLabel(string.getName())) {
       // The name to change to is already in the database, so we can't comply.
@@ -52,6 +52,7 @@ public class StringAddChange extends Change {
     } catch (KeyCollisionException ex) {
         Globals.logger("Error: could not add string '"+string.getName()+"' to tmp database: "+ex.getMessage());
     }
+    return true;
   }
 
 

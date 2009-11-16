@@ -74,7 +74,7 @@ public class MetaDataChange extends Change {
         return sp;
     }
 
-    void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         for (Iterator<MetaDataChangeUnit> iterator = changes.iterator(); iterator.hasNext();) {
             MetaDataChangeUnit unit = iterator.next();
             switch (unit.type) {
@@ -92,6 +92,7 @@ public class MetaDataChange extends Change {
                     break;
             }
         }
+        return true;
     }
 
     class MetaDataChangeUnit {

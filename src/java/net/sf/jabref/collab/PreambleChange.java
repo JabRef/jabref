@@ -37,10 +37,11 @@ public class PreambleChange extends Change {
       tp.setText(text.toString());
   }
 
-  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-    panel.database().setPreamble(disk);
-    undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
+  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+      panel.database().setPreamble(disk);
+      undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
       secondary.setPreamble(disk);
+      return true;
   }
 
   JComponent description() {

@@ -39,7 +39,7 @@ public class StringRemoveChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     try {
       panel.database().removeString(inMem.getId());
@@ -50,6 +50,8 @@ public class StringRemoveChange extends Change {
 
       // Update tmp database:
       secondary.removeString(tmpString.getId());
+
+      return true;
   }
 
 

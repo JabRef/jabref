@@ -23,7 +23,7 @@ public class GroupChange extends Change {
         this.tmpGroupRoot = tmpGroupRoot;
     }
 
-    public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.getGroupSelector().getGroupTreeRoot();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 panel.getGroupSelector(), root, Globals.lang("Modified groups")); // JZTODO lyrics
@@ -51,6 +51,7 @@ public class GroupChange extends Change {
         for (int i = 0; i < copied.getChildCount(); ++i)
             tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
+        return true;
     }
 
     JComponent description() {

@@ -49,7 +49,7 @@ public class StringChange extends Change {
     tp.setText(sb.toString());
   }
 
-  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
     if (string != null) {
       string.setContent(disk);
       undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
@@ -75,6 +75,8 @@ public class StringChange extends Change {
           BibtexString bs = new BibtexString(Util.createNeutralId(), label, disk);
           secondary.addString(bs);
       }
+
+      return true;
   }
 
 

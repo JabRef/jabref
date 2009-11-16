@@ -26,7 +26,7 @@ public class StringNameChange extends Change {
 
   }
 
-  public void makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
     if (panel.database().hasStringLabel(disk)) {
       // The name to change to is already in the database, so we can't comply.
@@ -59,6 +59,8 @@ public class StringNameChange extends Change {
 	      BibtexString bs = new BibtexString(newId, disk, content);
           secondary.addString(bs);
       }
+
+      return true;
   }
 
 
