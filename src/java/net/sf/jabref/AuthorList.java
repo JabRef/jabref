@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import net.sf.jabref.export.layout.format.CreateDocBookAuthors;
+
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -380,9 +382,11 @@ public class AuthorList {
 		if (tokens.size() == 0)
 			return null; // no author information
 
+
 		// the following negatives indicate absence of the corresponding part
 		int first_part_start = -1, von_part_start = -1, last_part_start = -1, jr_part_start = -1;
 		int first_part_end = 0, von_part_end = 0, last_part_end = 0, jr_part_end = 0;
+        boolean jrAsFirstname = false;
 		if (comma_first < 0) { // no commas
 			if (von_start < 0) { // no 'von part'
 				last_part_end = tokens.size();
@@ -414,8 +418,11 @@ public class AuthorList {
 			// 'junior part'
 			first_part_end = tokens.size();
 			if (comma_second < 0) { // one comma
-				if (comma_first < first_part_end)
-					first_part_start = comma_first;
+				if (comma_first < first_part_end) {
+                    first_part_start = comma_first;
+                    //if (((String)tokens.get(first_part_start)).toLowerCase().startsWith("jr."))
+                    //    jrAsFirstname = true;
+                }
 			} else { // two or more commas
 				if (comma_second < first_part_end)
 					first_part_start = comma_second;
@@ -448,6 +455,11 @@ public class AuthorList {
             last_part_end = von_part_end;
             von_part_start = -1;
             von_part_end = -1;
+        }
+        if (jrAsFirstname) {
+            // This variable, if set, indicates that the first name starts with "jr.", which
+            // is an indication that we may have a name formatted as "Firstname Lastname, Jr."
+            // which is an acceptable format for BibTeX.
         }
 
 		// Third step: do actual splitting, construct Author object
@@ -1138,4 +1150,20 @@ public class AuthorList {
 			return res.toString();
 		}
 	}// end Author
+
+
+    public static void main(String[] args) {
+        //String s = "Ford, Jr., Henry and Guy L. {Steele Jr.} and Olaf Nilsen, Jr.";
+        String s = "Olaf von Nilsen, Jr.";
+        AuthorList al = AuthorList.getAuthorList(s);
+        for (int i=0; i<al.size(); i++) {
+            Author a = al.getAuthor(i);
+            System.out.println((i+1)+": first = '"+a.getFirst()+"'");
+            System.out.println((i+1)+": last = '"+a.getLast()+"'");
+            System.out.println((i+1)+": jr = '"+a.getJr()+"'");
+            System.out.println((i+1)+": von = '"+a.getVon()+"'");
+        }
+
+        System.out.println((new CreateDocBookAuthors()).format(s));
+    }
 }// end AuthorList

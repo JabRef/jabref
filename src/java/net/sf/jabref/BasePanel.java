@@ -28,22 +28,72 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.matchers.Matcher;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.export.*;
-import net.sf.jabref.external.*;
+import net.sf.jabref.export.ExportToClipboardAction;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.SaveDatabaseAction;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.external.AutoSetExternalFileForEntries;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.FindFullTextAction;
+import net.sf.jabref.external.RegExpFileSearch;
+import net.sf.jabref.external.SynchronizeFileField;
+import net.sf.jabref.external.UpgradeExternalLinks;
+import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GlazedEntrySorter;
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.MainTableSelectionListener;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -52,24 +102,25 @@ import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.sql.*;
-import net.sf.jabref.undo.*;
+import net.sf.jabref.sql.DBConnectDialog;
+import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.DbConnectAction;
+import net.sf.jabref.sql.SQLutil;
+import net.sf.jabref.undo.CountingUndoManager;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableChangeType;
+import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.undo.UndoableKeyChange;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.Matcher;
 
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.*;
-import java.util.List;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -101,7 +152,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    HashMap<String, AutoCompleter> autoCompleters = new HashMap<String, AutoCompleter>();
+    HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -1777,11 +1828,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         repaint();
     }
 
-    public HashMap<String, AutoCompleter> getAutoCompleters() {
+    public HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
         return autoCompleters;
     }
     
-    public AutoCompleter getAutoCompleter(String fieldName) {
+    public AbstractAutoCompleter getAutoCompleter(String fieldName) {
         return autoCompleters.get(fieldName);
     }
 
@@ -1790,7 +1841,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         String[] completeFields = Globals.prefs.getStringArray("autoCompleteFields");
         for (int i = 0; i < completeFields.length; i++) {
             String field = completeFields[i];
-            autoCompleters.put(field, new AutoCompleter(field));
+            AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(field);
+			autoCompleters.put(field, autoCompleter );
         }
         for (BibtexEntry entry : database.getEntries()){
             Util.updateCompletersForEntry(autoCompleters, entry);
@@ -1806,13 +1858,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void addContentSelectorValuesToAutoCompleters() {
         for (String field : autoCompleters.keySet()) {
-            AutoCompleter ac = autoCompleters.get(field);
+            AbstractAutoCompleter ac = autoCompleters.get(field);
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + field) != null) {
                 Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + field);
                 if (items != null) {
                     Iterator<String> i = items.iterator();
                     while (i.hasNext())
-                        ac.addWord(i.next());
+                        ac.addWordToIndex(i.next());
                 }
             }
         }
@@ -1824,10 +1876,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void addJournalListToAutoCompleter() {
         if (autoCompleters.containsKey("journal")) {
-            AutoCompleter ac = autoCompleters.get("journal");
+            AbstractAutoCompleter ac = autoCompleters.get("journal");
             Set<String> journals = Globals.journalAbbrev.getJournals().keySet();
             for (String journal : journals)
-                ac.addWord(journal);
+                ac.addWordToIndex(journal);
         }
 
 

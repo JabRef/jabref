@@ -2,6 +2,9 @@ package net.sf.jabref.gui;
 
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
+
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.FocusListener;
@@ -13,7 +16,7 @@ import java.awt.event.FocusEvent;
 public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
 
-    AutoCompleter completer;
+    AbstractAutoCompleter completer;
     protected String toSetIn = null,
             lastBeginning = null;
     protected int lastCaretPosition = -1;
@@ -27,7 +30,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     // These variables keep track of the situation from time to time.
 
-    public AutoCompleteListener(AutoCompleter completer) {
+    public AutoCompleteListener(AbstractAutoCompleter completer) {
         this.completer = completer;
     }
 
@@ -43,7 +46,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     public void keyPressed(KeyEvent e) {
-        if ((toSetIn != null) && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
+    	if ((toSetIn != null) && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
             JTextComponent comp = (JTextComponent) e.getSource();
             int end = comp.getSelectionEnd();
             comp.select(end, end);
@@ -82,11 +85,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         //System.out.println("ToSetIn: '"+toSetIn+"'");
     }
 
-    public void keyTyped(KeyEvent e) {
-        
+    public void keyTyped(KeyEvent e) {        
         char ch = e.getKeyChar();
         if (Character.isLetter(ch)) {
             JTextComponent comp = (JTextComponent) e.getSource();
+            
             if ((toSetIn != null) && (toSetIn.length() > 1) &&
                     (ch == toSetIn.charAt(1))) {
                 // User continues on the word that was suggested.
@@ -184,21 +187,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     }
 
-
-    protected Object[] findCompletions(String beginning, JTextComponent comp) {
-        Object[] completed;
-        if (completer.isNameField()) {
-            int nameStatus = findNamePositionStatus(comp);
-            if (nameStatus == ANY_NAME)
-                completed = completer.complete(beginning);
-            else if (nameStatus == FIRST_NAME)
-                completed = completer.completeName(beginning, false);
-            else
-                completed = completer.completeName(beginning, true);
-        }
-        else
-            completed = completer.complete(beginning);
-        return completed;
+    protected Object[] findCompletions(String beginning, JTextComponent comp) {        
+        return completer.complete(beginning);
     }
 
     protected StringBuffer getCurrentWord(JTextComponent comp) {

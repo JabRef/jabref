@@ -1,3 +1,5 @@
+    - Applied patch by Philipp Cordes and Björn Kahlert for improved handling of names by
+      autocompleter. The patch also reorganizes the autocompleter classes.
     - Table will now scroll to keep the currently edited entry visible if an edit leads to
       the entry getting sorted to a different position.
     - Reworked author and editor handling in Docbook export. Added Docbook XML header.

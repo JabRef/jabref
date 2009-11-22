@@ -24,11 +24,25 @@
  */
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.VetoableChangeListener;
 import java.io.File;
@@ -40,22 +54,45 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
-import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.VerticalLabelUI;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.*;
-import com.jgoodies.looks.Options;
-import com.jgoodies.looks.HeaderStyle;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableChangeType;
+import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.undo.UndoableKeyChange;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
@@ -1162,9 +1199,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                             fe.setBackground(GUIGlobals.validFieldBackground);
 
                         // See if we need to update an AutoCompleter instance:
-                        AutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
+                        AbstractAutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
                         if (aComp != null)
-                            aComp.addAll(toSet, entry);
+                            aComp.addBibtexEntry(entry);
 
                         // Add an UndoableFieldChange to the baseframe's
                         // undoManager.

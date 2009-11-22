@@ -51,7 +51,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
@@ -76,26 +80,32 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.export.layout.LayoutEntry;
-import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.gui.AutoCompleter;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.imports.CiteSeerFetcher;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1702,13 +1712,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
      * This methods assures all words in the given entry are recorded in their
      * respective Completers, if any.
      */
-    public static void updateCompletersForEntry(HashMap<String, AutoCompleter> autoCompleters,
-                                                BibtexEntry be) {
-
-    	for (Map.Entry<String, AutoCompleter> entry : autoCompleters.entrySet()){
-    		String field = entry.getKey();
-            AutoCompleter comp = entry.getValue();
-            comp.addAll(be.getField(field), be);
+    public static void updateCompletersForEntry(HashMap<String, AbstractAutoCompleter> autoCompleters, BibtexEntry bibtexEntry) {
+    	for (Map.Entry<String, AbstractAutoCompleter> entry : autoCompleters.entrySet()){    		
+            AbstractAutoCompleter comp = entry.getValue();
+            comp.addBibtexEntry(bibtexEntry);
         }
     }
 

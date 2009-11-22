@@ -24,7 +24,11 @@
  */
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -32,13 +36,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.AutoCompleter;
 import net.sf.jabref.gui.FileListEditor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -140,7 +148,7 @@ public class EntryEditorTab {
             JComponent ex = parent.getExtra(fields[i], ta);
 
             // Add autocompleter listener, if required for this field:
-            AutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
+            AbstractAutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
             AutoCompleteListener acl = null;
             if (autoComp != null) {
                 acl = new AutoCompleteListener(autoComp);
