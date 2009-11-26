@@ -27,6 +27,8 @@
 
 package net.sf.jabref;
 
+import net.sf.jabref.gui.AutoCompleteListener;
+
 import java.awt.Color;
 import java.awt.Container;
 
@@ -105,4 +107,8 @@ public interface FieldEditor {
     public void redo();
 
     public void addUndoableEditListener(UndoableEditListener listener);
+
+    public void setAutoCompleteListener(AutoCompleteListener listener);
+
+    public void clearAutoCompleteSuggestion();
 }

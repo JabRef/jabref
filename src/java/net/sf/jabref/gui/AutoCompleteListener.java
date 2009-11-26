@@ -252,6 +252,14 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     public void focusLost(FocusEvent event) {
         if (lastCompletions != null) {
             JTextComponent comp = (JTextComponent)event.getSource();
+            clearCurrentSuggestion(comp);
+        }
+        if (nextFocusListener != null)
+            nextFocusListener.focusLost(event);
+    }
+
+    public void clearCurrentSuggestion(JTextComponent comp) {
+         if (lastCompletions != null) {
             int selStart = comp.getSelectionStart();
             String text = comp.getText();
             comp.setText(text.substring(0, selStart) + text.substring(comp.getSelectionEnd()));
@@ -261,7 +269,5 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             lastCaretPosition = -1;
             toSetIn = null;
         }
-        if (nextFocusListener != null)
-            nextFocusListener.focusLost(event);
     }
 }

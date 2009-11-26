@@ -154,6 +154,7 @@ public class EntryEditorTab {
                 acl = new AutoCompleteListener(autoComp);
             }
             setupJTextComponent(ta.getTextComponent(), acl);
+            ta.setAutoCompleteListener(acl);
 
             // Store the editor for later reference:
             editors.put(fields[i], ta);
@@ -181,7 +182,7 @@ public class EntryEditorTab {
 				.getEntry().getField(BibtexFields.KEY_FIELD), true);
             //tf.addUndoableEditListener(bPanel.undoListener);
 			setupJTextComponent(tf, null);
-
+            
 			editors.put("bibtexkey", tf);
 			/*
 			 * If the key field is the only field, we should have only one

@@ -743,5 +743,11 @@ public class FileListEditor extends JTable implements FieldEditor,
     }
 
     public void addUndoableEditListener(UndoableEditListener listener) {
-    }    
+    }
+
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+    }
+
+    public void clearAutoCompleteSuggestion() {
+    }
 }

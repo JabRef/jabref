@@ -26,6 +26,8 @@
  */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.AutoCompleteListener;
+
 import java.awt.*;
 import java.util.regex.Pattern;
 
@@ -59,6 +61,8 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
 
 	final static Pattern indent = Pattern.compile("\\s+.*");
+
+    private AutoCompleteListener autoCompleteListener = null;
 
     //protected UndoManager undo = new UndoManager();
 
@@ -178,4 +182,15 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     public void addUndoableEditListener(UndoableEditListener listener) {
         getDocument().addUndoableEditListener(listener);
     }
+
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        autoCompleteListener = listener;
+    }
+
+    public void clearAutoCompleteSuggestion() {
+        if (autoCompleteListener != null) {
+            autoCompleteListener.clearCurrentSuggestion(this);
+        }
+    }
 }
+

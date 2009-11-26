@@ -669,6 +669,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     public void storeCurrentEdit() {
         Component comp = Globals.focusListener.getFocused();
         if ((comp == source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
+            ((FieldEditor)comp).clearAutoCompleteSuggestion();
             storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
         }
     }
@@ -1414,7 +1415,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
                 EntryEditorTab fp = (EntryEditorTab) activeTab;
-                updateField(fp.getActive());
+                FieldEditor fe = fp.getActive();
+                fe.clearAutoCompleteSuggestion();
+                updateField(fe);
             } else
                 // Source panel.
                 updateField(activeTab);

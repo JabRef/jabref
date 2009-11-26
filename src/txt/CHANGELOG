@@ -6,6 +6,7 @@
     - Database will no longer be marked as changed after accepting external changes, unless one or
       more changes were not accepted before merging, and unless database was already marked as
       changed.
+    - Fixed bug: undesired autocompletion when saving file.
     - Fixed bug: entry editor doesn't appear when new entry is added while a filtering search or
       group selection is active.
     - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be

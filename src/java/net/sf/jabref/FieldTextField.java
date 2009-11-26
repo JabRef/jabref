@@ -26,6 +26,8 @@
  */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.AutoCompleteListener;
+
 import java.awt.Color;
 
 import javax.swing.JComponent;
@@ -40,6 +42,8 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
 	protected String fieldName;
 	protected JLabel label;
+
+    private AutoCompleteListener autoCompleteListener = null;
 
     //protected UndoManager undo = new UndoManager();
 
@@ -154,5 +158,14 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     public void addUndoableEditListener(UndoableEditListener listener) {
         getDocument().addUndoableEditListener(listener);
+    }
+
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        autoCompleteListener = listener;
+    }
+
+    public void clearAutoCompleteSuggestion() {
+        if (autoCompleteListener != null)
+            autoCompleteListener.clearCurrentSuggestion(this);
     }
 }
