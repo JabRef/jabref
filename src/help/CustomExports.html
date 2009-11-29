@@ -340,6 +340,11 @@
         consecutive newlines (e.g. \n \n) as the beginning of a new
         paragraph and creates paragraph-html-tags accordingly.</li>
 
+        <li><code>IfPlural</code> : outputs its first argument if the input field looks
+        like an author list with two or more names, or its second argument otherwise.
+        E.g. <code>\format[IfPlural(Eds.,Ed.)]{\editor}</code> will output "Eds." if there
+        is more than one editor, and "Ed." if there is only one.</li>
+
         <li><code>LastPage</code> : returns the last page from the "pages" field, if set.
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "360".</li>

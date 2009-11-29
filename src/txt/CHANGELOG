@@ -1,3 +1,5 @@
+    - Added IfPlural formatter by Russell Almond. The formatter outputs its first argument
+      if the input field contains " and " and the second one otherwise.
     - Applied patch by Philipp Cordes and Björn Kahlert for improved handling of names by
       autocompleter. The patch also reorganizes the autocompleter classes.
     - Table will now scroll to keep the currently edited entry visible if an edit leads to
