@@ -400,6 +400,12 @@
         le d&eacute;but d'un nouveau paragraphe et cr&eacute;e les
         balises html de paragraphes appropri&eacute;es.</li>
 
+        <li><code>IfPlural</code>&nbsp;: renvoie son premier argument si le
+        champ d'entr&eacute;e ressemble &agrave; une liste d'auteurs avec deux
+        noms ou plus, sinon renvoie son second argument. Par exemple,
+        <code>\format[IfPlural(Eds.,Ed.)]{\editor}</code> renverra "Eds." s'il y
+        a plus d'un &eacute;diteur et "Ed." s'il n'y en a qu'un seul.</li>
+
         <li><code>LastPage</code>&nbsp;: renvoie la derni&egrave;re page du champ "pages", si initialis&eacute;.
         Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
         ce formatteur renverra "360".</li>
