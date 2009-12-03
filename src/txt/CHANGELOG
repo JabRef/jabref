@@ -1,3 +1,4 @@
+    - Preview panel now defaults to preview layout 1 instead of 2. Switched default layouts.
     - Added IfPlural formatter by Russell Almond. The formatter outputs its first argument
       if the input field contains " and " and the second one otherwise.
     - Applied patch by Philipp Cordes and Björn Kahlert for improved handling of names by

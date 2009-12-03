@@ -36,7 +36,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         KeyListener, FocusListener {
 
     PreviewPanel[] previewPanel = null;
-    int activePreview = 1;
+    int activePreview = 0;
     PreviewPanel preview;
     MainTable table;
     BasePanel panel;

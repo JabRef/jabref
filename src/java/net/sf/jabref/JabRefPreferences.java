@@ -317,9 +317,10 @@ public class JabRefPreferences {
                      +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
                      +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
                      +"\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                     +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
+                     +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                     +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                     +"\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                      +"</dd>__NEWLINE__<p></p></font>");
-
         defaults.put("preview1", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
@@ -334,10 +335,10 @@ public class JabRefPreferences {
                      +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
                      +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
                      +"\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                     +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                     +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                     +"\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
+                     +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
                      +"</dd>__NEWLINE__<p></p></font>");
+
+
         // TODO: Currently not possible to edit this setting:
         defaults.put("previewPrintButton", Boolean.FALSE);
         defaults.put("autoDoubleBraces", Boolean.FALSE);
