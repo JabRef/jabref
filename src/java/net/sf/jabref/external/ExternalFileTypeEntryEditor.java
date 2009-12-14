@@ -199,8 +199,14 @@ public class ExternalFileTypeEntryEditor {
 
     public void storeSettings(ExternalFileType entry) {
         entry.setName(name.getText().trim());
-        entry.setExtension(extension.getText().trim());
         entry.setMimeType(mimeType.getText().trim());
+        // Set extension, but remove initial dot if user has added that:
+        String ext = extension.getText().trim();
+        if ((ext.length() > 0) && (ext.charAt(0) == '.'))
+            entry.setExtension(ext.substring(1));
+        else
+            entry.setExtension(ext);
+        
         if (selectedIcon != null)
             entry.setIconName(selectedIcon);
         if (!Globals.ON_WIN) {
