@@ -1,3 +1,4 @@
+    - Disabled JStor search, which doesn't work due to API changes.
     - External file type manager now removes "." prefix in file type extension if the user
       has typed it that way.
     - Preview panel now defaults to preview layout 1 instead of 2. Switched default layouts.
