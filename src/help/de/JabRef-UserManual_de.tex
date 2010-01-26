@@ -1,30 +1,28 @@
 %%%%% To do %%%%%
 % DW 2007-12-03
-% - Wiki-Seiten 'Searching with regular expressions' und 'Translating JabRef' übersetzen und einbinden
+% - Wiki-Seite 'Translating JabRef' übersetzen und einbinden
 % - [2.4 beta] Plugin.html ergänzen 
 % - [2.4 beta?] SQLExport.html ergänzen
 
-\documentclass[10pt,normalheadings,ngerman]{scrartcl}
+\documentclass[
+  fontsize=10pt,
+	headings=normal,
+	paper=a5,
+	pagesize,
+	ngerman
+]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{textcomp}
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
 \usepackage{xspace}
-\usepackage{pdfsync}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%15.\,09.\,2008
+\newcommand{\versiondate}{26.\,1.\,2010}%
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
-%%%%% Page Dimensions %%%%%
-%%%%% Bildschirmversion %%%%%
-%\usepackage{geometry}
-%\geometry{verbose,a5paper,tmargin=2cm,bmargin=2cm,lmargin=1cm,rmargin=1cm}
-%%%%% Druckversion %%%%%
-\usepackage{typearea}
-\typearea{calc}
 %%%%% Packages %%%%%
 \usepackage{array}
 \usepackage{longtable}
@@ -152,6 +150,10 @@
 \renewcommand{\headfont}{\normalfont\itshape} % Headlines italic, not slanted ***
 \usepackage[scaled=.83]{beramono}
 
+%%%%% Page Dimensions %%%%%
+\usepackage{typearea}
+\typearea{calc}
+
 %%%%% Other stuff %%%%%
 \deffootnote{1.5em}{1em}{\makebox[1.5em][l]{\thefootnotemark}}
 \usepackage{microtype} % micro typography
@@ -186,7 +188,7 @@
 \renewcommand{\ajtsep}{}				% kein Komma nach Zs-Titeln
 \renewcommand{\biburlprefix}{\jblangle\textsc{url: }}	% Klammer und Text vor einer URL (Standard: "URL: ")
 
-\renewcommand{\bib@heading}{\addsec{Kommentiertes Literaturverzeichnis}}
+\renewcommand{\bib@heading}{\addsec[Literaturverzeichnis]{Kommentiertes Literaturverzeichnis}}
 
 %%%%% Hyperref %%%%%
 \usepackage{hyperref}
@@ -253,10 +255,12 @@ zu starten.
 \end{abstract}
 \begin{quote}
 \begin{spacing}{0.7}
-\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2007, Dominik
+\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2010, Dominik
 Waßenhoven}
 \end{center}
-{\scriptsize Der Inhalt dieses Handbuchs wird unter den Bedingungen der Creative Commons Public License ">Namensnennung"=NichtKommerziell"=Weitergabe unter gleichen Bedingungen 2.0 Deutschland"< zur Verfügung gestellt. Um den Lizenzvertrag anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
+{\scriptsize Dieses Handbuch steht unter einer Creative Commons Namensnennung"=Weitergabe unter gleichen Bedingungen 3.0 Deutschland Lizenz (CC-by-sa). Die Lizenzbedingungen können unter
+\href{http://creativecommons.org/licenses/by-sa/3.0/de/}{http://creativecommons.org/licenses/by-sa/3.0/de}
+eingesehen werden.\par}\end{spacing}
 
 \end{quote}
 \thispagestyle{empty}
@@ -391,7 +395,7 @@ Die Nummer einer Zeitschrift, eines technischen Reports oder eines Bandes innerh
   \item \emph{organization}\\
     Die Organisation, die einen Konferenzband fördert.
   \item \emph{pages}\\
-    Die Seitenzahl(en) oder der Seitenzahlbereich, z.\,B. \texttt{42-111} oder \texttt{7,41,73-97} or \texttt{43+} (das \texttt{+} deutet auf folgende Seiten, die nicht einen einfachen Bereich umfassen).
+    Die Seitenzahl(en) oder der Seitenzahlbereich, z.\,B. \texttt{42-111} oder \texttt{7,41, 73-97} or \texttt{43+} (das \texttt{+} deutet auf folgende Seiten, die nicht einen einfachen Bereich umfassen).
 Ein einfacher Bindestrich (wie in \texttt{7-33}) wird in einen doppelten Bindestrich (\texttt{-{-}}) verwandelt, der in der Ausgabe als bis-Strich erscheint (also 7--33).
   \item \emph{publisher}\\
     Der Name des Verlags.
@@ -1787,7 +1791,7 @@ Es gibt mehrere Möglichkeiten, externe Dateien oder Internetseiten zu öffnen. In
 
 XMP ist ein Standard, der von Adobe Systems entwickelt wurde, um Metadaten (Daten, die Informationen über andere Daten enthalten) in Dateien zu speichern. Ein bekanntes Beispiel für Metadaten sind ID3-Tags, die zur Beschreibung von Künstlern, Albumtiteln und Liednamen einer MP3-Datei verwendet werden. Mit Hilfe von Metadaten können MP3-Dateien unabhängig von ihrem Dateinamen identifiziert und z.B. von MP3-Playern ausgelesen und angezeigt werden.
 
-Mit der XMP-Unterstützung versucht das \jabref-Team, die Vorteile von Metadaten in die Welt der Literaturmanager einzuführen. Sie können \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors wählen und damit alle \bibtex{}-Informationen in die verlinkte PDF-Datei schreiben. Wenn Sie diese PDF-Datei mit anderen austauschen, können diese die Datei in das \jabref-Fenster ziehen und haben damit alle Informationen zur Verfügung, die Sie eingegeben haben.
+Mit der XMP-Unterstützung versucht das \jabref-Team, die Vorteile von Metadaten in die Welt der Literaturmanager einzuführen. Sie können \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors wählen und damit alle \bibtex{}"=Informationen in die verlinkte PDF-Datei schreiben. Wenn Sie diese PDF-Datei mit anderen austauschen, können diese die Datei in das \jabref-Fenster ziehen und haben damit alle Informationen zur Verfügung, die Sie eingegeben haben.
 
 \subsubsection{Benutzung}
 
@@ -1797,7 +1801,7 @@ Um die XMP-Funktionen in \jabref zu nutzen, gehen Sie folgendermaßen vor:
   \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref ziehen.
   \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors (neben dem \emph{pdf}"=Feld).
   \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
-  \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
+  \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net\slash bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
   \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. Rufen Sie dazu auf der Kommandozeile einfach \lstinline{pdfinfo -meta <PDF-Datei>} auf, dann werden die entsprechenden Metadaten angezeigt.
 \end{itemize}
 
@@ -1869,7 +1873,7 @@ Einige Links zu XMP und PDFs mit Anmerkungen (englisch):
 
 \label{CiteSeerHelp}
 \tip[]{CiteSeer ist eine digitale Bibliothek und Suchmaschine für wissenschaftliche Literatur, vornehmlich zu den Bereichen Computer und Informatik.}
-\jabref kann Informationen über eine bestimmte
+Mit \jabref lassen sich Informationen zu einer bestimmten
 Literaturangabe aus der CiteSeer-Datenbank herunterladen. Um diesen
 Vorgang zu starten, fügen Sie Ihrer Datei einen neuen Eintrag hinzu
 und belegen das Feld \emph{citeseerurl} mit einem Link zur entsprechenden
@@ -1950,7 +1954,8 @@ deren Ergebnis eine bestimmte Trefferanzahl nicht übersteigt.
 
 Wenn Sie einen HTTP-Proxy-Server benutzen müssen, übergeben Sie den
 Servernamen und die Portnummer an Java. Diese Umgebungseinstellungen
-sind dokumentiert unter \url{http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html}
+sind dokumentiert unter
+\href{http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html}{http://java.sun.com/j2se/1.4.2/docs/guide/net/proper\allowbreak ties.html}
 
 \begin{lstlisting}
 java -Dhttp.proxyHost="hostname" -Dhttp.proxyPort="portnumber"
@@ -2043,7 +2048,7 @@ vorgestellt.
 \begin{itemize}
 \item Hilfe: \texttt{-h}
 
-Diese Option veranlasst \jabref, eine Zusammenfassung der Kommandozeilen-Optionen
+Diese Option veranlasst \jabref, eine Zusammenfassung der Kommandozeilen"=Optionen
 anzuzeigen und das Programm unmittelbar darauf zu schließen.
 
 \item Kein GUI-Modus: \texttt{-n}
@@ -2109,7 +2114,7 @@ als Argument maximal eine Datei.
 
 \item Einstellungen exportieren: \texttt{-x Dateiname}
 
-Mit dieser Option können Sie \jabref veranlassen, alle Benutzer-Einstellungen
+Mit dieser Option können Sie \jabref veranlassen, alle Benutzer"=Einstellungen
 in eine XML-Datei zu speichern. Nach dem Export startet \jabref
 normal.
 
@@ -2119,7 +2124,7 @@ Mit dieser Option importiert \jabref Benutzer-Einstellungen, die
 mit der Option \texttt{-x} exportiert wurden. Nach dem Import startet
 \jabref normal.
 
-\item Nur benutzte Einträge exportieren: \texttt{-a Dateiname{[}.aux{]},neueBibDatei{[}.bib{]}}
+\item Nur benutzte Einträge exportieren:\\ \texttt{-a Dateiname{[}.aux{]},neueBibDatei{[}.bib{]}}
 
 Manchmal ist es nützlich, eine \bibtex{}-Datei zu haben, die nur die
 benutzten Einträge enthält. Eine Liste dieser benutzten Einträge findet
@@ -2129,7 +2134,7 @@ die nur die bekannten und benutzten Einträge enthält. Das bedeutet,
 dass ein Eintrag, der in der Standard-\bibtex{}-Datei nicht definiert
 ist, auch nicht in die neue Datei geschrieben werden kann.
 
-\item Aus dem Internet abrufen: \lstinline{--fetch==Name des Fetchers:Suchausdruck}
+\item Aus dem Internet abrufen:\\ \lstinline{--fetch==Name des Fetchers:Suchausdruck}
 
 Die \emph{Fetcher}, also die direkte Suche in Online-Datenbanken,
 die Sie im Menü \menu{Internet} finden, können auch von der Kommandozeile
@@ -2346,7 +2351,7 @@ falls es mehr als drei Herausgeber gibt.
 \item [\texttt{{[}veryshorttitle{]}}]Die ersten beiden Worte des Titels
 (title), wobei >>the<<, >>a<< und >>an<< ausgelassen werden.
 \end{labeling}
-Hinter einem Feldnamen (oder einem der oben aufgeführten Pseudo-Feldnamen)
+Hinter einem Feldnamen (oder einem der oben aufgeführten Pseudo"=Feldnamen)
 kann ein Modifikator stehen. Modifikatoren werden in der Reihenfolge
 angewendet, in der sie angegeben wurden.
 
@@ -2512,7 +2517,7 @@ abhängen:
 \begin{labeling}{MMMM}
 \item [\texttt{HTMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie
        \texttt{\{\textbackslash{}\textasciicircum{}a\}} oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}}
-       durch ihre HTML"=Entsprechungen und übersetzt die \LaTeX"=Befehle \lstinline{\emph}, 
+       durch ihre HTML"=Entsprechungen und übersetzt die \LaTeX"=Befehle \texttt{\textbackslash emph}, 
        \lstinline{\textit}, \lstinline{\textbf} in ihre HTML"=Entsprechungen.
 \item [\texttt{HTMLParagraphs}]interpretiert zwei aufeinanderfolgende Zeilenumbrüche 
        (z.\,B. \lstinline{\n\n}) als Beginn eines neuen Absatzes und erstellt dementsprechend
@@ -2548,7 +2553,7 @@ abhängen:
        \emph{author}/\emph{editor} mit den Nachnamen zuerst, abgetrennt durch Kommas,
        mit einem ">and"< zwischen den letzten beiden Namen.
 \item [\texttt{AuthorLastFirstOxfordCommas}]ähnlich wie
-        \texttt{AuthorLastFirstCommas}, außer dass das ">and"<
+        \texttt{AuthorLastFirstCommas}, nur dass das ">and"<
         zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
 \item [\texttt{AuthorLastFirstAbbrCommas}]formatiert die Felder
         \emph{author}/\emph{editor} mit Nachnamen zuerst und abgekürzten Vornamen,
@@ -2574,7 +2579,7 @@ abhängen:
         in dem Feld ">file"< angegeben ist. Dieser Formatierer nimmt den Namen 
         eines Dateityps als optionales
         Argument, das in Klammern nach dem Namen des Formatierers angegeben
-        wird. So wird etwa mit \texttt{\textbackslash format[FileLink(pdf)]\{%
+        wird. So wird etwa mit \texttt{\textbackslash format[FileLink(pdf)] \{%
         \textbackslash file\}}
         der Dateityp \lstinline{pdf} als Argument angegeben. Wenn ein Argument
         mitgegeben wird, wählt der Formatierer den ersten Dateilink des
@@ -2828,8 +2833,9 @@ public class SimpleCsvImporter extends ImportFormat {
 
 \subparagraph{SimpleCsvImporter übersetzen}
 
-Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, sie liegt unter \texttt{/meinpfad\slash{}SimpleCsvImporter.java}, die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
-\texttt{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad. 
+Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, sie liegt unter
+\\\lstinline{/meinpfad/SimpleCsvImporter.java}, die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
+\lstinline{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad. 
 Kompilieren Sie die Klasse mit JSDK 1.4 zum Beispiel mit folgendem Kommandozeilen"=Aufruf: 
 \begin{lstlisting}
 javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
@@ -3011,7 +3017,7 @@ F1\tabularnewline
 \end{longtable}
 
 \clearpage 
-\section{Häufige Fragen und Antworten}\label{sec:faq}
+\section[Fragen und Antworten]{Häufige Fragen und Antworten}\label{sec:faq}
 %\secttoc
 
 Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
@@ -3082,7 +3088,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 
 \newpage
-\addsec{Versionsgeschichte}
+\addsec[Versionsgeschichte]{Versionsgeschichte dieses Handbuchs}
 
 \label{RevisionHistory}
 
@@ -3090,7 +3096,9 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%endgültiges Datum}
+\begin{revhist}{\versiondate}%26.\,1.\,2010}
+\item Lizenz geändert
+\item Format von A4 auf A5 geändert (bessere Bildschirmlesbarkeit)
 \item Abschnitte ">\nameref{Export-OOo}"< und ">\nameref{CustomExports}"< aktualisiert
 \item Abschnitte ">\nameref{search-regular-expressions}"< und ">\nameref{kommandozeilenoptionen}"< ergänzt
 \item Versionsnummer (2.4) angepasst
