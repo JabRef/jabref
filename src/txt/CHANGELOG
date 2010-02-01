@@ -1,4 +1,7 @@
+    - Added support for KOI8_R character set.
     - Removed DocumentPrinter class, using standard API functions instead. Patch by
+      Tony Mancill.
+    - Removed HightlightFilter class, using standard API functions instead. Patch by
       Tony Mancill.
     - Changed keyboard shortcut for IEEXplorer search to Alt-F8.
     - Disabled JStor search, which doesn't work due to API changes.
