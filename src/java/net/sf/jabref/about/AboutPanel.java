@@ -83,7 +83,6 @@ public class AboutPanel extends JComponent
 
   private AnimationListener aniListener ;
   private ImageProducer iProducer ;
-  private HighlightFilter filter ;
 
   AboutPanel()
   {
@@ -98,10 +97,6 @@ public class AboutPanel extends JComponent
     buildStr = " build " + Globals.BUILD ;
 
     image = new ImageIcon(getClass().getResource("/images/autumn.png"));
-
-    filter = new HighlightFilter(false, 5) ;
-    filter.setMiddle(image.getIconWidth(), image.getIconHeight());
-    iProducer = new FilteredImageSource( image.getImage().getSource(), filter) ;
 
     HEIGHT = image.getIconHeight() ;
     WIDTH = image.getIconWidth() ;
@@ -297,10 +292,6 @@ public class AboutPanel extends JComponent
     else
     {
       image.paintIcon(this, g, 0, 0);
-      if (filter.isReady())
-      {
-        skipAnimation() ;
-      }
     }
   }
 // ----------------------------------------------------------------------------
@@ -417,7 +408,6 @@ public class AboutPanel extends JComponent
             sleepTime -= sleepTime / 3 ;
 
           image.setImage( createImage( iProducer) );
-          filter.nextStep();
           repaint(0, 0, WIDTH, HEIGHT) ;
         }
       }
