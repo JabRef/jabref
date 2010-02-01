@@ -894,18 +894,28 @@ public class JabRef {
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Globals.lang("Importing") + ": " + data[0]);
-                List<BibtexEntry> entries =
-                        Globals.importFormatReader.importFromFile(data[1],
-                                data[0].replaceAll("~", System.getProperty("user.home")));
+                List<BibtexEntry> entries;
+                if (Globals.ON_WIN) {
+                  entries = Globals.importFormatReader.importFromFile(data[1], data[0]);
+                }
+                else {
+                  entries = Globals.importFormatReader.importFromFile( data[1],
+                            data[0].replaceAll("~", System.getProperty("user.home")) );
+                }
                 return new ParserResult(entries);
             } else {
                 // * means "guess the format":
                 System.out.println(Globals.lang("Importing in unknown format")
                         + ": " + data[0]);
-                
-            	Pair<String, ParserResult> importResult = 
-                    Globals.importFormatReader.importUnknownFormat(data[0]
-                            .replaceAll("~", System.getProperty("user.home")));
+
+                Pair<String, ParserResult>  importResult;
+                if (Globals.ON_WIN) {
+            	  importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
+                }
+                else {
+                  importResult = Globals.importFormatReader.importUnknownFormat(
+                                 data[0].replaceAll("~", System.getProperty("user.home")) );
+                }
             	
             	if (importResult != null){
             		System.out.println(Globals.lang("Format used") + ": "
