@@ -9,6 +9,9 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -16,7 +19,6 @@ import javax.swing.event.HyperlinkListener;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.util.DocumentPrinter;
 
 /**
  * Displays an BibtexEntry using the given layout format.
@@ -116,17 +118,18 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 			putValue(SHORT_DESCRIPTION, Globals.lang("Print Preview"));
 		}
 
-		DocumentPrinter printerService;
+		//DocumentPrinter printerService;
 
 		public void actionPerformed(ActionEvent arg0) {
-			if (printerService == null)
-				printerService = new DocumentPrinter();
 
 			// Background this, as it takes a while.
 			new Thread() {
 				public void run() {
 					try {
-						printerService.print(entry.getCiteKey(), previewPane);
+						PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+						pras.add(new JobName(entry.getCiteKey(), null));
+						previewPane.print(null, null, true, null, pras, false);
+
 					} catch (PrinterException e) {
 
 						// Inform the user... we don't know what to do.

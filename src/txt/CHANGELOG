@@ -1,3 +1,5 @@
+    - Removed DocumentPrinter class, using standard API functions instead. Patch by
+      Tony Mancill.
     - Changed keyboard shortcut for IEEXplorer search to Alt-F8.
     - Disabled JStor search, which doesn't work due to API changes.
     - External file type manager now removes "." prefix in file type extension if the user
