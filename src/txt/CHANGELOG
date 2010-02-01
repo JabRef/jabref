@@ -1,3 +1,5 @@
+    - Fixed handling of maximised state when shutting down and starting up JabRef.
+      Patch by Igor L. Chernyavsky.
     - Fixed bug that prevented correct handling of DOS short file names. Patch
       by Igor L. Chernyavsky.
     - Added support for KOI8_R character set.

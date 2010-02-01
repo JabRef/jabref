@@ -413,7 +413,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         initLayout();
         
         initActions();
-        
+
+        // Fixes occasional Window malbehaviour in Linux
+        setBounds(0, 0, (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),
+            (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() );
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         if (Globals.prefs.getBoolean("rememberWindowLocation")) {
             
             int sizeX = prefs.getInt("sizeX");
@@ -662,7 +667,10 @@ public JabRefPreferences prefs() {
       prefs.putInt("posY", JabRefFrame.this.getLocation().y);
       prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
       prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-      prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
+//      prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
+      prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
+      prefs.putBoolean("rememberWindowLocation", !Globals.prefs.getBoolean("windowMaximised"));
+
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();
