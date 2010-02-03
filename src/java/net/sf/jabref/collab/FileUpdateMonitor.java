@@ -158,6 +158,7 @@ public class FileUpdateMonitor extends Thread {
       listener = ul;
       file = f;
       timeStamp = file.lastModified();
+      fileSize = file.length();
       tmpFile = getTempFile();
       copy();
     }
