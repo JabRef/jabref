@@ -1,3 +1,5 @@
+    - When checking for external modifications, file size is now checked in addition
+      to the time stamp.
     - Fixed handling of maximised state when shutting down and starting up JabRef.
       Patch by Igor L. Chernyavsky.
     - Fixed bug that prevented correct handling of DOS short file names. Patch

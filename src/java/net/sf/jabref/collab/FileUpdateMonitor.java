@@ -152,7 +152,7 @@ public class FileUpdateMonitor extends Thread {
     FileUpdateListener listener;
     File file;
     File tmpFile;
-    long timeStamp;
+    long timeStamp, fileSize;
 
     public Entry(FileUpdateListener ul, File f) {
       listener = ul;
@@ -163,21 +163,23 @@ public class FileUpdateMonitor extends Thread {
     }
 
     /**
-     * Check if time stamp has changed.
+     * Check if time stamp or the file size has changed.
      * @throws IOException if the file does no longer exist.
      * @return boolean true if the file has changed.
      */
     public boolean hasBeenUpdated() throws IOException {
       long modified = file.lastModified();
+      long fileSizeNow = file.length();
       if (modified == 0L)
         throw new IOException("File deleted");
-      return timeStamp != modified;
+      return timeStamp != modified || fileSize != fileSizeNow;
     }
 
     public void updateTimeStamp() {
       timeStamp = file.lastModified();
       if (timeStamp == 0L)
         notifyFileRemoved();
+      fileSize = file.length();
 
       copy();
     }
