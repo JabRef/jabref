@@ -1,3 +1,6 @@
+    - Fixed bug 2938562: using the move/rename feature on a file link could give an
+      absolute link even if the file was put below the main file directory. 
+    - Fixed bug 2931293: error generating key with [authorsAlpha] for short names.
     - When checking for external modifications, file size is now checked in addition
       to the time stamp.
     - Fixed handling of maximised state when shutting down and starting up JabRef.

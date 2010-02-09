@@ -90,7 +90,6 @@ public class MoveFileAction extends AbstractAction {
                         sb.append(file.getName());
                     }
                     chosenFile = sb.toString();
-                    System.out.println(chosenFile);
                 } else {
                     chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
                 }
@@ -120,12 +119,13 @@ public class MoveFileAction extends AbstractAction {
                         // Remove the original file:
                         file.delete();
                         // Relativise path, if possible.
-                        if (newFile.getPath().startsWith(dir)) {
-                            if ((newFile.getPath().length() > dir.length()) &&
-                                    (newFile.getPath().charAt(dir.length()) == File.separatorChar))
-                                flEntry.setLink(newFile.getPath().substring(1+dir.length()));
+                        String canPath = (new File(dir)).getCanonicalPath();
+                        if (newFile.getCanonicalPath().startsWith(canPath)) {
+                            if ((newFile.getPath().length() > canPath.length()) &&
+                                    (newFile.getPath().charAt(canPath.length()) == File.separatorChar))
+                                flEntry.setLink(newFile.getPath().substring(1+canPath.length()));
                             else
-                                flEntry.setLink(newFile.getPath().substring(dir.length()));
+                                flEntry.setLink(newFile.getPath().substring(canPath.length()));
 
 
                         }
