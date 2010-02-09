@@ -619,7 +619,8 @@ public class LabelPatternUtil {
 				authors = authors.concat(firstAuthor[j].substring(0,1));
 			}
 			// append last part of last name completely
-			authors = authors.concat(firstAuthor[firstAuthor.length-1].substring(0,3));
+			authors = authors.concat(firstAuthor[firstAuthor.length-1].substring(0,
+                    Math.min(3, firstAuthor[firstAuthor.length-1].length())));
     	} else {
     		for (int i = 0; i < max; i++) {
     			// replace all whitespaces by " "
