@@ -56,6 +56,10 @@ public class SaveSession {
         return encoding;
     }
 
+    public void setUseBackup(boolean useBackup) {
+        this.backup = useBackup;
+    }
+
     public void commit() throws SaveException {
         if (file == null)
             return;
@@ -66,7 +70,9 @@ public class SaveSession {
             try {
                 Util.copyFile(file, backupFile, true);
             } catch (IOException ex) {
-                throw new SaveException(Globals.lang("Save failed during backup creation")+": "+ex.getMessage());
+                ex.printStackTrace();
+                throw SaveException.BACKUP_CREATION;
+                //throw new SaveException(Globals.lang("Save failed during backup creation")+": "+ex.getMessage());
             }
         }
         try {

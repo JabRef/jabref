@@ -40,9 +40,11 @@ public class SaveException extends Exception
 
     public static final SaveException FILE_LOCKED = new SaveException
             (Globals.lang("Could not save, file locked by another JabRef instance."));
+    public static final SaveException BACKUP_CREATION = new SaveException
+            (Globals.lang("Unable to create backup"));
 
     private BibtexEntry entry;
-    private int status;
+    private int status = 0;
     //~ Constructors ///////////////////////////////////////////////////////////
 
     public SaveException(String message)

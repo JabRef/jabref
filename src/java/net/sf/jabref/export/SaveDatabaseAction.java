@@ -269,6 +269,16 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.setEncoding(encoding); // Make sure to remember which encoding we used.
             } else
                 session.cancel();
+        } catch (SaveException e) {
+            int ans = JOptionPane.showConfirmDialog(null, Globals.lang("Save failed during backup creation")+". "
+                +Globals.lang("Save without backup?"), Globals.lang("Unable to create backup"),
+                    JOptionPane.YES_NO_OPTION);
+            if (ans == JOptionPane.YES_OPTION) {
+                session.setUseBackup(false);
+                session.commit();
+                panel.setEncoding(encoding);
+            }
+            else commit = false;
         } catch (IOException e) {
             e.printStackTrace();
         }
