@@ -338,8 +338,8 @@ public class MSBibEntry {
 		if (bibtex.getField("journal") != null)
 			journalName = bibtex.getField("journal").toString();
 
-		if (bibtex.getField("issue") != null)
-			issue = bibtex.getField("issue").toString();
+		if (bibtex.getField("number") != null)
+			issue = bibtex.getField("number").toString();
 
 		if (bibtex.getField(MSBIB+"periodical") != null)
 			periodicalTitle = bibtex.getField(MSBIB+"periodical").toString();

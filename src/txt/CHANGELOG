@@ -1,3 +1,5 @@
+    - Changed Microsoft Office XML export so "number" rather than "issue" is exported
+      as <b:Issue>, which conforms with import format. 
     - Added confirmation dialog that allows saving without backup in cases when
       backup creation fails.
     - Fixed bug 2938562: using the move/rename feature on a file link could give an
