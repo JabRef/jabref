@@ -19,6 +19,8 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -45,6 +47,8 @@ public class DroppedFileHandler {
 
     private JCheckBox renameCheckBox = new JCheckBox();
 
+    private JTextField renameToTextBox = new JTextField(25);
+    
     private JPanel optionsPanel = new JPanel();
 
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {
@@ -58,13 +62,19 @@ public class DroppedFileHandler {
         grp.add(moveRadioButton);
         copyRadioButton.setSelected(true);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref", ""),
-			optionsPanel);
-        builder.append(linkInPlace);
-        builder.append(destDirLabel);
-        builder.append(copyRadioButton);
-        builder.append(moveRadioButton);
-        builder.append(renameCheckBox);
+        FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref","bottom:14pt,pref,pref,pref,pref");
+        layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
+        builder.setDefaultDialogBorder();
+        CellConstraints cc = new CellConstraints();
+        
+        builder.add(linkInPlace, cc.xyw(1, 1, 4));
+        builder.add(destDirLabel, cc.xyw(1, 2, 4));
+        builder.add(copyRadioButton, cc.xyw(2, 3, 3));        
+        builder.add(moveRadioButton, cc.xyw(2, 4, 3));
+        builder.add(renameCheckBox, cc.xyw(2, 5, 1));
+        builder.add(renameToTextBox, cc.xyw(4, 5, 1));
+        
     }
 
     /**
@@ -114,10 +124,8 @@ public class DroppedFileHandler {
 
         // Show dialog
         boolean newEntry = false;
-        boolean rename = entry.getCiteKey() != null && entry.getCiteKey().length() > 0;
-        String citeKeyOrReason = (rename ? entry.getCiteKey() : Globals.lang("Entry has no citekey"));
-        int reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to file %0", fileName),
-            fileType, rename, citeKeyOrReason, newEntry, false);
+        String citeKey = entry.getCiteKey();
+        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, citeKey, newEntry, false);
 
         if (reply != JOptionPane.OK_OPTION)
             return;
@@ -126,18 +134,18 @@ public class DroppedFileHandler {
          * Ok, we're ready to go. See first if we need to do a file copy before
          * linking:
          */
+        
         boolean success = true;
         String destFilename;
 
         if (linkInPlace.isSelected()) {
             destFilename = fileName;
         } else {
-            destFilename = (renameCheckBox.isSelected() ? entry.getCiteKey() + "." + fileType.extension
-                    : new File(fileName).getName());
+            destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, fileType, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doRename(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, fileType, destFilename, edits);
             }
         }
 
@@ -215,7 +223,7 @@ public class DroppedFileHandler {
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, fileType, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doRename(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, fileType, destFilename, edits);
             }
         }
         if (success) {
@@ -239,27 +247,34 @@ public class DroppedFileHandler {
         return true;
     }
 
-    public int showLinkMoveCopyRenameDialog(String dialogTitle, ExternalFileType fileType,
-        final boolean allowRename, String citekeyOrReason, boolean newEntry,
-        final boolean multipleEntries) {
-        
+    public int showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
+        String citeKey, boolean newEntry, final boolean multipleEntries) {
+    	
+    	String dialogTitle = Globals.lang("Link to file %0", linkFileName);
         //String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
         String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         if ((dir == null) || !(new File(dir)).exists()) {
-            destDirLabel.setText(Globals.lang("File directory is not set or does not exist!"));
+            destDirLabel.setText(Globals.lang("File directory is not set or does not exist."));
             copyRadioButton.setEnabled(false);
             moveRadioButton.setEnabled(false);
+            renameToTextBox.setEnabled(false);
+            renameCheckBox.setEnabled(false);
             linkInPlace.setSelected(true);
         } else {
             destDirLabel.setText(Globals.lang("File directory is '%0':", dir));
             copyRadioButton.setEnabled(true);
             moveRadioButton.setEnabled(true);
+            renameToTextBox.setEnabled(true);
+            renameCheckBox.setEnabled(true);
         }
         
         ChangeListener cl = new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				renameCheckBox.setEnabled(!linkInPlace.isSelected()
-						&& allowRename && (!multipleEntries));
+						&&  (!multipleEntries));
+				renameToTextBox.setEnabled(!linkInPlace.isSelected()
+						&&  (!multipleEntries));
+				if (multipleEntries) { renameToTextBox.setText("Multiple entries"); }
 			}
 		};
 
@@ -273,15 +288,17 @@ public class DroppedFileHandler {
 			linkInPlace.setText(Globals
 					.lang("Leave file in its current directory."));
 			copyRadioButton.setText(Globals.lang("Copy file to file directory."));
-			moveRadioButton.setText(Globals.lang("Move file to file directory"));
+			moveRadioButton.setText(Globals.lang("Move file to file directory."));
 		}
 		
-        renameCheckBox.setText(Globals.lang("Rename to match citekey") + ": " + citekeyOrReason);
+        renameCheckBox.setText(Globals.lang("Rename file to") + ": ");
+        renameToTextBox.setText(citeKey == null ? "default" : citeKey + "." + fileType.extension);
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
-            return JOptionPane.showConfirmDialog(frame, optionsPanel, dialogTitle,
+        	Object[] messages = {"How would you like to link to " + linkFileName + "?", optionsPanel}; 
+            return JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
         } finally {
             linkInPlace.removeChangeListener(cl);
@@ -357,7 +374,7 @@ public class DroppedFileHandler {
      *            TODO we should be able to undo this action
      * @return true if the operation succeeded.
      */
-    private boolean doRename(String fileName, ExternalFileType fileType, String destFilename,
+    private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
         NamedCompound edits) {
         String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         if ((dir == null) || !(new File(dir)).exists()) {
@@ -366,12 +383,26 @@ public class DroppedFileHandler {
             // This should not happen!!
             return false;
         }
-        destFilename = new File(destFilename).getName();
-        File f = new File(fileName);
-        File destFile = new File(new StringBuffer(dir).append(System.getProperty("file.separator"))
-            .append(destFilename).toString());
-        f.renameTo(destFile);
-        return true;
+        File fromFile = new File(fileName);
+        File toFile = new File(dir + System.getProperty("file.separator") + destFilename);
+        if (toFile.exists()) {
+        	int answer = JOptionPane.showConfirmDialog(frame,
+        			toFile.getAbsolutePath() + " exists. Overwrite?", "Overwrite file?", 
+        			JOptionPane.YES_NO_OPTION);
+        	if (answer == JOptionPane.NO_OPTION) {
+        		return false;
+        	}
+        }
+ 
+        if (!fromFile.renameTo(toFile)) {
+        	JOptionPane.showMessageDialog(frame,
+        			"There was an error moving the file. Please move the file manually and link in place.",
+        			"Error moving file", JOptionPane.ERROR_MESSAGE);
+        	return false;
+        } else {
+        	return true;
+        }
+
     }
 
     /**
@@ -409,7 +440,7 @@ public class DroppedFileHandler {
         
         if (destFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame, "'" + destFile.getPath() + "' "
-                + Globals.lang("exists.Overwrite?"), Globals.lang("File exists"),
+                + Globals.lang("exists. Overwrite?"), Globals.lang("File exists"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION)
                 return false;
