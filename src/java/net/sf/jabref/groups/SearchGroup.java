@@ -391,14 +391,16 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
 		else
 			sb.append(Util.quoteForHTML(getName()));
-        sb.append("</b> - dynamic group (" + "search expression: <b>").
+            /*sb.append(Globals.lang("</b> - dynamic group (search expression: <b>")).*/
+            sb.append(Globals.lang("</b> - dynamic group (")+ Globals.lang("search expression: <b>")).
+                    
             append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
-			sb.append(", includes subgroups");
+			sb.append(Globals.lang(", includes subgroups"));
 			break;
 		case AbstractGroup.REFINING:
-			sb.append(", refines supergroup");
+			sb.append(Globals.lang(", refines supergroup"));
 			break;
 		default:
 			break;

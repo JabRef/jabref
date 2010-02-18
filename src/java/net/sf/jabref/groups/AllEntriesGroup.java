@@ -115,7 +115,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
 	}
 	
 	public String getShortDescription() {
-		return "<b>All Entries</b> (this group cannot be edited or removed)";
+		return Globals.lang("<b>All Entries</b> (this group cannot be edited or removed)");
 	}
 
     public String getTypeId() {
