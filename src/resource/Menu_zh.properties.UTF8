@@ -88,7 +88,6 @@ Show_error_console=打开错误显示终端
 
 Sort_tabs=标签页排序_(&S)
 Switch_preview_layout=切换记录预览方式_(&S)
-Synchronize_file_links=自动同步所有文件链接
 Synchronize_PDF_links=自动同步_PDF_链接
 Synchronize_PS_links=自动同步_PS_链接
 # Export menu
@@ -142,5 +141,5 @@ Back=后退
 
 Manage_plugins=管理插件
 Look_up_full_text_document=查找完整文档
-Push_entries_to_external_application_(LyX/Kile)=推送选中记录到外部程序_(LyX/Kile)
+Set/clear_fields=
 

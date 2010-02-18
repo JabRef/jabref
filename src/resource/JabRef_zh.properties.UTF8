@@ -608,8 +608,6 @@ entry=记录
 
 Entry_editor=记录编辑器
 
-Entry_has_no_citekey=记录没有引用键值
-
 Entry_in_current_database=当前数据库中的记录
 
 Entry_in_import=Entry_in_import
@@ -655,7 +653,7 @@ Exceptions=异常
 Existing_file=已有文件
 
 exists._Overwrite_file?=已存在，覆盖文件？
-exists.Overwrite?=已存在，覆盖？
+exists._Overwrite?=已存在，覆盖？
 
 Expand_subtree=展开子树
 
@@ -1082,7 +1080,6 @@ Move_down=下移
 
 Move_entries_in_group_selection_to_the_top=移动选中分组的记录到顶部
 Move_external_links_to_'file'_field=移动外部链接到_'file'_域
-Move_file_to_file_directory=移动文件到文件目录
 Move_files_to_file_directory.=移动文件到文件目录。
 
 move_group=移动分组
@@ -1431,7 +1428,6 @@ Removed_group_"%0".=已移除分组_"%0"。
 Removed_group_"%0"_and_its_subgroups.=已移除分组_"%0"_和它的子分组。
 
 Removed_string=已移除简写字串
-Rename_to_match_citekey=重命名以匹配引用键值
 
 Renamed_string=重命名字符串
 
@@ -2136,3 +2132,17 @@ Before_saving,_please_edit_any_strings_containing_the_#_character.=
 
 Save_without_backup?=
 Unable_to_create_backup=
+
+File_directory_is_not_set_or_does_not_exist.=
+Move_file_to_file_directory.=
+Rename_file_to=
+Reset=
+<b>All_Entries</b>_(this_group_cannot_be_edited_or_removed)=
+</b>_-_static_group=
+,_refines_supergroup=
+,_includes_subgroups=
+</b>_-_dynamic_group_(<b>=
+</b>_contains_<b>=
+</b>_-_dynamic_group_(=
+search_expression\:_<b>=
+
