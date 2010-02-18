@@ -135,6 +135,8 @@ public class JabRefPreferences {
 			defaults.put("pdfviewer", "/Applications/Preview.app");
 			defaults.put("psviewer", "/Applications/Preview.app");
 			defaults.put("htmlviewer", "/Applications/Safari.app");
+            defaults.put("fontFamily", "SansSerif");
+
 		} else if (Globals.osName.toLowerCase().startsWith("windows")) {
 			defaults.put("pdfviewer", "cmd.exe /c start /b");
 			defaults.put("psviewer", "cmd.exe /c start /b");
@@ -142,11 +144,15 @@ public class JabRefPreferences {
 			defaults.put("lookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
+            defaults.put("fontFamily", "Arial");
+
         } else {
 			defaults.put("pdfviewer", "evince");
 			defaults.put("psviewer", "gv");
 			defaults.put("htmlviewer", "firefox");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+            defaults.put("fontFamily", "SansSerif");
+
 		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
@@ -261,7 +267,6 @@ public class JabRefPreferences {
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(8));
-        defaults.put("fontFamily", "SansSerif");
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));
         defaults.put("overrideDefaultFonts", Boolean.FALSE);
