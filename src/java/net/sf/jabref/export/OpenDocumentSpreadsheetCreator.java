@@ -53,7 +53,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             // Add manifest (required for OOo 2.0) and "meta.xml": These are in the
             // resource/ods directory, and are copied verbatim into the zip file.
             addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
-            //addResourceFile("mimetype", "/resource/openoffice/mimetype", out);
+            addResourceFile("mimetype", "/resource/ods/mimetype", out);
             addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
 
             //zipEntry = new ZipEntry()
