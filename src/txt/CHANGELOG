@@ -1,3 +1,4 @@
+    - Added Reset button to entry fetchers. Patch by Dennis Hartrampf and Ines Moosdorf.
     - Changed Microsoft Office XML export so "number" rather than "issue" is exported
       as <b:Issue>, which conforms with import format. 
     - Added confirmation dialog that allows saving without backup in cases when

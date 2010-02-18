@@ -43,8 +43,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     JPanel pan = new JPanel();
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
-    JButton go = new JButton(Globals.lang("Fetch")),
-    helpBut = new JButton(GUIGlobals.getImage("helpSmall"));
+    JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
+			GUIGlobals.getImage("helpSmall")), reset = new JButton(Globals
+			.lang("Reset"));
     HelpAction help;
     EntryFetcher fetcher;
     SidePaneManager sidePaneManager;
@@ -63,6 +64,15 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1,tf.getPreferredSize().height));
+        
+        tf.setName("tf");
+		// add action to reset-button. resets tf and requests focus
+		reset.addActionListener(new AbstractAction() {
+			public void actionPerformed(ActionEvent event) {
+				tf.setText("");
+				new FocusRequester(tf);
+			}
+		});
 
         JPanel main = new JPanel();
         main.setLayout(gbl);
@@ -79,13 +89,19 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         
         // Go Button
         con.weighty = 0;
-        if (fetcher.getHelpPage() != null){
-        	con.gridwidth = 1;
-        } else {
-        	con.gridwidth = GridBagConstraints.REMAINDER;
-        }
+        con.gridwidth = 1;
         gbl.setConstraints(go, con);
         main.add(go);
+        
+        // Reset Button
+		if (fetcher.getHelpPage() != null) {
+			con.gridwidth = 1;
+		} else {
+			con.gridwidth = GridBagConstraints.REMAINDER;
+		}
+		reset.setName("reset");
+		gbl.setConstraints(reset, con);
+		main.add(reset);
         
         // Help Button
 		if (fetcher.getHelpPage() != null) {
