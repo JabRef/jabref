@@ -12,6 +12,7 @@ public class AllTests {
 		suite.addTestSuite(IsiImporterTest.class);
 		suite.addTestSuite(CopacImporterTest.class);
 		suite.addTestSuite(BibtexParserTest.class);
+		suite.addTestSuite(GeneralFetcherTest.class);
 		//$JUnit-END$
 		return suite;
 	}
