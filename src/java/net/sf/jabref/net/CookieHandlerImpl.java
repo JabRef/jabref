@@ -36,12 +36,13 @@ public class CookieHandlerImpl extends CookieHandler {
                 Cookie cookie = new Cookie(uri, item);
                 // Remove cookie if it already exists
                 // New one will replace
-                for (Cookie existingCookie : cache) {
+                for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
+                    Cookie existingCookie = i.next();
                     if ((cookie.getURI().equals(
                             existingCookie.getURI())) &&
                             (cookie.getName().equals(
                                     existingCookie.getName()))) {
-                        cache.remove(existingCookie);
+                        i.remove();
                         break;
                     }
                 }
@@ -70,10 +71,12 @@ public class CookieHandlerImpl extends CookieHandler {
         // Retrieve all the cookies for matching URI
         // Put in comma-separated list
         StringBuilder cookies = new StringBuilder();
-        for (Cookie cookie : cache) {
+        for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
+        //for (Cookie cookie : cache) {
+            Cookie cookie = i.next();
             // Remove cookies that have expired
             if (cookie.hasExpired()) {
-                cache.remove(cookie);
+                i.remove();
             } else if (cookie.matches(uri)) {
                 if (cookies.length() > 0) {
                     cookies.append(", ");

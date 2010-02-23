@@ -1,3 +1,5 @@
+    - Added new JStor fetcher that utilizes the BibSonomy scraper to obtain BibTeX data.
+    - Fixed bug in CookieHandlerImpl.
     - Fixed bug; when dragging a file into JabRef and asking to move it to the file
       directory, warning will now be given if the destination file already exists. Patch
       by Alastair Mailer.
