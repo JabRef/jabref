@@ -35,8 +35,11 @@ public class JSTORFetcher2 implements EntryFetcher {
 
     protected static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next &gt;");
-    
+
+    protected static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
+
     protected boolean stopFetching = false;
+    protected boolean noAccessFound = false;
 
     public String getHelpPage() {
         return "JSTOR.html";
@@ -61,17 +64,25 @@ public class JSTORFetcher2 implements EntryFetcher {
 
     public void stopFetching() {
         stopFetching = true;
+        noAccessFound = false;
     }
 
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         stopFetching = false;
         try {
             List<String> citations = getCitations(query);
-
+            if (citations == null)
+                return false;
             if (citations.size() == 0){
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
+                if (!noAccessFound)
+                    status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
                         Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                else {
+                    status.showMessage(Globals.lang("No entries found. It looks like you do not have access to search JStor.",
+                        query),
+                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                }
                 return false;
             }
 
@@ -128,14 +139,21 @@ public class JSTORFetcher2 implements EntryFetcher {
         String entirePage = cont;
 
         Matcher m = idPattern.matcher(cont);
-        while (m.find()) {
-            ids.add(m.group(1));
-            cont = cont.substring(m.end());
-            m = idPattern.matcher(cont);
+        if (m.find()) {
+            while (m.find()) {
+                ids.add(m.group(1));
+                cont = cont.substring(m.end());
+                m = idPattern.matcher(cont);
+            }
         }
-
+        else if (entirePage.indexOf(noAccessIndicator) >= 0) {
+            noAccessFound = true;
+            return null;
+        }
+        else {
+            return null;
+        }
         m = nextPagePattern.matcher(entirePage);
-        System.out.println(m.find());
         if (m.find()) {
             String newQuery = JSTOR_URL+m.group(1);
             return newQuery;
@@ -162,43 +180,6 @@ public class JSTORFetcher2 implements EntryFetcher {
             ex.printStackTrace();
             return null;
         }
-    }
-    /**
-     * evaluates the 'Set-Cookie'-Header of a HTTP response
-     *
-     * @param name
-     *            key of a cookie value
-     * @param conn
-     *            URLConnection
-     * @return cookie value referenced by the key. null if key not found
-     * @throws java.io.IOException
-     */
-    public static String getCookie(String name, URLConnection conn) throws IOException {
-
-        for (int i = 0;; i++) {
-            String headerName = conn.getHeaderFieldKey(i);
-            String headerValue = conn.getHeaderField(i);
-
-            if (headerName == null && headerValue == null) {
-                // No more headers
-                break;
-            }
-            if (headerName != null && headerName.equals("Set-Cookie")) {
-                System.out.println("Cookie: '"+headerValue+"'");
-                if (headerValue.startsWith(name)) {
-                    // several key-value-pairs are separated by ';'
-                    StringTokenizer st = new StringTokenizer(headerValue, "; ");
-                    while (st.hasMoreElements()) {
-                        String token = st.nextToken();
-                        if (token.startsWith(name)) {
-                            return token;
-                        }
-                    }
-                }
-            }
-
-        }
-        return null;
     }
 
 }
