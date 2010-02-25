@@ -1100,8 +1100,6 @@ Name_formatter=姓名格式化器
 
 Natbib_style=Natbib_格式
 
-Native_file_dialog=本地文件对话框
-
 nested_aux_files=nested_aux_文件
 
 New=新建
@@ -2146,3 +2144,6 @@ Reset=
 </b>_-_dynamic_group_(=
 search_expression\:_<b>=
 
+Disable_file_renaming_in_non-native_file_dialog=
+File_dialog=
+No_entries_found._It_looks_like_you_do_not_have_access_to_search_JStor.=
