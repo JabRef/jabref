@@ -1,3 +1,6 @@
+    - Changed non-native file dialog setting so files cannot be renamed. This prevents
+      accidentally entering rename mode when trying to enter directory. Can be enabled
+      again in Options -> Preferences -> Advanced.
     - Added new JStor fetcher that utilizes the BibSonomy scraper to obtain BibTeX data.
     - Fixed bug in CookieHandlerImpl.
     - Fixed bug; when dragging a file into JabRef and asking to move it to the file

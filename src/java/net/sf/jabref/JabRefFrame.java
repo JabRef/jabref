@@ -393,6 +393,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   private void init() {
 
         macOSXRegistration();
+
+        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
+      
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
         // glassPane.setVisible(true);

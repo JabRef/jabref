@@ -379,6 +379,7 @@ public class JabRefPreferences {
         defaults.put("floatMarkedEntries", Boolean.TRUE);
 
         defaults.put("useNativeFileDialogOnMac", Boolean.FALSE);
+        defaults.put("filechooserDisableRename", Boolean.TRUE);
 
         defaults.put("lastUsedExport", null);
         defaults.put("sidePaneWidth", new Integer(-1));

@@ -21,7 +21,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel pan = new JPanel(),
         lnf = new JPanel();
     JLabel lab;
-    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, useIEEEAbrv;
+    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename, useIEEEAbrv;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -40,6 +40,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
     useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
     useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
+    filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
@@ -102,10 +103,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     //if (Globals.ON_MAC) {
     builder.nextLine();
-    builder.appendSeparator(Globals.lang("Native file dialog"));
+    builder.appendSeparator(Globals.lang("File dialog"));
     builder.nextLine();
     builder.append(new JPanel());
     builder.append(useNativeFileDialogOnMac);
+    builder.nextLine();
+    builder.append(new JPanel());
+    builder.append(filechooserDisableRename);
     //}
 	// IEEE
     builder.nextLine();
@@ -131,6 +135,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     oldPort = _prefs.getInt("remoteServerPort");
     remoteServerPort.setText(String.valueOf(oldPort));
     useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
+    filechooserDisableRename.setSelected(Globals.prefs.getBoolean("filechooserDisableRename"));
     useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
     }
 
@@ -138,6 +143,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
         _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
+        _prefs.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
+        UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
         _prefs.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected())
         	Globals.journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
