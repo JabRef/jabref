@@ -1,3 +1,4 @@
+2.6b3    
     - Changed non-native file dialog setting so files cannot be renamed. This prevents
       accidentally entering rename mode when trying to enter directory. Can be enabled
       again in Options -> Preferences -> Advanced.

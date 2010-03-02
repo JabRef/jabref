@@ -27,9 +27,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     protected static final String SINGLE_CIT_ENC =
             "http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
             +"%3Dtrue%26suffix%3D";
-    protected static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
-    protected static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
-
+    
     protected static final Pattern idPattern = Pattern.compile(
             "<a class=\"title\" href=\"/stable/(\\d+)\\?");
 
@@ -163,23 +161,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     protected BibtexEntry getSingleCitation(String cit) {
-        String jstorEntryUrl = SINGLE_CIT_ENC+cit;
-        try {
-            URL url = new URL(BIBSONOMY_SCRAPER+jstorEntryUrl+BIBSONOMY_SCRAPER_POST);
-            URLDownload ud = new URLDownload(url);
-            ud.download();
-            String bibtex = ud.getStringContent();
-            BibtexParser bp = new BibtexParser(new StringReader(bibtex));
-            ParserResult pr = bp.parse();
-            if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
-                return pr.getDatabase().getEntries().iterator().next();
-            }
-            else return null;
-            
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        return BibsonomyScraper.getEntry(SINGLE_CIT_ENC+cit);
     }
 
 }
