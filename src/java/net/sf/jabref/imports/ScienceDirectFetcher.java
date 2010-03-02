@@ -7,41 +7,37 @@ import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.net.URLDownload;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class JSTORFetcher2 implements EntryFetcher {
+public class ScienceDirectFetcher implements EntryFetcher {
 
     protected static int MAX_PAGES_TO_LOAD = 8;
-    protected static final String JSTOR_URL = "http://www.jstor.org";
-    protected static final String SEARCH_URL = JSTOR_URL+"/action/doBasicSearch?Query=";
-    protected static final String SEARCH_URL_END = "&x=0&y=0&wc=on";
-    protected static final String SINGLE_CIT_ENC =
-            "http://www.jstor.org/action/exportSingleCitation?singleCitation=true&suffix=";
-            //"http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
-            //+"%3Dtrue%26suffix%3D";
-    
-    protected static final Pattern idPattern = Pattern.compile(
-            "<a class=\"title\" href=\"/stable/(\\d+)\\?");
+    protected static final String WEBSITE_URL = "http://www.sciencedirect.com";
+    protected static final String SEARCH_URL = WEBSITE_URL +"/science/quicksearch?query=";
+
+    protected static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&" ;
+    protected static final Pattern linkPattern = Pattern.compile(
+            "<a href=\""+
+            linkPrefix.replaceAll("\\?", "\\\\?")+
+            "([^\"]+)\"\"");
 
     protected static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next &gt;");
 
-    protected static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
 
     protected boolean stopFetching = false;
     protected boolean noAccessFound = false;
 
     public String getHelpPage() {
-        return "JSTOR.html";
+        return "ScienceDirect.html";
     }
 
     public URL getIcon() {
@@ -49,7 +45,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Search JSTOR";
+        return "Search ScienceDirect";
     }
 
     public JPanel getOptionsPanel() {
@@ -58,7 +54,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     public String getTitle() {
-        return Globals.menuTitle("Search JSTOR");
+        return Globals.menuTitle("Search ScienceDirect");
     }
 
     public void stopFetching() {
@@ -73,15 +69,9 @@ public class JSTORFetcher2 implements EntryFetcher {
             if (citations == null)
                 return false;
             if (citations.size() == 0){
-                if (!noAccessFound)
-                    status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        query),
-                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
-                else {
-                    status.showMessage(Globals.lang("No entries found. It looks like you do not have access to search JStor.",
-                        query),
-                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
-                }
+                status.showMessage(Globals.lang("No entries found for the search string '%0'",
+                    query),
+                    Globals.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -89,17 +79,17 @@ public class JSTORFetcher2 implements EntryFetcher {
             for (String cit : citations) {
                 if (stopFetching)
                     break;
-                BibtexEntry entry = getSingleCitation(cit);
+                BibtexEntry entry = BibsonomyScraper.getEntry(cit);
                 if (entry != null)
                     dialog.addEntry(entry);
                 dialog.setProgress(++i, citations.size());
             }
 
             return true;
-            
+
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Globals.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
+            status.showMessage(Globals.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
         }
         return false;
     }
@@ -115,7 +105,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
-            urlQuery = SEARCH_URL + URLEncoder.encode(query, "UTF-8") + SEARCH_URL_END;
+            urlQuery = SEARCH_URL + URLEncoder.encode(query, "UTF-8");
             int count = 1;
             String nextPage = null;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
@@ -135,34 +125,27 @@ public class JSTORFetcher2 implements EntryFetcher {
         ud.download();
 
         String cont = ud.getStringContent();
-        String entirePage = cont;
-
-        Matcher m = idPattern.matcher(cont);
+        //String entirePage = cont;
+        Matcher m = linkPattern.matcher(cont);
         if (m.find()) {
             while (m.find()) {
-                ids.add(m.group(1));
+                ids.add(linkPrefix+m.group(1));
                 cont = cont.substring(m.end());
-                m = idPattern.matcher(cont);
+                m = linkPattern.matcher(cont);
             }
         }
-        else if (entirePage.indexOf(noAccessIndicator) >= 0) {
-            noAccessFound = true;
-            return null;
-        }
+
         else {
             return null;
         }
-        m = nextPagePattern.matcher(entirePage);
+        /*m = nextPagePattern.matcher(entirePage);
         if (m.find()) {
-            String newQuery = JSTOR_URL+m.group(1);
+            String newQuery = WEBSITE_URL +m.group(1);
             return newQuery;
         }
-        else
+        else*/
             return null;
     }
 
-    protected BibtexEntry getSingleCitation(String cit) {
-        return BibsonomyScraper.getEntry(SINGLE_CIT_ENC+cit);
-    }
 
 }

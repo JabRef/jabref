@@ -1,4 +1,5 @@
-2.6b3    
+2.6b3
+    - Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.
     - Changed non-native file dialog setting so files cannot be renamed. This prevents
       accidentally entering rename mode when trying to enter directory. Can be enabled
       again in Options -> Preferences -> Advanced.

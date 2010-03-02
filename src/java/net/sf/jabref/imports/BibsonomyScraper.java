@@ -1,6 +1,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Util;
 import net.sf.jabref.net.URLDownload;
 
 import java.io.IOException;
@@ -23,6 +24,10 @@ public class BibsonomyScraper {
      */
     public static BibtexEntry getEntry(String entryUrl) {
         try {
+            // Replace special characters by corresponding sequences:
+            entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F")
+                    .replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
+                    
             URL url = new URL(BIBSONOMY_SCRAPER+entryUrl+BIBSONOMY_SCRAPER_POST);
             URLDownload ud = new URLDownload(url);
             ud.download();
