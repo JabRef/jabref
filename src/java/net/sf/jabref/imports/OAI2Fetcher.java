@@ -124,7 +124,7 @@ public class OAI2Fetcher implements EntryFetcher {
      * Construct the query URL
      * 
      * @param key
-     *            The key of the OAI2 entry that the url should poitn to.
+     *            The key of the OAI2 entry that the url should point to.
      *            
      * @return a String denoting the query URL
      */
@@ -146,7 +146,7 @@ public class OAI2Fetcher implements EntryFetcher {
     }
     
     /**
-     * Strip subccategories from ArXiv key.
+     * Strip subcategories from ArXiv key.
      * 
      * @param key The key to fix.
      * @return Fixed key.

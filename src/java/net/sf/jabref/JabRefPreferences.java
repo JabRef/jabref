@@ -868,6 +868,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Unmark entries", "ctrl shift M");
         defKeyBinds.put("Fetch Medline", "F5");
         defKeyBinds.put("Fetch CiteSeer", "F6");
+        defKeyBinds.put("Search ScienceDirect", "ctrl F5");
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
