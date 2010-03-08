@@ -826,6 +826,10 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
          "owner", "timestamp", "review", };
     }
 
+    public String[] getPrimaryOptionalFields() {
+        return null;
+    }
+
     public abstract String describeRequiredFields();
 
     public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
@@ -855,30 +859,35 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
     public static TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
     public static TreeMap<String, BibtexEntryType> STANDARD_TYPES = new TreeMap<String, BibtexEntryType>();
     static {
-	// Put the standard entry types into the type map.
-	ALL_TYPES.put("article", ARTICLE);
-	ALL_TYPES.put("inbook", INBOOK);
-	ALL_TYPES.put("book", BOOK);
-	ALL_TYPES.put("booklet", BOOKLET);
-	ALL_TYPES.put("incollection", INCOLLECTION);
-    ALL_TYPES.put("conference", CONFERENCE);
-	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
-	ALL_TYPES.put("proceedings", PROCEEDINGS);
-	ALL_TYPES.put("manual", MANUAL);
-	ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
-	ALL_TYPES.put("phdthesis", PHDTHESIS);
-	ALL_TYPES.put("techreport", TECHREPORT);
-	ALL_TYPES.put("unpublished", UNPUBLISHED);
-	ALL_TYPES.put("patent", PATENT);
-	ALL_TYPES.put("standard", STANDARD);
-	ALL_TYPES.put("electronic", ELECTRONIC);
-	ALL_TYPES.put("periodical", PERIODICAL);
-    ALL_TYPES.put("misc", MISC);
-    ALL_TYPES.put("other", OTHER);
+        // Put the standard entry types into the type map.
+        if (!Globals.prefs.getBoolean("biblatexMode")) {
+            ALL_TYPES.put("article", ARTICLE);
+            ALL_TYPES.put("inbook", INBOOK);
+            ALL_TYPES.put("book", BOOK);
+            ALL_TYPES.put("booklet", BOOKLET);
+            ALL_TYPES.put("incollection", INCOLLECTION);
+            ALL_TYPES.put("conference", CONFERENCE);
+            ALL_TYPES.put("inproceedings", INPROCEEDINGS);
+            ALL_TYPES.put("proceedings", PROCEEDINGS);
+            ALL_TYPES.put("manual", MANUAL);
+            ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
+            ALL_TYPES.put("phdthesis", PHDTHESIS);
+            ALL_TYPES.put("techreport", TECHREPORT);
+            ALL_TYPES.put("unpublished", UNPUBLISHED);
+            ALL_TYPES.put("patent", PATENT);
+            ALL_TYPES.put("standard", STANDARD);
+            ALL_TYPES.put("electronic", ELECTRONIC);
+            ALL_TYPES.put("periodical", PERIODICAL);
+            ALL_TYPES.put("misc", MISC);
+            ALL_TYPES.put("other", OTHER);
+        }
+        else {
+            ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
+        }
 
-	// We need a record of the standard types, in case the user wants
-	// to remove a customized version. Therefore we clone the map.
-	STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);
+        // We need a record of the standard types, in case the user wants
+        // to remove a customized version. Therefore we clone the map.
+        STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);
     }
 
     /**

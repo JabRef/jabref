@@ -24,11 +24,17 @@
  */
 package net.sf.jabref;
 
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.KeyboardFocusManager;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.FileListEditor;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -36,30 +42,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
-
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
-import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.FileListEditor;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
- * 
+ *
  * @author $Author$
  * @version $Revision$ ($Date$)
- * 
+ *
  */
-public class EntryEditorTab {
+public class CompressedEntryEditorTab extends EntryEditorTab {
 
 	private JPanel panel = new JPanel();
 
@@ -71,11 +61,7 @@ public class EntryEditorTab {
 
 	private FieldEditor activeField = null;
 
-    protected EntryEditorTab() {
-
-    }
-
-	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
+	public CompressedEntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
                           boolean addKeyField, String name) {
 		if (fields != null)
 			this.fields = fields.toArray(new String[0]);
@@ -95,7 +81,7 @@ public class EntryEditorTab {
 
 
     void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField, String title) {
-    	
+
     	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
 		ActionMap am = panel.getActionMap();
 
@@ -120,13 +106,15 @@ public class EntryEditorTab {
 		am.put("nexttab", parent.frame.nextTab);
 		im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
 		am.put("prevtab", parent.frame.prevTab);
-    	
-    	  	
+
+
         panel.setName(title);
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
-        String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
+        String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref, "
+                +"8dlu, fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < fields.length; i++) {
+        int rows = (int)Math.ceil((double)fields.length/2.0);
+        for (int i = 0; i < rows; i++) {
             sb.append("fill:pref:grow, ");
         }
         if (addKeyField)
@@ -148,7 +136,7 @@ public class EntryEditorTab {
             else
                 ta = new FieldTextArea(fields[i], null);
             //ta.addUndoableEditListener(bPanel.undoListener);
-            
+
             JComponent ex = parent.getExtra(fields[i], ta);
 
             // Add autocompleter listener, if required for this field:
@@ -165,8 +153,8 @@ public class EntryEditorTab {
             if (i == 0)
                 activeField = ta;
             //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
-            ta.getPane().setPreferredSize(new Dimension(100,
-                    (int)(50.0*BibtexFields.getFieldWeight(fields[i]))));
+            //ta.getPane().setPreferredSize(new Dimension(100,
+            //        (int)(50.0*BibtexFields.getFieldWeight(fields[i]))));
             builder.append(ta.getLabel());
             if (ex == null)
                 builder.append(ta.getPane(), 3);
@@ -177,7 +165,7 @@ public class EntryEditorTab {
                 pan.add(ex, BorderLayout.NORTH);
                 builder.append(pan);
             }
-            builder.nextLine();
+            if (i%2 == 1) builder.nextLine();
         }
 
         // Add the edit field for Bibtex-key.
@@ -186,7 +174,7 @@ public class EntryEditorTab {
 				.getEntry().getField(BibtexFields.KEY_FIELD), true);
             //tf.addUndoableEditListener(bPanel.undoListener);
 			setupJTextComponent(tf, null);
-            
+
 			editors.put("bibtexkey", tf);
 			/*
 			 * If the key field is the only field, we should have only one
@@ -232,9 +220,9 @@ public class EntryEditorTab {
 
 	/**
 	 * Only sets the activeField variable but does not focus it.
-	 * 
+	 *
 	 * Call activate afterwards.
-	 * 
+	 *
 	 * @param c
 	 */
 	public void setActive(FieldEditor c) {
@@ -260,7 +248,7 @@ public class EntryEditorTab {
 
 	/**
 	 * Reset all fields from the data in the BibtexEntry.
-	 * 
+	 *
 	 */
 	public void updateAll() {
 		setEntry(getEntry());
@@ -319,7 +307,7 @@ public class EntryEditorTab {
 
 	/**
 	 * Set up key bindings and focus listener for the FieldEditor.
-	 * 
+	 *
 	 * @param component
 	 */
 	public void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
@@ -385,11 +373,11 @@ public class EntryEditorTab {
 	/*
 	 * Focus listener that fires the storeFieldAction when a FieldTextArea loses
 	 * focus.
-	 * 
+	 *
 	 * TODO: It would be nice to test this thoroughly.
 	 */
 	FocusListener fieldListener = new FocusListener() {
-	
+
 		JTextComponent c;
 
 		DocumentListener d;

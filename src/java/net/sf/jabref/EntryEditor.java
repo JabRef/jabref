@@ -247,11 +247,29 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         tabs.add(reqPan);
 
         if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
-            optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
-                false, Globals.lang("Optional fields"));
-            tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
-                .getPane(), Globals.lang("Show optional fields"));
-            tabs.add(optPan);
+            if (!prefs.getBoolean("biblatexMode")) {
+                optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
+                    false, Globals.lang("Optional fields"));
+                tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
+                    .getPane(), Globals.lang("Show optional fields"));
+                tabs.add(optPan);
+            }
+            else {
+                optPan = new CompressedEntryEditorTab(frame, panel,
+                        java.util.Arrays.asList(entry.getType().getPrimaryOptionalFields()), this,
+                    false, Globals.lang("Optional fields"));
+                tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
+                    .getPane(), Globals.lang("Show optional fields"));
+                tabs.add(optPan);
+                optPan = new CompressedEntryEditorTab(frame, panel,
+                        java.util.Arrays.asList(Util.getRemainder(entry.getOptionalFields(),
+                                entry.getType().getPrimaryOptionalFields())), this,
+                    false, Globals.lang("Optional fields 2"));
+                tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan
+                    .getPane(), Globals.lang("Show optional fields"));
+                tabs.add(optPan);
+
+            }
         }
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();

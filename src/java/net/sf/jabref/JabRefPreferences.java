@@ -401,6 +401,8 @@ public class JabRefPreferences {
         
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
 
+        defaults.put("biblatexMode", Boolean.FALSE);
+
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

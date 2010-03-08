@@ -2862,4 +2862,26 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         lock.delete();
         return true;
     }
+
+    /**
+     * Build a String array containing all those elements of all that are not
+     * in subset.
+     * @param all The array of all values.
+     * @param subset The subset of values.
+     * @return The remainder that is not part of the subset.
+     */
+    public static String[] getRemainder(String[] all, String[] subset) {
+        ArrayList<String> al = new ArrayList<String>();
+        for (int i = 0; i < all.length; i++) {
+            boolean found = false;
+            inner: for (int j = 0; j < subset.length; j++) {
+                if (subset[j].equals(all[i])) {
+                    found = true;
+                    break inner;
+                }
+            }
+            if (!found) al.add(all[i]);
+        }
+        return al.toArray(new String[al.size()]);
+    }
 }

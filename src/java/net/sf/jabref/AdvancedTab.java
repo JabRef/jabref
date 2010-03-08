@@ -21,14 +21,15 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel pan = new JPanel(),
         lnf = new JPanel();
     JLabel lab;
-    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename, useIEEEAbrv;
+    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
+            useIEEEAbrv, biblatexMode;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
     JPanel p1 = new JPanel(),
         p2 = new JPanel();
     String oldLnf = "";
-    boolean oldUseDef;
+    boolean oldUseDef, oldBiblMode=false;
     int oldPort = -1;
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
@@ -42,6 +43,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
     filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
+    biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -50,6 +52,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             clName.setEnabled(((JCheckBox)e.getSource()).isSelected());
         }
         });
+
 
     FormLayout layout = new FormLayout
         ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
@@ -118,6 +121,11 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.append(new JPanel());
     builder.append(useIEEEAbrv);
 
+    builder.nextLine();
+    builder.appendSeparator(Globals.lang("BibLaTeX mode"));
+    builder.append(new JPanel());
+    builder.append(biblatexMode);
+
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setLayout(new BorderLayout());
@@ -126,17 +134,19 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     }
 
     public void setValues() {
-    oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
-    oldLnf = _prefs.get("lookAndFeel");
-    useDefault.setSelected(!oldUseDef);
-    className.setText(oldLnf);
-    className.setEnabled(!oldUseDef);
-    useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
-    oldPort = _prefs.getInt("remoteServerPort");
-    remoteServerPort.setText(String.valueOf(oldPort));
-    useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
-    filechooserDisableRename.setSelected(Globals.prefs.getBoolean("filechooserDisableRename"));
-    useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
+        oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
+        oldLnf = _prefs.get("lookAndFeel");
+        useDefault.setSelected(!oldUseDef);
+        className.setText(oldLnf);
+        className.setEnabled(!oldUseDef);
+        useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
+        oldPort = _prefs.getInt("remoteServerPort");
+        remoteServerPort.setText(String.valueOf(oldPort));
+        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
+        filechooserDisableRename.setSelected(Globals.prefs.getBoolean("filechooserDisableRename"));
+        useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
+        oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
+        biblatexMode.setSelected(oldBiblMode);
     }
 
     public void storeSettings() {
@@ -173,11 +183,19 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             JabRef.remoteListener = null;
         }
 
+        _prefs.putBoolean("biblatexMode", biblatexMode.isSelected());
+
         if ((useDefault.isSelected() == oldUseDef) ||
             !oldLnf.equals(className.getText())) {
             JOptionPane.showMessageDialog(null, Globals.lang("You have changed the look and feel setting. "
                                                              +"You must restart JabRef for this to come into effect."), Globals.lang("Changed look and feel settings"),
                                           JOptionPane.WARNING_MESSAGE);
+        }
+
+        if (biblatexMode.isSelected() != oldBiblMode) {
+            JOptionPane.showMessageDialog(null, Globals.lang("You have toggled the BibLaTeX mode. "
+                    +"You must restart JabRef for this change to come into effect."),
+                    Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
     }
 
