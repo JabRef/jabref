@@ -883,6 +883,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         }
         else {
             ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
+            ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
         }
 
         // We need a record of the standard types, in case the user wants

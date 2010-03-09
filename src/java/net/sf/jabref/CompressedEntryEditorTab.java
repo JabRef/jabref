@@ -110,8 +110,8 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 
         panel.setName(title);
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
-        String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref, "
-                +"8dlu, fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
+        String colSpec = "fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref, "
+                +"8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
         int rows = (int)Math.ceil((double)fields.length/2.0);
         for (int i = 0; i < rows; i++) {

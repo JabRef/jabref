@@ -42,6 +42,37 @@ public class BibLatexEntryTypes {
         }
     };
 
+    public static final BibtexEntryType BOOK = new BibtexEntryType() {
+        public String getName() {
+            return "Book";
+        }
+        public String[] getRequiredFields() {
+            return new String[] {"author", "title", "year", "date"};
+        }
+        public String[] getOptionalFields() {
+            return new String[] {"editor", "editora", "editorb", "editorc", "translator",
+                "annotator", "commentator", "introduction",
+                "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                "maintitleaddon", "language", "origlanguage", "volume", "part",
+                "edition", "volumes", "series", "number", "note", "publisher",
+                "location", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
+                "doi", "eprint", "eprinttype", "url", "urldate"};
+        }
+
+        public String[] getPrimaryOptionalFields() {
+            return new String[] {"editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
+                "pagetotal", "doi", "eprint", "eprinttype", "url", "urldate"};
+        }
+
+        public String describeRequiredFields() {
+            return "";
+        }
+        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
+            return entry.allFieldsPresent(getRequiredFields(), database);
+        }
+    };
+
     /*public static final BibtexEntryType ARTICLE = new BibtexEntryType() {
         public String getName() {
             return "Article";
@@ -50,6 +81,9 @@ public class BibLatexEntryTypes {
             return new String[] {};
         }
         public String[] getOptionalFields() {
+            return new String[] {};
+        }
+        public String[] getPrimaryOptionalFields() {
             return new String[] {};
         }
         public String describeRequiredFields() {
