@@ -133,9 +133,8 @@ public class JabRef {
 					 * through the socket to another JabRef instance. So we
 					 * assume it's all taken care of, and quit.
 					 */
-					System.out
-							.println(Globals
-									.lang("Arguments passed on to running JabRef instance. Shutting down."));
+					System.out.println(
+                            Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
 					System.exit(0);
 				}
 			} else {
@@ -397,8 +396,9 @@ public class JabRef {
 
 	if (importPrefs.isInvoked()) {
 	    try {
-		Globals.prefs.importPreferences(importPrefs.getStringValue());
-		BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
+		    Globals.prefs.importPreferences(importPrefs.getStringValue());
+		    BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
+            ExportFormats.initAllExports();
 	    }
 	    catch (IOException ex) {
 		Util.pr(ex.getMessage());

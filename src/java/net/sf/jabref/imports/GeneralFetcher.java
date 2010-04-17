@@ -122,6 +122,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         tf.addActionListener(this);
     }
 
+    public void setHelpResourceOwner(Class c) {
+        help.setResourceOwner(c);
+    }
+
     public JTextField getTextField() {
         return tf;
     }
@@ -154,7 +158,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
         public FetcherAction() {
             super(fetcher.getTitle(), new ImageIcon(fetcher.getIcon()));
-            putValue(ACCELERATOR_KEY, Globals.prefs.getKey(fetcher.getKeyName()));
+            if ((fetcher.getKeyName() != null) && (fetcher.getKeyName().length() > 0))
+                putValue(ACCELERATOR_KEY, Globals.prefs.getKey(fetcher.getKeyName()));
         }
         public void actionPerformed(ActionEvent e) {
         	String fetcherTitle = fetcher.getTitle();

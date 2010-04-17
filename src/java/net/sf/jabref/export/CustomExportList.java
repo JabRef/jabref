@@ -51,13 +51,20 @@ public class CustomExportList {
 		String[] s;
 		while ((s = Globals.prefs.getStringArray("customExportFormat" + i)) != null) {
             ExportFormat format = createFormat(s);
-			formats.put(format.getConsoleName(), format);
-			list.add(s);
+            if (format != null) {
+                formats.put(format.getConsoleName(), format);
+    			list.add(s);
+            } else {
+                System.out.println(Globals.lang("Error initializing custom export format from string '%0'",
+                    Globals.prefs.get("customExportFormat" + i)));
+            }
 			i++;
 		}
 	}
 
     private ExportFormat createFormat(String[] s) {
+        if (s.length < 3)
+            return null;
 		String lfFileName;
 		if (s[1].endsWith(".layout"))
 			lfFileName = s[1].substring(0, s[1].length() - 7);

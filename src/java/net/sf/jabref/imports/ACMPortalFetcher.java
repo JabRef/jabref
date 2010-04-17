@@ -5,7 +5,7 @@
 
 package net.sf.jabref.imports;
 
-import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,36 +31,30 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Mar 25, 2006
- * Time: 1:09:32 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ACMPortalFetcher implements EntryFetcher {
 
 	ImportInspector dialog = null;
 	OutputPrinter status;
-    HTMLConverter htmlConverter = new HTMLConverter();
+    final HTMLConverter htmlConverter = new HTMLConverter();
     private String terms;
     String startUrl = "http://portal.acm.org/";
     String searchUrlPart = "results.cfm?query=";
     String searchUrlPartII = "&dl=";
-    String endUrl = "&coll=Portal&short=1";//&start=";
+    String endUrl = "&coll=Portal&short=0";//&start=";
 
-    private static final int MAX_FETCH = 50; // 20 when short=0
-    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
-    private boolean shouldContinue = false;
     private JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
     private JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
-    private JCheckBox fetchAstracts = new JCheckBox(Globals.lang("Include abstracts"), false);
-    private boolean fetchingAbstracts = false;
+    private JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
+    
+    private static final int MAX_FETCH = 20; // 20 when short=0
+    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
+    private boolean shouldContinue = false;
+    private boolean fetchAbstract = false;
     private boolean acmOrGuide = false;
 
     Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b> of.*");
     Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
-    Pattern risPattern = Pattern.compile(".*(popBibTex.cfm.*)','BibTex'.*");
+    Pattern bibPattern = Pattern.compile(".*(popBibTex.cfm.*)','BibTex'.*");
     Pattern absPattern = Pattern.compile(".*ABSTRACT</A></span>\\s+<p class=\"abstract\">\\s+(.*)");
     
     Pattern fullCitationPattern =
@@ -68,17 +62,18 @@ public class ACMPortalFetcher implements EntryFetcher {
 
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
-        pan.setLayout(new BorderLayout());
+        pan.setLayout(new GridLayout(0,1));
 
-        acmButton.setSelected(true);
+        guideButton.setSelected(true);
         
         ButtonGroup group = new ButtonGroup();
         group.add(acmButton);
         group.add(guideButton);
-        pan.add(fetchAstracts, BorderLayout.NORTH);
-        pan.add(acmButton, BorderLayout.CENTER);
-        pan.add(guideButton, BorderLayout.SOUTH);
-
+        
+        pan.add(absCheckBox);
+        pan.add(acmButton);
+        pan.add(guideButton);
+        
         return pan;
     }
 
@@ -128,13 +123,13 @@ public class ACMPortalFetcher implements EntryFetcher {
             
             if (hits > MAX_FETCH) {
                 status.showMessage(Globals.lang("%0 entries found. To reduce server load, "
-                        +"only %1 will be downloaded.",
+                        +"only %1 will be downloaded. It will be very slow, in order to make ACM happy.",
                                 new String[] {String.valueOf(hits), String.valueOf(MAX_FETCH)}),
                         Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 hits = MAX_FETCH;
             }
         
-            fetchingAbstracts = fetchAstracts.isSelected();
+            fetchAbstract = absCheckBox.isSelected();
             //parse(dialog, page, 0, 51);
             //dialog.setProgress(perPage/2, hits);
             parse(dialog, page, 0, 1);
@@ -193,18 +188,21 @@ public class ACMPortalFetcher implements EntryFetcher {
                 parsed++;
             }
             entryNumber++;
-            //break;
+            try {
+            	Thread.sleep(10000);//wait between requests or you will be blocked by ACM
+            } catch (InterruptedException e) {
+            	System.err.println(e.getStackTrace());
+            }
         }
     }
 
-    private BibtexEntry parseEntryBibTeX(String fullCitation, boolean abs)
-        throws IOException
-    {
+    private BibtexEntry parseEntryBibTeX(String fullCitation, boolean abs) throws IOException {
         URL url;
         try {
             url = new URL(startUrl + fullCitation);
         	String page = getResults(url);
-			Matcher bibtexAddr = risPattern.matcher(page);
+			Thread.sleep(10000);//wait between requests or you will be blocked by ACM
+			Matcher bibtexAddr = bibPattern.matcher(page);
 			if (bibtexAddr.find()) {
 				URL bibtexUrl = new URL(startUrl + bibtexAddr.group(1));
 				BufferedReader in = new BufferedReader(new InputStreamReader(bibtexUrl.openStream()));
@@ -222,6 +220,8 @@ public class ACMPortalFetcher implements EntryFetcher {
 						//System.out.println(page);
 					}
 				}
+				
+				Thread.sleep(10000);//wait between requests or you will be blocked by ACM
 				return entry;
 			} else
 				return null;
@@ -234,11 +234,13 @@ public class ACMPortalFetcher implements EntryFetcher {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return null;
 		}
     }
 
-    private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber)
-    {
+    private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber) {
         String toFind = new StringBuffer().append("<strong>")
                 .append(entryNumber).append("</strong>").toString();
         int index = allText.indexOf(toFind, startIndex);
@@ -256,10 +258,11 @@ public class ACMPortalFetcher implements EntryFetcher {
 				fullCitationPattern.matcher(text);
 			if (fullCitation.find()) {
 				try {
-					entry = parseEntryBibTeX(fullCitation.group(1), fetchingAbstracts);
-				} catch (IOException e) {
-					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-				}
+					Thread.sleep(10000);//wait between requests or you will be blocked by ACM
+					entry = parseEntryBibTeX(fullCitation.group(1), fetchAbstract);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}  
 			} else {
 				System.out.printf("Citation Unmatched %d\n", entryNumber);
 				System.out.printf(text);

@@ -586,25 +586,40 @@ public class Util {
 				link = canonicalLink;
 		}
 
-		String cmdArray[] = new String[2];
 		if (fieldName.equals("url")) { // html
 			try {
 				link = sanitizeUrl(link);
-
+                ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
 				if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
+
+                    String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+                            new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), link } :
+                            new String[] { "/usr/bin/open", link };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
-					openFileOnWindows(link, false);
+
+                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                        // Application is specified. Use it:
+                        openFileWithApplicationOnWindows(link, fileType.getOpenWith());
+                    } else
+                        openFileOnWindows(link, true);
 				} else {
-					cmdArray[0] = Globals.prefs.get("htmlviewer");
-					cmdArray[1] = link;
-					Runtime.getRuntime().exec(cmdArray);
+                    // Use the given app if specified, and the universal "xdg-open" otherwise:
+                    String[] openWith;
+                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+                        openWith = fileType.getOpenWith().split(" ");
+                    else
+                        openWith = new String[] {"xdg-open"};
+
+                    String[] cmd = new String[openWith.length+1];
+                    System.arraycopy(openWith, 0, cmd, 0, openWith.length);
+                    cmd[cmd.length-1] = link;
+                    Runtime.getRuntime().exec(cmd);
 				}
 
 			} catch (IOException e) {
-				System.err.println("An error occured on the command: "
-					+ Globals.prefs.get("htmlviewer") + " " + link);
+                System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
+                e.printStackTrace();
 			}
 		} else if (fieldName.equals("ps")) {
 			try {
@@ -622,7 +637,8 @@ public class Util {
 					 */
 				} else {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String viewer = type != null ? type.getOpenWith() : "xdg-open";
+                    String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
 					cmdArray[1] = link;
 					Runtime.getRuntime().exec(cmdArray);
@@ -654,6 +670,7 @@ public class Util {
 				} else {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
+                    String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
 					cmdArray[1] = link;
 					// Process child = Runtime.getRuntime().exec(cmdArray[0]+"
@@ -822,26 +839,7 @@ public class Util {
 
             return false;
             // No file matched the name, or we didn't know the file type.
-			// Perhaps it is an URL thing.
 
-            /* TODO: find out if this fallback option of opening the link in a web browser is
-               TODO: actually necessary. */
-            /*
-            link = sanitizeUrl(link);
-
-			if (Globals.ON_MAC) {
-				String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
-				Runtime.getRuntime().exec(cmd);
-			} else if (Globals.ON_WIN) {
-				openFileOnWindows(link, false);
-			} else {
-				String[] openWith = Globals.prefs.get("htmlviewer").split(" ");
-                String[] cmdArray = new String[openWith.length+1];
-                System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-                cmdArray[cmdArray.length-1] = link;
-                Runtime.getRuntime().exec(cmdArray);
-            }
-            */
 		}
 
 

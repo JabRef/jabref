@@ -101,7 +101,7 @@ public class HelpContent extends JTextPane {
 		history.removeAllElements();
 	}
 
-	public void setPage(String filename) {
+	public void setPage(String filename, Class resourceOwner) {
 		
 		// Check for anchor
 		int indexOf = filename.indexOf('#');
@@ -119,15 +119,15 @@ public class HelpContent extends JTextPane {
 		String middle = prefs.get("language") + "/";
 		if (middle.equals("en/"))
 			middle = ""; // english in base help dir.
-		
-		URL old = getPage();
+
+        URL old = getPage();
 		try {
 			// First check in specified language
-			URL resource = JabRef.class.getResource(GUIGlobals.helpPre + middle + file);
+			URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
             
 			// If not available fallback to english
 			if (resource == null) {
-            	resource = JabRef.class.getResource(GUIGlobals.helpPre + file);
+            	resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
             }
 			
 			// If still not available print a warning
@@ -153,7 +153,7 @@ public class HelpContent extends JTextPane {
 	 */
 	public void setPage(URL url) {
 		File f = new File(url.getPath());
-		setPage(f.getName());
+		setPage(f.getName(), JabRef.class);
 	}
 
 	private void setPageOnly(URL url) {

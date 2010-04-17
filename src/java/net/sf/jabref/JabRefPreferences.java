@@ -97,6 +97,9 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
+    public final ExternalFileType HTML_FALLBACK_TYPE =
+            new ExternalFileType("URL", "html", "text/html", "", "www");
+
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
@@ -132,24 +135,24 @@ public class JabRefPreferences {
         prefs = Preferences.userNodeForPackage(JabRef.class);
         
         if (Globals.osName.equals(Globals.MAC)) {
-			defaults.put("pdfviewer", "/Applications/Preview.app");
-			defaults.put("psviewer", "/Applications/Preview.app");
-			defaults.put("htmlviewer", "/Applications/Safari.app");
+			//defaults.put("pdfviewer", "/Applications/Preview.app");
+			//defaults.put("psviewer", "/Applications/Preview.app");
+			//defaults.put("htmlviewer", "/Applications/Safari.app");
             defaults.put("fontFamily", "SansSerif");
 
 		} else if (Globals.osName.toLowerCase().startsWith("windows")) {
-			defaults.put("pdfviewer", "cmd.exe /c start /b");
-			defaults.put("psviewer", "cmd.exe /c start /b");
-			defaults.put("htmlviewer", "cmd.exe /c start /b");
+			//defaults.put("pdfviewer", "cmd.exe /c start /b");
+			//defaults.put("psviewer", "cmd.exe /c start /b");
+			//defaults.put("htmlviewer", "cmd.exe /c start /b");
 			defaults.put("lookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
             defaults.put("fontFamily", "Arial");
 
         } else {
-			defaults.put("pdfviewer", "evince");
-			defaults.put("psviewer", "gv");
-			defaults.put("htmlviewer", "firefox");
+			//defaults.put("pdfviewer", "evince");
+			//defaults.put("psviewer", "gv");
+			//defaults.put("htmlviewer", "firefox");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put("fontFamily", "SansSerif");
 
@@ -308,6 +311,7 @@ public class JabRefPreferences {
         defaults.put("searchAllBases", Boolean.FALSE);
         defaults.put("defaultLabelPattern", "[auth][year]");
         defaults.put("previewEnabled", Boolean.TRUE);
+        defaults.put("activePreview", 0);
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
@@ -948,7 +952,7 @@ public class JabRefPreferences {
     public void storeCustomEntryType(CustomEntryType tp, int number) {
         String nr = ""+number;
         put(CUSTOM_TYPE_NAME+nr, tp.getName());
-        putStringArray(CUSTOM_TYPE_REQ+nr, tp.getRequiredFields());
+        put(CUSTOM_TYPE_REQ+nr, tp.getRequiredFieldsString());//tp.getRequiredFields());
         putStringArray(CUSTOM_TYPE_OPT+nr, tp.getOptionalFields());
 
     }
@@ -1044,7 +1048,8 @@ public class JabRefPreferences {
     /**
      * Look up the external file type registered for this MIME type, if any.
      * @param mimeType The MIME type.
-     * @return The ExternalFileType registered, or null if none.
+     * @return The ExternalFileType registered, or null if none. For the mime type "text/html",
+     *   a valid file type is guaranteed to be returned.
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
         for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
@@ -1052,7 +1057,10 @@ public class JabRefPreferences {
             if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType))
                 return type;
         }
-        return null;
+        if (mimeType.equals("text/html"))
+            return HTML_FALLBACK_TYPE;
+        else
+            return null;
     }
 
     /**

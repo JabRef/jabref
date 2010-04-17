@@ -58,7 +58,7 @@ import java.io.IOException;
  * <p/>
  * If the formatter was called with a second argument, the list would be filtered.
  * For instance:
- * \format[WrapFileLinks(\i. \d (\p),,text file)]{\file}
+ * \format[WrapFileLinks(\i. \d (\p),text file)]{\file}
  * <p/>
  * would show only the text file:
  * 1. An early "draft" (/home/john/draft.txt)
@@ -66,12 +66,12 @@ import java.io.IOException;
  * If we wanted this output to be part of an XML styled output, the quotes in the
  * file description could cause problems. Adding two additional arguments to translate
  * the quotes into XML characters solves this:
- * \format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
+ * \format[WrapFileLinks(\i. \d (\p),text file,",&quot;)]{\file}
  * <p/>
  * would give the following output:
  * 1. An early &quot;draft&quot; (/home/john/draft.txt)
  *
- * Additional pairs of replacements could be added.
+ * Additional pairs of replacements can be added.
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 

@@ -160,6 +160,7 @@ public class FileUpdateMonitor extends Thread {
       timeStamp = file.lastModified();
       fileSize = file.length();
       tmpFile = getTempFile();
+      tmpFile.deleteOnExit();
       copy();
     }
 
@@ -216,13 +217,13 @@ public class FileUpdateMonitor extends Thread {
       listener.fileRemoved();
     }
 
-    public void finalize() {
+    /*public void finalize() {
       try {
         tmpFile.delete();
       } catch (Throwable e) {
         Globals.logger("Cannot delete temporary file '"+tmpFile.getPath()+"'");
       }
-    }
+    }*/
   }
 
   static synchronized File getTempFile() {

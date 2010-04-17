@@ -21,14 +21,6 @@ import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-/**
- * NOTAT:
- *    * S?rg for at ting oppdateres riktig ved tillegg av ny type. (velge, unng? at det blir feil innhold i listene).
- *    *
- *
- *
- * @author alver
- */
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
     protected JabRefFrame frame;
@@ -141,7 +133,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         if (rl == null) {
             BibtexEntryType type = BibtexEntryType.getType(s);
             if (type != null) {
-                String[] rf = type.getRequiredFields(),
+                String[] rf = type.getRequiredFieldsForCustomization(),
                         of = type.getOptionalFields();
                 List<String> req, opt;
                 if (rf != null)
@@ -337,7 +329,7 @@ class DefaultListener implements ActionListener {
 
         BibtexEntryType type = BibtexEntryType.getStandardType(lastSelected);
         if (type != null) {
-            String[] rf = type.getRequiredFields(),
+            String[] rf = type.getRequiredFieldsForCustomization(),
                     of = type.getOptionalFields();
             List<String> req, opt;
             if (rf != null)

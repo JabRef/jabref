@@ -384,4 +384,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 		}
 		return true;
 	}
+
+    @Override
+    public int hashCode() {
+        return getGroup().getName().hashCode();
+    }
 }

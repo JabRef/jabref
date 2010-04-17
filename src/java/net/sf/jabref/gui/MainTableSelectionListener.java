@@ -27,6 +27,7 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import net.sf.jabref.external.ExternalFileType;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
@@ -36,7 +37,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         KeyListener, FocusListener {
 
     PreviewPanel[] previewPanel = null;
-    int activePreview = 0;
+    int activePreview = Globals.prefs.getInt("activePreview");
     PreviewPanel preview;
     MainTable table;
     BasePanel panel;
@@ -295,7 +296,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                         return; // There is an icon, but the field is not set.
                     }
 
-                    try {
+                    {
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
                         if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
@@ -316,13 +317,28 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                 }
                             }
                         } else {
-                            Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                            try {
+                                Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                            } catch (IOException ex) {
+                                panel.output(Globals.lang("Unable to open link."));
+                            }
+
+                            /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
+                            ExternalFileMenuItem item = new ExternalFileMenuItem
+                                    (panel.frame(), entry, "",
+                                    (String)link, type.getIcon(),
+                                    panel.metaData(), type);
+                            boolean success = item.openLink();
+                            if (!success) {
+                                panel.output(Globals.lang("Unable to open link."));
+                            } */
+                            //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                         }
 
                     }
-                    catch (IOException ex) {
-                        panel.output(Globals.lang("Error") + ": " + ex.getMessage());
-                    }
+                    //catch (IOException ex) {
+                    //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
+                    //}
                 }
 
             }).start();
@@ -436,6 +452,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             activePreview++;
         else
             activePreview = 0;
+        Globals.prefs.putInt("activePreview", activePreview);
         if (previewActive) {
             this.preview = previewPanel[activePreview];
 

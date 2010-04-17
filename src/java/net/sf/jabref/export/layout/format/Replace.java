@@ -10,9 +10,10 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  * sequence: \,
  * For inserting newlines and tabs in arguments, use \n and \t, respectively.
  *
- * The first part is the regular expression to search for. The regular expression
- * is written normally, without extra escape sequences for backslashes. A description
- * of Java regular expressions can be found at:
+ * The first part is the regular expression to search for. Remember that any commma
+ * character must be preceded by a backslash, and consequently a literal backslash must
+ * be written as a pair of backslashes. A description of Java regular expressions can be
+ * found at:
  *   http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
  *
  * The second part is the text to replace all matches with.

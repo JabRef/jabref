@@ -92,7 +92,11 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 		back.setEnabled(false);
 	}
 
-	public void showPage(String url) {
+    public void showPage(String url) {
+        showPage(url, JabRef.class);
+    }
+
+	public void showPage(String url, Class resourceOwner) {
 		if (!isVisible()) {
 			Util.placeDialog(this, frame);
 			content.reset();
@@ -102,7 +106,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 			back.setEnabled(true);
 		}
 		forward.setEnabled(false);
-		content.setPage(url);
+		content.setPage(url, resourceOwner);
 		content.requestFocus();
 	}
 
@@ -155,7 +159,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			content.setPage(GUIGlobals.helpContents);
+			content.setPage(GUIGlobals.helpContents, JabRef.class);
 			back.setEnabled(true);
 		}
 	}

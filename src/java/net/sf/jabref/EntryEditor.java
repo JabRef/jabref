@@ -571,6 +571,26 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 String srcString = sw.getBuffer().toString();
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
+
+                //////////////////////////////////////////////////////////
+                // Set the current Entry to be selected.
+                // Fixes the bug of losing selection after, e.g.
+                // an autogeneration of a BibTeX key.
+                // - ILC (16/02/2010) -
+                //////////////////////////////////////////////////////////
+                SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                    final int row = panel.mainTable.findEntry(entry);
+                    if (row >= 0) {
+                        if (panel.mainTable.getSelectedRowCount() == 0)
+                            panel.mainTable.setRowSelectionInterval(row, row);
+                        //scrollTo(row);
+                        panel.mainTable.ensureVisible(row);
+                    }
+                  }
+                });
+                //////////////////////////////////////////////////////////
+
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
                                         Globals.lang("Correct the entry, and "
@@ -869,13 +889,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // panel.entryTable.repaint();
             // panel.refreshTable();
             panel.markBaseChanged();
-
+///////////////////////////////////////////////////////
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final int row = panel.mainTable.findEntry(entry);
                     if (row >= 0) {
-                        if (panel.mainTable.getSelectedRowCount() == 0)
-                            panel.mainTable.setRowSelectionInterval(row, row);
+                        //if (panel.mainTable.getSelectedRowCount() == 0)
+                        //    panel.mainTable.setRowSelectionInterval(row, row);
+                        //scrollTo(row);
                         panel.mainTable.ensureVisible(row);
                     }
                 }
@@ -1249,7 +1270,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 if (accepted) {
                 }
             }
-
+////////////////////////////////////
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
@@ -1258,8 +1279,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     public void run() {
                         final int row = panel.mainTable.findEntry(entry);
                         if (row >= 0) {
-                            if (panel.mainTable.getSelectedRowCount() == 0)
-                                panel.mainTable.setRowSelectionInterval(row, row);
+                            //if (panel.mainTable.getSelectedRowCount() == 0)
+                            //    panel.mainTable.setRowSelectionInterval(row, row);
+                            //scrollTo(row);
                             panel.mainTable.ensureVisible(row);
                         }
                     }

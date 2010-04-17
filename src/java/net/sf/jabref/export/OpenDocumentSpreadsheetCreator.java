@@ -9,6 +9,8 @@ package net.sf.jabref.export;
 import java.io.*;
 import java.net.URL;
 import java.util.Set;
+import java.util.zip.CRC32;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -41,8 +43,25 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     public static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+
         try {
+            
+            //addResourceFile("mimetype", "/resource/ods/mimetype", out);
+            ZipEntry ze = new ZipEntry("mimetype");
+            String mime = "application/vnd.oasis.opendocument.spreadsheet";
+            ze.setMethod(ZipEntry.STORED);
+            ze.setSize(mime.length());
+            CRC32 crc = new CRC32();
+            crc.update(mime.getBytes());
+            ze.setCrc(crc.getValue());
+            out.putNextEntry(ze);
+            for (int i=0; i<mime.length(); i++) {
+                out.write(mime.charAt(i));
+            }
+            out.closeEntry();
+
             ZipEntry zipEntry = new ZipEntry("content.xml");
+            //zipEntry.setMethod(ZipEntry.DEFLATED);
             out.putNextEntry(zipEntry);
             int c = -1;
             while ((c = source.read()) >= 0) {
@@ -53,7 +72,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             // Add manifest (required for OOo 2.0) and "meta.xml": These are in the
             // resource/ods directory, and are copied verbatim into the zip file.
             addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
-            addResourceFile("mimetype", "/resource/ods/mimetype", out);
+
             addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
 
             //zipEntry = new ZipEntry()

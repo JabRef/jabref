@@ -20,7 +20,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	JTextField pdfDir, regExpTextField, fileDir, psDir, pdf, ps, html;
+	JTextField pdfDir, regExpTextField, fileDir, psDir;
             
     JCheckBox runAutoFileSearch;
     JButton editFileTypes;
@@ -39,10 +39,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		psDir = new JTextField(25);
 		pdfDir = new JTextField(25);
         fileDir = new JTextField(25);
-        pdf = new JTextField(25);
-		ps = new JTextField(25);
-		html = new JTextField(25);
-		editFileTypes = new JButton(Globals.lang("Manage external file types"));
+        editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
@@ -128,16 +125,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.appendSeparator(Globals.lang("External programs"));
 
 		builder.nextLine();
-		lab = new JLabel(Globals.lang("Path to HTML viewer") + ":");
-		builder.append(pan);
-		builder.append(lab);
-		builder.append(html);
-		browse = new BrowseAction(_frame, html, false);
-		if (Globals.ON_WIN)
-			browse.setEnabled(false);
-		builder.append(new JButton(browse));
-		builder.nextLine();
-
+		
         addSettingsButton(new PushToLyx(), builder);
         addSettingsButton(new PushToEmacs(), builder);
         addSettingsButton(new PushToWinEdt(), builder);
@@ -172,19 +160,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		pdfDir.setText(_prefs.get("pdfDirectory"));
 		psDir.setText(_prefs.get("psDirectory"));
         fileDir.setText(_prefs.get(GUIGlobals.FILE_FIELD+"Directory"));
-        if (!Globals.ON_WIN) {
-			pdf.setText(_prefs.get("pdfviewer"));
-			ps.setText(_prefs.get("psviewer"));
-			html.setText(_prefs.get("htmlviewer"));
-		} else {
-			pdf.setText(Globals.lang("Uses default application"));
-			ps.setText(Globals.lang("Uses default application"));
-			html.setText(Globals.lang("Uses default application"));
-			pdf.setEnabled(false);
-			ps.setEnabled(false);
-			html.setEnabled(false);
-		}
-
 
         runAutoFileSearch.setSelected(_prefs.getBoolean("runAutomaticFileSearch"));
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
@@ -208,9 +183,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		_prefs.put("pdfDirectory", pdfDir.getText());
 		_prefs.put("psDirectory", psDir.getText());
         _prefs.put(GUIGlobals.FILE_FIELD+"Directory", fileDir.getText());
-        _prefs.put("pdfviewer", pdf.getText());
-		_prefs.put("psviewer", ps.getText());
-		_prefs.put("htmlviewer", html.getText());
 		_prefs.putBoolean("autolinkExactKeyOnly", matchExactKeyOnly.isSelected());
         _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
     }

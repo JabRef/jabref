@@ -1264,8 +1264,6 @@ Pasted=完成粘贴
 
 Path_to_%0_not_defined=到_%0_的路径未定义
 
-Path_to_HTML_viewer=到_HTML_查看器的路径
-
 Path_to_LatexEditor_(LEd.exe)=到_LatexEditor_(LEd.exe)_的路径
 
 Path_to_LyX_pipe=到_LyX_管道的路径
@@ -1869,8 +1867,6 @@ Use_the_following_delimiter_character(s)=使用下面的分隔符
 User_does_not_have_sufficient_privileges.\n=用户没有足够的权限。\n
 Username_\:=用户名:
 
-Uses_default_application=使用默认应用程序
-
 Value_cleared_externally=内容从外部被清除
 
 Value_set_externally=内容从外部被设置
@@ -1997,7 +1993,6 @@ Search_JSTOR=搜索_JSTOR
 Attempting_SQL_import...=尝试_SQL_导入...
 BibO_RDF=BibO_RDF
 HTML_parser=HTML_解析
-RIS_importer=RIS_导入
 
 Move_the_keyboard_focus_to_the_entry_table=将键盘焦点移动到记录列表
 MIME_type=MIME_类型
@@ -2006,7 +2001,6 @@ This_feature_lets_new_files_be_opened_or_imported_into_an_already_running_instan
 Note_that_these_settings_are_used_for_the_legacy_<b>pdf</b>_and_<b>ps</b>_fields_only.<br>For_most_users,_setting_the_<b>Main_file_directory</b>_above_should_be_sufficient.=注意：这些设置主要应用于旧式的_<b>pdf</b>_和_<b>ps</b>_域，这意味着如果您不知道它是什么意思，<BR>您可以忽视该选项。对大部分用户来说，设置上面的“主文件目录”就足够了。
 Legacy_file_fields=旧式文件域
 
-%0_entries_found._To_reduce_server_load,_only_%1_will_be_downloaded.=共找到_%0_条相关记录，为减轻服务器负担，只下载其中的_%1_条。
 This_makes_JabRef_look_up_each_%0_extension_and_check_if_the_file_exists._If_not,_you_will_be_given_options<BR>to_resolve_the_problem.=这将使_JabRef_依据%0扩展名查找文件是否存在，如果找不到，JabRef_将提供给您选项来解决这个问题。
 Run_Fetcher,_e.g._"--fetch=Medline\:cancer"=运行抓取器，例如_"--fetch=Medline\:cancer"
 Override_legacy_file_fields=覆盖旧式文件域
@@ -2042,7 +2036,6 @@ Unable_to_find_full_text_document_in_the_linked_web_page.=在给定的链接页�
 Connection_error_when_trying_to_find_full_text_document.=尝试下载全文时网络连接失败。
 This_entry_provides_no_URL_or_DOI_links.=此记录未提供_URL_或_DOI_链接。
 Full_text_article_download_failed=下载全文失败
-Down_up=下移
 Update_to_current_column_order=使用当前视图中的列顺序
 
 Rename_field=重命名域
@@ -2150,3 +2143,8 @@ No_entries_found._It_looks_like_you_do_not_have_access_to_search_JStor.=
 
 Search_ScienceDirect=
 Error_while_fetching_from_ScienceDirect=
+
+Error_initializing_custom_export_format_from_string_'%0'=
+
+%0_entries_found._To_reduce_server_load,_only_%1_will_be_downloaded._It_will_be_very_slow,_in_order_to_make_ACM_happy.=
+BibTeX_importer=

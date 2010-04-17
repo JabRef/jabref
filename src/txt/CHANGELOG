@@ -1,3 +1,20 @@
+2.6
+    - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
+    - Active preview (1 or 2) is now remembered.
+    - Applied patch by Igor L. Chernyavsky. to prevent loss of entry selection after
+      generating key.
+    - Changed OpenDocument Spreadsheet export so the mimetype file is written correctly
+      at the start of the zip file.
+    - Fixed bug when importing preferences: custom export filters would not be updated
+      after import.
+    - Changed help page loading procedure so help pages can be loaded for plugin entry
+      fetchers.
+    - Made it possible to define customized entry types with either-or conditions on
+      required fields, e.g. using a pseudo-field called "author/editor" will indicate
+      that the entry requires either the "author" or the "editor" field set.
+    - Fixed bug: entries of a customized type could be indicated as complete even if
+      BibTeX key was not set.
+    - Changed deletion process for some temporary files to avoid leftover files.
 2.6b3
     - Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.
     - Changed non-native file dialog setting so files cannot be renamed. This prevents

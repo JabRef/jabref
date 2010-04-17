@@ -281,7 +281,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 	class MoveRowDownAction extends AbstractMoveRowAction {
 		public MoveRowDownAction() {
 			super("Down", GUIGlobals.getImage("down"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Down up"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Down"));
 		}
 
 		public void actionPerformed(ActionEvent e) {

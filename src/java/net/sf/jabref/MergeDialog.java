@@ -46,10 +46,6 @@ public class MergeDialog extends JDialog {
     }
   }
 
-  public MergeDialog() {
-    this(null, "", false);
-  }
-
   private void jbInit(JabRefFrame parent) {
     //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
     panel1.setLayout(borderLayout1);

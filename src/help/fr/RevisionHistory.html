@@ -5,6 +5,119 @@
 
   <h1>Historique des r&eacute;visions (en anglais)</h1>
 
+    <h3>Version 2.6</h3>
+        <li>Fixed IEEExplorer and ACM fetchers to adapt to web site changes.</li>
+        <li>Active preview (1 or 2) is now remembered.</li>
+        <li>Applied patch by Igor L. Chernyavsky. to prevent loss of entry selection after
+            generating key.</li>
+        <li>Changed OpenDocument Spreadsheet export so the mimetype file is written correctly
+            at the start of the zip file.</li>
+        <li>Fixed bug when importing preferences: custom export filters would not be updated
+            after import.</li>
+        <li>Changed help page loading procedure so help pages can be loaded for plugin entry
+            fetchers.</li>
+        <li>Made it possible to define customized entry types with either-or conditions on
+            required fields, e.g. using a pseudo-field called "author/editor" will indicate
+            that the entry requires either the "author" or the "editor" field set.</li>
+        <li>Fixed bug: entries of a customized type could be indicated as complete even if
+            BibTeX key was not set.</li>
+        <li>Changed deletion process for some temporary files to avoid leftover files.</li>
+        
+    <h3>Version 2.6beta3</h3>
+
+        <li>Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.</li>
+        <li>Changed non-native file dialog setting so files cannot be renamed. This prevents
+          accidentally entering rename mode when trying to enter directory. Can be enabled
+          again in Options -> Preferences -> Advanced.</li>
+        <li>Added new JStor fetcher that utilizes the BibSonomy scraper to obtain BibTeX data.</li>
+        <li>Fixed bug in CookieHandlerImpl.</li>
+        <li>Fixed bug; when dragging a file into JabRef and asking to move it to the file
+          directory, warning will now be given if the destination file already exists. Patch
+          by Alastair Mailer.</li>
+        <li>When dragging a file into JabRef and asking to copy or move it to the file directory,
+          it is now possible to rename to an arbitrary name. Patch by Alastair Mailer.</li>
+        <li>Added "review" field to BibTeXML export.</li>
+        <li>Added Reset button to entry fetchers. Patch by Dennis Hartrampf and Ines Moosdorf.</li>
+        <li>Changed Microsoft Office XML export so "number" rather than "issue" is exported
+          as &lt;b:Issue&gt;, which conforms with import format.</li>
+        <li>Added confirmation dialog that allows saving without backup in cases when
+          backup creation fails.</li>
+        <li>Fixed bug 2938562: using the move/rename feature on a file link could give an
+          absolute link even if the file was put below the main file directory.</li>
+        <li>Fixed bug 2931293: error generating key with [authorsAlpha] for short names.</li>
+        <li>When checking for external modifications, file size is now checked in addition
+          to the time stamp.</li>
+        <li>Fixed handling of maximised state when shutting down and starting up JabRef.
+          Patch by Igor L. Chernyavsky.</li>
+        <li>Fixed bug that prevented correct handling of DOS short file names. Patch
+          by Igor L. Chernyavsky.</li>
+        <li>Added support for KOI8_R character set.</li>
+        <li>Removed DocumentPrinter class, using standard API functions instead. Patch by
+          Tony Mancill.</li>
+        <li>Removed HightlightFilter class, using standard API functions instead. Patch by
+          Tony Mancill.</li>
+        <li>Changed keyboard shortcut for IEEXplorer search to Alt-F8.</li>
+        <li>Disabled JStor search, which doesn't work due to API changes.</li>
+        <li>External file type manager now removes "." prefix in file type extension if the user
+          has typed it that way.</li>
+        <li>Preview panel now defaults to preview layout 1 instead of 2. Switched default layouts.</li>
+        <li>Added IfPlural formatter by Russell Almond. The formatter outputs its first argument
+          if the input field contains " and " and the second one otherwise.</li>
+        <li>Applied patch by Philipp Cordes and Björn Kahlert for improved handling of names by
+          autocompleter. The patch also reorganizes the autocompleter classes.</li>
+        <li>Table will now scroll to keep the currently edited entry visible if an edit leads to
+          the entry getting sorted to a different position.</li>
+        <li>Reworked author and editor handling in Docbook export. Added Docbook XML header.</li>
+        <li>Database will no longer be marked as changed after accepting external changes, unless one or
+          more changes were not accepted before merging, and unless database was already marked as
+          changed.</li>
+        <li>Fixed bug: undesired autocompletion when saving file.</li>
+        <li>Fixed bug: entry editor doesn't appear when new entry is added while a filtering search or
+          group selection is active.</li>
+        <li>Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
+          messed up after the metadata comment in a bib file.</li>
+        <li>Search dialog now automatically previews first hit, and hides preview if there are no hits.</li>
+
+    <h3>Version 2.6beta2</h3>
+
+        <li>Added export formatter "Default" which takes a single argument. Outputs the string to format
+          unchanged if it is non-empty, otherwise outputs the argument.</li>
+        <li>Added option under Options -> Preferences -> General for disabling the strict enforcing of
+          correct BibTeX keys. Disabling this makes it possible to use e.g. umlaut characters in keys.</li>
+        <li>Modified launcher script for Windows installer to give higher heap size limit.</li>
+        <li>Improved autocompletion. All fields with autocompletion which have content selectors will now
+          autocomplete on content selector values. For the "journal" field, the autocompleter will now
+          additionally use entries from the current journal abbreviations list, and will also complete
+          on the entire field up to the cursor rather than just looking at the last word only.</li>
+        <li>Added support for postformatter in Layout. The postformatter will be run after
+          the formatters called from a layout.</li>
+        <li>Improved group autogeneration. Added option to generate groups based on author or editor
+          last names. Autogenerated groups are now alphabetized.</li>
+        <li>Modified Endnote export filter so "--" gets converted to "-" in the "pages" field.</li>
+        <li>Changed keyword groups so they will match on whole words only. E.g. a keyword group for the
+          keyword "can" will no longer match the keyword "scanner".</li>
+        <li>Improved entry type determination and author parsing for some varieties of CSA files.</li>
+        <li>Minor change to Harvard RTF export. Added space after "ed.", and added editor to output for
+          inbook entries.</li>
+        <li>Set limit to the number of displayed characters in group names in groups tree in order to
+          avoid group panel width problems.</li>
+        <li>Changed file link handling so all remote links classified as URL can be opened through
+          the browser. Setting a different file type manually makes JabRef call a remote link using
+          the handler application instead.</li>
+        <li>Modified Endnote/refer import filter to strip "doi:" from the %R field.</li>
+        <li>Modified HTML conversion so single newline is displayed in the preview (and HTML exports) as
+          &lt;br&gt;, while multiple newlines are displayed as &lt;p&gt;.</li>
+        <li>Fixed bug: switching entry editor between entries of different type may result in switching
+          of entry editor tabs.</li>
+        <li>Fixed bug: adding external file link leads to relative path from root directory if file
+          directory is set to an empty string.</li>
+        <li>Fixed error message when a # in a BibTeX string prevents saving. No longer states that the
+          problem is in an entry, but specifies that it is in a string.</li>
+        <li>Fixed bug: ODS export doesn't resolve BibTeX strings.</li>
+        <li>Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.</li>
+        <li>Fixed bug: editing source doesn't allow change of entry type.</li>
+        <li>RTFChars formatter now converts --- to \emdash and -- to \endash.</li>
+
     <h3>Version 2.6beta</h3>
 
     <ul>
@@ -26,7 +139,7 @@
             author field.</li>
         <li>Fixed bug in autocompleter. Current suggested completion would be added to the field
             if the user closed the entry editor or mouse clicked on another field.</li>
-        <li>Fixed problem with exporting to some MySql versions. Patch by François Dorin.</li>
+        <li>Fixed problem with exporting to some MySql versions. Patch by Fran&ccedil;ois Dorin.</li>
         <li>Fixed bug in handling of LaTeX character sequences - now sequences with = as command
             character (e.g. "\={A}") are recognized.</li>
         <li>Fixed bug: gray out / hide setting in groups panel is overridden on startup

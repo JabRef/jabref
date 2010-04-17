@@ -201,7 +201,7 @@ public class OptionMenu implements OptionListener {
 		return;
 	    }
 	    boolean commandEntered = command != null && command.length() > 0;
-	    if ( command.equals( "?" ) ) {
+	    if (commandEntered && command.equals( "?" ) ) {
 		System.err.println( "\t- Options Delimiter" );
 		System.err.println( "\t? Help" );
 		System.err.println( "\t= Run program and return to menu" );

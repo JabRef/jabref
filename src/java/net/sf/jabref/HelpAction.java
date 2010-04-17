@@ -42,6 +42,8 @@ public class HelpAction extends MnemonicAwareAction {
 
 	protected HelpDialog diag;
 
+    protected Class resourceOwner = null;
+
 	protected URL helpfile;
 
 	protected String helpFile;
@@ -94,6 +96,10 @@ public class HelpAction extends MnemonicAwareAction {
 		this.helpFile = helpFile;
 	}
 
+    public void setResourceOwner(Class resourceOwner) {
+        this.resourceOwner = resourceOwner;
+    }
+
 	public JButton getIconButton() {
 		JButton hlp = new JButton(this);
 		hlp.setText(null);
@@ -102,6 +108,9 @@ public class HelpAction extends MnemonicAwareAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		diag.showPage(helpFile);
+        if (resourceOwner == null)
+		    diag.showPage(helpFile);
+        else
+            diag.showPage(helpFile, resourceOwner);
 	}
 }

@@ -319,7 +319,7 @@
         <li><code>AuthorLF_FF</code>&nbsp;: formate
         les champs author/editor avec le nom de famille en premier pour le
         premier auteur et le pr&eacute;nom en premier pour les auteurs restants.
-        Renvoie les noms sépar&eacute;s par des "and".</li>
+        Renvoie les noms s&eacute;par&eacute;s par des "and".</li>
 
         <li><code>AuthorLF_FFAbbr</code>&nbsp;: comme <code>AuthorLF_FF</code>,
         mais abr&egrave;ge les pr&eacute;noms.</li>
@@ -443,8 +443,10 @@
         Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni. Les parties sont
         s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
         d'&eacute;chappement&nbsp;: \,<br>
-        La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. L'expression r&eacute;guli&egrave;re
-        s'&eacute;crit normalement, sans s&eacute;quence d'&eacute;chappement suppl&eacute;mentaire pour les anti-slash ("backslashes"). Une description
+        La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. 
+        Notez bien que toute virgule doit y &ecirc;tre pr&eacute;c&eacute;d&eacute;e par un antislash,
+        et, qu'en cons&eacute;quence, un antislash dans l'expression r&eacute;guli&egrave;re
+        recherch&eacute;e y est repr&eacute;sent&eacute; par une paire d'anti-slash. Une description
         des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br>
         &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html<br>
         La seconde partie est le texte qui remplace tous les correspondances.</li>

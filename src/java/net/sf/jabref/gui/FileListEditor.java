@@ -183,7 +183,9 @@ public class FileListEditor extends JTable implements FieldEditor,
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getType().getName());
+                Util.openExternalFileAnyFormat(metaData, entry.getLink(),
+                        type != null ? type : entry.getType());
             } catch (IOException e) {
                 e.printStackTrace();
             }

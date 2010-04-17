@@ -89,7 +89,9 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        preview = new PreviewPanel(null, new MetaData(), Globals.prefs.get("preview1"));
+        int activePreview = Globals.prefs.getInt("activePreview");
+        preview = new PreviewPanel(null, new MetaData(),
+                activePreview == 0 ? Globals.prefs.get("preview0") : Globals.prefs.get("preview1"));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
         model = new EventTableModel<BibtexEntry>(sortedEntries,

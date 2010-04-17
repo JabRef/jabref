@@ -41,6 +41,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileDialogs;
@@ -201,6 +202,7 @@ public class PrefsDialog3 extends JDialog {
 					prefs.importPreferences(filename);
 					setValues();
 					BibtexEntryType.loadCustomEntryTypes(prefs);
+                    ExportFormats.initAllExports();
 					frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {

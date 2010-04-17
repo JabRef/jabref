@@ -221,7 +221,7 @@ public class FieldTextMenu implements MouseListener
         String author;
         String[] authors = in.split("( |,)and ",-1);
         for (int i = 0; i < authors.length; i++){
-            authors[i].trim();
+            authors[i] = authors[i].trim();
         }
         /* determine whether the last author name includes a comma
          * 0 is intentional (consider -1 as alternative) */

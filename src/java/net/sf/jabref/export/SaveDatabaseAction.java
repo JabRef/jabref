@@ -173,9 +173,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.undoManager.markUnchanged();
 
                 if (!AutoSaveManager.deleteAutoSaveFile(panel)) {
-                    System.out.println("Deletion of autosave file failed");
-                } else
-                    System.out.println("Deleted autosave file (if it existed)");
+                    //System.out.println("Deletion of autosave file failed");
+                }/* else
+                    System.out.println("Deleted autosave file (if it existed)");*/
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:

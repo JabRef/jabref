@@ -79,7 +79,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "number", "month", "eid", "note"
+                    "number", "month", "part", "eid", "note"
                 };
             }
 
@@ -170,6 +170,11 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 };
             }
 
+            @Override
+            public String[] getRequiredFieldsForCustomization() {
+                return new String[] {"author/editor", "title", "chapter/pages", "year", "publisher"};
+            }
+
             public String describeRequiredFields()
             {
                 return "TITLE, CHAPTER and/or PAGES, PUBLISHER, YEAR, and an "
@@ -211,6 +216,14 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return new String[]
                 {
                     "title", "publisher", "year", "editor", "author"
+                };
+            }
+
+            public String[] getRequiredFieldsForCustomization()
+            {
+                return new String[]
+                {
+                    "title", "publisher", "year", "author/editor"
                 };
             }
 
@@ -686,6 +699,11 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 };
             }
 
+            @Override
+            public String[] getRequiredFieldsForCustomization() {
+                return new String[] {"title", "organization/institution"};
+            }
+
             public String describeRequiredFields()
             {
                 return "TITLE, ORGANIZATION or INSTITUTION";
@@ -733,10 +751,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return entry.allFieldsPresent(new String[]
                     {
                         "bibtexkey"
-                    }, database) &&
-                ((entry.getField("howpublished") != null) ||
-                (entry.getField("note") != null) ||
-                (entry.getField("url") != null));
+                    }, database);
             }
         };
 
@@ -971,4 +986,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 	prefs.purgeCustomEntryTypes(number);
     }
 
+    /**
+     * Get an array of the required fields in a form appropriate for the entry customization
+     * dialog - that is, thie either-or fields together and separated by slashes.
+     * @return Array of the required fields in a form appropriate for the entry customization dialog.
+     */
+    public String[] getRequiredFieldsForCustomization() {
+        return getRequiredFields();
+    }
 }

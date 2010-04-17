@@ -1172,7 +1172,7 @@ public JabRefPreferences prefs() {
       file.add(close);
       file.add(quit);
       mb.add(file);
-      edit.add(test);
+      //edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();
@@ -1272,6 +1272,7 @@ public JabRefPreferences prefs() {
        */
       for (EntryFetcher fetcher : fetchers){
     	  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
+          generalFetcher.setHelpResourceOwner(fetcher.getClass());
     	  web.add(generalFetcher.getAction());
     	  fetcherActions.add(generalFetcher.getAction());
       }

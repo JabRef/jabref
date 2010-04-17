@@ -186,13 +186,15 @@ public class FindFullText {
 
         public FindResult(URL url, URL originalUrl) {
             this.url = url;
-            host = originalUrl.getHost();
             this.status = FOUND_PDF;
+            if (originalUrl != null)
+                host = originalUrl.getHost();
         }
         public FindResult(int status, URL originalUrl) {
             this.url = null;
             this.status = status;
-            this.host = originalUrl.getHost();
+            if (originalUrl != null)
+                this.host = originalUrl.getHost();
         }
     }
 
