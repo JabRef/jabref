@@ -1,3 +1,4 @@
+    - Added apostrophe (') as illegal character in BibTeX keys.
 2.6
     - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
     - Active preview (1 or 2) is now remembered.
