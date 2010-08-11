@@ -56,11 +56,7 @@ import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.DatabasePropertiesDialog;
-import net.sf.jabref.gui.EntryCustomizationDialog2;
-import net.sf.jabref.gui.GenFieldsCustomizer;
-import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.gui.SortTabsAction;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.GeneralFetcher;
@@ -658,12 +654,26 @@ public JabRefPreferences prefs() {
             }
           }
         }
+
         if (baseAt(i).getFile() != null) {
           filenames.add(baseAt(i).getFile().getAbsolutePath());
         }
       }
     }
+
     if (close) {
+
+      for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+          if (baseAt(i).isSaving()) {
+              // There is a database still being saved, so we need to wait.
+              WaitForSaveOperation w = new WaitForSaveOperation(this);
+              w.show(); // This method won't return until cancelled or the save operation is done.
+              if (w.cancelled())
+                  return; // The user clicked cancel.
+          }
+      }
+
+
       dispose();
 
       prefs.putInt("posX", JabRefFrame.this.getLocation().x);

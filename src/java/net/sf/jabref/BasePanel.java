@@ -2718,6 +2718,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.saving = saving;
     }
 
+    public boolean isSaving() {
+        return saving;
+    }
+
     public BibtexEntry getShowing() {
         return showing;
     }
