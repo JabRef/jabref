@@ -100,6 +100,7 @@ import net.sf.jabref.imports.SPIRESFetcher;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.sql.DBConnectDialog;
@@ -1434,8 +1435,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 forward();
             }
         });
-        
-        actions.put("downloadFullText", new FindFullTextAction(this));
+
+        actions.put("resolveDuplicateKeys", new SearchFixDuplicateLabels(this));
+
+        //actions.put("downloadFullText", new FindFullTextAction(this));
     }
 
     /**

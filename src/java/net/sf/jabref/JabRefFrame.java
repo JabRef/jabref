@@ -336,8 +336,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     //        Globals.lang("Follow DOI or URL link and try to locate PDF full text document")),
     increaseFontSize = new IncreaseTableFontSizeAction(),
     decreseFontSize = new DecreaseTableFontSizeAction(),
-    installPlugin = new PluginInstallerAction(this);
-            
+    installPlugin = new PluginInstallerAction(this),
+    resolveDuplicateKeys = new GeneralAction("resolveDuplicateKeys", "Resolve duplicate BibTeX keys",
+              Globals.lang("Find and remove duplicate BibTeX keys"),
+              prefs.getKey("Resolve duplicate BibTeX keys"));
+
     PushToApplicationButton pushExternalButton;
 
     CiteSeerFetcher citeSeerFetcher;
@@ -1242,6 +1245,7 @@ public JabRefPreferences prefs() {
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
       checkAndFix.add(dupliCheck);
+      checkAndFix.add(resolveDuplicateKeys);
       //checkAndFix.add(strictDupliCheck);
       checkAndFix.add(autoSetFile);
       checkAndFix.add(autoSetPdf);
