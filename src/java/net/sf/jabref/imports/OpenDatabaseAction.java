@@ -24,6 +24,7 @@ import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
+import net.sf.jabref.label.HandleDuplicateWarnings;
 
 // The action concerned with opening an existing database.
 
@@ -43,6 +44,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         postOpenActions.add(new CheckForNewEntryTypesAction());
         // Add the action for the new external file handling system in version 2.3:
         postOpenActions.add(new FileLinksUpgradeWarning());
+        // Add the action for warning about and handling duplicate BibTeX keys:
+        postOpenActions.add(new HandleDuplicateWarnings());
+
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {

@@ -1,5 +1,7 @@
     - Added new feature (Tools -> Scan database... -> Resolve duplicate BibTeX keys) to
       search for duplicate keys and offer to generate new keys to resolve the duplicates.
+      Instead of being listed in a warning dialog after opening a bib file, duplicate keys
+      now trigger a dialog asking whether the user wants to resolve the duplicates.
     - Added check that ensures that application doesn't quit while a large save operation
       is still in progress. Shows wait message with cancel button.
     - Added apostrophe (') as illegal character in BibTeX keys.

@@ -45,6 +45,8 @@ public class ParserResult {
 
     private File file = null;
     private ArrayList<String> warnings = new ArrayList<String>();
+    private ArrayList<String> duplicateKeys = new ArrayList<String>();
+
     private String errorMessage = null;
     private String encoding = null; // Which encoding was used?
 
@@ -168,6 +170,32 @@ public class ParserResult {
         s[i] = warnings.get(i);
       return s;
     }
+
+    /**
+     * Add a key to the list of duplicated BibTeX keys found in the database.
+     * @param key The duplicated key
+     */
+    public void addDuplicateKey(String key) {
+        if (!duplicateKeys.contains(key))
+            duplicateKeys.add(key);
+    }
+
+    /**
+     * Query whether any duplicated BibTeX keys have been found in the database.
+     * @return true if there is at least one duplicate key.
+     */
+    public boolean hasDuplicateKeys() {
+        return duplicateKeys.size() > 0;
+    }
+
+    /**
+     * Get all duplicated keys found in the database.
+     * @return An array containing the duplicated keys.
+     */
+    public String[] getDuplicateKeys() {
+        return duplicateKeys.toArray(new String[duplicateKeys.size()]);
+    }
+    
 
     public boolean isPostponedAutosaveFound() {
         return postponedAutosaveFound;
