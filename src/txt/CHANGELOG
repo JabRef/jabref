@@ -5,6 +5,7 @@
     - Added check that ensures that application doesn't quit while a large save operation
       is still in progress. Shows wait message with cancel button.
     - Added apostrophe (') as illegal character in BibTeX keys.
+    - Fixed bug: curly braces can now be used in arguments to formatters. 
 2.6
     - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
     - Active preview (1 or 2) is now remembered.

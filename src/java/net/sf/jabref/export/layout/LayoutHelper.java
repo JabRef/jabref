@@ -183,6 +183,7 @@ public class LayoutHelper {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
+        boolean doneWithOptions = false;
         String option = null;
         String tmp;
 
@@ -214,10 +215,10 @@ public class LayoutHelper {
 
                 return null;
             }
-
-            if ((c == '{') || (c == '}') || (c == ']') || (c == '['))
+            if ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))
+            //if ((c == '{') || (c == '}') || (c == ']') || (c == '['))
             {
-                if ((c == '}') || (c == ']'))
+                if ((c == ']') || (doneWithOptions && (c == '}')))
                 {
                     // changed section start - arudert
                     // buffer may be null for parameters
@@ -229,6 +230,7 @@ public class LayoutHelper {
                             option = buffer.toString();
                             buffer = null;
                             start = false;
+                            doneWithOptions = true;
                         }
 
                         //myStrings.add(buffer.toString());
@@ -275,20 +277,15 @@ public class LayoutHelper {
 
                 if (start)
                 {
-                  
-                    if ((c == '}') || (c == ']'))
-                    {
-                    }
-                    else
-                    {
-                        // changed section begin - arudert
-                        // keep the backslash so we know wether this is a fieldname or an ordinary parameter
-                        //if (c != '\\')
-                        //{
-                            buffer.append((char) c);
-                        //}
-                        // changed section end - arudert
-                    }
+
+                    // changed section begin - arudert
+                    // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+                    //if (c != '\\')
+                    //{
+                    buffer.append((char) c);
+                    //}
+                    // changed section end - arudert
+
                 }
             }
         }
