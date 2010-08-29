@@ -25,8 +25,6 @@
 <field_name>=<域名称>
 <HTML>Could_not_find_file_'%0'<BR>linked_from_entry_'%1'</HTML>=<HTML>无法找到记录'%1'链接的文件'%0'</HTML>
 
-<HTML>Unpack_the_zip_file_containing_import/export_filters_for_Endnote,<BR>for_optimal_interoperability_with_JabRef</HTML>=<HTML>打开解压包含_Endnote_导入/导出过滤器的_zip_文件<BR>（以最大的与_JabRef_的兼容性）</HTML>
-
 <no_field>=<没有域>
 
 <select>=<选择>

@@ -100,7 +100,6 @@ Unabbreviate_journal_names=展开期刊名称
 Undo=撤销_(&U)
 Unmark_all=撤销所有高亮标记_(&L)
 Unmark_entries=撤销选中高亮标记_(&N)
-Unpack_EndNote_filter_set=解开_&EndNote_filter_set
 View=视图_(&V)
 Web_search=Web_搜索
 Import_into_new_database=导入到新数据库
