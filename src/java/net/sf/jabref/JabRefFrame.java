@@ -302,7 +302,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       customImpAction = new CustomizeImportsAction(),
       customFileTypesAction = ExternalFileTypeEditor.getAction(this),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
-      expandEndnoteZip = new ExpandEndnoteFilters(this),
+      //expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
         autoSetFile = new GeneralAction("autoSetFile", Globals.lang("Synchronize file links"), Globals.prefs.getKey("Synchronize files")),
@@ -1272,11 +1272,6 @@ public JabRefPreferences prefs() {
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
       tools.add(unabbreviate);
-
-      // TODO: Temporary for 2.2 release: we should perhaps find a better solution:
-      tools.addSeparator();
-      tools.add(new ExpandEndnoteFilters(JabRefFrame.this));
-      
       mb.add(tools);
 
       web.add(fetchCiteSeer);

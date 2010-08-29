@@ -51,7 +51,7 @@
     <p>The EndNote Export filter maps BibTeX entrytypes
     to EndNote reference types as follows:</p>
     <pre>
-BibTeX entrytype -&gt; Endnote Reference Type
+BibTeX entrytype -&gt; EndNote Reference Type
 ------------------------------------------
 misc, other -&gt; Generic
 unpublished -&gt; Manuscript
@@ -73,39 +73,9 @@ mastersthesis, phdthesis -&gt; Thesis</pre>
     in brackets will be assumed to be corporate authors and
     therefore will be improperly formatted.</p>
 
-    <h2>Advanced Use: Endnote Extras</h2>
+    <h2>Advanced Use: EndNote Extras</h2>
 
-    <h3>Installing the EndNote Import from JabRef filter</h3>
-
-    <p>The default EndNote Import filter does not properly parse authors.
-    The EndNote Import from JabRef filter does. Additionally, this
-    filter will recognize a field endnotereftype that will override
-    the default mapping. To install the filter, extract the EndNote
-    Extras (<b>Tools -&gt; Unpack EndNote filter set</b>) and
-    unpack the Zip file which is created. Then follow the
-    directions in the file Readme.txt.</p>
-
-    <h3>Modifying EndNote Reference Types</h3>
-
-    <p>Several fields used
-    by BibTeX are not part of EndNote's default Reference Types.
-    While import from JabRef and export to JabRef will work fine
-    without modifying reference types, the field names will not
-    display correctly in EndNote (e.g. an entry window will call
-    the pdf field <i>Custom 1</i> instead of <i>pdf</i>.
-    Additionally, these fields cannot be added to new entries in
-    EndNote, since they will not appear in the entry window. To
-    modify the EndNote Reference Types, extract the EndNote Extras
-    and follow the directions in the file readme.txt.</p>
-
-    <h3>Export to JabRef</h3>
-
-    <p>EndNote comes with an export style
-    BibTeX. However, this does not support all BibTeX types and
-    fields, and does not support the additional General Fields
-    supported by JabRef (<i>pdf, owner, key,</i> etc.) If you wish
-    to have these fields supported, extract the EndNote Extras
-    (<b>Tools -&gt; Unpack EndNote filter set</b>) and follow the
-    directions in the file readme.txt.</p>
+    For better interoperability between EndNote and JabRef, download the
+    EndNote filter set from the Resources page of JabRef's web page.
 </body>
 </html>
