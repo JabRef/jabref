@@ -121,11 +121,11 @@ public class MoveFileAction extends AbstractAction {
                         // Relativise path, if possible.
                         String canPath = (new File(dir)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
-                            if ((newFile.getPath().length() > canPath.length()) &&
-                                    (newFile.getPath().charAt(canPath.length()) == File.separatorChar))
-                                flEntry.setLink(newFile.getPath().substring(1+canPath.length()));
+                            if ((newFile.getCanonicalPath().length() > canPath.length()) &&
+                                    (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar))
+                                flEntry.setLink(newFile.getCanonicalPath().substring(1+canPath.length()));
                             else
-                                flEntry.setLink(newFile.getPath().substring(canPath.length()));
+                                flEntry.setLink(newFile.getCanonicalPath().substring(canPath.length()));
 
 
                         }
