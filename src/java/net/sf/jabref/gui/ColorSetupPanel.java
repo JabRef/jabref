@@ -34,7 +34,7 @@ public class ColorSetupPanel extends JPanel {
         buttons.add(new ColorButton("tableBackground", Globals.lang("Table background color")));
         buttons.add(new ColorButton("tableReqFieldBackground", Globals.lang("Background color for required fields")));
         buttons.add(new ColorButton("tableOptFieldBackground", Globals.lang("Background color for optional fields")));
-        buttons.add(new ColorButton("markedEntryBackground", Globals.lang("Background color for marked entries")));
+        buttons.add(new ColorButton("markedEntryBackground0", Globals.lang("Background color for marked entries")));
         buttons.add(new ColorButton("incompleteEntryBackground", Globals.lang("Color for marking incomplete entries")));
         buttons.add(new ColorButton("gridColor", Globals.lang("Table grid color")));
 

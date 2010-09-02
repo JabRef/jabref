@@ -142,6 +142,12 @@ public class Util {
 
     public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
+    public static int MARK_COLOR_LEVELS = 6,
+            MAX_MARKING_LEVEL = MARK_COLOR_LEVELS-1,
+            IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
+    public static Pattern markNumberPattern = Pattern.compile(Globals.prefs.MARKING_WITH_NUMBER_PATTERN);
+
+
 	static {
 		idFormat = NumberFormat.getInstance();
 		idFormat.setMinimumIntegerDigits(8);
@@ -1750,7 +1756,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
 				timestamp);
             if (markEntries)
-                Util.markEntry(curEntry, new NamedCompound(""));
+                Util.markEntry(curEntry, IMPORT_MARK_LEVEL, false, new NamedCompound(""));
 		}
 
 	}
@@ -2371,34 +2377,94 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		return dateFormatter.format(date);
 	}
 
-	public static void markEntry(BibtexEntry be, NamedCompound ce) {
+    public static void markEntry(BibtexEntry be, int markIncrement, boolean increment, NamedCompound ce) {
 		Object o = be.getField(BibtexFields.MARKED);
-		if ((o != null) && (o.toString().indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0))
-			return;
-		String newValue;
-		if (o == null) {
-			newValue = Globals.prefs.WRAPPED_USERNAME;
-		} else {
-			StringBuffer sb = new StringBuffer(o.toString());
-			// sb.append(' ');
-			sb.append(Globals.prefs.WRAPPED_USERNAME);
-			newValue = sb.toString();
-		}
+        int prevMarkLevel = 0;
+        String newValue = null;
+		if (o != null) {
+            String s = o.toString();
+            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+            if (index >= 0) {
+                // Already marked 1 for this user.
+                prevMarkLevel = 1;
+                newValue = s.substring(0, index)
+                    + s.substring(index+Globals.prefs.WRAPPED_USERNAME.length())
+                    + Globals.prefs.WRAPPED_USERNAME.substring(0,
+                        Globals.prefs.WRAPPED_USERNAME.length()-1)+":"+
+                        (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel+markIncrement)
+                                : markIncrement)+"]";
+            }
+            else {
+                Matcher m = markNumberPattern.matcher(s);
+                if (m.find()) {
+                    try {
+                        prevMarkLevel = Integer.parseInt(m.group(1));
+                        newValue = s.substring(0, m.start(1))+
+                                (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel+markIncrement)
+                                : markIncrement)+
+                                s.substring(m.end(1));
+                    } catch (NumberFormatException ex) {
+                        // Do nothing.
+                    }
+                }
+            }
+        }
+        if (newValue == null)
+            newValue = Globals.prefs.WRAPPED_USERNAME.substring(0,
+                Globals.prefs.WRAPPED_USERNAME.length()-1)+":"+markIncrement+"]";
+
 		ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
 			.getField(BibtexFields.MARKED), newValue));
 		be.setField(BibtexFields.MARKED, newValue);
 	}
 
-	public static void unmarkEntry(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
+	public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel,
+                                   BibtexDatabase database, NamedCompound ce) {
 		Object o = be.getField(BibtexFields.MARKED);
 		if (o != null) {
 			String s = o.toString();
 			if (s.equals("0")) {
-				unmarkOldStyle(be, database, ce);
-				return;
+                if (!onlyMaxLevel) {
+                    unmarkOldStyle(be, database, ce);
+                }
+                return;
 			}
+            String newValue = null;
+            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+            if (index >= 0) {
+                // Marked 1 for this user.
+                if (!onlyMaxLevel)
+                    newValue = s.substring(0, index)
+                        + s.substring(index+Globals.prefs.WRAPPED_USERNAME.length());
+                else return;
+            }
+            else {
+                Matcher m = markNumberPattern.matcher(s);
+                if (m.find()) {
+                    try {
+                        int prevMarkLevel = Integer.parseInt(m.group(1));
+                        if (!onlyMaxLevel || (prevMarkLevel == MARK_COLOR_LEVELS)) {
+                            if (prevMarkLevel > 1)
+                                newValue = s.substring(0, m.start(1))+
+                                        s.substring(m.end(1));
+                            else {
+                                String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0,
+                                    Globals.prefs.WRAPPED_USERNAME.length()-1)+":1]";
+                                index = s.indexOf(toRemove);
+                                if (index >= 0) {
+                                    newValue = s.substring(0, index)
+                                        + s.substring(index+toRemove.length());
+                                }
+                            }
+                        }
+                        else return;
+                    } catch (NumberFormatException ex) {
+                        // Do nothing.
+                    }
+                }
+            }
 
-			int piv = 0, hit;
+			/*int piv = 0, hit;
 			StringBuffer sb = new StringBuffer();
 			while ((hit = s.indexOf(Globals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
 				if (hit > 0)
@@ -2408,10 +2474,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			if (piv < s.length() - 1) {
 				sb.append(s.substring(piv));
 			}
-			String newVal = sb.length() > 0 ? sb.toString() : null;
+			String newVal = sb.length() > 0 ? sb.toString() : null;*/
 			ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-				.getField(BibtexFields.MARKED), newVal));
-			be.setField(BibtexFields.MARKED, newVal);
+				.getField(BibtexFields.MARKED), newValue));
+			be.setField(BibtexFields.MARKED, newValue);
 		}
 	}
 
@@ -2450,12 +2516,28 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 	}
 
-	public static boolean isMarked(BibtexEntry be) {
+	public static int isMarked(BibtexEntry be) {
 		Object fieldVal = be.getField(BibtexFields.MARKED);
 		if (fieldVal == null)
-			return false;
+			return 0;
 		String s = (String) fieldVal;
-		return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
+		if (s.equals("0"))
+            return 1;
+        int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+        if (index >= 0)
+            return 1;
+
+        Matcher m = markNumberPattern.matcher(s);
+        if (m.find()) {
+            try {
+                int value = Integer.parseInt(m.group(1));
+                return value;
+            } catch (NumberFormatException ex) {
+                return 1;
+            }
+        }
+        else return 0;
+        
 	}
 
 	/**
@@ -2817,9 +2899,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         int lockCheckCount = 0;
         while (Util.hasLockFile(file)) {
 
-            System.out.println("File locked... waiting");
             if (lockCheckCount++ == maxWaitCount) {
-                System.out.println("Giving up wait.");
                 return false;
             }
             try { Thread.sleep(500); } catch (InterruptedException ex) {}

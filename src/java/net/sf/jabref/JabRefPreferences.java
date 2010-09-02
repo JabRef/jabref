@@ -73,7 +73,7 @@ public class JabRefPreferences {
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    public String WRAPPED_USERNAME;
+    public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
     Preferences prefs;
     public HashMap<String, Object> defaults = new HashMap<String, Object>();
@@ -286,7 +286,13 @@ public class JabRefPreferences {
         defaults.put("grayedOutText", "40:40:40");
         defaults.put("veryGrayedOutBackground", "180:180:180");
         defaults.put("veryGrayedOutText", "40:40:40");
-        defaults.put("markedEntryBackground", "255:255:180");
+        defaults.put("markedEntryBackground0", "255:255:180");
+        defaults.put("markedEntryBackground1", "255:220:180");
+        defaults.put("markedEntryBackground2", "255:180:160");
+        defaults.put("markedEntryBackground3", "255:120:120");
+        defaults.put("markedEntryBackground4", "255:75:75");
+        defaults.put("markedEntryBackground5", "220:255:220");
+
         defaults.put("incompleteEntryBackground", "250:175:175");
 
         defaults.put("antialias", Boolean.FALSE);
@@ -425,6 +431,7 @@ public class JabRefPreferences {
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
+        MARKING_WITH_NUMBER_PATTERN = "\\["+get("defaultOwner")+":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);

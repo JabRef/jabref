@@ -9,10 +9,8 @@ public class IsMarkedComparator implements Comparator<BibtexEntry> {
 
 	public int compare(BibtexEntry e1, BibtexEntry e2) {
 
-		if (Util.isMarked(e1))
-			return Util.isMarked(e2) ? 0 : -1;
-		else
-			return Util.isMarked(e2) ? 1 : 0;
+        return - Util.isMarked(e1) + Util.isMarked(e2);
+		
 	}
 
 }

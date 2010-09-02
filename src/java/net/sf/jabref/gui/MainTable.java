@@ -232,9 +232,11 @@ public class MainTable extends JTable {
                 renderer = incRenderer;
             } else {
                 compRenderer.setNumber(row);
-                if (isMarked(row)) {
-                    renderer = markedNumberRenderer;
-                    markedNumberRenderer.setNumber(row);
+                int marking = isMarked(row);
+                if (marking > 0) {
+                    marking = Math.min(marking, Util.MARK_COLOR_LEVELS);
+                    renderer = markedNumberRenderers[marking-1];
+                    markedNumberRenderers[marking-1].setNumber(row);
                 } else
                     renderer = compRenderer;
             }
@@ -249,8 +251,10 @@ public class MainTable extends JTable {
         }
 
         // For MARKED feature:
-        if ((column != 0) && isMarked(row)) {
-            renderer = markedRenderer;
+        int marking = isMarked(row);
+        if ((column != 0) && (marking > 0)) {
+            marking = Math.min(marking, Util.MARK_COLOR_LEVELS);
+            renderer = markedRenderers[marking-1];
         }
 
         return renderer;
@@ -435,13 +439,13 @@ public class MainTable extends JTable {
         }
     }
 
-    private boolean isMarked(int row) {
+    private int isMarked(int row) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
             return Util.isMarked(be);
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isMarked");
-            return false;
+            return 0;
         }
     }
 
@@ -507,23 +511,18 @@ public class MainTable extends JTable {
     }
 
 
-    private static GeneralRenderer defRenderer
-    ,
-    reqRenderer
-    ,
-    optRenderer
-    ,
-    grayedOutRenderer,
-    veryGrayedOutRenderer
-    ,
-    markedRenderer;
+    private static GeneralRenderer defRenderer, reqRenderer, optRenderer, grayedOutRenderer,
+        veryGrayedOutRenderer;
+
+    private static GeneralRenderer[] markedRenderers;
 
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer
             compRenderer,
             grayedOutNumberRenderer,
-            veryGrayedOutNumberRenderer,
-            markedNumberRenderer;
+            veryGrayedOutNumberRenderer;
+
+    private static CompleteRenderer[] markedNumberRenderers;
 
     public static void updateRenderers() {
 
@@ -535,7 +534,6 @@ public class MainTable extends JTable {
         optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"));
         incRenderer = new IncompleteRenderer();
         compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"));
-        markedNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("markedEntryBackground"));
         grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"));
         veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"));
         grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
@@ -544,8 +542,16 @@ public class MainTable extends JTable {
         veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
                 Globals.prefs.getColor("veryGrayedOutText"), mixColors(Globals.prefs.getColor("veryGrayedOutBackground"),
                 sel));
-        markedRenderer = new GeneralRenderer(Globals.prefs.getColor("markedEntryBackground"),
-                Globals.prefs.getColor("tableText"), mixColors(Globals.prefs.getColor("markedEntryBackground"), sel));
+
+        markedRenderers = new GeneralRenderer[Util.MARK_COLOR_LEVELS];
+        markedNumberRenderers = new CompleteRenderer[Util.MARK_COLOR_LEVELS];
+        for (int i=0; i<Util.MARK_COLOR_LEVELS; i++) {
+            Color c = Globals.prefs.getColor("markedEntryBackground"+i);
+            markedRenderers[i] = new GeneralRenderer(c,
+                Globals.prefs.getColor("tableText"), mixColors(Globals.prefs.getColor("markedEntryBackground"+i), sel));
+            markedNumberRenderers[i] = new CompleteRenderer(c);
+        }
+        
     }
 
     private static Color mixColors(Color one, Color two) {

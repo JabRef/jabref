@@ -21,15 +21,14 @@ public class MarkedComparator implements Comparator<BibtexEntry> {
         if (e1 == e2)
             return 0;
 
-        boolean mrk1 = Util.isMarked(e1),
+        int mrk1 = Util.isMarked(e1),
                 mrk2 = Util.isMarked(e2);
 
         if (mrk1 == mrk2)
             return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
 
-        else if (mrk2)
-            return 1;
-        else return -1;
+        else return mrk2-mrk1;
+        
     }
 
     private int idCompare(BibtexEntry b1, BibtexEntry b2) {
