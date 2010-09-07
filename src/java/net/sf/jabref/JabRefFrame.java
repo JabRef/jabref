@@ -1200,6 +1200,10 @@ public JabRefPreferences prefs() {
       //edit.add(exportToClipboard);
       edit.addSeparator();
       edit.add(mark);
+      JMenu markSpecific = subMenu("Mark specific color");
+      for (int i=0; i<Util.MAX_MARKING_LEVEL; i++)
+          markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
+      edit.add(markSpecific);
       edit.add(unmark);
       edit.add(unmarkAll);
       edit.addSeparator();
@@ -1339,7 +1343,7 @@ public JabRefPreferences prefs() {
       helpMenu.add(errorConsole);
   }
 
-    private JMenu subMenu(String name) {
+    public static JMenu subMenu(String name) {
         name = Globals.menuTitle(name);
         int i = name.indexOf('&');
         JMenu res;
