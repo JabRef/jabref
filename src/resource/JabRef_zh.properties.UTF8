@@ -187,8 +187,6 @@ Available_fields=可用的_BibTeX_域
 
 Available_import_formats=可用的导入格式
 
-Background_color_for_marked_entries=高亮记录的背景颜色
-
 Background_color_for_optional_fields=可选域的背景颜色
 
 Background_color_for_required_fields=必选域的背景颜色
@@ -2000,7 +1998,7 @@ Note_that_these_settings_are_used_for_the_legacy_<b>pdf</b>_and_<b>ps</b>_fields
 Legacy_file_fields=旧式文件域
 
 This_makes_JabRef_look_up_each_%0_extension_and_check_if_the_file_exists._If_not,_you_will_be_given_options<BR>to_resolve_the_problem.=这将使_JabRef_依据%0扩展名查找文件是否存在，如果找不到，JabRef_将提供给您选项来解决这个问题。
-Run_Fetcher,_e.g._"--fetch=Medline\:cancer"=运行抓取器，例如_"--fetch=Medline\:cancer"
+Run_Fetcher,_e.g._"--fetch\=Medline\:cancer"=Medline\:cancer"=运行抓取器，例如_"--fetch=Medline\:cancer"
 Override_legacy_file_fields=覆盖旧式文件域
 
 The_ACM_Digital_Library=ACM_数字图书馆
@@ -2156,3 +2154,10 @@ Resolving_duplicate_BibTeX_keys...=
 Finished_resolving_duplicate_BibTeX_keys._%0_entries_modified.=
 This_database_contains_one_or_more_duplicated_BibTeX_keys.=
 Do_you_want_to_resolve_duplicate_keys_now?=
+
+Find_and_remove_duplicate_BibTeX_keys=
+Expected_syntax_for_--fetch\='<name_of_fetcher>\:<query>'=
+Duplicate_BibTeX_key=
+Duplicate_key=
+Generate_key=
+Import_marking_color=
