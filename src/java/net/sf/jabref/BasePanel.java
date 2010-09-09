@@ -2263,9 +2263,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Put an asterix behind the file name to indicate the
         // database has changed.
         String oldTitle = frame.getTabTitle(this);
-        if (!oldTitle.endsWith("*"))
+        if (!oldTitle.endsWith("*")) {
             frame.setTabTitle(this, oldTitle+"*", frame.getTabTooltip(this));
-
+            frame.setWindowTitle();
+        }
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
@@ -2280,8 +2281,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
-            if (!baseChanged)
+            if (!baseChanged) {
                 markBaseChanged();
+            }
         }
         else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
@@ -2291,6 +2293,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             else
                 frame.setTabTitle(BasePanel.this, Globals.lang("untitled"), null);
         }
+        frame.setWindowTitle();
     }
 
     /**

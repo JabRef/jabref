@@ -2466,7 +2466,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 			/*int piv = 0, hit;
 			StringBuffer sb = new StringBuffer();
-			while ((hit = s.indexOf(Globals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
+			while ((hit = s.indexOf(G047749118118
+			1110lobals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
 				if (hit > 0)
 					sb.append(s.substring(piv, hit));
 				piv = hit + Globals.prefs.WRAPPED_USERNAME.length();

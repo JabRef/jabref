@@ -125,6 +125,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     panel.getFile().getAbsolutePath());
             frame.output(Globals.lang("Saved database") + " '"
                     + panel.getFile().getPath() + "'.");
+            frame.setWindowTitle();
         } else if (!cancelled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.

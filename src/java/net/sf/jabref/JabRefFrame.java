@@ -485,6 +485,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     highlightAll
                         .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
                     Globals.focusListener.setFocused(bp.mainTable);
+                    setWindowTitle();
                     // Set correct enabled state for Back and Forward actions:
                     bp.setBackAndForwardEnabledState();
                     new FocusRequester(bp.mainTable);
@@ -493,7 +494,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         });
     }
 
-
+    public void setWindowTitle() {
+        // Set window title:
+        BasePanel bp = basePanel();
+        if (bp == null) {
+            setTitle(GUIGlobals.frameTitle);
+            return;
+        }
+        String star = bp.baseChanged ? "*" : "";
+        if (bp.getFile() != null) {
+            setTitle(GUIGlobals.frameTitle+" - "+bp.getFile().getPath()+star);
+        } else {
+            setTitle(GUIGlobals.frameTitle+" - "+Globals.lang("untitled")+star);
+        }
+    }
 
     private void initSidePane() {
         sidePaneManager = new SidePaneManager(this);
@@ -1716,6 +1730,7 @@ public JabRefPreferences prefs() {
             if (tabbedPane.getTabCount() > 0) {
                 markActiveBasePanel();
             }
+            setWindowTitle();
             updateEnabledState(); // Man, this is what I call a bug that this is not called.
             output(Globals.lang("Closed database") + ".");
             System.gc(); // Test
