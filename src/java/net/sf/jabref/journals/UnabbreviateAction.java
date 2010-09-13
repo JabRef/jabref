@@ -37,7 +37,7 @@ public class UnabbreviateAction extends AbstractWorker {
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;
         for (int i = 0; i < entries.length; i++) {
-            if (Globals.journalAbbrev.unabbreviate(entries[i], "journal", ce))
+            if (Globals.journalAbbrev.unabbreviate(panel.database(), entries[i], "journal", ce))
                 count++;
         }
         if (count > 0) {

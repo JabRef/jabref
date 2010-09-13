@@ -13,10 +13,7 @@ import javax.swing.table.TableModel;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.Globals;
+import net.sf.jabref.*;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.util.CaseChanger;
 
@@ -189,23 +186,27 @@ public class JournalAbbreviations {
 
     /**
      * Abbreviate the journal name of the given entry.
+     * @param database The database the entry belongs to, or null if no database.
      * @param entry The entry to be treated.
      * @param fieldName The field name (e.g. "journal")
      * @param ce If the entry is changed, add an edit to this compound.
      * @param withDots True if the abbreviations should have dots.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibtexEntry entry, String fieldName, CompoundEdit ce, boolean withDots) {
-        Object o = entry.getField(fieldName);
-        if (o == null)
+    public boolean abbreviate(BibtexDatabase database, BibtexEntry entry,
+                              String fieldName, CompoundEdit ce, boolean withDots) {
+        String text = entry.getField(fieldName);
+        if (text == null)
             return false;
-        String text = (String)o;
+        String origText = text;
+        if (database != null)
+            text = database.resolveForStrings(text);
         if (isKnownName(text) && !isAbbreviatedName(text)) {
             String newText = getAbbreviatedName(text, withDots);
             if (newText == null)
                 return false;
             entry.setField(fieldName, newText);
-            ce.addEdit(new UndoableFieldChange(entry, fieldName, text, newText));
+            ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
             return true;
         } else {
             String unabbr = getFullName(text);
@@ -214,7 +215,7 @@ public class JournalAbbreviations {
                 if (newText == null)
                     return false;
                 entry.setField(fieldName, newText);
-                ce.addEdit(new UndoableFieldChange(entry, fieldName, text, newText));
+                ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
                 return true;
             } else
                 return false;
@@ -228,17 +229,20 @@ public class JournalAbbreviations {
      * @param ce If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean unabbreviate(BibtexEntry entry, String fieldName, CompoundEdit ce) {
-        Object o = entry.getField(fieldName);
-        if (o == null)
+    public boolean unabbreviate(BibtexDatabase database, BibtexEntry entry,
+                                String fieldName, CompoundEdit ce) {
+        String text = entry.getField(fieldName);
+        if (text == null)
             return false;
-        String text = (String)o;
+        String origText = text;
+        if (database != null)
+            text = database.resolveForStrings(text);
         if (isKnownName(text) && isAbbreviatedName(text)) {
             String newText = getFullName(text);
             if (newText == null)
                 return false;
             entry.setField(fieldName, newText);
-            ce.addEdit(new UndoableFieldChange(entry, fieldName, text, newText));
+            ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
             return true;
         } else
             return false;

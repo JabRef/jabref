@@ -385,7 +385,7 @@ public class LabelPatternUtil {
             } else if (val.equals("lastpage")) {
                 return lastPage(_entry.getField("pages"));
             } else if (val.equals("shorttitle")) {
-                return getTitleWords(3, _entry);
+                return keepLettersAndDigitsOnly(getTitleWords(3, _entry));
             } else if (val.equals("shortyear")) {
                 String ss = _entry.getField("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
@@ -396,7 +396,7 @@ public class LabelPatternUtil {
                     return ss;
                 }
             } else if (val.equals("veryshorttitle")) {
-                return getTitleWords(1, _entry);
+                return keepLettersAndDigitsOnly(getTitleWords(1, _entry));
             } else if (val.matches("keyword\\d+")) {
                 StringBuilder sb = new StringBuilder();
                 int num = Integer.parseInt(val.substring(7));
@@ -457,7 +457,8 @@ public class LabelPatternUtil {
         mainl: while ((piv < ss.length()) && (words < number)) {
             current = new StringBuffer();
             // Get the next word:
-            while ((piv<ss.length()) && !Character.isWhitespace(ss.charAt(piv))) {
+            while ((piv<ss.length()) && !Character.isWhitespace(ss.charAt(piv))
+                    && (ss.charAt(piv) != '-')) {
                 current.append(ss.charAt(piv));
                 piv++;
                 //System.out.println(".. "+piv+" '"+current.toString()+"'");
@@ -483,6 +484,14 @@ public class LabelPatternUtil {
         return _sbvalue.toString();
     }
 
+    static String keepLettersAndDigitsOnly(String in) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<in.length(); i++) {
+            if (Character.isLetterOrDigit(in.charAt(i)))
+                sb.append(in.charAt(i));
+        }
+        return sb.toString();
+    }
 
     /**
      * Tests whether a given label is unique.

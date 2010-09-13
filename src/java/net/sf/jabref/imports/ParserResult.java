@@ -54,7 +54,9 @@ public class ParserResult {
     private boolean invalid = false;
 
     private String jabrefVersion = null; // Which JabRef version wrote the file, if any?
-    private int jabrefMajorVersion = 0, jabrefMinorVersion = 0; // Numeric version representation
+    private int jabrefMajorVersion = 0;
+    private int jabrefMinorVersion = 0;
+    private int jabrefMinor2Version = 0; // Numeric version representation
     private boolean toOpenTab = false;
 
     public ParserResult(Collection<BibtexEntry> entries){
@@ -113,6 +115,14 @@ public class ParserResult {
         this.jabrefMinorVersion = jabrefMinorVersion;
     }
 
+    public int getJabrefMinor2Version() {
+        return jabrefMinor2Version;
+    }
+
+    public void setJabrefMinor2Version(int jabrefMinor2Version) {
+        this.jabrefMinor2Version = jabrefMinor2Version;
+    }
+    
     public BibtexDatabase getDatabase() {
     	return base;
     }

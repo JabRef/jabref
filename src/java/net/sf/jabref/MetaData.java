@@ -145,7 +145,7 @@ public class MetaData implements Iterable<String> {
         // There can be up to two directory definitions for these files - the database's
         // metadata can specify a directory, or the preferences can specify one. The
         // metadata directory takes precedence if defined.
-        String key = fieldName + "Directory";
+        String key = Globals.prefs.get("userFileDir");
         String dir;
         Vector<String> vec = getData(key);
         if ((vec != null) && (vec.size() > 0)) {

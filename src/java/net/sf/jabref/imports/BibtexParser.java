@@ -1076,6 +1076,10 @@ public class BibtexParser {
                     // It matched. Remove the last period and return:
                     return versionNum.substring(0, versionNum.length()-1);
                 }
+                else if (Pattern.compile("[1-9]+\\.[1-9]\\.[1-9A-Za-z ]+\\.").matcher(versionNum).matches()) {
+                    // It matched. Remove the last period and return:
+                    return versionNum.substring(0, versionNum.length()-1);
+                }
 
             }
         }
@@ -1091,12 +1095,17 @@ public class BibtexParser {
     private void setMajorMinorVersions() {
         String v = _pr.getJabrefVersion();
         Pattern p = Pattern.compile("([0-9]+)\\.([0-9]+).*");
+        Pattern p2 = Pattern.compile("([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
         Matcher m = p.matcher(v);
-        if (!m.matches())
-            return;
-        if (m.groupCount() >= 2) {
-            _pr.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
-            _pr.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
-        }
+        Matcher m2 = p2.matcher(v);
+        if (m.matches())
+            if (m.groupCount() >= 2) {
+                _pr.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
+                _pr.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
+            }
+        if (m2.matches())
+            if (m2.groupCount() >= 3) {
+                _pr.setJabrefMinor2Version(Integer.parseInt(m2.group(3)));
+            }
     }
 }

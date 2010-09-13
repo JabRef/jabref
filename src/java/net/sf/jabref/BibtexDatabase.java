@@ -65,6 +65,8 @@ public class BibtexDatabase {
 
 	Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
+    private boolean followCrossrefs = true;
+
 	/**
 	 * use a map instead of a set since i need to know how many of each key is
 	 * inthere
@@ -624,8 +626,9 @@ public class BibtexDatabase {
         Object o = bibtex.getField(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
-        // field in the referred entry:
-        if ((o == null) && (database != null)) {
+        // field in the referred entry: Do not do this for the bibtex key.
+        if ((o == null) && (database != null) && database.followCrossrefs &&
+                !field.equals(BibtexFields.KEY_FIELD) && (database != null)) {
             Object crossRef = bibtex.getField("crossref");
             if (crossRef != null) {
                 BibtexEntry referred = database.getEntryByKey((String)crossRef);
@@ -635,7 +638,7 @@ public class BibtexDatabase {
                     o = referred.getField(field);
                 }
             }
-        }
+        } 
 
         return getText((String)o, database);
 	}
@@ -654,4 +657,8 @@ public class BibtexDatabase {
 		
 		return toResolve;
 	}
+
+    public void setFollowCrossrefs(boolean followCrossrefs) {
+        this.followCrossrefs = followCrossrefs;
+    }
 }

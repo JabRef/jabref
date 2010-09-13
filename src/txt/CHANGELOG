@@ -1,3 +1,4 @@
+2.6.1
     - Window title now includes the full path to the current file.
     - Entries can now be marked in a series of different colors. Automarking of imported
       entries is now done in separate color without affecting other marked entries.
@@ -11,6 +12,11 @@
     - Fixed bug in Move/rename file link feature that could cause the wrong link to be
       stored for certain directory structures.
     - Fixed bug: curly braces can now be used in arguments to formatters. 
+    - Fixed lockup bug when generating key for entries with crossref fields.
+    - BibTeX strings are now resolved before attempting to (un)abbreviate journal names.
+    - Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
+      a hyphen a word boundary, and remove punctuation characters (keep only numbers and
+      letters).
 2.6
     - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
     - Active preview (1 or 2) is now remembered.

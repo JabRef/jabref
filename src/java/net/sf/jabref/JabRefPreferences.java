@@ -438,6 +438,9 @@ public class JabRefPreferences {
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put("useIEEEAbrv", Boolean.TRUE);
+
+	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
+	defaults.put("showFileDirUpgradeWarning", true);
     }
     
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";

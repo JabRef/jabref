@@ -786,8 +786,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                             : Globals.lang("entry"))+"...");
         }
 
+
         // Run second, on a different thread:
                 public void run() {
+                    database.setFollowCrossrefs(false);
                     BibtexEntry bes = null ;
                     NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
 
@@ -843,6 +845,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Run third, on EDT:
         public void update() {
+            database.setFollowCrossrefs(true);
             if (cancelled) {
                 frame.unblock();
                 return;

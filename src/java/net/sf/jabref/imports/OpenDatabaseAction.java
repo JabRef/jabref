@@ -25,6 +25,7 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 import net.sf.jabref.label.HandleDuplicateWarnings;
+import net.sf.jabref.external.FileDirectoryUpgradeWarning;
 
 // The action concerned with opening an existing database.
 
@@ -46,7 +47,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         postOpenActions.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
         postOpenActions.add(new HandleDuplicateWarnings());
-
+        // Add the action for the new user-specific file directory setting in version 2.6+:
+        postOpenActions.add(new FileDirectoryUpgradeWarning());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -354,7 +356,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         ParserResult pr = bp.parse();
         pr.setEncoding(encoding);
-
+        pr.setFile(fileToOpen);
         return pr;
     }
 
