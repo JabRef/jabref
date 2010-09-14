@@ -2570,6 +2570,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void fileUpdated() {
       if (saving)
         return; // We are just saving the file, so this message is most likely due
+      //if (updatedExternally) {
+      //  return;
+      //}
       // to bad timing. If not, we'll handle it on the next polling.
       //Util.pr("File '"+file.getPath()+"' has been modified.");
       updatedExternally = true;

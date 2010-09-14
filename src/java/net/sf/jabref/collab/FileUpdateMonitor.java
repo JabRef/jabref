@@ -207,6 +207,7 @@ public class FileUpdateMonitor extends Thread {
     public void notifyListener() {
       // Update time stamp.
       timeStamp = file.lastModified();
+      fileSize = file.length();
       listener.fileUpdated();
     }
 

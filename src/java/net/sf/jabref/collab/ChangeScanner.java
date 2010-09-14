@@ -130,13 +130,11 @@ public class ChangeScanner extends Thread {
     private void storeTempDatabase() {
         new Thread(new Runnable() {
             public void run() {
-                System.out.println("Storing temp database");
                 try {
                     SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
                         Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
                         false, false, panel.getEncoding(), true);
                     ss.commit();
-                    System.out.println("done");
                 } catch (SaveException ex) {
                     System.out.println("Problem updating tmp file after accepting external changes");
                 }

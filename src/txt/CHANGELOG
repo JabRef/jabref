@@ -9,6 +9,8 @@
     - Added check that ensures that application doesn't quit while a large save operation
       is still in progress. Shows wait message with cancel button.
     - Added apostrophe (') as illegal character in BibTeX keys.
+    - Fixed bug in merging external changes - file would still be reported as modified
+      externally after merging changes.
     - Fixed bug in Move/rename file link feature that could cause the wrong link to be
       stored for certain directory structures.
     - Fixed bug: curly braces can now be used in arguments to formatters. 
