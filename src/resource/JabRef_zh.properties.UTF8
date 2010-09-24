@@ -1998,7 +1998,7 @@ Note_that_these_settings_are_used_for_the_legacy_<b>pdf</b>_and_<b>ps</b>_fields
 Legacy_file_fields=旧式文件域
 
 This_makes_JabRef_look_up_each_%0_extension_and_check_if_the_file_exists._If_not,_you_will_be_given_options<BR>to_resolve_the_problem.=这将使_JabRef_依据%0扩展名查找文件是否存在，如果找不到，JabRef_将提供给您选项来解决这个问题。
-Run_Fetcher,_e.g._"--fetch\=Medline\:cancer"=Medline\:cancer"=运行抓取器，例如_"--fetch=Medline\:cancer"
+Run_Fetcher,_e.g._"--fetch\=Medline\:cancer"=运行抓取器，例如_"--fetch\=Medline\:cancer"
 Override_legacy_file_fields=覆盖旧式文件域
 
 The_ACM_Digital_Library=ACM_数字图书馆
