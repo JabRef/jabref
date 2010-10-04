@@ -251,6 +251,7 @@ public class GUIGlobals {
         //LANGUAGES.put("Polski", "pl");
 	LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Simplified Chinese", "zh");
+        LANGUAGES.put("Vietnamese", "vi");
 	}
 
 	/**
