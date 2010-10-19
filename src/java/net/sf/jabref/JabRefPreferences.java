@@ -292,6 +292,10 @@ public class JabRefPreferences {
         defaults.put("markedEntryBackground3", "255:120:120");
         defaults.put("markedEntryBackground4", "255:75:75");
         defaults.put("markedEntryBackground5", "220:255:220");
+        defaults.put("validFieldBackgroundColor", "255:255:255");
+        defaults.put("invalidFieldBackgroundColor", "255:0:0");
+        defaults.put("activeFieldEditorBackgroundColor", "220:220:255");
+        defaults.put("fieldEditorTextColor", "0:0:0");
 
         defaults.put("incompleteEntryBackground", "250:175:175");
 
@@ -911,6 +915,9 @@ public class JabRefPreferences {
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
 
         defKeyBinds.put("Automatically link files", "alt F");
+
+        defKeyBinds.put("Refresh OO", "ctrl alt O");
+        
     }
 
     private String getNextUnit(Reader data) throws IOException {

@@ -20,12 +20,12 @@ public class FieldEditorFocusListener implements FocusListener {
     }
 
     public void focusGained(FocusEvent event) {
-        ((Component)event.getSource()).setBackground(GUIGlobals.activeEditor);
+        ((FieldEditor)event.getSource()).setActiveBackgroundColor();
     }
 
 
     public void focusLost(FocusEvent event) {
-        ((Component)event.getSource()).setBackground(Color.white);
+        ((FieldEditor)event.getSource()).setValidBackgroundColor();
     }
 
 }

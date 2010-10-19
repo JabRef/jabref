@@ -68,6 +68,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(fontButton);
         builder.nextLine();
+        builder.appendSeparator(Globals.lang("Table and entry editor colors"));
         builder.append(colorPanel);
         /*builder.appendSeparator(Globals.lang("Custom icon theme"));
         builder.append(useCustomIconTheme);

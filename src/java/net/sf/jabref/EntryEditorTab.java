@@ -299,9 +299,9 @@ public class EntryEditorTab {
 			FieldEditor ed = editors.get(field);
 			ed.setEnabled(true);
 			if (((Component) ed).hasFocus())
-				ed.setBackground(GUIGlobals.activeEditor);
+				ed.setActiveBackgroundColor();
 			else
-				ed.setBackground(GUIGlobals.validFieldBackground);
+				ed.setValidBackgroundColor();
 		}
 	}
 

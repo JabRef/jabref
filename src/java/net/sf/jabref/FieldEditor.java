@@ -61,6 +61,12 @@ public interface FieldEditor {
 
 	public JLabel getLabel();
 
+    public void setActiveBackgroundColor();
+
+    public void setValidBackgroundColor();
+
+    public void setInvalidBackgroundColor();
+
 	public void setLabelColor(Color c);
 
 	public void setBackground(Color c);

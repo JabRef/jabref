@@ -170,11 +170,6 @@ public class GUIGlobals {
 	lightGray = new Color(230, 30, 30), // Light gray background
 	validFieldColor = new Color(100, 100, 150), // Empty field, blue.
 	nullFieldColor = new Color(75, 130, 95), // Valid field, green.
-	invalidFieldColor = new Color(141, 0, 61), // Invalid field, red.
-//	invalidFieldColor = new Color(210, 70, 70), // Invalid field, red.
-	validFieldBackground = Color.white, // Valid field backgnd.
-//	invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
-	invalidFieldBackground = new Color(255, 100, 100), // Invalid field backgnd.
 	gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
 	gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
 	//activeTabbed = Color.black,  // active Database (JTabbedPane)
@@ -183,6 +178,10 @@ public class GUIGlobals {
 	inActiveTabbed = Color.black,  // inactive Database
 	infoField = new Color(254, 255, 225) // color for an info field
 	;
+
+    public static Color
+        editorTextColor = null, validFieldBackgroundColor = null,
+        activeBackground = null, invalidFieldBackgroundColor = null;
 
 	public static String META_FLAG = "jabref-meta: ";
 	public static String META_FLAG_OLD = "bibkeeper-meta: ";
@@ -252,8 +251,17 @@ public class GUIGlobals {
 	LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Simplified Chinese", "zh");
         LANGUAGES.put("Vietnamese", "vi");
+
+        // Set up entry editor colors, first time:
+        updateEntryEditorColors();
 	}
 
+    public static void updateEntryEditorColors() {
+        activeBackground = JabRefPreferences.getInstance().getColor("activeFieldEditorBackgroundColor");
+        validFieldBackgroundColor = JabRefPreferences.getInstance().getColor("validFieldBackgroundColor");
+        invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor("invalidFieldBackgroundColor");
+        editorTextColor = JabRefPreferences.getInstance().getColor("fieldEditorTextColor");
+    }
 	/**
 	 * Read either the default icon theme, or a custom one. If loading of the custom theme
 	 * fails, try to fall back on the default theme.

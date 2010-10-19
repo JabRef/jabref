@@ -70,7 +70,9 @@ public class FieldTextField extends JTextField implements FieldEditor {
 		label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
 		// label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
 		// label.setBorder(BorderFactory.createEtchedBorder());
-		setBackground(GUIGlobals.validFieldBackground);
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setForeground(GUIGlobals.editorTextColor);
+
 		// label.setOpaque(true);
 		// if ((content != null) && (content.length() > 0))
 		// label.setForeground(GUIGlobals.validFieldColor);
@@ -106,6 +108,18 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	public JComponent getTextComponent() {
 		return this;
 
+    }
+
+    public void setActiveBackgroundColor() {
+        setBackground(GUIGlobals.activeBackground);
+    }
+
+    public void setValidBackgroundColor() {
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+    }
+
+    public void setInvalidBackgroundColor() {
+        setBackground(GUIGlobals.invalidFieldBackgroundColor);
     }
 
     public void updateFont() {

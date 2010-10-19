@@ -43,6 +43,10 @@ public class ColorSetupPanel extends JPanel {
         buttons.add(new ColorButton("gridColor", Globals.lang("Table grid color")));
         buttons.add(new ColorButton("markedEntryBackground5", Globals.lang("Import marking color")));
 
+        buttons.add(new ColorButton("fieldEditorTextColor", Globals.lang("Entry editor font color")));
+        buttons.add(new ColorButton("validFieldBackgroundColor", Globals.lang("Entry editor background color")));
+        buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Globals.lang("Entry editor active background color")));
+        buttons.add(new ColorButton("invalidFieldBackgroundColor", Globals.lang("Entry editor invalid field color")));
 
         for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
             ColorButton but = i.next();

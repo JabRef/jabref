@@ -752,4 +752,13 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     public void clearAutoCompleteSuggestion() {
     }
+
+    public void setActiveBackgroundColor() {
+    }
+
+    public void setValidBackgroundColor() {
+    }
+
+    public void setInvalidBackgroundColor() {
+    }
 }

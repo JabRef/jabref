@@ -1,4 +1,6 @@
 2.6.1
+    - Font and background colors are now customizable in the entry editor (Options ->
+      Preferences -> Appearance).
     - Window title now includes the full path to the current file.
     - Entries can now be marked in a series of different colors. Automarking of imported
       entries is now done in separate color without affecting other marked entries.

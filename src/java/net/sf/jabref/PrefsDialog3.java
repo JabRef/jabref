@@ -259,6 +259,7 @@ public class PrefsDialog3 extends JDialog {
 						return;
 					setVisible(false);
 					MainTable.updateRenderers();
+                    GUIGlobals.updateEntryEditorColors();
 					frame.setupAllTables();
 					frame.groupSelector.revalidateGroups(); // icons may have
 					// changed

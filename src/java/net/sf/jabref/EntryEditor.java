@@ -1152,14 +1152,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 if ((cleaned != null) && !cleaned.equals(newValue)) {
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid BibTeX key"),
                         Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                    fe.setBackground(GUIGlobals.invalidFieldBackground);
+                    fe.setInvalidBackgroundColor();
                     return;
                 } else {
-                    fe.setBackground(/*
-                                         * fe.getTextComponent().hasFocus() ?
-                                         * GUIGlobals.activeEditor :
-                                         */
-                    GUIGlobals.validFieldBackground);
+                    fe.setValidBackgroundColor();
                 }
 
                 boolean isDuplicate = panel.database.setCiteKeyForEntry(entry.getId(), newValue);
@@ -1179,13 +1175,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
                 if ((newValue != null) && (newValue.length() > 0))
                     // fe.setLabelColor(GUIGlobals.validFieldColor);
-                    fe.setBackground(GUIGlobals.validFieldBackground);
+                    fe.setValidBackgroundColor();
                 else
                     // fe.setLabelColor(GUIGlobals.nullFieldColor);
-                    fe.setBackground(GUIGlobals.validFieldBackground);
+                    fe.setValidBackgroundColor();
 
                 if (fe.getTextComponent().hasFocus())
-                    fe.setBackground(GUIGlobals.activeEditor);
+                    fe.setActiveBackgroundColor();
                 updateSource();
                 panel.markBaseChanged();
             }
@@ -1234,10 +1230,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
                         if ((toSet != null) && (toSet.length() > 0))
                             // fe.setLabelColor(GUIGlobals.validFieldColor);
-                            fe.setBackground(GUIGlobals.validFieldBackground);
+                            fe.setValidBackgroundColor();
                         else
                             // fe.setLabelColor(GUIGlobals.nullFieldColor);
-                            fe.setBackground(GUIGlobals.validFieldBackground);
+                            fe.setValidBackgroundColor();
 
                         // See if we need to update an AutoCompleter instance:
                         AbstractAutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
@@ -1254,12 +1250,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
                             .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                        fe.setBackground(GUIGlobals.invalidFieldBackground);
+                        fe.setInvalidBackgroundColor();
                     }
                 } else {
                     // set == false
                     // We set the field and label color.
-                    fe.setBackground(GUIGlobals.validFieldBackground);
+                    fe.setValidBackgroundColor();
                 }
                 if (fe.getTextComponent().hasFocus())
                     fe.setBackground(GUIGlobals.activeEditor);
