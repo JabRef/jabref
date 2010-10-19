@@ -404,7 +404,18 @@ version=${jabref.version}</echo>
 
 
 	<target name="osxjar">
-		<jarbundler dir="${build.lib}" name="JabRef" mainclass="net.sf.jabref.JabRef" jars="${build.lib}/${build.jar}" icon="${images.dir}/JabRef-Logo.icns" version="${jabref.version}" jvmversion="1.4+" stubfile="${lib.dir}/JavaApplicationStub" />
+		<jarbundler dir="${build.lib}"
+                    name="JabRef"
+                    mainclass="net.sf.jabref.JabRef"
+                    jars="${build.lib}/${build.jar}"
+                    icon="${images.dir}/JabRef-Logo.icns"
+                    version="${jabref.version}"
+                    jvmversion="1.4+"
+                    stubfile="${lib.dir}/JavaApplicationStub"
+                    signature="JABr">
+            <documenttype name="BibTeX file" extensions="bib" role="Editor"
+                          iconFile="${images.dir}/JabRef-Logo.icns"/>
+        </jarbundler>
 	</target>
 
 
@@ -612,6 +623,6 @@ Number (CCN)           maintenance
 		</jalopy>
 	</target>
 
-	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-1.4.jar" classname="com.loomcom.ant.tasks.jarbundler.JarBundler" />
+	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-2.1.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 </project>
