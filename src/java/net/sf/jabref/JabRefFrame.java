@@ -871,7 +871,7 @@ public JabRefPreferences prefs() {
     status.add(progressBar);
     con.weightx = 1;
     con.gridwidth = GridBagConstraints.REMAINDER;
-    statusLabel.setForeground(GUIGlobals.validFieldColor.darker());
+    statusLabel.setForeground(GUIGlobals.entryEditorLabelColor.darker());
     con.insets = new Insets(0, 0, 0, 0);
     gbl.setConstraints(status, con);
     getContentPane().add(status);

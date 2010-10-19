@@ -297,6 +297,7 @@ public class EntryEditorTab {
 		for (Iterator<String> i = editors.keySet().iterator(); i.hasNext();) {
 			String field = i.next();
 			FieldEditor ed = editors.get(field);
+            ed.updateFontColor();
 			ed.setEnabled(true);
 			if (((Component) ed).hasFocus())
 				ed.setActiveBackgroundColor();

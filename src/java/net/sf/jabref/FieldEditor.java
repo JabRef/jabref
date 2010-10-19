@@ -71,6 +71,8 @@ public interface FieldEditor {
 
 	public void setBackground(Color c);
 
+    public void updateFontColor();
+
 	public String getText();
 
 	/**

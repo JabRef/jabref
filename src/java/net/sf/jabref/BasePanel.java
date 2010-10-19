@@ -1811,6 +1811,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         createMainTable();
 
+        for (EntryEditor ee : entryEditors.values()) {
+            ee.validateAllFields();
+        }
+
+
+
         splitPane.setTopComponent(mainTable.getPane());
 
         //setupTable();

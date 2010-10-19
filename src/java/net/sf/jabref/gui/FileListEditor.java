@@ -761,4 +761,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     public void setInvalidBackgroundColor() {
     }
+
+    public void updateFontColor() {
+    }
 }

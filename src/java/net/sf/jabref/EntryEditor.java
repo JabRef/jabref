@@ -997,7 +997,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         public TypeLabel(String type) {
             super(type+" ");
             setUI(new VerticalLabelUI(false));
-            setForeground(GUIGlobals.validFieldColor);
+            setForeground(GUIGlobals.entryEditorLabelColor);
             setHorizontalAlignment(RIGHT);
             setFont(GUIGlobals.typeNameFont);
             addMouseListener(new MouseAdapter() {
@@ -1020,7 +1020,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
         public void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g;
-            //g2.setColor(GUIGlobals.validFieldColor);
+            //g2.setColor(GUIGlobals.entryEditorLabelColor);
             //g2.setFont(GUIGlobals.typeNameFont);
             //FontMetrics fm = g2.getFontMetrics();
             //int width = fm.stringWidth(label);
@@ -1174,7 +1174,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     oldValue, newValue));
 
                 if ((newValue != null) && (newValue.length() > 0))
-                    // fe.setLabelColor(GUIGlobals.validFieldColor);
+                    // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
                     fe.setValidBackgroundColor();
                 else
                     // fe.setLabelColor(GUIGlobals.nullFieldColor);
@@ -1229,7 +1229,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                             entry.clearField(fe.getFieldName());
 
                         if ((toSet != null) && (toSet.length() > 0))
-                            // fe.setLabelColor(GUIGlobals.validFieldColor);
+                            // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
                             fe.setValidBackgroundColor();
                         else
                             // fe.setLabelColor(GUIGlobals.nullFieldColor);

@@ -14,7 +14,7 @@ public class FieldNameLabel extends JLabel {
     super(name, JLabel.LEFT);
       setVerticalAlignment(NORTH);
     //setFont(GUIGlobals.fieldNameFont);
-    setForeground(GUIGlobals.validFieldColor);
+    setForeground(GUIGlobals.entryEditorLabelColor);
       setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
     //setBorder(BorderFactory.createEtchedBorder());
   }

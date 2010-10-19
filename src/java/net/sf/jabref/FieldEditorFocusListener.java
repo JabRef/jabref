@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import javax.swing.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
@@ -20,12 +21,18 @@ public class FieldEditorFocusListener implements FocusListener {
     }
 
     public void focusGained(FocusEvent event) {
-        ((FieldEditor)event.getSource()).setActiveBackgroundColor();
+        if (event.getSource() instanceof FieldEditor)
+            ((FieldEditor)event.getSource()).setActiveBackgroundColor();
+        else
+            ((JComponent)event.getSource()).setBackground(GUIGlobals.activeBackground);
     }
 
 
     public void focusLost(FocusEvent event) {
-        ((FieldEditor)event.getSource()).setValidBackgroundColor();
+        if (event.getSource() instanceof FieldEditor)
+            ((FieldEditor)event.getSource()).setValidBackgroundColor();
+        else
+            ((JComponent)event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
     }
 
 }

@@ -148,6 +148,10 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
         setBackground(GUIGlobals.invalidFieldBackgroundColor);
     }
 
+    public void updateFontColor() {
+        setForeground(GUIGlobals.editorTextColor);
+    }
+
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
     }

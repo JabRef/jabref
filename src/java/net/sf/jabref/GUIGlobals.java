@@ -168,13 +168,13 @@ public class GUIGlobals {
 //	Colors.
 	public static Color
 	lightGray = new Color(230, 30, 30), // Light gray background
-	validFieldColor = new Color(100, 100, 150), // Empty field, blue.
+	entryEditorLabelColor = new Color(100, 100, 150), // Empty field, blue.
 	nullFieldColor = new Color(75, 130, 95), // Valid field, green.
 	gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
 	gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
 	//activeTabbed = Color.black,  // active Database (JTabbedPane)
 	//inActiveTabbed = Color.gray.darker(),  // inactive Database
-	activeTabbed = validFieldColor.darker(),  // active Database (JTabbedPane)
+	activeTabbed = entryEditorLabelColor.darker(),  // active Database (JTabbedPane)
 	inActiveTabbed = Color.black,  // inactive Database
 	infoField = new Color(254, 255, 225) // color for an info field
 	;

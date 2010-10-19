@@ -34,9 +34,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.event.UndoableEditListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.CannotUndoException;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
@@ -75,7 +72,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
 		// label.setOpaque(true);
 		// if ((content != null) && (content.length() > 0))
-		// label.setForeground(GUIGlobals.validFieldColor);
+		// label.setForeground(GUIGlobals.entryEditorLabelColor);
 		// At construction time, the field can never have an invalid value.
 		// else label.setForeground(GUIGlobals.nullFieldColor);
 
@@ -122,6 +119,10 @@ public class FieldTextField extends JTextField implements FieldEditor {
         setBackground(GUIGlobals.invalidFieldBackgroundColor);
     }
 
+    public void updateFontColor() {
+        setForeground(GUIGlobals.editorTextColor);
+    }
+    
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
     }
