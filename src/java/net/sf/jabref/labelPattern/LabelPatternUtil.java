@@ -178,7 +178,10 @@ public class LabelPatternUtil {
         if ((oldKey != null) && oldKey.equals(_label))
             occurences--; // No change, so we can accept one dupe.
 
-        if (occurences == 0) {
+        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"),
+                firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
+
+        if (!alwaysAddLetter && (occurences == 0)) {
             // No dupes found, so we can just go ahead.
             if (!_label.equals(oldKey))
                 _db.setCiteKeyForEntry(_entry.getId(), _label);
@@ -186,6 +189,8 @@ public class LabelPatternUtil {
         } else {
             // The key is already in use, so we must modify it.
             int number = 0;
+            if (!alwaysAddLetter && !firstLetterA)
+                number = 1;
 
             String moddedKey = _label + getAddition(number);
             occurences = _db.getNumberOfKeyOccurences(moddedKey);

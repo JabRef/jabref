@@ -36,6 +36,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys")),
         generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)")),
         autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
+    private JRadioButton
+        letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)")),
+        letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)")),
+        alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
 
 
     private JLabel lblEntryType, lblKeyPattern;
@@ -83,6 +87,18 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
          Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
          Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
          Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
+
+         if (alwaysAddLetter.isSelected())
+             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
+         else if (letterStartA.isSelected()) {
+             Globals.prefs.putBoolean("keyGenFirstLetterA", true);
+             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+         }
+         else {
+            Globals.prefs.putBoolean("keyGenFirstLetterA", false);
+            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+         }
+        
          LabelPatternUtil.updateDefaultPattern();
 
 
@@ -157,6 +173,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 *
 	 */
 	private void buildGUI(){
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(letterStartA);
+        bg.add(letterStartB);
+        bg.add(alwaysAddLetter);
 
 	    JPanel pan = new JPanel();
 	    JScrollPane sp = new JScrollPane(pan);
@@ -266,10 +287,15 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         builder.nextLine();
         builder.append(pan);
         builder.append(autoGenerateOnImport);
+        builder.append(letterStartA);
         builder.nextLine();
         builder.append(pan);
         builder.append(warnBeforeOverwriting);
+        builder.append(letterStartB);
+        builder.nextLine();
+        builder.append(pan);
         builder.append(dontOverwrite);
+        builder.append(alwaysAddLetter);
         builder.nextLine();
         builder.append(pan);
         builder.append(generateOnSave);        
@@ -390,6 +416,16 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         generateOnSave.setSelected(Globals.prefs.getBoolean("generateKeysBeforeSaving"));
         autoGenerateOnImport.setSelected(Globals.prefs.getBoolean("generateKeysAfterInspection"));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
+
+        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"),
+                firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
+        if (alwaysAddLetter)
+            this.alwaysAddLetter.setSelected(true);
+        else if (firstLetterA)
+            this.letterStartA.setSelected(true);
+        else
+            this.letterStartB.setSelected(true);
+
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
 	    for (Iterator<String> i=textFields.keySet().iterator(); i.hasNext();) {

@@ -1,4 +1,7 @@
 2.6.1
+    - Introduced three choices for ensuring unique generated keys. The default one (marking
+      with a, b, etc.), a modified one (marking with b, c, etc.) and always adding a letter
+      (a, b, etc.).
     - Font and background colors are now customizable in the entry editor (Options ->
       Preferences -> Appearance).
     - Window title now includes the full path to the current file.

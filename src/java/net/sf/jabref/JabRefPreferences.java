@@ -417,6 +417,9 @@ public class JabRefPreferences {
 
         defaults.put("biblatexMode", Boolean.FALSE);
 
+        defaults.put("keyGenFirstLetterA", Boolean.TRUE);
+        defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
+
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
