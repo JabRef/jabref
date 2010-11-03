@@ -184,7 +184,13 @@ public class LayoutEntry {
 		case LayoutHelper.IS_LAYOUT_TEXT:
 			return text;
 		case LayoutHelper.IS_SIMPLE_FIELD:
-			return BibtexDatabase.getResolvedField(text, bibtex, database);
+			String value = BibtexDatabase.getResolvedField(text, bibtex, database);
+            if (value == null)
+                value = "";
+            // If a post formatter has been set, call it:
+            if (postFormatter != null)
+                value = postFormatter.format(value);
+            return value;
 		case LayoutHelper.IS_FIELD_START:
 		case LayoutHelper.IS_GROUP_START: {
             String field;
