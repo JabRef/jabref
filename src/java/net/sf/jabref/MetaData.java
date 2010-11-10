@@ -162,8 +162,9 @@ public class MetaData implements Iterable<String> {
                     dir = relDir;
             }
         }
-        else
-            dir = Globals.prefs.get(key);
+        else {
+            dir = Globals.prefs.get(fieldName + "Directory");
+	}
 
         return dir;
     }
