@@ -55,7 +55,8 @@ public class Cookie {
           }
           uriDomain = uriDomain.substring(
             uriDomain.indexOf('.'));
-          if (!uriDomain.equals(value) && !uriDomain.endsWith(value)) {
+          if (!uriDomain.equals(value) && !uriDomain.endsWith(value)
+                  && !value.endsWith(uriDomain)) {
             throw new IllegalArgumentException("Trying to set foreign cookie");
           }
           this.domain = value;
