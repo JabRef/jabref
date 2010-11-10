@@ -89,7 +89,7 @@ public class FileActions
         for (String s : database.getStringKeySet()) {
             strings.add(database.getString(s));
         }
-        Collections.sort(strings, new BibtexStringComparator(false));
+        Collections.sort(strings, new BibtexStringComparator(true));
         // First, make a Map of all entries:
         HashMap<String, BibtexString> remaining = new HashMap<String, BibtexString>();
         for (Iterator<BibtexString> i=strings.iterator(); i.hasNext();) {

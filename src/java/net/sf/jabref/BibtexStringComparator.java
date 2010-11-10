@@ -28,12 +28,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
 
     protected boolean considerRefs;
-    private static final String MARKER = "__MARKER__";
-    private static final String PADDED_MARKER = " "+MARKER+" ";
 
     /**
      * @param considerRefs Indicates whether the strings should be
@@ -45,19 +44,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
     }
 
     public int compare(BibtexString s1, BibtexString s2) {
-
-        /*
-         If crossreferences are to be considered, the following block sorts by the number of string
-         references, so strings with less references precede those with more.
-        */
-        if (considerRefs) {
-            //Pattern refPat = Pattern.compile("#[A-Za-z]+#");
-            int ref1 = s1.getContent().replaceAll("#[A-Za-z]+#", PADDED_MARKER).split(MARKER).length,
-                ref2 = s2.getContent().replaceAll("#[A-Za-z]+#", PADDED_MARKER).split(MARKER).length;
-
-            if (ref1 != ref2)
-                return ref1-ref2;
-        }
 
         int res = 0;
 
@@ -90,9 +76,9 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
                     textPre = pre.getContent().toLowerCase();
 
             // If that is the case, reverse the order found:
-            if (textPre.indexOf("#" + namePost + "#") >= 0)
+            if (textPre.indexOf("#" + namePost + "#") >= 0) {
                 res = -res;
-
+            }
 
         }
 

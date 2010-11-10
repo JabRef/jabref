@@ -14,6 +14,7 @@
     - Added check that ensures that application doesn't quit while a large save operation
       is still in progress. Shows wait message with cancel button.
     - Added apostrophe (') as illegal character in BibTeX keys.
+    - BibTeX strings that refer each other are now sorted correctly when saving bib file.
     - Fixed bug in merging external changes - file would still be reported as modified
       externally after merging changes.
     - Fixed bug in Move/rename file link feature that could cause the wrong link to be
