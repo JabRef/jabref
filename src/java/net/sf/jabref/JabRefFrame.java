@@ -416,53 +416,46 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         
         initActions();
 
-        // Fixes occasional Window malbehaviour in Linux
-        setBounds(0, 0, (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),
-            (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() );
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        int sizeX = prefs.getInt("sizeX");
+        int sizeY = prefs.getInt("sizeY");
+        int posX = prefs.getInt("posX");
+        int posY = prefs.getInt("posY");
 
-        if (Globals.prefs.getBoolean("rememberWindowLocation")) {
-            
-            int sizeX = prefs.getInt("sizeX");
-            int sizeY = prefs.getInt("sizeY");
-            int posX = prefs.getInt("posX");
-            int posY = prefs.getInt("posY");
-            
-            //
-            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            //
-            // Do not put a window outside the screen if the preference values are wrong.
-            //
-            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
-            // googled on forums.java.sun.com graphicsenvironment second screen java
-            //
-            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1){
+        //
+        // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
+        //
+        // Do not put a window outside the screen if the preference values are wrong.
+        //
+        // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
+        // googled on forums.java.sun.com graphicsenvironment second screen java
+        //
+        if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1){
 
-                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
-                int height = (int) dim.getHeight();
-                int width = (int) dim.getWidth();
+            int height = (int) dim.getHeight();
+            int width = (int) dim.getWidth();
 
-                if (posX + sizeX > width) {
-                    if (sizeX <= width) {
-                        posX = width - sizeX;
-                    } else {
-                        posX = prefs.getIntDefault("posX");
-                        sizeX = prefs.getIntDefault("sizeX");
-                    }
-                }
-
-                if (posY + sizeY > height) {
-                    if (sizeY <= height) {
-                        posY = height - sizeY;
-                    } else {
-                        posY = prefs.getIntDefault("posY");
-                        sizeY = prefs.getIntDefault("sizeY");
-                    }
+            if (posX + sizeX > width) {
+                if (sizeX <= width) {
+                    posX = width - sizeX;
+                } else {
+                    posX = prefs.getIntDefault("posX");
+                    sizeX = prefs.getIntDefault("sizeX");
                 }
             }
-            setBounds(posX, posY, sizeX, sizeY);
+
+            if (posY + sizeY > height) {
+                if (sizeY <= height) {
+                    posY = height - sizeY;
+                } else {
+                    posY = prefs.getIntDefault("posY");
+                    sizeY = prefs.getIntDefault("sizeY");
+                }
+            }
         }
+        setBounds(posX, posY, sizeX, sizeY);
+
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
@@ -699,8 +692,7 @@ public JabRefPreferences prefs() {
       prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
 //      prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
       prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
-      prefs.putBoolean("rememberWindowLocation", !Globals.prefs.getBoolean("windowMaximised"));
-
+      
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();

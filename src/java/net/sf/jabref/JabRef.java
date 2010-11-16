@@ -752,13 +752,13 @@ public class JabRef {
 
             //Util.pr(": Showing frame");
             jrf.setVisible(true);
+
             // If we are set to remember the window location, we also remember the maximised
             // state. This needs to be set after the window has been made visible, so we
             // do it here:
-             if (Globals.prefs.getBoolean("rememberWindowLocation") &&
-                     Globals.prefs.getBoolean("windowMaximised")) {
-                 jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
-             }
+            if (Globals.prefs.getBoolean("windowMaximised")) {
+                jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            }
 
 
             // TEST TEST TEST TEST TEST TEST

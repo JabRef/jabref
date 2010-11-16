@@ -166,7 +166,6 @@ public class JabRefPreferences {
         defaults.put("sizeX", new Integer(840));
         defaults.put("sizeY", new Integer(680));
         defaults.put("windowMaximised", Boolean.FALSE);
-        defaults.put("rememberWindowLocation", Boolean.TRUE);
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
