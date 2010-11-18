@@ -2166,3 +2166,12 @@ Retain_legacy_file_directory_setting_(for_older_versions_of_JabRef)=
 The_current_version_features_a_new_way_of_storing_the_file_directory_setting_of<br>a_database._This_enables_multiple_users_of_the_same_database_file_to_keep_their<br>own_personal_setting_for_the_path_to_the_file_directory.<br>To_take_advantage_of_this,_your_file_directory_setting_must_be_changed_into_the<br>new_format.=
 Legacy_file_directory_setting_found_-_clear_setting?=
 
+Ensure_unique_keys_using_letters_(a,_b,_...)=
+Ensure_unique_keys_using_letters_(b,_c,_...)=
+Always_add_letter_(a,_b,_...)_to_generated_keys=
+
+Table_and_entry_editor_colors=
+Entry_editor_font_color=
+Entry_editor_background_color=
+Entry_editor_active_background_color=
+Entry_editor_invalid_field_color=
