@@ -416,21 +416,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         
         initActions();
 
+      
+      setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+      if ( !prefs.getBoolean("windowMaximised") ) {
+         
         int sizeX = prefs.getInt("sizeX");
         int sizeY = prefs.getInt("sizeY");
         int posX = prefs.getInt("posX");
         int posY = prefs.getInt("posY");
 
-        if (Globals.prefs.getBoolean("windowMaximised") && !Globals.ON_MAC
-                && !Globals.ON_WIN) {
-
-            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            sizeY = (int) dim.getHeight();
-            sizeX = (int) dim.getWidth();
-            posX = 0;
-            posY = 0;
-
-        }
         //
         // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
         //
@@ -465,6 +459,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
         setBounds(posX, posY, sizeX, sizeY);
+      }
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
