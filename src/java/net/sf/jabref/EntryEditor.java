@@ -756,9 +756,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      *            a <code>BibtexEntry</code> value
      */
     public synchronized void switchTo(BibtexEntry be) {
-        if (entry == be)
+        if (entry == be) {
+            /**
+             * Even if the editor is already showing the same entry, update
+             * the source panel. I'm not sure if this is the correct place to
+             * do this, but in some cases the source panel will otherwise not
+             * be up-to-date when an entry is changed while the entry editor
+             * is existing, set to the same entry, but not visible.
+             */
+            updateSource();
             return;
-
+        }
         storeCurrentEdit();
 
         // Remove this instance as property listener for the entry:

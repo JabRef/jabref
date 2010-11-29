@@ -152,6 +152,7 @@ public class DroppedFileHandler {
         if (success) {
             doLink(entry, fileType, destFilename, false, edits);
             panel.markBaseChanged();
+            panel.updateEntryEditorIfShowing();
         }
         edits.end();
         panel.undoManager.addEdit(edits);

@@ -263,7 +263,7 @@ public class EntryEditorTab {
 	 * 
 	 */
 	public void updateAll() {
-		setEntry(getEntry());
+    	setEntry(getEntry());
 	}
 
 	protected boolean updating = false;
