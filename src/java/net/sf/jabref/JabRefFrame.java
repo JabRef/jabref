@@ -344,6 +344,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     MassSetFieldAction massSetField = new MassSetFieldAction(this);
 
+	GeneralAction findUnlinkedFiles = new GeneralAction(
+  			FindUnlinkedFilesDialog.ACTION_COMMAND,
+  			FindUnlinkedFilesDialog.ACTION_TITLE,
+  			FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
+  			FindUnlinkedFilesDialog.ACTION_ICON,
+  			prefs.getKey(FindUnlinkedFilesDialog.ACTION_COMMAND)
+  	);
+    
     PushToApplicationButton pushExternalButton;
 
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
@@ -1299,7 +1307,7 @@ public JabRefPreferences prefs() {
       bibtex.add(editPreamble);
       bibtex.add(editStrings);
       mb.add(bibtex);
-
+      
       tools.add(makeKeyAction);
       tools.add(Cleanup);
       //tools.add(downloadFullText);
@@ -1316,7 +1324,7 @@ public JabRefPreferences prefs() {
       tools.add(openPdf);
       tools.add(openUrl);
       //tools.add(openSpires);
-
+      tools.add(findUnlinkedFiles);
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);

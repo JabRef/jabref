@@ -785,7 +785,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
         });
-
+        	
+        actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, new BaseAction() {
+      	  	@Override
+      	  	public void action() throws Throwable {
+					FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
+					Util.placeDialog(dialog, frame);
+					dialog.setVisible(true);
+				}
+          });
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {

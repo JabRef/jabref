@@ -983,6 +983,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Forward", "alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");
         defKeyBinds.put("Import into new database", "ctrl alt I");
+        defKeyBinds.put(FindUnlinkedFilesDialog.ACTION_COMMAND, "");
         defKeyBinds.put("Increase table font size", "ctrl PLUS");
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
         defKeyBinds.put("Automatically link files", "alt F");

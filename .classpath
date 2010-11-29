@@ -30,7 +30,7 @@
 	<classpathentry kind="lib" path="lib/spl/jersey/mimepull-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jempbox-1.6.0.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox-1.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdfbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/oo/juh.jar"/>
 	<classpathentry kind="lib" path="lib/oo/jurt.jar"/>
 	<classpathentry kind="lib" path="lib/oo/ridl.jar"/>
