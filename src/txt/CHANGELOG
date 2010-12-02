@@ -1,4 +1,5 @@
 2.7 beta
+    - Some improvements to MS Office export filter.
     - Introduced three choices for ensuring unique generated keys. The default one (marking
       with a, b, etc.), a modified one (marking with b, c, etc.) and always adding a letter
       (a, b, etc.).

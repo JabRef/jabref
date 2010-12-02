@@ -128,6 +128,10 @@ public class MSBibEntry {
 	protected String bibTex_Copyright = null;	 
 	protected String bibTex_Price = null; 	 
 	protected String bibTex_Size = null;
+	
+	/* SM 2010.10 intype, paper support */
+	protected String bibTex_InType = null;
+	protected String bibTex_Paper = null;
 
 	private final String BIBTEX = "BIBTEX_";
 	private final String MSBIB = "msbib-";
@@ -312,14 +316,18 @@ public class MSBibEntry {
 			edition = bibtex.getField("edition").toString();
 		
 		standardNumber = new String();
-		if (bibtex.getField("ISBN") != null)
-			standardNumber += ":ISBN:" + bibtex.getField("ISBN").toString();
-		if (bibtex.getField("ISSN") != null)
-			standardNumber += ":ISSN:"+ bibtex.getField("ISSN").toString();
-		if (bibtex.getField("LCCN") != null)
-			standardNumber += ":LCCN:"+ bibtex.getField("LCCN").toString();
+		if (bibtex.getField("isbn") != null) /* SM: 2010.10: lower case */
+			standardNumber += " ISBN: " + bibtex.getField("isbn").toString(); /* SM: 2010.10: lower case */
+		if (bibtex.getField("issn") != null) /* SM: 2010.10: lower case */
+			standardNumber += " ISSN: "+ bibtex.getField("issn").toString(); /* SM: 2010.10: lower case */
+		if (bibtex.getField("lccn") != null) /* SM: 2010.10: lower case */
+			standardNumber += " LCCN: "+ bibtex.getField("lccn").toString(); /* SM: 2010.10: lower case */
 		if (bibtex.getField("mrnumber") != null)
-			standardNumber += ":MRN:"+ bibtex.getField("mrnumber").toString();
+			standardNumber += " MRN: "+ bibtex.getField("mrnumber").toString();
+		/* SM: 2010.10 begin DOI support */	
+		if (bibtex.getField("doi") != null)
+			standardNumber += " DOI: "+ bibtex.getField("doi").toString();
+		/* SM: 2010.10 end DOI support */	
 		if(standardNumber.equals(""))
 			standardNumber = null;
 
@@ -351,15 +359,31 @@ public class MSBibEntry {
 		if (bibtex.getField("institution") != null)
 			institution = bibtex.getField("institution").toString();
 
+		/* SM: 2010.10 Modified for default source types */
 		if (bibtex.getField("type") != null)
 			thesisType = bibtex.getField("type").toString();
+		else
+		{
+			if (bibtex.getType().getName().equalsIgnoreCase("techreport"))
+				thesisType = "Tech. rep.";
+			else if (bibtex.getType().getName().equalsIgnoreCase("mastersthesis"))
+				thesisType = "Master's thesis";
+			else if (bibtex.getType().getName().equalsIgnoreCase("phdthesis"))
+				thesisType = "Ph.D. dissertation";
+			else if (bibtex.getType().getName().equalsIgnoreCase("unpublished"))
+				thesisType = "unpublished";
+			//else if (bibtex.getType().getName().equalsIgnoreCase("manual"))
+			//	thesisType = "manual";
+		}
+		
+		
 		if ( (sourceType.equals("InternetSite")==true || sourceType.equals("DocumentFromInternetSite")==true)
 				&& bibtex.getField("title") != null)
 			internetSiteTitle = bibtex.getField("title").toString();
 		if (bibtex.getField(MSBIB+"accessed") != null)
 			dateAccessed = bibtex.getField(MSBIB+"accessed").toString();
-		if (bibtex.getField("URL") != null)
-			url = bibtex.getField("URL").toString();
+		if (bibtex.getField("url") != null) /* SM: 2010.10: lower case */
+			url = bibtex.getField("url").toString(); /* SM: 2010.10: lower case */
 		if (bibtex.getField(MSBIB+"productioncompany") != null)
 			productionCompany = bibtex.getField(MSBIB+"productioncompany").toString();
 		
@@ -396,6 +420,7 @@ public class MSBibEntry {
 			caseNumber = bibtex.getField(MSBIB+"casenumber").toString();
 		if (bibtex.getField(MSBIB+"abbreviatedcasenumber") != null)
 			abbreviatedCaseNumber = bibtex.getField(MSBIB+"abbreviatedcasenumber").toString();
+		
 		if (bibtex.getField("series") != null)
 			bibTex_Series = bibtex.getField("series").toString();
 		if (bibtex.getField("abstract") != null)
@@ -417,7 +442,13 @@ public class MSBibEntry {
 		if (bibtex.getField("size") != null)
 			bibTex_Size = bibtex.getField("size").toString();
 	 
+		/* SM: 2010.10 end intype, paper support */	
+		if (bibtex.getField("intype") != null)
+			bibTex_InType = bibtex.getField("intype").toString();
+		if (bibtex.getField("paper") != null)
+			bibTex_Paper = bibtex.getField("paper").toString();
 
+		
 		if (bibtex.getField("author") != null)
 			authors = getAuthors(bibtex.getField("author").toString());
         if (bibtex.getField("editor") != null)
@@ -559,7 +590,7 @@ public class MSBibEntry {
 		if (bibtexType.equalsIgnoreCase("book"))
 			result = "Book";
 		else if(bibtexType.equalsIgnoreCase("inbook"))
-			result = "BookSection";
+			{ result = "BookSection"; bibTexEntry = "inbook"; } /* SM 2010.10: generalized */
 		else if(bibtexType.equalsIgnoreCase("booklet"))
 			{ result = "BookSection"; bibTexEntry = "booklet"; } 
 		else if(bibtexType.equalsIgnoreCase("incollection"))
@@ -569,7 +600,7 @@ public class MSBibEntry {
 			result = "JournalArticle"; 
 
 		else if(bibtexType.equalsIgnoreCase("inproceedings"))
-			result = "ConferenceProceedings"; 
+		{ result = "ConferenceProceedings"; bibTexEntry = "inproceedings"; }  /* SM 2010.10: generalized */ 
 		else if(bibtexType.equalsIgnoreCase("conference"))
 			{ result = "ConferenceProceedings"; bibTexEntry = "conference"; } 
 		else if(bibtexType.equalsIgnoreCase("proceedings"))
@@ -578,7 +609,7 @@ public class MSBibEntry {
 			{ result = "ConferenceProceedings"; bibTexEntry = "collection"; } 
 
 		else if(bibtexType.equalsIgnoreCase("techreport"))
-			result = "Report"; 
+		{ result = "Report"; bibTexEntry = "techreport"; } /* SM 2010.10: generalized */ 
 		else if(bibtexType.equalsIgnoreCase("manual"))
 			{ result = "Report"; bibTexEntry = "manual"; } 
 		else if(bibtexType.equalsIgnoreCase("mastersthesis"))
@@ -593,6 +624,10 @@ public class MSBibEntry {
 
 		else if(bibtexType.equalsIgnoreCase("misc"))
 			result = "Misc"; 
+			
+		/*SM: 2010.10 - bibtex @electronic */
+		else if(bibtexType.equalsIgnoreCase("electronic"))
+			{ result = "Misc"; bibTexEntry = "electronic"; } 
 		
 		return result;
 	}
@@ -664,6 +699,9 @@ public class MSBibEntry {
 			addField(d, parent,"StateProvince",m.group(2));
 			addField(d, parent,"CountryRegion",m.group(3));
 		}
+		else
+			/* SM: 2010.10 generalized */
+			addField(d, parent,"City",address);
 	}
 
 	public void addDate(Document d,Element parent, String date, String extra) {
@@ -746,6 +784,9 @@ public class MSBibEntry {
 	   		
 	   		addDate(d,msbibEntry, dateAccessed, "Accessed");
 	   		
+	   		/* SM 2010.10 added month export */
+	   		addField(d,msbibEntry,"Month",month);
+	   		
 	   		addField(d,msbibEntry,"URL",url);
 	   		addField(d,msbibEntry,"ProductionCompany",productionCompany);
 	   		addField(d,msbibEntry,"PublicationTitle",publicationTitle);
@@ -774,6 +815,11 @@ public class MSBibEntry {
 	   		addField(d,msbibEntry,BIBTEX+"Copyright",bibTex_Copyright);
 	   		addField(d,msbibEntry,BIBTEX+"Price",bibTex_Price);
 	   		addField(d,msbibEntry,BIBTEX+"Size",bibTex_Size);
+	   		
+			/* SM: 2010.10 end intype, paper support */	
+	   		addField(d,msbibEntry,BIBTEX+"InType",bibTex_InType);
+	   		addField(d,msbibEntry,BIBTEX+"Paper",bibTex_Paper);
+
 
 	   		return msbibEntry;
 	   	}
@@ -787,7 +833,7 @@ public class MSBibEntry {
 	   }
 	
 	protected void parseSingleStandardNumber(String type,String bibtype, String standardNum, HashMap<String, String> hm) {
-		// teste using http://www.javaregex.com/test.html
+		// tested using http://www.javaregex.com/test.html
 		Pattern p = Pattern.compile(":"+type+":(.[^:]+)");
 		Matcher m = p.matcher(standardNum);
 		if (m.matches())
@@ -797,10 +843,13 @@ public class MSBibEntry {
 	protected void parseStandardNumber(String standardNum, HashMap<String, String> hm) {
 		if(standardNumber == null)
 			return;
-		parseSingleStandardNumber("ISBN","ISBN",standardNum,hm);
-		parseSingleStandardNumber("ISSN","ISSN",standardNum,hm);
-		parseSingleStandardNumber("LCCN","LCCN",standardNum,hm);
+		parseSingleStandardNumber("ISBN","isbn",standardNum,hm); /* SM: 2010.10: lower case */
+		parseSingleStandardNumber("ISSN","issn",standardNum,hm); /* SM: 2010.10: lower case */
+		parseSingleStandardNumber("LCCN","lccn",standardNum,hm); /* SM: 2010.10: lower case */
 		parseSingleStandardNumber("MRN","mrnumber",standardNum,hm);
+		/* SM: 2010.10 begin DOI support */	
+		parseSingleStandardNumber("DOI","doi",standardNum,hm);
+		/* SM: 2010.10 end DOI support */
 	}
 
 	public void addAuthor(HashMap<String, String> hm, String type, List<PersonName> authorsLst) {
