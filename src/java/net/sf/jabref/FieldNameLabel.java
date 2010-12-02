@@ -12,7 +12,7 @@ public class FieldNameLabel extends JLabel {
 
   public FieldNameLabel(String name) {
     super(name, JLabel.LEFT);
-      setVerticalAlignment(NORTH);
+      setVerticalAlignment(TOP);
     //setFont(GUIGlobals.fieldNameFont);
     setForeground(GUIGlobals.entryEditorLabelColor);
       setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));

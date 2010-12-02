@@ -437,7 +437,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         entries.add(entry);
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-        final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, types.length-1);
+        final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length-1);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         final JLabel label = new JLabel(Globals.lang("Searching for files"));
