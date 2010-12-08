@@ -251,7 +251,7 @@ public class GUIGlobals {
 	LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Simplified Chinese", "zh");
         LANGUAGES.put("Vietnamese", "vi");
-
+        LANGUAGES.put("Indonesian", "in");
         // Set up entry editor colors, first time:
         updateEntryEditorColors();
 	}

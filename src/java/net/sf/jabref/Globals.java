@@ -282,7 +282,7 @@ public class Globals {
 		messages = ResourceBundle.getBundle(resourcePrefix, locale);
 		menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale);
 		intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale);
-		Locale.setDefault(locale);
+        Locale.setDefault(locale);
 		javax.swing.JComponent.setDefaultLocale(locale);
 	}
 
