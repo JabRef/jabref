@@ -163,8 +163,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
                 int answer = JOptionPane.showConfirmDialog(null,"<html>"+
-                        Globals.lang("An autosave file was found for this database. This could indicate "
-                            +"that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
+                        Globals.lang("An autosave file was found for this database. This could indicate ")
+                            +Globals.lang("that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
                         +Globals.lang("Do you want to recover the database from the autosave file?")+"</html>",
                         Globals.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {

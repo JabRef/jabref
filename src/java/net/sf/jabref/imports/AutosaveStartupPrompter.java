@@ -33,8 +33,8 @@ public class AutosaveStartupPrompter implements Runnable {
             boolean tryingAutosave = false;
             if (Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
                 int answer = JOptionPane.showConfirmDialog(null,"<html>"+
-                    Globals.lang("An autosave file was found for this database. This could indicate "
-                        +"that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
+                    Globals.lang("An autosave file was found for this database. This could indicate ")
+                        +Globals.lang("that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
                     +Globals.lang("Do you want to recover the database from the autosave file?")+"</html>",
                     Globals.lang("Autosave of file '%0'", file.getName()), JOptionPane.YES_NO_OPTION);
                 tryingAutosave = answer == JOptionPane.YES_OPTION;
