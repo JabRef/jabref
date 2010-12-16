@@ -35,9 +35,12 @@ public class Authors extends AbstractParamLayoutFormatter {
         authorOrder.add("LastFirst");
         authorOrder.add("LastFirstFirst");
 
-        authorAbbr.add("Names");
+        authorAbbr.add("FullName");
         authorAbbr.add("Initials");
         authorAbbr.add("FirstInitial");
+        authorAbbr.add("MiddleInitial");
+        authorAbbr.add("LastName");
+        authorAbbr.add("InitialsNoSpace");
 
         authorPunc.add("FullPunc");
         authorPunc.add("NoPunc");
@@ -54,7 +57,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         lastSeparators.add("Colon");
         lastSeparators.add("Semicolon");
         lastSeparators.add("Amp");
-        lastSeparators.add("Oxfort");
+        lastSeparators.add("Oxford");
         lastSeparators.add("LastSep");
 
     }
@@ -69,7 +72,8 @@ public class Authors extends AbstractParamLayoutFormatter {
         AMP = " & ",
         COLON = ": ",
         SEMICOLON = "; ",
-        AND = " and ";
+        AND = " and ",
+        OXFORD = ", and ";
 
     int flMode = 1;
 
@@ -77,6 +81,8 @@ public class Authors extends AbstractParamLayoutFormatter {
         firstFirst = true,
         abbreviate = true,
         firstInitialOnly = false,
+        middleInitial = false,
+        lastNameOnly = false,
         abbrDots = true,
         abbrSpaces = true;
 
@@ -129,6 +135,17 @@ public class Authors extends AbstractParamLayoutFormatter {
                 abbreviate = true;
                 firstInitialOnly = true;
             }
+            else if (key.equals("MiddleInitial")) {
+                abbreviate = true;
+                middleInitial = true;
+            }
+            else if (key.equals("LastName")) {
+                lastNameOnly = true;
+            }
+            else if (key.equals("InitialsNoSpace")) {
+                abbreviate = true;
+                abbrSpaces = false;
+            }
         }
         else if (authorPunc.contains(key)) {
             if (key.equals("FullPunc")) {
@@ -176,6 +193,9 @@ public class Authors extends AbstractParamLayoutFormatter {
                     setSep = true;
                 } else lastSeparator = SEMICOLON;
             }
+            else if (key.equals("Oxford")) {
+                lastSeparator = OXFORD;
+            }
             else if (key.equals("Sep") && (value.length() > 0)) {
                 separator = value;
                 setSep = true;
@@ -194,18 +214,6 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
 
-        /*if (key.equals("order")) {
-            value = value.toLowerCase();
-            if (value.equals("ff") || value.equals("firstfirst"))
-                flMode = FIRST_FIRST;
-            else if (value.equals("lf") || value.equals("lastfirst"))
-                flMode = LAST_FIRST;
-            else if (value.equals("lf-ff") || value.equals("lastfirst-firstfirst"))
-                flMode = LF_FF;
-        }
-        else if (key.equals("separator")) {
-            
-        }*/
     }
 
     public String format(String fieldText) {
@@ -239,20 +247,39 @@ public class Authors extends AbstractParamLayoutFormatter {
             firstNamePart = a.getFirstAbbr();
             if (firstInitialOnly && (firstNamePart.length() > 2))
                 firstNamePart = firstNamePart.substring(0, 2);
+            else if (middleInitial) {
+                String abbr = firstNamePart;
+                firstNamePart = a.getFirst();
+                int index = firstNamePart.indexOf(" ");
+                //System.out.println(firstNamePart);
+                //System.out.println(index);
+                if (index >= 0) {
+                    firstNamePart = firstNamePart.substring(0, index+1);
+                    if (abbr.length() > 3) {
+                        firstNamePart = firstNamePart + abbr.substring(3);
+                    }
+                }
+            }
             if (!abbrDots)
                 firstNamePart = firstNamePart.replaceAll("\\.", "");
             if (!abbrSpaces)
                 firstNamePart = firstNamePart.replaceAll(" ", "");
         }
-
-        if (firstFirst) {
+        String von = a.getVon();
+        if (lastNameOnly) {
+            if ((von != null) && (von.length() > 0))
+                sb.append(von).append(" ");
+            sb.append(a.getLast());
+        }
+        else if (firstFirst) {
             sb.append(firstNamePart).append(firstFirstSeparator);
-            String von = a.getVon();
             if ((von != null) && (von.length() > 0))
                 sb.append(von).append(" ");
             sb.append(a.getLast());
         }
         else {
+            if ((von != null) && (von.length() > 0))
+                sb.append(von).append(" ");
             sb.append(a.getLast()).append(lastFirstSeparator).append(firstNamePart);
         }
 
@@ -260,7 +287,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     public static void main(String[] args) {
         Authors format = new Authors();
-        format.setArgument("LastFirstFirst,Initials,NoComma,Comma,LastSep= und ,2,EtAl= m.fl.");
-        System.out.println(format.format("Jo-Arve Alfredsen and Morten O. Alver and Yngvar von Olsen and S. A. L. M. Kooijman"));
+        format.setArgument("FirstFirst,MiddleInitial,FullPunc,Comma,Oxford,10,EtAl= m.fl.");
+        System.out.println(format.format("Jo Arve Alfredsen and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
     }
 }
