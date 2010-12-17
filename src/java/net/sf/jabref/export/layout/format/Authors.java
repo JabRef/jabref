@@ -93,9 +93,10 @@ public class Authors extends AbstractParamLayoutFormatter {
     String
         firstFirstSeparator = " ",
         lastFirstSeparator = ", ",
-        separator = SEMICOLON,
-        lastSeparator = AMP,
-        etAlString = " et al.";
+        separator = COMMA,
+        lastSeparator = AND,
+        etAlString = " et al.",
+        jrSeparator = " ";
 
 
     public void setArgument(String arg) {
@@ -243,6 +244,14 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     private void addSingleName(StringBuilder sb, AuthorList.Author a, boolean firstFirst) {
         String firstNamePart = a.getFirst();
+        String lastNamePart = a.getLast();
+        String von = a.getVon();
+        if ((von != null) && (von.length() > 0))
+            lastNamePart = von+" "+lastNamePart;
+        String jr = a.getJr();
+        if ((jr != null) && (jr.length() > 0))
+            lastNamePart = lastNamePart+jrSeparator+jr;
+
         if (abbreviate) {
             firstNamePart = a.getFirstAbbr();
             if (firstInitialOnly && (firstNamePart.length() > 2))
@@ -265,29 +274,23 @@ public class Authors extends AbstractParamLayoutFormatter {
             if (!abbrSpaces)
                 firstNamePart = firstNamePart.replaceAll(" ", "");
         }
-        String von = a.getVon();
+
         if (lastNameOnly) {
-            if ((von != null) && (von.length() > 0))
-                sb.append(von).append(" ");
-            sb.append(a.getLast());
+            sb.append(lastNamePart);
         }
         else if (firstFirst) {
             sb.append(firstNamePart).append(firstFirstSeparator);
-            if ((von != null) && (von.length() > 0))
-                sb.append(von).append(" ");
-            sb.append(a.getLast());
+            sb.append(lastNamePart);
         }
         else {
-            if ((von != null) && (von.length() > 0))
-                sb.append(von).append(" ");
-            sb.append(a.getLast()).append(lastFirstSeparator).append(firstNamePart);
+            sb.append(lastNamePart).append(lastFirstSeparator).append(firstNamePart);
         }
 
     }
 
     public static void main(String[] args) {
         Authors format = new Authors();
-        format.setArgument("FirstFirst,MiddleInitial,FullPunc,Comma,Oxford,10,EtAl= m.fl.");
-        System.out.println(format.format("Jo Arve Alfredsen and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
+        format.setArgument("LastFirst,MiddleInitial,FullPunc,Comma,Oxford,10,EtAl= m.fl.");
+        System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
     }
 }
