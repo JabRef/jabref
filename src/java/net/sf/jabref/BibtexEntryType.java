@@ -898,7 +898,34 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         }
         else {
             ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
-            ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
+	    ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
+	    ALL_TYPES.put("inbook", BibLatexEntryTypes.INBOOK);
+	    ALL_TYPES.put("bookinbook", BibLatexEntryTypes.BOOKINBOOK);
+	    ALL_TYPES.put("suppbook", BibLatexEntryTypes.SUPPBOOK);
+	    ALL_TYPES.put("booklet", BibLatexEntryTypes.BOOKLET);
+	    ALL_TYPES.put("collection", BibLatexEntryTypes.COLLECTION);
+	    ALL_TYPES.put("incollection", BibLatexEntryTypes.INCOLLECTION);
+	    ALL_TYPES.put("suppcollection", BibLatexEntryTypes.SUPPCOLLECTION);
+	    ALL_TYPES.put("manual", BibLatexEntryTypes.MANUAL);
+	    ALL_TYPES.put("misc", BibLatexEntryTypes.MISC);
+	    ALL_TYPES.put("online", BibLatexEntryTypes.ONLINE);
+	    ALL_TYPES.put("patent", BibLatexEntryTypes.PATENT);
+	    ALL_TYPES.put("periodical", BibLatexEntryTypes.PERIODICAL);
+	    ALL_TYPES.put("suppperiodical", BibLatexEntryTypes.SUPPPERIODICAL);
+	    ALL_TYPES.put("proceedings", BibLatexEntryTypes.PROCEEDINGS);
+	    ALL_TYPES.put("inproceedings", BibLatexEntryTypes.INPROCEEDINGS);
+	    ALL_TYPES.put("reference", BibLatexEntryTypes.REFERENCE);
+	    ALL_TYPES.put("inreference", BibLatexEntryTypes.INREFERENCE);
+	    ALL_TYPES.put("report", BibLatexEntryTypes.REPORT);
+	    ALL_TYPES.put("set", BibLatexEntryTypes.SET);
+	    ALL_TYPES.put("thesis", BibLatexEntryTypes.THESIS);
+	    ALL_TYPES.put("unpublished", BibLatexEntryTypes.UNPUBLISHED);
+	    ALL_TYPES.put("conference", BibLatexEntryTypes.CONFERENCE);
+	    ALL_TYPES.put("electronic", BibLatexEntryTypes.ELECTRONIC);
+	    ALL_TYPES.put("mastersthesis", BibLatexEntryTypes.MASTERSTHESIS);
+	    ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
+	    ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
+	    ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
         }
 
         // We need a record of the standard types, in case the user wants
