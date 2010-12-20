@@ -215,79 +215,10 @@
 
     <h2>Built-in export formatters</h2>
 
-    <p>JabRef provides the following set of formatters, some of
-    which depend on the others:</p>
+    <p>JabRef provides the following set of formatters:</p>
 
     <ul>
-
-        <li><code>AuthorAbbreviator</code> or <code>AuthorLastFirstAbbreviator</code>
-            : abbreviates first and middle names of all authors. This formatter
-        returns names with the last name first. Follow this formatter with
-        AuthorFirstFirst to get abbreviated names with the initials first.</li>
-
-        <li><code>AuthorAndsCommaReplacer</code> : replaces "and"
-        between names with ",", and "&amp;" between the last
-        two.</li>
-
-        <li><code>AuthorAndsReplacer</code> : replaces "and"
-        between names with ";", and "&amp;" between the last
-        two.</li>
-
-        <li><code>AuthorFirstFirst</code> : formats author/editor
-        fields with the first names first.</li>
-
-        <li><code>AuthorFirstFirstCommas</code> or <code>AuthorFirstLastCommas</code>
-        : formats author/editor fields with the first names first, delimited by
-        commas, with "and" between the last two names.</li>
-
-        <li><code>AuthorFirstLastOxfordCommas</code> : similar
-        to <code>AuthorFirstLastCommas</code>, except that the "and"
-        between the last two names is preceded by a comma.</li>
-
-        <li><code>AuthorFirstAbbrLastCommas</code> : formats
-        author/editor fields with abbreviated first names first, delimited by
-        commas, with "and" between the last two names.</li>
-
-        <li><code>AuthorFirstAbbrLastOxfordCommas</code> : similar
-        to <code>AuthorFirstAbbrLastCommas</code>, except that the "and"
-        between the last two names is preceded by a comma.</li>
-
-        <li><code>AuthorLastFirst</code> : formats author/editor
-        fields with the last names first.</li>
-
-        <li><code>AuthorLastFirstAbbrCommas</code> : formats
-        author/editor fields with last names first and abbreviated first names
-        last, delimited by commas, with "and" between the last two names.</li>
-
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : similar
-        to <code>AuthorLastFirstAbbrCommas</code>, except that the "and"
-        between the last two names is preceded by a comma.</li>
-
-        <li><code>AuthorLastFirstCommas</code> : formats
-        author/editor fields with the last names first, delimited by
-        commas, with "and" between the last two names.</li>
-
-        <li><code>AuthorLastFirstOxfordCommas</code> : similar
-        to <code>AuthorLastFirstCommas</code>, except that the "and"
-        between the last two names is preceded by a comma.</li>
-
-        <li><code>AuthorLF_FF</code> : formats
-        author/editor fields with last name first for the first author,
-        and the first name first for the remaining authors. Returns
-        names delimited with "and".</li>
-
-        <li><code>AuthorLF_FFAbbr</code> : same as <code>AuthorLF_FF</code>,
-        but abbreviates first names.</li>
-                
-        <li><code>AuthorNatBib</code> : formats author names in
-        NatBib style, with last names only, separating names by
-        "and" if there are two authors, and giving the first author
-        followed by "et al." if there are more than two
-        authors.</li>
-
-        <li><code>AuthorOrgSci</code> : first author is in "last,
-        first" all others in "first last". First names are
-        abbreviated.</li>
+        <li><code>Authors</code> : this formatter provides formatting options for the author and editor fields; for detailed information, see below. It deprecates a range of dedicated formatters provided in versions of JabRef prior to 2.7.</li>
 
         <li><code>CreateDocBookAuthors</code> : formats the author
         field in DocBook style.</li>
@@ -307,6 +238,9 @@
         If the string to format is non-empty, it is output without changes. If it is empty,
         the default value is output. For instance, <code>\format[Default(unknown)]{\year}</code>
         will output the entry's year if set, and "unknown" if no year is set.</li>
+	
+        <li><code>DOIStrip</code> : strips any prefixes from the DOI string.</li>
+        <li><code>DOICheck</code> : provides the full url for a DOI link.</li>
 
         <li><code>FileLink(filetype)</code> : if no argument is given, this formatter outputs
         the first external file link encoded in the field. To work, the formatter must
@@ -322,11 +256,9 @@
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "345".</li>
 
-        <li><code>FormatPagesForHTML</code> : replaces "--" with
-        "-".</li>
+        <li><code>FormatPagesForHTML</code> : replaces "--" with "-".</li>
 
-        <li><code>FormatPagesForXML</code> : replaces "--" with an
-        XML en-dash.</li>
+        <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.</li>
 
         <li><code>GetOpenOfficeType</code> : returns the number used by the OpenOffice.org
         bibliography system (versions 1.x and 2.x) to denote the type of this entry.</li>
@@ -349,9 +281,6 @@
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "360".</li>
 
-        <li><code>NoSpaceBetweenAbbreviations</code> : spaces
-        between multiple abbreviated first names are removed.</li>
-
         <li><code>Number</code> : outputs the 1-based sequence number of the current entry in the
         current export. This formatter can be used to make a numbered list of entries. The
         sequence number depends on the current entry's place in the current sort order, not on
@@ -359,8 +288,7 @@
 
         <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".</li>
 
-        <li><code>RemoveBracketsAddComma</code> : to be
-        documented.</li>
+        <li><code>RemoveBracketsAddComma</code> : to be documented.</li>
 
         <li><code>RemoveLatexCommands</code> : removes LaTeX
         commands like <code>\em</code>, <code>\textbf</code>, etc.
@@ -411,11 +339,67 @@
         characters (e.g. {\^a} or {\"{o}}) with their XML
         representations.</li>
 
-
-
     </ul>
 
-    <h3>The <code>WrapFileLinks</code> formatter</h3>
+<h3>The <code>Authors</code> formatter</h3>
+
+<p>To accommodate for the numerous citation styles, the <code>Authors</code> formatter allows flexible control over the layout of the author list. The formatter takes a comma-separated list of options, by which the default values can be overridden. The following option/value pairs are currently available, where the default values are given in italics.</p>
+<dl>
+<dt><code>AuthorSort = [<i>FirstFirst</i> | LastFirst | LastFirstFirstFirst]</code></dt>
+<dd>specifies the order in wich the author names are formatted.
+	<ul>
+		<li><code><i>FirstFirst</i></code> :  first names are followed by the surname.</li>
+		<li><code>LastFirst</code> : the authors' surnames are followed by their first names, separated by a comma.</li>		
+		<li><code>LastFirstFirstFirst</code> : the first author is formatted as LastFirst, the subsequent authors as FirstFirst.</li>
+	</ul>
+</dd>
+
+<dt><code>AuthorAbbr = [<i>FullName</i> | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital]</code></dt>
+<dd>specifies how the author names are abbreviated.
+	<ul>
+		<li><code><i>FullName</i></code> : shows full author names; first names are not abbreviated.</li>
+		<li><code>LastName</code> : show only surnames, first names are removed.</li> 
+		<li><code>Initials</code> : all first names are abbreviated.</li> 
+		<li><code>InitialsNospace</code> : as Initials, with any spaces between initials removed</li> 
+		<li><code>FirstInitial</code> : only first initial is shown.</li> 
+		<li><code>MiddleInitial</code> : first name is shown, but all middle names are abbreviated.</li>
+	</ul>	
+</dd>
+
+<dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code><dt>
+<dd>specifies the punctuation used in the author list when <code>AuthorAbbr</code> is used
+	<ul>
+		<li><code><i>FullPunc</i></code> : no changes are made to punctuation.</li>
+		<li><code>NoPunc</code> : all full stops and commas are removed from the author name.</li>
+		<li><code>NoComma</code> : all commas are removed from the author name.</li>
+		<li><code>NoPeriod</code> : all full stops are removed from the author name.</li>
+	</ul>	
+</dd>
+
+<dt><code>AuthorSep = [<i>Comma</i> | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
+<dd>specifies the separator to be used between authors. Any separator can be specified, with the <code>Sep=&lt;string&gt;</code> option.</dd> 
+
+<dt><code>AuthorLastSep = [<i>And</i> | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
+<dd>specifies the last separator in the author list. Any separator can be specified, with the <code>LastSep=&lt;string&gt;</code> option.</dd>
+
+<dt><code>AuthorNumber = [<i>inf</i> | &lt;integer&gt;]</code></dt>
+<dd>specifies the number of authors that are printed. If the number of authors exceeds the maximum specified, the authorlist is replaced by the first author, followed by <code>EtAlString</code>.</dd>
+
+<dt><code>EtAlString = [<i> et al.</i> | EtAl=&lt;string&gt;]</code></dt>
+<dd>specifies the string used to replace multiple authors. Any string can be given, using <code>EtAl=&lt;string&gt;</code></dd>
+
+</dl>
+
+<p>If an option is unspecified, the default value (shown in italics above) is used. Therefore, only layout options that differ from the defaults need to be specified. The order in which the options are defined is (mostly) irrelevant. So, for example,</p> 
+<pre>\format[Authors(Initials,Oxford)]{\author}</pre>
+ is equivalent to
+<pre>\format[Authors(Oxford,Initials)]{\author}</pre>
+</p>
+<p>As mentioned, the order in which the options are specified is irrelevant. There is one possibility for ambiguity, and that is if both <code>AuthorSep</code> and <code>AuthorLastSep</code> are given. In that case, the first applicable value encountered would be for <code>AuthorSep</code>, and the second for <code>AuthorLastSep</code>.</p>
+
+
+
+<h3>The <code>WrapFileLinks</code> formatter</h3>
 
     This formatter iterates over all file links, or all file links of a specified
     type, outputting a format string given as the first argument. The format string
@@ -454,8 +438,10 @@
     <p/>
     If the entry contained a second file link to the file "/home/john/draft.txt" of the
     "Text file" type with description 'An early "draft"', the output would be as follows:<br>
-    <pre>1. John's final report (/home/john/report.pdf)</pre>
-    <pre>2. An early "draft" (/home/john/draft.txt)</pre>
+    <pre>
+    1. John's final report (/home/john/report.pdf)
+    2. An early "draft" (/home/john/draft.txt)
+    </pre>
     <p/>
     If the formatter was called with a second argument, the list would be filtered.
     For instance:<br>
