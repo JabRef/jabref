@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
 public class Authors extends AbstractParamLayoutFormatter {
 
     /*
-    AuthorSort = [FirstLast | LastFirst | LastFirstFirst]
-    AuthorAbbr = [Names | Initials | FirstInitial]
+    AuthorSort = [FirstFirst | LastFirst | LastFirstFirstFirst]
+    AuthorAbbr = [FullName | Initials | FirstInitial | MiddleInitial | InitialsNoSpace | LastName]
     AuthorSep = [Comma | And | Colon | Semicolon | Sep=<string>]
-    AuthorLastSep = [And | Colon | Semicolon | Amp | Oxford | LastSep=<string>]
+    AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | LastSep=<string>]
     AuthorPunc = [FullPunc | NoPunc | NoComma | NoPeriod]
     AuthorNumber = [inf | <number>]
-    EtAlString = [et al. | EtAl=<string>]
+    EtAlString = [ et al. | EtAl=<string>]
     */
     
     static ArrayList<String>
@@ -33,7 +33,7 @@ public class Authors extends AbstractParamLayoutFormatter {
     static {
         authorOrder.add("FirstFirst");
         authorOrder.add("LastFirst");
-        authorOrder.add("LastFirstFirst");
+        authorOrder.add("LastFirstFirstFirst");
 
         authorAbbr.add("FullName");
         authorAbbr.add("Initials");
@@ -121,7 +121,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 flMode = FIRST_FIRST;
             else if (key.equals("LastFirst"))
                 flMode = LAST_FIRST;
-            else if (key.equals("LastFirstFirst"))
+            else if (key.equals("LastFirstFirstFirst"))
                 flMode = LF_FF;
         }
         else if (authorAbbr.contains(key)) {
@@ -168,7 +168,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
         // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
-        // AuthorLastSep = [And | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
+        // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
         else if (separators.contains(key) || lastSeparators.contains(key)) {
             if (key.equals("Comma")) {
                 if (!setSep) {
