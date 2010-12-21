@@ -151,10 +151,10 @@
     entre crochets, ce qui est n&eacute;cessaire s'il inclut les caract&egrave;res de parenth&egrave;ses.
     Par exemple, <code>\format[Replace("\s,_")]{\journal}</code> appelle
     le formateur <b>Replace</b> avec l'argument <b>\s,_</b> (ce qui remplace
-    tous les espaces par des soulignets dans le champ "field").</p>
+    tous les espaces par des soulign&eacute;s dans le champ "field").</p>
 
 
-    <p>See below for a list of built-in export formatters.</p>
+    <p>Voir ci-dessous pour une liste des formateurs d'exportation disponibles.</p>
 
 
     <h3>Les sorties conditionnelles</h3>
@@ -242,7 +242,7 @@
     ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
     faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
     utilisateurs afin qu'ils utilisent votre format d'exportation.
-    Pour un example, t&eacute;l&eacute;charger le source de JabRef et jeter un
+    Pour un exemple, t&eacute;l&eacute;charger le source de JabRef et jeter un
     oeil au r&eacute;pertoire <code>src/plugins/</code>. N'h&eacute;sitez pas
     &agrave; participer aux forums sur Sourceforge, puisque nous ne disposons
     pas encore d'une documentation volumineuse.</p>
@@ -250,90 +250,15 @@
 
     <h2>Formateurs d'exportation inclus</h2>
 
-    <p>JabRef fournit la s&eacute;rie suivante de formateurs, certains
-    d&eacute;pendant des autres&nbsp;:</p>
+    <p>JabRef fournit la s&eacute;rie suivante de formateurs&nbsp;:</p>
 
     <ul>
-        
-        <li><code>AuthorAbbreviator</code> ou <code>AuthorLastFirstAbbreviator</code>&nbsp;:
-        abr&egrave;ge les pr&eacute;noms de tous les auteurs. Ce formateur renvoie les noms avec
-        le nom propre en premier. Faire suivre ce formateur d'<code>AuthorFirstFirst</code> pour
-        avoir les noms abr&eacute;g&eacute;s avec les initiales en premier.</li>
-
-        <li><code>AuthorAndsCommaReplacer</code>&nbsp;: remplace
-        "and" entre les noms par une virgule (",") et "&amp;" entre
-        les deux derniers.</li>
-
-        <li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and"
-        par ";" entre les premiers noms et par "&amp;" entre les
-        deux derniers.</li>
-
-        <li><code>AuthorFirstFirst</code>&nbsp;: formate le contenu
-        des champs author/editor en mettant les pr&eacute;noms en
-        premier.</li>
-
-        <li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le
-        contenu des champs author/editor en mettant les
-        pr&eacute;noms en premier, des virgules comme
-        s&eacute;parateurs et "and" entre les deux derniers noms.</li>
-
-        <li><code>AuthorFirstLastOxfordCommas</code>&nbsp;:
-        similaire &agrave; <code>AuthorFirstLastCommas</code>,
-        except&eacute; que le "and" entre les deux derniers noms
-        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
-
-        <li><code>AuthorFirstAbbrLastCommas</code>&nbsp;: formate le
-        contenu des champs author/editor en mettant les
-        pr&eacute;noms abr&eacute;g&eacute;s en premier, des virgules comme
-        s&eacute;parateurs et "and" entre les deux derniers noms.</li>
-
-        <li><code>AuthorFirstAbbrLastOxfordCommas</code>&nbsp;:
-        similaire &agrave; <code>AuthorFirstAbbrLastCommas</code>,
-        except&eacute; que le "and" entre les deux derniers noms
-        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
-
-        <li><code>AuthorLastFirst</code>&nbsp;: formate le contenu
-        des champs author/editor en mettant les noms de famille en
-        premier.</li>
-
-        <li><code>AuthorLastFirstAbbrCommas</code>&nbsp;: formate le
-        contenu des champs author/editor en mettant les noms en premier suivis
-        du pr&eacute;nom abr&eacute;g&eacute;, en utilisant des virgules comme
-        s&eacute;parateurs et "and" entre les deux derniers noms.</li> 
- 
-        <li><code>AuthorLastFirstAbbrOxfordCommas</code>&nbsp;: 
-        similaire &agrave; <code>AuthorLastFirstAbbrCommas</code>,
-        except&eacute; que le "and" entre les deux derniers noms
-        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
-       
-        <li><code>AuthorLastFirstCommas</code>&nbsp;: formate le contenu
-        des champs author/editor en mettant les noms de famille en
-        premier, des virgules comme s&eacute;parateurs et "and"
-        entre les deux derniers noms.</li> 
-
-        <li><code>AuthorLastFirstOxfordCommas</code>&nbsp;:
-        similaire &agrave; <code>AuthorLastFirstCommas</code>,
-        except&eacute; que le "and" entre les deux derniers noms
-        est pr&eacute;c&eacute;d&eacute; d'une virgule.</li>
-
-        <li><code>AuthorLF_FF</code>&nbsp;: formate
-        les champs author/editor avec le nom de famille en premier pour le
-        premier auteur et le pr&eacute;nom en premier pour les auteurs restants.
-        Renvoie les noms s&eacute;par&eacute;s par des "and".</li>
-
-        <li><code>AuthorLF_FFAbbr</code>&nbsp;: comme <code>AuthorLF_FF</code>,
-        mais abr&egrave;ge les pr&eacute;noms.</li>
-
-        <li><code>AuthorNatBib</code>&nbsp;: Formats des noms
-        d'auteurs dans le style NatBib, avec les noms propres
-        s&eacute;par&eacute;s par "and" s'il y a deux auteurs, ou
-        le premier nom suivi de "et al." s'il y en a plus de
-        deux.</li>
-
-        <li><code>AuthorOrgSci</code>&nbsp;: premier auteur selon
-        "nom, pr&eacute;nom" et tous les autres selon
-        "pr&eacute;nom nom". Les pr&eacute;noms sont
-        abr&eacute;g&eacute;s.</li>
+        <li><code>Authors</code>&nbsp;: Ce formateur fournit des options de
+            formatage pour les champs author et editor&nbsp;
+            pour des informations d&eacute;taill&eacute;es, voir ci-dessous.
+            Il rend obsol&egrave;te une s&eacute;rie de formateurs
+            d&eacute;di&eacute;s qui &eacute;taient disponibles dans les
+            versions de JabRef ant&eacute;rieures &agrave; 2.7.</li>
 
         <li><code>CreateDocBookAuthors</code>&nbsp;: formate le
         contenu du champ author selon le style DocBook.</li>
@@ -351,14 +276,20 @@
         uniquement la date, comme par exemple 2005.11.30.</li>
         
         <li><code>Default</code>&nbsp;: prend un seul argument, qui sert comme
-        valeur par d&eacute;faut. Si la cha&icirc;ne &agrave; formatter
+        valeur par d&eacute;faut. Si la cha&icirc;ne &agrave; formater
         n'est pas vide, elle est renvoy&eacute;e sans changement.
         Si elle est vide, la valeur par d&eacute;faut est renvoy&eacute;e.
         Par exemple,
         <code>\format[Default(unknown)]{\year}</code>
         renverra l'ann&eacute;e de l'entr&eacute;e si elle existe,
         et "unknown" si l'ann&eacute;e n'est pas pr&eacute;cis&eacute;e.</li>
-       
+
+        <li><code>DOIStrip</code>&nbsp;: supprime tous les pr&eacute;fixes d'une
+            cha&icirc;ne de DOI.</li>
+
+        <li><code>DOICheck</code>&nbsp;: fournit l'URL compl&egrave;te pour
+            un lien DOI.</li>
+
         <li><code>FileLink(TypeDeFichier)</code>&nbsp;: sans argument, ce formateur renvoie
         le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
         &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).<br>
@@ -371,7 +302,7 @@
 
         <li><code>FirstPage</code>&nbsp;: renvoie la premi&egrave;re page du champ "pages", si initialis&eacute;.
         Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
-        ce formatteur renverra "345".</li>
+        ce formateur renverra "345".</li>
 
         <li><code>FormatChars</code>&nbsp;: remplace les 
         caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
@@ -408,16 +339,12 @@
 
         <li><code>LastPage</code>&nbsp;: renvoie la derni&egrave;re page du champ "pages", si initialis&eacute;.
         Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
-        ce formatteur renverra "360".</li>
+        ce formateur renverra "360".</li>
 
-        <li><code>NoSpaceBetweenAbbreviations</code>&nbsp;: Les espaces
-        entre les initiales des pr&eacute;noms sont
-        supprim&eacute;s.</li>
-                
         <li><code>Number</code>&nbsp;: renvoie la s&eacute;quence de nombres &agrave; base de 1 de l'entr&eacute;e actuelle dans
-        l'exportation actuelle. Ce formatteur peut &ecirc;tre utilis&eacute; pour faire une liste num&eacute;rot&eacute;e d'entr&eacute;es. Le
+        l'exportation actuelle. Ce formateur peut &ecirc;tre utilis&eacute; pour faire une liste num&eacute;rot&eacute;e d'entr&eacute;es. Le
         num&eacute;ro de s&eacute;quence d&eacute;pend de la place de l'entr&eacute;e actuelle dans l'ordre de tri actuel, pas du
-        nombre d'appels de ce formatteur.</li>
+        nombre d'appels de ce formateur.</li>
 
         <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les
         accolades "{" ou "}".</li>
@@ -484,6 +411,103 @@
 
     </ul>
 
+    <h3>Le formateur <code>Authors</code></h3>
+
+    <p>Pour satisfaire les nombreux styles de citation,
+        le formateur <code>Authors</code> permet un contr&ocirc;le flexible de la mise
+        en page de la liste des auteurs. Le formateur prend en argument
+        une liste d'options s&eacute;par&eacute;es par des virgules, ce qui remplace leurs
+        valeurs par d&eacute;faut. Les paires option/valeur suivantes sont actuellement
+        disponibles, les valeurs par d&eacute;faut &eacute;tant &eacute;crites en italique.</p>
+
+    <dl>
+    <dt><code>AuthorSort = [<i>FirstFirst</i> | LastFirst | LastFirstFirstFirst]</code></dt>
+    <dd>d&eacute;finit l'ordre dans lequel les noms d'auteur sont format&eacute;s.
+	<ul>
+		<li><code><i>FirstFirst</i></code>&nbsp;:
+                    les pr&eacute;noms sont suivis du nom de famille.</li>
+		<li><code>LastFirst</code>&nbsp;:
+                    les noms de famille des auteurs sont suivis de leurs pr&eacute;noms,
+                    s&eacute;par&eacute;s par une virgule.</li>
+		<li><code>LastFirstFirstFirst</code>&nbsp;:
+                    Le premier auteur est format&eacute; en LastFirst&nbsp;;
+                    les auteurs suivants en FirstFirst.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorAbbr = [<i>FullName</i> | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital]</code></dt>
+    <dd>d&eacute;finit comment les noms d'auteur sont abr&eacute;g&eacute;s.
+    <ul>
+		<li><code><i>FullName</i></code>&nbsp;:
+                    montre les noms complets des auteurs&nbsp;;
+                    les pr&eacute;noms ne sont pas abr&eacute;g&eacute;s.</li>
+		<li><code>LastName</code>&nbsp;:
+                    montre uniquement les noms de familles,
+                    les pr&eacute;noms sont enlev&eacute;s.</li>
+		<li><code>Initials</code>&nbsp;:
+                    tous les pr&eacute;noms sont abr&eacute;g&eacute;s.</li>
+		<li><code>InitialsNospace</code>&nbsp;:
+                    comme Initials, tous les espaces entre les initiales
+                    &eacute;tant enlev&eacute;s.</li>
+		<li><code>FirstInitial</code>&nbsp;:
+                    seule la premi&egrave;re initiale est affich&eacute;e.</li>
+		<li><code>MiddleInitial</code>&nbsp;:
+                    le premier pr&eacute;nom est affich&eacute;, mais tous les pr&eacute;noms suivants
+                    sont abr&eacute;g&eacute;s.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code><dt>
+    <dd>d&eacute;finit la ponctuation &agrave; utiliser dans la liste des auteurs
+        lorsque <code>AuthorAbbr</code> est utilis&eacute;
+	<ul>
+		<li><code><i>FullPunc</i></code>&nbsp;:
+                    aucun changement &agrave; la ponctuation n'est effectu&eacute;.</li>
+		<li><code>NoPunc</code>&nbsp;:
+                    tous les points et les virgules sont supprim&eacute;s du nom d'auteur.</li>
+		<li><code>NoComma</code>&nbsp;:
+                    toutes les virgules sont supprim&eacute;es du nom d'auteur.</li>
+		<li><code>NoPeriod</code>&nbsp;:
+                    tous les points sont supprim&eacute;s du nom d'auteur.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorSep = [<i>Comma</i> | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit le s&eacute;parateur &agrave; utiliser entre les auteurs. Tout s&eacute;parateur
+        peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>Sep=&lt;string&gt;</code>.</dd>
+
+    <dt><code>AuthorLastSep = [<i>And</i> | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit le dernier s&eacute;parateur dans la liste d'auteurs. Tout s&eacute;parateur
+        peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>LastSep=&lt;string&gt;</code>.</dd>
+
+    <dt><code>AuthorNumber = [<i>inf</i> | &lt;integer&gt;]</code></dt>
+    <dd>d&eacute;finit le nombre d'auteurs devant &ecirc;tre affich&eacute;s. Si le nombre d'auteurs
+        exc&egrave;de le maximum d&eacute;fini, la liste d'auteurs est remplac&eacute;e par le
+        premier auteur suivi de <code>EtAlString</code>.</dd>
+
+    <dt><code>EtAlString = [<i> et al.</i> | EtAl=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit la cha&icirc;ne utilis&eacute;e pour remplacer des auteurs multiples.
+        Toute cha&icirc;ne peut &ecirc;tre sp&eacute;cifi&eacute;e en utilisant <code>EtAl=&lt;string&gt;</code></dd>
+
+    </dl>
+
+    <p>Si une option n'est pas sp&eacute;cifi&eacute;e, la valeur par d&eacute;faut (montr&eacute;e en italique
+        ci-dessus) est utilis&eacute;e. Ainsi, uniquement les options de mise en page
+        qui diff&egrave;re de celles par d&eacute;faut ont besoin d'&ecirc;tre d&eacute;finies.
+        L'ordre dans lequel les options sont d&eacute;finies est (en g&eacute;n&eacute;ral) indiff&eacute;rent.
+        Ainsi, par exemple, </p>
+    <pre>\format[Authors(Initials,Oxford)]{\author}</pre>
+    est &eacute;quivalent &agrave;
+    <pre>\format[Authors(Oxford,Initials)]{\author}</pre>
+    </p>
+    <p>Comme mentionn&eacute;, l'ordre dans lequel les options sont d&eacute;finies est
+        indiff&eacute;rent. Il y a une possibilit&eacute; d'ambigu&iuml;t&eacute; si &agrave; la fois
+        <code>AuthorSep</code> et <code>AuthorLastSep</code> sont d&eacute;finis.
+        Dans ce cas, la premi&egrave;re valeur applicable rencontr&eacute;e devrait &ecirc;tre
+        pour <code>AuthorSep</code>, et la seconde pour <code>AuthorLastSep</code>.
+    </p>
+
+
     <h3>Le formateur <code>WrapFileLinks</code></h3>
 
     <p>
@@ -534,8 +558,10 @@
     <p>
     Si l'entr&eacute;e contient un second lien de fichier vers le fichier "/home/john/draft.txt"
     du type "Text file" avec la description 'An early "draft"', le sortie sera comme suit&nbsp;:<br>
-    <pre>1. John's final report (/home/john/report.pdf)</pre>
-    <pre>2. An early "draft" (/home/john/draft.txt)</pre>
+    <pre>
+    1. John's final report (/home/john/report.pdf)
+    2. An early "draft" (/home/john/draft.txt)
+    </pre>
     <p/>
     <p>
     Si le formateur a &eacute;t&eacute; appel&eacute; avec un second argument, la liste sera filtr&eacute;e.
@@ -572,7 +598,7 @@
     <code>net.sf.jabref.export.layout.format</code>, vous pouvez
     appeler votre formateur en utilisant son nom de classe, comme
     pour les formateurs standards. Sinon, vous devez appeler le
-    formateur par son nom complet (incluant le nom du package).
+    formateur par son nom complet (incluant le nom du paquetage).
     Dans les deux cas, le formateur doit &ecirc;tre dans votre
     chemin de classe lorsque vous lancez JabRef</p>
 
