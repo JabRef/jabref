@@ -292,7 +292,7 @@
 
         <li><code>FileLink(TypeDeFichier)</code>&nbsp;: sans argument, ce formateur renvoie
         le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
-        &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).<br>
+        &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).<br/>
         Ce formateur prend comme argument optionnel l'extension du type de fichier externe
         sp&eacute;cifi&eacute; entre parenth&egrave;ses apr&egrave;s le nom du formateur. Par exemple,
         <code>\format[FileLink(pdf)]{\file}</code> sp&eacute;cifie <code>pdf</code> comme un
@@ -369,13 +369,13 @@
         <li><code>Replace(ExpReg,RemplaceAvec)</code>&nbsp;: effectue le remplacement d'une expression r&eacute;guli&egrave;re.
         Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni. Les parties sont
         s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
-        d'&eacute;chappement&nbsp;: \,<br>
+        d'&eacute;chappement&nbsp;: \,<br/>
         La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. 
         Notez bien que toute virgule doit y &ecirc;tre pr&eacute;c&eacute;d&eacute;e par un antislash,
         et, qu'en cons&eacute;quence, un antislash dans l'expression r&eacute;guli&egrave;re
         recherch&eacute;e y est repr&eacute;sent&eacute; par une paire d'anti-slash. Une description
-        des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br>
-        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html<br>
+        des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br/>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html<br/>
         La seconde partie est le texte qui remplace tous les correspondances.</li>
 
         <li><code>RTFChars</code>&nbsp;: remplace les
@@ -457,7 +457,7 @@
 	</ul>
     </dd>
 
-    <dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code><dt>
+    <dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code></dt>
     <dd>d&eacute;finit la ponctuation &agrave; utiliser dans la liste des auteurs
         lorsque <code>AuthorAbbr</code> est utilis&eacute;
 	<ul>
@@ -495,11 +495,11 @@
         ci-dessus) est utilis&eacute;e. Ainsi, uniquement les options de mise en page
         qui diff&egrave;re de celles par d&eacute;faut ont besoin d'&ecirc;tre d&eacute;finies.
         L'ordre dans lequel les options sont d&eacute;finies est (en g&eacute;n&eacute;ral) indiff&eacute;rent.
-        Ainsi, par exemple, </p>
+        Ainsi, par exemple,</p>
     <pre>\format[Authors(Initials,Oxford)]{\author}</pre>
     est &eacute;quivalent &agrave;
     <pre>\format[Authors(Oxford,Initials)]{\author}</pre>
-    </p>
+    
     <p>Comme mentionn&eacute;, l'ordre dans lequel les options sont d&eacute;finies est
         indiff&eacute;rent. Il y a une possibilit&eacute; d'ambigu&iuml;t&eacute; si &agrave; la fois
         <code>AuthorSep</code> et <code>AuthorLastSep</code> sont d&eacute;finis.
@@ -515,77 +515,73 @@
     d'un type particulier, renvoyant une cha&icirc;ne de formatage donn&eacute;e comme premier
     argument. La cha&icirc;ne de formatage peut contenir un nombre de s&eacute;quences d'&eacute;chappement
     indiquant les informations sur le lien de fichier &agrave; &ecirc;tre ins&eacute;r&eacute; dans la cha&icirc;ne.
-    <p/>
+    </p>
     <p>
     Ce formateur peut prendre un second argument optionnel sp&eacute;cifiant le nom d'un type
     de fichier. Si sp&eacute;cifi&eacute;, l'it&eacute;ration inclura uniquement les fichiers correspondant
     au type de fichier recherch&eacute; (en &eacute;tant sensible &agrave; la casse des
     caract&egrave;res). S'il est sp&eacute;cifi&eacute; comme un argument vide, tous les liens de fichiers
     seront inclus.
-    <p/>
+    </p>
     <p>
     Apr&egrave;s le second argument, des paires d'arguments additionnels peuvent &ecirc;tre ajout&eacute;es
     afin de sp&eacute;cifier des expressions r&eacute;guli&egrave;res de remplacement devant &ecirc;tre ex&eacute;cut&eacute;es
     sur les informations du lien ins&eacute;r&eacute; avant son insertion dans la cha&icirc;ne de sortie.
     Un argument non appari&eacute; sera ignor&eacute;. Afin de sp&eacute;cifier des remplacements sans effectuer
     de filtrage sur les types de fichiers, utilisez un second argument vide.
-    <p/>
+    </p>
     <p>
     Les s&eacute;quences d'&eacute;chappement pour les informations incluses sont les suivantes&nbsp;:
-    <p/>
+    </p>
     <p>
     \i&nbsp;: Cela ins&egrave;re l'index d'it&eacute;ration (d&eacute;butant &agrave; 1), et peut &ecirc;tre utile si
-    la liste des fichiers en sortie doit &ecirc;tre &eacute;num&eacute;r&eacute;e.<br>
-    \p&nbsp;: Cela ins&egrave;re le chemin de fichier d'un lien de fichier.<br>
-    \f&nbsp;: Cela ins&egrave;re le nom du type du lien de fichier.<br>
-    \x&nbsp;: Cela ins&egrave;re l'extension de fichier, si elle existe.<br>
-    \d&nbsp;: Cela ins&egrave;re la description du lien de fichier, si elle existe.<br>
-    <p/>
+    la liste des fichiers en sortie doit &ecirc;tre &eacute;num&eacute;r&eacute;e.<br/>
+    \p&nbsp;: Cela ins&egrave;re le chemin de fichier d'un lien de fichier.<br/>
+    \f&nbsp;: Cela ins&egrave;re le nom du type du lien de fichier.<br/>
+    \x&nbsp;: Cela ins&egrave;re l'extension de fichier, si elle existe.<br/>
+    \d&nbsp;: Cela ins&egrave;re la description du lien de fichier, si elle existe.<br/>
+    </p>
     <p>
     Par exemple, une entr&eacute;e pourrait contenir un lien de fichier vers le fichier    
     "/home/john/report.pdf" de type "PDF" avec la description "John's final report".
-    <p/>
+    </p>
     <p>
     En utilisant le formateur WrapFileLinks avec l'argument suivant&nbsp;:
-    <p/>
+    </p>
+    <pre>\format[WrapFileLinks(\i. \d (\p))]{\file}</pre>
     <p>
-    \format[WrapFileLinks(\i. \d (\p))]{\file}
-    <p/>
-    <p>
-    donnera la sortie suivante&nbsp;:<br>
+    donnera la sortie suivante&nbsp;:</p>
     <pre>1. John's final report (/home/john/report.pdf)</pre>
-    <p/>
     <p>
     Si l'entr&eacute;e contient un second lien de fichier vers le fichier "/home/john/draft.txt"
-    du type "Text file" avec la description 'An early "draft"', le sortie sera comme suit&nbsp;:<br>
+    du type "Text file" avec la description 'An early "draft"', le sortie sera comme suit&nbsp;:</p>
     <pre>
     1. John's final report (/home/john/report.pdf)
     2. An early "draft" (/home/john/draft.txt)
     </pre>
-    <p/>
     <p>
     Si le formateur a &eacute;t&eacute; appel&eacute; avec un second argument, la liste sera filtr&eacute;e.
-    Par exemple&nbsp;:<br>
+    Par exemple&nbsp;:
     <pre>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</pre>
-    <p/>
+    </p>
     <p>
-    affichera uniquement le texte suivant&nbsp;:<br>
+    affichera uniquement le texte suivant&nbsp;:
     <pre>1. An early "draft" (/home/john/draft.txt)</pre>
-    <p/>
+    </p>
     <p>
     Si l'on veut que cette sortie soit incluse dans une sortie en style XML,
     les guillemets dans la description de fichier pourrait causer probl&egrave;me.
     En ajoutant deux arguments additionnels pour traduire les guillemets en
     caract&egrave;res XML, on r&eacute;soudra ce probl&egrave;me&nbsp;:<br>
     \format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
-    <p/>
+    </p>
     <p>
-    affichera la sortie suivante&nbsp;:<br>
+    affichera la sortie suivante&nbsp;:
     <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
-    <p/>
+    </p>
     <p>
     Des paires de remplacement suppl&eacute;mentaires pourraient &ecirc;tre ajout&eacute;es.
-    <p/>
+    </p>
 
 
     <h3>Formateurs personnalis&eacute;s</h3>

@@ -306,13 +306,13 @@
         <li><code>Replace(regexp,replacewith)</code> : does a regular expression replacement.
         To use this formatter, a two-part argument must be given. The parts are
         separated by a comma. To indicate the comma character, use an escape
-        sequence: \,<br>&nbsp;<br>
+        sequence: \,<br/>&nbsp;<br/>
         The first part is the regular expression to search for. Remember that any commma
         character must be preceded by a backslash, and consequently a literal backslash must
         be written as a pair of backslashes. A description of Java regular expressions can be
-        found at:<br>
+        found at:<br/>
         &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
-         <br>&nbsp;<br>
+         <br/>&nbsp;<br/>
         The second part is the text to replace all matches with.</li>
 
         <li><code>RTFChars</code> : replaces TeX-specific special
@@ -390,74 +390,77 @@
 
 </dl>
 
-<p>If an option is unspecified, the default value (shown in italics above) is used. Therefore, only layout options that differ from the defaults need to be specified. The order in which the options are defined is (mostly) irrelevant. So, for example,</p> 
+<p>If an option is unspecified, the default value (shown in italics above) is used. Therefore, only layout options that differ from the defaults need to be specified. The order in which the options are defined is (mostly) irrelevant. So, for example,</p>
 <pre>\format[Authors(Initials,Oxford)]{\author}</pre>
  is equivalent to
 <pre>\format[Authors(Oxford,Initials)]{\author}</pre>
-</p>
 <p>As mentioned, the order in which the options are specified is irrelevant. There is one possibility for ambiguity, and that is if both <code>AuthorSep</code> and <code>AuthorLastSep</code> are given. In that case, the first applicable value encountered would be for <code>AuthorSep</code>, and the second for <code>AuthorLastSep</code>.</p>
 
 
 
 <h3>The <code>WrapFileLinks</code> formatter</h3>
 
-    This formatter iterates over all file links, or all file links of a specified
+   <p>This formatter iterates over all file links, or all file links of a specified
     type, outputting a format string given as the first argument. The format string
     can contain a number of escape sequences indicating file link information to
     be inserted into the string.
-    <p/>
-    This formatter can take an optional second argument specifying the name of a file
+    </p>
+    <p>This formatter can take an optional second argument specifying the name of a file
     type. If specified, the iteration will only include those files with a file type
     matching the given name (case-insensitively). If specified as an empty argument,
     all file links will be included.
-    <p/>
+    </p>
+    <p>
     After the second argument, pairs of additional arguments can be added in order to
     specify regular expression replacements to be done upon the inserted link information
     before insertion into the output string. A non-paired argument will be ignored.
     In order to specify replacements without filtering on file types, use an empty second
     argument.
-    <p/>
+    </p>
+    <p>
     The escape sequences for embedding information are as follows:
-    <p/>
+    </p>
+    <p>
     \i   : This inserts the iteration index (starting from 1), and can be useful if
-    the output list of files should be enumerated.<br>
-    \p   : This inserts the file path of the file link.<br>
-    \f   : This inserts the name of the file link's type.<br>
-    \x   : This inserts the file's extension, if any.<br>
-    \d   : This inserts the file link's description, if any.<br>
-    <p/>
+    the output list of files should be enumerated.<br/>
+    \p   : This inserts the file path of the file link.<br/>
+    \f   : This inserts the name of the file link's type.<br/>
+    \x   : This inserts the file's extension, if any.<br/>
+    \d   : This inserts the file link's description, if any.<br/>
+    </p>
+    <p>
     For instance, an entry could contain a file link to the file "/home/john/report.pdf"
     of the "PDF" type with description "John's final report".
-    <p/>
-    Using the WrapFileLinks formatter with the following argument:
-    <p/>
+    </p>
+    <p>
+    Using the WrapFileLinks formatter with the following argument:</p>
+    <pre>
     \format[WrapFileLinks(\i. \d (\p))]{\file}
-    <p/>
-    would give the following output:<br>
+    </pre>
+    would give the following output:
     <pre>1. John's final report (/home/john/report.pdf)</pre>
-    <p/>
+    <p>
     If the entry contained a second file link to the file "/home/john/draft.txt" of the
-    "Text file" type with description 'An early "draft"', the output would be as follows:<br>
+    "Text file" type with description 'An early "draft"', the output would be as follows:</p>
     <pre>
     1. John's final report (/home/john/report.pdf)
     2. An early "draft" (/home/john/draft.txt)
     </pre>
-    <p/>
+    
     If the formatter was called with a second argument, the list would be filtered.
-    For instance:<br>
+    For instance:
     <pre>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</pre>
-    <p/>
-    would show only the text file:<br>
+    
+    would show only the text file:
     <pre>1. An early "draft" (/home/john/draft.txt)</pre>
-    <p/>
+    
     If we wanted this output to be part of an XML styled output, the quotes in the
     file description could cause problems. Adding two additional arguments to translate
-    the quotes into XML characters solves this:<br>
-    \format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
-    <p/>
-    would give the following output:<br>
+    the quotes into XML characters solves this:
+    <pre>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}</pre>
+    would give the following output:
     <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
-    <p/>Additional pairs of replacements could be added.
+    Additional pairs of replacements could be added.
 
 
     <h3>Custom formatters</h3>
