@@ -206,7 +206,7 @@
     distribute a collection of submitted layout files, or to add to
     the selection of standard export filters and formatters.</p>
 
-    <p>Starting with JabRef 2.4b1 you can also package your
+    <p>Starting with JabRef 2.4 you can also package your 
 	ExportFormat or LayoutFormatter as a plug-in. If you do so,
 	you can provide a single zip-file to other user to make use
 	of your ExportFormat. For an example download the JabRef
@@ -347,19 +347,19 @@
 
 <p>To accommodate for the numerous citation styles, the <code>Authors</code> formatter allows flexible control over the layout of the author list. The formatter takes a comma-separated list of options, by which the default values can be overridden. The following option/value pairs are currently available, where the default values are given in italics.</p>
 <dl>
-<dt><code>AuthorSort = [<i>FirstFirst</i> | LastFirst | LastFirstFirstFirst]</code></dt>
+<dt><code>AuthorSort = [ {FirstFirst} | LastFirst | LastFirstFirstFirst ]</code></dt>
 <dd>specifies the order in which the author names are formatted.
 	<ul>
-		<li><code><i>FirstFirst</i></code> :  first names are followed by the surname.</li>
+		<li><code>FirstFirst</code> :  first names are followed by the surname.</li>
 		<li><code>LastFirst</code> : the authors' surnames are followed by their first names, separated by a comma.</li>		
 		<li><code>LastFirstFirstFirst</code> : the first author is formatted as LastFirst, the subsequent authors as FirstFirst.</li>
 	</ul>
 </dd>
 
-<dt><code>AuthorAbbr = [<i>FullName</i> | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital]</code></dt>
+<dt><code>AuthorAbbr = [ {FullName} | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital ]</code></dt>
 <dd>specifies how the author names are abbreviated.
 	<ul>
-		<li><code><i>FullName</i></code> : shows full author names; first names are not abbreviated.</li>
+		<li><code>FullName</code> : shows full author names; first names are not abbreviated.</li>
 		<li><code>LastName</code> : show only surnames, first names are removed.</li> 
 		<li><code>Initials</code> : all first names are abbreviated.</li> 
 		<li><code>InitialsNospace</code> : as Initials, with any spaces between initials removed.</li>
@@ -368,105 +368,91 @@
 	</ul>	
 </dd>
 
-<dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code></dt>
+<dt><code>AuthorPunc = [ {FullPunc} | NoPunc | NoComma | NoPeriod ]</code></dt>
 <dd>specifies the punctuation used in the author list when <code>AuthorAbbr</code> is used
 	<ul>
-		<li><code><i>FullPunc</i></code> : no changes are made to punctuation.</li>
+		<li><code>FullPunc</code> : no changes are made to punctuation.</li>
 		<li><code>NoPunc</code> : all full stops and commas are removed from the author name.</li>
 		<li><code>NoComma</code> : all commas are removed from the author name.</li>
 		<li><code>NoPeriod</code> : all full stops are removed from the author name.</li>
 	</ul>	
 </dd>
 
-<dt><code>AuthorSep = [<i>Comma</i> | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
-<dd>specifies the separator to be used between authors. Any separator can be specified, with the <code>Sep=&lt;string&gt;</code> option.</dd> 
+<dt><code>AuthorSep = [ {Comma} | And | Colon | Semicolon | Sep=&lt;string&gt; ]</code></dt>
+<dd>specifies the separator to be used between authors. Any separator can be specified, with the <code>Sep=&lt;string&gt;</code> option. Note that appropriate spaces need to be added around <code>string</code>.</dd> 
 
-<dt><code>AuthorLastSep = [<i>And</i> | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
-<dd>specifies the last separator in the author list. Any separator can be specified, with the <code>LastSep=&lt;string&gt;</code> option.</dd>
+<dt><code>AuthorLastSep = [ {And} | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt; ]</code></dt>
+<dd>specifies the last separator in the author list. Any separator can be specified, with the <code>LastSep=&lt;string&gt;</code> option. Note that appropriate spaces need to be added around <code>string</code>.</dd>
 
-<dt><code>AuthorNumber = [<i>inf</i> | &lt;integer&gt;]</code></dt>
+<dt><code>AuthorNumber = [ {inf} | &lt;integer&gt; ]</code></dt>
 <dd>specifies the number of authors that are printed. If the number of authors exceeds the maximum specified, the authorlist is replaced by the first author, followed by <code>EtAlString</code>.</dd>
 
-<dt><code>EtAlString = [<i> et al.</i> | EtAl=&lt;string&gt;]</code></dt>
+<dt><code>EtAlString = [ { et al.} | EtAl=&lt;string&gt; ]</code></dt>
 <dd>specifies the string used to replace multiple authors. Any string can be given, using <code>EtAl=&lt;string&gt;</code></dd>
 
 </dl>
 
-<p>If an option is unspecified, the default value (shown in italics above) is used. Therefore, only layout options that differ from the defaults need to be specified. The order in which the options are defined is (mostly) irrelevant. So, for example,</p>
-<pre>\format[Authors(Initials,Oxford)]{\author}</pre>
- is equivalent to
-<pre>\format[Authors(Oxford,Initials)]{\author}</pre>
-<p>As mentioned, the order in which the options are specified is irrelevant. There is one possibility for ambiguity, and that is if both <code>AuthorSep</code> and <code>AuthorLastSep</code> are given. In that case, the first applicable value encountered would be for <code>AuthorSep</code>, and the second for <code>AuthorLastSep</code>.</p>
+<p>If an option is unspecified, the default value (shown in curly brackets above) is used. Therefore, only layout options that differ from the defaults need to be specified. The order in which the options are defined is (mostly) irrelevant. So, for example,</p>
+<p><code>\format[Authors(Initials,Oxford)]{\author}</code></p>
+<p>is equivalent to</p>
+<p><code>\format[Authors(Oxford,Initials)]{\author}</code></p>
+<p>As mentioned, the order in which the options are specified is irrelevant. There is one possibility for ambiguity, and that is if both <code>AuthorSep</code> and <code>AuthorLastSep</code> are given. In that case, the first applicable value encountered would be for <code>AuthorSep</code>, and the second for <code>AuthorLastSep</code>. It is good practise to specify both when changing the default, to avoid ambiguity.</p>
 
+<h4>Examples</h4>
+<p>Given the following authors, <i>"Joe James Doe and Mary Jane and Bruce Bar and Arthur Kay"</i> ,the <code>Authors</code> formatter will give the folling results:</p>
+<dl>
+<dt><code>\Authors()</code>, or equivalently, <code>format[Authors(FirstFirst,&shy;FullName,&shy;FullPunc,&shy;Comma,&shy;And,&shy;inf,&shy;EtAl= et al.)</code></dt>
+<dd><pre>Joe James Doe, Mary Jane, Bruce Bar and Arthur Kay</pre></dd>
 
+<dt><code>\Authors(LastFirst,Initials,Semicolon,NoComma)</code></dt>
+<dd><pre>Doe J. J.; Jane M.; Bar B. and Kay A.</pre></dd>
+
+<dt><code>\Authors(LastFirst,InitialsNoSpace,NoPunc,Oxford)</code></dt>
+<dd><pre>Doe JJ, Jane M, Bar B, and Kay A</pre></dd>
+
+<dt><code>\Authors(2,EtAl= and others)</code></dt>
+<dd><pre>J. J. Doe and others</pre></dd>
+</dl>
+<p>Most commonly available citation formats should be possible with this formatter. For even more advanced options, consider using the Custom Formatters detailed below.</p>
 
 <h3>The <code>WrapFileLinks</code> formatter</h3>
 
-   <p>This formatter iterates over all file links, or all file links of a specified
-    type, outputting a format string given as the first argument. The format string
-    can contain a number of escape sequences indicating file link information to
-    be inserted into the string.
-    </p>
-    <p>This formatter can take an optional second argument specifying the name of a file
-    type. If specified, the iteration will only include those files with a file type
-    matching the given name (case-insensitively). If specified as an empty argument,
-    all file links will be included.
-    </p>
-    <p>
-    After the second argument, pairs of additional arguments can be added in order to
-    specify regular expression replacements to be done upon the inserted link information
-    before insertion into the output string. A non-paired argument will be ignored.
-    In order to specify replacements without filtering on file types, use an empty second
-    argument.
-    </p>
-    <p>
-    The escape sequences for embedding information are as follows:
-    </p>
-    <p>
-    \i   : This inserts the iteration index (starting from 1), and can be useful if
-    the output list of files should be enumerated.<br/>
-    \p   : This inserts the file path of the file link.<br/>
-    \f   : This inserts the name of the file link's type.<br/>
-    \x   : This inserts the file's extension, if any.<br/>
-    \d   : This inserts the file link's description, if any.<br/>
-    </p>
-    <p>
-    For instance, an entry could contain a file link to the file "/home/john/report.pdf"
-    of the "PDF" type with description "John's final report".
-    </p>
-    <p>
-    Using the WrapFileLinks formatter with the following argument:</p>
-    <pre>
-    \format[WrapFileLinks(\i. \d (\p))]{\file}
-    </pre>
-    would give the following output:
-    <pre>1. John's final report (/home/john/report.pdf)</pre>
-    <p>
-    If the entry contained a second file link to the file "/home/john/draft.txt" of the
-    "Text file" type with description 'An early "draft"', the output would be as follows:</p>
-    <pre>
+<p>This formatter iterates over all file links, or all file links of a specified type, outputting a format string given as the first argument. The format string can contain a number of escape sequences indicating file link information to be inserted into the string.</p>
+<p>This formatter can take an optional second argument specifying the name of a file type. If specified, the iteration will only include those files with a file type matching the given name (case-insensitively). If specified as an empty argument, all file links will be included.</p>
+<p> After the second argument, pairs of additional arguments can be added in order to specify regular expression replacements to be done upon the inserted link information before insertion into the output string. A non-paired argument will be ignored. In order to specify replacements without filtering on file types, use an empty second argument.</p>
+<p>The escape sequences for embedding information are as follows:</p>
+<ul>
+	<li><code>\i</code> : This inserts the iteration index (starting from 1), and can be useful if the output list of files should be enumerated.</li>
+	<li><code>\p</code> : This inserts the file path of the file link.</li>
+	<li><code>\f</code> : This inserts the name of the file link's type.</li>
+	<li><code>\x</code> : This inserts the file's extension, if any.</li>
+	<li><code>\d</code> : This inserts the file link's description, if any.</li>
+</ul>
+<p>For instance, an entry could contain a file link to the file "/home/john/report.pdf" of the "PDF" type with description "John's final report". Using the WrapFileLinks formatter with the following argument:</p>
+<code>\format[WrapFileLinks(\i. \d (\p))]{\file}</code>
+<p>would give the following output:</p>
+<pre>    1. John's final report (/home/john/report.pdf)
+</pre>
+<p>If the entry contained a second file link to the file "/home/john/draft.txt" of the "Text file" type with description 'An early "draft"', the output would be as follows:</p>
+<pre>
     1. John's final report (/home/john/report.pdf)
     2. An early "draft" (/home/john/draft.txt)
-    </pre>
-    
-    If the formatter was called with a second argument, the list would be filtered.
-    For instance:
-    <pre>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</pre>
-    
-    would show only the text file:
-    <pre>1. An early "draft" (/home/john/draft.txt)</pre>
-    
-    If we wanted this output to be part of an XML styled output, the quotes in the
-    file description could cause problems. Adding two additional arguments to translate
-    the quotes into XML characters solves this:
-    <pre>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}</pre>
-    would give the following output:
-    <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
-    Additional pairs of replacements could be added.
+</pre>
+<p>If the formatter was called with a second argument, the list would be filtered. For instance:</p>
+<code>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</code>
+
+<p> would show only the text file:</p>
+<pre>    1. An early "draft" (/home/john/draft.txt)
+</pre>
+<p>If we wanted this output to be part of an XML styled output, the quotes in the file description could cause problems. Adding two additional arguments to translate the quotes into XML characters solves this:</p>
+<code>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}</code>
+<p>would give the following output:</p>
+<pre>    1. An early &quot;draft&quot; (/home/john/draft.txt)
+</pre>
+<p>Additional pairs of replacements could be added.</p>
 
 
     <h3>Custom formatters</h3>
-
     <p>If none of the available formatters can do what you want to
     achieve, you can add your own by implementing the
     <code>net.sf.jabref.export.layout.LayoutFormatter</code>
