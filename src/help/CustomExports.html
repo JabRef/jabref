@@ -399,9 +399,9 @@
 <p>As mentioned, the order in which the options are specified is irrelevant. There is one possibility for ambiguity, and that is if both <code>AuthorSep</code> and <code>AuthorLastSep</code> are given. In that case, the first applicable value encountered would be for <code>AuthorSep</code>, and the second for <code>AuthorLastSep</code>. It is good practise to specify both when changing the default, to avoid ambiguity.</p>
 
 <h4>Examples</h4>
-<p>Given the following authors, <i>"Joe James Doe and Mary Jane and Bruce Bar and Arthur Kay"</i> ,the <code>Authors</code> formatter will give the folling results:</p>
+<p>Given the following authors, <i>"Joe James Doe and Mary Jane and Bruce Bar and Arthur Kay"</i> ,the <code>Authors</code> formatter will give the following results:</p>
 <dl>
-<dt><code>\Authors()</code>, or equivalently, <code>format[Authors(FirstFirst,&shy;FullName,&shy;FullPunc,&shy;Comma,&shy;And,&shy;inf,&shy;EtAl= et al.)</code></dt>
+<dt><code>\Authors()</code>, or equivalently, <code>format[Authors(FirstFirst,FullName,FullPunc,Comma,And,inf,EtAl= et al.)</code></dt>
 <dd><pre>Joe James Doe, Mary Jane, Bruce Bar and Arthur Kay</pre></dd>
 
 <dt><code>\Authors(LastFirst,Initials,Semicolon,NoComma)</code></dt>
