@@ -350,13 +350,13 @@
 <dt><code>AuthorSort = [ {FirstFirst} | LastFirst | LastFirstFirstFirst ]</code></dt>
 <dd>specifies the order in which the author names are formatted.
 	<ul>
-		<li><code>FirstFirst</code> :  first names are followed by the surname.</li>
+		<li><code>FirstFirst</code> : first names are followed by the surname.</li>
 		<li><code>LastFirst</code> : the authors' surnames are followed by their first names, separated by a comma.</li>		
 		<li><code>LastFirstFirstFirst</code> : the first author is formatted as LastFirst, the subsequent authors as FirstFirst.</li>
 	</ul>
 </dd>
 
-<dt><code>AuthorAbbr = [ {FullName} | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital ]</code></dt>
+<dt><code>AuthorAbbr = [ FullName | LastName | {Initials} | InitialsNoSpace | FirstInitial | MiddleInital ]</code></dt>
 <dd>specifies how the author names are abbreviated.
 	<ul>
 		<li><code>FullName</code> : shows full author names; first names are not abbreviated.</li>
@@ -381,7 +381,7 @@
 <dt><code>AuthorSep = [ {Comma} | And | Colon | Semicolon | Sep=&lt;string&gt; ]</code></dt>
 <dd>specifies the separator to be used between authors. Any separator can be specified, with the <code>Sep=&lt;string&gt;</code> option. Note that appropriate spaces need to be added around <code>string</code>.</dd> 
 
-<dt><code>AuthorLastSep = [ {And} | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt; ]</code></dt>
+<dt><code>AuthorLastSep = [ Comma | {And} | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt; ]</code></dt>
 <dd>specifies the last separator in the author list. Any separator can be specified, with the <code>LastSep=&lt;string&gt;</code> option. Note that appropriate spaces need to be added around <code>string</code>.</dd>
 
 <dt><code>AuthorNumber = [ {inf} | &lt;integer&gt; ]</code></dt>
@@ -401,16 +401,16 @@
 <h4>Examples</h4>
 <p>Given the following authors, <i>"Joe James Doe and Mary Jane and Bruce Bar and Arthur Kay"</i> ,the <code>Authors</code> formatter will give the following results:</p>
 <dl>
-<dt><code>\Authors()</code>, or equivalently, <code>format[Authors(FirstFirst,FullName,FullPunc,Comma,And,inf,EtAl= et al.)</code></dt>
-<dd><pre>Joe James Doe, Mary Jane, Bruce Bar and Arthur Kay</pre></dd>
+<dt><code>Authors()</code>, or equivalently, <code>Authors(FirstFirst,Initials,FullPunc,Comma,And,inf,EtAl= et al.)</code></dt>
+<dd><pre>J. J. Doe, M. Jane, B. Bar and A. Kay</pre></dd>
 
-<dt><code>\Authors(LastFirst,Initials,Semicolon,NoComma)</code></dt>
-<dd><pre>Doe J. J.; Jane M.; Bar B. and Kay A.</pre></dd>
+<dt><code>Authors(LastFirstFirstFirst,MiddleInitial,Semicolon)</code></dt>
+<dd><pre>Doe, Joe J.; Mary Jane; Bruce Bar and Arthur Kay</pre></dd>
 
-<dt><code>\Authors(LastFirst,InitialsNoSpace,NoPunc,Oxford)</code></dt>
+<dt><code>Authors(LastFirst,InitialsNoSpace,NoPunc,Oxford)</code></dt>
 <dd><pre>Doe JJ, Jane M, Bar B, and Kay A</pre></dd>
 
-<dt><code>\Authors(2,EtAl= and others)</code></dt>
+<dt><code>Authors(2,EtAl= and others)</code></dt>
 <dd><pre>J. J. Doe and others</pre></dd>
 </dl>
 <p>Most commonly available citation formats should be possible with this formatter. For even more advanced options, consider using the Custom Formatters detailed below.</p>
@@ -429,25 +429,31 @@
 	<li><code>\d</code> : This inserts the file link's description, if any.</li>
 </ul>
 <p>For instance, an entry could contain a file link to the file "/home/john/report.pdf" of the "PDF" type with description "John's final report". Using the WrapFileLinks formatter with the following argument:</p>
-<code>\format[WrapFileLinks(\i. \d (\p))]{\file}</code>
+<p><code>\format[WrapFileLinks(\i. \d (\p))]{\file}</code></p>
 <p>would give the following output:</p>
-<pre>    1. John's final report (/home/john/report.pdf)
+<pre>
+    1. John's final report (/home/john/report.pdf)
+
 </pre>
 <p>If the entry contained a second file link to the file "/home/john/draft.txt" of the "Text file" type with description 'An early "draft"', the output would be as follows:</p>
 <pre>
     1. John's final report (/home/john/report.pdf)
     2. An early "draft" (/home/john/draft.txt)
+
 </pre>
 <p>If the formatter was called with a second argument, the list would be filtered. For instance:</p>
-<code>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</code>
-
+<p><code>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</code></p>
 <p> would show only the text file:</p>
-<pre>    1. An early "draft" (/home/john/draft.txt)
+<pre>
+    1. An early "draft" (/home/john/draft.txt)
+
 </pre>
 <p>If we wanted this output to be part of an XML styled output, the quotes in the file description could cause problems. Adding two additional arguments to translate the quotes into XML characters solves this:</p>
-<code>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}</code>
+<p><code>\format[WrapFileLinks(\i. \d (\p),,text file,",&amp;quot;)]{\file}</code></p>
 <p>would give the following output:</p>
-<pre>    1. An early &quot;draft&quot; (/home/john/draft.txt)
+<pre>
+    1. An early &quot;draft&quot; (/home/john/draft.txt)
+
 </pre>
 <p>Additional pairs of replacements could be added.</p>
 
