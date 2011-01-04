@@ -75,10 +75,9 @@ public class Authors extends AbstractParamLayoutFormatter {
         AND = " and ",
         OXFORD = ", and ";
 
-    int flMode = 1;
+    int flMode = FIRST_FIRST;
 
     boolean
-        firstFirst = true,
         abbreviate = true,
         firstInitialOnly = false,
         middleInitial = false,
@@ -125,7 +124,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 flMode = LF_FF;
         }
         else if (authorAbbr.contains(key)) {
-            if (key.equals("Names")) {
+            if (key.equals("FullName")) {
                 abbreviate = false;
             }
             else if (key.equals("Initials")) {
@@ -196,6 +195,9 @@ public class Authors extends AbstractParamLayoutFormatter {
             }
             else if (key.equals("Oxford")) {
                 lastSeparator = OXFORD;
+            }
+            else if (key.equals("Amp")) {
+                lastSeparator = AMP;
             }
             else if (key.equals("Sep") && (value.length() > 0)) {
                 separator = value;
@@ -290,7 +292,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     public static void main(String[] args) {
         Authors format = new Authors();
-        format.setArgument("LastFirst,MiddleInitial,FullPunc,Comma,Oxford,10,EtAl= m.fl.");
+        format.setArgument("MiddleInitial,FullPunc,Amp,Semicolon,10,EtAl= m.fl.");
         System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
     }
 }
