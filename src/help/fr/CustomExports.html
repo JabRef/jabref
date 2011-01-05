@@ -240,7 +240,7 @@
     &agrave; la s&eacute;rie des filtres d'exportation standard ou
     des formateurs.</p>
 
-    <p>A partir de JabRef 2.4b1 vous pouvez aussi empaqueter votre
+    <p>A partir de JabRef 2.4 vous pouvez aussi empaqueter votre
     format d'exportation ("ExportFormat") ou formateur de gabarit
     ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
     faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
@@ -421,13 +421,13 @@
         en page de la liste des auteurs. Le formateur prend en argument
         une liste d'options s&eacute;par&eacute;es par des virgules, ce qui remplace leurs
         valeurs par d&eacute;faut. Les paires option/valeur suivantes sont actuellement
-        disponibles, les valeurs par d&eacute;faut &eacute;tant &eacute;crites en italique.</p>
+        disponibles, les valeurs par d&eacute;faut &eacute;tant &eacute;crites entre accolades.</p>
 
     <dl>
-    <dt><code>AuthorSort = [<i>FirstFirst</i> | LastFirst | LastFirstFirstFirst]</code></dt>
+    <dt><code>AuthorSort = [ {FirstFirst} | LastFirst | LastFirstFirstFirst]</code></dt>
     <dd>d&eacute;finit l'ordre dans lequel les noms d'auteur sont format&eacute;s.
 	<ul>
-		<li><code><i>FirstFirst</i></code>&nbsp;:
+		<li><code>FirstFirst</code>&nbsp;:
                     les pr&eacute;noms sont suivis du nom de famille.</li>
 		<li><code>LastFirst</code>&nbsp;:
                     les noms de famille des auteurs sont suivis de leurs pr&eacute;noms,
@@ -438,10 +438,10 @@
 	</ul>
     </dd>
 
-    <dt><code>AuthorAbbr = [<i>FullName</i> | LastName | Initials | InitialsNoSpace | FirstInitial | MiddleInital]</code></dt>
+    <dt><code>AuthorAbbr = [ FullName | LastName | {Initials} | InitialsNoSpace | FirstInitial | MiddleInitial]</code></dt>
     <dd>d&eacute;finit comment les noms d'auteur sont abr&eacute;g&eacute;s.
     <ul>
-		<li><code><i>FullName</i></code>&nbsp;:
+		<li><code>FullName</code>&nbsp;:
                     montre les noms complets des auteurs&nbsp;;
                     les pr&eacute;noms ne sont pas abr&eacute;g&eacute;s.</li>
 		<li><code>LastName</code>&nbsp;:
@@ -460,11 +460,11 @@
 	</ul>
     </dd>
 
-    <dt><code>AuthorPunc = [<i>FullPunc</i> | NoPunc | NoComma | NoPeriod]</code></dt>
+    <dt><code>AuthorPunc = [ {FullPunc} | NoPunc | NoComma | NoPeriod]</code></dt>
     <dd>d&eacute;finit la ponctuation &agrave; utiliser dans la liste des auteurs
         lorsque <code>AuthorAbbr</code> est utilis&eacute;
 	<ul>
-		<li><code><i>FullPunc</i></code>&nbsp;:
+		<li><code>FullPunc</code>&nbsp;:
                     aucun changement &agrave; la ponctuation n'est effectu&eacute;.</li>
 		<li><code>NoPunc</code>&nbsp;:
                     tous les points et les virgules sont supprim&eacute;s du nom d'auteur.</li>
@@ -475,41 +475,66 @@
 	</ul>
     </dd>
 
-    <dt><code>AuthorSep = [<i>Comma</i> | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
+    <dt><code>AuthorSep = [ {Comma} | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
     <dd>d&eacute;finit le s&eacute;parateur &agrave; utiliser entre les auteurs. Tout s&eacute;parateur
         peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>Sep=&lt;string&gt;</code>.</dd>
 
-    <dt><code>AuthorLastSep = [<i>And</i> | Comma | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
+    <dt><code>AuthorLastSep = [ Comma | {And} | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
     <dd>d&eacute;finit le dernier s&eacute;parateur dans la liste d'auteurs. Tout s&eacute;parateur
         peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>LastSep=&lt;string&gt;</code>.</dd>
 
-    <dt><code>AuthorNumber = [<i>inf</i> | &lt;integer&gt;]</code></dt>
+    <dt><code>AuthorNumber = [ {inf} | &lt;integer&gt;]</code></dt>
     <dd>d&eacute;finit le nombre d'auteurs devant &ecirc;tre affich&eacute;s. Si le nombre d'auteurs
         exc&egrave;de le maximum d&eacute;fini, la liste d'auteurs est remplac&eacute;e par le
         premier auteur suivi de <code>EtAlString</code>.</dd>
 
-    <dt><code>EtAlString = [<i> et al.</i> | EtAl=&lt;string&gt;]</code></dt>
+    <dt><code>EtAlString = [ {et al.} | EtAl=&lt;string&gt;]</code></dt>
     <dd>d&eacute;finit la cha&icirc;ne utilis&eacute;e pour remplacer des auteurs multiples.
         Toute cha&icirc;ne peut &ecirc;tre sp&eacute;cifi&eacute;e en utilisant <code>EtAl=&lt;string&gt;</code></dd>
 
     </dl>
 
-    <p>Si une option n'est pas sp&eacute;cifi&eacute;e, la valeur par d&eacute;faut (montr&eacute;e en italique
+    <p>Si une option n'est pas sp&eacute;cifi&eacute;e, la valeur par d&eacute;faut (montr&eacute;e entre accolades
         ci-dessus) est utilis&eacute;e. Ainsi, uniquement les options de mise en page
         qui diff&egrave;re de celles par d&eacute;faut ont besoin d'&ecirc;tre d&eacute;finies.
         L'ordre dans lequel les options sont d&eacute;finies est (en g&eacute;n&eacute;ral) indiff&eacute;rent.
         Ainsi, par exemple,</p>
-    <pre>\format[Authors(Initials,Oxford)]{\author}</pre>
-    est &eacute;quivalent &agrave;
-    <pre>\format[Authors(Oxford,Initials)]{\author}</pre>
+    <p><code>\format[Authors(Initials,Oxford)]{\author}</code></p>
+    <p>est &eacute;quivalent &agrave;</p>
+    <p><code>\format[Authors(Oxford,Initials)]{\author}</code></p>
     
     <p>Comme mentionn&eacute;, l'ordre dans lequel les options sont d&eacute;finies est
         indiff&eacute;rent. Il y a une possibilit&eacute; d'ambigu&iuml;t&eacute; si &agrave; la fois
         <code>AuthorSep</code> et <code>AuthorLastSep</code> sont d&eacute;finis.
         Dans ce cas, la premi&egrave;re valeur applicable rencontr&eacute;e devrait &ecirc;tre
         pour <code>AuthorSep</code>, et la seconde pour <code>AuthorLastSep</code>.
+        Afin d'&eacute;viter toute ambigu&iuml;t&eacute;, lorsque la valeur par défaut
+        est modifi&eacute;e, il est recommand&eacute; de sp&eacute;cifier les deux.
     </p>
 
+
+    <h4>Exemples</h4>
+    <p>Pour les auteurs suivants, <i>"Joe James Doe and Mary Jane
+        and Bruce Bar and Arthur Kay"</i> ,le formateur <code>Authors</code>
+        donnera les r&eacute;sultats suivants&nbsp;:</p>
+    <dl>
+    <dt><code>Authors()</code> ou, de mani&egrave;re &eacute;quivalente,
+        <code>Authors(FirstFirst,Initials,FullPunc,Comma,And,inf,EtAl= et al.)</code></dt>
+    <dd><pre>J. J. Doe, M. Jane, B. Bar and A. Kay</pre></dd>
+
+    <dt><code>Authors(LastFirstFirstFirst,MiddleInitial,Semicolon)</code></dt>
+    <dd><pre>Doe, Joe J.; Mary Jane; Bruce Bar and Arthur Kay</pre></dd>
+
+    <dt><code>Authors(LastFirst,InitialsNoSpace,NoPunc,Oxford)</code></dt>
+    <dd><pre>Doe JJ, Jane M, Bar B, and Kay A</pre></dd>
+
+    <dt><code>Authors(2,EtAl= and others)</code></dt>
+    <dd><pre>J. J. Doe and others</pre></dd>
+    </dl>
+    <p>Les formats de citations les plus courants devraient &ecirc;tre r&eacute;alisables
+        avec ce formateur. Pour des options encore plus avanc&eacute;es, envisagez
+        d'utiliser les Formateurs personnalis&eacute;s detaill&eacute;s ci-dessous.
+    </p>
 
     <h3>Le formateur <code>WrapFileLinks</code></h3>
 
@@ -536,55 +561,56 @@
     <p>
     Les s&eacute;quences d'&eacute;chappement pour les informations incluses sont les suivantes&nbsp;:
     </p>
-    <p>
-    \i&nbsp;: Cela ins&egrave;re l'index d'it&eacute;ration (d&eacute;butant &agrave; 1), et peut &ecirc;tre utile si
-    la liste des fichiers en sortie doit &ecirc;tre &eacute;num&eacute;r&eacute;e.<br/>
-    \p&nbsp;: Cela ins&egrave;re le chemin de fichier d'un lien de fichier.<br/>
-    \f&nbsp;: Cela ins&egrave;re le nom du type du lien de fichier.<br/>
-    \x&nbsp;: Cela ins&egrave;re l'extension de fichier, si elle existe.<br/>
-    \d&nbsp;: Cela ins&egrave;re la description du lien de fichier, si elle existe.<br/>
-    </p>
+    <ul>
+        <li><code>\i</code>&nbsp;: Cela ins&egrave;re l'index d'it&eacute;ration (d&eacute;butant
+                &agrave; 1), et peut &ecirc;tre utile si la liste des fichiers en sortie
+                doit &ecirc;tre &eacute;num&eacute;r&eacute;e.</li>
+        <li><code>\p</code><&nbsp;: Cela ins&egrave;re le chemin de fichier d'un lien de fichier.</li>
+        <li><code>\f</code>&nbsp;: Cela ins&egrave;re le nom du type du lien de fichier.</li>
+        <li><code>\x</code>&nbsp;: Cela ins&egrave;re l'extension de fichier, si elle existe.</li>
+        <li><code>\d</code>&nbsp;: Cela ins&egrave;re la description du lien de fichier, si elle existe.</li>
+    </ul>
     <p>
     Par exemple, une entr&eacute;e pourrait contenir un lien de fichier vers le fichier    
     "/home/john/report.pdf" de type "PDF" avec la description "John's final report".
-    </p>
-    <p>
     En utilisant le formateur WrapFileLinks avec l'argument suivant&nbsp;:
-    </p>
-    <pre>\format[WrapFileLinks(\i. \d (\p))]{\file}</pre>
-    <p>
-    donnera la sortie suivante&nbsp;:</p>
-    <pre>1. John's final report (/home/john/report.pdf)</pre>
+    </p><code>\format[WrapFileLinks(\i. \d (\p))]{\file}</code>
+    <p>donnera la sortie suivante&nbsp;:</p>
+    <pre>
+    1. John's final report (/home/john/report.pdf)
+    </pre>
     <p>
     Si l'entr&eacute;e contient un second lien de fichier vers le fichier "/home/john/draft.txt"
     du type "Text file" avec la description 'An early "draft"', le sortie sera comme suit&nbsp;:</p>
     <pre>
     1. John's final report (/home/john/report.pdf)
     2. An early "draft" (/home/john/draft.txt)
+
     </pre>
     <p>
     Si le formateur a &eacute;t&eacute; appel&eacute; avec un second argument, la liste sera filtr&eacute;e.
     Par exemple&nbsp;:
-    <pre>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</pre>
     </p>
-    <p>
-    affichera uniquement le texte suivant&nbsp;:
-    <pre>1. An early "draft" (/home/john/draft.txt)</pre>
-    </p>
+    <p><code>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</code></p>
+    <p>affichera uniquement le texte suivant&nbsp;:</p>
+    <pre>
+    1. An early "draft" (/home/john/draft.txt)
+
+    </pre>
+    
     <p>
     Si l'on veut que cette sortie soit incluse dans une sortie en style XML,
     les guillemets dans la description de fichier pourrait causer probl&egrave;me.
     En ajoutant deux arguments additionnels pour traduire les guillemets en
-    caract&egrave;res XML, on r&eacute;soudra ce probl&egrave;me&nbsp;:<br>
-    \format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
-    </p>
-    <p>
-    affichera la sortie suivante&nbsp;:
-    <pre>1. An early &quot;draft&quot; (/home/john/draft.txt)</pre>
-    </p>
-    <p>
-    Des paires de remplacement suppl&eacute;mentaires pourraient &ecirc;tre ajout&eacute;es.
-    </p>
+    caract&egrave;res XML, on r&eacute;soudra ce probl&egrave;me&nbsp;:</p>
+    <p><code>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
+    </code></p>
+    <p>affichera la sortie suivante&nbsp;:</p>
+    <pre>
+    1. An early &quot;draft&quot; (/home/john/draft.txt)
+
+    </pre>
+    <p>Des paires de remplacement suppl&eacute;mentaires pourraient &ecirc;tre ajout&eacute;es.</p>
 
 
     <h3>Formateurs personnalis&eacute;s</h3>
