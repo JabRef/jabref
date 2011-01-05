@@ -31,34 +31,34 @@ public class Authors extends AbstractParamLayoutFormatter {
     static Pattern numberPattern = Pattern.compile("[0-9]+");
 
     static {
-        authorOrder.add("FirstFirst");
-        authorOrder.add("LastFirst");
-        authorOrder.add("LastFirstFirstFirst");
+        authorOrder.add("firstfirst");
+        authorOrder.add("lastfirst");
+        authorOrder.add("lastfirstfirstfirst");
 
-        authorAbbr.add("FullName");
-        authorAbbr.add("Initials");
-        authorAbbr.add("FirstInitial");
-        authorAbbr.add("MiddleInitial");
-        authorAbbr.add("LastName");
-        authorAbbr.add("InitialsNoSpace");
+        authorAbbr.add("fullname");
+        authorAbbr.add("initials");
+        authorAbbr.add("firstinitial");
+        authorAbbr.add("middleinitial");
+        authorAbbr.add("lastname");
+        authorAbbr.add("initialsnospace");
 
-        authorPunc.add("FullPunc");
-        authorPunc.add("NoPunc");
-        authorPunc.add("NoComma");
-        authorPunc.add("NoPeriod");
+        authorPunc.add("fullpunc");
+        authorPunc.add("nopunc");
+        authorPunc.add("nocomma");
+        authorPunc.add("noperiod");
 
-        separators.add("Comma");
-        separators.add("And");
-        separators.add("Colon");
-        separators.add("Semicolon");
-        separators.add("Sep");
+        separators.add("comma");
+        separators.add("and");
+        separators.add("colon");
+        separators.add("semicolon");
+        separators.add("sep");
         
-        lastSeparators.add("And");
-        lastSeparators.add("Colon");
-        lastSeparators.add("Semicolon");
-        lastSeparators.add("Amp");
-        lastSeparators.add("Oxford");
-        lastSeparators.add("LastSep");
+        lastSeparators.add("and");
+        lastSeparators.add("colon");
+        lastSeparators.add("semicolon");
+        lastSeparators.add("amp");
+        lastSeparators.add("oxford");
+        lastSeparators.add("lastsep");
 
     }
 
@@ -114,53 +114,52 @@ public class Authors extends AbstractParamLayoutFormatter {
 
 
     private void handleArgument(String key, String value) {
-        //System.out.println(": "+key);
-        if (authorOrder.contains(key)) {
-            if (key.equals("FirstFirst"))
+        if (authorOrder.contains(key.trim().toLowerCase())) {
+            if (comp(key, "FirstFirst"))
                 flMode = FIRST_FIRST;
-            else if (key.equals("LastFirst"))
+            else if (comp(key, "LastFirst"))
                 flMode = LAST_FIRST;
-            else if (key.equals("LastFirstFirstFirst"))
+            else if (comp(key, "LastFirstFirstFirst"))
                 flMode = LF_FF;
         }
-        else if (authorAbbr.contains(key)) {
-            if (key.equals("FullName")) {
+        else if (authorAbbr.contains(key.trim().toLowerCase())) {
+            if (comp(key, "FullName")) {
                 abbreviate = false;
             }
-            else if (key.equals("Initials")) {
+            else if (comp(key, "Initials")) {
                 abbreviate = true;
                 firstInitialOnly = false;
             }
-            else if (key.equals("FirstInitial")) {
+            else if (comp(key, "FirstInitial")) {
                 abbreviate = true;
                 firstInitialOnly = true;
             }
-            else if (key.equals("MiddleInitial")) {
+            else if (comp(key, "MiddleInitial")) {
                 abbreviate = true;
                 middleInitial = true;
             }
-            else if (key.equals("LastName")) {
+            else if (comp(key, "LastName")) {
                 lastNameOnly = true;
             }
-            else if (key.equals("InitialsNoSpace")) {
+            else if (comp(key, "InitialsNoSpace")) {
                 abbreviate = true;
                 abbrSpaces = false;
             }
         }
-        else if (authorPunc.contains(key)) {
-            if (key.equals("FullPunc")) {
+        else if (authorPunc.contains(key.trim().toLowerCase())) {
+            if (comp(key, "FullPunc")) {
                 abbrDots = true;
                 lastFirstSeparator = ", ";
             }
-            else if (key.equals("NoPunc")) {
+            else if (comp(key, "NoPunc")) {
                 abbrDots = false;
                 lastFirstSeparator = " ";
             }
-            else if (key.equals("NoComma")) {
+            else if (comp(key, "NoComma")) {
                 abbrDots = true;
                 lastFirstSeparator = " ";
             }
-            else if (key.equals("NoPeriod")) {
+            else if (comp(key, "NoPeriod")) {
                 abbrDots = false;
                 lastFirstSeparator = ", ";
             }
@@ -168,55 +167,66 @@ public class Authors extends AbstractParamLayoutFormatter {
 
         // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
         // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
-        else if (separators.contains(key) || lastSeparators.contains(key)) {
-            if (key.equals("Comma")) {
+        else if (separators.contains(key.trim().toLowerCase()) || lastSeparators.contains(key.trim().toLowerCase())) {
+            if (comp(key, "Comma")) {
                 if (!setSep) {
                     separator = COMMA;
                     setSep = true;
                 } else lastSeparator = COMMA;
             }
-            else if (key.equals("And")) {
+            else if (comp(key, "And")) {
                 if (!setSep) {
                     separator = AND;
                     setSep = true;
                 } else lastSeparator = AND;
             }
-            else if (key.equals("Colon")) {
+            else if (comp(key, "Colon")) {
                 if (!setSep) {
                     separator = COLON;
                     setSep = true;
                 } else lastSeparator = COLON;
             }
-            else if (key.equals("Semicolon")) {
+            else if (comp(key, "Semicolon")) {
                 if (!setSep) {
                     separator = SEMICOLON;
                     setSep = true;
                 } else lastSeparator = SEMICOLON;
             }
-            else if (key.equals("Oxford")) {
+            else if (comp(key, "Oxford")) {
                 lastSeparator = OXFORD;
             }
-            else if (key.equals("Amp")) {
+            else if (comp(key, "Amp")) {
                 lastSeparator = AMP;
             }
-            else if (key.equals("Sep") && (value.length() > 0)) {
+            else if (comp(key, "Sep") && (value.length() > 0)) {
                 separator = value;
                 setSep = true;
             }
-            else if (key.equals("LastSep") && (value.length() > 0)) {
+            else if (comp(key, "LastSep") && (value.length() > 0)) {
                 lastSeparator = value;
             }
         }
-        else if (key.equals("EtAl") && (value.length() > 0)) {
+        else if (key.trim().toLowerCase().equals("etal") && (value.length() > 0)) {
             etAlString = value;
         }
-        else if (numberPattern.matcher(key).matches()) {
+        else if (numberPattern.matcher(key.trim()).matches()) {
             // Just a number:
-            int num = Integer.parseInt(key);
+            int num = Integer.parseInt(key.trim());
             maxAuthors = num;
         }
 
 
+    }
+
+    /**
+     * Check for case-insensitive equality between two strings after removing
+     * white space at the beginning and end of the first string.
+     * @param one The first string - whitespace is trimmed
+     * @param two The second string
+     * @return true if the strings are deemed equal
+     */
+    public boolean comp(String one, String two) {
+        return one.trim().equalsIgnoreCase(two);
     }
 
     public String format(String fieldText) {
@@ -292,7 +302,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     public static void main(String[] args) {
         Authors format = new Authors();
-        format.setArgument("MiddleInitial,FullPunc,Amp,Semicolon,10,EtAl= m.fl.");
+        format.setArgument("lastfirstfirstfirst , initials,  Nocomma,Amp,Semicolon,30 ,EtAl = m.fl.");
         System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
     }
 }
