@@ -8,6 +8,7 @@
   <h1>Revision history</h1>
 
     <h3>Version 2.7beta</h3>
+    <ul>
 	<li>Some improvements to MS Office export filter.</li>
 	<li>Introduced three choices for ensuring unique generated keys. The default one (marking
       	with a, b, etc.), a modified one (marking with b, c, etc.) and always adding a letter
@@ -35,8 +36,10 @@
 	<li>Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
 	a hyphen a word boundary, and remove punctuation characters (keep only numbers and
 	letters).</li>
+    </ul>
 
     <h3>Version 2.6</h3>
+    <ul>
         <li>Fixed IEEExplorer and ACM fetchers to adapt to web site changes.</li>
         <li>Active preview (1 or 2) is now remembered.</li>
         <li>Applied patch by Igor L. Chernyavsky. to prevent loss of entry selection after
@@ -53,9 +56,10 @@
         <li>Fixed bug: entries of a customized type could be indicated as complete even if
             BibTeX key was not set.</li>
         <li>Changed deletion process for some temporary files to avoid leftover files.</li>
+    </ul>
 
     <h3>Version 2.6beta3</h3>
-
+    <ul>
         <li>Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.</li>
         <li>Changed non-native file dialog setting so files cannot be renamed. This prevents
           accidentally entering rename mode when trying to enter directory. Can be enabled
@@ -108,9 +112,10 @@
         <li>Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
           messed up after the metadata comment in a bib file.</li>
         <li>Search dialog now automatically previews first hit, and hides preview if there are no hits.</li>
+    </ul>
 
     <h3>Version 2.6beta2</h3>
-
+    <ul>
         <li>Added export formatter "Default" which takes a single argument. Outputs the string to format
           unchanged if it is non-empty, otherwise outputs the argument.</li>
         <li>Added option under Options -> Preferences -> General for disabling the strict enforcing of
@@ -148,6 +153,7 @@
         <li>Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.</li>
         <li>Fixed bug: editing source doesn't allow change of entry type.</li>
         <li>RTFChars formatter now converts --- to \emdash and -- to \endash.</li>
+    </ul>
 
     <h3>Version 2.6beta</h3>
 
