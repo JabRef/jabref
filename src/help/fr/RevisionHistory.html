@@ -8,7 +8,40 @@
 
   <h1>Historique des r&eacute;visions (en anglais)</h1>
 
+
+    <h3>Version 2.7beta</h3>
+    <ul>
+	<li>Some improvements to MS Office export filter.</li>
+	<li>Introduced three choices for ensuring unique generated keys. The default one (marking
+      	with a, b, etc.), a modified one (marking with b, c, etc.) and always adding a letter
+      	(a, b, etc.).</li>
+	<li>Font and background colors are now customizable in the entry editor (Options ->
+      	Preferences -> Appearance).</li>
+	<li>Window title now includes the full path to the current file.</li>
+	<li>Entries can now be marked in a series of different colors. Automarking of imported
+	entries is now done in separate color without affecting other marked entries.</li>
+	<li>Added new feature (Tools -> Scan database... -> Resolve duplicate BibTeX keys) to
+	search for duplicate keys and offer to generate new keys to resolve the duplicates.
+	Instead of being listed in a warning dialog after opening a bib file, duplicate keys
+	now trigger a dialog asking whether the user wants to resolve the duplicates.</li>
+	<li>Added check that ensures that application doesn't quit while a large save operation
+	is still in progress. Shows wait message with cancel button.</li>
+	<li>Added apostrophe (') as illegal character in BibTeX keys.</li>
+	<li>BibTeX strings that refer each other are now sorted correctly when saving bib file.</li>
+	<li>Fixed bug in merging external changes - file would still be reported as modified
+	externally after merging changes.</li>
+	<li>Fixed bug in Move/rename file link feature that could cause the wrong link to be
+	stored for certain directory structures.</li>
+	<li>Fixed bug: curly braces can now be used in arguments to formatters. </li>
+	<li>Fixed lockup bug when generating key for entries with crossref fields.</li>
+	<li>BibTeX strings are now resolved before attempting to (un)abbreviate journal names.</li>
+	<li>Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
+	a hyphen a word boundary, and remove punctuation characters (keep only numbers and
+	letters).</li>
+    </ul>
+
     <h3>Version 2.6</h3>
+    <ul>
         <li>Fixed IEEExplorer and ACM fetchers to adapt to web site changes.</li>
         <li>Active preview (1 or 2) is now remembered.</li>
         <li>Applied patch by Igor L. Chernyavsky. to prevent loss of entry selection after
@@ -25,9 +58,10 @@
         <li>Fixed bug: entries of a customized type could be indicated as complete even if
             BibTeX key was not set.</li>
         <li>Changed deletion process for some temporary files to avoid leftover files.</li>
+    </ul>
         
     <h3>Version 2.6beta3</h3>
-
+    <ul>
         <li>Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.</li>
         <li>Changed non-native file dialog setting so files cannot be renamed. This prevents
           accidentally entering rename mode when trying to enter directory. Can be enabled
@@ -80,9 +114,10 @@
         <li>Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
           messed up after the metadata comment in a bib file.</li>
         <li>Search dialog now automatically previews first hit, and hides preview if there are no hits.</li>
+    </ul>
 
     <h3>Version 2.6beta2</h3>
-
+    <ul>
         <li>Added export formatter "Default" which takes a single argument. Outputs the string to format
           unchanged if it is non-empty, otherwise outputs the argument.</li>
         <li>Added option under Options -> Preferences -> General for disabling the strict enforcing of
@@ -120,6 +155,7 @@
         <li>Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.</li>
         <li>Fixed bug: editing source doesn't allow change of entry type.</li>
         <li>RTFChars formatter now converts --- to \emdash and -- to \endash.</li>
+    </ul>
 
     <h3>Version 2.6beta</h3>
 
