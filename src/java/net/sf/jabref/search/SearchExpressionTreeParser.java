@@ -179,8 +179,9 @@ public SearchExpressionTreeParser() {
 								default: // regular field
 									if (!fieldSpec.matcher(searchKeys[i].toString()).matches())
 										continue;
-									content = removeLatexCommands.format(
-                                            bibtexEntry.getField(searchKeys[i].toString()));
+                                    String field = bibtexEntry.getField(searchKeys[i].toString());
+									content = field != null ? removeLatexCommands.format(field) : null;
+
 							}
 			noSuchField = false;
 							if (content == null)
