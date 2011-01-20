@@ -1,3 +1,4 @@
+    - Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files. 
     - Removed potential NullPointerException in SearchExpressionTreeParser.
 2.7 beta
     - Some improvements to MS Office export filter.

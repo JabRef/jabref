@@ -191,6 +191,13 @@ public class RisImporter extends ImportFormat {
             // Added ID import 2005.12.01, Morten Alver:
             else if (lab.equals("ID"))
                 hm.put("refid", val);
+            // Added doi import (sciencedirect.com) 2011.01.10, Alexander Hug <alexander@alexanderhug.info>
+            else if (lab.equals("M3")){
+                String doi = val;
+                if (doi.startsWith("doi:")){
+                    doi = doi.replaceAll("(?i)doi:", "").trim();
+                    hm.put("doi", doi);
+                }
         }
         }
         // fix authors
@@ -228,9 +235,9 @@ public class RisImporter extends ImportFormat {
         bibitems.add(b);
 
     }
-
+    }
     return bibitems;
     }
-}
 
+}
 
