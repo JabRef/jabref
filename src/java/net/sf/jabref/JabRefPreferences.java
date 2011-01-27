@@ -47,6 +47,8 @@ import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -445,8 +447,14 @@ public class JabRefPreferences {
         defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put("useIEEEAbrv", Boolean.TRUE);
 
-	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
-	defaults.put("showFileDirUpgradeWarning", true);
+	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
+	try {
+	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "@" + InetAddress.getLocalHost().getHostName());
+	}
+	catch(UnknownHostException ex) {
+	    Globals.logger("Hostname not found.");
+	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
+	}
     }
     
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";

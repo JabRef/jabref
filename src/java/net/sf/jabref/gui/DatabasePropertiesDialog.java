@@ -27,12 +27,12 @@ public class DatabasePropertiesDialog extends JDialog {
     JComboBox encoding;
     JButton ok, cancel;
     JTextField fileDir = new JTextField(40),
-            pdfDir = new JTextField(40), psDir = new JTextField(40);
-    String oldFileVal="", oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
+	fileDirIndv = new JTextField(40),
+	pdfDir = new JTextField(40),
+	psDir = new JTextField(40);
+    String oldFileVal="", oldFileIndvVal="", oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
     JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
     boolean oldProtectVal = false;
-    JCheckBox clearLegacyFileDir = new JCheckBox(Globals.lang("Legacy file directory setting found - clear setting?"), false);
-    boolean oldClearLgcFileVal = false;
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), false);
@@ -50,9 +50,11 @@ public class DatabasePropertiesDialog extends JDialog {
     public final void init(JFrame parent) {
 
         JButton browseFile = new JButton(Globals.lang("Browse"));
+        JButton browseFileIndv = new JButton(Globals.lang("Browse"));
         JButton browsePdf = new JButton(Globals.lang("Browse"));
         JButton browsePs = new JButton(Globals.lang("Browse"));
         browseFile.addActionListener(new BrowseAction(parent, fileDir, true));
+        browseFileIndv.addActionListener(new BrowseAction(parent, fileDirIndv, true));
         browsePdf.addActionListener(new BrowseAction(parent, pdfDir, true));
         browsePs.addActionListener(new BrowseAction(parent, psDir, true));
 
@@ -64,17 +66,14 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Override default file directories"));
         builder.nextLine();
-        builder.append(Globals.lang("File directory"));
+        builder.append(Globals.lang("General file directory"));
         builder.append(fileDir);
         builder.append(browseFile);
         builder.nextLine();
-	builder.append(clearLegacyFileDir,3);
-	builder.nextLine();
-        builder.appendSeparator(Globals.lang("Override legacy file fields"));
-		builder.append(new JLabel("<html>"+Globals.lang("Note that these settings are used for the legacy "
-			+"<b>pdf</b> and <b>ps</b> fields only.<br>For most users, setting the <b>Main file directory</b> "
-			+"above should be sufficient.")+"</html>"), 3);
-		builder.nextLine();
+        builder.append(Globals.lang("User-specific file directory"));
+        builder.append(fileDirIndv);
+        builder.append(browseFileIndv);
+        builder.nextLine();
         builder.append(Globals.lang("PDF directory"));
         builder.append(pdfDir);
         builder.append(browsePdf);
@@ -139,6 +138,15 @@ public class DatabasePropertiesDialog extends JDialog {
                 fileDir.setText((fileD.get(0)).trim());
         }
 
+        Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual"));
+        if (fileDI == null)
+            fileDirIndv.setText("");
+        else {
+            // Better be a little careful about how many entries the Vector has:
+            if (fileDI.size() >= 1)
+                fileDirIndv.setText((fileDI.get(0)).trim());
+        }
+
         Vector<String> pdfD = metaData.getData("pdfDirectory");
         if (pdfD == null)
             pdfDir.setText("");
@@ -165,14 +173,12 @@ public class DatabasePropertiesDialog extends JDialog {
                 protect.setSelected(Boolean.parseBoolean(prot.get(0)));
         }
 
-	clearLegacyFileDir.setVisible(metaData.getData(GUIGlobals.FILE_FIELD + "Directory") != null);
-
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
+        oldFileIndvVal = fileDir.getText();
         oldPdfVal = pdfDir.getText();
         oldPsVal = psDir.getText();
         oldProtectVal = protect.isSelected();
-	oldClearLgcFileVal = clearLegacyFileDir.isSelected();
     }
 
     public void storeSettings() {
@@ -188,12 +194,15 @@ public class DatabasePropertiesDialog extends JDialog {
         }
         else
             metaData.remove(Globals.prefs.get("userFileDir"));
-
-	if (metaData.getData(GUIGlobals.FILE_FIELD + "Directory") != null) {
-	    if (clearLegacyFileDir.isSelected()) {
-		metaData.remove(GUIGlobals.FILE_FIELD + "Directory");
-	    }
-	}
+	// Repeat for individual file dir - reuse 'text' and 'dir' vars
+	dir = new Vector<String>(1);
+	text = fileDirIndv.getText().trim();
+        if (text.length() > 0) {
+            dir.add(text);
+            metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
+        }
+        else
+            metaData.remove(Globals.prefs.get("userFileDirIndividual"));
 
         dir = new Vector<String>(1);
         text = pdfDir.getText().trim();
@@ -224,10 +233,11 @@ public class DatabasePropertiesDialog extends JDialog {
 
         // See if any of the values have been modified:
         boolean changed = !newEncoding.equals(oldEncoding)
+            || !oldFileVal.equals(fileDir.getText())
+            || !oldFileIndvVal.equals(fileDirIndv.getText())
             || !oldPdfVal.equals(pdfDir.getText())
             || !oldPsVal.equals(psDir.getText())
-            || (oldProtectVal != protect.isSelected())
-	    || (oldClearLgcFileVal != clearLegacyFileDir.isSelected());
+            || (oldProtectVal != protect.isSelected());
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed)

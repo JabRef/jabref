@@ -142,12 +142,18 @@ public class MetaData implements Iterable<String> {
      * @return The default directory for this field type.
      */
     public String getFileDirectory(String fieldName) {
-        // There can be up to two directory definitions for these files - the database's
-        // metadata can specify a directory, or the preferences can specify one. The
-        // metadata directory takes precedence if defined.
-        String key = Globals.prefs.get("userFileDir");
+        // There can be up to three directory definitions for these files - the database's
+        // metadata can specify a general directory and/or a user-specific directory, or
+	// the preferences can specify one. The settings are prioritized in the following
+	// order and the first defined setting is used: metadata user-specific directory,
+	// metadata general directory, preferences directory.
+        String key = Globals.prefs.get("userFileDirIndividual");
         String dir;
         Vector<String> vec = getData(key);
+	if (vec == null) {
+	    key = Globals.prefs.get("userFileDir");
+	    vec = getData(key);
+	}
         if ((vec != null) && (vec.size() > 0)) {
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
