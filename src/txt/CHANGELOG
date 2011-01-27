@@ -28,6 +28,8 @@
     - Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
       a hyphen a word boundary, and remove punctuation characters (keep only numbers and
       letters).
+    - deprecate various export formatters with new Authors formatter, which provides flexible 
+      formatting options.
 2.6
     - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
     - Active preview (1 or 2) is now remembered.
