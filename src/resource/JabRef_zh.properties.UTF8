@@ -722,7 +722,6 @@ File_'%0'_is_already_open.=文件_'%0'_已经被打开。
 File_'%0'_not_found=无法找到文件_'%0'
 
 File_changed=File_changed
-File_directory=文件目录
 File_directory_is_'%0'\:=文件目录是_'%0':
 
 File_directory_is_not_set_or_does_not_exist!=文件目录未设置或该目录不存在！
@@ -1999,7 +1998,6 @@ Legacy_file_fields=旧式文件域
 
 This_makes_JabRef_look_up_each_%0_extension_and_check_if_the_file_exists._If_not,_you_will_be_given_options<BR>to_resolve_the_problem.=这将使_JabRef_依据%0扩展名查找文件是否存在，如果找不到，JabRef_将提供给您选项来解决这个问题。
 Run_Fetcher,_e.g._"--fetch\=Medline\:cancer"=运行抓取器，例如_"--fetch\=Medline\:cancer"
-Override_legacy_file_fields=覆盖旧式文件域
 
 The_ACM_Digital_Library=ACM_数字图书馆
 
@@ -2161,10 +2159,7 @@ Duplicate_BibTeX_key=
 Duplicate_key=
 Generate_key=
 Import_marking_color=
-Set_user_specific_file_directory=
-Retain_legacy_file_directory_setting_(for_older_versions_of_JabRef)=
 The_current_version_features_a_new_way_of_storing_the_file_directory_setting_of<br>a_database._This_enables_multiple_users_of_the_same_database_file_to_keep_their<br>own_personal_setting_for_the_path_to_the_file_directory.<br>To_take_advantage_of_this,_your_file_directory_setting_must_be_changed_into_the<br>new_format.=
-Legacy_file_directory_setting_found_-_clear_setting?=
 
 Ensure_unique_keys_using_letters_(a,_b,_...)=
 Ensure_unique_keys_using_letters_(b,_c,_...)=
@@ -2178,3 +2173,5 @@ Entry_editor_invalid_field_color=
 
 An_autosave_file_was_found_for_this_database._This_could_indicate_=
 that_JabRef_didn't_shut_down_cleanly_last_time_the_file_was_used.=
+General_file_directory=
+User-specific_file_directory=
