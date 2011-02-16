@@ -569,7 +569,12 @@ public class JabRef {
                         objLnf = Class.forName(defaultLookAndFeel).newInstance();
                 } catch (Exception ex) {
                     ex.printStackTrace();
-
+                    if (splashScreen != null) {// do this only if splashscreen was actually created
+                        splashScreen.dispose();
+                        splashScreen = null;
+                    }
+                    JOptionPane.showMessageDialog(null, Globals.lang("Error setting look and feel")+
+                        ": "+lookAndFeel);
                     try {
                         objLnf = Class.forName(defaultLookAndFeel).newInstance();
                     } catch (Exception ex2) {
