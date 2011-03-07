@@ -303,7 +303,11 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		return contains(searchOptions, entry) ? 1 : 0;
 	}
 
-	public AbstractGroup deepCopy() {
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
+
+    public AbstractGroup deepCopy() {
 		try {
 			return new KeywordGroup(m_name, m_searchField, m_searchExpression,
 					m_caseSensitive, m_regExp, m_context);

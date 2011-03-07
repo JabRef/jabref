@@ -408,6 +408,12 @@ class SearchManager2 extends SidePaneComponent
         }
 
         searchRules.addRule(rule1) ;
+
+        if (!searchRules.validateSearchStrings(searchOptions)) {
+            panel.output(Globals.lang("Search failed: illegal search expression"));
+            panel.stopShowingSearchResults();
+            return;
+        }
         SearchWorker worker = new SearchWorker(searchRules, searchOptions);
         worker.getWorker().run();
         worker.getCallBack().update();

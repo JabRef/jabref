@@ -407,4 +407,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		}
 		return sb.toString();
 	}
+
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
 }

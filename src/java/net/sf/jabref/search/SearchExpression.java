@@ -44,4 +44,8 @@ public class SearchExpression implements SearchRule {
 			return 0; // this should never occur
 		}
 	}
+
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
 }

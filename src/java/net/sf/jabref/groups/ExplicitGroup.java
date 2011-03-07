@@ -139,6 +139,10 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return contains(searchStrings, bibtexEntry) ? 1 : 0;
     }
 
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
+
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(m_name, m_context);
         copy.m_entries.addAll(m_entries);

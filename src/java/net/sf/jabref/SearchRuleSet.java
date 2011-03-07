@@ -51,4 +51,13 @@ public class SearchRuleSet implements SearchRule {
         }
         return score;
     }
+
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        Enumeration<SearchRule> e = ruleSet.elements();
+        while (e.hasMoreElements()) {
+            if (!e.nextElement().validateSearchStrings(searchStrings))
+                return false;
+        }
+        return true;
+    }
 }

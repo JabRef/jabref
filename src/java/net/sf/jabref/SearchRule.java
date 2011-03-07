@@ -32,6 +32,7 @@ public interface SearchRule{
 
     public int applyRule(Map<String, String> searchStrings,BibtexEntry bibtexEntry) ;
 
+    public boolean validateSearchStrings(Map<String, String> searchStrings);
 }
 
 

@@ -40,6 +40,10 @@ public class SimpleSearchRule implements SearchRule {
         m_caseSensitiveSearch = caseSensitive;
     }
 
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
+
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         String searchString = searchStrings.values().iterator().next();
 

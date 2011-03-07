@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.SearchRule;
@@ -32,6 +33,27 @@ public class BasicSearch implements SearchRule {
         return applyRule(map, bibtexEntry);
     }
 
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        if (regExp) {
+            int flags = 0;
+            String searchString = searchStrings.values().iterator().next();
+            if (!caseSensitive) {
+                searchString = searchString.toLowerCase();
+                flags = Pattern.CASE_INSENSITIVE;
+            }
+            ArrayList<String> words = parseQuery(searchString);
+            try {
+                pattern = new Pattern[words.size()];
+                for (int i = 0; i < pattern.length; i++) {
+                    pattern[i] = Pattern.compile(words.get(i), flags);
+                }
+            } catch (PatternSyntaxException ex) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
 
         int flags = 0;
@@ -43,12 +65,15 @@ public class BasicSearch implements SearchRule {
 
         ArrayList<String> words = parseQuery(searchString);
 
-        if (regExp) {
-            pattern = new Pattern[words.size()];
-            for (int i = 0; i < pattern.length; i++) {
-                pattern[i] = Pattern.compile(words.get(i), flags);
+        if (regExp)
+            try {
+                pattern = new Pattern[words.size()];
+                for (int i = 0; i < pattern.length; i++) {
+                    pattern[i] = Pattern.compile(words.get(i), flags);
+                }
+            } catch (PatternSyntaxException ex) {
+                return 0;
             }
-        }
 
         //print(words);
         // We need match for all words:

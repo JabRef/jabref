@@ -88,6 +88,10 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return new AllEntriesGroup();
     }
 
+    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+        return true;
+    }
+
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         return 1; // contains everything
     }
