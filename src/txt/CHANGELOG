@@ -1,3 +1,5 @@
+    - Made it possible to copy entries from the search dialog.    
+    - Added proper error message when trying to search with invalid regular expression.
     - Added error dialog on startup if custom look and feel cannot be loaded.
     - Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files.
     - Removed potential NullPointerException in SearchExpressionTreeParser.

@@ -1,9 +1,6 @@
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,18 +22,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.EntryComparator;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.GeneralRenderer;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -107,7 +93,7 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
+        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -125,7 +111,21 @@ public class SearchResultsDialog {
         InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", closeAction);
-        
+
+        entryTable.getActionMap().put("copy", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    if (selectionModel.getSelected().size() > 0) {
+                        BibtexEntry[] selectedEntries = selectionModel.getSelected().toArray
+                                (new BibtexEntry[selectionModel.getSelected().size()]);
+                        TransferableBibtexEntry trbe
+                                = new TransferableBibtexEntry(selectedEntries);
+                            // ! look at ClipBoardManager
+                            Toolkit.getDefaultToolkit().getSystemClipboard()
+                                .setContents(trbe, frame.basePanel());
+                    }
+                }
+            });
+
         diag.addWindowListener(new WindowAdapter() {
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
