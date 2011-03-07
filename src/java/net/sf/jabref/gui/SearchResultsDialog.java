@@ -115,13 +115,16 @@ public class SearchResultsDialog {
         entryTable.getActionMap().put("copy", new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     if (selectionModel.getSelected().size() > 0) {
-                        BibtexEntry[] selectedEntries = selectionModel.getSelected().toArray
+                        BibtexEntry[] bes = selectionModel.getSelected().toArray
                                 (new BibtexEntry[selectionModel.getSelected().size()]);
                         TransferableBibtexEntry trbe
-                                = new TransferableBibtexEntry(selectedEntries);
+                                = new TransferableBibtexEntry(bes);
                             // ! look at ClipBoardManager
                             Toolkit.getDefaultToolkit().getSystemClipboard()
                                 .setContents(trbe, frame.basePanel());
+                        frame.output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
+                                                           +Globals.lang("entries")
+                                                           : "1 "+Globals.lang("entry")+"."));
                     }
                 }
             });
