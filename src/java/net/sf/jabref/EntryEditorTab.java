@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -62,6 +64,9 @@ import com.jgoodies.forms.layout.FormLayout;
 public class EntryEditorTab {
 
 	private JPanel panel = new JPanel();
+
+	private JScrollPane scrollPane = new JScrollPane(panel,
+			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 	private String[] fields;
 
@@ -90,7 +95,7 @@ public class EntryEditorTab {
 		 * The following line makes sure focus cycles inside tab instead of
 		 * being lost to other parts of the frame:
 		 */
-		panel.setFocusCycleRoot(true);
+		scrollPane.setFocusCycleRoot(true);
 	}
 
 
@@ -315,7 +320,7 @@ public class EntryEditorTab {
 	}
 
 	public Component getPane() {
-		return panel;
+		return scrollPane;
 	}
 
 	/**
@@ -385,7 +390,7 @@ public class EntryEditorTab {
 
 	/*
 	 * Focus listener that fires the storeFieldAction when a FieldTextArea loses
-	 * focus.
+	 * focus, and makes the vertical scroll view follow up.
 	 * 
 	 * TODO: It would be nice to test this thoroughly.
 	 */
@@ -432,6 +437,21 @@ public class EntryEditorTab {
 						}
 					};
 					c.getDocument().addDocumentListener(d);
+
+					/**
+					 * Makes the vertical scroll panel view follow the focus
+					 */
+					Component cScrollPane = c.getParent().getParent();
+					if (cScrollPane instanceof JScrollPane) {
+    					JScrollPane componentPane = (JScrollPane) cScrollPane;
+    					Component cPane = componentPane.getParent();
+    					if (cPane instanceof JPanel) {
+        					JPanel panel = (JPanel) cPane;
+        					Rectangle bounds = componentPane.getBounds();
+        					panel.scrollRectToVisible(bounds);
+    					}
+					}
+
 				}
 			}
 
