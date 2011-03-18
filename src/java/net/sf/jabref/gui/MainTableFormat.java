@@ -31,6 +31,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     URL_ = {"url", "doi"}
     ,
     CITESEER = {"citeseerurl"},
+    ARXIV = {"eprint"},
     FILE = {GUIGlobals.FILE_FIELD};
 
     BasePanel panel;
@@ -210,6 +211,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             iconCols.put(coln++, URL_);
         if (Globals.prefs.getBoolean("citeseerColumn"))
             iconCols.put(coln++, CITESEER);
+        if (Globals.prefs.getBoolean("arxivColumn"))
+            iconCols.put(coln++, ARXIV);
 
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();

@@ -101,6 +101,7 @@ public class Globals {
         PROTECTED_FLAG_META = "protectedFlag",
         LAYOUT_PREFIX = "/resource/layout/", MAC = "Mac OS X",
 		DOI_LOOKUP_PREFIX = "http://dx.doi.org/", NONE = "_non__",
+		ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/",
 		FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
 	public static float duplicateThreshold = 0.75f;

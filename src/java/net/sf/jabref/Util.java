@@ -572,25 +572,34 @@ public class Util {
 			}
 
         } else if (fieldName.equals("doi")) {
-			fieldName = "url";
+	    fieldName = "url";
 			
-			link = sanitizeUrl(link);
+	    link = sanitizeUrl(link);
 			
-			// Check to see if link field already contains a well formated URL
-			if (!link.startsWith("http://")) {
-			    // Remove possible 'doi:'
-			    if (link.matches("^doi:/*.*")){
-	                link = link.replaceFirst("^doi:/*", "");
-	            }
-			    link = Globals.DOI_LOOKUP_PREFIX + link;
-			}
-		} else if (fieldName.equals("citeseerurl")) {
-			fieldName = "url";
-
-			String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
-			if (canonicalLink != null)
-				link = canonicalLink;
+	    // Check to see if link field already contains a well formated URL
+	    if (!link.startsWith("http://")) {
+		// Remove possible 'doi:'
+		if (link.matches("^doi:/*.*")){
+		    link = link.replaceFirst("^doi:/*", "");
 		}
+		link = Globals.DOI_LOOKUP_PREFIX + link;
+	    }
+        } else if (fieldName.equals("eprint")) {
+	    fieldName = "url";
+			
+	    link = sanitizeUrl(link);
+			
+	    // Check to see if link field already contains a well formated URL
+	    if (!link.startsWith("http://")) {
+		link = Globals.ARXIV_LOOKUP_PREFIX + link;
+	    }
+	} else if (fieldName.equals("citeseerurl")) {
+	    fieldName = "url";
+
+	    String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
+	    if (canonicalLink != null)
+		link = canonicalLink;
+	}
 
 		if (fieldName.equals("url")) { // html
 			try {
@@ -2963,4 +2972,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         }
         return al.toArray(new String[al.size()]);
     }
+
+    public static <T> T[] concat(T[] first, T[] second) {
+	T[] result = Arrays.copyOf(first, first.length + second.length);
+	System.arraycopy(second, 0, result, first.length, second.length);
+	return result;
+    }
+
+
 }

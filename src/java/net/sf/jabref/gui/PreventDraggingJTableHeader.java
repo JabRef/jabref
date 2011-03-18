@@ -81,10 +81,12 @@ public class PreventDraggingJTableHeader extends JTableHeader {
             count++;
         }
         if (Globals.prefs.getBoolean("urlColumn")) {
-            ;
             count++;
         }
         if (Globals.prefs.getBoolean("citeseerColumn")) {
+            count++;
+        }
+        if (Globals.prefs.getBoolean("arxivColumn")) {
             count++;
         }
         return count;

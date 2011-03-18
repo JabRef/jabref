@@ -307,6 +307,7 @@ public class JabRefPreferences {
         defaults.put("urlColumn", Boolean.TRUE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("citeseerColumn", Boolean.FALSE);
+        defaults.put("arxivColumn", Boolean.FALSE);
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("overwriteOwner", Boolean.FALSE);
         defaults.put("allowTableEditing", Boolean.FALSE);

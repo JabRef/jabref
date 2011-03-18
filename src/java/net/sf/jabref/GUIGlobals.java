@@ -414,6 +414,9 @@ public class GUIGlobals {
 		lab = new JLabel(getImage("citeseer"));
 		lab.setToolTipText(Globals.lang("Open")+" CiteSeer URL");
 		tableIcons.put("citeseerurl", lab);
+		lab = new JLabel(getImage("arxiv"));
+		lab.setToolTipText(Globals.lang("Open")+" ArXiv URL");
+		tableIcons.put("eprint", lab);
 		lab = new JLabel(getImage("doiSmall"));
 		lab.setToolTipText(Globals.lang("Open")+" DOI "+Globals.lang("web link"));
 		tableIcons.put("doi", lab);

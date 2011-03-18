@@ -19,7 +19,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	JabRefPreferences _prefs;
 
     private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
-		fileColumn, citeseerColumn;
+	fileColumn, citeseerColumn, arxivColumn;
 
 	private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
 		lastNamesOnly;
@@ -66,6 +66,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
 		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
 		citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
+		arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
 
 		floatMarked = new JCheckBox(Globals.lang("Float marked entries"));
 
@@ -135,6 +136,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		builder.nextLine();
 		builder.append(pan);
 		builder.append(citeseerColumn);
+		builder.nextLine();
+		builder.append(pan);
+		builder.append(arxivColumn);
 		builder.nextLine();
 		builder.appendSeparator(Globals.lang("Format of author and editor names"));
 		DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
@@ -219,6 +223,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
         fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
+        arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
 
 		priField.setText(_prefs.get("priSort"));
 		secField.setText(_prefs.get("secSort"));
@@ -275,6 +280,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
 		_prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
+		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
 		_prefs.putInt("autoResizeMode",
 			autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
 		_prefs.putBoolean("priDescending", priDesc.isSelected());
