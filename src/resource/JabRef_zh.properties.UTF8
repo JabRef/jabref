@@ -2176,3 +2176,5 @@ that_JabRef_didn't_shut_down_cleanly_last_time_the_file_was_used.=
 General_file_directory=
 User-specific_file_directory=
 Error_setting_look_and_feel=
+Search_failed\:_illegal_search_expression=
+Show_ArXiv_column=
