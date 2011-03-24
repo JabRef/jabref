@@ -238,22 +238,25 @@ public class GUIGlobals {
 
 	static {
 		LANGUAGES = new HashMap<String, String>();
+
 		// LANGUAGES contains mappings for supported languages.
 		LANGUAGES.put("English", "en");
 		LANGUAGES.put("Dansk", "da");
 		LANGUAGES.put("Deutsch", "de");
 		LANGUAGES.put("Fran\u00E7ais", "fr");
 		LANGUAGES.put("Italiano", "it");
-        LANGUAGES.put("Nederlands", "nl");
-        LANGUAGES.put("Norsk", "no");
-        //LANGUAGES.put("Español", "es"); // Not complete
-        //LANGUAGES.put("Polski", "pl");
-	LANGUAGES.put("Turkish", "tr");
-        LANGUAGES.put("Simplified Chinese", "zh");
-        LANGUAGES.put("Vietnamese", "vi");
-        LANGUAGES.put("Bahasa Indonesia", "in");
-        // Set up entry editor colors, first time:
-        updateEntryEditorColors();
+		LANGUAGES.put("Japanese", "ja");
+		LANGUAGES.put("Nederlands", "nl");
+		LANGUAGES.put("Norsk", "no");
+		//LANGUAGES.put("Español", "es"); // Not complete
+		//LANGUAGES.put("Polski", "pl");
+		LANGUAGES.put("Turkish", "tr");
+		LANGUAGES.put("Simplified Chinese", "zh");
+		LANGUAGES.put("Vietnamese", "vi");
+		LANGUAGES.put("Bahasa Indonesia", "in");
+
+		// Set up entry editor colors, first time:
+		updateEntryEditorColors();
 	}
 
     public static void updateEntryEditorColors() {

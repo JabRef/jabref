@@ -1,3 +1,4 @@
+    - Added Japanese translation by Koji Yokota.
     - Added scrollbar to entry editor when it is too high to fit in its panel. Patch
       by Matthias Erll 
     - Made it possible to copy entries from the search dialog.    
