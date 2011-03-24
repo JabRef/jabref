@@ -330,21 +330,22 @@ public class JabRef {
                     if (loaded.size() > 0) {
                         ParserResult pr =
                             loaded.elementAt(loaded.size() - 1);
-
-                        try {
-                            System.out.println(Globals.lang("Saving") + ": " + data[0]);
-                            SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
-                                new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
-                                false, false, Globals.prefs.get("defaultEncoding"), false);
-                            // Show just a warning message if encoding didn't work for all characters:
-                            if (!session.getWriter().couldEncodeAll())
-                                System.err.println(Globals.lang("Warning")+": "+
-                                    Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
-                                    session.getEncoding())+session.getWriter().getProblemCharacters());
-                            session.commit();
-                        } catch (SaveException ex) {
-                            System.err.println(Globals.lang("Could not save file") + " '"
-                                + data[0] + "': " + ex.getMessage());
+                        if (!pr.isInvalid()) {
+                            try {
+                                System.out.println(Globals.lang("Saving") + ": " + data[0]);
+                                SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
+                                    new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
+                                    false, false, Globals.prefs.get("defaultEncoding"), false);
+                                // Show just a warning message if encoding didn't work for all characters:
+                                if (!session.getWriter().couldEncodeAll())
+                                    System.err.println(Globals.lang("Warning")+": "+
+                                        Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                                        session.getEncoding())+session.getWriter().getProblemCharacters());
+                                session.commit();
+                            } catch (SaveException ex) {
+                                System.err.println(Globals.lang("Could not save file") + " '"
+                                    + data[0] + "': " + ex.getMessage());
+                            }
                         }
                     } else
                         System.err.println(Globals.lang(
@@ -357,8 +358,11 @@ public class JabRef {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
+                    File theFile = pr.getFile();
+                    if (!theFile.isAbsolute())
+                        theFile = theFile.getAbsoluteFile();
                     MetaData metaData = new MetaData(pr.getMetaData(), pr.getDatabase());
-                    metaData.setFile(pr.getFile());
+                    metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                     System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
@@ -849,6 +853,14 @@ public class JabRef {
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
         System.out.println(Globals.lang("Opening") + ": " + name);
         File file = new File(name);
+        if (!file.exists()) {
+            ParserResult pr = new ParserResult(null, null, null);
+            pr.setFile(file);
+            pr.setInvalid(true);
+            System.err.println(Globals.lang("Error:")+" "+Globals.lang("File not found"));
+            return pr;
+
+        }
         try {
 
             if (!ignoreAutosave) {
