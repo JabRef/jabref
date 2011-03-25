@@ -202,11 +202,19 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     public boolean readyToClose() {
 	   
         try {
-            Integer.parseInt(remoteServerPort.getText());
-            return true; // Ok, the number was legal.
+            int portNumber = Integer.parseInt(remoteServerPort.getText());
+            if (portNumber > 1024 && portNumber <= 65535)
+                return true; // Ok, the number was legal.
+            else {
+                JOptionPane.showMessageDialog
+                    (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
+                    Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
+                            JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
-                    (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
+                    (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
                     Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
