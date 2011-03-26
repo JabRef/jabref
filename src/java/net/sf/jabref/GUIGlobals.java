@@ -38,9 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
+import java.util.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -237,7 +235,7 @@ public class GUIGlobals {
 	public static final Map<String, String> LANGUAGES;
 
 	static {
-		LANGUAGES = new HashMap<String, String>();
+		LANGUAGES = new TreeMap<String, String>();
 
 		// LANGUAGES contains mappings for supported languages.
 		LANGUAGES.put("English", "en");
@@ -254,6 +252,8 @@ public class GUIGlobals {
 		LANGUAGES.put("Simplified Chinese", "zh");
 		LANGUAGES.put("Vietnamese", "vi");
 		LANGUAGES.put("Bahasa Indonesia", "in");
+
+
 
 		// Set up entry editor colors, first time:
 		updateEntryEditorColors();
