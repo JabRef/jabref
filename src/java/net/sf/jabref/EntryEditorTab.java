@@ -148,10 +148,16 @@ public class EntryEditorTab {
             int editorType = BibtexFields.getEditorType(fields[i]);
 
             final FieldEditor ta;
-            if (editorType == GUIGlobals.FILE_LIST_EDITOR)
+            int defaultHeight;
+            int wHeight = (int) (50.0 * BibtexFields.getFieldWeight(fields[i]));
+            if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
                 ta = new FileListEditor(frame, bPanel.metaData(), fields[i], null, parent);
-            else
+                defaultHeight = 0;
+            }
+            else {
                 ta = new FieldTextArea(fields[i], null);
+                defaultHeight = ta.getPane().getPreferredSize().height;
+            }
             //ta.addUndoableEditListener(bPanel.undoListener);
             
             JComponent ex = parent.getExtra(fields[i], ta);
@@ -170,8 +176,7 @@ public class EntryEditorTab {
             if (i == 0)
                 activeField = ta;
             //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
-            ta.getPane().setPreferredSize(new Dimension(100,
-                    (int)(50.0*BibtexFields.getFieldWeight(fields[i]))));
+            ta.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             builder.append(ta.getLabel());
             if (ex == null)
                 builder.append(ta.getPane(), 3);
