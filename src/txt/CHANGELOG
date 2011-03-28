@@ -1,3 +1,5 @@
+    - The "Open URL or DOI" action now uses URL links in the "file" field as fallback if
+      no links are found in the "url" or "doi" fields.
     - Restricted remote listener port numbers to interval 1025-65535.
     - Added Japanese translation by Koji Yokota.
     - Added scrollbar to entry editor when it is too high to fit in its panel. Patch

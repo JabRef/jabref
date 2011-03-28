@@ -295,6 +295,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mode;
     }
 
+
     public BibtexDatabase database() {
 		return database;
 	}
@@ -1149,30 +1150,54 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 
         actions.put("openUrl", new BaseAction() {
-                      public void action() {
-                          BibtexEntry[] bes = mainTable.getSelectedEntries();
-                          String field = "doi";
-                          if ((bes != null) && (bes.length == 1)) {
-                              Object link = bes[0].getField("doi");
-                              if (bes[0].getField("url") != null) {
-                                link = bes[0].getField("url");
-                                field = "url";
-                              }
-                              if (link != null) {
-                                //output(Globals.lang("Calling external viewer..."));
-                                try {
-                                  Util.openExternalViewer(metaData(), link.toString(), field);
-                                  output(Globals.lang("External viewer called")+".");
-                                } catch (IOException ex) {
-                                    output(Globals.lang("Error") + ": " + ex.getMessage());
-                                }
-                              }
-                              else
-                                  output(Globals.lang("No url defined")+".");
-                          } else
-                            output(Globals.lang("No entries or multiple entries selected."));
-                      }
-              });
+            public void action() {
+                BibtexEntry[] bes = mainTable.getSelectedEntries();
+                String field = "doi";
+                if ((bes != null) && (bes.length == 1)) {
+                    Object link = bes[0].getField("doi");
+                    if (bes[0].getField("url") != null) {
+                        link = bes[0].getField("url");
+                        field = "url";
+                    }
+                    if (link != null) {
+                        //output(Globals.lang("Calling external viewer..."));
+                        try {
+                            Util.openExternalViewer(metaData(), link.toString(), field);
+                            output(Globals.lang("External viewer called")+".");
+                        } catch (IOException ex) {
+                            output(Globals.lang("Error") + ": " + ex.getMessage());
+                        }
+                    }
+                    else {
+                        // No URL or DOI found in the "url" and "doi" fields.
+                        // Look for web links in the "file" field as a fallback:
+                        FileListEntry entry = null;
+                        FileListTableModel tm = new FileListTableModel();
+                        tm.setContent(bes[0].getField("file"));
+                        for (int i=0; i< tm.getRowCount(); i++) {
+                            FileListEntry flEntry = tm.getEntry(i);
+                            if (flEntry.getType().getName().toLowerCase().equals("url")
+                                    || flEntry.getType().getName().toLowerCase().equals("ps")) {
+                                entry = flEntry;
+                                break;
+                            }
+                        }
+                        if (entry != null) {
+                            try {
+                                Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                                output(Globals.lang("External viewer called") + ".");
+                            } catch (IOException e) {
+                                output(Globals.lang("Could not open link"));
+                                e.printStackTrace();
+                            }
+                            return;
+                        } else
+                            output(Globals.lang("No url defined")+".");
+                    }
+                } else
+                    output(Globals.lang("No entries or multiple entries selected."));
+            }
+        });
 
         actions.put("openSpires", new BaseAction() {
         	public void action() {
