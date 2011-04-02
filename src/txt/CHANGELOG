@@ -1,3 +1,4 @@
+    - Fixed shortcut key collision. Shortcut for Import to new database is now Ctrl-Alt-I.
     - The "Open URL or DOI" action now uses URL links in the "file" field as fallback if
       no links are found in the "url" or "doi" fields.
     - Restricted remote listener port numbers to interval 1025-65535.

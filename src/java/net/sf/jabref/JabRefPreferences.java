@@ -920,7 +920,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Back", "alt LEFT");
         defKeyBinds.put("Forward", "alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");
-        defKeyBinds.put("Import into new database", "ctrl shift I");
+        defKeyBinds.put("Import into new database", "ctrl alt I");
 
         defKeyBinds.put("Increase table font size", "ctrl PLUS");
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
