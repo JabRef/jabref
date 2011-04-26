@@ -422,6 +422,8 @@ public class JabRefPreferences {
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
 
+        defaults.put("allowFileAutoOpenBrowse", Boolean.TRUE);
+
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

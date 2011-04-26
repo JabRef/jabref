@@ -242,7 +242,7 @@ public class FileListEntryEditor {
     }
 
     public void setVisible(boolean visible, boolean openBrowse) {
-        openBrowseWhenShown = openBrowse;
+        openBrowseWhenShown = openBrowse && Globals.prefs.getBoolean("allowFileAutoOpenBrowse");
         if (visible)
             okPressed = false;
         diag.setVisible(visible);

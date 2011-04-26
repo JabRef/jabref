@@ -22,7 +22,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JTextField pdfDir, regExpTextField, fileDir, psDir;
             
-    JCheckBox runAutoFileSearch;
+    JCheckBox runAutoFileSearch, allowFileAutoOpenBrowse;
     JButton editFileTypes;
     ItemListener regExpListener;
 
@@ -41,6 +41,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         fileDir = new JTextField(25);
         editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
+        allowFileAutoOpenBrowse = new JCheckBox(Globals.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
 		regExpListener = new ItemListener() {
@@ -91,12 +92,16 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(new JPanel());
         builder.append(useRegExpComboBox);
 		builder.append(regExpTextField);
+
 		HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
 			Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
 		builder.append(helpAction.getIconButton());
 		builder.nextLine();
         builder.append(new JPanel());
         builder.append(runAutoFileSearch, 3);
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(allowFileAutoOpenBrowse);
         builder.nextLine();
 		builder.appendSeparator(Globals.lang("Legacy file fields"));
 		pan = new JPanel();
@@ -163,6 +168,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
         runAutoFileSearch.setSelected(_prefs.getBoolean("runAutomaticFileSearch"));
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
+        allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean("allowFileAutoOpenBrowse"));
 
         if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
             useRegExpComboBox.setSelected(true);
@@ -185,6 +191,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put(GUIGlobals.FILE_FIELD+"Directory", fileDir.getText());
 		_prefs.putBoolean("autolinkExactKeyOnly", matchExactKeyOnly.isSelected());
         _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
+        _prefs.putBoolean("allowFileAutoOpenBrowse", allowFileAutoOpenBrowse.isSelected());
     }
 
 	public boolean readyToClose() {
