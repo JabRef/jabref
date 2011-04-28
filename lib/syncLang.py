@@ -255,14 +255,14 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
         "resource/JabRef_nl.properties", "resource/JabRef_da.properties",\
         "resource/JabRef_no.properties", "resource/JabRef_tr.properties",\
         "resource/JabRef_vi.properties", "resource/JabRef_in.properties", \
-        "resource/JabRef_zh.properties", "resource/JabRef_zh.properties.UTF8"), changeFiles)
+        "resource/JabRef_zh.properties"), changeFiles)
     handleFileSet("resource/Menu_en.properties", ("resource/Menu_de.properties",\
         "resource/Menu_fr.properties", "resource/Menu_it.properties",\
         "resource/Menu_ja.properties", \
         "resource/Menu_nl.properties", "resource/Menu_da.properties",\
         "resource/Menu_no.properties", "resource/Menu_tr.properties",\
         "resource/Menu_vi.properties", "resource/Menu_in.properties",\
-        "resource/Menu_zh.properties", "resource/Menu_zh.properties.UTF8"), changeFiles)
+        "resource/Menu_zh.properties"), changeFiles)
         
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-d"):
     files = ("resource/JabRef_en.properties", "resource/JabRef_de.properties",\
@@ -271,13 +271,13 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-d"):
         "resource/JabRef_no.properties", "resource/JabRef_nl.properties",\
         "resource/JabRef_da.properties", "resource/JabRef_tr.properties",\
         "resource/JabRef_vi.properties", "resource/JabRef_in.properties",\
-        "resource/JabRef_zh.properties", "resource/JabRef_zh.properties.UTF8",\
+        "resource/JabRef_zh.properties",\
         "resource/Menu_en.properties", "resource/Menu_de.properties",\
         "resource/Menu_fr.properties", "resource/Menu_it.properties",\
         "resource/Menu_ja.properties", \
         "resource/Menu_no.properties", "resource/Menu_nl.properties",\
         "resource/Menu_da.properties", "resource/Menu_tr.properties",\
         "resource/Menu_vi.properties", "resource/Menu_in.properties",\
-        "resource/Menu_zh.properties", "resource/Menu_zh.properties.UTF8")
+        "resource/Menu_zh.properties")
     for file in files:
         lookForDuplicates(file)
