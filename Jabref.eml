@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="commons-logging.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/plugin/commons-logging.jar!/"/>
+	</lib>
+	<lib name="spin.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/spin.jar!/"/>
+	</lib>
+	<lib name="microba.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/microba.jar!/"/>
+	</lib>
+	<lib name="PDFBox-0.7.3-dev-reduced.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/PDFBox-0.7.3-dev-reduced.jar!/"/>
+	</lib>
+	<lib name="antlr.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/antlr.jar!/"/>
+	</lib>
+	<lib name="antlr-3.0b5.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/antlr-3.0b5.jar!/"/>
+	</lib>
+	<lib name="junit.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/junit.jar!/"/>
+	</lib>
+	<lib name="jpf.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/plugin/jpf.jar!/"/>
+	</lib>
+	<lib name="jpf-boot.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/plugin/jpf-boot.jar!/"/>
+	</lib>
+	<lib name="JPFCodeGenerator-rt.jar" scope="COMPILE">
+		<srcroot url="file:///JPFCodeGenerator/src"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/plugin/JPFCodeGenerator-rt.jar!/"/>
+	</lib>
+	<lib name="glazedlists-1.7.0_java15.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/glazedlists-1.7.0_java15.jar!/"/>
+	</lib>
+	<lib name="JempBox-0.2.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/JempBox-0.2.0.jar!/"/>
+	</lib>
+	<lib name="forms-1.1.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/forms-1.1.0.jar!/"/>
+	</lib>
+	<lib name="mysql-connector-java-5.0.7-bin.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/mysql-connector-java-5.0.7-bin.jar!/"/>
+	</lib>
+	<lib name="looks-2.3.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/looks-2.3.1.jar!/"/>
+	</lib>
+</component>

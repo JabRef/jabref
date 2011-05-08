@@ -56,6 +56,7 @@ import net.sf.jabref.util.ErrorConsole;
 import net.sf.jabref.util.TBuildInfo;
 import net.sf.jabref.export.AutoSaveManager;
 
+
 public class Globals {
 
 	private static int SHORTCUT_MASK = -1;

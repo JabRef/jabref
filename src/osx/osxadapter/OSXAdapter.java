@@ -52,7 +52,7 @@
     04092003  mdrance    added comments
 
 */
-package osxadapter;
+/*package osxadapter;
 
 import net.sf.jabref.JabRefFrame;
 import com.apple.eawt.*;
@@ -99,7 +99,7 @@ public class OSXAdapter extends ApplicationAdapter {
       /  routine that chooses whether or not to quit, so the functionality is identical
       /  on all platforms.  This example simply cancels the AppleEvent-based quit and
       /  defers to that universal method.
-      */
+      *//*
       ae.setHandled(false);
       mainApp.quit();
     } else {
@@ -130,4 +130,4 @@ public class OSXAdapter extends ApplicationAdapter {
     }
     theApplication.setEnabledPreferencesMenu(enabled);
   }
-}
+}   */

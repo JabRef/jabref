@@ -52,6 +52,8 @@ import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
+import spl.PdfImporter;
+import spl.Tools;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
@@ -144,7 +146,49 @@ public class EntryTableTransferHandler extends TransferHandler {
 				List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
 				return handleDraggedFiles(l, dropRow);
 			}
-
+            // Done by MrDlib
+            /*if(t.isDataFlavorSupported(MindMapNodesSelection.mindMapNodesFlavor)){
+                String xml = (String)t.getTransferData(MindMapNodesSelection.mindMapNodesFlavor);
+                URL mindmapURL = null;
+                if(t.isDataFlavorSupported(MindMapNodesSelection.mindmapUrlFlavor)){
+                    mindmapURL = (URL)t.getTransferData(MindMapNodesSelection.mindmapUrlFlavor);
+                }
+                List<File> files = new ArrayList<File>();
+                String[] xmlNodes = xml.split("<nodeseparator>");
+                for(String xmlNode : xmlNodes){
+                    XMLElement element = new XMLElement();
+                    element.parseString(xmlNode);
+                    String link = element.getStringAttribute("Link");
+                    String absoluteLink = Tools.getLink(link, mindmapURL);
+                    if(absoluteLink == null) continue;
+                    File file = new File(absoluteLink);
+                    if(file.exists()){
+                        files.add(file);
+                    }
+                    else{
+                        try {
+                            URL url = new URL(absoluteLink);
+                            file = new File(url.toURI());
+                            if(file.exists()){
+                                files.add(file);
+                            }
+                        } catch (URISyntaxException e) {
+                            // Todo logging
+                        } catch(IllegalArgumentException e){
+                            // Todo logging
+                        } catch(MalformedURLException e){
+                            // Todo logging
+                        }
+                    }
+                }
+                if(files.size() > 0){
+                    return handleDraggedFiles(files, dropRow);
+                }
+                else{
+                    return false;
+                }
+            }*/
+            // Done by MrDlib
 			if (t.isDataFlavorSupported(urlFlavor)) {
 				URL dropLink = (URL) t.getTransferData(urlFlavor);
 				return handleDropTransfer(dropLink, dropRow);
@@ -341,7 +385,13 @@ public class EntryTableTransferHandler extends TransferHandler {
 		// This process must be spun off into a background thread:
 		new Thread(new Runnable() {
 			public void run() {
-				loadOrImportFiles(fileNames, dropRow);
+				// Done by MrDlib
+                final String[] newfileNames = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames);
+                if(newfileNames.length > 0){
+                    loadOrImportFiles(newfileNames, dropRow);
+                }
+                //loadOrImportFiles(fileNames, dropRow);
+                // Done by MrDlib
 			}
 		}).start();
 

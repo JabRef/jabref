@@ -25,6 +25,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.Util;
+import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -42,7 +43,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     JabRefFrame frame;
     boolean openInNew;
     MyWorker worker = null;
-    ImportFormat importer;
+    ImportFormat importer;     
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -56,6 +57,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         this.openInNew = openInNew;
         addActionListener(this);
     }
+
 
     public void actionPerformed(ActionEvent e) {
         worker = new MyWorker();
@@ -77,7 +79,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         worker.getWorker().run();
         worker.getCallBack().update();
     }
-    
+
 
     class MyWorker extends AbstractWorker {
         String[] filenames = null, formatName = null;
@@ -234,7 +236,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             panel.markBaseChanged();
                         }
 
-                    }
+                    }                    
 
                 }
 

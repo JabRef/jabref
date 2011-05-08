@@ -5,7 +5,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/plugin/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/microba.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/looks-2.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFBox-0.7.3-dev-reduced.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.0b5.jar"/>
@@ -19,5 +18,8 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.7-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="lib/looks-2.3.1.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/sciplore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

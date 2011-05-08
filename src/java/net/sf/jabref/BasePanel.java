@@ -295,6 +295,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mode;
     }
 
+    //Done by MrDlib
+    public void setMode(int mode) {
+        this.mode = mode;
+    }
+    //Done by MrDlib
 
     public BibtexDatabase database() {
 		return database;

@@ -159,6 +159,102 @@ public class DroppedFileHandler {
 
     }
 
+    // Done by MrDlib
+    public void linkPdfToEntry(String fileName, MainTable entryTable, int dropRow){
+        BibtexEntry entry = entryTable.getEntryAt(dropRow);
+        linkPdfToEntry(fileName, entryTable, entry);
+    }
+
+    public void linkPdfToEntry(String fileName, MainTable entryTable, BibtexEntry entry){
+        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
+
+        // Show dialog
+        boolean newEntry = false;
+        String citeKey = entry.getCiteKey();
+        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, citeKey, newEntry, false);
+
+        if (reply != JOptionPane.OK_OPTION)
+            return;
+
+        /*
+         * Ok, we're ready to go. See first if we need to do a file copy before
+         * linking:
+         */
+
+        boolean success = true;
+        String destFilename;
+
+        if (linkInPlace.isSelected()) {
+            destFilename = fileName;
+        } else {
+            destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
+            if (copyRadioButton.isSelected()) {
+                success = doCopy(fileName, fileType, destFilename, edits);
+            } else if (moveRadioButton.isSelected()) {
+                success = doMove(fileName, fileType, destFilename, edits);
+            }
+        }
+
+        if (success) {
+            doLink(entry, fileType, destFilename, false, edits);
+            panel.markBaseChanged();
+        }
+        edits.end();
+        panel.undoManager.addEdit(edits);
+    }
+
+    public void importXmp(List<BibtexEntry> xmpEntriesInFile, String fileName){
+        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
+        NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
+
+        boolean isSingle = xmpEntriesInFile.size() == 1;
+        BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
+
+
+        boolean success = true;
+
+        String destFilename;
+
+        if (linkInPlace.isSelected()) {
+            destFilename = fileName;
+        } else {
+            if (renameCheckBox.isSelected()) {
+                destFilename = fileName;
+            } else {
+                destFilename = single.getCiteKey() + "." + fileType.extension;
+            }
+
+            if (copyRadioButton.isSelected()) {
+                success = doCopy(fileName, fileType, destFilename, edits);
+            } else if (moveRadioButton.isSelected()) {
+                success = doMove(fileName, fileType, destFilename, edits);
+            }
+        }
+        if (success) {
+
+            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
+
+            while (it.hasNext()) {
+                try {
+                    BibtexEntry entry = it.next();
+                    entry.setId(Util.createNeutralId());
+                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+                    panel.getDatabase().insertEntry(entry);
+                    doLink(entry, fileType, destFilename, true, edits);
+                } catch (KeyCollisionException ex) {
+
+                }
+            }
+            panel.markBaseChanged();
+            panel.updateEntryEditorIfShowing();
+        }
+        edits.end();
+        panel.undoManager.addEdit(edits);
+    }
+    // Done by MrDlib
+
+
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
         NamedCompound edits) {
 

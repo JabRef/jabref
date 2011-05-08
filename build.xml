@@ -124,11 +124,21 @@
 		<include name="plugin/jpf-boot.jar" />
 		<include name="plugin/commons-logging.jar" />
 	</fileset>
+    <!-- Done by MrDlib -->
+    <fileset id="splJars" dir="${lib.dir}">
+        <include name="spl/**/*.jar" />
+        <include name="spl/*.jar" />
+    </fileset>
+    <!-- Done by MrDlib -->
 
 	<!-- Build classpath -->
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
 		<pathelement path="${build.dir}" />
+        <!-- Done by MrDlib -->
+        <pathelement path="${lib.dir}/spl" />
+        <fileset refid="splJars" />
+        <!-- Done by MrDlib -->
 		<fileset refid="jarsFileset" />
 	</path>
 
@@ -219,8 +229,16 @@
 	<!-- Jars up project -->
 	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
+        <!-- Done by MrDlib -->
+        <copy todir="${build.lib}/lib">
+            <fileset dir="${lib.dir}">
+                <include name="spl/**/*.jar" />
+                <include name="spl/*.jar" />
+            </fileset>
+        </copy>
+        <!-- Done by MrDlib -->
 		<mkdir dir="${build.tmp}" />
-		<jar destfile="${build.lib}/${build.jar}">
+		<jar destfile="${build.lib}/${build.jar}" manifest="${src.dir}/MANIFEST.MF"><!-- Done by MrDlib -->
 
 			<fileset dir="${build.classes}" />
 			<fileset dir="${build.tmp}" />
@@ -236,7 +254,13 @@
 			<fileset dir="${src.dir}">
 				<include name="plugins/**" />
 			</fileset>
-
+             <!-- Done by MrDlib -->
+            <fileset dir ="${java.dir}">
+                <include name="spl/localization/spljabref.properties"/>
+                <include name="spl/gui/ajax-loader.gif"/>
+                <include name="spl/gui/mrdlib header.png"/>
+            </fileset>
+            <!-- Done by MrDlib -->
 			<fileset dir="${lib.dir}">
 				<include name="EndNote.zip" />
 			</fileset>
