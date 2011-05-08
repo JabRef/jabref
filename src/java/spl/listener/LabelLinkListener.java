@@ -4,7 +4,6 @@ package spl.listener;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
 import spl.Tools;
-import splmm.Localization.LocalizationSupport;
 
 import javax.swing.*;
 import java.awt.*;
