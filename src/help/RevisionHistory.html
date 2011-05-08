@@ -7,6 +7,23 @@
 
   <h1>Revision history</h1>
 
+    <h3>Version 2.7beta 2</h3>
+    <ul>
+      <li>- Added option under "External programs" for disabling the automatic opening of the
+      Browse dialog when creating a new file link.</li>
+    <li>Fixed shortcut key collision. Shortcut for Import to new database is now Ctrl-Alt-I.</li>
+    <li>The "Open URL or DOI" action now uses URL links in the "file" field as fallback if
+      no links are found in the "url" or "doi" fields.</li>
+    <li>Restricted remote listener port numbers to interval 1025-65535.</li>
+    <li>Added Japanese translation by Koji Yokota.</li>
+    <li>Added scrollbar to entry editor when it is too high to fit in its panel. Patch
+      by Matthias Erll.</li>
+    <li>Made it possible to copy entries from the search dialog.</li>
+    <li>Added proper error message when trying to search with invalid regular expression.</li>
+    <li>Added error dialog on startup if custom look and feel cannot be loaded.</li>
+    <li>Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files.</li>
+    <li>Removed potential NullPointerException in SearchExpressionTreeParser.</li>
+    </ul>
     <h3>Version 2.7beta</h3>
     <ul>
 	<li>Some improvements to MS Office export filter.</li>
