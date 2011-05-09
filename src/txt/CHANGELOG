@@ -1,3 +1,5 @@
+    - Added support for MrdLib lookup or metadata extraction when PDFs are dragged into
+      JabRef.
     - Added option under "External programs" for disabling the automatic opening of the
       Browse dialog when creating a new file link.
     - Fixed shortcut key collision. Shortcut for Import to new database is now Ctrl-Alt-I.
