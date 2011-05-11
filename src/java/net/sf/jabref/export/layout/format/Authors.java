@@ -264,8 +264,9 @@ public class Authors extends AbstractParamLayoutFormatter {
         if ((jr != null) && (jr.length() > 0))
             lastNamePart = lastNamePart+jrSeparator+jr;
 
-        if (abbreviate) {
-            firstNamePart = a.getFirstAbbr();
+        if (abbreviate && (firstNamePart != null)) {
+	    firstNamePart = a.getFirstAbbr();
+		
             if (firstInitialOnly && (firstNamePart.length() > 2))
                 firstNamePart = firstNamePart.substring(0, 2);
             else if (middleInitial) {
@@ -284,12 +285,12 @@ public class Authors extends AbstractParamLayoutFormatter {
             if (!abbrDots)
                 firstNamePart = firstNamePart.replaceAll("\\.", "");
             if (!abbrSpaces)
-                firstNamePart = firstNamePart.replaceAll(" ", "");
+		firstNamePart = firstNamePart.replaceAll(" ", "");
         }
 
-        if (lastNameOnly) {
-            sb.append(lastNamePart);
-        }
+	if (lastNameOnly || (firstNamePart == null)) {
+            sb.append(lastNamePart);	
+	}
         else if (firstFirst) {
             sb.append(firstNamePart).append(firstFirstSeparator);
             sb.append(lastNamePart);
