@@ -1,0 +1,32 @@
+/* CSS for JabRef */
+
+body { 
+	font-family: Arial, sans-serif; 
+	font-size: 12pt;
+	color: #393939;
+	margin: 0px;
+	padding: 20px;
+	padding-left: 50px;
+	background-image: url(/images/JabRef-icon-48.png);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	word-break: break-all;
+}
+
+h1 { font-size: 18pt; background-color: #efefef; padding: 2px 0px; margin-top: 0px; }
+h2 { font-size: 14pt; margin-top: 15px ; margin-bottom: 5px; }
+h3 { font-size: 12pt; margin-top: 10px ; margin-bottom: 5px; }
+
+p { text-align: justify; margin-top: 0px; margin-bottom: 10px; line-height: 15pt; }
+
+code { font-family: Courier, monospace; font-size: 12pt; background-color: #FAFAFA; }
+
+ul, dl { margin-top: 0px; }
+li, dd { text-align: justify; margin-top: 0px; margin-bottom: 3px; } 
+
+ul { margin-left: 10px; }
+
+blockquote { background-color: #FAFAFA; border: 1px solid #EFEFEF; padding: 5px; }
+
+
+

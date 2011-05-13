@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+<h1>項目エディタ</h1>
+
+    <p><em>これは、基本ウィンドウで当該項目行の適当なところをダブルクリックするか、項目を選んでENTER鍵を押すと開きます。パネルはESC鍵を押すと閉じます。</em></p>
+
+    <p>このパネルでは、単一の項目に関連したすべての情報を指定することができます。項目エディタは、ご使用の項目の型を確認し、この項目を<em>bibtex</em>で参照するための、必須フィールドと非必須フィールドとをすべて列挙します。くわえて、すべての項目型に共通な<em>汎用フィールド</em>と名付けられたフィールドがあります。</p>
+
+    <p>項目型のそれぞれについて、どのフィールドが必須で、どのフィールドが非必須か、またどのフィールドが汎用フィールドタブに表示されるべきかを、完全に指定することができます。これについて詳しくは、<a href="CustomEntriesHelp.html">項目型のカスタマイズ</a>を参照してください。</p>
+
+    <p>フィールドをどのように埋めていくべきかについての情報は、<a href="BibtexHelp.html">Bibtexヘルプ</a>をご覧ください。</p>
+
+    <h2>項目エディタのパネル</h2>
+
+    <p>項目エディタには、<em>必須フィールド</em>・<em>非必須フィールド</em>・<em>General</em>・<em>Abstract</em>・<em>Review</em>・<em>BibTeXソース</em>の6つのパネルがあります。ここで、<em>General</em>・<em>Abstract</em>・<em>Review</em>はカスタマイズ可能です(<a href="GeneralFields.html">汎用フィールドのカスタマイズ</a>を参照)。最初の3つのパネルでは、TABとSHIFT-TABがテキストフィールド間でフォーカスを移すのに使用できます。</p>
+
+    <p>パネルを切り替えるにはタブをクリックするか、以下のキーの組み合わせで左右のパネルに移動してください。右側のタブに異動するには、CTRL-TABまたはCTRL-プラス、左側のタブに異動するには、CTRL-SHIFT-TABまたはCTRL-マイナスを使います。また、次または前の項目に移動するには、それぞれCTRL-SHIFT-↓またはCTRL-SHIFT-↑を押すか、適切なツールバーボタンをクリックしてください。</p>
+
+    <p><em>bibtexソース</em>パネルは、データベースが<em>bibtex</em>形式に保存されたときに、項目がどのように表記されるかを示します。お望みならば、このパネルで<em>bibtex</em>ソースを直接編集することもできます。別のパネルに移動したり、CTRL-Sを押したり、あるいは項目エディタを閉じたりした際に、JabRefはソースパネルの内容を解析しようと試みます。問題がある場合には、それを通知して、その項目をさらに編集するのか、以前の内容に戻すのかの選択肢を提示します。<strong>設定</strong>ダイアログの<strong>項目エディタ</strong>タブにある<strong>既定でBibTeXソースを表示</strong>を有効にすると、項目エディタを開く度に、ソースパネルが表示されます。BibTeXの提供する4つのパネルではなく、ソースで編集することをお好みならば、このオプションを有効にしてください。</p>
+
+    <p><strong>一口メモ</strong> お使いのデータベースにJabRefが知らないフィールドが含まれている場合、これらはソースパネルから見ることができます。</p>
+
+    <h2>フィールド整合性検査</h2>
+
+    <p>フィールドの内容が変更された場合、JabRefは新しい内容を受諾可能かどうか検査します。<em>bibtex</em>が使用するフィールド型については、「#」文字の使用法に関しての検査も行われます。#記号は、(「\#」の形でエスケープされている場合を除き)<em>つねに</em>対で使用され、参照されている<em>bibtex</em>文字列を囲みます。なお、JabRefは、参照されている文字列が実際に存在するかどうかの検査は行わないので注意してください(これは自明ではありません。自分で使用する<em>bibtex</em>スタイルは、JabRefが知らない文字列を好きなだけ定義することができるからです)。</p>
+
+   <p>内容が受諾されなければ、フィールドが赤く表示されてエラーであることを示します。この場合には、変更点は保存されません。</p>
+
+<!--<h2>Word/name autocompletion</h2>
+
+    <p>The entry editor offers autocompletion of words. In the Preferences dialog
+    you can enable or disable autocompletion, and choose for which fields
+    autocompletion is active.</p>
+
+    <p>With autocompletion, JabRef records all words that appear in
+    each of the chosen fields throughout your database. Whenever you write
+    the beginning of one of these words, it will be suggested visually. To
+    ignore the suggestion, simply write on. To accept the suggestion,
+    either press <em>ENTER</em> or use your arrow keys or other keys to
+    remove the selection box around the suggested characters.</p>
+
+    <p><em>Note:</em> the words considered for suggestion are only the ones
+    appearing in the same field in entries of the same database as the one you
+    are editing. There are many ways to realise this kind of feature, and if you feel
+    it should have been implemented differently, we'd like to hear your suggestions!</p>
+
+    <h2>Copy <em>bibtex</em> key</h2>
+
+    <p>Pressing CTRL-K or the 'key' button causes the <em>bibtex</em> key for your entry
+    to be copied to the clipboard.</p>
+    -->
+
+    <h2><em>bibtex</em>キー自動生成</h2>
+
+    <p>当該項目の必須フィールドの内容に基づいて<em>bibtex</em>キーを自動生成させるには、CTRL-Gを押すか「キー生成」ボタン(魔法の杖)を押してください。</p>
+
+    <p>JabRefがどうやって<em>bibtex</em>キーを生成するかについての詳しい情報は、<a href="LabelPatterns.html">BibTeXキーの生成をカスタマイズする</a>をご覧ください。</p>
+
+    <h2>単語/名称自動補完</h2>
+
+    <p>JabRefには、単語および名称の自動補完機能があります。自動補完は、<b>オプション→設定→項目エディタ</b>で設定することができ、よく使われるフィールドのいくつかにおいて、既定で有効化されています。</p>
+
+    <p>自動補完が有効になっているフィールドを編集すると、JabRefは、これまでにデータベース中のその特定のフィールドで使用された単語に基づいて、あなたが書き込むと同時に単語補完を提案しようとします。提案候補は、補完時に強調されたテキストブロックとして表示されます。補完候補が複数ある場合には、候補を変えるのにPAGE UPおよびPAGE DOWNを使用することができます。候補を受け入れるには、ENTERを一度押してください。候補を無視するには、入力をそのまま続けてください。</p>
+
+</body>
+</html>
