@@ -1,275 +1,162 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 
 <body>
 
-    <h1>About <em>bibtex</em></h1>
+    <h1><em>bibtex</em> について</h1>
 
-    <p>JabRef helps you work with your
-    <em>bibtex</em> databases, but there are still rules to keep in
-    mind when editing your entries, to ensure that your database is
-    treated properly by the <em>bibtex</em> program.</p>
+    <p>JabRefは、あなたが<em>bibtex</em>データベースの作業をする手助けをしますが、それでも依然として、お使いのデータベースが、正しく確実に<em>bibtex</em>プログラムによって取り扱われるようにするためには、項目編集にあたって頭においておかなくてはならない規則があります。</p>
 
-    <h2><em>Bibtex</em> fields</h2>
+    <h2><em>Bibtex</em> フィールド</h2>
 
-    <p>There is a lot of different
-    fields in <em>bibtex</em>, and some additional fields that you
-    can set in JabRef.</p>
+    <p><em>bibtex</em>には多くのフィールドがあるほか、JabRef特有のフィールドもあります。</p>
 
-    <p>Generally, you can use LaTeX commands inside of fields
-    containing text. <em>Bibtex</em> will automatically format your
-    reference lists, and those fields that are included in the
-    lists will be (de)capitalized according to your bibliography
-    style. To ensure that certain characters remain capitalized,
-    enclose them in braces, like in the word {B}elgium.</p>
+    <p>一般に、テキストを含むフィールド内部では、LaTeXコマンドを使用することができます。<em>Bibtex</em>は、自動的にあなたの文献一覧を整形し、一覧に含まれているフィールドは、文献目録様式にしたがって、自動的に大文字や小文字に変換されます。特定の文字が確実に大文字のままで残されるようにするためには、{B}elgiumのように、その文字を波括弧で囲んでください。</p>
 
-    <p>Notes about some of the field types:</p>
+    <p>一部のフィールド型に関する注釈:</p>
 
     <ul>
-        <li><strong style="font-style: italic;">Bibtexkey</strong>
-        A unique string used to refer to the entry in LaTeX
-        documents. Note that when referencing an entry from LaTeX,
-        the key must match case-sensitively with the reference
-        string.<br />
+        <li><strong style="font-style: italic;">Bibtexkey</strong> LaTeX文書中で、この項目を参照するために使われる固有文字列。LaTeXから項目を参照する際、キーは大文字小文字の区別を含め、参照文字列と一致していなくてはならないことに注意してください。<br /><br /></li>
+
+        <li><strong>address<br /></strong> 通常は、<tt>publisher</tt>あるいは他の型の団体の住所を示します。van&nbsp;Leunenによれば、主要な出版社に関しては、この情報を空欄にしておくことが推奨されます。一方、小さな出版社については、完全なアドレスを提供することによって読者を助けることができるでしょう。</li>
+
+        <li><strong>annote<br /></strong> 注釈。標準の文献目録様式では使用されませんが、注釈付きの文献目録を出力する一部の様式では使用されることがあります。 </li>
+
+        <li><strong>author<br /></strong> このフィールドは、当該項目の著者全員のリストを入れます。氏名は、3名以上の著者がいる場合でも<em>and</em>という単語で区切ります。それぞれの氏名は、以下の二つの書き方で書くことができます。<br/>
+         Donald E. Knuth <em>または</em> Knuth, Donald E.<br />
+         Eddie van Halen <em>または</em> van Halen, Eddie<br />
+	2つ以上の名前からなる著者には、ミドルネームや姓と区別するために、後者の形を使用しなくてはなりません。<br />
         <br /></li>
 
-        <li><strong>address<br /></strong> Usually the address of
-        the <tt>publisher</tt> or other type of institution. For
-        major publishing houses, van&nbsp;Leunen recommends
-        omitting the information entirely. For small publishers, on
-        the other hand, you can help the reader by giving the
-        complete address.</li>
+        <li><strong>booktitle<br /></strong> 内容の一部が引用されている場合の書籍のタイトル。book項目の場合には、これではなく<tt>title</tt>フィールドを使用してください。</li>
 
-        <li><strong>annote<br /></strong> An annotation. It is not
-        used by the standard bibliography styles, but may be used
-        by others that produce an annotated bibliography.</li>
+        <li><strong>chapter<br /></strong> 章 (または節などの)番号</li>
 
-        <li><strong>author<br /></strong> This field should contain
-        the complete author list for your entry. The names are
-        separated by the word <em>and</em>, even if there are more
-        than two authors. Each name can be written in two
-        equivalent forms:<br />
-         Donald E. Knuth <em>or</em> Knuth, Donald E.<br />
-         Eddie van Halen <em>or</em> van Halen, Eddie<br />
-         The second form should be used for authors with more than
-        two names, to differentiate between middle names and last
-        names.<br />
-        <br /></li>
+        <li><strong>crossref<br /></strong> 相互参照している項目のデータベースキー。</li>
 
-        <li><strong>booktitle<br /></strong> Title of a book, part
-        of which is being cited. For book entries, use the
-        <tt>title</tt> field instead.</li>
+        <li><strong>edition<br /></strong> 書籍の版--例えば「Second」。これは、ここに示されているように第1文字を大文字にした序数でなくてはなりません。標準的な様式では、必要に応じて小文字に変換されます。</li>
 
-        <li><strong>chapter<br /></strong> A chapter (or section or
-        whatever) number.</li>
+        <li><strong>editor<br /></strong> このフィールドは<em>author</em>フィールドに類似のものです。<tt>author</tt>フィールドもある場合、<tt>editor</tt>フィールドは、参照文献の現れる書籍やコレクションの編集者を示します。</li>
 
-        <li><strong>crossref<br /></strong> The database key of the
-        entry being cross referenced.</li>
+        <li><strong>howpublished<br /></strong> 変わった経緯を持つ文献がどのように出版されたかを示します。最初の文字は大文字にしなくてはなりません。</li>
 
-        <li><strong>edition<br /></strong> The edition of a
-        book--for example, ``Second''. This should be an ordinal,
-        and should have the first letter capitalized, as shown
-        here; the standard styles convert to lower case when
-        necessary.</li>
+        <li><strong>institution<br /></strong> テクニカルレポートを提供している団体。</li>
 
-        <li><strong>editor<br /></strong> This field is analogue to
-        the <em>author</em> field. If there is also an
-        <tt>author</tt> field, then the <tt>editor</tt> field gives
-        the editor of the book or collection in which the reference
-        appears.</li>
+        <li><strong>journal<br /></strong> 学術誌名。学術誌名は、「文字列」を使用して短縮することができます。この文字列を定義するには、<a href="StringEditorHelp.html">文字列エディタ</a>を使用してください。</li>
 
-        <li><strong>howpublished<br /></strong> How something
-        strange has been published. The first word should be
-        capitalized.</li>
+        <li><strong>key<br /></strong> 「author」情報が欠けているときに、アルファベット順の整序や相互参照、ラベルの作成に使用されます。このフィールドを、<code>\cite</code>コマンドに現れるキーやデータベース項目の最初のキーと混同しないようにしてください。</li>
 
-        <li><strong>institution<br /></strong> The sponsoring
-        institution of a technical report.</li>
+        <li><strong>month<br /></strong> 著作が発行された月、または未刊行著作の場合にはそれが書かれた月。標準的な3文字短縮形を使用してください (jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec)。</li>
 
-        <li><strong>journal<br /></strong> A journal name. The name
-        of a journal can be abbreviated using a "string". To define
-        such string, use the <a href="StringEditorHelp.html">string
-        editor</a>.</li>
-
-        <li><strong>key<br /></strong> Used for alphabetizing,
-        cross referencing, and creating a label when the ``author''
-        information is missing. This field should not be confused
-        with the key that appears in the <code>\cite</code> command
-        and at the beginning of the database entry.</li>
-
-        <li><strong>month<br /></strong> The month in which the
-        work was published or, for an unpublished work, in which it
-        was written. You should use the standard three-letter
-        abbreviation (jan, feb, mar, apr, may, jun, jul, aug, sep,
-        oct, nov, dec).</li>
-
-        <li><strong>note<br /></strong> Any additional information
-        that can help the reader. The first word should be
-        capitalized.</li>
+        <li><strong>note<br /></strong> 読者の助けとなる任意の追加情報。最初の文字は大文字にしてください。</li>
 
         <li><strong>number</strong><br />
-        The number of a journal, magazine, technical report, or of
-        a work in a series. An issue of a journal or magazine is
-        usually identified by its volume and number; the
-        organization that issues a technical report usually gives
-        it a number; and sometimes books are given numbers in a
-        named series.</li>
+	学術誌・雑誌・テクニカルレポートまたはシリーズ中の著作の号。学術誌や雑誌刊行物は、通常、巻と号とで識別されます。テクニカルレポートを発行する団体は、通常、号を付与します。また、シリーズものの書籍にも号が振られることがあります。</li>
 
-        <li><strong>organization<br /></strong> The organization
-        that sponsors a conference or that publishes a manual.</li>
+        <li><strong>organization<br /></strong> コンファレンスの主催団体やマニュアルの発行元団体。</li>
 
-        <li><strong>pages<br /></strong> One or more page numbers
-        or range of numbers, such as <tt>42-111</tt> or
-        <tt>7,41,73-97</tt> or <tt>43+</tt> (the `<tt>+</tt>' in
-        this last example indicates pages following that don't form
-        a simple range). To make it easier to maintain
-        <em>Scribe</em>-compatible databases, the standard styles
-        convert a single dash (as in <tt>7-33</tt>) to the double
-        dash used in TeX to denote number ranges (as in
-        <tt>7-33</tt>).</li>
+        <li><strong>pages<br /></strong> <tt>42-111</tt>や<tt>7,41,73-97</tt>や<tt>43+</tt>のように表記される(最後の例における「<tt>+</tt>」はそのページに続く範囲が単純な範囲ではないことを示します)、ページ数あるいはページ数の範囲。<em>Scribe</em>互換のデータベースを維持することが簡単になるように、標準的な様式は、単一のダッシュ(例: <tt>7-33</tt>)を、TeX中でのページ範囲の表記のように複数ダッシュ(例: <tt>7--33</tt>)に変換します。</li>
 
-        <li><strong>publisher<br /></strong> The publisher's
-        name.</li>
+        <li><strong>publisher<br /></strong> 出版社名。</li>
 
-        <li><strong>school<br /></strong> The name of the school
-        where a thesis was written.</li>
+        <li><strong>school<br /></strong> 論文の執筆された学校名。</li>
 
-        <li><strong>series<br /></strong> The name of a series or
-        set of books. When citing an entire book, the
-        <tt>title</tt> field gives its title and an optional
-        <tt>series</tt> field gives the name of a series or
-        multi-volume set in which the book is published.</li>
+        <li><strong>series<br /></strong> シリーズまたは全集の名称。書籍全体を引用する際には、<tt>title</tt>フィールドがそのタイトルを与え、非必須フィールドの<tt>series</tt>が、その本が刊行されたシリーズ名ないし複数巻書籍の名称を与えます。</li>
 
-        <li><strong>title<br /></strong> The work's title. The
-        capitalization may depend on the bibliography style and on
-        the language used. For words that have to be capitalized
-        (such as a proper noun), enclose the word (or its first
-        letter) in braces.</li>
+        <li><strong>title<br /></strong> 著作のタイトル。大文字化は、文献目録様式と使用される言語とに依存します。大文字にしなくてはならない単語(固有名詞など)については、その単語(ないし最初の文字)を波括弧で囲んでください。</li>
 
-        <li><strong>type<br /></strong> The type of a technical
-        report--for example, ``Research Note''.</li>
+        <li><strong>type<br /></strong> テクニカルレポートの型。例えば「Research Note」。</li>
 
-        <li><strong>volume<br /></strong> The volume of a journal
-        or multivolume book.</li>
+        <li><strong>volume<br /></strong> 学術誌ないし複数巻書籍の巻。</li>
 
-        <li><strong>year<br /></strong> The year of publication or,
-        for an unpublished work, the year it was written. Generally
-        it should consist of four numerals, such as <tt>1984</tt>,
-        although the standard styles can handle any <tt>year</tt>
-        whose last four nonpunctuation characters are numerals,
-        such as `(about 1984)'. This field is required for most
-        entry types.</li>
+        <li><strong>year<br /></strong> 発行年、あるいは未発行の著作に関しては執筆年。一般には、<tt>1984</tt>のような4桁数字を含んでいなくてはなりません。しかしながら、標準的な様式は、「(about 1984)」のように最後の非句読点文字4つが数字であるものならば、どのような<tt>year</tt>も取扱可能です。このフィールドは、ほとんどの項目型で必須です。</li>
     </ul><br />
 
 
-    <h2>Other fields</h2>
+    <h2>他のフィールド</h2>
 
-    <p>BibTeX is extremely popular, and many
-    people have used it to store information. Here is a list of
-    some of the more common fields:</p>
+    <p>BibTeXは非常にポピュラーであり、多くの人々が情報を保管するために使用しています。以下は、よく使われるフィールドの一部を挙げたものです。</p>
 
     <ul>
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        affiliation*</span><br /></strong> The authors
-        affiliation.<br />
+        affiliation*</span><br /></strong> 著者の所属<br />
         <br /></li>
 
-        <li><strong>abstract<br /></strong> An abstract of the
-        work.<br />
+        <li><strong>abstract<br /></strong> 著作の要約<br />
         <br /></li>
 
-        <li><strong>doi<br /></strong> The Digital Object
-        Identifier, a permanent identifier given to
-        documents.<br />
+        <li><strong>doi<br /></strong> デジタルオブジェクト識別子 (Digital Object Identifier)。文書に振られた恒久的識別子。<br />
         <br /></li>
 
-        <li><strong>eid<br /></strong> The Electronic identifier is
-        for electronic journals that also appear in print. This
-        number replaces the page number, and is used to find the
-        article within the printed volume. Sometimes also called
-        <em>citation number</em>.<br />
+        <li><strong>eid<br /></strong> 電子識別子 (electronic identifier) は、印刷もされている電子ジャーナルのためのものです。この番号はページ数の代わりであり、印刷された刊行物で論文を見つけるのに用いられます。これは、<em>citation number</em>とも呼ばれています。<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        contents*</span><br /></strong> A Table of Contents<br />
+        contents*</span><br /></strong> 目次<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        copyright*</span><br /></strong> Copyright
-        information.<br />
+        copyright*</span><br /></strong> 著作権情報<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        ISBN*</span><br /></strong> The International Standard Book
-        Number.<br />
+        ISBN*</span><br /></strong> 国際標準図書番号 (International Standard Book Number)<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        ISSN*</span><br /></strong> The International Standard
-        Serial Number. Used to identify a journal.<br />
+        ISSN*</span><br /></strong> 国際標準逐次刊行物番号 (International Standard Serial Number)。学術誌を特定するのに使用されます。<br />
         <br /></li>
 
-        <li><strong>keywords<br /></strong> Key words used for
-        searching or possibly for annotation.<br />
-        <br /></li>
-
-        <li>
-        <strong><span style="font-weight: normal; font-style: italic;">
-        language*</span><br /></strong> The language the document
-        is in.<br />
+        <li><strong>keywords<br /></strong> 検索やときに注釈に使われるキーワード<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        location*</span><br /></strong> A location associated with
-        the entry, such as the city in which a conference took
-        place.<br />
+        language*</span><br /></strong> 文書で使用されている言語<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        LCCN*</span><br /></strong> The Library of Congress Call
-        Number. I've also seen this as <tt>lib-congress</tt>.<br />
+        location*</span><br /></strong> コンファレンスの開催された都市など、項目に関連した場所。<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        mrnumber*</span><br /></strong> The <i>Mathematical
-        Reviews</i> number.<br />
+        LCCN*</span><br /></strong> 米国議会図書館管理番号 (Library of Congress Control Number)。<tt>lib-congress</tt>と表記することもあるようです。<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        price*</span><br /></strong> The price of the
-        document.<br />
+        mrnumber*</span><br /></strong> <i>Mathematical Reviews</i>番号<br />
         <br /></li>
 
         <li>
         <strong><span style="font-weight: normal; font-style: italic;">
-        size*</span><br /></strong> The physical dimensions of a
-        work.<br />
+        price*</span><br /></strong> 文書の価格<br />
         <br /></li>
 
-        <li><strong>URL<br /></strong> The WWW Universal Resource
-        Locator that points to the item being referenced. This
-        often is used for technical reports to point to the ftp
-        site where the postscript source of the report is
-        located.</li>
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        size*</span><br /></strong> 著作物の物理的な寸法<br />
+        <br /></li>
+
+        <li><strong>URL<br /></strong> 参照されている項目を指し示すWWWユニフォームリソースロケータ。これは、テクニカルレポートにおいて、レポートのPostScriptソースのあるFTPサイトを指し示すのによく使用されます。</li>
     </ul>
 
     <h3>JuraBib</h3>
 
     <ul>
-        <li><strong>urldate<br /></strong> The date of the last
-        page visit.</li>
+        <li><strong>urldate<br /></strong> 最後にページを訪れた日付。</li>
     </ul><br />
-     *) not direct supported by JabRef<br />
+     *) は、JabRefによって直接サポートされていません。<br />
      <br />
 </body>
 </html>

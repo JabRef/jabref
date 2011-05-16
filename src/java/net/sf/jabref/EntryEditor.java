@@ -276,7 +276,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
                 tabList.getTabName(i));
-            tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
+            tabbed.addTab(Globals.lang(tabList.getTabName(i)), GUIGlobals.getImage("general"), newTab.getPane());
             tabs.add(newTab);
         }
 
