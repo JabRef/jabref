@@ -257,7 +257,7 @@ public class JabRefPreferences {
         defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
 
     // Entry editor tab 0:
-    	defaults.put(CUSTOM_TAB_NAME+"_def0", "General[CUSTOM_TAB]");
+    	defaults.put(CUSTOM_TAB_NAME+"_def0", "General");
         defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;citeseerurl;"+
                      "comment;owner;timestamp");
 
