@@ -1,103 +1,52 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 
 <body>
-    <h1>Journal abbreviations</h1>
+    <h1>学術誌名の短縮形</h1>
 
-    <p>This feature can be configured
-    under <b>Options -&gt; Manage journal abbreviations</b>.</p>
+    <p>この機能は、<b>オプション→誌名短縮形を管理</b>で設定することができます。</p>
 
-    <p>JabRef can automatically toggle journal names between
-    abbreviated and unabbreviated form, as long as the names are
-    contained in one of your journal lists. You can use several
-    lists, all realized as external text files on your hard
-    disk.</p>
+    <p>JabRefでは、学術誌名が誌名表に登録されていれば、短縮形と非短縮形を切り替えることができます。誌名表は複数持つことができ、これらはハードディスク上の外部テキストファイルとして取り扱われます。</p>
 
-    <h2>Using the feature</h2>
+    <h2>この機能を使うには</h2>
 
-    <p>Journal name conversion can be accessed either from within
-    the entry editor, or from the <b>Tools</b> menu. In the entry
-    editor you will find a button labelled <i>Toggle
-    abbreviation</i> by the <i>journal</i> field. Clicking this
-    button will cause the current journal name to be switched to
-    the next of three modes:</p>
+    <p>誌名変換機能は、項目エディタ内か<b>ツール</b>メニューから使用することができます。項目エディタ内には、<i>journal</i>フィールド脇に<b>短縮形/非短縮形の切替</b>というラベルの付いたボタンがあります。これを押すと、現在の誌名が、以下の3つのモードの間で切り替わります。</p>
 
     <ul>
-        <li>Full name, e.g. "Aquacultural Engineering"</li>
+        <li>完全名 (例) "Aquacultural Engineering"</li>
 
-        <li>ISO abbreviation, e.g. "Aquacult. Eng."</li>
+        <li>ISO式短縮形 (例) "Aquacult. Eng."</li>
 
-        <li>MEDLINE abbreviation, e.g. "Aquacult Eng"</li>
-    </ul>If the current journal name is not found in your journal
-    lists, the field will not be modified.
+        <li>MEDLINE式短縮形 (例) "Aquacult Eng"</li>
+    </ul>現在の誌名が誌名表にない場合には、フィールドは変更されません。
 
-    <p>To convert the journal names of many entries in bulk, you
-    can select any number of entries, and choose <b>Tools -&gt;
-    Abbreviate journal names (ISO)</b>, <b>Tools -&gt; Abbreviate
-    journal names (MEDLINE)</b> or <b>Tools -&gt; Unabbreviate
-    journal names</b>. These three actions will abbreviate and
-    unabbreviate the journal names of all selected entries for
-    which the journal name could be found in your journal
-    lists.</p>
+    <p>多くの項目の誌名を一括して変換するには、好きな数だけ項目を選択してから、<b>ツール→学術誌名を短縮形に (ISO)</b>、<b>ツール→学術誌名を短縮形に (MEDLINE)</b>、または<b>ツール→学術誌名を非短縮形に</b>のいずれかを選択します。これら3つのアクションは、選択項目のうち、誌名表に掲載されているすべての誌名を、略語化したり解除したりします。</p>
 
-    <h2>Setting up your journal lists</h2>
+    <h2>誌名表を準備する</h2>
 
-    <p>You can have several
-    journal lists, all external text files linked from JabRef. The
-    primary list can be edited from within JabRef.</p>
+    <p>誌名表は、JabRefからリンクした外部テキストファイルの形で、複数持つことができます。そのうち優先表は、JabRef内から編集することができます。</p>
 
-    <h3>Your personal journal abbreviations list</h3>
+    <h3>個人用の誌名短縮表</h3>
 
-    <p>Your personal
-    journal list is managed in the upper part of the <b>Manage
-    journal abbreviations</b> window. To start building your
-    personal journal abbreviations list, choose <i>New file</i>,
-    and enter a filename manually or using the <i>Browse</i>
-    button. If you already have a file that you want to use as a
-    starting point, choose <i>Existing file</i>, and use the
-    <i>Browse</i> button to choose the file. The table will update
-    to show the contents of the list you have selected.</p>
+    <p>個人用の誌名表は、<b>誌名短縮形の管理</b>ウィンドウの上部で取り扱うことができます。個人用誌名表を作成するには、<b>新規ファイル</b>を選択して、手動でファイル名を入力するか<b>一覧</b>ボタンを使用してください。手始めとなるファイルが既にある場合には、<b>既存ファイル</b>を選択して、<b>一覧</b>ボタンからファイルを選択してください。画面の表が更新されて、選択した表の内容が表示されます。</p>
 
-    <p>The table and the tool buttons to the right allow you to
-    add, remove and edit journal entries. For each entry you must
-    provide the full journal name, and the ISO abbreviation (e.g.
-    "Aquacultural Engineering" and "Aquacult. Eng."). To edit an
-    entry, double-click its row in the table.</p>
+    <p>この表と右側のツールボタンを用いて、学術誌項目を追加したり削除したり編集したりすることができます。それぞれの項目については、学術誌の完全な名称とISO式短縮形を指定しなくてはなりません(例えば"Aquacultural Engineering"と"Aquacult. Eng.")。項目を編集するには、表中の行をダブルクリックしてください。</p>
 
-    <p>Once you click <i>OK</i>, if you have selected a file, and
-    the table contains at least one entry, the table contents will
-    be stored to the selected file, and JabRef's list of journals
-    will be updated.</p>
+    <p>ファイルが選択されていて、表に1項目以上が含まれていれば、<b>OK</b>をクリックすると、表の内容が選択したファイルに保存され、JabRefの誌名表が更新されます。</p>
 
-    <h3>External journal lists</h3>
+    <h3>外部誌名表</h3>
 
-    <p>In addition to your personal
-    list, you can link to a number of external lists. These links
-    can be set up in the lower part of the <b>Manage journal
-    abbreviations</b> window. External lists are similar to the
-    personal list - the only difference is that JabRef doesn't
-    provide an interface for editing the external lists.</p>
+    <p>個人用誌名表の他に、複数の外部の誌名表にリンクすることができます。これらのリンクは、<b>誌名短縮形の管理</b>ウィンドウの下部で設定することができます。外部誌名表は、個人用誌名表と類似しています。唯一の違いは、JabRefには、外部誌名表を編集するインタフェースが備わっていないことです。</p>
 
-    <p>To add a new external list, if necessary, click the <b>+</b>
-    button to add another slot to the interface. Then use either
-    the <i>Browse</i> or <i>Download</i> button next to one of the
-    slots in the lower part of the window.</p>
+    <p>必要に応じて外部誌名表を新たに追加するには、<b>＋</b>ボタンをクリックして、インタフェースにファイル行を追加してください。その上で、ウィンドウ下部のファイル行横にある<b>一覧</b>か<b>ダウンロード</b>ボタンを使用してください。</p>
 
     <ul>
-        <li>The <i>Browse</i> button allows you to select an
-        existing file on your computer.</li>
+        <li><b>一覧</b>ボタンを使うと、コンピューター上の既存のファイルを選択することができます。</li>
 
-        <li>The <i>Download</i> button allows you to download a
-        list over the internet by entering and URL, store it to a
-        local file on your computer, and link to it as a journal
-        list from JabRef. The URL will default to the address of a
-        journal list provided from the JabRef web page. This list
-        is incomplete, but may be improved in the future.</li>
-    </ul>Any entry in your personal journal list will override an
-    entry with the same full journal name in one of the external
-    lists. Similarly, the external lists are given precedence in
-    the order they are listed.
+        <li><b>ダウンロード</b>ボタンを使うと、URLを入力してインターネットから誌名表をダウンロードし、コンピューター上のローカルファイルとして保存して、JabRefから誌名表としてリンクすることができます。URLは、既定でJabRefのウェブページにある誌名表のアドレスになっています。この誌名表は完全ではありませんが、将来的に改善されていくでしょう。</li>
+    </ul>個人用誌名表にある項目は、外部誌名表のいずれかに存在する、同じ完全名の項目に優先します。同様に、外部誌名表間の優先順位は、ウィンドウに挙げられている順で優先されます。
 </body>
 </html>
