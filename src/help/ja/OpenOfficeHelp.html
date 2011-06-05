@@ -1,102 +1,73 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 
 <body>
 
-    <h1>Using JabRef bibliographies in OpenOffice.org</h1>
+    <h1>OpenOffice.org で JabRef 書誌情報を利用するには</h1>
 
-    <p>JabRef can export your database in both the OpenOffice.org 1.1
-    <b>.sxc</b> spreadsheet format, and the OpenDocument
-    <b>.ods</b> spreadsheet format used by OpenOffice.org 2.0.</p>
+    <p>JabRef は、データベースを OpenOffice.org 1.1 の <b>.sxc</b> 表計算ドキュメント形式と、 OpenOffice.org 2.0 で用いられる OpenDocument <b>.ods</b> 表計算ドキュメント形式の両方に書き出すことができます。</p>
 
-    <p>In both cases the exported spreadsheet will contain one data
-    sheet, listing entries in rows and the various fields in
-    columns. The order and names of the columns is set to be
-    compatible with OpenOffice.org's bibliography functions (OOo
-    1.1 in the case of the <b>.sxc</b> export, and OOo 2.0 in the
-    case of the <b>.ods</b> format).</p>
+    <p>どちらの場合も、書き出した表計算ドキュメントには、各項目を行とし、各フィールドを列とした1つのデータシートだけが含まれます。列順と列名は、OpenOffice.org の書誌情報関数と互換性があるように設定されます (<b>.sxc</b> 形式の場合は OOo 1.1、<b>.ods</b> 形式の場合は OOo 2.0)。</p>
 
-    Depending on your version of OpenOffice.org, here are the method to use JabRef bibliographic databases:
+    以下は、OpenOffice.org のバージョン毎の、JabRef 書誌情報データベースの利用法です。
 
-    <h2>Using the exported file as bibliography database in
-    OpenOffice.org 2.3 and 2.4</h2>
+    <h2>書き出したファイルを OpenOffice.org 2.3 および 2.4 の書誌情報データベースとして利用するには</h2>
 
-    <p>Use the following steps to set up a spreadsheet exported from
-    JabRef as bibliography database in OpenOffice.org:</p>
+    <p>JabRef から書き出したスプレッドシートを OpenOffice.org の書誌情報データベースとして設定するには、以下のステップを踏んでください。</p>
 
     <ul>
-    <li>From JabRef, export your database using the <b>.ods</b> format</li>
-    <li>Start OpenOffice.org Writer</li>
+    <li>JabRef からデータベースを <b>.ods</b> 形式で書き出します。</li>
+    <li>OpenOffice.org Writer を起動します。</li>
 
-    <li>Choose <b>Edit -&gt; Change database</b>. Click on <b>Select</b>, and select your database exported to the .ods format.</li>
-    <li>Unfold the <b>+</b> located in front of the name of the imported database, then click on the displayed filename, and, finally, on the button <b>Define</b>.</li>
-    <li>Choose <b>Tools -&gt; Options -&gt; OpenOffice.org Base -&gt; Database</b>. In this window, the database you just imported should be displayed. The default OOo bibliographic database should also be displayed (<i>Bibliography</i>).</li>
-    <li>Edit the Bibliography database, and alter its name, such as <i>Bibliography-old</i> (in fact, OpenOffice.org Writer does not allow selecting several bibliographic databases).
-    <li>Select your bibliographic database, edit it, and rename it <i>Bibliography</i> (pay a special attention to the capital letter at the beginning of the name).</li>
+    <li><b>編集→データベースを交換</b>を選ぶ。<b>選択</b>をクリックし、.ods 形式に書き出されたデータベースを選択します。</li>
+    <li>読み込んだデータベース名の前にある <b>+</b> を展開して、表示されたファイル名をクリックし、最後に<b>指定</b>ボタンを押します。</li>
+    <li><b>ツール→オプション→OpenOffice.org Base→データベース</b>を選択します。このウィンドウには、いま読み込んだデータベースが表示されているはずです。また、既定のOOo書誌情報データベース (<i>Bibliography</i>) も表示されているはずです。</li>
+    <li>Bibliography データベースを編集し、その名前を <i>Bibliography-old</i> などに変えてください (OpenOffice.org Writer では複数の書誌情報データベースを選択することができません)。</li>
+    <li>使用する書誌情報データベースを選択し、その名前を <i>Bibliography</i> に変えてください (名前の最初の文字が大文字になっていることに特に注意してください)。</li>
     </ul>
 
-    After these steps, your bibliographic database should be ready for use with OpenOffice.org. To check about it, choose <b>Insert -&gt; Index -&gt; Bibliographic entry...</b>: the list of the BibTeX keys should be displayed.
+    これらのステップを踏むと、あなたの書誌情報データベースが OpenOffice.org で利用できるようになっているはずです。これを確認するには、<b>挿入→目次と索引→参考文献項目...</b>を選択してください。すると、BibTeX 鍵のリストが表示されるはずです。
 
 
-    <h2>Using the exported file as bibliography database in
-    OpenOffice.org 2.0, 2.1 and 2.2</h2>
+    <h2>書き出したファイルを OpenOffice.org 2.0/2.1/2.2 の書誌情報データベースとして利用するには</h2>
 
-    <p>Use the following steps to set up a spreadsheet exported from
-    JabRef as bibliography database in OpenOffice.org:</p>
+    <p>JabRef から書き出したスプレッドシートを OpenOffice.org の書誌情報データベースとして設定するには、以下のステップを踏んでください。</p>
 
     <ul>
-        <li>Export your database using the <b>.ods</b> format</li>
+        <li>データベースを <b>.ods</b> 形式で書き出します。</li>
 
-        <li>Start OpenOffice.org</li>
+        <li>OpenOffice.org を起動します。</li>
 
-        <li>Choose <b>Tools -&gt; Options -&gt; OpenOffice.org Base
-        -&gt; Databases</b></li>
+        <li><b>ツール→オプション→OpenOffice.org Base→データベース</b>を選択します。</li>
 
-        <li>Edit the <i>Bibliography</i> database, and change the
-        name to something else, e.g. <i>Bibliography-old</i>
-        (indeed, OpenOffice.orgWriter does not allow for several
-        bibliographies)</li>
+        <li><i>Bibliography</i> データベースを編集し、その名前を <i>Bibliography-old</i> などに変えてください (OpenOffice.org Writer では複数の書誌情報データベースを選択することができません)。</li>
 
-        <li>Close the <b>Options</b> window, and choose <b>File
-        -&gt; New -&gt; Database</b></li>
+        <li><b>オプション</b>ウィンドウを閉じて、<b>ファイル→新規作成→データベース</b>を選びます。</li>
 
-        <li>Choose <b>Connect to an existing database</b>, select
-        <b>Spreadsheet</b> as the database type, and choose the
-        <b>.ods</b> file you exported</li>
+        <li><b>既存のデータベースに接続</b>を選び、データベース型として<b>表計算ドキュメント</b>を選択して、書き出した <b>.ods</b> ファイルを選びます。</li>
 
-        <li>Click <b>Finish</b>, then choose the name
-        <i>Bibliography</i> when prompted</li>
-    </ul>After finishing these steps, choose <b>Tools -&gt;
-    Bibliography Database</b>. Your database should now be
-    displayed.
+        <li><b>完了</b>をクリックして、選択を促されたら <i>Bibliography</i> を選んでください。</li>
+    </ul>これらのステップを終えた後に<b>ツール→参考文献データベース</b>を選んでください。すると、あなたのデータベースｗが表示されているはずです。
 
-    <h2>Using the exported file as bibliography database in
-    OpenOffice.org 1.1.x</h2>
+    <h2>書き出したファイルを OpenOffice.org 1.1.x の書誌情報データベースとして利用するには</h2>
 
     <ul>
-        <li>Export your database using the <b>.sxc</b> format</li>
+        <li>データベースを <b>.sxc</b> 形式で書き出します。</li>
 
-        <li>Start OpenOffice.org</li>
+        <li>OpenOffice.org を起動する</li>
 
-        <li>Choose <b>Tools -&gt; Data sources</b></li>
+        <li><b>ツール→データソース</b>を選択します。</li>
 
-        <li>Select the <i>Bibliography</i> database, and change its
-        name to something else, e.g. <i>Bibliography-old</i>. Click
-        <b>Apply</b>.</li>
+        <li><i>Bibliography</i> データベースを編集し、その名前を <i>Bibliography-old</i> などに変え、<b>適用</b>をクリックしてください。</li>
 
-        <li>Click <b>New Data Source</b>. A new entry will appear.
-        Change its name to <i>Bibliography</i>.</li>
+	<li><b>新規データソース</b>をクリックすると、新しい項目が表示されるので、その名前を <i>Bibliography</i> に変更してください。</li>
 
-        <li>Change <b>Database type</b> to <b>Spreadsheet</b>.
-        Click the <b>...</b> button in the <b>Data source URL</b>
-        line. Choose the <b>.sxc</b> file you exported.</li>
+        <li><b>データベース型</b>を<b>表計算ドキュメント</b>に変更し、<b>データソースURL</b>行にある<b>...</b>ボタンをクリックしてください。そして書き出した <b>.sxc</b> ファイルを選択してください。</li>
 
-        <li>Click <b>OK</b> to close the <b>Data Sources</b>
-        window.</li>
-    </ul>After finishing these steps, choose <b>Tools -&gt;
-    Bibliography Database</b>. Your database should now be
-    displayed.
+        <li><b>OK</b> をクリックして<b>データソース</b>ウィンドウを閉じてください。</li>
+    </ul>これらのステップを終えた後に<b>ツール→参考文献データベース</b>を選んでください。すると、あなたのデータベースが表示されているはずです。
 </body>
 </html> 
