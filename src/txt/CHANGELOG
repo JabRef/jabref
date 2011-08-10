@@ -1,3 +1,17 @@
+2.7
+    - Medline importer now wraps multipart last names in braces.
+    - RIS importer now handles multiple title fields by concatenation.
+    - Disallowed "comment" as entry type name, since this conflicts with the BibTeX format.
+    - Fixed handling of suffix name parts (Jr, etc.) in Medline importer.
+    - Added optional second numeric argument to Authors formatter, which determines
+      how many authors are shown if the maximum number is exceeded.
+    - Added content selector for "review" field in entry editor.
+    - Improved detection of file type when adding new link. Can now recognize double
+      extensions such as ".ps.gz".
+    - Improved autocompletion of author names. Added options to complete either in
+      'Firstname Lastname' or 'Lastname, Firstname' formats, or in both.
+    - Fixed bug in import function if no suitable import filter is found.
+2.7 beta 2
     - Added support for MrdLib lookup or metadata extraction when PDFs are dragged into
       JabRef.
     - Added option under "External programs" for disabling the automatic opening of the

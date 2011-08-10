@@ -4,6 +4,8 @@
  */
 package net.sf.jabref.net;
 
+import net.sf.jabref.imports.ImportFormatReader;
+
 import java.awt.Component;
 import java.io.*;
 import java.net.URL;
@@ -172,7 +174,8 @@ public class URLDownload {
     public void copy(InputStream in, Writer out) throws IOException
       {
         InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
-        BufferedReader read = new BufferedReader(new InputStreamReader(_in));
+        BufferedReader read = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(_in));
+
         byte[] buffer = new byte[512];
         String line;
         while ((line = read.readLine()) != null) {

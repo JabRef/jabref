@@ -18,6 +18,7 @@ public class Authors extends AbstractParamLayoutFormatter {
     AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | LastSep=<string>]
     AuthorPunc = [FullPunc | NoPunc | NoComma | NoPeriod]
     AuthorNumber = [inf | <number>]
+    AuthorNumberEtAl = [ {1} | <number>]
     EtAlString = [ et al. | EtAl=<string>]
     */
     
@@ -86,8 +87,10 @@ public class Authors extends AbstractParamLayoutFormatter {
         abbrSpaces = true;
 
     boolean setSep = false;
-
+    boolean setMaxAuthors = false;
     int maxAuthors = -1;
+    int authorNumberEtAl = 1;
+
 
     String
         firstFirstSeparator = " ",
@@ -212,7 +215,12 @@ public class Authors extends AbstractParamLayoutFormatter {
         else if (numberPattern.matcher(key.trim()).matches()) {
             // Just a number:
             int num = Integer.parseInt(key.trim());
-            maxAuthors = num;
+            if (!setMaxAuthors) {
+                maxAuthors = num;
+                setMaxAuthors = true;
+            }
+            else
+                authorNumberEtAl = num;
         }
 
 
@@ -247,7 +255,11 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
         else {
-            addSingleName(sb, al.getAuthor(0), flMode == FIRST_FIRST);
+            for (int i=0; i<Math.min(al.size() - 1, authorNumberEtAl); i++) {
+                if (i > 0)
+                    sb.append(separator);
+                addSingleName(sb, al.getAuthor(i), flMode == FIRST_FIRST);
+            }
             sb.append(etAlString);
         }
 
@@ -264,8 +276,9 @@ public class Authors extends AbstractParamLayoutFormatter {
         if ((jr != null) && (jr.length() > 0))
             lastNamePart = lastNamePart+jrSeparator+jr;
 
-        if (abbreviate) {
-            firstNamePart = a.getFirstAbbr();
+        if (abbreviate && (firstNamePart != null)) {
+	    firstNamePart = a.getFirstAbbr();
+		
             if (firstInitialOnly && (firstNamePart.length() > 2))
                 firstNamePart = firstNamePart.substring(0, 2);
             else if (middleInitial) {
@@ -284,12 +297,12 @@ public class Authors extends AbstractParamLayoutFormatter {
             if (!abbrDots)
                 firstNamePart = firstNamePart.replaceAll("\\.", "");
             if (!abbrSpaces)
-                firstNamePart = firstNamePart.replaceAll(" ", "");
+		firstNamePart = firstNamePart.replaceAll(" ", "");
         }
 
-        if (lastNameOnly) {
-            sb.append(lastNamePart);
-        }
+	if (lastNameOnly || (firstNamePart == null)) {
+            sb.append(lastNamePart);	
+	}
         else if (firstFirst) {
             sb.append(firstNamePart).append(firstFirstSeparator);
             sb.append(lastNamePart);

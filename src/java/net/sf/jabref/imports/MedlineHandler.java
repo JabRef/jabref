@@ -42,6 +42,7 @@ public class MedlineHandler extends DefaultHandler
 		inJournal = false,			inMonth = false,
 		inVolume = false,			inAuthorList = false,
 		inAuthor =false,			inLastName = false,
+        inSuffix = false,
 		inInitials = false,			inMedlinePgn = false,
 		inMedlineID = false,		inURL=false,
 		inIssue = false,			inPubDate = false,
@@ -50,7 +51,7 @@ public class MedlineHandler extends DefaultHandler
         inAffiliation=false, inMeshHeader=false, inQualifierName=false,
         inLanguage=false, inPst=false;
     String title="", journal="", keywords ="",author="",
-		lastName="",year="",forename="", abstractText="", affiliation="";
+		lastName="",suffix="",year="",forename="", abstractText="", affiliation="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
 		pubmedid="",doi="",pii="", majorTopic = "", minorTopics = "", language = "", pst= "";
@@ -108,6 +109,10 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("ForeName") || localName.equals("FirstName")) {
 			inForename=true; forename="";
 		}
+        else if (localName.equals("Suffix")) {
+            inSuffix = true;
+            suffix = "";
+        }
 		else if(localName.equals("Issue")){inIssue=true;}
 		else if(localName.equals("MedlinePgn")){inMedlinePgn=true;
 		}//pagenumber
@@ -219,12 +224,14 @@ public class MedlineHandler extends DefaultHandler
 			year="";
 			forename="";
 			lastName="";
+			suffix = "";
 			abstractText="";
             affiliation="";
             pubmedid="";
             majorTopic = "";
             minorTopics = "";
-            month="";volume="";language="";pst="";lastname="";initials="";number="";page="";medlineID="";url="";
+            month="";volume="";language="";pst="";lastname=""; suffix="";
+            initials="";number="";page="";medlineID="";url="";
 			MedlineDate="";
             descriptors.clear();
         }
@@ -249,13 +256,25 @@ public class MedlineHandler extends DefaultHandler
 			if(forename.length()==3 && forename.charAt(1)==' '){
 				forename=initials;
 			}
-			author = forename + " " + lastname;
+
+            // Put together name with last name first, and enter suffix in between if present:
+            if (lastname.indexOf(" ") > 0)
+                author = "{"+lastname+"}";
+            else
+                author = lastname;
+
+            if (suffix.length() > 0)
+                author = author+", "+suffix;
+            if (forename.length() > 0)
+                author = author+", "+forename;
+
 			//author = initials + " " + lastname;
 			authors.add(author);
 			inAuthor=false;
 			forename = "";
 			initials = "";
 			lastname = "";
+			suffix = "";
 		}
 		else if(localName.equals("DescriptorName")) inDescriptorName=false;
         else if(localName.equals("QualifierName")) inQualifierName=false;
@@ -267,6 +286,7 @@ public class MedlineHandler extends DefaultHandler
                 descriptors.add(majorTopic+", "+minorTopics);
         }
         else if(localName.equals("LastName")){inLastName=false;}
+        else if(localName.equals("Suffix")){inSuffix=false;}
 		else if(localName.equals("ForeName")||localName.equals("FirstName")){ inForename=false;}
 		else if(localName.equals("Issue")){ inIssue = false;}
 		else if(localName.equals("MedlinePgn")){inMedlinePgn=false;}//pagenumber
@@ -295,6 +315,7 @@ public class MedlineHandler extends DefaultHandler
         else if(inLanguage){language += new String(data,start,length).toLowerCase();}
         else if(inPst){pst += new String(data,start,length);}
 		else if(inLastName){lastname += new String(data,start,length);}
+		else if(inSuffix){suffix += new String(data,start,length);}
 		else if(inInitials){initials += new String(data,start,length);}
 		else if(inIssue){number += new String(data,start,length);}
 		else if(inMedlinePgn){ page += new String(data,start,length);}

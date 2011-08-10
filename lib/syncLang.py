@@ -178,12 +178,13 @@ def findNewKeysInJavaCode(mainFile, dir, update):
         f1.close()
     
     
-def lookForDuplicates(file):
+def lookForDuplicates(file, displayKeys):
     duplicount = 0
     f1 = open(file)
     lines = f1.readlines()
     f1.close()
     mappings = {}
+    emptyVals = 0
     for line in lines:
         comment = line.find("#")
         index = line.find("=")
@@ -193,15 +194,30 @@ def lookForDuplicates(file):
             if key in mappings:
                 mappings[key].append(value)
                 duplicount += 1
-                print "Duplicate: "+file+": "+key+" =",
-                print mappings[key]
+                if displayKeys:
+		  print "Duplicate: "+file+": "+key+" =",
+		  print mappings[key]
             else:
                 mappings[key] = [value]
                 if value == "":
-                    print "Empty value: "+file+": "+key
+		    emptyVals = emptyVals + 1
+                    if displayKeys:
+		      print "Empty value: "+file+": "+key
                 #print "New: "+value
-    if duplicount == 0:
-        print file+": No duplicates found."
+    if duplicount > 0:
+	dupstring = str(duplicount)+" duplicates. "
+    else:
+	dupstring = ""
+    if emptyVals > 0:
+        emptStr = str(emptyVals)+" empty values. "
+    else:
+	emptStr = ""
+    if duplicount+emptyVals > 0:
+	okString = ""
+    else:
+	okString = "ok"
+    print file+": "+dupstring+emptStr+okString
+    #print file+": "+str(emptyVals)+" empty values."
         
         
 ############# Main part ###################
@@ -211,6 +227,10 @@ if len(sys.argv) == 1:
     
 Usage: syncLang.py option   
 Option can be one of the following:
+ 
+    -c: Search the language files for empty and duplicate translations. Display only
+        counts for duplicated and empty values in each language file.
+
     -d: Search the language files for empty and duplicate translations. 
         For each duplicate set found, a list will be printed showing the various 
         translations for the same key. There is currently to option to remove duplicates
@@ -260,24 +280,27 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
         "resource/Menu_fr.properties", "resource/Menu_it.properties",\
         "resource/Menu_ja.properties", \
         "resource/Menu_nl.properties", "resource/Menu_da.properties",\
+        "resource/Menu_es.properties",\
         "resource/Menu_no.properties", "resource/Menu_tr.properties",\
         "resource/Menu_vi.properties", "resource/Menu_in.properties",\
         "resource/Menu_zh.properties"), changeFiles)
         
-elif (len(sys.argv) >= 2) and (sys.argv[1] == "-d"):
+elif (len(sys.argv) >= 2) and ((sys.argv[1] == "-d") or (sys.argv[1] == "-c")):
     files = ("resource/JabRef_en.properties", "resource/JabRef_de.properties",\
         "resource/JabRef_fr.properties", "resource/JabRef_it.properties",\
         "resource/JabRef_ja.properties", \
         "resource/JabRef_no.properties", "resource/JabRef_nl.properties",\
-        "resource/JabRef_da.properties", "resource/JabRef_tr.properties",\
+        "resource/JabRef_da.properties",\
+        "resource/JabRef_tr.properties",\
         "resource/JabRef_vi.properties", "resource/JabRef_in.properties",\
         "resource/JabRef_zh.properties",\
         "resource/Menu_en.properties", "resource/Menu_de.properties",\
         "resource/Menu_fr.properties", "resource/Menu_it.properties",\
         "resource/Menu_ja.properties", \
         "resource/Menu_no.properties", "resource/Menu_nl.properties",\
-        "resource/Menu_da.properties", "resource/Menu_tr.properties",\
+        "resource/Menu_da.properties", "resource/Menu_es.properties", \
+        "resource/Menu_tr.properties",\
         "resource/Menu_vi.properties", "resource/Menu_in.properties",\
         "resource/Menu_zh.properties")
     for file in files:
-        lookForDuplicates(file)
+        lookForDuplicates(file, sys.argv[1] == "-d")

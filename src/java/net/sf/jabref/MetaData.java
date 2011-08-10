@@ -111,6 +111,7 @@ public class MetaData implements Iterable<String> {
         metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<String>());
         metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<String>());
         metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<String>());
     }
 
     public Iterator<String> iterator() {

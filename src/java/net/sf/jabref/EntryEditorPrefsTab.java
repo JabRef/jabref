@@ -15,6 +15,9 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, showSource,
         defSource, editSource, disableOnMultiple, autoComplete;
+    private JRadioButton autoCompBoth, autoCompFF, autoCompLF;
+    boolean oldAutoCompFF, oldAutoCompLF;
+
     private JTextField autoCompFields;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
@@ -31,6 +34,13 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         editSource = new JCheckBox(Globals.lang("Enable source editing"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
+        autoCompFF = new JRadioButton(Globals.lang("Autocomplete names in 'Firstname Lastname' format only"));
+        autoCompLF = new JRadioButton(Globals.lang("Autocomplete names in 'Lastname, Firstname' format only"));
+        autoCompBoth = new JRadioButton(Globals.lang("Autocomplete names in both formats"));
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(autoCompLF);
+        bg.add(autoCompFF);
+        bg.add(autoCompBoth);
         autoCompFields = new JTextField(40);
         Insets marg = new Insets(0,12,3,0);
         editSource.setMargin(marg);
@@ -55,7 +65,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         FormLayout layout = new FormLayout
                 ("8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                         "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
-                                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
+                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1,1, 5));
@@ -70,7 +80,9 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder3.append(label);
         builder3.append(autoCompFields);
         builder.add(builder3.getPanel(), cc.xyw(2, 13, 3));
-
+        builder.add(autoCompFF, cc.xy(2,15));
+        builder.add(autoCompLF, cc.xy(2,17));
+        builder.add(autoCompBoth, cc.xy(2,19));
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
@@ -90,7 +102,14 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         editSource.setEnabled(showSource.isSelected());
         // Autocomplete fields is only enabled when autocompletion is:
         autoCompFields.setEnabled(autoComplete.isSelected());
-        
+        if (_prefs.getBoolean("autoCompFF"))
+            autoCompFF.setSelected(true);
+        else if (_prefs.getBoolean("autoCompLF"))
+            autoCompLF.setSelected(true);
+        else
+            autoCompBoth.setSelected(true);
+        oldAutoCompFF = autoCompFF.isSelected();
+        oldAutoCompLF = autoCompLF.isSelected();
     }
 
     public void storeSettings() {
@@ -105,10 +124,23 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("autoComplete", autoComplete.isSelected());
         _prefs.put("autoCompleteFields", autoCompFields.getText());
         _prefs.putBoolean("showSource", showSource.isSelected());
+        if (autoCompBoth.isSelected()) {
+            _prefs.putBoolean("autoCompFF", false);
+            _prefs.putBoolean("autoCompLF", false);
+        }
+        else if (autoCompFF.isSelected()) {
+            _prefs.putBoolean("autoCompFF", true);
+            _prefs.putBoolean("autoCompLF", false);
+        }
+        else {
+            _prefs.putBoolean("autoCompFF", false);
+            _prefs.putBoolean("autoCompLF", true);
+        }
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
         if ((oldShowSource != showSource.isSelected()) || (oldAutoComplete != autoComplete.isSelected())
-                || (!oldAutoCompFields.equals(autoCompFields.getText()))) {
+                || (!oldAutoCompFields.equals(autoCompFields.getText())) ||
+                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected())) {
             for (int j=0; j<_frame.getTabbedPane().getTabCount(); j++) {
 	            BasePanel bp = (BasePanel)_frame.getTabbedPane().getComponentAt(j);
 	            bp.entryEditors.clear();

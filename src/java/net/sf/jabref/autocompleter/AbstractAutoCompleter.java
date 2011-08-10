@@ -71,4 +71,8 @@ public abstract class AbstractAutoCompleter {
 		return _index.contains(word);
 	}
 
+    public String getPrefix() {
+        return "";
+    }
+
 }

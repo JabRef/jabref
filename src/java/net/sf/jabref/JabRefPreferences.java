@@ -226,6 +226,8 @@ public class JabRefPreferences {
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
+        defaults.put("autoCompFF", Boolean.FALSE);
+        defaults.put("autoCompLF", Boolean.FALSE);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
@@ -255,19 +257,6 @@ public class JabRefPreferences {
 
         defaults.put("useCustomIconTheme", Boolean.FALSE);
         defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
-
-    // Entry editor tab 0:
-    	defaults.put(CUSTOM_TAB_NAME+"_def0", "General");
-        defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;citeseerurl;"+
-                     "comment;owner;timestamp");
-
-    // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS+"_def1", "abstract");
-    	defaults.put(CUSTOM_TAB_NAME+"_def1", "Abstract");
-
-  // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS+"_def2", "review");
-    	defaults.put(CUSTOM_TAB_NAME+"_def2", "Review");
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(8));
@@ -458,6 +447,23 @@ public class JabRefPreferences {
 	    Globals.logger("Hostname not found.");
 	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
 	}
+    }
+
+    public void setLanguageDependentDefaultValues() {
+
+        // Entry editor tab 0:
+        defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
+            defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;citeseerurl;"+
+                         "comment;owner;timestamp");
+
+        // Entry editor tab 1:
+            defaults.put(CUSTOM_TAB_FIELDS+"_def1", "abstract");
+        defaults.put(CUSTOM_TAB_NAME+"_def1", Globals.lang("Abstract"));
+
+      // Entry editor tab 2: Review Field - used for research comments, etc.
+            defaults.put(CUSTOM_TAB_FIELDS+"_def2", "review");
+        defaults.put(CUSTOM_TAB_NAME+"_def2", Globals.lang("Review"));
+
     }
     
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
@@ -902,6 +908,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Fetch Medline", "F5");
         defKeyBinds.put("Fetch CiteSeer", "F6");
         defKeyBinds.put("Search ScienceDirect", "ctrl F5");
+        defKeyBinds.put("Search ADS", "ctrl shift F6");
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
@@ -923,12 +930,10 @@ public class JabRefPreferences {
         defKeyBinds.put("Forward", "alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");
         defKeyBinds.put("Import into new database", "ctrl alt I");
-
         defKeyBinds.put("Increase table font size", "ctrl PLUS");
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
-
         defKeyBinds.put("Automatically link files", "alt F");
-
+        defKeyBinds.put("Resolve duplicate BibTeX keys", "ctrl shift D");
         defKeyBinds.put("Refresh OO", "ctrl alt O");
         
     }
@@ -1073,6 +1078,27 @@ public class JabRefPreferences {
                 return type;
         }
         return null;
+    }
+
+    /**
+     * Look up the external file type registered for this filename, if any.
+     * @param filename The name of the file whose type to look up.
+     * @return The ExternalFileType registered, or null if none.
+     */
+    public ExternalFileType getExternalFileTypeForName(String filename) {
+        int longestFound = -1;
+        ExternalFileType foundType = null;
+        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
+            if ((type.getExtension() != null) && filename.toLowerCase().
+                    endsWith(type.getExtension().toLowerCase())) {
+                if (type.getExtension().length() > longestFound) {
+                    longestFound = type.getExtension().length();
+                    foundType = type;
+                }
+            }
+        }
+        return foundType;
     }
 
     /**

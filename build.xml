@@ -47,7 +47,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.7b2" />
+	<property name="jabref.version" value="2.7" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
@@ -190,7 +190,8 @@
 	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
+		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8"
+		   source="1.5" target="1.5">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
@@ -647,6 +648,6 @@ Number (CCN)           maintenance
 		</jalopy>
 	</target>
 
-	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-2.1.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
+	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 </project>

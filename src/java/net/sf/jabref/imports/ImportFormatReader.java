@@ -277,7 +277,12 @@ public class ImportFormatReader {
                     sb.append(", ");
               }
               for (int j=1; j<names.length; j++) {
-                  sb.append(expandAll(names[j]));
+                  if (j == 1)
+                    sb.append(expandAll(names[j]));
+                  else
+                    sb.append(names[j]);
+                  if (j < names.length-1)
+                      sb.append(", ");
               }
 
           } else {

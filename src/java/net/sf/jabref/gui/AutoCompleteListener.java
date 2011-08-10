@@ -160,28 +160,27 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             currentword.append(ch);
 
             Object[] completed = findCompletions(currentword.toString(), comp);
-
+            String prefix = completer.getPrefix();
+            String cWord = (prefix != null) && (prefix.length() > 0) ?
+                    currentword.toString().substring(prefix.length()) : currentword.toString();
             int no = 0; // We use the first word in the array of completions.
             if ((completed != null) && (completed.length > 0)) {
                 lastShownCompletion = 0;
                 lastCompletions = completed;
                 String sno = (String) (completed[no]);
-                toSetIn = sno.substring(currentword.length() - 1);
-                //Util.pr("AutoCompListener: Found "+completed[0]);
+                toSetIn = sno.substring(cWord.length() - 1);
                 StringBuffer alltext = new StringBuffer(comp.getText());
                 int cp = comp.getCaretPosition();
                 alltext.insert(cp, toSetIn);
-                //Util.pr(alltext.toString());
                 comp.setText(alltext.toString());
                 comp.setCaretPosition(cp);
-                comp.select(cp + 1, cp + 1 + sno.length() - currentword.length());
+                comp.select(cp + 1, cp + 1 + sno.length() - cWord.length());
                 e.consume();
                 lastCaretPosition = comp.getCaretPosition();
-                lastBeginning = currentword.toString();
+                lastBeginning = cWord;
                 return;
             }
         }
-        //Util.pr("#hm");
         toSetIn = null;
         lastCompletions = null;
 

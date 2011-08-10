@@ -59,7 +59,12 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             JOptionPane.showMessageDialog(this, Globals.lang("Entry type names are not allowed to contain white space or the following "
                     +"characters")+": # { } ~ , ^ &",
                     Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            
+            return;
+        }
+        else if (s.equalsIgnoreCase("comment")) {
+            // Report error and exit.
+            JOptionPane.showMessageDialog(this, Globals.lang("The name 'comment' can not be used as an entry type name."),
+                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         addFieldUncritically(s);

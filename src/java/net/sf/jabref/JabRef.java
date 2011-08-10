@@ -101,7 +101,7 @@ public class JabRef {
         Globals.startBackgroundTasks();
 		Globals.prefs = prefs;
 		Globals.setLanguage(prefs.get("language"), "");
-
+        Globals.prefs.setLanguageDependentDefaultValues();
 		/*
 		 * The Plug-in System is started automatically on the first call to
 		 * PluginCore.getManager().

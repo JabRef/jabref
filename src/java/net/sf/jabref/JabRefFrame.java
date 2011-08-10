@@ -341,6 +341,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
               Globals.lang("Find and remove duplicate BibTeX keys"),
               prefs.getKey("Resolve duplicate BibTeX keys"));
 
+    MassSetFieldAction massSetField = new MassSetFieldAction(this);
+
     PushToApplicationButton pushExternalButton;
 
     CiteSeerFetcher citeSeerFetcher;
@@ -1254,7 +1256,7 @@ public JabRefPreferences prefs() {
       tools.add(normalSearch);
       tools.add(incrementalSearch);
       tools.add(replaceAll);
-      tools.add(new MassSetFieldAction(this));
+      tools.add(massSetField);
       tools.add(makeKeyAction);
       //tools.add(downloadFullText);
       // [kiar] I think we should group these festures
@@ -1503,7 +1505,7 @@ public JabRefPreferences prefs() {
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
                 openPdf, openUrl, openFile, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-            highlightAny, newEntryAction, plainTextImport,
+            highlightAny, newEntryAction, plainTextImport, massSetField,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
             abbreviateMedline, unabbreviate, exportAll, exportSelected,

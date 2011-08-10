@@ -476,7 +476,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     BibtexEntry anEntry = i.next();
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
-			        f = relativizePath(f, dirs);
+    			        f = relativizePath(f, dirs);
                         boolean alreadyHas = false;
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);

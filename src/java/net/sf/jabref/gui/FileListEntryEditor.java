@@ -198,14 +198,9 @@ public class FileListEntryEditor {
 
             // Try to guess the file type:
             String theLink = link.getText().trim();
-            int index = theLink.lastIndexOf('.');
-            if ((index >= 0) && (index < theLink.length()-1)) {
-
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
-                        (theLink.substring(index+1));
-                if (type != null)
-                    types.setSelectedItem(type);
-            }
+            ExternalFileType type = Globals.prefs.getExternalFileTypeForName(theLink);
+            if (type != null)
+                types.setSelectedItem(type);
         }
     }
 

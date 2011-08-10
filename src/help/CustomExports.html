@@ -38,9 +38,8 @@
 
     <h3>Layout files</h3>
 
-    <p>Let us assume that we are creating an HTML export filter.</p>
-
-    <p>While the export filter only needs to consist of a single
+    <p>Let us assume that we are creating an HTML export filter. 
+     While the export filter only needs to consist of a single
     <b>.layout</b> file, which in this case could be called
     <i>html.layout</i>, you may also want to add two files called
     <i>html.begin.layout</i> and <i>html.end.layout</i>. The former
@@ -52,20 +51,16 @@
 
     <p>Note that these files must reside in the same directory as
     <i>html.layout</i>, and must be named by inserting
-    <b>.begin</b> and <b>.end</b>, respectively.</p>
-
-    <p>In our example export filter, these could look like the
+    <b>.begin</b> and <b>.end</b>, respectively.
+    In our example export filter, these could look like the
     following:</p>
 
     <p><i>html.begin.layout</i>:<br />
-    <code>&lt;HTML&gt;<br />
-     &lt;BODY&gt; text="#275856"&gt;<br />
-    &lt;basefont size="4" color="#2F4958"
-    face="arial"&gt;</code></p>
+    <code>&lt;!DOCTYPE html&gt;<br/>&lt;html&gt;<br /> &lt;body style="color:#275856; font-family: Arial, sans-serif;"&gt;</code>
+    </p>
 
     <p><i>html.end.layout</i>:<br />
-    <code>&lt;/BODY&gt;<br />
-     &lt;/HTML&gt;</code></p>
+    <code>&lt;/body&gt;<br />&lt;/html&gt;</code></p>
 
     <p>The file <i>html.layout</i> provides the <i>default</i>
     template for exporting one single entry. If you want to use
@@ -385,7 +380,11 @@
 <dd>specifies the last separator in the author list. Any separator can be specified, with the <code>LastSep=&lt;string&gt;</code> option. Note that appropriate spaces need to be added around <code>string</code>.</dd>
 
 <dt><code>AuthorNumber = [ {inf} | &lt;integer&gt; ]</code></dt>
-<dd>specifies the number of authors that are printed. If the number of authors exceeds the maximum specified, the authorlist is replaced by the first author, followed by <code>EtAlString</code>.</dd>
+<dd>specifies the number of authors that are printed. If the number of authors exceeds the maximum specified, the authorlist is replaced by the first author (or any number specified by <code>AuthorNumberEtAl</code>), followed by <code>EtAlString</code>.</dd>
+
+<dt><code>AuthorNumberEtAl = [ {1} | &lt;integer&gt; ]</code></dt>
+<dd>specifies the number of authors that are printed if the total number of authors exceeds <code>AuthorNumber</code>.
+This argument can only be given after <code>AuthorNumber</code> has already been given.</dd>
 
 <dt><code>EtAlString = [ { et al.} | EtAl=&lt;string&gt; ]</code></dt>
 <dd>specifies the string used to replace multiple authors. Any string can be given, using <code>EtAl=&lt;string&gt;</code></dd>
