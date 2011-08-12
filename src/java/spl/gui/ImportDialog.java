@@ -29,6 +29,8 @@ public class ImportDialog extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JCheckBox checkBoxDoNotShowAgain;
+    private JCheckBox storeDefault;
+	private JCheckBox useDefaultPDFImportStyle;
     private JRadioButton radioButtonXmp;
 	private JRadioButton radioButtonPDFcontent;
     private JRadioButton radioButtonMrDlib;
@@ -81,7 +83,9 @@ public class ImportDialog extends JDialog {
         labelMrDlib2.setForeground(new Color(-16776961));
         buttonOK = new JButton(Globals.lang("Ok"));
         buttonCancel = new JButton(Globals.lang("Cancel"));
+        storeDefault = new JCheckBox(Globals.lang("Store choice as default"));
         checkBoxDoNotShowAgain = new JCheckBox(Globals.lang("Do not show this box again for this import"));
+        useDefaultPDFImportStyle = new JCheckBox(Globals.lang("Always use this PDF import style (and do not ask for each import)"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow",""));
         b.appendSeparator(Globals.lang("Create New Entry"));
         b.append(radioButtonNoMeta, 3);
@@ -93,7 +97,11 @@ public class ImportDialog extends JDialog {
         b.append(radioButtononlyAttachPDF, 3);
         b.append(radioButtonUpdateEmptyFields);
         b.append(labelMrDlib2);
+        b.nextLine();
+        b.append(storeDefault);
+        b.nextLine();
         b.append(checkBoxDoNotShowAgain);
+        b.append(useDefaultPDFImportStyle);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -191,6 +199,13 @@ public class ImportDialog extends JDialog {
 
     private void onOK() {
         this.result = JOptionPane.OK_OPTION;
+        if (storeDefault.isSelected()) {
+        	Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
+        }
+        if (useDefaultPDFImportStyle.isSelected()) {
+        	Globals.prefs.putBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, true);
+        }
+        // checkBoxDoNotShowAgain handled by local variable
         dispose();
     }
 
