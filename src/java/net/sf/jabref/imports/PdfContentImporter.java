@@ -60,6 +60,7 @@ public class PdfContentImporter extends ImportFormat {
 	 * 
 	 * @param input
 	 * @return
+	 * TODO Additionally repalce multiple subsequent spaces by one space
 	 */
 	private String removeNonLettersAtEnd(String input) {
 		input = input.trim();
@@ -83,37 +84,63 @@ public class PdfContentImporter extends ImportFormat {
 		if (names.contains(",")) {
 			String[] split = names.split(",");
 			res = "";
+			boolean isFirst = true;
 			for (int i=0; i<split.length; i++) {
 				String curName = removeNonLettersAtEnd(split[i]);
-				if (curName.indexOf("and ")==0) {
+				if (curName.indexOf("and")==0) {
 					// skip possible ands between names
-					curName = curName.substring(4);
+					curName = curName.substring(3).trim();
+				} else {
+					int posAnd = curName.indexOf(" and "); 
+					if (posAnd>=0) {
+						String nameBefore = curName.substring(0, posAnd);
+						// cannot be first name as "," is contained in the string
+						res = res.concat(" and ").concat(removeNonLettersAtEnd(nameBefore));
+						curName = curName.substring(posAnd+5);
+					}
 				}
-				if (curName.equalsIgnoreCase("et al."))
-					curName = "others";
-				res = res.concat(curName);
-				if (i!=split.length-1) {
-					res = res.concat(" and ");
+					
+				if (!curName.equals("")) {
+					if (curName.equalsIgnoreCase("et al."))
+						curName = "others";
+					if (isFirst) {
+						isFirst = false;
+					} else {
+						res = res.concat(" and ");
+					}
+					res = res.concat(curName);
 				}
 			}
 		} else {
 			// assumption: names separated by space
 			
 			String[] split = names.split(" ");
-			res = null;
+			if (split.length == 0) {
+				// empty names... something was really wrong...
+				return "";
+			}
+			
 			boolean workedOnFirstOrMiddle = false;
+			boolean isFirst = true;
 			int i=0;
 			res = "";
 			do {
 				if (!workedOnFirstOrMiddle) {
-					if ((split[i].equalsIgnoreCase("et")) && (split.length>i+1) && (split[i+1].equalsIgnoreCase("al."))) {
-						res = res.concat("others");
-						break;
-					} else if (split[i].equalsIgnoreCase("and")) {
+					if (split[i].equalsIgnoreCase("and")) {
 						// do nothing, just increment i at the end of this iteration
 					} else {
-						res = res.concat(split[i]).concat(" ");
-						workedOnFirstOrMiddle = true;
+						if (isFirst) {
+							isFirst = false;
+						} else {
+							res = res.concat(" and ");
+						}
+						if ((split[i].equalsIgnoreCase("et")) && (split.length>i+1) && (split[i+1].equalsIgnoreCase("al."))) {
+							res = res.concat("others");
+							break;
+						} else {
+							res = res.concat(split[i]).concat(" ");
+							workedOnFirstOrMiddle = true;
+						}
 					}
 				} else {
 					// last item was a first or a middle name
@@ -124,10 +151,16 @@ public class PdfContentImporter extends ImportFormat {
 						res = res.concat(split[i]).concat(" ");
 					} else {
 						// last name found
-						// finish this name
-						workedOnFirstOrMiddle = false;
 						res = res.concat(removeNonLettersAtEnd(split[i]));
-						if (i+1<split.length) res = res.concat(" and ");
+						if (Character.isLowerCase(split[i].charAt(0))) {
+							// it is probably be "van", "vom", ...
+							// we just rely on the fact that these things are written in lower case letters
+							// do NOT finish name
+							res = res.concat(" ");
+						} else {
+							// finish this name
+							workedOnFirstOrMiddle = false;
+						}
 					}
 				}
 				i++;
@@ -194,6 +227,15 @@ public class PdfContentImporter extends ImportFormat {
 			final String lineBreak = System.getProperty("line.separator");
 			
 			String[] split = textResult.split(lineBreak);
+			
+			// idea: split[] contains the different lines
+			// blocks are separated by empty lines
+			// treat each block
+			//   or do special treatment at authors (which are not broken)
+			//   therefore, we do a line-based and not a block-based splitting
+			// i points to the current line
+			// curString (mostly) contains the current block
+			//   the different lines are joined into one and thereby separated by " "
 			
 			String curString = split[0].concat(" ");
 			int i = 1;
