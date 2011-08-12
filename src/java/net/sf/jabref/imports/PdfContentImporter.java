@@ -166,7 +166,7 @@ public class PdfContentImporter extends ImportFormat {
 			if (document.isEncrypted()) {
 				logger.log(Level.INFO,
 						Globals.lang("Encrypted documents are not supported"));
-				return res;
+				//return res;
 			}
 
 			PDFTextStripper stripper = new PDFTextStripper();
