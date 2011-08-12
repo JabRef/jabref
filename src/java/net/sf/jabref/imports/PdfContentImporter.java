@@ -27,11 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 
 /**
@@ -47,6 +50,22 @@ import net.sf.jabref.Globals;
 public class PdfContentImporter extends ImportFormat {
 	
 	private static Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
+
+	/* global variables holding the state of the current parse run
+	 * needed to be able to generate methods such as "fillCurStringWithNonEmptyLines"
+	 */
+	
+	// input split into several lines
+	private String[] split; 
+	
+	// current index in split
+    private int i;
+    
+    // curent "line" in split.
+    // sometimes, a "line" is several lines in split
+    private String curString;
+    
+	private String year = null;
 
 	@Override
 	public boolean isRecognizedFormat(InputStream in) throws IOException {
@@ -84,11 +103,11 @@ public class PdfContentImporter extends ImportFormat {
 		// supported formats:
 		//   Matthias Schrepfer1, Johannes Wolf1, Jan Mendling1, and Hajo A. Reijers2
 		if (names.contains(",")) {
-			String[] split = names.split(",");
+			String[] splitNames = names.split(",");
 			res = "";
 			boolean isFirst = true;
-			for (int i=0; i<split.length; i++) {
-				String curName = removeNonLettersAtEnd(split[i]);
+			for (int i=0; i<splitNames.length; i++) {
+				String curName = removeNonLettersAtEnd(splitNames[i]);
 				if (curName.indexOf("and")==0) {
 					// skip possible ands between names
 					curName = curName.substring(3).trim();
@@ -116,8 +135,8 @@ public class PdfContentImporter extends ImportFormat {
 		} else {
 			// assumption: names separated by space
 			
-			String[] split = names.split(" ");
-			if (split.length == 0) {
+			String[] splitNames = names.split(" ");
+			if (splitNames.length == 0) {
 				// empty names... something was really wrong...
 				return "";
 			}
@@ -128,7 +147,7 @@ public class PdfContentImporter extends ImportFormat {
 			res = "";
 			do {
 				if (!workedOnFirstOrMiddle) {
-					if (split[i].equalsIgnoreCase("and")) {
+					if (splitNames[i].equalsIgnoreCase("and")) {
 						// do nothing, just increment i at the end of this iteration
 					} else {
 						if (isFirst) {
@@ -136,11 +155,11 @@ public class PdfContentImporter extends ImportFormat {
 						} else {
 							res = res.concat(" and ");
 						}
-						if ((split[i].equalsIgnoreCase("et")) && (split.length>i+1) && (split[i+1].equalsIgnoreCase("al."))) {
+						if ((splitNames[i].equalsIgnoreCase("et")) && (splitNames.length>i+1) && (splitNames[i+1].equalsIgnoreCase("al."))) {
 							res = res.concat("others");
 							break;
 						} else {
-							res = res.concat(split[i]).concat(" ");
+							res = res.concat(splitNames[i]).concat(" ");
 							workedOnFirstOrMiddle = true;
 						}
 					}
@@ -148,13 +167,13 @@ public class PdfContentImporter extends ImportFormat {
 					// last item was a first or a middle name
 					// we have to check whether we are on a middle name
 					// if not, just add the item as last name and add an "and"
-					if (split[i].contains(".")) {
+					if (splitNames[i].contains(".")) {
 						// we found a middle name
-						res = res.concat(split[i]).concat(" ");
+						res = res.concat(splitNames[i]).concat(" ");
 					} else {
 						// last name found
-						res = res.concat(removeNonLettersAtEnd(split[i]));
-						if (Character.isLowerCase(split[i].charAt(0))) {
+						res = res.concat(removeNonLettersAtEnd(splitNames[i]));
+						if (Character.isLowerCase(splitNames[i].charAt(0))) {
 							// it is probably be "van", "vom", ...
 							// we just rely on the fact that these things are written in lower case letters
 							// do NOT finish name
@@ -166,7 +185,7 @@ public class PdfContentImporter extends ImportFormat {
 					}
 				}
 				i++;
-			} while (i<split.length);
+			} while (i<splitNames.length);
 			
 		}
 		return res;
@@ -215,6 +234,7 @@ public class PdfContentImporter extends ImportFormat {
 
 			String author = null;
 			String editor = null;
+			String institution = null;
 			String abstractT = null;
 			String keywords = null;
 			String title = null;
@@ -222,13 +242,15 @@ public class PdfContentImporter extends ImportFormat {
 			String DOI = null;
 			String series = null;
 			String volume = null;
+			String number = null;
 			String pages = null;
-			String year = null;
+			// year is a class variable as the method extractYear() uses it;
 			String publisher = null;
+			BibtexEntryType type = BibtexEntryType.INPROCEEDINGS; 
 			
 			final String lineBreak = System.getProperty("line.separator");
 			
-			String[] split = textResult.split(lineBreak);
+			split = textResult.split(lineBreak);
 			
 			// idea: split[] contains the different lines
 			// blocks are separated by empty lines
@@ -239,55 +261,34 @@ public class PdfContentImporter extends ImportFormat {
 			// curString (mostly) contains the current block
 			//   the different lines are joined into one and thereby separated by " "
 			
-			String curString = split[0].concat(" ");
-			int i = 1;
+			proceedToNextNonEmptyLine();
+			curString = split[i];
+			i = i+1;
 			
 			if (curString.length()>4) {
 				// special case: possibly conference as first line on the page
-				boolean match = false;
-				if (isYear(curString.substring(0,4))) {
-					year = curString.substring(0,4);
-					match = true;
-				}
-				match = match || curString.contains("Conference");
-				if (match) {
-					while ((i<split.length)  && (!split[i].equals(""))) {
-						curString = curString.concat(split[i]).concat(" ");
-						i++;
-					}
+				extractYear();
+				if (curString.contains("Conference")) {
+					fillCurStringWithNonEmptyLines();
 					conference = curString;
 					curString = "";
-					i++;
 				} else {
 					// e.g. Copyright (c) 1998 by the Genetics Society of America
 					// future work: get year using RegEx
 					String lower = curString.toLowerCase();
 					if (lower.contains("copyright")) {
-						while ((i<split.length)  && (!split[i].equals(""))) {
-							curString = curString.concat(split[i]).concat(" ");
-							i++;
-						}
+						fillCurStringWithNonEmptyLines();
 						publisher = curString;
 						curString = "";
-						i++;
 					}
 				}
 			}
 			
 			// start: title
-			while ((i<split.length)  && (!split[i].equals(""))) {
-				curString = curString.concat(split[i]).concat(" ");
-				i++;
-			}
+			fillCurStringWithNonEmptyLines();
 			title = streamlineTitle(curString);
 			curString = "";
-			i++;
 			//i points to the next non-empty line
-			// PDFTextStripper does NOT produce multiple empty lines (besides at strange PDFs)
-			
-			// special handling for strange PDFs which contain a line with " "
-			while ((i<split.length) && (split[i].trim().equals("")))
-				i++;
 			
 			// after title: authors
 			author = null;
@@ -320,11 +321,14 @@ public class PdfContentImporter extends ImportFormat {
 						curString = curString.substring("Abstract".length()+1).trim().concat(lineBreak);
 					}
 					i++;
+					// fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
+					// whereas we need linebreak as separator
 					while ((i<split.length)  && (!split[i].equals(""))) {
 						curString = curString.concat(split[i]).concat(lineBreak);
 						i++;
 					}
 					abstractT=curString;
+					i++;
 				} else if ((curString.length()>="Keywords".length()) && (curString.substring(0, "Keywords".length()).equalsIgnoreCase("Keywords"))) {
 					if (curString.length() == "Keywords".length()) {
 						// only word "Keywords" found -- skip line
@@ -333,30 +337,42 @@ public class PdfContentImporter extends ImportFormat {
 						curString = curString.substring("Keywords".length()+1).trim();
 					}
 					i++;
-					while ((i<split.length)  && (!split[i].equals(""))) {
-						curString = curString.concat(split[i]).concat(" ");
-						i++;
-					}
+					fillCurStringWithNonEmptyLines();
 					keywords=removeNonLettersAtEnd(curString);
+				} else {
+					String lower = curString.toLowerCase();
+					
+					int pos = lower.indexOf("technical");
+					if (pos>=0) {
+						type = BibtexEntryType.TECHREPORT;
+						pos = curString.trim().lastIndexOf(' ');
+						if (pos>=0) {
+							// assumption: last character of curString is NOT ' '
+							//   otherwise pos+1 leads to an out-of-bounds exception
+							number = curString.substring(pos+1);
+						}
+					}
+					
+					i++;
+					proceedToNextNonEmptyLine();
 				}
-				i++;
 			}
 			
 			i = split.length-1;
+			
 			// last block: DOI, detailed information
-			while ((i>0) && (!split[i].equals(""))) {
-				i--;
-			}			
-			curString = "";
-			if (i>0) {
-				for (int j = i+1; j<split.length; j++) {
-					curString = curString.concat(split[j]);
-					if (j!=split.length-1) {
-						curString = curString.concat(" ");
-					}
-				}
+			// sometimes, this information is in the third last block etc...
+			// therefore, read until the beginning of the file 
+			
+			while (i>=0) {
+				readLastBlock();
+				// i now points to the block before or is -1
+				// curString contains the last block, separated by " "
+			
+				extractYear();
+				
 				int pos = curString.indexOf("(Eds.)");
-				if (pos >= 0) {
+				if ((pos >= 0) && (publisher == null)) {
 					// looks like a Springer last line
 					// e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161–175, 2009.
 					publisher = "Springer";
@@ -378,49 +394,64 @@ public class PdfContentImporter extends ImportFormat {
 						}
 					}
 				} else {
-					pos = curString.indexOf("DOI");
-					if (pos < 0) pos = curString.indexOf("doi");
-					if (pos>=0) {
-						pos += 3;
-						char delimiter = curString.charAt(pos);
-						if ((delimiter == ':') || (delimiter == ' ')) {
-							pos++;
+					if (DOI==null) {
+						pos = curString.indexOf("DOI");
+						if (pos < 0) pos = curString.indexOf("doi");
+						if (pos>=0) {
+							pos += 3;
+							char delimiter = curString.charAt(pos);
+							if ((delimiter == ':') || (delimiter == ' ')) {
+								pos++;
+							}
+							int nextSpace = curString.indexOf(' ', pos);
+							if (nextSpace > 0)
+								DOI = curString.substring(pos, nextSpace);
+							else
+								DOI = curString.substring(pos);
 						}
-						int nextSpace = curString.indexOf(' ', pos);
-						if (nextSpace > 0)
-							DOI = curString.substring(pos, nextSpace);
-						else
-							DOI = curString.substring(pos);
 					}
-					if (curString.indexOf("IEEE")>=0) {
+					
+					if ((publisher==null) && (curString.indexOf("IEEE")>=0)) {
 						// IEEE has the conference things at the end
 						publisher = "IEEE";
+
+						// year is extracted by extractYear
+						// otherwise, we could it determine as follows: 
+						// String yearStr = curString.substring(curString.length()-4);
+						// if (isYear(yearStr)) {
+						//	year = yearStr;
+						// }
 						
-						String yearStr = curString.substring(curString.length()-4);
-						if (isYear(yearStr)) {
-							year = yearStr;
-						}
-						
-						pos = curString.indexOf('$');
-						if (pos>0) {
-							// we found the price
-							// before the price, the ISSN is stated
-							// skip that
-							pos -= 2;
-							while ((pos>=0) && (curString.charAt(pos) != ' '))
-								pos--;
+						if (conference == null) {
+							pos = curString.indexOf('$');
 							if (pos>0) {
-								conference = curString.substring(0,pos);
+								// we found the price
+								// before the price, the ISSN is stated
+								// skip that
+								pos -= 2;
+								while ((pos>=0) && (curString.charAt(pos) != ' '))
+									pos--;
+								if (pos>0) {
+									conference = curString.substring(0,pos);
+								}
 							}
 						}
 					}
+					
+//					String lower = curString.toLowerCase();
+//					if (institution == null) {
+//						
+//					}
+					
 				}
 			}
 
 			BibtexEntry entry = new BibtexEntry();
+			entry.setType(type);
 			
 			if (author!=null) entry.setField("author", author);
 			if (editor!=null) entry.setField("editor", editor);
+			if (institution!=null) entry.setField("institution", institution);
 			if (abstractT!=null) entry.setField("abstract", abstractT);
 			if (keywords!=null) entry.setField("keywords", keywords);
 			if (title!=null) entry.setField("title", title);
@@ -428,6 +459,7 @@ public class PdfContentImporter extends ImportFormat {
 			if (DOI!=null) entry.setField("doi", DOI);
 			if (series!=null) entry.setField("series", series);
 			if (volume!=null) entry.setField("volume", volume);
+			if (number!=null) entry.setField("number", number);
 			if (pages!=null) entry.setField("pages", pages);
 			if (year!=null) entry.setField("year", year);
 			if (publisher!=null) entry.setField("publisher", publisher);
@@ -440,6 +472,94 @@ public class PdfContentImporter extends ImportFormat {
 		}
 		
 		return res;
+	}
+
+	
+	
+	/**
+	 * Extract the year out of curString (if it is not yet defined)
+	 */
+	private void extractYear() {
+		if (year != null)
+			return;
+		
+		final Pattern p = Pattern.compile("\\d\\d\\d\\d");
+		Matcher m = p.matcher(curString);
+		if (m.find()) {
+			year = curString.substring(m.start(), m.end());
+		}
+		
+	}
+
+	/**
+	 * PDFTextStripper normally does NOT produce multiple empty lines 
+	 * (besides at strange PDFs). These strange PDFs are handled here:
+	 * proceed to next non-empty line
+	 */
+	private void proceedToNextNonEmptyLine() {
+		while ((i<split.length) && (split[i].trim().equals(""))) {
+			i++;
+		}
+	}
+	
+
+	/**
+	 * Fill curString with lines until "" is found
+	 * No trailing space is added
+	 * i is advanced to the next non-empty line (ignoring white space)
+	 * 
+	 * Lines containing only white spaces are ignored,
+	 * but NOT considered as ""
+	 * 
+	 * Uses GLOBAL variables split, curLine, i
+	 */
+	private void fillCurStringWithNonEmptyLines() {
+		// ensure that curString does not end with " "
+		curString = curString.trim();
+		while ((i<split.length)  && (!split[i].equals(""))) {
+			String curLine = split[i].trim();
+			if (!curLine.equals("")) {
+				if (curString.length()>0) {
+					// insert separating space if necessary
+					curString = curString.concat(" ");
+				}
+				curString = curString.concat(split[i]);
+			}
+			i++;
+		}
+
+		proceedToNextNonEmptyLine();
+	}
+
+	/**
+	 * resets curString
+	 * curString now contains the last block (until "" reached)
+	 * Trailing space is added
+	 * 
+	 * invariant before/after: i points to line before the last handled block
+	 */
+	private void readLastBlock() {
+		while ((i>=0) && (split[i].trim().equals(""))) {
+			i--;
+		}
+		// i is now at the end of a block
+		
+		int end = i;
+		
+		// find beginning
+		while ((i>=0) && (!split[i].equals(""))) {
+			i--;
+		}
+		// i is now the line before the beginning of the block
+		// this fulfills the invariant
+		
+		curString = "";
+		for (int j = i+1; j<=end; j++) {
+			curString = curString.concat(split[j].trim());
+			if (j!=end) {
+				curString = curString.concat(" ");
+			}
+		}
 	}
 
 	@Override

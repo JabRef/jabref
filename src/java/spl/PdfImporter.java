@@ -107,15 +107,6 @@ public class PdfImporter {
 			        importer.automatedImport(new String[]{ fileName });
 			        break;
     			case ImportDialog.CONTENT:
-//                    // Find out what type is wanted.
-//                    EntryTypeDialog etd = new EntryTypeDialog(frame);
-//                    // We want to center the dialog, to make it look nicer.
-//                    Util.placeDialog(etd, frame);
-//                    etd.setVisible(true);
-//                    BibtexEntryType type = etd.getChoice();
-                	// possibly, the type should be set in PdfContentImporter as the type can in some cases be derived from the PDF
-                	type = BibtexEntryType.INPROCEEDINGS;
-                	
                 	PdfContentImporter contentImporter = new PdfContentImporter();
                 	
                 	File file = new File (fileName);
@@ -153,7 +144,6 @@ public class PdfImporter {
 					
 					// insert entry to database and link file
 					
-					entry.setType(type);
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
                     LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
