@@ -625,7 +625,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                  +".");
                           markBaseChanged();
                         	  
-                          selectionListener.editSignalled(firstBE);
+                          if (Globals.prefs.getBoolean("autoOpenForm")) {
+                        	  selectionListener.editSignalled(firstBE);
+                          }
                           highlightEntry(firstBE);
                         }
                       }
