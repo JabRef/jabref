@@ -9,18 +9,18 @@ import net.sf.jabref.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
-import org.jempbox.impl.DateConverter;
-import org.jempbox.impl.XMLUtil;
-import org.jempbox.xmp.XMPMetadata;
-import org.jempbox.xmp.XMPSchema;
-import org.jempbox.xmp.XMPSchemaDublinCore;
-import org.pdfbox.cos.COSDictionary;
-import org.pdfbox.cos.COSName;
-import org.pdfbox.exceptions.COSVisitorException;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDDocumentCatalog;
-import org.pdfbox.pdmodel.PDDocumentInformation;
-import org.pdfbox.pdmodel.common.PDMetadata;
+import org.apache.jempbox.impl.DateConverter;
+import org.apache.jempbox.impl.XMLUtil;
+import org.apache.jempbox.xmp.XMPMetadata;
+import org.apache.jempbox.xmp.XMPSchema;
+import org.apache.jempbox.xmp.XMPSchemaDublinCore;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.common.PDMetadata;
 
 /**
  * XMPUtils provide support for reading and writing BibTex data as XMP-Metadata

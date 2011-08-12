@@ -7,8 +7,8 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
 
-import org.jempbox.xmp.XMPMetadata;
-import org.jempbox.xmp.XMPSchema;
+import org.apache.jempbox.xmp.XMPMetadata;
+import org.apache.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -105,8 +105,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.addSequenceValue(makeProperty(seqName), value);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<String> getSequenceDateList(String seqName) throws IOException {
+	public List<Calendar> getSequenceDateList(String seqName) throws IOException {
 		return super.getSequenceDateList(makeProperty(seqName));
 	}
 

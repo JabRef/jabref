@@ -35,17 +35,17 @@ import net.sf.jabref.util.EncryptionNotSupportedException;
 import net.sf.jabref.util.XMPSchemaBibtex;
 import net.sf.jabref.util.XMPUtil;
 
-import org.jempbox.xmp.XMPMetadata;
-import org.jempbox.xmp.XMPSchema;
-import org.jempbox.xmp.XMPSchemaBasic;
-import org.jempbox.xmp.XMPSchemaDublinCore;
-import org.jempbox.xmp.XMPSchemaMediaManagement;
-import org.pdfbox.exceptions.COSVisitorException;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDDocumentCatalog;
-import org.pdfbox.pdmodel.PDPage;
-import org.pdfbox.pdmodel.common.PDMetadata;
-import org.pdfbox.util.XMLUtil;
+import org.apache.jempbox.xmp.XMPMetadata;
+import org.apache.jempbox.xmp.XMPSchema;
+import org.apache.jempbox.xmp.XMPSchemaBasic;
+import org.apache.jempbox.xmp.XMPSchemaDublinCore;
+import org.apache.jempbox.xmp.XMPSchemaMediaManagement;
+import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDMetadata;
+import org.apache.pdfbox.util.XMLUtil;
 
 /**
  * 
@@ -606,7 +606,6 @@ public class XMPUtilTest extends TestCase {
 	 * @throws Exception
 	 *             (indicating an failure)
 	 */
-	@SuppressWarnings("unchecked")
 	public void testSimpleUpdate() throws Exception {
 
 		String s = " <rdf:Description rdf:about=''"
@@ -1024,7 +1023,6 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(t3BibtexEntry(), b);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testReadWriteDC() throws IOException, TransformerException {
 		List<BibtexEntry> l = new LinkedList<BibtexEntry>();
 		l.add(t3BibtexEntry());
@@ -1105,7 +1103,6 @@ public class XMPUtilTest extends TestCase {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testWriteSingleUpdatesDCAndInfo() throws IOException,
 			TransformerException {
 		List<BibtexEntry> l = new LinkedList<BibtexEntry>();
@@ -1187,7 +1184,6 @@ public class XMPUtilTest extends TestCase {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testReadRawXMP() throws Exception {
 
 		ParserResult result = BibtexParser
@@ -1540,7 +1536,6 @@ public class XMPUtilTest extends TestCase {
 	 * @throws TransformerException
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	public void testResolveStrings2() throws FileNotFoundException,
 			IOException, TransformerException {
 

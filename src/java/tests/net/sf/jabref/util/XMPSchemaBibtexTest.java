@@ -12,8 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.util.XMPSchemaBibtex;
 
-import org.jempbox.impl.XMLUtil;
-import org.jempbox.xmp.XMPMetadata;
+import org.apache.jempbox.impl.XMLUtil;
+import org.apache.jempbox.xmp.XMPMetadata;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

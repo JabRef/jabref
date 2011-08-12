@@ -5,7 +5,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/plugin/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/microba.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/PDFBox-0.7.3-dev-reduced.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.0b5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
@@ -13,7 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf-boot.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/JPFCodeGenerator-rt.jar" sourcepath="/JPFCodeGenerator/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/glazedlists-1.7.0_java15.jar"/>
-	<classpathentry kind="lib" path="lib/JempBox-0.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.7-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
@@ -32,5 +30,8 @@
 	<classpathentry kind="lib" path="lib/spl/jersey/mimepull-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/spl/sciplore/SciPloreDBAccess.jar"/>
 	<classpathentry kind="lib" path="lib/spl/bindings.jar"/>
+	<classpathentry kind="lib" path="lib/fontbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/jempbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox-1.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
