@@ -12,14 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import spl.gui.ImportDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Import;
 
 public class ImportSettingsTab extends JPanel implements PrefsTab {
 
