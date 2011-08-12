@@ -62,14 +62,19 @@ public class PdfImporter {
 
     private boolean importPdfFiles(List<String> fileNames){
         if(panel == null) return false;
+        ImportDialog importDialog = null;
+        boolean doNotShowAgain = false;
         for(String fileName : fileNames){
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
-            ImportDialog importDialog = new ImportDialog(dropRow, fileName);
-            if(!hasXmpEntries(xmpEntriesInFile)){
-                importDialog.getRadioButtonXmp().setEnabled(false);
+            if (!doNotShowAgain) {
+            	importDialog = new ImportDialog(dropRow, fileName);
+            	if(!hasXmpEntries(xmpEntriesInFile)){
+            		importDialog.getRadioButtonXmp().setEnabled(false);
+            	}
+            	Tools.centerRelativeToWindow(importDialog, frame);
+            	importDialog.showDialog();
+            	doNotShowAgain = importDialog.getDoNotShowAgain();
             }
-            Tools.centerRelativeToWindow(importDialog, frame);
-            importDialog.showDialog();
             if(importDialog.getResult() == JOptionPane.OK_OPTION){
                 if(importDialog.getRadioButtonXmp().isSelected()){
                     //SplDatabaseChangeListener dataListener = new SplDatabaseChangeListener(frame, panel, entryTable, fileName);

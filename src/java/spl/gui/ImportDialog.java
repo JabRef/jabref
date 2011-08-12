@@ -19,6 +19,7 @@ public class ImportDialog extends JDialog {
     private JLabel labelSubHeadline;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JCheckBox checkBoxDoNotShowAgain;
     private JRadioButton radioButtonXmp;
     private JRadioButton radioButtonMrDlib;
     private JRadioButton radioButtonNoMeta;
@@ -71,6 +72,7 @@ public class ImportDialog extends JDialog {
         labelMrDlib2.setForeground(new Color(-16776961));
         buttonOK = new JButton(Globals.lang("Ok"));
         buttonCancel = new JButton(Globals.lang("Cancel"));
+        checkBoxDoNotShowAgain = new JCheckBox(Globals.lang("Do not show this box again for this import"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref:grow",""));
         b.appendSeparator(Globals.lang("Create New Entry"));
         b.append(radioButtonNoMeta, 3);
@@ -81,6 +83,7 @@ public class ImportDialog extends JDialog {
         b.append(radioButtononlyAttachPDF, 3);
         b.append(radioButtonUpdateEmptyFields);
         b.append(labelMrDlib2);
+        b.append(checkBoxDoNotShowAgain);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -185,6 +188,10 @@ public class ImportDialog extends JDialog {
 
     public JRadioButton getRadioButtonUpdateEmptyFields() {
         return radioButtonUpdateEmptyFields;
+    }
+    
+    public boolean getDoNotShowAgain() {
+    	return this.checkBoxDoNotShowAgain.isSelected();
     }
 
     public int getResult() {
