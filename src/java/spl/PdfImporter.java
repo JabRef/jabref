@@ -5,6 +5,7 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
+import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
@@ -17,6 +18,9 @@ import spl.listener.SplDatabaseChangeListener;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +48,13 @@ public class PdfImporter {
         this.dropRow = dropRow;
     }
 
+    /**
+     * 
+     * Imports the PDF files given by fileNames
+     * 
+     * @param fileNames states the names of the files to import
+     * @return list of non-PDF files
+     */
     public String[] importPdfFiles(String[] fileNames){
         List<String> files = new ArrayList<String>(Arrays.asList(fileNames));
         List<String> noPdfFiles = new ArrayList<String>();
@@ -60,6 +71,10 @@ public class PdfImporter {
         return noPdfFilesArray;
     }
 
+    /**
+     * @param fileNames - PDF files to import
+     * @return true if the import succeeded, false otherwise
+     */
     private boolean importPdfFiles(List<String> fileNames){
         if(panel == null) return false;
         ImportDialog importDialog = null;
@@ -82,6 +97,61 @@ public class PdfImporter {
                     ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
 			        importer.automatedImport(new String[]{ fileName });
                     
+                }
+                else if(importDialog.getRadioButtonPDFcontent().isSelected()) {
+//                    // Find out what type is wanted.
+//                    EntryTypeDialog etd = new EntryTypeDialog(frame);
+//                    // We want to center the dialog, to make it look nicer.
+//                    Util.placeDialog(etd, frame);
+//                    etd.setVisible(true);
+//                    BibtexEntryType type = etd.getChoice();
+                	// possibly, the type should be set in PdfContentImporter as the type can in some cases be derived from the PDF
+                	BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
+                	
+                	PdfContentImporter importer = new PdfContentImporter();
+                	
+                	File file = new File (fileName);
+                	InputStream in = null;
+                	List<BibtexEntry> res = null;
+                	try {
+						in = new FileInputStream(file);
+					} catch (Exception e) {
+						// import failed -> generate default entry
+						createNewBlankEntry(fileName);
+						return true;
+					}
+					try {
+						res = importer.importEntries(in);
+					} catch (Exception e) {
+						// import failed -> generate default entry
+						createNewBlankEntry(fileName);
+						return true;
+					} finally {
+						try { in.close(); } catch (Exception f) {}
+					}
+					
+					// import failed -> generate default entry
+					if ((res == null) || (res.size() == 0)) {
+						createNewBlankEntry(fileName);
+						return true;
+					}
+					
+					// only one entry is imported
+					BibtexEntry entry = res.get(0);
+					
+					// insert entry to database and link file
+					
+					entry.setType(type);
+                    panel.database().insertEntry(entry);
+                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
+					DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
+					dfh.linkPdfToEntry(fileName, entryTable, entry);
+                    panel.highlightEntry(entry);
+                    if (Globals.prefs.getBoolean("autoOpenForm")) {
+                        EntryEditor editor = panel.getEntryEditor(entry);
+                        panel.showEntryEditor(editor);
+                        panel.adjustSplitter();
+                    }
                 }
                 else if(importDialog.getRadioButtonMrDlib().isSelected()){                    
                     MetaDataListDialog metaDataListDialog = new MetaDataListDialog(fileName, true);

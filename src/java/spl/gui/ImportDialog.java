@@ -21,6 +21,7 @@ public class ImportDialog extends JDialog {
     private JButton buttonCancel;
     private JCheckBox checkBoxDoNotShowAgain;
     private JRadioButton radioButtonXmp;
+	private JRadioButton radioButtonPDFcontent;
     private JRadioButton radioButtonMrDlib;
     private JRadioButton radioButtonNoMeta;
     private JLabel labelHeadline;
@@ -61,6 +62,7 @@ public class ImportDialog extends JDialog {
         panel3.add(labelSubHeadline);
         radioButtonNoMeta = new JRadioButton(Globals.lang("Create_blank_entry_linking_the_PDF"));
         radioButtonXmp = new JRadioButton(Globals.lang("Create_entry_based_on_XMP_data"));
+        radioButtonPDFcontent = new JRadioButton(Globals.lang("Create_entry_based_on_content"));
         radioButtonMrDlib = new JRadioButton(Globals.lang("Create_entry_based_on_data_fetched_from"));
         radioButtononlyAttachPDF = new JRadioButton(Globals.lang("Only_attach_PDF"));
         radioButtonUpdateEmptyFields = new JRadioButton(Globals.lang("Update_empty_fields_with_data_fetched_from"));
@@ -73,10 +75,11 @@ public class ImportDialog extends JDialog {
         buttonOK = new JButton(Globals.lang("Ok"));
         buttonCancel = new JButton(Globals.lang("Cancel"));
         checkBoxDoNotShowAgain = new JCheckBox(Globals.lang("Do not show this box again for this import"));
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref:grow",""));
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow",""));
         b.appendSeparator(Globals.lang("Create New Entry"));
         b.append(radioButtonNoMeta, 3);
         b.append(radioButtonXmp, 3);
+        b.append(radioButtonPDFcontent, 3);
         b.append(radioButtonMrDlib);
         b.append(labelMrDlib1);
         b.appendSeparator(Globals.lang("Update_Existing_Entry"));
@@ -121,6 +124,7 @@ public class ImportDialog extends JDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(radioButtonNoMeta);
         bg.add(radioButtonXmp);
+        bg.add(radioButtonPDFcontent);
         bg.add(radioButtonMrDlib);
         bg.add(radioButtononlyAttachPDF);
         bg.add(radioButtonUpdateEmptyFields);
@@ -150,8 +154,9 @@ public class ImportDialog extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        this.radioButtonMrDlib.setSelected(true);
-        this.radioButtonMrDlib.requestFocus();
+        //this.radioButtonMrDlib.setSelected(true);
+        //this.radioButtonMrDlib.requestFocus();
+        this.radioButtonPDFcontent.setSelected(true);
         this.setSize(555, 371);
     }
 
@@ -172,6 +177,10 @@ public class ImportDialog extends JDialog {
 
     public JRadioButton getRadioButtonXmp() {
         return radioButtonXmp;
+    }
+    
+    public JRadioButton getRadioButtonPDFcontent() {
+    	return radioButtonPDFcontent;
     }
 
     public JRadioButton getRadioButtonMrDlib() {
@@ -198,28 +207,25 @@ public class ImportDialog extends JDialog {
         return result;
     }
 
-    private void setText() {
-        this.labelHeadline.setText(LocalizationSupport.message("Import_Metadata_from:"));
-        this.labelSubHeadline.setText(LocalizationSupport.message("Choose_the_source_for_the_metadata_import"));
-        this.buttonOK.setText(LocalizationSupport.message("Ok"));
-        this.buttonCancel.setText(LocalizationSupport.message("Cancel"));
-        this.radioButtonXmp.setText(LocalizationSupport.message("Create_entry_based_on_XMP_data"));
-        this.radioButtonUpdateEmptyFields.setText(LocalizationSupport.message("Update_empty_fields_with_data_fetched_from"));
-        this.radioButtonMrDlib.setText(LocalizationSupport.message("Create_entry_based_on_data_fetched_from"));
-        this.radioButtonNoMeta.setText(LocalizationSupport.message("Create_blank_entry_linking_the_PDF"));
-        this.radioButtononlyAttachPDF.setText(LocalizationSupport.message("Only_attach_PDF"));
-        this.labelMrDlib1.setText(LocalizationSupport.message("Mr._dLib"));
-        this.labelMrDlib2.setText(LocalizationSupport.message("Mr._dLib"));
-        this.panelNewEntry.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), LocalizationSupport.message("Create_New_Entry"), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font(panelNewEntry.getFont().getName(), panelNewEntry.getFont().getStyle(), 12), new Color(-16777216)));
-        panelUpdateEntry.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), LocalizationSupport.message("Update_Existing_Entry"), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font(panelUpdateEntry.getFont().getName(), panelUpdateEntry.getFont().getStyle(), 12), new Color(-16777216)));
-    }
-
-
-    private void createUIComponents() {
-    }
-
-
-
+//    private void setText() {
+//        this.labelHeadline.setText(LocalizationSupport.message("Import_Metadata_from:"));
+//        this.labelSubHeadline.setText(LocalizationSupport.message("Choose_the_source_for_the_metadata_import"));
+//        this.buttonOK.setText(LocalizationSupport.message("Ok"));
+//        this.buttonCancel.setText(LocalizationSupport.message("Cancel"));
+//        this.radioButtonXmp.setText(LocalizationSupport.message("Create_entry_based_on_XMP_data"));
+//        this.radioButtonUpdateEmptyFields.setText(LocalizationSupport.message("Update_empty_fields_with_data_fetched_from"));
+//        this.radioButtonMrDlib.setText(LocalizationSupport.message("Create_entry_based_on_data_fetched_from"));
+//        this.radioButtonNoMeta.setText(LocalizationSupport.message("Create_blank_entry_linking_the_PDF"));
+//        this.radioButtononlyAttachPDF.setText(LocalizationSupport.message("Only_attach_PDF"));
+//        this.labelMrDlib1.setText(LocalizationSupport.message("Mr._dLib"));
+//        this.labelMrDlib2.setText(LocalizationSupport.message("Mr._dLib"));
+//        this.panelNewEntry.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), LocalizationSupport.message("Create_New_Entry"), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font(panelNewEntry.getFont().getName(), panelNewEntry.getFont().getStyle(), 12), new Color(-16777216)));
+//        panelUpdateEntry.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), LocalizationSupport.message("Update_Existing_Entry"), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font(panelUpdateEntry.getFont().getName(), panelUpdateEntry.getFont().getStyle(), 12), new Color(-16777216)));
+//    }
+//
+//
+//    private void createUIComponents() {
+//    }
 
     /**
      * @noinspection ALL
