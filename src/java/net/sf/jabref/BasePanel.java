@@ -2060,8 +2060,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         int divLoc = -1;
         String visName = null;
         if (getShowing() != null) {
-            visName = ((EntryEditor)splitPane.getBottomComponent()).
-                getVisiblePanelName();
+        	if (isShowingEditor()) {
+        		visName = ((EntryEditor) splitPane.getBottomComponent()).getVisiblePanelName();
+        	}
         }
         if (getShowing() != null)
             divLoc = splitPane.getDividerLocation();
