@@ -1750,21 +1750,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
           database.insertEntry(bibEntry) ;
           if (Globals.prefs.getBoolean("useOwner"))
             // Set owner field to default value
-            bibEntry.setField(BibtexFields.OWNER, Globals.prefs.get("defaultOwner") );
+        	Util.setAutomaticFields(bibEntry, true, true);
             // Create an UndoableInsertEntry object.
             undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
             output(Globals.lang("Added new")+" '"
                    +bibEntry.getType().getName().toLowerCase()+"' "
                    +Globals.lang("entry")+".");
-            int row = mainTable.findEntry(bibEntry);
 
-            mainTable.clearSelection();
-            mainTable.scrollTo(row);
             markBaseChanged(); // The database just changed.
             if (Globals.prefs.getBoolean("autoOpenForm"))
             {
-                  showEntry(bibEntry);
+                  selectionListener.editSignalled(bibEntry);
             }
+            highlightEntry(bibEntry);
         } catch (KeyCollisionException ex) { Util.pr(ex.getMessage()); }
       }
     }
