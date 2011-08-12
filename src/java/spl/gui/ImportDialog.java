@@ -113,6 +113,14 @@ public class ImportDialog extends JDialog {
 
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        
+        // only one of the radio buttons may be selected.
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(radioButtonNoMeta);
+        bg.add(radioButtonXmp);
+        bg.add(radioButtonMrDlib);
+        bg.add(radioButtononlyAttachPDF);
+        bg.add(radioButtonUpdateEmptyFields);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -123,36 +131,6 @@ public class ImportDialog extends JDialog {
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
-            }
-        });
-
-        radioButtonXmp.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onXmp();
-            }
-        });
-
-        radioButtonMrDlib.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onMrDlib();
-            }
-        });
-
-        radioButtonNoMeta.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onNoMeta();
-            }
-        });
-
-        radioButtononlyAttachPDF.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onAttachPDF();
-            }
-        });
-
-        radioButtonUpdateEmptyFields.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onUpdateEntry();
             }
         });
 
@@ -182,44 +160,6 @@ public class ImportDialog extends JDialog {
     private void onCancel() {
         this.result = JOptionPane.CANCEL_OPTION;
         dispose();
-    }
-
-    private void onXmp() {
-        this.setSelection(this.radioButtonXmp);
-    }
-
-    private void onAttachPDF() {
-        this.setSelection(this.radioButtononlyAttachPDF);
-    }
-
-    private void onUpdateEntry() {
-        this.setSelection(this.radioButtonUpdateEmptyFields);
-    }
-
-    private void onMrDlib() {
-        this.setSelection(this.radioButtonMrDlib);
-    }
-
-    private void onNoMeta() {
-        this.setSelection(this.radioButtonNoMeta);
-    }
-
-    private void setSelection(JRadioButton button) {
-        if (button != this.radioButtonMrDlib) {
-            this.radioButtonMrDlib.setSelected(false);
-        }
-        if (button != this.radioButtonUpdateEmptyFields) {
-            this.radioButtonUpdateEmptyFields.setSelected(false);
-        }
-        if (button != this.radioButtononlyAttachPDF) {
-            this.radioButtononlyAttachPDF.setSelected(false);
-        }
-        if (button != this.radioButtonXmp) {
-            this.radioButtonXmp.setSelected(false);
-        }
-        if (button != this.radioButtonNoMeta) {
-            this.radioButtonNoMeta.setSelected(false);
-        }
     }
 
     public void showDialog() {
