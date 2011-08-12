@@ -109,7 +109,7 @@ public class PdfContentImporter extends ImportFormat {
 					if ((split[i].equalsIgnoreCase("et")) && (split.length>i+1) && (split[i+1].equalsIgnoreCase("al."))) {
 						res = res.concat("others");
 						break;
-					} else if (split[i].equalsIgnoreCase("AND")) {
+					} else if (split[i].equalsIgnoreCase("and")) {
 						// do nothing, just increment i at the end of this iteration
 					} else {
 						res = res.concat(split[i]).concat(" ");
@@ -126,7 +126,7 @@ public class PdfContentImporter extends ImportFormat {
 						// last name found
 						// finish this name
 						workedOnFirstOrMiddle = false;
-						res = res.concat(split[i]);
+						res = res.concat(removeNonLettersAtEnd(split[i]));
 						if (i+1<split.length) res = res.concat(" and ");
 					}
 				}
@@ -207,18 +207,31 @@ public class PdfContentImporter extends ImportFormat {
 				}
 				match = match || curString.contains("Conference");
 				if (match) {
-					while ((i<split.length)  && (!split[i] .equals(""))) {
+					while ((i<split.length)  && (!split[i].equals(""))) {
 						curString = curString.concat(split[i]).concat(" ");
 						i++;
 					}
 					conference = curString;
 					curString = "";
 					i++;
+				} else {
+					// e.g. Copyright (c) 1998 by the Genetics Society of America
+					// future work: get year using RegEx
+					String lower = curString.toLowerCase();
+					if (lower.contains("copyright")) {
+						while ((i<split.length)  && (!split[i].equals(""))) {
+							curString = curString.concat(split[i]).concat(" ");
+							i++;
+						}
+						publisher = curString;
+						curString = "";
+						i++;
+					}
 				}
 			}
 			
 			// start: title
-			while ((i<split.length)  && (!split[i] .equals(""))) {
+			while ((i<split.length)  && (!split[i].equals(""))) {
 				curString = curString.concat(split[i]).concat(" ");
 				i++;
 			}
@@ -233,11 +246,22 @@ public class PdfContentImporter extends ImportFormat {
 				i++;
 			
 			// after title: authors
+			author = null;
 			while ((i<split.length)  && (!split[i].equals(""))) {
-				curString = curString.concat(split[i]).concat(" ");
+				// author names are unlikely to be split among different lines
+				// treat them line by line
+				curString = streamlineNames(split[i]);
+				if (author==null) {
+					author = curString;
+				} else {
+					if (curString.equals("")) {
+						// if split[i] is "and" then "" is returned by streamlineNames -> do nothing
+					} else {
+						author = author.concat(" and ").concat(curString);
+					}
+				}
 				i++;
-			}
-			author = streamlineNames(curString);
+			}			
 			curString = "";
 			i++;
 			
@@ -245,17 +269,27 @@ public class PdfContentImporter extends ImportFormat {
 			while (i<split.length) {
 				curString = split[i];
 				if ((curString.length()>="Abstract".length()) && (curString.substring(0, "Abstract".length()).equalsIgnoreCase("Abstract"))) {
-					curString = curString.substring("Abstract".length()+1).trim().concat(lineBreak);
+					if (curString.length() == "Abstract".length()) {
+						// only word "abstract" found -- skip line
+						curString = "";
+					} else {
+						curString = curString.substring("Abstract".length()+1).trim().concat(lineBreak);
+					}
 					i++;
-					while ((i<split.length)  && (!split[i] .equals(""))) {
+					while ((i<split.length)  && (!split[i].equals(""))) {
 						curString = curString.concat(split[i]).concat(lineBreak);
 						i++;
 					}
 					abstractT=curString;
 				} else if ((curString.length()>="Keywords".length()) && (curString.substring(0, "Keywords".length()).equalsIgnoreCase("Keywords"))) {
-					curString = curString.substring("Keywords".length()+1).trim();
+					if (curString.length() == "Keywords".length()) {
+						// only word "Keywords" found -- skip line
+						curString = "";
+					} else {
+						curString = curString.substring("Keywords".length()+1).trim();
+					}
 					i++;
-					while ((i<split.length)  && (!split[i] .equals(""))) {
+					while ((i<split.length)  && (!split[i].equals(""))) {
 						curString = curString.concat(split[i]).concat(" ");
 						i++;
 					}
