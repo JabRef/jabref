@@ -583,9 +583,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                           NamedCompound ce = new NamedCompound
                               (Globals.lang(bes.length > 1 ? "paste entries" : "paste entry"));
+                          
+                          // Store the first inserted bibtexentry.
+                          // bes[0] does not work as bes[0] is first clonded,
+                          // then inserted.
+                          // This entry is used to open up an entry editor
+                          // for the first inserted entry.
+                          BibtexEntry firstBE = null;
+                          
                           for (int i=0; i<bes.length; i++) {
                             try {
                               BibtexEntry be = (BibtexEntry)(bes[i].clone());
+                              if (firstBE == null) firstBE = be;
                                 Util.setAutomaticFields(be,
                                         Globals.prefs.getBoolean("overwriteOwner"),
                                         Globals.prefs.getBoolean("overwriteTimeStamp"));
@@ -612,6 +621,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                   Globals.lang("entries") : "1 "+Globals.lang("entry"))
                                  +".");
                           markBaseChanged();
+                        	  
+                          selectionListener.editSignalled(firstBE);
+                          highlightEntry(firstBE);
                         }
                       }
 
