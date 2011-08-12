@@ -234,6 +234,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
                                       //"Put a BibTeX reference to the selected entries on the clipboard",
                                       prefs.getKey("Copy \\cite{BibTeX key}")),
+      copyKeyAndTitle = new GeneralAction("copyKeyAndTitle", 
+    		  							  "Copy BibTeX key and title",
+    		  							  prefs.getKey("Copy BibTeX key and title")),
       mergeDatabaseAction = new GeneralAction("mergeDatabase",
                                               "Append database",
                                               Globals.lang("Append contents from a BibTeX database into the currently viewed database"),
@@ -1210,6 +1213,7 @@ public JabRefPreferences prefs() {
       edit.add(delete);
       edit.add(copyKey);
       edit.add(copyCiteKey);
+      edit.add(copyKeyAndTitle);
       //edit.add(exportToClipboard);
       edit.addSeparator();
       edit.add(mark);
@@ -1501,7 +1505,7 @@ public JabRefPreferences prefs() {
         openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
             mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
             redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
-            selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
+            selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
                 openPdf, openUrl, openFile, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,

@@ -44,6 +44,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,6 +78,8 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;
@@ -998,6 +1001,54 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
             });
+        
+          // The action for copying the BibTeX key and the title for the first selected entry
+          actions.put("copyKeyAndTitle", new BaseAction() {
+        	  public void action() {
+                  BibtexEntry[] bes = mainTable.getSelectedEntries();
+                  if ((bes != null) && (bes.length > 0)) {
+                      storeCurrentEdit();
+
+                      // OK: in a future version, this string should be configurable to allow arbitrary exports
+              		  StringReader sr = new StringReader("\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
+            		  Layout layout;
+					  try {
+						  layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+					  } catch (Exception e) {
+						  e.printStackTrace();
+						  return;
+					  }
+					  
+            		  StringBuffer sb = new StringBuffer();
+
+            		  int copied = 0;
+                      // Collect all non-null keys.
+                      for (int i=0; i<bes.length; i++)
+                          if (bes[i].getField(BibtexFields.KEY_FIELD) != null) {
+                        	  copied++;
+                        	  sb.append(layout.doLayout(bes[i], database));
+                          }
+                      
+                      if (copied==0) {
+                          output("None of the selected entries have BibTeX keys.");
+                          return;
+                      }
+
+                      StringSelection ss = new StringSelection(sb.toString());
+                      Toolkit.getDefaultToolkit().getSystemClipboard()
+                          .setContents(ss, BasePanel.this);
+
+                      if (copied == bes.length)
+                          // All entries had keys.
+                          output(Globals.lang((bes.length > 1) ? "Copied keys"
+                                              : "Copied key")+".");
+                      else
+                          output(Globals.lang("Warning")+": "+(copied)
+                                 +" "+Globals.lang("out of")+" "+bes.length+" "+
+                                 Globals.lang("entries have undefined BibTeX key")+".");
+                  }
+        	  }
+          });
 
           actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 

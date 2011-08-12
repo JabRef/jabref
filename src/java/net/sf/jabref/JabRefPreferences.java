@@ -898,6 +898,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Load session", "F12");
         defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
         defKeyBinds.put("Copy BibTeX key", "ctrl shift K");
+        defKeyBinds.put("Copy BibTeX key and title", "ctrl shift alt K");
         defKeyBinds.put("Next tab", "ctrl PAGE_DOWN");
         defKeyBinds.put("Previous tab", "ctrl PAGE_UP");
         defKeyBinds.put("Replace string", "ctrl R");
