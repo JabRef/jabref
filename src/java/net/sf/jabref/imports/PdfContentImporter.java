@@ -64,6 +64,8 @@ public class PdfContentImporter extends ImportFormat {
 	 */
 	private String removeNonLettersAtEnd(String input) {
 		input = input.trim();
+		if (input.length() == 0)
+			return input;
 		char lastC = input.charAt(input.length()-1);
 		while (!Character.isLetter(lastC) &&  (lastC!=')')) {
 			// if there is an asterix, a dot or something else at the end: remove it
