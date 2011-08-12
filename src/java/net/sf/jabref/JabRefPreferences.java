@@ -425,6 +425,9 @@ public class JabRefPreferences {
         //Util.pr(System.getProperty("java.io.tempdir"));
 
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
+        
+        defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
+        defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         restoreKeyBindings();
 

@@ -1,6 +1,25 @@
+/*
+PdfContentImporter is part of JabRef. 
+Copyright (C) 2011 Oliver Kopp
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+or see http://www.gnu.org/licenses/gpl-2.0.html
+*/
+
 package net.sf.jabref.imports;
 
-import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -10,16 +29,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
+/**
+ * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
+ * 
+ * Currently, Springer and IEEE formats are supported.
+ * 
+ * Integrating XMP support is future work
+ * 
+ * @author koppor
+ *
+ */
 public class PdfContentImporter extends ImportFormat {
 	
 	private static Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
@@ -62,33 +86,52 @@ public class PdfContentImporter extends ImportFormat {
 			for (int i=0; i<split.length; i++) {
 				String curName = removeNonLettersAtEnd(split[i]);
 				if (curName.indexOf("and ")==0) {
+					// skip possible ands between names
 					curName = curName.substring(4);
 				}
+				if (curName.equalsIgnoreCase("et al."))
+					curName = "others";
 				res = res.concat(curName);
 				if (i!=split.length-1) {
 					res = res.concat(" and ");
 				}
 			}
 		} else {
-			// names could be spearated by "and" - not treated here
+			// assumption: names separated by space
 			
-			// assume: names separated by space
-			// will fail at double names
 			String[] split = names.split(" ");
 			res = null;
-			for (int i=0; i<split.length; i+=2) {
-				if (i==0) {
-					res = split[0];
-					if (split.length>1) {
-						res = res.concat(" ").concat(split[1]);
+			boolean workedOnFirstOrMiddle = false;
+			int i=0;
+			res = "";
+			do {
+				if (!workedOnFirstOrMiddle) {
+					if ((split[i].equalsIgnoreCase("et")) && (split.length>i+1) && (split[i+1].equalsIgnoreCase("al."))) {
+						res = res.concat("others");
+						break;
+					} else if (split[i].equalsIgnoreCase("AND")) {
+						// do nothing, just increment i at the end of this iteration
+					} else {
+						res = res.concat(split[i]).concat(" ");
+						workedOnFirstOrMiddle = true;
 					}
 				} else {
-					res = res.concat(" and ").concat(split[i]);
-					if (split.length>i+1) {
-						res = res.concat(" ").concat(split[i+1]);
+					// last item was a first or a middle name
+					// we have to check whether we are on a middle name
+					// if not, just add the item as last name and add an "and"
+					if (split[i].contains(".")) {
+						// we found a middle name
+						res = res.concat(split[i]).concat(" ");
+					} else {
+						// last name found
+						// finish this name
+						workedOnFirstOrMiddle = false;
+						res = res.concat(split[i]);
+						if (i+1<split.length) res = res.concat(" and ");
 					}
 				}
-			}
+				i++;
+			} while (i<split.length);
 			
 		}
 		return res;

@@ -99,6 +99,7 @@ public class PrefsDialog3 extends JDialog {
 		tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
 		tabs.add(new PreviewPrefsTab(prefs));
 		tabs.add(new NameFormatterTab(parent.helpDiag));
+		tabs.add(new ImportSettingsTab());
 		tabs.add(new XmpPrefsTab());
         tabs.add(new AdvancedTab(prefs, parent.helpDiag));
 		
