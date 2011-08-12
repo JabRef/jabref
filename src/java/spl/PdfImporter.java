@@ -125,6 +125,8 @@ public class PdfImporter {
 						in = new FileInputStream(file);
 					} catch (Exception e) {
 						// import failed -> generate default entry
+						Globals.logger(Globals.lang("Import failed"));
+						e.printStackTrace();
 						createNewBlankEntry(fileName);
 						return true;
 					}
@@ -132,6 +134,8 @@ public class PdfImporter {
 						res = contentImporter.importEntries(in);
 					} catch (Exception e) {
 						// import failed -> generate default entry
+						Globals.logger(Globals.lang("Import failed"));
+						e.printStackTrace();
 						createNewBlankEntry(fileName);
 						return true;
 					} finally {
