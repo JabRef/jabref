@@ -1446,8 +1446,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       }
                   });
 
-          actions.put("exportToClipboard", new ExportToClipboardAction(frame, database()));
+        actions.put("exportToClipboard", new ExportToClipboardAction(frame, database()));
+        actions.put("sendAsEmail", new SendAsEMailAction(frame));
         
+          
         actions.put("writeXMP", new WriteXMPAction(this));
         
         actions.put("abbreviateIso", new AbbreviateAction(this, true));

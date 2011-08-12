@@ -411,6 +411,9 @@ public class JabRefPreferences {
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
 
+        defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));
+        defaults.put(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+        
         defaults.put("allowFileAutoOpenBrowse", Boolean.TRUE);
 
         //defaults.put("lastAutodetectedImport", "");
@@ -469,6 +472,9 @@ public class JabRefPreferences {
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+
+	public static final String EMAIL_SUBJECT = "emailSubject";
+	public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     
     public boolean putBracesAroundCapitals(String fieldName) {
         return putBracesAroundCapitalsFields.contains(fieldName);

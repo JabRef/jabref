@@ -20,9 +20,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	JTextField pdfDir, regExpTextField, fileDir, psDir;
+	JTextField pdfDir, regExpTextField, fileDir, psDir, emailSubject;
             
-    JCheckBox runAutoFileSearch, allowFileAutoOpenBrowse;
+    JCheckBox runAutoFileSearch, allowFileAutoOpenBrowse, openFoldersOfAttachedFiles;
     JButton editFileTypes;
     ItemListener regExpListener;
 
@@ -103,7 +103,20 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(new JPanel());
         builder.append(allowFileAutoOpenBrowse);
         builder.nextLine();
-		builder.appendSeparator(Globals.lang("Legacy file fields"));
+
+		builder.appendSeparator(Globals.lang("Sending of emails"));
+		builder.append(new JPanel());
+		lab = new JLabel(Globals.lang("Subject for sending an email with references").concat(":"));
+		builder.append(lab);
+		emailSubject = new JTextField(25);
+		builder.append(emailSubject);
+		builder.nextLine();
+		builder.append(new JPanel());
+		openFoldersOfAttachedFiles = new JCheckBox(Globals.lang("Automatically open folders of attached files"));
+		builder.append(openFoldersOfAttachedFiles);
+		builder.nextLine();
+
+        builder.appendSeparator(Globals.lang("Legacy file fields"));
 		pan = new JPanel();
 		builder.append(pan);		
 		builder.append(new JLabel("<html>"+Globals.lang("Note that these settings are used for the legacy "
@@ -169,6 +182,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
         runAutoFileSearch.setSelected(_prefs.getBoolean("runAutomaticFileSearch"));
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
         allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean("allowFileAutoOpenBrowse"));
+        
+        emailSubject.setText(_prefs.get(JabRefPreferences.EMAIL_SUBJECT));
+        openFoldersOfAttachedFiles.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
         if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
             useRegExpComboBox.setSelected(true);
@@ -192,6 +208,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		_prefs.putBoolean("autolinkExactKeyOnly", matchExactKeyOnly.isSelected());
         _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
         _prefs.putBoolean("allowFileAutoOpenBrowse", allowFileAutoOpenBrowse.isSelected());
+        _prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
+        _prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
     }
 
 	public boolean readyToClose() {
