@@ -27,6 +27,9 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 	public final static String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
 	public final static int DEFAULT_STYLE = ImportDialog.CONTENT; 
 	
+	public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
+	public final static String DEFAULT_FILENAMEPATTERN = "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}";
+	
     private JRadioButton radioButtonXmp;
 	private JRadioButton radioButtonPDFcontent;
     private JRadioButton radioButtonMrDlib;
@@ -34,6 +37,9 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 	private JRadioButton radioButtononlyAttachPDF;
 	private JRadioButton radioButtonUpdateEmptyFields;
 	private JCheckBox useDefaultPDFImportStyle;
+	
+	private JTextField fileNamePattern;
+	private JButton defaultFileNamePattern;
 
 	public ImportSettingsTab() {
         setLayout(new BorderLayout());
@@ -89,6 +95,15 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 		builder.append(useDefaultPDFImportStyle);
         builder.nextLine();
 		
+		builder.appendSeparator(Globals.lang("Default PDF file link action"));
+        builder.nextLine();
+        builder.append(pan);
+        JPanel pan2 = new JPanel();
+        JLabel lab = new JLabel(Globals.lang("File name format pattern").concat(":"));
+        pan2.add(lab);
+        pan2.add(fileNamePattern);
+        pan2.add(defaultFileNamePattern);
+        builder.append(pan2);
 
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -123,6 +138,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 			radioButtonPDFcontent.setSelected(true);
 			break;
 		}
+		fileNamePattern.setText(Globals.prefs.get(PREF_IMPORT_FILENAMEPATTERN));
 	}
 
 	@Override
@@ -142,6 +158,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 		else if (radioButtonUpdateEmptyFields.isSelected())
 			style = ImportDialog.UPDATEEMPTYFIELDS;
 		Globals.prefs.putInt(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
+		Globals.prefs.put(PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
 	}
 
 	@Override

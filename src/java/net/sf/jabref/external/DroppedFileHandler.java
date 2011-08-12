@@ -2,6 +2,7 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
@@ -47,7 +50,7 @@ public class DroppedFileHandler {
 
     private JCheckBox renameCheckBox = new JCheckBox();
 
-    private JTextField renameToTextBox = new JTextField(25);
+    private JTextField renameToTextBox = new JTextField(75);
     
     private JPanel optionsPanel = new JPanel();
 
@@ -125,7 +128,7 @@ public class DroppedFileHandler {
         // Show dialog
         boolean newEntry = false;
         String citeKey = entry.getCiteKey();
-        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, citeKey, newEntry, false);
+        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database());
 
         if (reply != JOptionPane.OK_OPTION)
             return;
@@ -172,7 +175,7 @@ public class DroppedFileHandler {
         // Show dialog
         boolean newEntry = false;
         String citeKey = entry.getCiteKey();
-        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, citeKey, newEntry, false);
+        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database());
 
         if (reply != JOptionPane.OK_OPTION)
             return;
@@ -345,7 +348,8 @@ public class DroppedFileHandler {
     }
 
     public int showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
-        String citeKey, boolean newEntry, final boolean multipleEntries) {
+        BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
+    	String citeKey = entry.getCiteKey();
     	
     	String dialogTitle = Globals.lang("Link to file %0", linkFileName);
         //String dir = panel.metaData().getFileDirectory(fileType.getFieldName());
@@ -388,8 +392,22 @@ public class DroppedFileHandler {
 			moveRadioButton.setText(Globals.lang("Move file to file directory."));
 		}
 		
-        renameCheckBox.setText(Globals.lang("Rename file to") + ": ");
-        renameToTextBox.setText(citeKey == null ? "default" : citeKey + "." + fileType.extension);
+        renameCheckBox.setText(Globals.lang("Rename file to").concat(": "));
+        
+        // determine targetName
+        String targetName = citeKey == null ? "default" : citeKey;
+		StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+		Layout layout = null;
+		try {
+			layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+		} catch (Exception e) {
+			Globals.logger(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
+		}
+		if (layout != null) {
+			targetName = layout.doLayout(entry, database);
+		}
+        renameToTextBox.setText(targetName.concat(".").concat(fileType.extension));
+
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
