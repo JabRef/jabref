@@ -155,6 +155,7 @@ public class PdfImporter {
 					
 					entry.setType(type);
                     panel.database().insertEntry(entry);
+                    panel.markBaseChanged();
                     LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
 					dfh = new DroppedFileHandler(frame, panel);
 					dfh.linkPdfToEntry(fileName, entryTable, entry);
