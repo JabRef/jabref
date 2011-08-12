@@ -374,7 +374,7 @@ public class PdfContentImporter extends ImportFormat {
 				int pos = curString.indexOf("(Eds.)");
 				if ((pos >= 0) && (publisher == null)) {
 					// looks like a Springer last line
-					// e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161–175, 2009.
+					// e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161-175, 2009.
 					publisher = "Springer";
 					editor = streamlineNames(curString.substring(0, pos - 1));
 					curString = curString.substring(pos+"(Eds.)".length()+2); //+2 because of ":" after (Eds.) and the subsequent space
