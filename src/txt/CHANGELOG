@@ -1,3 +1,17 @@
+2.8 beta
+    - Added metadata extraction from text when PDFs are dragged into JabRef.
+    - The filename pattern for renaming a file when dropping a PDF can now be
+      configured at "Options"/"Preferences"/"Import"/"File name format pattern".
+    - The defaults of the ImportDialog shown when PDFs are dragged into JabRef
+      can now be configured at "Options"/"Preferences"/"Import". It is possible to
+      override showing the ImportDialog.
+    - In case a new entry is added, this entry is highlighted and the editor is opened
+      if configured in the settings (patch 3370466). The UI behavior of adding an entry
+      at "new entry from plain text" is now similar to "new entry".
+    - An entry can be sent by a right click on an entry and select "Send as Email"
+      (patch 3306271).
+    - Added option to "copy BibTeX key and title" (patch 3370471).
+    - switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7
     - Medline importer now wraps multipart last names in braces.
     - RIS importer now handles multiple title fields by concatenation.
