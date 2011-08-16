@@ -52,11 +52,11 @@ public class JabRefMain {
         }
 
         String javaVendor = System.getProperty("java.vendor", null);
-        if (javaVendor.indexOf("Sun Microsystems") == -1) {
+        if ((javaVendor.indexOf("Sun Microsystems") == -1) && (javaVendor.indexOf("Oracle") == -1)) {
             System.out.println("\n" + 
-                    "WARNING: You are not running a Java version from Sun Microsystems.\n" +
+                    "WARNING: You are not running a Java version from Oracle (or Sun Microsystems).\n" +
                     "         Your java vendor is: " + javaVendor + "\n" +
-                    "         If JabRef crashes please consider switching to a Sun Java Runtime.\n" +
+                    "         If JabRef crashes please consider switching to an Oracle Java Runtime.\n" +
                     "         See http://jabref.sf.net/faq.php for more information.\n");
         }
 
