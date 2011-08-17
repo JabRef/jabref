@@ -99,12 +99,12 @@ public class CreateDocBookAuthors implements LayoutFormatter
                 sb.append("</othername>");
             }
             if ((a.getLast() != null) && (a.getLast().length() > 0)) {
-                sb.append("<lastname>");
+                sb.append("<surname>");
                 sb.append(xc.format(a.getLast()));
                 if ((a.getJr() != null) && (a.getJr().length() > 0)) {
                     sb.append(" "+xc.format(a.getJr()));
                 }
-                sb.append("</lastname>");
+                sb.append("</surname>");
             }
 
             if (i < al.size()-1)

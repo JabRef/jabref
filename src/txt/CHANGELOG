@@ -11,6 +11,7 @@
     - An entry can be sent by a right click on an entry and select "Send as Email"
       (patch 3306271).
     - Added option to "copy BibTeX key and title" (patch 3370471).
+    - DocBook format switched to 4.4 (based on patch 3313898)
     - switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7
     - Medline importer now wraps multipart last names in braces.

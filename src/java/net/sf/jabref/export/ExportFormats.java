@@ -39,7 +39,7 @@ public class ExportFormats {
                 Globals.lang("HTML"), "html", "html", null, ".html"));
         putFormat(new ExportFormat(
                 Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
-        putFormat(new ExportFormat(Globals.lang("Docbook"), "docbook", "docbook", null, ".xml"));
+        putFormat(new ExportFormat(Globals.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
         putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
         putFormat(new ExportFormat(Globals.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
         putFormat(new ModsExportFormat());
