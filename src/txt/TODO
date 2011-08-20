@@ -9,10 +9,10 @@ Chris:
   
 Morten:
 
+* Encoding used for reading URLs. URLDownload.java
+
 * Look into whether incremental search could be made more persistent when search panel loses focus.
-* Fix handling of Jr particle in names.
 * Problem: when looking at group with hiding non-hits, newly created entry doesn't appear in entry editor.
-* Improve handling of SO field in CSA import (csaresults-12.txt).
 
 * Plugins like SVN plugin might need hooks for performing actions before a database is
   closed, and may need the ability to cancel the closing, and to avoid questions about
@@ -24,8 +24,5 @@ Morten:
   Basic functionality in AccessLinksForEntries.
 * Problem setting today with Microba calendar.
 
-* [MADE WORKAROUND] Native FileDialog does not work for selecting a directory.
-  - workaround is to autodisable native file dialog for dir selection.
-
 * [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
-* [POSTPONE] Fix Save/Export file dialog stuff
+

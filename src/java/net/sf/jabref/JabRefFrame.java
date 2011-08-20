@@ -71,6 +71,7 @@ import net.sf.jabref.label.BookLabelRule;
 import net.sf.jabref.label.IncollectionLabelRule;
 import net.sf.jabref.label.InproceedingsLabelRule;
 import net.sf.jabref.label.LabelMaker;
+import net.sf.jabref.oo.OOTestPanel;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstallerAction;
 import net.sf.jabref.plugin.core.JabRefPlugin;
@@ -1265,6 +1266,10 @@ public JabRefPreferences prefs() {
       //tools.add(downloadFullText);
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
+      OOTestPanel otp = new OOTestPanel();
+      otp.init(this, sidePaneManager);
+
+      tools.add(otp.getMenuItem());
       checkAndFix.add(dupliCheck);
       checkAndFix.add(resolveDuplicateKeys);
       //checkAndFix.add(strictDupliCheck);

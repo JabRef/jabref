@@ -125,6 +125,15 @@
 		<include name="plugin/jpf-boot.jar" />
 		<include name="plugin/commons-logging.jar" />
 	</fileset>
+
+    <!-- Openoffice connection dependencies. Compile-time only -->
+    <fileset id="ooFileset" dir="${lib.dir}">
+        <include name="oo/unoil.jar" />
+        <include name="oo/ridl.jar" />
+        <include name="oo/juh.jar" />
+        <include name="oo/jurt.jar" />
+    </fileset>
+
     <!-- Done by MrDlib -->
     <fileset id="splJars" dir="${lib.dir}">
         <include name="spl/**/*.jar" />
@@ -141,6 +150,7 @@
         <fileset refid="splJars" />
         <!-- Done by MrDlib -->
 		<fileset refid="jarsFileset" />
+        <fileset refid="ooFileset" />
 	</path>
 
 	<!-- Classpath for running the code generator -->
