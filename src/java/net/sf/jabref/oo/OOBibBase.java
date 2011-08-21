@@ -338,7 +338,7 @@ public class OOBibBase {
                 ex.printStackTrace();
             }
         } catch (DisposedException ex) {
-            // We need to catch this one here because the OOTestPanel class is
+            // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
             // or catch a DisposedException (which is in a OO jar file).
             throw new ConnectionLostException(ex.getMessage());
@@ -357,7 +357,7 @@ public class OOBibBase {
         try {
             return refreshCiteMarkersInternal(databases, style);
         } catch (DisposedException ex) {
-            // We need to catch this one here because the OOTestPanel class is
+            // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
             // or catch a DisposedException (which is in a OO jar file).
             throw new ConnectionLostException(ex.getMessage());

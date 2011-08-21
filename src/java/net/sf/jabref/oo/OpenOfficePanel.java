@@ -1,7 +1,6 @@
 package net.sf.jabref.oo;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
@@ -30,7 +29,7 @@ import java.util.Map;
  * argument to the start() method. It displays buttons for testing interaction functions
  * between JabRef and OpenOffice.
  */
-public class OOTestPanel extends AbstractWorker implements SidePanePlugin, PushToApplication {
+public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, PushToApplication {
 
     // This field indicates whether the running JabRef supports post formatters in Layout:
     public static boolean postLayoutSupported;
@@ -79,8 +78,8 @@ public class OOTestPanel extends AbstractWorker implements SidePanePlugin, PushT
     private Exception connectException = null;
 
 
-    public OOTestPanel() {
-        ImageIcon connectImage = new ImageIcon(OOTestPanel.class.getResource("/images/connect_no.png"));
+    public OpenOfficePanel() {
+        ImageIcon connectImage = new ImageIcon(OpenOfficePanel.class.getResource("/images/connect_no.png"));
 
         connect = new JButton(connectImage);
         manualConnect = new JButton(connectImage);
@@ -139,7 +138,7 @@ public class OOTestPanel extends AbstractWorker implements SidePanePlugin, PushT
     public JMenuItem getMenuItem() {
         if (Globals.prefs.getBoolean("showOOPanel"))
             manager.show(getName());
-        JMenuItem item = new JMenuItem("OpenOffice.org panel", GUIGlobals.getImage("openoffice"));
+        JMenuItem item = new JMenuItem("OpenOffice/LibreOffice connection", GUIGlobals.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 manager.show(getName());
@@ -381,6 +380,7 @@ public class OOTestPanel extends AbstractWorker implements SidePanePlugin, PushT
     }
 
     public void connect(boolean auto) {
+        System.out.println("I am the built-in version");
         /*if (ooBase != null) {
             try {
                 java.util.List<XTextDocument> list = ooBase.getTextDocuments();
@@ -921,7 +921,7 @@ public class OOTestPanel extends AbstractWorker implements SidePanePlugin, PushT
         }
 
         public String getName() {
-            return OOTestPanel.this.getName();
+            return OpenOfficePanel.this.getName();
         }
 
         @Override

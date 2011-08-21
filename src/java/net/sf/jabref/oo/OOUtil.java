@@ -277,7 +277,7 @@ public class OOUtil {
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OOTestPanel.postLayoutSupported && (value != null))
+            if (!OpenOfficePanel.postLayoutSupported && (value != null))
                 e.setField(field, postformatter.format(value));
         }
         return e;
