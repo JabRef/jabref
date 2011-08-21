@@ -7,6 +7,45 @@
 
   <h1>Riwayat Perbaikan</h1>
 
+  <h3>Versi 2.7</h3>
+    <ul>
+      <li>Pengimpor Medline meringkas nama belakang ganda dalam kurung kurawal.</li>
+      <li>Pengimpor RIS dapat menggunakan bidang judul ganda dalam satu rangkaian.</li>
+      <li>Tidak lagi menggunakan "komentar" di semua tipe, karena menyebabkan konflik dengan format BibTeX.</li>
+      <li>Penanganan nama tambahan (Jr, dll.) dalam pengimpor Medline sudah diperbaiki.</li>
+      <li>Penambahan argumen angka tambahan untuk pemformat Penulis, untuk menghitung jumlah penulis
+        yang ditampilkan jika sudah melebihi jumlah penulis maksimum.</li>
+      <li>Penambahan pemilih isi untuk bidang "review" di penyunting entri.</li>
+      <li>Perbaikan deteksi type berkas ketika menambah tautan baru. Sekarang bisa membedakan
+        adanya ekstensi ganda misalnya ".ps.gz".</li>
+      <li>Perbaikan isi otomatis untuk nama penulis. Menambahkan pilihan dengan format
+        'Namadepan Namabelakang' atau 'Namabelakang, Namadepan', atau gabungan keduanya.</li>
+      <li>Memperbaiki kutu fungsi impor jika penapis impor tidak ditemukan.</li>
+    </ul>
+
+  <h3>Version 2.7beta 2</h3>
+    <ul>
+      <li>Penambahan dukungan untuk pengenal MrdLib atau ekstraksi metadata ketika PDF diseret masuk ke 
+	  dalam JabRef.</li>
+      <li>Penambahan pilihan dalam "Program eksternal" untuk mematikan buka otomatis dari
+          dialog melayari ketika membuat tautan berkas baru.</li>
+      <li>Perbaikan kunci pintasan pemercepat. Kunci pintasan untuk impor ke basidata baru 
+          sekarang Ctrl-Alt-I.</li>
+      <li>Aksi "Membuka URL atau DOI" sekarang menggunakan tautan URL dalam bidang "berkas" yang tadinya
+          hanya akan menuju ke bidang "url" atau "doi".</li>
+      <li>Pembatasan port pendengar jauh hanya dalam interval 1025-65535.</li>
+      <li>Penambahan terjemahan basasa Jepang oleh Koji Yokota.</li>
+      <li>Penambahan kotak pengulung untuk penyunting entri ketika tidak sesuai dengan jendela. 
+          Perbaikan ini dilakukan oleh Matthias Erll.</li>
+      <li>Sekarang memungkinkan menyalin ke entri dari dialog pencarian.</li>
+      <li>Penambahan pesan kesalahan yang tepat ketika mencoba mencari dan 
+          menghasilkan ekspresi yang salah.</li>
+      <li>Penambahan dialog kesalahan jika tampilan suaian sendiri tidak bisa dimuat.</li>
+      <li>Penggunakan tempelan dari Alexander Hug untuk mengimpor secara benar doi 
+          dari berkas RIS ScienceDirect.</li>
+      <li>Menghilangkan kemungkinan NullPointerException di SearchExpressionTreeParser.</li>
+    </ul>
+
     <h3>Versi 2.7beta</h3>
     <ul>
 	<li>Beberapa perbaikan untuk penapis ekspor MS Office.</li>
