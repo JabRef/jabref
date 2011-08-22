@@ -6,6 +6,7 @@ import java.io.InputStream;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -14,13 +15,14 @@ import com.jgoodies.forms.layout.FormLayout;
  * User: alver
  * Date: Jan 14, 2006
  * Time: 4:55:23 PM
- * To change this template use File | Settings | File Templates.
  */
 public class PushToEmacs implements PushToApplication {
-
+	
     private JPanel settings = null;
     private JTextField citeCommand = new JTextField(30);
-
+    private JTextField emacsPath = new JTextField(30);
+    private JTextField additionalParams = new JTextField(30);
+    
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
@@ -47,16 +49,30 @@ public class PushToEmacs implements PushToApplication {
         if (settings == null)
             initSettingsPanel();
         citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
+        emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
+        additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         return settings;
     }
 
     public void storeSettings() {
         Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
+        Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
     }
 
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref", ""));
+                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
+        builder.append(new JLabel(Globals.lang("Path to gnuclient.exe or emacsclient.exe").concat(":")));
+        builder.append(emacsPath);
+        BrowseAction action = new BrowseAction(null, emacsPath, false);
+        JButton browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(action);
+        builder.append(browse);
+        builder.nextLine();
+        builder.append(Globals.lang("Additional parameters").concat(":"));
+        builder.append(additionalParams);
+        builder.nextLine();
         builder.append(Globals.lang("Cite command") + ":");
         builder.append(citeCommand);
         settings = builder.getPanel();
@@ -66,29 +82,39 @@ public class PushToEmacs implements PushToApplication {
 
         couldNotConnect=false;
         couldNotRunClient=false;
+        String command = Globals.prefs.get(JabRefPreferences.EMACS_PATH);
+        String addParams[] = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
-            String[] com = Globals.ON_WIN ?
+        	String[] com = new String[addParams.length+2];
+        	com[0] = command;
+        	for (int i=0; i<addParams.length; i++) {
+        		com[i+1] = addParams[i];
+        	}
+            com[com.length-1] = Globals.ON_WIN ?
                 // Windows gnuclient escaping:
                 // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                new String[] {"gnuclient", "-qe",
                 "(insert \\\"\\\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
-                        "{" + keys + "}\\\")"}
+                        "{" + keys + "}\\\")"
             :
                 // Linux gnuclient escaping:
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                new String[] {"gnuclient", "-batch", "-eval",
                 "(insert \"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
-                       "{" + keys + "}\")"};
+                       "{" + keys + "}\")";
 
             final Process p = Runtime.getRuntime().exec(com);
 
             Runnable errorListener = new Runnable() {
                 public void run() {
                     InputStream out = p.getErrorStream();
+//                    try {
+//                    	if (out.available() <= 0)
+//                    		out = p.getInputStream();
+//                    } catch (Exception e) {
+//                    }
                     int c;
                     StringBuffer sb = new StringBuffer();
                     try {
@@ -99,7 +125,7 @@ public class PushToEmacs implements PushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (sb.toString().trim().length() > 0) {
-			System.out.println(sb.toString());
+                    	System.out.println(sb.toString());
                         couldNotConnect = true;
                         return;
                     }
@@ -125,14 +151,14 @@ public class PushToEmacs implements PushToApplication {
                 "<HTML>"+
                 Globals.lang("Could not connect to a running gnuserv process. Make sure that "
                 +"Emacs or XEmacs is running,<BR>and that the server has been started "
-                +"(by running the command 'gnuserv-start').")
+                +"(by running the command 'server-start'/'gnuserv-start').")
                 +"</HTML>",
                 Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
         else if (couldNotRunClient)
             JOptionPane.showMessageDialog(
                 panel.frame(),
-                Globals.lang("Could not run the 'gnuclient' program. Make sure you have "
-                +"the gnuserv/gnuclient programs installed."),
+                Globals.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
+                +"the emacsclient/gnuclient program installed and available in the PATH."),
                 Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
         else {
             panel.output(Globals.lang("Pushed citations to Emacs"));

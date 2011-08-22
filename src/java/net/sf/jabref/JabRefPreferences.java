@@ -64,12 +64,15 @@ import net.sf.jabref.labelPattern.LabelPattern;
 
 public class JabRefPreferences {
 
-    public final String
+    public final static String
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
         CUSTOM_TYPE_OPT = "customTypeOpt_",
         CUSTOM_TAB_NAME = "customTabName_",
-        CUSTOM_TAB_FIELDS = "customTabFields_";
+        CUSTOM_TAB_FIELDS = "customTabFields_",
+        EMACS_PATH = "emacsPath",
+        EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -140,6 +143,8 @@ public class JabRefPreferences {
 			//defaults.put("pdfviewer", "/Applications/Preview.app");
 			//defaults.put("psviewer", "/Applications/Preview.app");
 			//defaults.put("htmlviewer", "/Applications/Safari.app");
+        	defaults.put(EMACS_PATH, "emacsclient");
+        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-e");
             defaults.put("fontFamily", "SansSerif");
 
 		} else if (Globals.osName.toLowerCase().startsWith("windows")) {
@@ -149,6 +154,8 @@ public class JabRefPreferences {
 			defaults.put("lookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
+        	defaults.put(EMACS_PATH, "emacsclient.exe");
+        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-e");
             defaults.put("fontFamily", "Arial");
 
         } else {
@@ -157,7 +164,10 @@ public class JabRefPreferences {
 			//defaults.put("htmlviewer", "firefox");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put("fontFamily", "SansSerif");
-
+            
+        	// linux
+        	defaults.put(EMACS_PATH, "gnuclient");
+        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");

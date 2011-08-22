@@ -11,6 +11,8 @@
     - An entry can be sent by a right click on an entry and select "Send as Email"
       (patch 3306271).
     - Added option to "copy BibTeX key and title" (patch 3370471).
+    - The command for pushing to emacs can be configured now. 
+      New default for Windows: emacsclient.
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.1
     - DocBook export format switched to 4.4 (based on patch 3313898).
@@ -367,7 +369,6 @@
     - Fixed bug where selection would jump back if an entry of different type was selected
       by mouse click while editing a field of the current entry.
     - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
->>>>>>> .merge-right.r2733
 2.4b
     - Added Export to SQL database feature. Supports MySQL.
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
