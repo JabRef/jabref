@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import classes.net.sf.jabref.oo.ComparableMark;
+import net.sf.jabref.oo.ComparableMark;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.

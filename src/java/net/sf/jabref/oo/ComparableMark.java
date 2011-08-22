@@ -1,4 +1,4 @@
-package classes.net.sf.jabref.oo;
+package net.sf.jabref.oo;
 
 import com.sun.star.awt.Point;
 
