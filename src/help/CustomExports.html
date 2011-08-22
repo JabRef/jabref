@@ -273,6 +273,11 @@
         like an author list with two or more names, or its second argument otherwise.
         E.g. <code>\format[IfPlural(Eds.,Ed.)]{\editor}</code> will output "Eds." if there
         is more than one editor, and "Ed." if there is only one.</li>
+        
+        <li><code>JournalAbbreviator</code> : The given input text is abbreviated according to the journal abbreviation lists.
+		If no abbreviation for input is found (e.g. not in list or already abbreviated), the input will be returned unmodified.
+		For instance, when using <code>\format[JournalAbbreviator]{\journal}</code>, 
+		"Physical Review Letters" gets "Phys. Rev. Lett." </li>
 
         <li><code>LastPage</code> : returns the last page from the "pages" field, if set.
             For instance, if the pages field is set to "345-360" or "345--360",
