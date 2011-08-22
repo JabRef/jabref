@@ -51,7 +51,7 @@ import net.sf.jabref.groups.SearchGroup;
 public class SQLutil {
 
     public enum DBTYPE {
-        MYSQL, DERBY
+        MYSQL, DERBY, POSTGRESQL
     } 
 
     private static ArrayList<String> fields = null;
@@ -71,9 +71,10 @@ public class SQLutil {
 
         if (srvtype.equalsIgnoreCase("mysql")) {
             dbtype = DBTYPE.MYSQL;
-        }
-        if (srvtype.equalsIgnoreCase("derby")) {
+        } else if (srvtype.equalsIgnoreCase("derby")) {
             dbtype = DBTYPE.DERBY;
+        } else if (srvtype.equalsIgnoreCase("postgresql")) {
+            dbtype = DBTYPE.POSTGRESQL;
         }
 
         return dbtype;
@@ -95,9 +96,11 @@ public class SQLutil {
             url = "jdbc:" + dbs.getServerType().toLowerCase() + "://" 
                           + dbs.getServerHostname() + "/" 
                           + dbs.getDatabase();
-        }
-
-        if (servertype.equalsIgnoreCase("derby")) {
+        } else if (servertype.equalsIgnoreCase("postgresql")) {
+            url = "jdbc:" + dbs.getServerType().toLowerCase() + "://" 
+                          + dbs.getServerHostname() + "/" 
+                          + dbs.getDatabase();
+        } else if (servertype.equalsIgnoreCase("derby")) {
             url = "jdbc:" + dbs.getServerType().toLowerCase() + ":"
                           + dbs.getDatabase() + ";create=true";
         }
@@ -112,10 +115,10 @@ public class SQLutil {
 
         if (servertype.equalsIgnoreCase("mysql")) {
             driver ="com.mysql.jdbc.Driver";
-        }
-
-        if (servertype.equalsIgnoreCase("derby")) {
+        } else if (servertype.equalsIgnoreCase("derby")) {
             driver = "org.apache.derby.jdbc.EmbeddedDriver";
+        } else if (servertype.equalsIgnoreCase("postgresql")) {
+            driver = "org.postgresql.Driver";
         }
 
         return driver;
@@ -170,7 +173,7 @@ public class SQLutil {
         return null;
     }
 
-    private static String processDMLWithSingleResult ( Connection conn, String query) throws SQLException {
+    private static String processDMLWithSingleResult(Connection conn, String query) throws SQLException {
         Object res = execDMLWithResults(conn, query);
         if (res instanceof Statement) {
             Statement st = (Statement)res;
@@ -213,13 +216,13 @@ public class SQLutil {
      * @param dml
      *          The DML statements to be processed
      */
-    private static void processDML ( Object out, String dml) 
+    private static void processDML(Object out, String dml) 
                             throws SQLException {
 
         if ( out instanceof PrintStream) {
             PrintStream fout = (PrintStream) out;
             fout.println(dml);
-        }
+        } 
 
         if ( out instanceof Connection) {
             Connection conn = (Connection) out;
@@ -401,7 +404,15 @@ public class SQLutil {
          }
 
           // Read the column names from the entry table:
-         res = processDMLWithResults(conn, "SHOW columns FROM entries;");
+	 switch (dbtype) {
+	     case MYSQL:
+		 res = processDMLWithResults(conn, "SHOW columns FROM entries;");
+		 break;
+	     case POSTGRESQL:
+		 res = processDMLWithResults(conn, "select a.attname from pg_attribute a, pg_class b where b.relfilenode=a.attrelid and b.relname=\'entries\' and a.attname not in (\'tableoid\',\'cmax\',\'xmax\',\'cmin\'\'xmin\',\'ctid\');");
+		 break;
+	     default:
+	 }
          ArrayList<String> colNames = new ArrayList<String>();
          if (res instanceof Statement) {
              Statement statement = (Statement)res;
@@ -481,7 +492,7 @@ public class SQLutil {
             
             while ( rs.next()) {
                 AbstractGroup group = null;
-                String typeId = findGroupTypeName(rs.getString("group_types_id"), conn);
+                String typeId = findGroupTypeName(dbtype,rs.getString("group_types_id"), conn);
                 if (typeId.equals(AllEntriesGroup.ID)) {
                     // register the id of the root node:
                     groups.put(rs.getString("groups_id"), rootNode);
@@ -561,8 +572,18 @@ public class SQLutil {
      * @return The name (JabRef type id) of the group type.
      * @throws SQLException
      */
-    public static String findGroupTypeName(String groupId, Connection conn) throws SQLException {
-        return processDMLWithSingleResult(conn, "SELECT label FROM group_types WHERE group_types_id=\""+groupId+"\";");
+    public static String findGroupTypeName(DBTYPE dbtype, String groupId, Connection conn) throws SQLException {
+	String res = "";
+	switch (dbtype) {
+	case MYSQL:
+	    res = processDMLWithSingleResult(conn, "SELECT label FROM group_types WHERE group_types_id=\""+groupId+"\";");
+	    break;
+	case POSTGRESQL:
+	    res = processDMLWithSingleResult(conn, "SELECT label FROM group_types WHERE group_types_id=\'"+groupId+"\';");
+	    break;
+	default:
+	}
+	return res;
     }
 
     /**
@@ -640,10 +661,10 @@ public class SQLutil {
         dmlCreateTables(dbtype,out);
 
         // populate entry_type table
-        dmlPopTab_ET(out);
+        dmlPopTab_ET(dbtype,out);
 
         // populate entries table
-        dmlPopTab_FD(entries,out);
+        dmlPopTab_FD(dbtype,entries,out);
 
         // populate strings table:
         dmlPopTab_ST(database,out);
@@ -651,14 +672,14 @@ public class SQLutil {
         GroupTreeNode gtn = metaData.getGroups();
 
         // populate group_types table
-        dmlPopTab_GT(out);
+        dmlPopTab_GT(dbtype,out);
 
 
         // populate groups table
-        dmlPopTab_GP(gtn,out);
+        dmlPopTab_GP(dbtype,gtn,out);
         
 		// populate entry_group table
-        dmlPopTab_EG(gtn,out);
+        dmlPopTab_EG(dbtype,gtn,out);
     }
 
     
@@ -697,6 +718,24 @@ public class SQLutil {
 
                 // create tables
                 dmlTable_mysql(dml1, dml2, out);
+
+                break;
+            case POSTGRESQL:
+
+                // drop tables
+                processDML(out,"DROP TABLE IF EXISTS entry_types CASCADE;");
+                processDML(out,"DROP TABLE IF EXISTS entries CASCADE;");
+                processDML(out,"DROP TABLE IF EXISTS strings;");
+                processDML(out,"DROP TABLE IF EXISTS group_types;");
+                processDML(out,"DROP TABLE IF EXISTS groups CASCADE;");
+                processDML(out,"DROP TABLE IF EXISTS entry_group;");
+
+                // generate DML that specifies DB columns corresponding to fields
+                dml1 = SQLutil.fieldsAsCols(fields, " VARCHAR(3) DEFAULT NULL");
+                dml2 = SQLutil.fieldsAsCols(fields, " TEXT DEFAULT NULL");
+
+                // create tables
+                dmlTable_postgresql(dml1, dml2, out);
 
                 break;
 
@@ -831,6 +870,82 @@ public class SQLutil {
     }
 
     /**
+     * Generates DML code necessary to create all tables in a PostgreSQL database, 
+     * and writes it to appropriate output.
+     *
+     * @param dml1
+     *            Column specifications for fields in entry_type table.
+     * @param dml2
+     *            Column specifications for fields in entries table.
+     * @param out
+     *            The output (PrintStream or Connection) object to which the DML should be written.
+     * @return DML to create all MySQL tables.
+     */
+    private static void dmlTable_postgresql(String dml1, String dml2, Object out)
+            throws SQLException {
+
+        processDML(out,"CREATE TABLE entry_types ( \n"
+            + "entry_types_id    SERIAL, \n"
+            + "label			 TEXT, \n"
+            + dml1
+            + ", \n"
+            + "PRIMARY KEY (entry_types_id) \n"
+            + ");" );
+           			
+        processDML(out,"CREATE TABLE entries ( \n"
+            + "entries_id      SERIAL, \n"
+	    + "jabref_eid      VARCHAR("
+			+  Util.getMinimumIntegerDigits()
+		    + ")   DEFAULT NULL, \n"
+            + "entry_types_id  INTEGER DEFAULT NULL, \n"
+            + "cite_key        VARCHAR(100)     DEFAULT NULL, \n"
+            + dml2
+            + ",\n"
+            + "PRIMARY KEY (entries_id), \n"
+            + "FOREIGN KEY (entry_types_id) REFERENCES entry_types (entry_types_id) \n"
+            + ");" );
+        processDML(out,"CREATE TABLE strings ( \n"
+            + "strings_id      SERIAL, \n"
+	    + "label      VARCHAR(100)  DEFAULT NULL, \n"
+	    + "content    VARCHAR(200)  DEFAULT NULL, \n"
+            + "PRIMARY KEY (strings_id) \n"
+            + ");" );
+
+        processDML(out,"CREATE TABLE group_types ( \n"
+                 + "group_types_id  SERIAL, \n"
+                 + "label   VARCHAR(100)    DEFAULT NULL, \n"
+                 + "PRIMARY KEY (group_types_id) \n"
+                 + ");" );
+
+        processDML(out,"CREATE TABLE groups ( \n"
+            + "groups_id       SERIAL, \n"
+            + "group_types_id  INTEGER         DEFAULT NULL, \n"
+            + "label           VARCHAR(100)    DEFAULT NULL, \n"
+            + "parent_id       INTEGER         DEFAULT NULL, \n"
+            + "search_field       VARCHAR(100)          DEFAULT NULL, \n"
+            + "search_expression  VARCHAR(200)          DEFAULT NULL, \n"
+            + "case_sensitive  BOOLEAN       DEFAULT NULL, \n"
+            + "reg_exp BOOLEAN DEFAULT NULL, \n"
+            + "hierarchical_context INTEGER DEFAULT NULL, \n"
+            + "PRIMARY KEY (groups_id) \n"
+            + ");");
+           
+        processDML(out,"CREATE TABLE entry_group ( \n"
+            + "entries_id       SERIAL, \n"
+            + "groups_id        INTEGER        DEFAULT NULL, \n"
+	    + "FOREIGN KEY (entries_id) REFERENCES entries (entries_id), \n"
+            + "FOREIGN KEY (groups_id)  REFERENCES groups (groups_id) \n"
+            + ");");
+	processDML(out,"CREATE INDEX entry_types_id_index ON entries (entry_types_id);");
+	processDML(out,"CREATE INDEX entries_id_index ON entry_group (entries_id);");
+	processDML(out,"CREATE INDEX groups_id_index ON entry_group (groups_id);");
+
+        return;
+
+    }
+
+
+    /**
      * Generates DML code necessary to create all tables in a Derby database, 
      * and writes it to appropriate output.
      *
@@ -904,12 +1019,21 @@ public class SQLutil {
      *  The output (PrintSream or Connection) object to which the DML should be written.
      * @throws SQLException
      */
-    private static void dmlPopTab_GT( Object out) throws SQLException{
+    private static void dmlPopTab_GT( DBTYPE dbtype,Object out) throws SQLException{
         String[] typeNames = new String[] {
                 AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
         for (int i = 0; i < typeNames.length; i++) {
             String typeName = typeNames[i];
-            String insert = "INSERT INTO group_types (label) VALUES (\""+typeName+"\");";
+	    String insert = "";
+	    switch (dbtype) {
+	    case MYSQL:
+		insert = "INSERT INTO group_types (label) VALUES (\""+typeName+"\");";
+	    break;
+	    case POSTGRESQL:
+		insert = "INSERT INTO group_types (label) VALUES (\'"+typeName+"\');";
+	    break;
+	    default:
+	    }
             // handle DML according to output type
             processDML(out, insert);
         }
@@ -923,7 +1047,7 @@ public class SQLutil {
      * @param out
      *          The output (PrintSream or Connection) object to which the DML should be written.
      */
-    private static void dmlPopTab_ET( Object out) throws SQLException{
+    private static void dmlPopTab_ET( DBTYPE dbtype, Object out) throws SQLException{
 
         String dml = "";
         String insert = "INSERT INTO entry_types (label, "+fieldstr+") VALUES (";
@@ -948,6 +1072,8 @@ public class SQLutil {
             fieldID = setFieldID(fields, fieldID, val.getUtilityFields(), "uti");
 
             // build DML insert statement
+	    switch (dbtype) {
+	    case MYSQL:
             dml = insert + "\"" + val.getName().toLowerCase() + "\"";
             for (int i = 0; i < fieldID.size(); i++) {
                 dml = dml + ", ";
@@ -957,6 +1083,20 @@ public class SQLutil {
                     dml = dml + "NULL";
                 }
             }
+	    break;
+	    case POSTGRESQL:
+            dml = insert + "\'" + val.getName().toLowerCase() + "\'";
+            for (int i = 0; i < fieldID.size(); i++) {
+                dml = dml + ", ";
+                if (fieldID.get(i) != "") {
+                    dml = dml + "\'" + fieldID.get(i) + "\'";
+                } else {
+                    dml = dml + "NULL";
+                }
+            }
+	    break;
+	    default:
+	    }
             dml = dml + ");";
 
             // handle DML according to output type
@@ -1004,7 +1144,7 @@ public class SQLutil {
      * @param out
      *          The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private static void dmlPopTab_FD(List<BibtexEntry> entries, Object out) 
+    private static void dmlPopTab_FD(DBTYPE dbtype,List<BibtexEntry> entries, Object out) 
                             throws SQLException {
 
         String dml = "";
@@ -1017,22 +1157,46 @@ public class SQLutil {
         for (BibtexEntry entry : entries) {
 
             // build DML insert statement
+	    switch (dbtype) {
+	    case MYSQL:
             dml = insert 
 			      + "\"" + entry.getId() + "\""
 			      + ", (SELECT entry_types_id FROM entry_types WHERE label=\""
 			      + entry.getType().getName().toLowerCase() + "\"), \""
                   + entry.getCiteKey() + "\"";
-
+	    break;
+	    case POSTGRESQL:
+            dml = insert 
+		  + "\'" + entry.getId() + "\'"
+		  + ", (SELECT entry_types_id FROM entry_types WHERE label=\'"
+		  + entry.getType().getName().toLowerCase() + "\'), \'"
+                  + entry.getCiteKey() + "\'";
+	    break;
+	    default:
+	    }
             for (int i = 0; i < fields.size(); i++) {
                 dml = dml + ", ";
                 val = entry.getField(fields.get(i));
                 if (val != null) {
+		    switch (dbtype) {
+		    case MYSQL:
                     //escape slashes and quotes for MySQL
                 	val = val.replace("\\", "\\\\");
                 	val = val.replace("\"", "\\\"");
                 	val = val.replace("\'", "\\\'");
                 	val = val.replace("`", "\\`");
                 	dml = dml + "\"" + val + "\"";
+			break;
+		    case POSTGRESQL:
+                    //escape slashes and quotes for PostgreSQL
+                	val = val.replace("\\", "\\\\");
+                	val = val.replace("\"", "\\\"");
+                	val = val.replace("\'", "\\\'");
+                	val = val.replace("`", "\\`");
+                	dml = dml + "\'" + val + "\'";
+			break;
+		    default:
+		    }
                 } else {
                     dml = dml + "NULL";
                 }
@@ -1081,9 +1245,9 @@ public class SQLutil {
      * @param out
      *            The output (PrintStream or Connection) object to which the DML should be written.
      */
-	private static int dmlPopTab_GP (GroupTreeNode cursor, Object out) 
+    private static int dmlPopTab_GP (DBTYPE dbtype, GroupTreeNode cursor, Object out) 
                         throws Exception {
-        int cnt = dmlPopTab_GP_worker(cursor, 1, 1, out);
+        int cnt = dmlPopTab_GP_worker(dbtype,cursor, 1, 1, out);
         return cnt;
     }
 
@@ -1099,7 +1263,7 @@ public class SQLutil {
      * @param out
      *            The output (PrintStream or Connection) object to which the DML should be written.
      */
-	private static int dmlPopTab_GP_worker (GroupTreeNode cursor, int parentID,
+    private static int dmlPopTab_GP_worker (DBTYPE dbtype, GroupTreeNode cursor, int parentID,
             int ID, Object out) throws SQLException{
 
         AbstractGroup group = cursor.getGroup();
@@ -1124,22 +1288,39 @@ public class SQLutil {
             searchExpr = Util.quote(searchExpr, "\"", '\\');
 
         // handle DML according to output type
+	switch (dbtype) {
+	case MYSQL:
         processDML(out, "INSERT INTO groups (groups_id, label, parent_id, group_types_id, search_field, "
             +"search_expression, case_sensitive, reg_exp, hierarchical_context) "
-				      + "VALUES (" + ID + ", \"" + cursor.getGroup().getName() 
-				      + "\", " + parentID
-                      +", (SELECT group_types_id FROM group_types where label=\""+group.getTypeId()+"\")"
-                      +", "+(searchField != null ? "\""+searchField+"\"" : "NULL")
-                      +", "+(searchExpr != null ? "\""+searchExpr+"\"" : "NULL")
-                      +", "+(caseSensitive != null ? "\""+caseSensitive+"\"" : "NULL")
-                      +", "+(reg_exp != null ? "\""+reg_exp+"\"" : "NULL")
-                      +", "+hierContext
-                      + ");");
-
+	    + "VALUES (" + ID + ", \"" + cursor.getGroup().getName() 
+	    + "\", " + parentID
+            +", (SELECT group_types_id FROM group_types where label=\""+group.getTypeId()+"\")"
+            +", "+(searchField != null ? "\""+searchField+"\"" : "NULL")
+            +", "+(searchExpr != null ? "\""+searchExpr+"\"" : "NULL")
+            +", "+(caseSensitive != null ? "\""+caseSensitive+"\"" : "NULL")
+            +", "+(reg_exp != null ? "\""+reg_exp+"\"" : "NULL")
+            +", "+hierContext
+            + ");");
+	break;
+	case POSTGRESQL:
+        processDML(out, "INSERT INTO groups (groups_id, label, parent_id, group_types_id, search_field, "
+            +"search_expression, case_sensitive, reg_exp, hierarchical_context) "
+	    + "VALUES (" + ID + ", \'" + cursor.getGroup().getName() 
+	    + "\', " + parentID
+            +", (SELECT group_types_id FROM group_types where label=\'"+group.getTypeId()+"\')"
+            +", "+(searchField != null ? "\'"+searchField+"\'" : "NULL")
+            +", "+(searchExpr != null ? "\'"+searchExpr+"\'" : "NULL")
+            +", "+(caseSensitive != null ? "\'"+caseSensitive+"\'" : "NULL")
+            +", "+(reg_exp != null ? "\'"+reg_exp+"\'" : "NULL")
+            +", "+hierContext
+            + ");");
+	break;
+	default:
+	}
 		// recurse on child nodes (depth-first traversal)
 	    int myID = ID;
 	    for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) 
-			ID = dmlPopTab_GP_worker(e.nextElement(),myID,++ID,out);
+		ID = dmlPopTab_GP_worker(dbtype,e.nextElement(),myID,++ID,out);
 	    return ID;
 	}
 
@@ -1153,10 +1334,10 @@ public class SQLutil {
      * @param out
      *            The output (PrintStream or Connection) object to which the DML should be written.
      */
-	private static int dmlPopTab_EG(GroupTreeNode cursor, Object fout) 
+    private static int dmlPopTab_EG(DBTYPE dbtype,GroupTreeNode cursor, Object fout) 
                         throws SQLException{
 
-            int cnt = dmlPopTab_EG_worker(cursor, 1, 1, fout);
+	int cnt = dmlPopTab_EG_worker(dbtype,cursor, 1, 1, fout);
             return cnt;
     }
 
@@ -1173,7 +1354,7 @@ public class SQLutil {
      *            The output (PrintStream or Connection) object to which the DML should be written.
      */
 
-	private static int dmlPopTab_EG_worker(GroupTreeNode cursor, int parentID, int ID, 
+    private static int dmlPopTab_EG_worker(DBTYPE dbtype,GroupTreeNode cursor, int parentID, int ID, 
 			Object out) throws SQLException{
 
 		// if this group contains entries...
@@ -1185,7 +1366,9 @@ public class SQLutil {
 			for (BibtexEntry be : grp.getEntries()){
 
                 // handle DML according to output type
-                processDML(out, "INSERT INTO entry_group (entries_id, groups_id) " 
+			    switch (dbtype) {
+			    case MYSQL:
+				processDML(out, "INSERT INTO entry_group (entries_id, groups_id) " 
 						   + "VALUES (" 
 						   + "(SELECT entries_id FROM entries WHERE jabref_eid="
 						   + "\"" + be.getId() + "\""
@@ -1193,13 +1376,26 @@ public class SQLutil {
 						   + "(SELECT groups_id FROM groups WHERE groups_id=" 
 						   + "\"" + ID + "\")"
 						   + ");");
+				break;
+			    case POSTGRESQL:
+				processDML(out, "INSERT INTO entry_group (entries_id, groups_id) " 
+						   + "VALUES (" 
+						   + "(SELECT entries_id FROM entries WHERE jabref_eid="
+						   + "\'" + be.getId() + "\'"
+						   + "), "
+						   + "(SELECT groups_id FROM groups WHERE groups_id=" 
+						   + "\'" + ID + "\')"
+						   + ");");
+				break;
+			    default:
+		}
 			}
 		}
 
 		// recurse on child nodes (depth-first traversal)
 	    int myID = ID;
 	    for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) 
-			ID = dmlPopTab_EG_worker(e.nextElement(),myID,++ID,out);
+		ID = dmlPopTab_EG_worker(dbtype,e.nextElement(),myID,++ID,out);
 
 	    return ID;
 	}
@@ -1219,6 +1415,9 @@ public class SQLutil {
 
         switch (dbtype) {
             case MYSQL:
+                errorMessage = getExceptionMessage_MySQL(ex);
+                break;
+            case POSTGRESQL:
                 errorMessage = getExceptionMessage_MySQL(ex);
                 break;
             case DERBY:

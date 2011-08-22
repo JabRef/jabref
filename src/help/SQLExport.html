@@ -9,11 +9,16 @@
 
     <p> JabRef is capable of
         exporting the contents of the BibTeX database, along with groups
-    information, to an external MySQL database.</p>
+    information, to an external MySQL or PostgreSQL database.</p>
 
     <h2>Setup</h2>
     <ol>
-      <li> Using your favorite MySQL administration tool, create an empty MySQL database.</li>
+      <li> Create an empty database.
+      	<ul>
+      		<li>MySQL: Using your favorite MySQL administration tool, create an empty MySQL database.</li>
+      		<li>PostgreSQL: Use following command to create the database: <code>createdb jabref -E UTF8 --lc-ctype=en_US.utf-8 -T template0</code></li>
+      	</ul>
+      </li>
       <li> Make sure there is a user for this database that has <em>full privileges</em>.</li>
     </ol>
 

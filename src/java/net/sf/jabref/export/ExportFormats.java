@@ -61,6 +61,7 @@ public class ExportFormats {
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
         putFormat(new MySQLExport());
+        putFormat(new PostgreSQLExport());
     
         // Add Export Formats contributed by Plugins
         JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());

@@ -37,5 +37,6 @@
 	<classpathentry kind="lib" path="lib/oo/jurt.jar"/>
 	<classpathentry kind="lib" path="lib/oo/ridl.jar"/>
 	<classpathentry kind="lib" path="lib/oo/unoil.jar"/>
+	<classpathentry kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

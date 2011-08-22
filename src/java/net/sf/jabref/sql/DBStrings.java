@@ -40,7 +40,7 @@ public class DBStrings {
 
     public void initialize() {
         //String [] servers = {Globals.lang("MySQL"), Globals.lang("Derby")};
-        String [] servers = {Globals.lang("MySQL")};
+        String [] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
         setServerTypes(servers);
         setServerType(Globals.lang("MySQL"));
         setServerHostname(Globals.lang("localhost"));
