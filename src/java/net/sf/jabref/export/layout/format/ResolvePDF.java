@@ -10,6 +10,9 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Will expand the relative PDF path and return a URI for the given file (which
  * must exist).
  * 
+ * Users should use FileLink (even if that uses f.getCanonicalPath() instead of toURI().toString()
+ * 
+ * @deprecated
  * @author $Author$
  * @version $Revision$ ($Date$)
  */

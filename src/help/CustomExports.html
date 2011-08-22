@@ -217,11 +217,12 @@
     <ul>
         <li><code>Authors</code> : this formatter provides formatting options for the author and editor fields; for detailed information, see below. It deprecates a range of dedicated formatters provided in versions of JabRef prior to 2.7.</li>
 
+		<li><code>CreateBibORDFAuthors</code> : formats authors for according to the requirements of the Bibliographic Ontology (bibo).</li>
+
         <li><code>CreateDocBookAuthors</code> : formats the author
         field in DocBook style.</li>
 
-        <li><code>CreateDocBookEditors</code> : to be
-        documented.</li>
+        <li><code>CreateDocBookEditors</code> : formats the editor field in DocBook style. </li>
 
         <li><code>CurrentDate</code> : outputs the current date.
         With no argument, this formatter outputs the current date
@@ -252,6 +253,10 @@
         <li><code>FirstPage</code> : returns the first page from the "pages" field, if set.
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "345".</li>
+            
+        <li><code>FormatChars</code> : This formatter converts LaTeX character sequences 
+        their equicalent unicode characters and removes other LaTeX commands without
+        handling them.</li>
 
         <li><code>FormatPagesForHTML</code> : replaces "--" with "-".</li>
 
@@ -282,7 +287,13 @@
         <li><code>LastPage</code> : returns the last page from the "pages" field, if set.
             For instance, if the pages field is set to "345-360" or "345--360",
             this formatter will return "360".</li>
-
+            
+        <li><code>NoSpaceBetweenAbbreviations</code> :  LayoutFormatter that removes
+        the space between abbreviated First names. Example: J. R. R. Tolkien becomes J.R.R. Tolkien.</li>
+        
+        <li><code>NotFoundFormatter</code> : Formatter used to signal that a formatter hasn't been found.
+        This can be used for graceful degradation if a layout uses an undefined format.</li>
+ 
         <li><code>Number</code> : outputs the 1-based sequence number of the current entry in the
         current export. This formatter can be used to make a numbered list of entries. The
         sequence number depends on the current entry's place in the current sort order, not on
@@ -290,7 +301,8 @@
 
         <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".</li>
 
-        <li><code>RemoveBracketsAddComma</code> : to be documented.</li>
+        <li><code>RemoveBracketsAddComma</code> : removes all curly brackets "{" or "}". The closing curly bracket
+        is replaced by a comma.</li>
 
         <li><code>RemoveLatexCommands</code> : removes LaTeX
         commands like <code>\em</code>, <code>\textbf</code>, etc.
@@ -316,6 +328,10 @@
         &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
          <br/>&nbsp;<br/>
         The second part is the text to replace all matches with.</li>
+
+		<li><code>RisAuthors</code> : to be documented.</li>
+		<li><code>RisKeywords</code> : to be documented.</li>
+		<li><code>RisMonth</code> : to be documented.</li>
 
         <li><code>RTFChars</code> : replaces TeX-specific special
         characters (e.g. {\^a} or {\"{o}}) with their RTF

@@ -25,8 +25,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 
 /**
- * Create DocBook authors formatter.
- *
  * @author $author$
  * @version $Revision: 2268 $
  */
