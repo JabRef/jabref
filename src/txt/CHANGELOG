@@ -13,6 +13,7 @@
     - Added option to "copy BibTeX key and title" (patch 3370471).
     - The command for pushing to emacs can be configured now. 
       New default for Windows: emacsclient.
+    - Added export support for DIN1505 style (based on patch 1874662).
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.1
     - DocBook export format switched to 4.4 (based on patch 3313898).
