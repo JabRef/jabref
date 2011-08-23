@@ -152,7 +152,7 @@ public class RTFChars implements LayoutFormatter {
 				sb.append("\\u").append((long) c).append('?');
 		}
 
-		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}");
+		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''","{\\\\rdblquote}");
 	}
 
 	private IntAndString getPart(String text, int i) {
