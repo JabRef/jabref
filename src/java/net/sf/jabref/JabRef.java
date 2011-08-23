@@ -71,8 +71,10 @@ public class JabRef {
 
     boolean graphicFailure = false;
 
-    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine;
+    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine, exportMatches;
     BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
+
+    private final static String exportMatchesSyntax = "[".concat(Globals.lang("field")).concat("]").concat("searchTerm").concat(",").concat("outputFile").concat(": ").concat(Globals.lang("file")).concat("[,").concat(Globals.lang("exportFormat")).concat("]");
 
     public static final int MAX_DIALOG_WARNINGS = 10;
 
@@ -170,7 +172,7 @@ public class JabRef {
 		
 		openWindow(processArguments(args, true));
 	}
-
+    
     private void setupOptions() {
 
         importFile = new StringOption("");
@@ -186,6 +188,7 @@ public class JabRef {
         auxImExport = new StringOption("");
         importToOpenBase = new StringOption("");
         fetcherEngine = new StringOption("");
+    	exportMatches = new StringOption(""); 
 
         options = new Options("JabRef "); // Create an options repository.
         options.setVersion(GUIGlobals.version);
@@ -218,6 +221,8 @@ public class JabRef {
         options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
 
         options.register("fetch", 'f', Globals.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\""), fetcherEngine);
+
+        options.register("exportMatches", 'm', exportMatchesSyntax, exportMatches); 
 
         options.setUseMenu(false);
     }
@@ -319,6 +324,64 @@ public class JabRef {
             if (res != null)
                 loaded.add(res);
         }
+
+
+        if(exportMatches.isInvoked()) {
+            if (loaded.size() > 0) {
+                String[] data = exportMatches.getStringValue().split(",");
+                String searchTerm = data[0].replace("\\$"," "); //enables blanks within the search term:
+                                                                //? stands for a blank
+                ParserResult pr =
+                    (ParserResult) loaded.elementAt(loaded.size() - 1);
+                BibtexDatabase dataBase = pr.getDatabase();
+                SearchManagerNoGUI smng = new SearchManagerNoGUI(searchTerm, dataBase);
+                BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
+                
+                
+                //export database
+                if (newBase != null && newBase.getEntryCount() > 0) {
+                	String formatName = null;
+	                IExportFormat format = null;
+
+	                //read in the export format, take default format if no format entered
+	                switch (data.length){
+		                case(3):{
+		                	formatName = data[2];
+		                	break;
+		                }
+		                case (2):{
+		                	//default ExportFormat: HTML table (with Abstract & BibTeX)
+		                	formatName = "tablerefsabsbib";
+		                	break;
+		                }
+		                default:{
+		                	System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + exportMatchesSyntax);
+		                	System.exit(0);
+		                }
+	                } //end switch
+	                
+	                //export new database
+	                format = ExportFormats.getExportFormat(formatName);
+	                if (format != null) {
+	                    // We have an ExportFormat instance:
+	                    try {
+		                System.out.println(Globals.lang("Exporting") + ": " + data[1]);
+	                        format.performExport(newBase, new MetaData(pr.getMetaData(), pr.getDatabase()), data[1], pr.getEncoding(), null);
+	                    } catch (Exception ex) {
+	                        System.err.println(Globals.lang("Could not export file")
+	                            + " '" + data[1] + "': " + ex.getMessage());
+	                    }
+	                } else
+	                    System.err.println(Globals.lang("Unknown export format")
+	                            + ": " + formatName);
+                } /*end if newBase != null*/ else {
+                	System.err.println(Globals.lang("No search matches."));
+                }
+            } else {
+            	System.err.println(Globals.lang("The output option depends on a valid input option."));
+            }  //end if(loaded.size > 0)
+        } //end exportMatches invoked 
+
 
         if (exportFile.isInvoked()) {
             if (loaded.size() > 0) {
