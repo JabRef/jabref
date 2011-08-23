@@ -16,6 +16,7 @@
     - Added export support for DIN1505 style (based on patch 1874662).
     - Added support for PostgresSQL import/export (patch 3368760 by Fred Stevens).
     - Added formatter "JournalAbbreviator" (patch 3013311 by Meigel).
+    - Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).
     - ToggleButton added to GroupSelector to ease adding/removing references to/from groups
       (based on patch 3313564 updated by Andreas Schlicker). 
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.

@@ -53,6 +53,9 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 
 	private JPanel panel = new JPanel();
 
+    private JScrollPane scrollPane = new JScrollPane(panel,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
 	private String[] fields;
 
 	private EntryEditor parent;
@@ -76,7 +79,7 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 		 * The following line makes sure focus cycles inside tab instead of
 		 * being lost to other parts of the frame:
 		 */
-		panel.setFocusCycleRoot(true);
+		scrollPane.setFocusCycleRoot(true);
 	}
 
 
@@ -120,7 +123,8 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
         if (addKeyField)
             sb.append("4dlu, fill:pref");
         else
-            sb.delete(sb.length()-2, sb.length());
+            if (sb.length() >= 2)
+                sb.delete(sb.length() - 2, sb.length());
         String rowSpec = sb.toString();
 
         DefaultFormBuilder builder = new DefaultFormBuilder
@@ -302,7 +306,7 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 	}
 
 	public Component getPane() {
-		return panel;
+		return scrollPane;
 	}
 
 	/**
@@ -419,6 +423,21 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 						}
 					};
 					c.getDocument().addDocumentListener(d);
+
+                    /**
+                     * Makes the vertical scroll panel view follow the focus
+                     */
+                    Component cScrollPane = c.getParent().getParent();
+                    if (cScrollPane instanceof JScrollPane) {
+                        JScrollPane componentPane = (JScrollPane) cScrollPane;
+                        Component cPane = componentPane.getParent();
+                        if (cPane instanceof JPanel) {
+                            JPanel panel = (JPanel) cPane;
+                            Rectangle bounds = componentPane.getBounds();
+                            panel.scrollRectToVisible(bounds);
+                        }
+                    }
+				
 				}
 			}
 
