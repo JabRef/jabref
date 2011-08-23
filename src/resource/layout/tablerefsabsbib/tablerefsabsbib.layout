@@ -5,15 +5,19 @@
 	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
 	<td>\format[ToLowerCase]{\bibtextype}</td>
 	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a> \end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url}&nbsp;</td>
+	<td>\begin{file}<a href="\format[FileLink]{\file}">\format[FileLink,Replace(.+/,)]{\file}</a> \end{file}&nbsp;</td>
+	<td>\begin{note}
+	  \note
+	\end{note}</td>
 </tr>\begin{abstract}
 <tr id="abs_\format{\bibtexkey}" class="abstract noshow">
-	<td colspan="6"><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
+	<td colspan="8"><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
 </tr>\end{abstract}\begin{review}
 <tr id="rev_\format{\bibtexkey}" class="review noshow">
-	<td colspan="6"><b>Review</b>: \format[HTMLChars]{\review}</td>
+	<td colspan="8"><b>Review</b>: \format[HTMLChars]{\review}</td>
 </tr>\end{review}
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
-<td colspan="6"><b>BibTeX</b>:
+<td colspan="8"><b>BibTeX</b>:
 <pre>
 @\format[ToLowerCase]{\bibtextype}{\bibtexkey,\begin{author}
   author = {\format[HTMLChars]{\author}}\end{author}\begin{title},

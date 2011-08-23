@@ -372,5 +372,5 @@ p.infolinks { margin: 0.5em 0em 0em 0em; padding: 0px; }
 	</form>
 </div>
 <table id="qstable" border="1">
-<thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
+<thead><tr><th width="20%">Author</th><th width="20%">Title</th><th width="5%">Year</th><th width="25%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th><th width="5%">Supplementary file(s)</th><th width="20%">Comment</th></tr></thead>
 <tbody>
