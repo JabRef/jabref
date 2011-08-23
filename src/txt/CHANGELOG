@@ -23,6 +23,7 @@
       (based on patch 3313564 updated by Andreas Schlicker).
     - Export filter "tablerefsandbib" updated to contain links to files and notes 
       (patch 2787096 by Thomas Arildsen).
+    - "of" added to the list of skip words (patch 2781830).
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.1
     - DocBook export format switched to 4.4 (based on patch 3313898).

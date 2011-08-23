@@ -191,7 +191,7 @@ public class Globals {
 
 	public static boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows");
 
-	public static String[] SKIP_WORDS = { "a", "an", "the", "for", "on" };
+	public static String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
 
 	public static SidePaneManager sidePaneManager;
 
