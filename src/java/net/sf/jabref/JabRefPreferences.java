@@ -144,7 +144,7 @@ public class JabRefPreferences {
 			//defaults.put("psviewer", "/Applications/Preview.app");
 			//defaults.put("htmlviewer", "/Applications/Safari.app");
         	defaults.put(EMACS_PATH, "emacsclient");
-        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-e");
+        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "SansSerif");
 
 		} else if (Globals.osName.toLowerCase().startsWith("windows")) {
@@ -155,7 +155,7 @@ public class JabRefPreferences {
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         	defaults.put(EMACS_PATH, "emacsclient.exe");
-        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-e");
+        	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "Arial");
 
         } else {
