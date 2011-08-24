@@ -41,6 +41,7 @@ import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.imports.ImportFormatReader;
@@ -1336,6 +1337,32 @@ public class Globals {
 			}
 		}
 
+	}
+
+	/**
+	 * Returns a reg exp pattern in the form (w1) | (w2) | ...
+	 * wi are escaped if no regex search is enabled
+	 */
+	public static Pattern getPatternForWords(ArrayList<String> words) {
+		if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty()))
+			return Pattern.compile("");
+		
+		boolean regExSearch = Globals.prefs.getBoolean("regExpSearch");
+		
+		// compile the words to a regex in the form (w1) | (w2) | (w3)
+		String searchPattern = "(".concat(regExSearch?words.get(0):Pattern.quote(words.get(0))).concat(")");
+		for (int i = 1; i < words.size(); i++) {
+			searchPattern = searchPattern.concat(" | (").concat(regExSearch?words.get(i):Pattern.quote(words.get(i))).concat(")");
+		}
+
+		Pattern pattern;
+		if (!Globals.prefs.getBoolean("caseSensitiveSearch")) {
+			pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
+		} else {
+			pattern = Pattern.compile(searchPattern);
+		}
+		
+		return pattern;
 	}
 
 }

@@ -439,12 +439,8 @@ public class SearchManager2 extends SidePaneComponent
 
     }
     }
-
-    public void actionPerformed(ActionEvent e) {
-
-        fireSearchlistenerEvent(searchField.getText());
-    if (e.getSource() == escape) {
-        incSearch = false;
+    
+    private void clearSearchLater() {
         if (panel != null) {
             Thread t = new Thread() {
                 public void run() {
@@ -454,7 +450,14 @@ public class SearchManager2 extends SidePaneComponent
             // do this after the button action is over
             SwingUtilities.invokeLater(t);
         }
+    }
 
+    public void actionPerformed(ActionEvent e) {
+
+        fireSearchlistenerEvent(searchField.getText());
+    if (e.getSource() == escape) {
+        incSearch = false;
+        clearSearchLater();
     }
     else if (((e.getSource() == searchField) || (e.getSource() == search))
          && !increment.isSelected()
@@ -463,7 +466,7 @@ public class SearchManager2 extends SidePaneComponent
         updatePrefs(); // Make sure the user's choices are recorded.
             if (searchField.getText().equals("")) {
               // An empty search field should cause the search to be cleared.
-              panel.stopShowingSearchResults();
+              clearSearchLater();
               return;
             }
         // Setup search parameters common to both normal and float.

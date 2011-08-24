@@ -1,6 +1,8 @@
 package net.sf.jabref;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
@@ -10,7 +12,7 @@ import javax.swing.text.Highlighter;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
-	private ArrayList<String> textToHighlight;
+	private ArrayList<String> wordsToHighlight;
 
 	public JTextAreaWithHighlighting() {
 		super();
@@ -36,60 +38,61 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 			int columns) {
 		super(doc, text, rows, columns);
 	}
-
+	
 	/**
 	 * Highlight words in the Textarea
 	 * 
 	 * @param words to highlight
 	 */
 	private void highLight(ArrayList<String> words) {
-			// highlight all characters that appear in charsToHighlight
-			Highlighter h = getHighlighter();
-			// myTa.set
-			h.removeAllHighlights();
-	
-			if (words == null || words.size() == 0) {
-				return;
-			}
-			String content = getText().toUpperCase();
-			if (content.equals(""))
-				return;
-			
-			for(String word: words){
-			
-			String text = word.toUpperCase();
-	
-			int index = 0;
-			if (!word.equals(""))
-			while (true) {
-				int startposition = content.indexOf(text, index);
-				if (startposition == -1)
-					break;
-	
-				try {
-	//				System.out.println("highlight @ " + startposition);
-					h.addHighlight(startposition, startposition + text.length(),
-							DefaultHighlighter.DefaultPainter);
-				} catch (BadLocationException ble) {
-				}
-				index = startposition + 1;
-			}	
-		  }
+		// highlight all characters that appear in charsToHighlight
+		Highlighter h = getHighlighter();
+		// myTa.set
+		h.removeAllHighlights();
+
+		if (words == null || words.size() == 0) {
+			return;
 		}
+		String content = getText().toUpperCase();
+		if (content.isEmpty())
+			return;
+
+		Matcher matcher = Globals.getPatternForWords(words).matcher(content);
+
+		while (matcher.find()) {
+			try {
+				h.addHighlight(matcher.start(), matcher.end(),
+						DefaultHighlighter.DefaultPainter);
+			} catch (BadLocationException ble) {
+			}
+		}
+
+	}
 
 	@Override
 	public void setText(String t) {
 		super.setText(t);
-		highLight(textToHighlight);
+		if (Globals.prefs.getBoolean("highLightWords")) {
+			highLight(wordsToHighlight);
+		}
 	}
 
 	@Override
 	public void searchText(ArrayList<String> words) {
 		// words have to be stored in class variable as 
 		// setText() makes use of them
-		textToHighlight = words;
 		
-		highLight(words);
+		if (Globals.prefs.getBoolean("highLightWords")) {
+			this.wordsToHighlight = words;
+			highLight(words);
+		} else {
+			if (this.wordsToHighlight != null) {
+				// setting of "highLightWords" seems to have changed.
+				// clear all highlights and remember the clearing (by wordsToHighlight = null)
+				this.wordsToHighlight = null;
+				highLight(null);
+			}
+		}
 		
 	}
 

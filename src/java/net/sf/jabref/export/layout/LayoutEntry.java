@@ -510,57 +510,6 @@ public class LayoutEntry {
     }
     
     /** 
-     * Will look through a String and highlights every presence of a searched word
-     * 
-     * @param content This is a String in which we search for a word
-     * @param word This String will get highlighted if it is found - this is interpreted as regular expression!
-     * 
-     * @return The text which was called by the method with HTML Tags to highlight the word that was searched
-     */
-   private String highlightWord(String content, String word)
-	{
-		if ((word != null) && (!word.isEmpty()))
-		{
-			String hlColor=Globals.highlightColor;
-			StringBuffer sb;
-			String found;
-			boolean foundSomething;
-			
-			foundSomething = false;
-			sb = new StringBuffer();
-			Pattern pattern;
-			
-			if (!Globals.prefs.getBoolean("caseSensitiveSearch")){
-				pattern = Pattern.compile(word, Pattern.CASE_INSENSITIVE);
-			}
-			else
-			{
-				pattern = Pattern.compile(word);
-			}
-			
-			Matcher matcher = pattern.matcher(content);
-			
-			while (matcher.find())
-			{
-				matcher.end();
-				found = matcher.group();
-				// color the search keyword	-
-				// put first String Part and then html + word + html to a StringBuffer
-				matcher.appendReplacement(sb, "<span style=\"background-color:"+hlColor+";\">" + found + "</span>");
-				foundSomething = true;
-			}
-			
-			if (foundSomething)
-			{
-				matcher.appendTail(sb);
-				content = sb.toString();
-			}
-		}
-		return content;	
-	}
-
- 
-    /** 
      * Will return the text that was called by the method with HTML tags 
      * to highlight each word the user has searched for and will skip
      * the highlight process if the first Char isn't a letter or a digit
@@ -574,11 +523,30 @@ public class LayoutEntry {
     	if (toHighlight == null)
     		return text;
     	
-    	if(Character.isLetterOrDigit(text.charAt(0))){
-        	// TODO: convert tohighlight to regex (word1) | (word2) | (word3) and call highlightWord only once
-    		for (String word : toHighlight) {
-    			text = highlightWord(text, word);
-    		}
+		Matcher matcher = Globals.getPatternForWords(toHighlight).matcher(text);
+
+    	if (Character.isLetterOrDigit(text.charAt(0))) {
+			String hlColor=Globals.highlightColor;
+			StringBuffer sb = new StringBuffer();
+			boolean foundSomething = false;
+
+			String found;
+			while (matcher.find())
+			{
+				matcher.end();
+				found = matcher.group();
+				// color the search keyword	-
+				// put first String Part and then html + word + html to a StringBuffer
+				matcher.appendReplacement(sb, "<span style=\"background-color:"+hlColor+";\">" + found + "</span>");
+				foundSomething = true;
+			}
+			
+			if (foundSomething)
+			{
+				matcher.appendTail(sb);
+				text = sb.toString();
+			}
+
     	}
     	return text;
     }
