@@ -50,10 +50,10 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 		// myTa.set
 		h.removeAllHighlights();
 
-		if (words == null || words.size() == 0) {
+		if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
 			return;
 		}
-		String content = getText().toUpperCase();
+		String content = getText();
 		if (content.isEmpty())
 			return;
 
@@ -61,9 +61,10 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
 		while (matcher.find()) {
 			try {
-				h.addHighlight(matcher.start(), matcher.end(),
-						DefaultHighlighter.DefaultPainter);
+				h.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
 			} catch (BadLocationException ble) {
+				// should not occur if matcher works right
+				System.out.println(ble);
 			}
 		}
 
