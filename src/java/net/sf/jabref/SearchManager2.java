@@ -47,7 +47,7 @@ import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.gui.SearchResultsDialog;
 
-class SearchManager2 extends SidePaneComponent
+public class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
 
     private JabRefFrame frame;
@@ -73,7 +73,7 @@ class SearchManager2 extends SidePaneComponent
     /** This button's text will be set later. */
     private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
-    searchAll, caseSensitive, regExpSearch;
+    searchAll, caseSensitive, regExpSearch, highLightWords;
 
     private JRadioButton increment, floatSearch, hideSearch, showResultsInDialog,
         searchAllBases;
@@ -157,6 +157,9 @@ class SearchManager2 extends SidePaneComponent
 
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
                       Globals.prefs.getBoolean("caseSensitiveSearch"));
+        
+        highLightWords = new JCheckBoxMenuItem(Globals.lang("Highlight Words"),
+        		Globals.prefs.getBoolean("highLightWords"));
 
     settings.add(select);
 
@@ -172,6 +175,8 @@ class SearchManager2 extends SidePaneComponent
     settings.addSeparator();
         settings.add(caseSensitive);
     settings.add(regExpSearch);
+    settings.addSeparator();
+    settings.add(highLightWords);
     //settings.addSeparator();
 
 
@@ -347,7 +352,13 @@ class SearchManager2 extends SidePaneComponent
      */
     private void fireSearchlistenerEvent(String t){
     	// parse the Search string to words    	
-    	ArrayList<String> words = getSearchwords(t);
+    	ArrayList<String> words;
+    	if ((t == null) || (t.isEmpty())) {
+    		words = null;
+    	} else { 
+    		words = getSearchwords(t);
+    	}
+    	
     	//fire an event for every listener
     	for(SearchTextListener s: listeners)s.searchText(words);
     }
@@ -384,6 +395,7 @@ class SearchManager2 extends SidePaneComponent
         Globals.prefs.putBoolean("caseSensitiveSearch",
                  caseSensitive.isSelected());
         Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
+        Globals.prefs.putBoolean("highLightWords", highLightWords.isSelected());
         Globals.prefs.putBoolean("showSearchInDialog", showResultsInDialog.isSelected());
         Globals.prefs.putBoolean("searchAllBases", searchAllBases.isSelected());
     }
@@ -499,6 +511,7 @@ class SearchManager2 extends SidePaneComponent
             if (!searchAllBases.isSelected()) {
                 // Search only the current database:
                 for (BibtexEntry entry : panel.getDatabase().getEntries()){
+
                     boolean hit = rules.applyRule(searchTerm, entry) > 0;
                     entry.setSearchHit(hit);
                     if (hit) hits++;
@@ -509,6 +522,7 @@ class SearchManager2 extends SidePaneComponent
                 for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
                     BasePanel p = frame.baseAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()){
+
                         boolean hit = rules.applyRule(searchTerm, entry) > 0;
                         entry.setSearchHit(hit);
                         if (hit) hits++;

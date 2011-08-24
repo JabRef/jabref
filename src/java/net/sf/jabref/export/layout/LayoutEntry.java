@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.plugin.NameFormat;
@@ -63,7 +65,7 @@ public class LayoutEntry {
 	private String classPrefix;
 
     private ArrayList<String> invalidFormatter = null;
-
+    
 	// ~ Constructors
 	// ///////////////////////////////////////////////////////////
 
@@ -101,7 +103,8 @@ public class LayoutEntry {
 			}
 		}
 	}
-
+	
+	
 	public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) throws Exception {
 		classPrefix = classPrefix_;
 		String blockStart = null;
@@ -177,14 +180,18 @@ public class LayoutEntry {
     public void setPostFormatter(LayoutFormatter formatter) {
         this.postFormatter = formatter;
     }
-
-	public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
-
+    
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    	return doLayout(bibtex, database, null); 
+    }
+    
+	public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight ) {
 		switch (type) {
 		case LayoutHelper.IS_LAYOUT_TEXT:
 			return text;
 		case LayoutHelper.IS_SIMPLE_FIELD:
 			String value = BibtexDatabase.getResolvedField(text, bibtex, database);
+			
             if (value == null)
                 value = "";
             // If a post formatter has been set, call it:
@@ -203,9 +210,10 @@ public class LayoutEntry {
                     field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
                     if (field == null)
                         break;
+                    
                 }
             }
-			
+            
 			if ((field == null)
 				|| ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper
 					.getCurrentGroup())))) {
@@ -230,6 +238,7 @@ public class LayoutEntry {
 							}
 						}
 					} else {
+						
 						// if previous was skipped --> remove leading line
 						// breaks
 						if (previousSkipped) {
@@ -244,15 +253,29 @@ public class LayoutEntry {
 								sb.append(fieldText.substring(eol));
 							}
 						} else {
-							// System.out.println("ENTRY-BLOCK: " +
-							// layoutEntries[i].doLayout(bibtex));
-							sb.append(fieldText);
+							//System.out.println("ENTRY-BLOCK: " +
+							//layoutEntries[i].doLayout(bibtex));
+							
+							/*
+							 * if fieldText is not null and the bibtexentry is marked
+							 * as a searchhit, try to highlight the searched words
+							 * 
+							*/
+			                if (bibtex.isSearchHit()) {
+			                    sb.append(highlightWords(fieldText,wordsToHighlight));
+			                }
+			                else{
+			                	sb.append(fieldText);
+			                	
+			                }
+			               
+
 						}
 					}
 
 					previousSkipped = false;
 				}
-
+				
 				return sb.toString();
 			}
 		}
@@ -277,7 +300,7 @@ public class LayoutEntry {
 				}
 			}
 
-			// System.out.println("OPTION: "+option);
+			//System.out.println("OPTION: "+option);
 			if (option != null) {
 				for (int i = 0; i < option.length; i++) {
 					fieldEntry = option[i].format(fieldEntry);
@@ -484,5 +507,79 @@ public class LayoutEntry {
 
     public ArrayList<String> getInvalidFormatters() {
         return invalidFormatter;
+    }
+    
+    /** 
+     * Will look through a String and highlights every presence of a searched word
+     * 
+     * @param content This is a String in which we search for a word
+     * @param word This String will get highlighted if it is found - this is interpreted as regular expression!
+     * 
+     * @return The text which was called by the method with HTML Tags to highlight the word that was searched
+     */
+   private String highlightWord(String content, String word)
+	{
+		if ((word != null) && (!word.isEmpty()))
+		{
+			String hlColor=Globals.highlightColor;
+			StringBuffer sb;
+			String found;
+			boolean foundSomething;
+			
+			foundSomething = false;
+			sb = new StringBuffer();
+			Pattern pattern;
+			
+			if (!Globals.prefs.getBoolean("caseSensitiveSearch")){
+				pattern = Pattern.compile(word, Pattern.CASE_INSENSITIVE);
+			}
+			else
+			{
+				pattern = Pattern.compile(word);
+			}
+			
+			Matcher matcher = pattern.matcher(content);
+			
+			while (matcher.find())
+			{
+				matcher.end();
+				found = matcher.group();
+				// color the search keyword	-
+				// put first String Part and then html + word + html to a StringBuffer
+				matcher.appendReplacement(sb, "<span style=\"background-color:"+hlColor+";\">" + found + "</span>");
+				foundSomething = true;
+			}
+			
+			if (foundSomething)
+			{
+				matcher.appendTail(sb);
+				content = sb.toString();
+			}
+		}
+		return content;	
+	}
+
+ 
+    /** 
+     * Will return the text that was called by the method with HTML tags 
+     * to highlight each word the user has searched for and will skip
+     * the highlight process if the first Char isn't a letter or a digit
+     * 
+     * @param text This is a String in which we search for different words
+     * @param toHighlight List of all words which must be highlighted
+     * 
+     * @return String that was called by the method, with HTML Tags if a word was found 
+     */
+    private String highlightWords(String text, ArrayList<String> toHighlight){
+    	if (toHighlight == null)
+    		return text;
+    	
+    	if(Character.isLetterOrDigit(text.charAt(0))){
+        	// TODO: convert tohighlight to regex (word1) | (word2) | (word3) and call highlightWord only once
+    		for (String word : toHighlight) {
+    			text = highlightWord(text, word);
+    		}
+    	}
+    	return text;
     }
 }

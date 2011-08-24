@@ -148,6 +148,10 @@ public class Layout
             layoutEntry.setPostFormatter(formatter);
         }
     }
+    
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    	return doLayout(bibtex, database, null);
+    }
 
     /**
      * Returns the processed bibtex entry. If the database argument is
@@ -155,13 +159,13 @@ public class Layout
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database)
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight)
     {
         StringBuffer sb = new StringBuffer(100);
 
         for (int i = 0; i < layoutEntries.length; i++)
         {
-            String fieldText = layoutEntries[i].doLayout(bibtex, database);
+            String fieldText = layoutEntries[i].doLayout(bibtex, database, wordsToHighlight);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the

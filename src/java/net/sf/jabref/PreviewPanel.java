@@ -8,6 +8,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
@@ -28,7 +29,7 @@ import net.sf.jabref.export.ExportFormats;
  *          2007) $)
  * 
  */
-public class PreviewPanel extends JPanel implements VetoableChangeListener {
+public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener {
 
 	/**
 	 * The bibtex entry currently shown
@@ -165,6 +166,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 
 	Action closeAction;
 
+	private ArrayList<String> wordsToHighlight = null;
+
 	public Action getCloseAction() {
 		if (closeAction == null)
 			closeAction = new CloseAction();
@@ -288,8 +291,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 
 		StringBuffer sb = new StringBuffer();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
-		if (entry != null)
-			sb.append(layout.doLayout(entry, database));
+		if (entry != null) {
+			sb.append(layout.doLayout(entry, database, wordsToHighlight));
+		}
 		previewPane.setText(sb.toString());
 		previewPane.invalidate();
 		previewPane.revalidate();
@@ -317,5 +321,20 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		// TODO updating here is not really necessary isn't it?
 		// Only if we are visible.
 		update();
+	}
+
+	@Override
+	public void searchText(ArrayList<String> words) {
+		if (Globals.prefs.getBoolean("highLightWords")) {
+			this.wordsToHighlight = words;
+			update();
+		} else {
+			if (this.wordsToHighlight != null) {
+				// setting of "highLightWords" seems to have changed.
+				// clear all highlights and remember the clearing (by wordsToHighlight = null)
+				this.wordsToHighlight = null;
+				update();
+			}
+		}
 	}
 }

@@ -26,6 +26,8 @@
     - Added highlighting in textarea for search text (patch 3117881 by Ben). 
       Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
       "Clear" also clears the highlighting.
+    - Added highlighting in preview area for search text (based on patch 3121914 by
+      Maximilian Lengsfeld).      
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.1
     - DocBook export format switched to 4.4 (based on patch 3313898).

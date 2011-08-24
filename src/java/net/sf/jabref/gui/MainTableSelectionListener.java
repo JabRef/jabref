@@ -17,6 +17,7 @@ import javax.swing.Timer;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldTextArea;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -75,9 +76,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 				.get("preview0")),
 			new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
 				.get("preview1")) };
-		//BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
-		//previewPanel[0].setEntry(testEntry);
-		//previewPanel[1].setEntry(testEntry);
+		
+		panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
+		panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
 	}
 
     public void updatePreviews() {

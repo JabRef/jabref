@@ -354,8 +354,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
     List<Action> fetcherActions = new LinkedList<Action>();
 
-    SearchManager2 searchManager;
-    public GroupSelector groupSelector;
+    private SearchManager2 searchManager;
+
+	public GroupSelector groupSelector;
 
   // The menus for importing/appending other formats
   JMenu importMenu = subMenu("Import into current database"),
@@ -2606,4 +2607,8 @@ class SaveSessionAction
   public void showMessage(String message){
 	  JOptionPane.showMessageDialog(this, message);
   }
+  
+  public SearchManager2 getSearchManager() {
+		return searchManager;
+	}
 }

@@ -140,7 +140,7 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
             else{
                 ta = new FieldTextArea(fields[i], null);
                 //inform the fieldtextarea of search events to highlight searchstrings
-                frame.searchManager.addSearchListener((FieldTextArea)ta);                
+                frame.getSearchManager().addSearchListener((FieldTextArea)ta);                
             }
             //ta.addUndoableEditListener(bPanel.undoListener);
 

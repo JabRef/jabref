@@ -904,7 +904,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     //boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(true);
                     if (true)
-                      frame.searchManager.startSearch();
+                      frame.getSearchManager().startSearch();
                 }
             });
 
@@ -915,7 +915,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     boolean on = sidePaneManager.isComponentVisible("search");
                     frame.searchToggle.setSelected(on);
                     if (on)
-                      frame.searchManager.startSearch();
+                      frame.getSearchManager().startSearch();
                 }
             });
 
@@ -923,7 +923,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() {
                     sidePaneManager.show("search");
                     frame.searchToggle.setSelected(true);
-                    frame.searchManager.startIncrementalSearch();
+                    frame.getSearchManager().startIncrementalSearch();
                 }
             });
 

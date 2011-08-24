@@ -25,11 +25,9 @@
  */
 package net.sf.jabref;
 
-import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,11 +41,6 @@ import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.event.UndoableEditListener;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.imports.ImportFormatReader;
@@ -67,6 +60,11 @@ public class Globals {
 
 		STANDARD_EXPORT_COUNT = 5, // The number of standard export formats.
 		METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
+    
+    // used at highlighting in preview area. 
+    // Color chosen similar to JTextComponent.getSelectionColor(), which is
+    // used at highlighting words at the editor 
+    public static final String highlightColor = "#3399FF";
 
 	private static String resourcePrefix = "resource/JabRef", menuResourcePrefix = "resource/Menu",
 		integrityResourcePrefix = "resource/IntegrityMessage";

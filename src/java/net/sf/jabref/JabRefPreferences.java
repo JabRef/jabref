@@ -232,6 +232,7 @@ public class JabRefPreferences {
         defaults.put("exportInOriginalOrder", Boolean.FALSE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
+        defaults.put("highLightWords", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
