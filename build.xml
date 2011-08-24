@@ -251,8 +251,8 @@
         </copy>
         <!-- Done by MrDlib -->
 		<mkdir dir="${build.tmp}" />
-		<!--<jar destfile="${build.lib}/${build.jar}" manifest="${src.dir}/MANIFEST.MF">--><!-- Done by MrDlib -->
-        <jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">
+		<jar destfile="${build.lib}/${build.jar}" manifest="${src.dir}/MANIFEST.MF"><!-- Done by MrDlib -->
+        <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
 
 			<fileset dir="${build.classes}" />
 			<fileset dir="${build.tmp}" />
