@@ -14,6 +14,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorListTest.class);
 		suite.addTestSuite(FileBasedTestCase.class);
 		suite.addTestSuite(UtilTest.class);
+		suite.addTestSuite(SearchTextListenerTest.class);
 		//$JUnit-END$
 
 		suite.addTest(tests.net.sf.jabref.export.layout.format.AllTests.suite());

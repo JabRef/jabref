@@ -137,8 +137,11 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
             final FieldEditor ta;
             if (editorType == GUIGlobals.FILE_LIST_EDITOR)
                 ta = new FileListEditor(frame, bPanel.metaData(), fields[i], null, parent);
-            else
+            else{
                 ta = new FieldTextArea(fields[i], null);
+                //inform the fieldtextarea of search events to highlight searchstrings
+                frame.searchManager.addSearchListener((FieldTextArea)ta);                
+            }
             //ta.addUndoableEditListener(bPanel.undoListener);
 
             JComponent ex = parent.getExtra(fields[i], ta);

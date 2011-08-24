@@ -31,7 +31,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -55,6 +57,12 @@ class SearchManager2 extends SidePaneComponent
 
     IncrementalSearcher incSearcher;
     SearchResultsDialog searchDialog = null;
+    
+    
+	/**
+	 * subscribed Objects
+	 */
+	private Vector<SearchTextListener> listeners = new Vector<SearchTextListener>();
 
     //private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
@@ -293,6 +301,58 @@ class SearchManager2 extends SidePaneComponent
     updateSearchButtonText();
     }
 
+
+	/**
+	 * Subscribe to the SearchListener and receive events, if the user searches for some thing. You
+	 * will receive a list of words
+	 * 
+	 * @param l
+	 */
+	public void addSearchListener(SearchTextListener l) {
+		if (listeners.contains(l))
+			return;
+		else
+			listeners.add(l);
+		//fire event for the new subscriber
+		l.searchText(getSearchwords(searchField.getText()));
+	}
+
+	/**
+	 * Remove object from the SearchListener
+	 * @param l
+	 */
+	public void removeSearchListener(SearchTextListener l) {
+		listeners.remove(l);
+	}
+
+	/**
+	 * parse the search string for valid words and return a list of words
+	 * Like "The great Vikinger" will be ["The","great","Vikinger"] 
+	 * 
+	 * @param t
+	 * @return
+	 */
+	private ArrayList<String> getSearchwords(String t) {
+		// for now ... just seperate words by whitespace
+		String[] strings = t.split(" ");
+		ArrayList<String> words = new ArrayList<String>(strings.length);
+		for (int i = 0; i < strings.length; i++) {
+			words.add(strings[i]);
+		}
+		return words;
+	}
+    /**
+     * Fires an event if a search was started / canceled
+     * @param t
+     */
+    private void fireSearchlistenerEvent(String t){
+    	// parse the Search string to words    	
+    	ArrayList<String> words = getSearchwords(t);
+    	//fire an event for every listener
+    	for(SearchTextListener s: listeners)s.searchText(words);
+    }
+    
+    
     /** force the search button to be large enough for
      * the longer of the two texts */
     private void setSearchButtonSizes() {
@@ -369,6 +429,8 @@ class SearchManager2 extends SidePaneComponent
     }
 
     public void actionPerformed(ActionEvent e) {
+
+        fireSearchlistenerEvent(searchField.getText());
     if (e.getSource() == escape) {
         incSearch = false;
         if (panel != null) {
@@ -380,10 +442,12 @@ class SearchManager2 extends SidePaneComponent
             // do this after the button action is over
             SwingUtilities.invokeLater(t);
         }
+
     }
     else if (((e.getSource() == searchField) || (e.getSource() == search))
          && !increment.isSelected()
          && (panel != null)) {
+
         updatePrefs(); // Make sure the user's choices are recorded.
             if (searchField.getText().equals("")) {
               // An empty search field should cause the search to be cleared.
@@ -418,6 +482,7 @@ class SearchManager2 extends SidePaneComponent
         worker.getWorker().run();
         worker.getCallBack().update();
         escape.setEnabled(true);
+        
     }
     }
 
@@ -529,6 +594,7 @@ class SearchManager2 extends SidePaneComponent
     }
 
     public void clearSearch() {
+        
         if (panel.isShowingFloatSearch()) {
             startedFloatSearch = false;
             panel.mainTable.stopShowingFloatSearch();
