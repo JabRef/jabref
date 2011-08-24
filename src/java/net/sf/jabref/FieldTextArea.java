@@ -30,18 +30,13 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.SearchTextListener;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.event.UndoableEditEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.CannotUndoException;
 
@@ -53,7 +48,7 @@ import javax.swing.undo.CannotUndoException;
  * @version $Revision$ ($Date$)
  * 
  */
-public class FieldTextArea extends JTextArea implements FieldEditor, SearchTextListener {
+public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
 	Dimension PREFERRED_SIZE;
 
@@ -70,54 +65,6 @@ public class FieldTextArea extends JTextArea implements FieldEditor, SearchTextL
 	private AutoCompleteListener autoCompleteListener = null;
 
 	// protected UndoManager undo = new UndoManager();
-
-	//text to highlight (like from searches) 
-	private ArrayList<String> textToHighlight;
-	
-	/**
-	 * Highlight words in the Textarea
-	 * 
-	 * @param words to highlight
-	 */
-	private void highLight(ArrayList<String> words) {
-		// highlight all characters that appear in charsToHighlight
-		Highlighter h = getHighlighter();
-		// myTa.set
-		h.removeAllHighlights();
-
-		if (words == null || words.size() == 0) {
-			return;
-		}
-		String content = getText().toUpperCase();
-		if (content.equals(""))
-			return;
-		
-		for(String word: words){
-		
-		String text = word.toUpperCase();
-
-		int index = 0;
-		while (true) {
-			int startposition = content.indexOf(text, index);
-			if (startposition == -1)
-				break;
-
-			try {
-//				System.out.println("highlight @ " + startposition);
-				h.addHighlight(startposition, startposition + text.length(),
-						DefaultHighlighter.DefaultPainter);
-			} catch (BadLocationException ble) {
-			}
-			index = startposition + 1;
-		}	
-	  }
-	}
-	
-	@Override
-	public void setText(String t) {
-		super.setText(t);
-		highLight(textToHighlight);
-	}
 
 	public FieldTextArea(String fieldName_, String content) {
 		super(content);
@@ -254,15 +201,5 @@ public class FieldTextArea extends JTextArea implements FieldEditor, SearchTextL
 		if (autoCompleteListener != null) {
 			autoCompleteListener.clearCurrentSuggestion(this);
 		}
-	}
-
-	@Override
-	public void searchText(ArrayList<String> words) {
-		// words have to be stored in class variable as 
-		// setText() makes use of them
-		textToHighlight = words;
-		
-		highLight(words);
-		
 	}
 }

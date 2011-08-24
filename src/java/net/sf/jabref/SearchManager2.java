@@ -602,6 +602,12 @@ class SearchManager2 extends SidePaneComponent
             startedFilterSearch = false;
             panel.stopShowingSearchResults();
         }
+        
+        // clear search means that nothing is searched for
+        // even if a word is written in the text field,
+        // nothing should be highlighted
+        fireSearchlistenerEvent(null);
+        
         // disable "Cancel" button to signal this to the user
         escape.setEnabled(false);
     }
