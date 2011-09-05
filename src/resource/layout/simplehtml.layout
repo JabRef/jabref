@@ -1,5 +1,5 @@
-<dt>\format[ToLowerCase]{\bibtextype}\begin{bibtexkey}<a name="\bibtexkey">(\bibtexkey)</a>\end{bibtexkey}</dt>
-\begin{author}<dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,NoSpaceBetweenAbbreviations,HTMLChars]{\author}</dd>\end{author}\begin{title}
+<dt>\format[ToLowerCase]{\bibtextype} \begin{bibtexkey}<a name="\bibtexkey">(\bibtexkey)</a>\end{bibtexkey}</dt>
+\begin{author}<dd>\format[Authors(LastFirst,InititialsNoSpace),HTMLChars]{\author}</dd>\end{author}\begin{title}
 <dd><i>\format[HTMLChars]{\title}</i></dd>\end{title}\begin{editor}
 <dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{booktitle}
 <dd>\format[HTMLChars]{\booktitle}</dd>\end{booktitle}\begin{chapter}

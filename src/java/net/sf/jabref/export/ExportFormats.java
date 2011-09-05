@@ -46,6 +46,8 @@ public class ExportFormats {
         putFormat(new ModsExportFormat());
         putFormat(new ExportFormat(Globals.lang("HTML table"),
                 "tablerefs", "tablerefs", "tablerefs", ".html"));
+        putFormat(new ExportFormat(Globals.lang("HTML list"),
+                "listrefs", "listrefs", "listrefs", ".html"));	    
         putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
         putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
