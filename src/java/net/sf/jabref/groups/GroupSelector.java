@@ -29,6 +29,7 @@ package net.sf.jabref.groups;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -61,6 +62,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
@@ -80,6 +83,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.SearchRule;
 import net.sf.jabref.SearchRuleSet;
@@ -123,9 +127,10 @@ public class GroupSelector extends SidePaneComponent implements
     ButtonGroup nonHits = new ButtonGroup();
     JButton expand = new JButton(GUIGlobals.getImage("down")),
             reduce = new JButton(GUIGlobals.getImage("up"));
-    JToggleButton editModeButton = new JToggleButton(Globals.lang("Invert Group Membership Mode"), false);
-    boolean editModeIndicator = false;
-    boolean delete = false;
+    JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Globals.lang("Edit Group Membership"), false);
+    Border editModeBorder = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
+            "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP, Font.getFont("Default"), Color.RED);
+    boolean editModeIndicator;
     SidePaneManager manager;
 
     /**
@@ -207,6 +212,8 @@ public class GroupSelector extends SidePaneComponent implements
         invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean("groupShowOverlapping"));
         select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
+        editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
+        editModeCb.setSelected(editModeIndicator);
 
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(andCb);
@@ -215,6 +222,8 @@ public class GroupSelector extends SidePaneComponent implements
         settings.add(invCb);
         settings.addSeparator();
         settings.add(select);
+        settings.addSeparator();
+        settings.add(editModeCb);
         settings.addSeparator();
         settings.add(grayOut);
         settings.add(hideNonHits);
@@ -267,10 +276,12 @@ public class GroupSelector extends SidePaneComponent implements
             }
         });
 
-        editModeButton.addActionListener(new ActionListener() {
+        editModeCb.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                editModeIndicator = !editModeIndicator;
+                editModeIndicator = editModeCb.getState();
+                updateBorder(editModeIndicator);
+                Globals.prefs.putBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE, editModeIndicator);
             }
         });
 
@@ -324,7 +335,7 @@ public class GroupSelector extends SidePaneComponent implements
         select.setToolTipText(Globals.lang("Select entries in group selection"));
         expand.setToolTipText(Globals.lang("Show one more row"));
         reduce.setToolTipText(Globals.lang("Show one less rows"));
-        editModeButton.setToolTipText("Toggle annotation mode");
+        editModeCb.setToolTipText(Globals.lang("Click group to toggle membership of selected entries"));
         bgr.add(andCb);
         bgr.add(orCb);
         visMode.add(floatCb);
@@ -407,9 +418,6 @@ public class GroupSelector extends SidePaneComponent implements
         con.gridx = 0;
         con.fill = GridBagConstraints.HORIZONTAL;
 
-        gb.setConstraints(editModeButton, con);
-        pan.add(editModeButton);
-
         con.gridy = 2;
         con.gridx = 0;
         con.gridwidth = 4;
@@ -417,6 +425,7 @@ public class GroupSelector extends SidePaneComponent implements
         main.add(pan);
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         add(main, BorderLayout.CENTER);
+        updateBorder(editModeIndicator);
         definePopup();
         moveNodeUpAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
@@ -426,7 +435,7 @@ public class GroupSelector extends SidePaneComponent implements
                 KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
-    }
+}
 
     private void definePopup() {
         // These key bindings are just to have the shortcuts displayed
@@ -602,6 +611,18 @@ public class GroupSelector extends SidePaneComponent implements
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
 
+    private void updateBorder(boolean editMode) {
+        if (editMode) {
+            groupsTree.setBorder(editModeBorder);
+            this.setTitle("<html><font color='red'>Groups Edit mode</font></html>");
+        } else {
+            groupsTree.setBorder(null);
+            this.setTitle("Groups");
+        }
+        groupsTree.revalidate();
+        groupsTree.repaint();
+    }
+    
     /**
      * 
      * @param deletion != addition

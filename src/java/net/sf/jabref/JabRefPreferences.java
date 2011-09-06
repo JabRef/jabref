@@ -71,7 +71,8 @@ public class JabRefPreferences {
         CUSTOM_TAB_NAME = "customTabName_",
         CUSTOM_TAB_FIELDS = "customTabFields_",
         EMACS_PATH = "emacsPath",
-        EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+        EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
+        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
     
 
     // This String is used in the encoded list in prefs of external file type
@@ -252,6 +253,7 @@ public class JabRefPreferences {
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
+        defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
