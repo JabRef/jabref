@@ -133,6 +133,26 @@
     <code>-x</code>. Apr&egrave;s l'importation, JabRef
     d&eacute;marre normalement.</p>
 
+
+    <h2>Exportation des entr&eacute;es correspondantes&nbsp;: -m [field=]TermeDeRecherche,FichierDeSortie[,FormatExportation]</h2>
+    <p>JabRef enregistre toutes les entr&eacute;es de la base correspondant &agrave; un terme de recherche donn&eacute; dans un nouveau fichier.
+    Le format du fichier d'exportation peut &ecirc;tre choisi, le format par d&eacute;faut &eacute;tant un tableau html (avec r&eacute;sum&eacute;
+    et BibTeX, fourni par tablerefsabsbib).
+    </p>
+    <p>Appel&nbsp;: <code>JabRef.jar -m [field=]TermeDeRecherche,FichierDeSortie[,FormatExportation] -n true FichierEntr&eacute;e</code></p>
+    <p>Pour des informations sur la fonction de recherche, voyez l'aide sur la 'recherche avanc&eacute;e'.
+    De plus, il est aussi possible de recherche des entr&eacute;es sur une p&eacute;riode temporelle au lieu
+    de les rechercher uniquement pour une ann&eacute;e donn&eacute;e.</p>
+    <p>Notez que les termes de recherche contenant des espaces doivent &ecirc;tre encadr&eacute;s par des guillemets.</p>
+	<p>Exemples
+	<ul>
+		<li> <code>Year=2005</code> </li>
+		<li> <code>title|keywords=Optimization</code> </li>
+		<li> <code>(author=bock or title|keywords="computer methods")and not(author=sager)</code> </li>
+		<li> <code>Year=1989-2005</code> </li>
+	</ul>
+	</p>
+
     <h2>Exportation des entr&eacute;es utilis&eacute;es&nbsp;: -a
     nomdefichier[.aux],nouvelleBaseBib[.bib]</h2>
 

@@ -8,6 +8,41 @@
 
   <h1>Historique des r&eacute;visions (en anglais)</h1>
 
+  <h3>Version 2.7</h3>
+    <ul>
+    <li>Medline importer now wraps multipart last names in braces.</li>
+    <li>RIS importer now handles multiple title fields by concatenation.</li>
+    <li>Disallowed "comment" as entry type name, since this conflicts with the BibTeX format.</li>
+    <li>Fixed handling of suffix name parts (Jr, etc.) in Medline importer.</li>
+    <li>Added optional second numeric argument to Authors formatter, which determines
+      how many authors are shown if the maximum number is exceeded.</li>
+    <li>Added content selector for "review" field in entry editor.</li>
+    <li>Improved detection of file type when adding new link. Can now recognize double
+      extensions such as ".ps.gz".</li>
+    <li>Improved autocompletion of author names. Added options to complete either in
+      'Firstname Lastname' or 'Lastname, Firstname' formats, or in both.</li>
+    <li>Fixed bug in import function if no suitable import filter is found.</li>
+    </ul>
+
+  <h3>Version 2.7beta 2</h3>
+    <ul>
+	<li>Added support for MrdLib lookup or metadata extraction when PDFs are dragged
+	into JabRef.</li>
+    <li>Added option under "External programs" for disabling the automatic opening of the
+      Browse dialog when creating a new file link.</li>
+    <li>Fixed shortcut key collision. Shortcut for Import to new database is now Ctrl-Alt-I.</li>
+    <li>The "Open URL or DOI" action now uses URL links in the "file" field as fallback if
+      no links are found in the "url" or "doi" fields.</li>
+    <li>Restricted remote listener port numbers to interval 1025-65535.</li>
+    <li>Added Japanese translation by Koji Yokota.</li>
+    <li>Added scrollbar to entry editor when it is too high to fit in its panel. Patch
+      by Matthias Erll.</li>
+    <li>Made it possible to copy entries from the search dialog.</li>
+    <li>Added proper error message when trying to search with invalid regular expression.</li>
+    <li>Added error dialog on startup if custom look and feel cannot be loaded.</li>
+    <li>Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files.</li>
+    <li>Removed potential NullPointerException in SearchExpressionTreeParser.</li>
+    </ul>
 
     <h3>Version 2.7beta</h3>
     <ul>
@@ -38,6 +73,7 @@
 	<li>Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
 	a hyphen a word boundary, and remove punctuation characters (keep only numbers and
 	letters).</li>
+	<li>deprecate various export formatters with new Authors formatter, which provides flexible formatting options.</li>
     </ul>
 
     <h3>Version 2.6</h3>
@@ -59,7 +95,7 @@
             BibTeX key was not set.</li>
         <li>Changed deletion process for some temporary files to avoid leftover files.</li>
     </ul>
-        
+
     <h3>Version 2.6beta3</h3>
     <ul>
         <li>Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.</li>
@@ -462,7 +498,7 @@
 		Caution needs to be used though since, JabRef does overwrite existing values.</li>
 	    <li>XMP privacy filter can be used to prevent sensible fields to be exported.</li>
           </ul>
-	</li>  
+	</li>
 	<li>Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001</li>
 	<li>Fixed bug that made explicit groups appear empty after updating group tree from external change.</li>
 	<li>New windows installer thanks to Uwe St&ouml;hr.</li>

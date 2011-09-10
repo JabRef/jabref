@@ -5,7 +5,6 @@
 
 <body>
 
-
     <h1>Filtres d'exportation personnalis&eacute;s</h1>
 
     <p>JabRef vous permet de d&eacute;finir et d'utiliser vos
@@ -238,7 +237,7 @@
     &agrave; la s&eacute;rie des filtres d'exportation standard ou
     des formateurs.</p>
 
-    <p>A partir de JabRef 2.4 vous pouvez aussi empaqueter votre
+    <p>&Agrave; partir de JabRef 2.4 vous pouvez aussi empaqueter votre
     format d'exportation ("ExportFormat") ou formateur de gabarit
     ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
     faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
@@ -261,11 +260,14 @@
             d&eacute;di&eacute;s qui &eacute;taient disponibles dans les
             versions de JabRef ant&eacute;rieures &agrave; 2.7.</li>
 
+        <li><code>CreateBibORDFAuthors</code>&nbsp;: formate les auteurs
+            selon les sp&eacute;cification de Bibliographic Ontology (bibo).</li>
+
         <li><code>CreateDocBookAuthors</code>&nbsp;: formate le
         contenu du champ author selon le style DocBook.</li>
 
-        <li><code>CreateDocBookEditors</code>&nbsp;: &agrave;
-        documenter.</li>
+        <li><code>CreateDocBookEditors</code>&nbsp;: formate le
+        contenu du champ editor selon le style DocBook.</li>
 
         <li><code>CurrentDate</code>&nbsp;: renvoie la date
         actuelle. Sans argument, ce formateur renvoie la date et
@@ -305,10 +307,9 @@
         Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
         ce formateur renverra "345".</li>
 
-        <li><code>FormatChars</code>&nbsp;: remplace les 
-        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
-        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
-        repr&eacute;sentation Unicode.</li>
+        <li><code>FormatChars</code>&nbsp;: Ce formateur convertit les s&eacute;quences
+        de caract&egrave;res LaTeX dans les caract&egrave;res unicode &eacute;quivalents et
+        supprime les autres commandes LaTeX sans les transf&eacute;rer.</li>
 
         <li><code>FormatPagesForHTML</code>&nbsp;: remplace "--"
         par "-".</li>
@@ -338,9 +339,26 @@
         <code>\format[IfPlural(Eds.,Ed.)]{\editor}</code> renverra "Eds." s'il y
         a plus d'un &eacute;diteur et "Ed." s'il n'y en a qu'un seul.</li>
 
+        <li><code>JournalAbbreviator</code>&nbsp;: Le texte donn&eacute; en entr&eacute;e
+        est abr&eacute;g&eacute; selon les listes d'abr&eacute;viations des journaux.
+        Si aucune abr&eacute;viation n'est trouv&eacute; pour l'entr&eacute;e (par exemple, si elle
+        n'est pas dans la liste ou si elle est d&eacute;j&agrave; abr&eacute;g&eacute;e), l'entr&eacute;e sera
+        renvoy&eacute;e sans modification.
+        Par exemple, en utilisant <code>\format[JournalAbbreviator]{\journal}</code>,
+	"Physical Review Letters" renvoie "Phys. Rev. Lett."</li>
+
         <li><code>LastPage</code>&nbsp;: renvoie la derni&egrave;re page du champ "pages", si initialis&eacute;.
         Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
         ce formateur renverra "360".</li>
+
+        <li><code>NoSpaceBetweenAbbreviations</code>&nbsp;: Un formateur de mise
+        en page qui supprime l'espace entre les initiales des pr&eacute;noms.
+        Par exemple&nbsp;: J. R. R. Tolkien devient J.R.R. Tolkien.</li>
+
+        <li><code>NotFoundFormatter</code>&nbsp;: Ce formateur est utilis&eacute;
+        pour indiquer qu'un formateur n'a pas &eacute;t&eacute; trouv&eacute;.
+        Cela peut-&ecirc;tre utilis&eacute; pour g&eacute;rer proprement les cas o&ugrave; une mise
+        en page utilise un format non d&eacute;fini.</li>
 
         <li><code>Number</code>&nbsp;: renvoie la s&eacute;quence de nombres &agrave; base de 1 de l'entr&eacute;e actuelle dans
         l'exportation actuelle. Ce formateur peut &ecirc;tre utilis&eacute; pour faire une liste num&eacute;rot&eacute;e d'entr&eacute;es. Le
@@ -350,8 +368,8 @@
         <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les
         accolades "{" ou "}".</li>
 
-        <li><code>RemoveBracketsAddComma</code>&nbsp;: &agrave;
-        documenter.</li>
+        <li><code>RemoveBracketsAddComma</code>&nbsp;: supprime toutes les
+        accolades "{" ou "}". L'accolade fermante est remplac&eacute;e par une virgule.</li>
 
         <li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes
         les commandes LaTeX comme <code>\em</code>,
@@ -378,6 +396,12 @@
         des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br/>
         &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html<br/>
         La seconde partie est le texte qui remplace tous les correspondances.</li>
+
+        <li><code>RisAuthors</code>&nbsp;: &agrave; documenter.</li>
+
+        <li><code>RisKeywords</code>&nbsp;: &agrave; documenter.</li>
+
+        <li><code>RisMonth</code>&nbsp;: &agrave; documenter.</li>
 
         <li><code>RTFChars</code>&nbsp;: remplace les
         caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
@@ -506,7 +530,7 @@
         <code>AuthorSep</code> et <code>AuthorLastSep</code> sont d&eacute;finis.
         Dans ce cas, la premi&egrave;re valeur applicable rencontr&eacute;e devrait &ecirc;tre
         pour <code>AuthorSep</code>, et la seconde pour <code>AuthorLastSep</code>.
-        Afin d'&eacute;viter toute ambigu&iuml;t&eacute;, lorsque la valeur par défaut
+        Afin d'&eacute;viter toute ambigu&iuml;t&eacute;, lorsque la valeur par d&eacute;faut
         est modifi&eacute;e, il est recommand&eacute; de sp&eacute;cifier les deux.
     </p>
 
@@ -531,7 +555,7 @@
     </dl>
     <p>Les formats de citations les plus courants devraient &ecirc;tre r&eacute;alisables
         avec ce formateur. Pour des options encore plus avanc&eacute;es, envisagez
-        d'utiliser les Formateurs personnalis&eacute;s detaill&eacute;s ci-dessous.
+        d'utiliser les Formateurs personnalis&eacute;s d&eacute;taill&eacute;s ci-dessous.
     </p>
 
     <h3>Le formateur <code>WrapFileLinks</code></h3>
@@ -628,7 +652,7 @@
     <h2 id="NameFormatter">Utiliser des formateurs de nom
     personnalis&eacute;</h2>
 
-    <p>A partir de JabRef 2.2, il est possible de
+    <p>&Agrave; partir de JabRef 2.2, il est possible de
     d&eacute;finir des formateurs de nom personnalis&eacute;s et
     utilisant la syntaxe des fichiers de style BibTeX. Cela permet
     une flexibilit&eacute; totale, mais c'est fastidieux &agrave;

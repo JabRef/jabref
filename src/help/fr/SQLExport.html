@@ -8,13 +8,22 @@
 
     <h1>Exportation vers une base de donn&eacute;es SQL externe</h1>
 
-    <p> JabRef est capable d'exporter le contenu de la base BibTeX, ainsi que les informations sur les groupes, dans une base de donn&eacute;es SQL externe.</p>
+    <p> JabRef est capable d'exporter le contenu de la base BibTeX, ainsi que les informations sur les groupes, dans une base de donn&eacute;es externe MySQL ou PostgreSQL.</p>
 
     <h2>Configuration</h2>
     <ol>
-      <li> En utilisant votre outil d'administration favori de MySQL, cr&eacute;er une base de donn&eacute;es MySQL vide.</li>
+      <li> Cr&eacute;er une base de donn&eacute;es vide.
+      	<ul>
+      		<li>MySQL&nbsp;: En utilisant votre outil d'administration favori de MySQL, cr&eacute;er une base de donn&eacute;es MySQL vide.</li>
+                <li>PostgreSQL&nbsp;: Utilisez la commande suivante pour cr&eacute;er la base de donn&eacute;es&nbsp;:
+                   <code>createdb jabref -E UTF8 --lc-ctype=en_US.utf-8 -T template0</code></li>
+        </ul>
+      </li>
       <li> Assurez-vous qu'un utilisateur de cette base dispose de <em>tous les privil&egrave;ges</em>.</li>
     </ol>
+
+
+
 
     <h2>Exportation</h2>
     <ol>
@@ -23,7 +32,7 @@
     </ol>
 
 		<p>
-		JabRef se connectera alors &agrave; la base de donn&eacute;es sp&eacute;cifi&eacute;e, <b><em>effacera les tables existantes</em></b>, creera de nouvelles tables et remplira ces tables avec les informations sur les entr&eacute;es et sur les groupes. Notez que les informations de connexion ne vous seront pas demand&eacute;es lors des prochaines exportations.
+		JabRef se connectera alors &agrave; la base de donn&eacute;es sp&eacute;cifi&eacute;e, <b><em>effacera les tables existantes</em></b>, cr&eacute;era de nouvelles tables et remplira ces tables avec les informations sur les entr&eacute;es et sur les groupes. Notez que les informations de connexion ne vous seront pas demand&eacute;es lors des prochaines exportations.
 		Si vous souhaitez exporter vers une base de donn&eacute;es diff&eacute;rente, vous pouvez changez les informations de connexion en choisissant <b>Fichier -&gt; Connecter vers une base SQL externe</b> (ou en cliquant sur le bouton correspondant dans le barre d'outils), puis en effectuant une exportation.
     </p>
 
