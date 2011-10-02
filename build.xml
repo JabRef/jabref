@@ -88,7 +88,7 @@
 	<property name="lib.dir" value="lib" />
 	<property name="tests.dir" value="${src.dir}/tests" />
 
-	<property name="nsis.executable" value="makensis.exe"/>
+	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
 	<property name="nsis.executable.linux" value="makensis"/>
 
 	<!-- Load user dependent properties -->
