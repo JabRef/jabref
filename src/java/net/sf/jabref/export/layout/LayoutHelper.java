@@ -364,7 +364,7 @@ public class LayoutHelper {
                 _eof = true;
             }
 
-            if (!Character.isLetter((char) c) && (c != '_'))
+            if (!Character.isLetter((char) c) && (c != '_') && (c != '-'))
             {
                 unread(c);
 
