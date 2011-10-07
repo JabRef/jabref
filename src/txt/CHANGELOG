@@ -8,7 +8,7 @@
     - An entry can be sent by a right click on an entry and select "Send as Email"
       (patch 3306271).
     - Added option to "copy BibTeX key and title" (patch 3370471).
-    - The command for pushing to emacs can be configured now. 
+    - The command for pushing to emacs can be configured now. New command for Emacs 23.
       New default for Windows: emacsclient.
     - Added export support for DIN1505 style (based on patch 1874662).
     - Added support for PostgresSQL import/export (patch 3368760 by Fred Stevens).

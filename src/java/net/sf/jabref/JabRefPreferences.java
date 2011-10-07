@@ -72,6 +72,7 @@ public class JabRefPreferences {
         CUSTOM_TAB_FIELDS = "customTabFields_",
         EMACS_PATH = "emacsPath",
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
+        EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
     
 
@@ -145,6 +146,7 @@ public class JabRefPreferences {
 			//defaults.put("psviewer", "/Applications/Preview.app");
 			//defaults.put("htmlviewer", "/Applications/Safari.app");
         	defaults.put(EMACS_PATH, "emacsclient");
+        	defaults.put(EMACS_23, true);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "SansSerif");
 
@@ -156,6 +158,7 @@ public class JabRefPreferences {
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         	defaults.put(EMACS_PATH, "emacsclient.exe");
+        	defaults.put(EMACS_23, true);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "Arial");
 
@@ -168,6 +171,7 @@ public class JabRefPreferences {
             
         	// linux
         	defaults.put(EMACS_PATH, "gnuclient");
+        	defaults.put(EMACS_23, false);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
@@ -492,8 +496,9 @@ public class JabRefPreferences {
 
 	public static final String EMAIL_SUBJECT = "emailSubject";
 	public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
-    
-    public boolean putBracesAroundCapitals(String fieldName) {
+
+
+	public boolean putBracesAroundCapitals(String fieldName) {
         return putBracesAroundCapitalsFields.contains(fieldName);
     }
 

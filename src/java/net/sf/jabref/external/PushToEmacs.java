@@ -22,6 +22,7 @@ public class PushToEmacs implements PushToApplication {
     private JTextField citeCommand = new JTextField(30);
     private JTextField emacsPath = new JTextField(30);
     private JTextField additionalParams = new JTextField(30);
+    private JCheckBox useEmacs23 = new JCheckBox(); 
     
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
@@ -51,6 +52,7 @@ public class PushToEmacs implements PushToApplication {
         citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
         emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
+        useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
         return settings;
     }
 
@@ -58,6 +60,7 @@ public class PushToEmacs implements PushToApplication {
         Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
+        Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
     }
 
     private void initSettingsPanel() {
@@ -72,6 +75,9 @@ public class PushToEmacs implements PushToApplication {
         builder.nextLine();
         builder.append(Globals.lang("Additional parameters").concat(":"));
         builder.append(additionalParams);
+        builder.nextLine();
+        builder.append(Globals.lang("Use EMACS 23 insertion string").concat(":"));
+        builder.append(useEmacs23);
         builder.nextLine();
         builder.append(Globals.lang("Cite command") + ":");
         builder.append(citeCommand);
@@ -90,20 +96,30 @@ public class PushToEmacs implements PushToApplication {
         	for (int i=0; i<addParams.length; i++) {
         		com[i+1] = addParams[i];
         	}
+        	String prefix;        	
+        	String suffix;
+        	if (Globals.prefs.getBoolean(JabRefPreferences.EMACS_23)) {
+        		prefix = "(with-current-buffer (window-buffer) (insert ";
+        		suffix = "))";
+        	} else {
+        		prefix = "(insert ";
+        		suffix = ")";
+        	}
+        		
             com[com.length-1] = Globals.ON_WIN ?
                 // Windows gnuclient escaping:
                 // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                "(insert \\\"\\\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
-                        "{" + keys + "}\\\")"
+                prefix.concat("\\\"\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                        "{" + keys + "}\\\"").concat(suffix)
             :
                 // Linux gnuclient escaping:
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                "(insert \"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
-                       "{" + keys + "}\")";
+                prefix.concat("\"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                       "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);
 
