@@ -10,14 +10,23 @@
 
     <p> JabRef est capable d'exporter le contenu de la base BibTeX, ainsi que les informations sur les groupes, dans une base de donn&eacute;es externe MySQL ou PostgreSQL.</p>
 
-    <h2>Configuration</h2>
+
+    <h3>MySQL</h3>
     <ol>
-      <li> Cr&eacute;er une base de donn&eacute;es vide.
-      	<ul>
-      		<li>MySQL&nbsp;: En utilisant votre outil d'administration favori de MySQL, cr&eacute;er une base de donn&eacute;es MySQL vide.</li>
-                <li>PostgreSQL&nbsp;: Utilisez la commande suivante pour cr&eacute;er la base de donn&eacute;es&nbsp;:
-                   <code>createdb jabref -E UTF8 --lc-ctype=en_US.utf-8 -T template0</code></li>
-        </ul>
+      <li> En utilisant votre outil d'administration MySQL favori, cr&eacute;er une base de donn&eacute;es MySQL vide.</li>
+      <li> Assurez-vous qu'il existe un utilisateur ayant <em>tous les privil&egrave;ges</em> pour cette base de donn&eacute;es.</li>
+    </ol>
+
+    <h3>PostgreSQL</h3>
+    <ol>
+      <li> En utilisant votre outil d'administration PostgreSQL favori (PGAdminIII, PHPpgadmin, etc.), cr&eacute;er une base de donn&eacute;es PostgreSQL vide.
+           Autrement, la ligne de commande <em>createdb</em> peut &ecirc;tre utilis&eacute;e comme suit&nbsp;:</li>
+      <b>createdb -h [HOST] -U [USERNAME] [DBNAME] -E UTF8 --lc-ctype=en_US.utf-8 -T template0</b>
+
+	<p>l'hypoth&egrave;se &eacute;tant que le langage est l'anglais et le lieu est US.
+           Si un mot de passe est n&eacute;cessaire, le serveur en demandera un &agrave; partir de la ligne de commande.
+           Voir la page du manuel de createdb pour plus d'informations.</p>
+
       </li>
       <li> Assurez-vous qu'un utilisateur de cette base dispose de <em>tous les privil&egrave;ges</em>.</li>
     </ol>
@@ -28,6 +37,7 @@
     <h2>Exportation</h2>
     <ol>
       <li> Choisissez <b>Fichier -&gt; Exporter vers une base SQL externe</b>, ou cliquez sur le bouton correspondant dans la barre d'outils.</li>
+      <li> S&eacute;lectionnez le type de base de donn&eacute;es &agrave; partir du menu d&eacute;roulant pour le<em>Type de Serveur</em>.</li>
       <li> Entrez les informations de connexion de la base de donn&eacute;es, et cliquez sur <b>Connecter</b>.</li>
     </ol>
 
