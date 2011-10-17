@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -8,6 +9,13 @@ import java.util.Iterator;
  */
 public class DuplicateCheck {
 
+    static HashMap<String,Double> fieldWeights = new HashMap<String, Double>();
+    static {
+        fieldWeights.put("author", 2.5);
+        fieldWeights.put("editor", 2.5);
+        fieldWeights.put("title", 3.);
+        fieldWeights.put("journal", 2.);
+    }
 
     /**
      * Checks if the two entries represent the same publication.
@@ -25,37 +33,47 @@ public class DuplicateCheck {
         // The check if they have the same required fields:
         String[] fields = one.getType().getRequiredFields();
 
-        float req, reqWeight = 2;
+        double req, reqWeight = 4;
         if (fields == null) {
             req = 0;
             reqWeight = 0;
         }
         else
             req = compareFieldSet(fields, one, two);
+        //System.out.println("Req comp: "+req);
         fields = one.getType().getOptionalFields();
 
         if (fields != null) {
-            float opt = compareFieldSet(fields, one, two);
+            double opt = compareFieldSet(fields, one, two);
+            //System.out.println("Opt comp: "+opt);
+            //System.out.println("Total: "+((reqWeight * req + opt) / (1 + reqWeight)));
             return (reqWeight * req + opt) / (1 + reqWeight) >= Globals.duplicateThreshold;
         } else {
             return (req >= Globals.duplicateThreshold);
         }
     }
 
-    private static float compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
-        int res = 0, empty = 0;
+    private static double compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+        double res = 0;
+        double totWeights = 0.;
         for (int i = 0; i < fields.length; i++) {
             // Util.pr(":"+compareSingleField(fields[i], one, two));
+            double weight;
+            if (fieldWeights.containsKey(fields[i]))
+                weight = fieldWeights.get(fields[i]);
+            else
+                weight = 1.0;
+            totWeights += weight;
             int result = compareSingleField(fields[i], one, two);
+            //System.out.println("Field: "+fields[i]+": "+result);
             if (result == Util.EQUAL) {
-                res++;
-                // Util.pr(fields[i]);
+                res += weight;
             }
             else if (result == Util.EMPTY_IN_BOTH)
-                empty++;
+                totWeights -= weight;
         }
-        if (fields.length > empty)
-            return ((float) res) / ((float) (fields.length - empty));
+        if (totWeights > 0)
+            return res / totWeights;
         else // no fields present. This points to a possible duplicate?
             return 0.5f;
     }
@@ -75,7 +93,18 @@ public class DuplicateCheck {
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
-            String[] aus1 = AuthorList.fixAuthor_lastNameFirst(s1).split(" and "), aus2 = AuthorList
+            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " "),
+                    auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ");
+            //System.out.println(auth1);
+            //System.out.println(auth2);
+            //System.out.println(correlateByWords(auth1, auth2));
+            double similarity = correlateByWords(auth1, auth2);
+            if (similarity > 0.8)
+                return Util.EQUAL;
+            else
+                return Util.NOT_EQUAL;
+
+            /*String[] aus1 = AuthorList.fixAuthor_lastNameFirst(s1).split(" and "), aus2 = AuthorList
                     .fixAuthor_lastNameFirst(s2).split(" and "), au1 = aus1[0].split(","), au2 = aus2[0]
                     .split(",");
 
@@ -84,7 +113,7 @@ public class DuplicateCheck {
                     && au1[0].trim().equals(au2[0].trim()))
                 return Util.EQUAL;
             else
-                return Util.NOT_EQUAL;
+                return Util.NOT_EQUAL;*/
         } else {
             double similarity = correlateByWords(s1, s2);
             if (similarity > 0.8)
