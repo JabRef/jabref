@@ -164,8 +164,7 @@ class SearcherThread extends Thread {
   public void run() {
     for (int i = 0; (i < bes.length - 1) && !finished ; i++) {
       for (int j = i + 1; (j < bes.length) && !finished ; j++) {
-        boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]
-        );
+        boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
         // If (suspected) duplicates, add them to the duplicates vector.
         if (eq)
@@ -179,7 +178,6 @@ class SearcherThread extends Thread {
       }
     }
     finished = true;
-
     // if no duplicates found, the graphical thread will never wake up
     synchronized(duplicates)
     {

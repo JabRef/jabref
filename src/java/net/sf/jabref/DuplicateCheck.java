@@ -9,6 +9,9 @@ import java.util.Iterator;
  */
 public class DuplicateCheck {
 
+    final static double reqWeight = 3; // Weighting of all required fields
+
+    // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     static HashMap<String,Double> fieldWeights = new HashMap<String, Double>();
     static {
         fieldWeights.put("author", 2.5);
@@ -29,31 +32,30 @@ public class DuplicateCheck {
         // First check if they are of the same type - a necessary condition:
         if (one.getType() != two.getType())
             return false;
-
+        //System.out.println(one.getCiteKey()+" : "+two.getCiteKey());
         // The check if they have the same required fields:
         String[] fields = one.getType().getRequiredFields();
-
-        double req, reqWeight = 4;
+        double[] req;
         if (fields == null) {
-            req = 0;
-            reqWeight = 0;
+            req = new double[] {0., 0.};
         }
         else
             req = compareFieldSet(fields, one, two);
-        //System.out.println("Req comp: "+req);
+        //System.out.println("Req comp: "+req[0]+" / "+req[1]);
         fields = one.getType().getOptionalFields();
 
         if (fields != null) {
-            double opt = compareFieldSet(fields, one, two);
-            //System.out.println("Opt comp: "+opt);
-            //System.out.println("Total: "+((reqWeight * req + opt) / (1 + reqWeight)));
-            return (reqWeight * req + opt) / (1 + reqWeight) >= Globals.duplicateThreshold;
+            double[] opt = compareFieldSet(fields, one, two);
+            //System.out.println("Opt comp: "+opt[0]+" / "+opt[1]);
+            //System.out.println("Total: "+(reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]));
+            double totValue = (reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]);
+            return totValue >= Globals.duplicateThreshold;
         } else {
-            return (req >= Globals.duplicateThreshold);
+            return (req[0] >= Globals.duplicateThreshold);
         }
     }
 
-    private static double compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+    private static double[] compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (int i = 0; i < fields.length; i++) {
@@ -73,9 +75,9 @@ public class DuplicateCheck {
                 totWeights -= weight;
         }
         if (totWeights > 0)
-            return res / totWeights;
+            return new double[] {res / totWeights, totWeights};
         else // no fields present. This points to a possible duplicate?
-            return 0.5f;
+            return new double[] {0.5, 0.0};
     }
 
     private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
@@ -174,6 +176,8 @@ public class DuplicateCheck {
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
         for (int i=0; i<n; i++) {
+            /*if (!w1[i].equalsIgnoreCase(w2[i]))
+                misses++;*/
             double corr = correlateStrings(w1[i], w2[i]);
             if (corr < 0.75)
                 misses++;
