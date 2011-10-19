@@ -14,12 +14,13 @@ public class LastPage implements LayoutFormatter {
         if (s == null)
 			return "";
 		String[] pageParts = s.split("[\\-]+");
-		if (pageParts.length == 2)
+        if (pageParts.length == 2)
             return pageParts[1];
         // If we didn't get two parts, it may be that only the number of pages is given.
         // Return the first part:
-        else return pageParts[0];
-        //else return "";
+        else if (pageParts.length >= 1)
+            return pageParts[0];
+        else return "";
 
     }
 }

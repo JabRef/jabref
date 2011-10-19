@@ -1,4 +1,5 @@
 2.8 beta
+    - Fixed possible array index exception in LastPage formatter.
     - Improved author/editor normalization in entry editor.
     - Added metadata extraction from text when PDFs are dragged into JabRef.
     - The filename pattern for renaming a file when dropping a PDF can now be
