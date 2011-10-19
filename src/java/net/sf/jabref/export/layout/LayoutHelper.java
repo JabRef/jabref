@@ -53,6 +53,8 @@ public class LayoutHelper {
     public static final int IS_GROUP_START = 6;
     public static final int IS_GROUP_END = 7;
     public static final int IS_ENCODING_NAME = 8;
+    public static final int IS_FILENAME = 9;
+    public static final int IS_FILEPATH = 10;
     
     private static String currentGroup = null;
     
@@ -410,6 +412,22 @@ public class LayoutHelper {
                             return;
                         }
                     }
+                    else if (name.equalsIgnoreCase("filename"))
+                    {
+                        // Print the name of the database bib file.
+                        // This is only supported in begin/end layouts, not in
+                        // entry layouts.
+                        parsedEntries.add(new StringInt(name, IS_FILENAME));
+                        return;
+                    }
+                    else if (name.equalsIgnoreCase("filepath"))
+                    {
+                        // Print the full path of the database bib file.
+                        // This is only supported in begin/end layouts, not in
+                        // entry layouts.
+                        parsedEntries.add(new StringInt(name, IS_FILEPATH));
+                        return;
+                    }
                 }
                 else if (name.charAt(0) == 'e')
                 {
@@ -434,7 +452,7 @@ public class LayoutHelper {
                         return;
                     }
                 }
-                
+
                 // for all other cases
                 parsedEntries.add(new StringInt(name, IS_SIMPLE_FIELD));
 

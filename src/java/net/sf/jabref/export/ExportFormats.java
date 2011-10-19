@@ -236,7 +236,9 @@ public class ExportFormats {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
-                            .getFileDirectory(GUIGlobals.FILE_FIELD);                    
+                            .getFileDirectory(GUIGlobals.FILE_FIELD);
+                    // Also store the database's file in a global variable:
+                    Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:

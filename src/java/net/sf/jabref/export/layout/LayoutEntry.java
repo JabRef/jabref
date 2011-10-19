@@ -25,6 +25,7 @@
  */
 package net.sf.jabref.export.layout;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -360,6 +361,14 @@ public class LayoutEntry {
             // Try to translate from Java encoding name to common name:
             String commonName = Globals.ENCODING_NAMES_LOOKUP.get(encoding);
             return commonName != null ? commonName : encoding;
+        }
+        else if (type == LayoutHelper.IS_FILENAME) {
+            File f = Globals.prefs.databaseFile;
+            return f != null ? f.getName() : "";
+        }
+        else if (type == LayoutHelper.IS_FILEPATH) {
+            File f = Globals.prefs.databaseFile;
+            return f != null ? f.getPath() : "";
         }
 		return "";
 	}

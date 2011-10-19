@@ -114,6 +114,11 @@ public class JabRefPreferences {
     // string to be formatted and possible formatter arguments.
     public String fileDirForDatabase = null;
 
+    // Similarly to the previous variable, this is a global that can be used during
+    // the export of a database if the database filename should be output. If a database
+    // is tied to a file on disk, this variable is set to that file before export starts:
+    public File databaseFile = null;
+
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
     // It is set before the export starts:
@@ -955,6 +960,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Write XMP", "ctrl F4");
         defKeyBinds.put("New file link", "ctrl N");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");
+        defKeyBinds.put("Fetch INSPIRE", "ctrl F2");
         defKeyBinds.put("Back", "alt LEFT");
         defKeyBinds.put("Forward", "alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");

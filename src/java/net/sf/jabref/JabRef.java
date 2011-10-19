@@ -427,6 +427,7 @@ public class JabRef {
                     MetaData metaData = new MetaData(pr.getMetaData(), pr.getDatabase());
                     metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                    Globals.prefs.databaseFile = metaData.getFile();
                     System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format != null) {
