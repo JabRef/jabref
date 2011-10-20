@@ -15,13 +15,14 @@ public class NameListNormalizer {
     static Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     static Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
-    public static void main(String[] args) {
-        System.out.println(normalizeAuthorList("Ølver MA"));
-        System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y."));
-        System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y."));
-        System.out.println(normalizeAuthorList("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."));
-        System.out.println(normalizeAuthorList("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
-    }
+    /*public static void main(String[] args) {
+        normalizeAuthorList("Staci D. Bilbo and Smith SH and Jaclyn M Schwarz");
+        //System.out.println(normalizeAuthorList("Ølver MA"));
+        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y."));
+        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y."));
+        //System.out.println(normalizeAuthorList("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."));
+        //System.out.println(normalizeAuthorList("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
+    }*/
 
     public static String normalizeAuthorList(String in){
         boolean andSep = false, semicolonSep = false, commaSep = false;
