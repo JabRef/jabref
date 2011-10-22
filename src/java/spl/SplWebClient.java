@@ -1,20 +1,33 @@
 package spl;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
+import org.sciplore.beans.Author;
+import org.sciplore.beans.Document;
+import org.sciplore.deserialize.creator.AuthorBeanCreator;
+import org.sciplore.deserialize.creator.AuthorsBeanCreator;
+import org.sciplore.deserialize.creator.DefaultStringCreator;
+import org.sciplore.deserialize.creator.DocumentBeanCreator;
+import org.sciplore.deserialize.creator.DocumentsBeanCreator;
+import org.sciplore.deserialize.creator.ObjectCreator;
+import org.sciplore.deserialize.creator.TitleBeanCreator;
+import org.sciplore.deserialize.creator.YearBeanCreator;
+import org.sciplore.deserialize.reader.ObjectCreatorMapper;
+import org.sciplore.deserialize.reader.XmlResourceReader;
+import org.sciplore.formatter.Bean;
+import org.sciplore.formatter.SimpleTypeElementBean;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import org.sciplore.xml.XmlApplication;
-import org.sciplore.xml.XmlDocument;
-import org.sciplore.xml.XmlDocuments;
-
-import javax.swing.*;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,11 +43,11 @@ public class SplWebClient {
         CLIENT.setConnectTimeout(1000);
         CLIENT.setReadTimeout(70000);
     }
-    private static WebResource WEBRESOURCE = CLIENT.resource( "http://api.mr-dlib.org/rest/" );
+    private static WebResource WEBRESOURCE = CLIENT.resource( "http://api.mr-dlib.org/" );
     private static WebResource INTERNETRESOURCE = CLIENT.resource( "http://www.google.com" );
     //private static WebResource WEBRESOURCE = CLIENT.resource( "http://localhost:8080/rest/" );
 
-    public static XmlDocuments metadata;
+    public static Document metadata;
 
     public static WebServiceStatus getMetaData(File file){
         try{
@@ -52,10 +65,18 @@ public class SplWebClient {
             if(isMetaDataServiceAvailable() == false){
                 return  WebServiceStatus.UNAVAILABLE;
             }
-            byte[] data = Tools.zip(file);
+            FileInputStream fin = new FileInputStream(file);      
+            byte[] data = new byte[(int)file.length()];          
+            fin.read(data);           
+            
             FormDataMultiPart formDataMultiPart = new FormDataMultiPart();            
-            formDataMultiPart.field("gzippedpdf", data,  MediaType.APPLICATION_OCTET_STREAM_TYPE);
-            ClientResponse response = WEBRESOURCE.path("service/metadata").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
+            formDataMultiPart.field("file", data,  MediaType.APPLICATION_OCTET_STREAM_TYPE);            
+            formDataMultiPart.field("source", "jabref",  MediaType.TEXT_PLAIN_TYPE);
+            formDataMultiPart.field("filename", file.getName(), MediaType.TEXT_PLAIN_TYPE);
+           
+           
+            ClientResponse response = WEBRESOURCE.path("documents").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
+            //System.out.println(response.getEntity(String.class));
             if(response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()){
                 String entity = response.getEntity(String.class);
                 byte[] bytes = new byte[0];
@@ -66,8 +87,33 @@ public class SplWebClient {
                 }
                 InputStream is = new ByteArrayInputStream(bytes);
                 if(is != null){
-                    XmlDocuments documents = JAXB.unmarshal(is, XmlDocuments.class);
-                    SplWebClient.metadata = documents;
+                	ObjectCreatorMapper resourceMapper = new ObjectCreatorMapper();
+                	ObjectCreator stringCreator = new DefaultStringCreator();
+                	// initialize Mapper    
+	            	  resourceMapper.addCreator("documents", new DocumentsBeanCreator());
+	            	  resourceMapper.addCreator("authors", new AuthorsBeanCreator());
+	            	  resourceMapper.addCreator("document", new DocumentBeanCreator());
+	            	  resourceMapper.addCreator("title", new TitleBeanCreator());
+	            	  resourceMapper.addCreator("year", new YearBeanCreator());
+	            	  resourceMapper.addCreator("author", new AuthorBeanCreator());
+	            	  
+	            	  resourceMapper.addCreator("name_first", stringCreator);
+	            	  resourceMapper.addCreator("name_middle", stringCreator);
+	            	  resourceMapper.addCreator("name_last", stringCreator);
+	            	  resourceMapper.addCreator("name_last_prefix", stringCreator);
+	            	  resourceMapper.addCreator("name_last_suffix", stringCreator);
+	            	  
+	            	  // initialize xml reader
+	            	  XmlResourceReader<?> reader = new XmlResourceReader(resourceMapper);
+	            	  
+	            	  // parse given file -> create object tree
+	            	  Document docs =  (Document)reader.parse(is);
+	            	  for(Bean author : docs.getAuthors().getCollection()){
+	            		  Author temp = (Author)author;
+	            		  System.out.println(((SimpleTypeElementBean)temp.getName_Last()).getValue() + " " + temp.getRank());
+	            	  }
+                   // XmlDocuments documents = JAXB.unmarshal(is, XmlDocuments.class);
+                    SplWebClient.metadata = docs;
                     return WebServiceStatus.OK;
                 }
                 else{
@@ -92,12 +138,12 @@ public class SplWebClient {
                 byte[] bytes = entity.getBytes();
                 InputStream is = new ByteArrayInputStream(bytes);
                 if(is != null){
-                    XmlApplication app = JAXB.unmarshal(is, XmlApplication.class);
+                    /*XmlApplication app = JAXB.unmarshal(is, XmlApplication.class);
                     if(app != null){
                         if(app.getVersion() != null && !app.getVersion().equalsIgnoreCase(Tools.WEBSERVICE_VERSION_SHORT)){
                             return true;
                         }
-                    }
+                    }*/
                 }
             }
         }catch(Exception e){

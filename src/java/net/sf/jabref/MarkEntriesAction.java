@@ -24,6 +24,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         menuItem = new JMenuItem("               ");
         menuItem.setMnemonic(String.valueOf(level+1).charAt(0));
         menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground"+this.level));
+        menuItem.setOpaque(true);
         menuItem.addActionListener(this);
     }
 

@@ -1,3 +1,4 @@
+
 2.8 beta
     - Added markers \filename and \filepath for .begin.layout files in order to output the
       name or full path of the bib file of the exported database.
@@ -27,17 +28,33 @@
     - "of" added to the list of skip words (patch 2781830).
     - Added cli-function for exporting entries filtered by a search term 
       (patch 1817093 by Silberer, Zirn)
-    - Added highlighting in textarea for search text (patch 3117881 by Ben). 
+    - Added highlighting in textarea for search text (patch 3117881 by Ben).
       Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
       "Clear" also clears the highlighting.
     - Added highlighting in preview area for search text (based on patch 3121914 by
-      Maximilian Lengsfeld).      
+      Maximilian Lengsfeld). 
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.1
+    - Fixed problem with search function under Java 7.
+    - Made Database properties dialog modal to prevent database from being closed
+      while properties window is open.
+    - Fixed error handling in custom import dialog when invalid jar files or class
+      files are specified.
+    - Added OR operator for conditional export formatting.
     - DocBook export format switched to 4.4 (based on patch 3313898).
+    - Fixed bug that made the key generator combination [shorttitle:abbr] return
+      only a single letter.
+    - "of" added to the list of skip words (patch 2781830).
+    - Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).
+    - RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
+      (patch 2905383 by Russell Almond).
+    - Fixed bug that made menu items for marking in specific colors invisible
+      under Windows 7.
     - In case a new entry is added, this entry is highlighted and the editor is opened
       if configured in the settings (patch 3370466). The UI behavior of adding an entry
       at "new entry from plain text" is now similar to "new entry".
+    - Fixed bug in focus handling that affected some actions.
+    - Running JabRef under the Oracle JVM will no longer give a warning.
 2.7
     - Medline importer now wraps multipart last names in braces.
     - RIS importer now handles multiple title fields by concatenation.
@@ -391,6 +408,7 @@
     - Fixed bug where selection would jump back if an entry of different type was selected
       by mouse click while editing a field of the current entry.
     - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
+>>>>>>> .merge-right.r2733
 2.4b
     - Added Export to SQL database feature. Supports MySQL.
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
@@ -1015,3 +1033,4 @@
           new types.
 1.0:	First release.
 
+>>>>>>> .merge-right.r3689

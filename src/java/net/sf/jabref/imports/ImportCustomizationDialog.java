@@ -89,7 +89,10 @@ public class ImportCustomizationDialog extends JDialog {
       className = path.getName() + (className != null ? "." + className : "");
       path = path.getParentFile();
     }
-    className = className.substring(0, className.lastIndexOf('.'));
+    int lastDot = className.lastIndexOf('.');
+    if (lastDot < 0)
+        return className;
+    className = className.substring(0, lastDot);
     return className;
   }
 
@@ -123,21 +126,20 @@ public class ImportCustomizationDialog extends JDialog {
            Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
        if (chosenFileStr != null) {
          try {
-           importer.setClassName( pathToClass(importer.getBasePath(), new File(chosenFileStr)) );
-           importer.setName( importer.getInstance().getFormatName() );
-           importer.setCliId( importer.getInstance().getCLIId() );
+            importer.setClassName( pathToClass(importer.getBasePath(), new File(chosenFileStr)) );
+            importer.setName( importer.getInstance().getFormatName() );
+            importer.setCliId( importer.getInstance().getCLIId() );
+            addOrReplaceImporter(importer);
+            customImporterTable.revalidate();
+            customImporterTable.repaint();
+            frame.setUpImportMenus();
          } catch (Exception exc) {
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", chosenFileStr + ":\n", exc.getMessage()));
+            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", chosenFileStr));
          } catch (NoClassDefFoundError exc) {
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1. Have you chosen the correct package path?", chosenFileStr + ":\n", exc.getMessage()));
+            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
          }
 
-         addOrReplaceImporter(importer);
-         customImporterTable.revalidate();
-         customImporterTable.repaint();
-         frame.setUpImportMenus();
+
        }
       }
     });
@@ -153,23 +155,24 @@ public class ImportCustomizationDialog extends JDialog {
            zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
          } catch (IOException exc) {
            exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0 %1", basePath + ":\n", exc.getMessage())
-                                              + "\n" + Globals.lang("Have you chosen the correct package path?"));
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
+                + "\n" + Globals.lang("Have you chosen the correct package path?"));
            return;
          } catch (NoClassDefFoundError exc) {
            exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", basePath + ":\n", exc.getMessage())
-                                              + "\n" + Globals.lang("Have you chosen the correct package path?"));
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", basePath)
+                + "\n" + Globals.lang("Have you chosen the correct package path?"));
          }
        }
 
        if (zipFile != null) {
          ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
          zipFileChooser.setVisible(true);
+         customImporterTable.revalidate();
+         customImporterTable.repaint(10);
+         frame.setUpImportMenus();
        }
-       customImporterTable.revalidate();
-       customImporterTable.repaint(10);
-       frame.setUpImportMenus();
+
       }
     });
     addFromJarButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));

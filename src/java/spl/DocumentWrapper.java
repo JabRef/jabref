@@ -1,11 +1,13 @@
 package spl;
 
-import org.sciplore.xml.XmlAuthor;
-import org.sciplore.xml.XmlDocument;
-import org.sciplore.xml.XmlKeyword;
-import org.sciplore.xml.XmlKeywords;
-
 import java.util.List;
+
+import org.sciplore.beans.Abstract;
+import org.sciplore.beans.Author;
+import org.sciplore.beans.Authors;
+import org.sciplore.beans.Document;
+import org.sciplore.formatter.Bean;
+import org.sciplore.formatter.SimpleTypeElementBean;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,17 +18,17 @@ import java.util.List;
  */
 public class DocumentWrapper {
 
-    XmlDocument xmlDocument;
+    Document xmlDocument;
 
-    public DocumentWrapper(XmlDocument xmlDocument) {
+    public DocumentWrapper(Document xmlDocument) {
         this.xmlDocument = xmlDocument;
     }
 
-    public XmlDocument getXmlDocument() {
+    public Document getXmlDocument() {
         return xmlDocument;
     }
 
-    public void setXmlDocument(XmlDocument xmlDocument) {
+    public void setXmlDocument(Document xmlDocument) {
         this.xmlDocument = xmlDocument;
     }
 
@@ -45,7 +47,7 @@ public class DocumentWrapper {
 
     public String getAbstract(){
         if(this.hasAbstract()){
-            return xmlDocument.getAbstract().getValue();
+            return ((Abstract)xmlDocument.getAbstract()).getValue();
         }
         else{
             return "";
@@ -53,21 +55,22 @@ public class DocumentWrapper {
     }
 
     public boolean hasAbstract(){
-        return (xmlDocument.getAbstract() != null && xmlDocument.getAbstract().getValue() != null && !xmlDocument.getAbstract().getValue().isEmpty());
+        return (xmlDocument.getAbstract() != null && ((Abstract)xmlDocument.getAbstract()).getValue() != null && !((Abstract)xmlDocument.getAbstract()).getValue().isEmpty());
     }
 
-    public String getAuthors(String seperator){
+   public String getAuthors(String seperator){
         if(this.hasAuthors()){
-            List<XmlAuthor> authors = xmlDocument.getAuthors().getAuthors();
+        	List<Bean> authors = xmlDocument.getAuthors().getCollection();
+            authors = this.sortAuthors(authors);
             String value = "";
             int i = 1;
-            for(XmlAuthor author : authors){
+            for(Bean author : authors){
                 if(i < authors.size()){
-                    value = value + author.getNameComplete();
-                    value = value + seperator + " ";
+                    value = value + getNameComplete((Author)author);
+                    value = value + " " + seperator + " ";
                 }
                 else{
-                    value = value + author.getNameComplete();
+                    value = value + getNameComplete((Author)author);
                 }
                 i++;
             }
@@ -79,10 +82,10 @@ public class DocumentWrapper {
     }
 
     public boolean hasAuthors(){
-        return (xmlDocument.getAuthors() != null && xmlDocument.getAuthors().getAuthors() != null && !xmlDocument.getAuthors().getAuthors().isEmpty());
+        return (xmlDocument.getAuthors() != null && xmlDocument.getAuthors().getCollection() != null && !xmlDocument.getAuthors().getCollection().isEmpty());
     }
 
-    public String getKeyWords(){
+    /* public String getKeyWords(){
         if(this.hasKeyWords()){
             List<XmlKeyword> keywords = xmlDocument.getKeywords().getKeywords();
             String value = "";
@@ -107,11 +110,11 @@ public class DocumentWrapper {
     public boolean hasKeyWords(){
         return (xmlDocument.getKeywords() != null && xmlDocument.getKeywords().getKeywords() != null && !xmlDocument.getKeywords().getKeywords().isEmpty());
     }
-
+*/
 
     public String getDoi(){
         if(this.hasDoi()){
-            return xmlDocument.getDoi().getValue();
+            return this.getSimpleTypeValue(xmlDocument.getDoi());
         }
         else{
             return "";
@@ -119,9 +122,9 @@ public class DocumentWrapper {
     }
 
     public boolean hasDoi(){
-        return (xmlDocument.getDoi() != null && xmlDocument.getDoi().getValue() != null && !xmlDocument.getDoi().getValue().isEmpty());
+        return (xmlDocument.getDoi() != null && this.getSimpleTypeValue(xmlDocument.getDoi()) != null && !this.getSimpleTypeValue(xmlDocument.getDoi()).isEmpty());
     }
-
+/*
     public String getPages(){
         if(this.hasPages()){
             return xmlDocument.getPages().getValue();
@@ -160,10 +163,11 @@ public class DocumentWrapper {
     public boolean hasNumber(){
         return (xmlDocument.getNumber() != null && xmlDocument.getNumber().getValue() != null && !xmlDocument.getNumber().getValue().isEmpty());
     }
-
+*/
+    
     public String getYear(){
         if(this.hasYear()){
-            return xmlDocument.getPublishdate().getYear();
+            return this.getSimpleTypeValue(xmlDocument.getYear());
         }
         else{
             return "";
@@ -171,9 +175,10 @@ public class DocumentWrapper {
     }
 
     public boolean hasYear(){
-        return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getYear() != null && !xmlDocument.getPublishdate().getYear().isEmpty() && !xmlDocument.getPublishdate().getYear().equalsIgnoreCase("null"));
+        return (this.getSimpleTypeValue(xmlDocument.getYear()) != null && !this.getSimpleTypeValue(xmlDocument.getYear()).isEmpty() && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
     }
-
+    
+/*
      public String getMonth(){
         if(this.hasMonth()){
             return xmlDocument.getPublishdate().getMonth();
@@ -199,7 +204,8 @@ public class DocumentWrapper {
     public boolean hasDay(){
         return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getDay() != null && !xmlDocument.getPublishdate().getDay().isEmpty());
     }
-
+    
+	/*
     public String getVenue() {
         if(this.hasVenue()){
             return xmlDocument.getVenue().getValue();
@@ -211,5 +217,56 @@ public class DocumentWrapper {
 
     public boolean hasVenue(){
         return (xmlDocument.getVenue() != null && xmlDocument.getVenue().getValue() != null && !xmlDocument.getVenue().getValue().isEmpty());
+    }*/
+    
+    private String getNameComplete(Author author){
+    	if(author == null) return "";
+    	String result = "";
+    	if(getSimpleTypeValue(author.getName_First()) != null)
+    		result = result + getSimpleTypeValue(author.getName_First()).trim() + " ";
+    	if(getSimpleTypeValue(author.getName_Middle()) != null)
+    		result = result + getSimpleTypeValue(author.getName_Middle()).trim() + " ";
+    	if(getSimpleTypeValue(author.getName_Last_Prefix()) != null)
+    		result = result + getSimpleTypeValue(author.getName_Last_Prefix()).trim() + " ";
+    	if(getSimpleTypeValue(author.getName_Last()) != null)
+    		result = result + getSimpleTypeValue(author.getName_Last()).trim() + " ";
+    	if(getSimpleTypeValue(author.getName_Last_Suffix()) != null)
+    		result = result + getSimpleTypeValue(author.getName_Last_Suffix()).trim() + " ";
+    	return result.trim();
     }
+    
+    private String getSimpleTypeValue(Bean bean){
+    	if(bean == null || !(bean instanceof SimpleTypeElementBean)) return null;
+    	SimpleTypeElementBean simpleTypeElementBean = (SimpleTypeElementBean)bean;
+    	if(simpleTypeElementBean.getValue() == null || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || simpleTypeElementBean.getValue().length() <= 0) return null;
+    	return simpleTypeElementBean.getValue();
+    }
+    
+    private List<Bean> sortAuthors(List<Bean> authors){
+   	 boolean unsorted = true;
+        Bean temp;
+        
+        while (unsorted){
+       	 unsorted = false;
+       	 for (int i = 0; i < authors.size() - 1; i++){
+       		 int rank = 99;
+       		 int otherRank = 99;
+       		 if(((Author)authors.get(i)).getRank() != null && !((Author)authors.get(i)).getRank().equalsIgnoreCase("null")){
+       			 rank = Integer.parseInt(((Author)authors.get(i)).getRank());
+       		 }        		 
+       		 if(((Author)authors.get(i + 1)).getRank() != null && !((Author)authors.get(i + 1)).getRank().equalsIgnoreCase("null")){
+       			 otherRank = Integer.parseInt(((Author)authors.get(i + 1)).getRank());
+       		 }       		 
+       		 
+       	 	 if (rank > otherRank) {                      
+                 temp       = authors.get(i);
+                 authors.set(i, authors.get(i + 1));
+                 authors.set(i + 1, temp);                 
+                 unsorted = true;
+              }          
+        	} 	 
+       } 
+   	
+   	return authors;
+   }
 }

@@ -67,6 +67,7 @@ public class MainTable extends JTable {
                      BasePanel panel) {
         super();
 
+        addFocusListener(Globals.focusListener);
         setAutoResizeMode(Globals.prefs.getInt("autoResizeMode"));
         this.tableFormat = tableFormat;
         this.panel = panel;

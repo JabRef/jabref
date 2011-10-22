@@ -7,6 +7,30 @@
 
   <h1>Revision history</h1>
 
+  <h3>Version 2.7.1</h3>
+    <ul>
+    <li>Fixed problem with search function under Java 7.</li>
+    <li>Made Database properties dialog modal to prevent database from being closed
+      while properties window is open.</li>
+    <li>Fixed error handling in custom import dialog when invalid jar files or class
+      files are specified.</li>
+    <li>Added OR operator for conditional export formatting.</li>
+    <li>DocBook export format switched to 4.4 (based on patch 3313898).</li>
+    <li>Fixed bug that made the key generator combination [shorttitle:abbr] return
+      only a single letter.</li>
+    <li>"of" added to the list of skip words (patch 2781830).</li>
+    <li>Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).</li>
+    <li>RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
+      (patch 2905383 by Russell Almond).</li>
+    <li>Fixed bug that made menu items for marking in specific colors invisible
+      under Windows 7.</li>
+    <li>In case a new entry is added, this entry is highlighted and the editor is opened
+      if configured in the settings (patch 3370466). The UI behavior of adding an entry
+      at "new entry from plain text" is now similar to "new entry".</li>
+    <li>Fixed bug in focus handling that affected some actions.</li>
+    <li>Running JabRef under the Oracle JVM will no longer give a warning.</li>
+    </ul>
+
   <h3>Version 2.7</h3>
     <ul>
     <li>Medline importer now wraps multipart last names in braces.</li>

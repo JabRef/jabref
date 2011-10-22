@@ -1,22 +1,36 @@
 package spl;
 
-import net.sf.jabref.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.*;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.EntryTypeDialog;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.Util;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.ImportSettingsTab;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
-import org.sciplore.xml.XmlDocument;
-import org.sciplore.xml.XmlDocuments;
+
+import org.sciplore.beans.Document;
+
 import spl.filter.PdfFileFilter;
 import spl.gui.ImportDialog;
 import spl.gui.MetaDataListDialog;
-import spl.listener.SplDatabaseChangeListener;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -98,7 +112,6 @@ public class PdfImporter {
             	BibtexEntry entry;
             	BibtexEntryType type;
             	MetaDataListDialog metaDataListDialog;
-            	XmlDocuments documents;
                 switch (choice) {
     			case ImportDialog.XMP:
                     //SplDatabaseChangeListener dataListener = new SplDatabaseChangeListener(frame, panel, entryTable, fileName);
@@ -160,11 +173,11 @@ public class PdfImporter {
                     metaDataListDialog = new MetaDataListDialog(fileName, true);
                     Tools.centerRelativeToWindow(metaDataListDialog, frame);
                     metaDataListDialog.showDialog();
-                    documents = metaDataListDialog.getXmlDocuments();
-                    if(documents != null && documents.getDocuments() != null && documents.getDocuments().size() > 0 && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
+                    Document document = metaDataListDialog.getXmlDocuments();
+                    if(document != null /*&& documents.getDocuments() != null && documents.getDocuments().size() > 0*/ && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
-                        if(selected > -1 && selected < documents.getDocuments().size()){
-                            XmlDocument document = documents.getDocuments().get(selected);
+                        if(selected > -1 /*&& selected < documents.getDocuments().size()*/){
+                            //Document document = documents/*.getDocuments().get(selected)*/;
                             String id = Util.createNeutralId();
                             entry = new BibtexEntry(id);
                             if(fieldExists(document.getType())){
@@ -198,7 +211,7 @@ public class PdfImporter {
                     else if(metaDataListDialog.getResult() == JOptionPane.NO_OPTION ){
                         createNewBlankEntry(fileName);
                     }
-                    else if(documents == null || documents.getDocuments() == null || documents.getDocuments().size() <= 0 && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
+                    else if(document == null /*|| document.getDocuments() == null || document.getDocuments().size() <= 0*/ && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
                         createNewBlankEntry(fileName);
                     }
                     break;
@@ -209,11 +222,11 @@ public class PdfImporter {
                     metaDataListDialog = new MetaDataListDialog(fileName, false);                   
                     Tools.centerRelativeToWindow(metaDataListDialog, frame);
                     metaDataListDialog.showDialog();
-                    documents = metaDataListDialog.getXmlDocuments();
-                    if(documents != null && documents.getDocuments() != null && documents.getDocuments().size() > 0 && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
+                    document = metaDataListDialog.getXmlDocuments();
+                    if(document != null /*&& document.getDocuments() != null && document.getDocuments().size() > 0*/ && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
-                        if(selected > -1 && selected < documents.getDocuments().size()){
-                            XmlDocument document = documents.getDocuments().get(selected);
+                        if(selected > -1 /*&& selected < document.getDocuments().size()*/){
+                            //XmlDocument document = documents.getDocuments().get(selected);
                             entry = entryTable.getEntryAt(dropRow);
                             if(fieldExists(document.getType())){
                                 type = BibtexEntryType.getStandardType(document.getType());
@@ -251,7 +264,7 @@ public class PdfImporter {
         }
     }
 
-    private void insertFields(String[] fields, BibtexEntry entry, XmlDocument xmlDocument) {
+    private void insertFields(String[] fields, BibtexEntry entry, Document xmlDocument) {
         DocumentWrapper document = new DocumentWrapper(xmlDocument);
         for(String field : fields){
             if(entry.getField(field) != null){
@@ -266,13 +279,13 @@ public class PdfImporter {
             if(field.equalsIgnoreCase("abstract")){
                 entry.setField(field, document.getAbstract());
             }
-            if(field.equalsIgnoreCase("keywords")){
+            /*if(field.equalsIgnoreCase("keywords")){
                 entry.setField(field, document.getKeyWords());
-            }
+            }*/
             if(field.equalsIgnoreCase("doi")){
                 entry.setField(field, document.getDoi());
             }
-            if(field.equalsIgnoreCase("pages")){
+            /*if(field.equalsIgnoreCase("pages")){
                 entry.setField(field, document.getPages());
             }
             if(field.equalsIgnoreCase("volume")){
@@ -280,11 +293,11 @@ public class PdfImporter {
             }
             if(field.equalsIgnoreCase("number")){
                 entry.setField(field, document.getNumber());
-            }
+            }*/
             if(field.equalsIgnoreCase("year")){
                 entry.setField(field, document.getYear());
             }
-            if(field.equalsIgnoreCase("month")){
+            /*if(field.equalsIgnoreCase("month")){
                 entry.setField(field, document.getMonth());
             }
             if(field.equalsIgnoreCase("day")){
@@ -295,7 +308,7 @@ public class PdfImporter {
             }
             if(field.equalsIgnoreCase("journal")){
                 entry.setField(field, document.getVenue());
-            }
+            }*/
         }
     }
 

@@ -35,7 +35,7 @@ public class DatabasePropertiesDialog extends JDialog {
     boolean oldProtectVal = false;
 
     public DatabasePropertiesDialog(JFrame parent) {
-        super(parent, Globals.lang("Database properties"), false);
+        super(parent, Globals.lang("Database properties"), true);
         encoding = new JComboBox(Globals.ENCODINGS);
         ok = new JButton(Globals.lang("Ok"));
         cancel = new JButton(Globals.lang("Cancel"));

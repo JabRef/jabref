@@ -53,19 +53,21 @@ public class PushToApplicationButton implements ActionListener {
         applications = new ArrayList<PushToApplication>();
 
         JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
-        for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
-            applications.add(extension.getPushToApp());
+        if(jabrefPlugin != null){
+		    List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
+		    for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
+		        applications.add(extension.getPushToApp());
+		    }
+		
+		    applications.add(new PushToLyx());
+		    applications.add(new PushToEmacs());
+		    applications.add(new PushToWinEdt());
+		    applications.add(new PushToLatexEditor());
+		    applications.add(new PushToVim());
+		
+		    // Finally, sort the entries:
+		    //Collections.sort(applications, new PushToApplicationComparator());
         }
-
-        applications.add(new PushToLyx());
-        applications.add(new PushToEmacs());
-        applications.add(new PushToWinEdt());
-        applications.add(new PushToLatexEditor());
-        applications.add(new PushToVim());
-
-        // Finally, sort the entries:
-        //Collections.sort(applications, new PushToApplicationComparator());
     }
 
 

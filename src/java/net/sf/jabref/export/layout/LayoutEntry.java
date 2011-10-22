@@ -202,10 +202,11 @@ public class LayoutEntry {
 		case LayoutHelper.IS_FIELD_START:
 		case LayoutHelper.IS_GROUP_START: {
             String field;
-            if (type == LayoutHelper.IS_GROUP_START)
+            if (type == LayoutHelper.IS_GROUP_START) {
                 field = BibtexDatabase.getResolvedField(text, bibtex, database);
-            else {
-                String[] parts = text.split(";");
+            } else if(text.matches(".*(;|(\\&+)).*")) {
+		// split the strings along &, && or ; for AND formatter
+                String[] parts = text.split("\\s*(;|(\\&+))\\s*");
                 field = null;
                 for (int i = 0; i < parts.length; i++) {
                     field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
@@ -213,7 +214,16 @@ public class LayoutEntry {
                         break;
                     
                 }
-            }
+            } else { 
+		// split the strings along |, ||  for OR formatter
+                String[] parts = text.split("\\s*(\\|+)\\s*");
+                field = null;
+                for (int i = 0; i < parts.length; i++) {
+                    field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
+                    if (field != null)
+                        break;
+                }
+	    }
             
 			if ((field == null)
 				|| ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper

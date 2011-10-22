@@ -1439,7 +1439,10 @@ public class GroupSelector extends SidePaneComponent implements
             frame.groupToggle.setSelected(false);
         }
 
-        validateTree();
+        synchronized (getTreeLock()) {
+            validateTree();
+        }
+
 
     }
 

@@ -158,16 +158,12 @@
     referred in the curly braces is defined for the entry being
     exported.</p>
 
-    <p>A conditional block can also be dependent on more than one field. In this case
-    the contents of the block are printed only if all the fields are defined. To make
-    such a block, simply give the list of fields separated by semicolons. For instance,
-    to output text only if both <code>year</code> and <code>month</code> are set, use
-    a block like the following:</p>
-
-    <p><code>\begin{year;month}Month: \format[HTMLChars]{\month}\end{year;month}</code></p>
-
-    <p>which will print "Month: " plus the contents of the <code>month</code> field, but
-    only if also the <code>year</code> field is defined.</p>
+    <p>A conditional block can also be dependent on more than one field, and the content is only printed when simple boolean conditions are satisfied. Two boolean operator are provided:</p>
+    <ul>
+	<li>AND operator : <code>&amp;</code>, <code>&amp;&amp;</code></li>
+	<li>OR operator : <code>|</code>, <code>||</code></li>
+    </ul>
+    <p>To output text only if both <code>year</code> and <code>month</code> are set, use a block like the following:<br/><br/> <code>\begin{year&amp;&amp;month}Month: \format[HTMLChars]{\month}\end{year&amp;&amp;month}</code><br/><br/>which will print "Month: " plus the contents of the <code>month</code> field, but only if also the <code>year</code> field is defined.</p>
 
     <p><b>Note:</b> Use of the <code>\begin</code> and
     <code>\end</code> commands is a key to creating layout files
