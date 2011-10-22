@@ -47,7 +47,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.7" />
+	<property name="jabref.version" value="2.7.1" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
@@ -140,6 +140,9 @@
         <include name="spl/**/*.jar" />
         <include name="spl/*.jar" />
     </fileset>
+	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
+	        <exclude name="services/**/*" />	        
+	</fileset>
     <!-- Done by MrDlib -->
 
 	<!-- Build classpath -->
@@ -242,16 +245,9 @@
 	<!-- Jars up project -->
 	<target name="jars" depends="build, unjarlib,get-svn-rev">
 		<mkdir dir="${build.lib}" />
-        <!-- Done by MrDlib -->
-        <copy todir="${build.lib}/lib">
-            <fileset dir="${lib.dir}">
-                <include name="spl/**/*.jar" />
-                <include name="spl/*.jar" />
-            </fileset>
-        </copy>
-        <!-- Done by MrDlib -->
+        
 		<mkdir dir="${build.tmp}" />
-		<jar destfile="${build.lib}/${build.jar}" manifest="${src.dir}/MANIFEST.MF"><!-- Done by MrDlib -->
+		<jar destfile="${build.lib}/${build.jar}" > 
         <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
 
 			<fileset dir="${build.classes}" />
@@ -434,8 +430,13 @@ version=${jabref.version}</echo>
 		<mkdir dir="${build.tmp}" />
 		<unjar dest="${build.tmp}">
 			<fileset refid="jarsFileset" />
+			<fileset refid="splJars" />
 		</unjar>
-		<delete dir="${build.tmp}/META-INF" />
+		<!-- done by MrDlib -->
+		<delete includeEmptyDirs="true">
+			<fileset refid="deletableMeta-InfFiles" />
+		</delete>
+		<!-- done by MrDlib -->
 		<!-- rename the microba license file -->
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
