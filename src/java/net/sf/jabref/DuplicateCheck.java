@@ -9,10 +9,16 @@ import java.util.Iterator;
  */
 public class DuplicateCheck {
 
+    public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
+    // Non-required fields are investigated only if the required fields give a value within
+    // the doubt range of the threshold:
+    public static double doubtRange = 0.05;
+
     final static double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     static HashMap<String,Double> fieldWeights = new HashMap<String, Double>();
+
     static {
         fieldWeights.put("author", 2.5);
         fieldWeights.put("editor", 2.5);
@@ -32,7 +38,7 @@ public class DuplicateCheck {
         // First check if they are of the same type - a necessary condition:
         if (one.getType() != two.getType())
             return false;
-        //System.out.println(one.getCiteKey()+" : "+two.getCiteKey());
+
         // The check if they have the same required fields:
         String[] fields = one.getType().getRequiredFields();
         double[] req;
@@ -41,17 +47,21 @@ public class DuplicateCheck {
         }
         else
             req = compareFieldSet(fields, one, two);
-        //System.out.println("Req comp: "+req[0]+" / "+req[1]);
-        fields = one.getType().getOptionalFields();
 
-        if (fields != null) {
-            double[] opt = compareFieldSet(fields, one, two);
-            //System.out.println("Opt comp: "+opt[0]+" / "+opt[1]);
-            //System.out.println("Total: "+(reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]));
-            double totValue = (reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]);
-            return totValue >= Globals.duplicateThreshold;
-        } else {
-            return (req[0] >= Globals.duplicateThreshold);
+        if (Math.abs(req[0] - duplicateThreshold) > doubtRange) {
+            // Far from the threshold value, so we base our decision on the req. fields only
+            return req[0] >= duplicateThreshold;
+        }
+        else {
+            // Close to the threshold value, so we take a look at the optional fields, if any:
+            fields = one.getType().getOptionalFields();
+            if (fields != null) {
+                double[] opt = compareFieldSet(fields, one, two);
+                double totValue = (reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]);
+                return totValue >= duplicateThreshold;
+            } else {
+                return (req[0] >= duplicateThreshold);
+            }
         }
     }
 
@@ -89,35 +99,49 @@ public class DuplicateCheck {
                 return Util.EMPTY_IN_ONE;
         } else if (s2 == null)
             return Util.EMPTY_IN_TWO;
-        s1 = s1.toLowerCase();
-        s2 = s2.toLowerCase();
+
         // Util.pr(field+": '"+s1+"' vs '"+s2+"'");
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " "),
-                    auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ");
+            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase(),
+                    auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
             //System.out.println(auth1);
             //System.out.println(auth2);
             //System.out.println(correlateByWords(auth1, auth2));
-            double similarity = correlateByWords(auth1, auth2);
+            double similarity = correlateByWords(auth1, auth2, false);
             if (similarity > 0.8)
                 return Util.EQUAL;
             else
                 return Util.NOT_EQUAL;
 
-            /*String[] aus1 = AuthorList.fixAuthor_lastNameFirst(s1).split(" and "), aus2 = AuthorList
-                    .fixAuthor_lastNameFirst(s2).split(" and "), au1 = aus1[0].split(","), au2 = aus2[0]
-                    .split(",");
-
-            // Can check number of authors, all authors or only the first.
-            if ((aus1.length > 0) && (aus1.length == aus2.length)
-                    && au1[0].trim().equals(au2[0].trim()))
+        } else if (field.equals("pages")) {
+            // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
+            // We do a replace to harmonize these to a simple "-":
+            // After this, a simple test for equality should be enough:
+            s1 = s1.replaceAll("[- ]+","-");
+            s2 = s2.replaceAll("[- ]+","-");
+            if (s1.equals(s2))
                 return Util.EQUAL;
             else
-                return Util.NOT_EQUAL;*/
+                return Util.NOT_EQUAL;
+
+        } else if (field.equals("journal")) {
+            // We do not attempt to harmonize abbreviation state of the journal names,
+            // but we remove periods from the names in case they are abbreviated with
+            // and without dots:
+            s1 = s1.replaceAll("\\.", "").toLowerCase();
+            s2 = s2.replaceAll("\\.", "").toLowerCase();
+            //System.out.println(s1+" :: "+s2);
+            double similarity = correlateByWords(s1, s2, true);
+            if (similarity > 0.8)
+                return Util.EQUAL;
+            else
+                return Util.NOT_EQUAL;
         } else {
-            double similarity = correlateByWords(s1, s2);
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            double similarity = correlateByWords(s1, s2, false);
             if (similarity > 0.8)
                 return Util.EQUAL;
             else
@@ -170,7 +194,15 @@ public class DuplicateCheck {
         return null; // No duplicate found.
 	}
 
-    public static double correlateByWords(String s1, String s2) {
+    /**
+     * Compare two strings on the basis of word-by-word correlation analysis.
+     * @param s1 The first string
+     * @param s2 The second string
+     * @param truncate if true, always truncate the longer of two words to be compared to
+     *   harmonize their length. If false, use interpolation to harmonize the strings.
+     * @return a value in the interval [0, 1] indicating the degree of match.
+     */
+    public static double correlateByWords(String s1, String s2, boolean truncate) {
         String[] w1 = s1.split("\\s"),
                 w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
@@ -178,7 +210,7 @@ public class DuplicateCheck {
         for (int i=0; i<n; i++) {
             /*if (!w1[i].equalsIgnoreCase(w2[i]))
                 misses++;*/
-            double corr = correlateStrings(w1[i], w2[i]);
+            double corr = correlateStrings(w1[i], w2[i], truncate);
             if (corr < 0.75)
                 misses++;
         }
@@ -186,17 +218,34 @@ public class DuplicateCheck {
         return 1-missRate;
     }
 
-    public static double correlateStrings(String s1, String s2) {
-        if (s1.length() == 1 && s2.length() == 1) {
+    public static double correlateStrings(String s1, String s2, boolean truncate) {
+        int minLength = Math.min(s1.length(), s2.length());
+        if (truncate && minLength == 1) {
+            return s1.charAt(0) == s2.charAt(0) ? 1.0 : 0.0;
+        }
+        else if (s1.length() == 1 && s2.length() == 1) {
             return s1.equals(s2) ? 1.0 : 0.0;
         }
-        // Convert strings to numbers and pad the shortest one with zeros:
+        else if (minLength == 0)
+            return s1.length() == 0 && s2.length() == 0 ? 1.0 : 0;
+
+        // Convert strings to numbers and harmonize length in a method dependent on truncate:
+        if (truncate) {
+            // Harmonize length by truncation:
+            if (s1.length() > minLength)
+                s1 = s1.substring(0, minLength);
+            if (s2.length() > minLength)
+                s2 = s2.substring(0, minLength);
+        }
         double[] n1 = numberizeString(s1),
                 n2 = numberizeString(s2);
-        if (n1.length < n2.length)
-            n1 = stretchArray(n1, n2.length);
-        else if (n2.length < n1.length)
-            n2 = stretchArray(n2, n1.length);
+        // If truncation is disabled, harmonize length by interpolation:
+        if (!truncate) {
+            if (n1.length < n2.length)
+                n1 = stretchArray(n1, n2.length);
+            else if (n2.length < n1.length)
+                n2 = stretchArray(n2, n1.length);
+        }
         return corrCoef(n1, n2);
     }
 
@@ -234,7 +283,7 @@ public class DuplicateCheck {
     }
 
     private static double[] stretchArray(double[] array, int length) {
-        if (length <= array.length)
+        if (length <= array.length || array.length == 0)
             return array;
         double multip = ((double)array.length)/((double)length);
         double[] newArray = new double[length];
@@ -253,9 +302,9 @@ public class DuplicateCheck {
         String d1 =  "Characterization of Calanus finmarchicus habitat in the North Sea",
                 d2 = "Characterization of Calunus finmarchicus habitat in the North Sea",
                 d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
-        System.out.println(correlateByWords(d1, d2));
-        System.out.println(correlateByWords(d1, d3));
-        System.out.println(correlateByWords(d2, d3));
+        System.out.println(correlateByWords(d1, d2, false));
+        System.out.println(correlateByWords(d1, d3, false));
+        System.out.println(correlateByWords(d2, d3, false));
 
     }
 }

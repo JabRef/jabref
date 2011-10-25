@@ -104,9 +104,7 @@ public class Globals {
 		ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/",
 		FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
-	public static float duplicateThreshold = 0.75f;
-
-	private static Handler consoleHandler;
+    private static Handler consoleHandler;
 
 	public static String[] ENCODINGS, ALL_ENCODINGS = // (String[])
 		// Charset.availableCharsets().keySet().toArray(new
