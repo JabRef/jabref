@@ -380,48 +380,6 @@ public class ImportFormatReader {
     return reader;
   }
 
-  public static BibtexDatabase import_File(String format, String filename)
-    throws IOException {
-    BibtexDatabase database = null;
-    List<BibtexEntry> bibentries = null;
-    File f = new File(filename);
-
-    if (!f.exists())
-      throw new IOException(Globals.lang("File not found") + ": " + filename);
-
-    try {
-      bibentries = Globals.importFormatReader.importFromFile(format, filename);
-    } catch (IllegalArgumentException ex) {
-      throw new IOException(Globals.lang("Could not resolve import format") + " '"
-        + format + "'");
-    }
-
-    if (bibentries == null)
-      throw new IOException(Globals.lang("Import failed"));
-
-    // Remove all empty entries:
-    purgeEmptyEntries(bibentries);
-
-    // Add entries to database.
-    database = new BibtexDatabase();
-
-    Iterator<BibtexEntry> it = bibentries.iterator();
-
-    while (it.hasNext()) {
-      BibtexEntry entry = it.next();
-
-      try {
-        entry.setId(Util.createNeutralId());
-        database.insertEntry(entry);
-      } catch (KeyCollisionException ex) {
-        //ignore
-        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-      }
-    }
-
-    return database;
-  }
-
   /**
    * Receives an ArrayList of BibtexEntry instances, iterates through them, and
    * removes all entries that have no fields set. This is useful for rooting out
@@ -445,7 +403,7 @@ public class ImportFormatReader {
 	 * 
 	 * @throws IOException 
 	 */
-	public Pair<String, ParserResult> importUnknownFormat(String filename) throws IOException {
+	public Pair<String, ParserResult> importUnknownFormat(String filename) {
 
 		Pair<String, ParserResult> result = null;
 		
@@ -487,7 +445,7 @@ public class ImportFormatReader {
 
               return new Pair<String, ParserResult>(BIBTEX_FORMAT, pr);
           }
-      } catch (RuntimeException ex) {
+      } catch (Throwable ex) {
           return null;
       }
 

@@ -43,7 +43,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     JabRefFrame frame;
     boolean openInNew;
     MyWorker worker = null;
-    ImportFormat importer;     
+    ImportFormat importer;
+    IOException importError = null;
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -87,6 +88,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         boolean fileOk = false;
 
         public void init() {
+            importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get("workingDirectory")),
                     (importer != null ? importer.getExtensions() : null), true);
@@ -119,12 +121,15 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 					} else {
 						// Unknown format:
                         frame.output(Globals.lang("Importing in unknown format")+"...");
+                        // This import method never throws an IOException:
                         imports.add(Globals.importFormatReader
 							.importUnknownFormat(filename));
 					}
 				} catch (IOException e) {
-					// No entries found...
-                    e.printStackTrace();
+					// This indicates that a specific importer was specified, and that
+                    // this importer has thrown an IOException. We store the exception,
+                    // so a relevant error message can be displayed.
+                    importError = e;
                 }
 			}
 
@@ -252,10 +257,18 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             } else {
                 if (importer == null)
                     frame.output(Globals.lang("Could not find a suitable import format."));
-                else
-                    JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "
-								  +"using the correct import filter."), Globals.lang("Import failed"),
-					      JOptionPane.ERROR_MESSAGE);
+                else {
+                    // Import in a specific format was specified. Check if we have stored error information:
+                    if (importError != null) {
+                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Globals.lang("Import failed"),
+                              JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "
+                                      +"using the correct import filter."), Globals.lang("Import failed"),
+                              JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
             frame.unblock();
         }

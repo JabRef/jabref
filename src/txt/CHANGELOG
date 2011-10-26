@@ -1,7 +1,10 @@
 
 2.8 beta
-    - Added markers \filename and \filepath for .begin.layout files in order to output the
-      name or full path of the bib file of the exported database.
+    - Improved error handling when importing in specific format.
+    - Prevented crash when calling invalid import format on startup.
+    - Improved duplicate detection.
+    - Added markers \filename and \filepath for ".begin.layout" and ".end.layout" files
+      in order to output the name or full path of the bib file of the exported database.
     - Fixed possible array index exception in LastPage formatter.
     - Improved author/editor normalization in entry editor.
     - Added metadata extraction from text when PDFs are dragged into JabRef.
@@ -16,7 +19,7 @@
     - The command for pushing to emacs can be configured now. New command for Emacs 23.
       New default for Windows: emacsclient.
     - Added export support for DIN1505 style (based on patch 1874662).
-    - Added support for PostgresSQL import/export (patch 3368760 by Fred Stevens).
+    - Added support for PostgreSQL import/export (patch 3368760 by Fred Stevens).
     - Added formatter "JournalAbbreviator" (patch 3013311 by Meigel).
     - RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
       (patch 2905383 by Russell Almond).
