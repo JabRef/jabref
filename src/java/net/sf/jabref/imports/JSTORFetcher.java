@@ -21,7 +21,7 @@ import net.sf.jabref.OutputPrinter;
 
 /**
  * This class fetches up to 200 citations from JStor by a given search query. It
- * communicates with jstor via HTTP and Cookies. The fetcher automates the
+ * communicates with jstor via HTTP and Cookies. The activeFetcher automates the
  * following steps:
  * <ol>
  * <li>Do a basic search on www.jstor.org</li>

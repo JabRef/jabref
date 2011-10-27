@@ -1,5 +1,7 @@
 
 2.8 beta
+    - Changed entry fetcher system so all fetchers are accessed from a single side pane
+      component with a selector.
     - Added INSPIRE fetcher by Sheer El-Showk.
     - Improved error handling when importing in specific format.
     - Prevented crash when calling invalid import format on startup.

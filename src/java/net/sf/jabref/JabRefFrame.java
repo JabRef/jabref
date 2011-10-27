@@ -1315,12 +1315,19 @@ public JabRefPreferences prefs() {
       /*
        * Add all entryFetchers
        */
-      for (EntryFetcher fetcher : fetchers){
+      /*for (EntryFetcher fetcher : fetchers){
     	  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
           generalFetcher.setHelpResourceOwner(fetcher.getClass());
     	  web.add(generalFetcher.getAction());
     	  fetcherActions.add(generalFetcher.getAction());
+      }*/
+      GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
+      web.add(generalFetcher.getAction());
+      if (prefs.getBoolean("webSearchVisible")) {
+          sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
+          sidePaneManager.show(generalFetcher.getTitle());
       }
+
 
       mb.add(web);
 

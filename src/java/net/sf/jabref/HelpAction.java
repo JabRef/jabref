@@ -44,8 +44,6 @@ public class HelpAction extends MnemonicAwareAction {
 
     protected Class resourceOwner = null;
 
-	protected URL helpfile;
-
 	protected String helpFile;
 
 	public HelpAction(HelpDialog diag, String helpFile) {
@@ -106,6 +104,10 @@ public class HelpAction extends MnemonicAwareAction {
 		hlp.setPreferredSize(new Dimension(24, 24));
 		return hlp;
 	}
+
+    public void setHelpFile(String helpFile) {
+        this.helpFile = helpFile;
+    }
 
 	public void actionPerformed(ActionEvent e) {
         if (resourceOwner == null)

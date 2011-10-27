@@ -8,7 +8,7 @@ import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
- * Implement this interface to add another fetcher (something that grabs records
+ * Implement this interface to add another activeFetcher (something that grabs records
  * from the Web for JabRef). Have a look at the existing implemenations
  * OAI2Fetcher, IEEEXploreFetcher, MedlineFetcher, JStorFetcher and
  * CiteSeerEntryFetcher.
@@ -32,7 +32,7 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @param inspector
      *            The dialog to add imported entries to.
      * @param status
-     *            An OutputPrinter passed to the fetcher for reporting about the
+     *            An OutputPrinter passed to the activeFetcher for reporting about the
      *            status of the fetching.
      * 
      * @return True if the query was completed successfully, false if an error
@@ -41,14 +41,14 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status);
 
     /**
-     * The title for this fetcher, displayed in the menu and in the side pane.
+     * The title for this activeFetcher, displayed in the menu and in the side pane.
      * 
      * @return The title
      */
     public String getTitle();
 
     /**
-     * Get the name of the key binding for this fetcher, if any.
+     * Get the name of the key binding for this activeFetcher, if any.
      * 
      * @return The name of the key binding or null, if no keybinding should be
      *         created.
@@ -56,29 +56,29 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
     public String getKeyName();
 
     /**
-     * Get the appropriate icon URL for this fetcher.
+     * Get the appropriate icon URL for this activeFetcher.
      * 
      * @return The icon URL
      */
     public URL getIcon();
 
     /**
-     * Get the name of the help page for this fetcher.
+     * Get the name of the help page for this activeFetcher.
      * 
      * If given, a question mark is displayed in the side pane which leads to
      * the help page.
      * 
-     * @return The name of the help file or null if this fetcher does not have
+     * @return The name of the help file or null if this activeFetcher does not have
      *         any help.
      */
     public String getHelpPage();
 
     /**
-     * If this fetcher requires additional options, a panel for setting up these
+     * If this activeFetcher requires additional options, a panel for setting up these
      * should be returned in a JPanel by this method. This JPanel will be added
      * to the side pane component automatically.
      * 
-     * @return Options panel for this fetcher or null if this fetcher does not
+     * @return Options panel for this activeFetcher or null if this activeFetcher does not
      *         have any options.
      */
     public JPanel getOptionsPanel();

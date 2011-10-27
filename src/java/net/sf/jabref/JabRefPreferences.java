@@ -423,20 +423,16 @@ public class JabRefPreferences {
         defaults.put("autoSave", Boolean.TRUE);
         defaults.put("autoSaveInterval", 5);
         defaults.put("promptBeforeUsingAutosave", Boolean.TRUE);
-
         defaults.put("deletePlugins", "");
-        
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
-
         defaults.put("biblatexMode", Boolean.FALSE);
-
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
-
         defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));
         defaults.put(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
-        
         defaults.put("allowFileAutoOpenBrowse", Boolean.TRUE);
+        defaults.put("webSearchVisible", Boolean.FALSE);
+        defaults.put("selectedFetcherIndex", 0);
 
         //defaults.put("lastAutodetectedImport", "");
 
