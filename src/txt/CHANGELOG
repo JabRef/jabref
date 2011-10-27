@@ -1,5 +1,6 @@
 
 2.8 beta
+    - Added INSPIRE fetcher by Sheer El-Showk.
     - Improved error handling when importing in specific format.
     - Prevented crash when calling invalid import format on startup.
     - Improved duplicate detection.

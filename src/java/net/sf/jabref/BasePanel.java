@@ -100,6 +100,7 @@ import net.sf.jabref.gui.MainTableSelectionListener;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
+import net.sf.jabref.imports.INSPIREFetcher;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -1293,6 +1294,35 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   output(Globals.lang("No entries or multiple entries selected."));
             }
         	});
+
+		/*
+		 *  It looks like this action was not being supported for SPIRES anyway
+		 *  so we don't bother to implement it.
+        actions.put("openInspire", new BaseAction() {
+        	public void action() {
+        		BibtexEntry[] bes = mainTable.getSelectedEntries();
+                if ((bes != null) && (bes.length == 1)) {
+                	Object link = null;
+                    if (bes[0].getField("eprint") != null)
+                      link = INSPIREFetcher.constructUrlFromEprint(bes[0].getField("eprint").toString());
+                    else if (bes[0].getField("slaccitation") != null)
+                        link = INSPIREFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation").toString());
+                    if (link != null) {
+                      //output(Globals.lang("Calling external viewer..."));
+                      try {
+                        Util.openExternalViewer(metaData(), link.toString(), "url");
+                        output(Globals.lang("External viewer called")+".");
+                      } catch (IOException ex) {
+                          output(Globals.lang("Error") + ": " + ex.getMessage());
+                      }
+                    }
+                    else
+                        output(Globals.lang("No url defined")+".");
+                } else
+                  output(Globals.lang("No entries or multiple entries selected."));
+            }
+        	});
+			*/
 
         
           actions.put("replaceAll", new BaseAction() {

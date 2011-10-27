@@ -295,6 +295,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       openSpires = new GeneralAction("openSpires", "Open SPIRES entry",
                                           Globals.lang("Open SPIRES entry"),
                                           prefs.getKey("Open SPIRES entry")),
+      /*
+	   * It looks like this wasn't being implemented for spires anyway so we
+	   * comment it out for now.
+	   *
+	  openInspire = new GeneralAction("openInspire", "Open INSPIRE entry",
+                                          Globals.lang("Open INSPIRE entry"),
+                                          prefs.getKey("Open INSPIRE entry")),
+		*/
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
       //strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
       plainTextImport = new GeneralAction("plainTextImport",
@@ -1515,7 +1523,9 @@ public JabRefPreferences prefs() {
             selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
-                openPdf, openUrl, openFile, openSpires, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+			/* openSpires wasn't being supported so no point in supporting
+			 * openInspire */
+                openPdf, openUrl, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, newEntryAction, plainTextImport, massSetField,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
