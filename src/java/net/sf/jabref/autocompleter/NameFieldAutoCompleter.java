@@ -13,15 +13,27 @@ import net.sf.jabref.Globals;
  */
 public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
-	private String _fieldName;
+	private String[] fieldNames;
+    private boolean lastNameOnly;
     private String prefix = "";
     private boolean autoCompFF, autoCompLF;
+    private boolean caseSensitive = true;
 
 	/**
 	 * @see AutoCompleterFactory
 	 */
-	protected NameFieldAutoCompleter(String fieldName) {
-		_fieldName = fieldName;
+    protected NameFieldAutoCompleter(String fieldName) {
+        this(new String[] {fieldName}, false);
+
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+	public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnly) {
+		this.fieldNames = fieldNames;
+        this.lastNameOnly = lastNameOnly;
         if (Globals.prefs.getBoolean("autoCompFF")) {
             autoCompFF = true;
             autoCompLF = false;
@@ -47,25 +59,32 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
 	public void addBibtexEntry(BibtexEntry entry) {
         if (entry != null) {
-			String fieldValue = entry.getField(_fieldName);
-			if (fieldValue != null) {
-				AuthorList authorList = AuthorList.getAuthorList(fieldValue);
-				for (int i = 0; i < authorList.size(); i++) {
-					AuthorList.Author author = authorList.getAuthor(i);
-                    if (autoCompLF) {
-                        addWordToIndex(author.getLastFirst(true));
-                        addWordToIndex(author.getLastFirst(false));
+            for (int i=0; i<fieldNames.length; i++) {
+                String fieldValue = entry.getField(fieldNames[i]);
+                if (fieldValue != null) {
+                    AuthorList authorList = AuthorList.getAuthorList(fieldValue);
+                    for (int j = 0; j < authorList.size(); j++) {
+                        AuthorList.Author author = authorList.getAuthor(j);
+                        if (lastNameOnly) {
+                            addWordToIndex(author.getLastOnly());
+                        } else {
+                            if (autoCompLF) {
+                                addWordToIndex(author.getLastFirst(true));
+                                addWordToIndex(author.getLastFirst(false));
+                            }
+                            if (autoCompFF) {
+                                addWordToIndex(author.getFirstLast(true));
+                                addWordToIndex(author.getFirstLast(false));
+                            }
+                        }
                     }
-                    if (autoCompFF) {
-                        addWordToIndex(author.getFirstLast(true));
-                        addWordToIndex(author.getFirstLast(false));
-                    }
-				}
-			}
+                }
+            }
 		}
 	}
 
 	public String[] complete(String str) {
+        str = str.toLowerCase();
         int index = str.lastIndexOf(" and ");
         if (index >= 0) {
             prefix = str.substring(0, index+5);
@@ -78,11 +97,16 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 	}
 
 	public String getFieldName() {
-		return _fieldName;
+		return fieldNames[0];
 	}
 
     @Override
     public String getPrefix() {
         return prefix;
+    }
+
+    @Override
+    public void addWordToIndex(String word) {
+        super.addWordToIndex(word.toLowerCase());
     }
 }

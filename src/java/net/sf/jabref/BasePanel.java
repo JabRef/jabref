@@ -70,6 +70,7 @@ import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleterFactory;
+import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
@@ -90,13 +91,7 @@ import net.sf.jabref.external.UpgradeExternalLinks;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.GlazedEntrySorter;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -160,6 +155,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
+
+    NameFieldAutoCompleter searchCompleter = null;
+    AutoCompleteListener searchCompleteListener = null;
 
     // The undo manager.
     public CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -1969,6 +1967,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         removeAll();
         add(splitPane, BorderLayout.CENTER);
 
+        // Set up name autocompleter for search:
+        instantiateSearchAutoCompleter();
+
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean("autoComplete")) {
             instantiateAutoCompleters();
@@ -1979,12 +1980,29 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         repaint();
     }
 
+    public void updateSearchManager() {
+        frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+    }
+
     public HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
         return autoCompleters;
     }
     
     public AbstractAutoCompleter getAutoCompleter(String fieldName) {
         return autoCompleters.get(fieldName);
+    }
+
+    private void instantiateSearchAutoCompleter() {
+        //if (!Globals.prefs.getBoolean("searchAutoComplete"))
+        //    return;
+        searchCompleter = new NameFieldAutoCompleter(new String[] {"author", "editor"}, true);
+        HashMap<String, AbstractAutoCompleter> hm = new HashMap<String, AbstractAutoCompleter>();
+        hm.put("x", searchCompleter);
+        for (BibtexEntry entry : database.getEntries()){
+            Util.updateCompletersForEntry(hm, entry);
+        }
+        searchCompleteListener = new AutoCompleteListener(searchCompleter);
+        searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
     private void instantiateAutoCompleters() {

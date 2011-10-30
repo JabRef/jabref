@@ -499,6 +499,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
+                    // Update search autocompleter with information for the correct database:
+                    bp.updateSearchManager();
                     // Set correct enabled state for Back and Forward actions:
                     bp.setBackAndForwardEnabledState();
                     new FocusRequester(bp.mainTable);

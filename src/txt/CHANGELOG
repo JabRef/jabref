@@ -1,5 +1,6 @@
 
 2.8 beta
+    - Added optional autocompletion of author/editor last names in search field.
     - Changed entry fetcher system so all fetchers are accessed from a single side pane
       component with a selector.
     - Added INSPIRE fetcher by Sheer El-Showk.

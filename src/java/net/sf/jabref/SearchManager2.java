@@ -41,6 +41,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.search.BasicSearch;
 import net.sf.jabref.search.SearchExpression;
 import net.sf.jabref.search.SearchExpressionParser;
@@ -57,7 +58,8 @@ public class SearchManager2 extends SidePaneComponent
 
     IncrementalSearcher incSearcher;
     SearchResultsDialog searchDialog = null;
-    
+
+    AutoCompleteListener autoCompleteListener = null;
     
 	/**
 	 * subscribed Objects
@@ -73,7 +75,7 @@ public class SearchManager2 extends SidePaneComponent
     /** This button's text will be set later. */
     private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
-    searchAll, caseSensitive, regExpSearch, highLightWords;
+    searchAll, caseSensitive, regExpSearch, highLightWords, searchAutoComplete;
 
     private JRadioButton increment, floatSearch, hideSearch, showResultsInDialog,
         searchAllBases;
@@ -161,6 +163,8 @@ public class SearchManager2 extends SidePaneComponent
         highLightWords = new JCheckBoxMenuItem(Globals.lang("Highlight Words"),
         		Globals.prefs.getBoolean("highLightWords"));
 
+        searchAutoComplete = new JCheckBoxMenuItem(Globals.lang("Autocomplete names"),
+                Globals.prefs.getBoolean("searchAutoComplete"));
     settings.add(select);
 
     // 2005.03.29, trying to remove field category searches, to simplify
@@ -177,8 +181,8 @@ public class SearchManager2 extends SidePaneComponent
     settings.add(regExpSearch);
     settings.addSeparator();
     settings.add(highLightWords);
-    //settings.addSeparator();
-
+    settings.addSeparator();
+    settings.add(searchAutoComplete);
 
     searchField.addActionListener(this);
     searchField.addCaretListener(this);
@@ -217,6 +221,15 @@ public class SearchManager2 extends SidePaneComponent
         }
         });
 
+    searchAutoComplete.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+            Globals.prefs.putBoolean("searchAutoComplete", searchAutoComplete.isSelected());
+            if (SearchManager2.this.frame.basePanel() != null) {
+                SearchManager2.this.frame.basePanel().updateSearchManager();
+            }
+
+        }
+    });
             Insets margin = new Insets(0, 2, 0, 2);
             //search.setMargin(margin);
             escape.setMargin(margin);
@@ -306,6 +319,29 @@ public class SearchManager2 extends SidePaneComponent
     updateSearchButtonText();
     }
 
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        this.autoCompleteListener = listener;
+        updateKeyListeners();
+    }
+
+    /**
+     * Add the correct key listeners to the search text field, depending on whether
+     * and autocomplete listener has been set and whether incremental search
+     * is selected.
+     */
+    protected void updateKeyListeners() {
+        KeyListener[] listeners = searchField.getKeyListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            searchField.removeKeyListener(listeners[i]);
+        }
+        if (increment.isSelected()) {
+            searchField.addKeyListener(this);
+        }
+        else {
+            if (searchAutoComplete.isSelected() && autoCompleteListener != null)
+                searchField.addKeyListener(autoCompleteListener);
+        }
+    }
 
 	/**
 	 * Subscribe to the SearchListener and receive events, if the user searches for some thing. You
@@ -634,10 +670,10 @@ public class SearchManager2 extends SidePaneComponent
             clearSearch();
         }
         updateSearchButtonText();
-        if (increment.isSelected())
-        searchField.addKeyListener(this);
-        else
-        searchField.removeKeyListener(this);
+
+        // Make sure the correct key listener is activated:
+        updateKeyListeners();
+
     } else /*if (e.getSource() == normal)*/ {
         updateSearchButtonText();
 

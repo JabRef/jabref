@@ -236,6 +236,7 @@ public class JabRefPreferences {
         defaults.put("searchGen", Boolean.TRUE);
         defaults.put("searchAll", Boolean.FALSE);
         defaults.put("incrementS", Boolean.FALSE);
+        defaults.put("searchAutoComplete", Boolean.TRUE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
         defaults.put("saveInOriginalOrder", Boolean.FALSE);
         defaults.put("exportInStandardOrder", Boolean.TRUE);

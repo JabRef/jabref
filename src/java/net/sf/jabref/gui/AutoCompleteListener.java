@@ -22,6 +22,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     protected int lastCaretPosition = -1;
     protected Object[] lastCompletions = null;
     protected int lastShownCompletion = 0;
+    protected boolean consumeEnterKey = true;
 
     // This field is set if the focus listener should call another focus listener
     // after finishing. This is needed because the autocomplete listener must
@@ -45,12 +46,23 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         this.nextFocusListener = listener;
     }
 
+    /**
+     * This setting determines whether the autocomplete listener should consume the Enter key
+     * stroke when it leads to accepting a completion. If set to false, the JTextComponent will receive
+     * the Enter key press after the completion is done. The default value if true.
+     * @param t true to indicate that the Enter key should be consumed, false that it should be forwarded
+     */
+    public void setConsumeEnterKey(boolean t) {
+        this.consumeEnterKey = t;
+    }
+
     public void keyPressed(KeyEvent e) {
     	if ((toSetIn != null) && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
             JTextComponent comp = (JTextComponent) e.getSource();
             int end = comp.getSelectionEnd();
             comp.select(end, end);
-            e.consume();
+            if (consumeEnterKey)
+                e.consume();
             return;
         }
         // Cycle through alternative completions when user presses PGUP/PGDN:
@@ -85,7 +97,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         //System.out.println("ToSetIn: '"+toSetIn+"'");
     }
 
-    public void keyTyped(KeyEvent e) {        
+    public void keyTyped(KeyEvent e) {
         char ch = e.getKeyChar();
         if (Character.isLetter(ch)) {
             JTextComponent comp = (JTextComponent) e.getSource();
