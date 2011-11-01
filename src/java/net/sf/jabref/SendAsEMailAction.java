@@ -46,7 +46,6 @@ public class SendAsEMailAction extends AbstractWorker {
 			return;
 		if (panel.getSelectedEntries().length == 0) {
 			message = Globals.lang("No entries selected") + ".";
-			getCallBack().update();
 			return;
 		}
 
@@ -91,6 +90,7 @@ public class SendAsEMailAction extends AbstractWorker {
 			} catch (Exception e) {
 				e.printStackTrace();
 				message = Globals.lang("Error creating email");
+				return;
 			}
 		}
 		
@@ -128,6 +128,7 @@ public class SendAsEMailAction extends AbstractWorker {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					message = String.format("%s: %s", Globals.lang("Could not open directory"), d.getAbsolutePath());
+					return;
 				}
 			}
 		}
