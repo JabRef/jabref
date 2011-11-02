@@ -41,6 +41,8 @@
     - Added highlighting in preview area for search text (based on patch 3121914 by
       Maximilian Lengsfeld). 
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
+2.7.2
+    - Fixed bug that prevented search functions from working under Java 7.
 2.7.1
     - Fixed problem with search function under Java 7.
     - Made Database properties dialog modal to prevent database from being closed
