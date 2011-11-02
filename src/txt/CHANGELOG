@@ -1,5 +1,7 @@
 
 2.8 beta
+    - Applied bjoerntm's patch for making the loading of group information less sensitive
+      to white space, in order to prevent trouble loading files written by other tools.
     - Added optional autocompletion of author/editor last names in search field.
     - Changed entry fetcher system so all fetchers are accessed from a single side pane
       component with a selector.
