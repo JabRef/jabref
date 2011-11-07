@@ -967,6 +967,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Automatically link files", "alt F");
         defKeyBinds.put("Resolve duplicate BibTeX keys", "ctrl shift D");
         defKeyBinds.put("Refresh OO", "ctrl alt O");
+        defKeyBinds.put("File list editor, move entry up", "ctrl UP");
+        defKeyBinds.put("File list editor, move entry down", "ctrl DOWN");
         
     }
 

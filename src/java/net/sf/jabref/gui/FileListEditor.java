@@ -165,6 +165,22 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
+        // Add input/action pair for moving an entry up:
+        getInputMap().put(Globals.prefs.getKey("File list editor, move entry up"), "move up");
+        getActionMap().put("move up", new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                moveEntry(-1);
+            }
+        });
+
+        // Add input/action pair for moving an entry down:
+        getInputMap().put(Globals.prefs.getKey("File list editor, move entry down"), "move down");
+        getActionMap().put("move down", new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                moveEntry(1);
+            }
+        });
+
         menu.add(openLink);
         openLink.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
