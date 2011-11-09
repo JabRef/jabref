@@ -243,7 +243,7 @@
 	</target>
 
 	<!-- Jars up project -->
-	<target name="jars" depends="build, unjarlib,get-svn-rev">
+	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
         
 		<mkdir dir="${build.tmp}" />
@@ -545,10 +545,6 @@ version=${jabref.version}</echo>
 	</target>
 
 
-    <!-- find out svn.revision of working copy -->
-    <target name="get-svn-rev">
-        <exec executable="svnversion" outputproperty="revision"/>
-    </target>
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets
