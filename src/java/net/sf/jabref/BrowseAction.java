@@ -6,10 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.
@@ -18,6 +15,7 @@ public class BrowseAction extends AbstractAction implements ActionListener {
 
 	private static final long serialVersionUID = 3007593430933681310L;
 
+    JComponent focusTarget = null;
 	JFrame frame=null;
     //JDialog dialog=null;
     JTextField comp;
@@ -39,6 +37,10 @@ public class BrowseAction extends AbstractAction implements ActionListener {
 
     } */
 
+    public void setFocusTarget(JComponent focusTarget) {
+        this.focusTarget = focusTarget;
+    }
+
     public void actionPerformed(ActionEvent e) {
         String chosen = null;
         if (dir)
@@ -50,6 +52,8 @@ public class BrowseAction extends AbstractAction implements ActionListener {
         if (chosen != null) {
             File newFile = new File(chosen);
             comp.setText(newFile.getPath());
+            if (focusTarget != null)
+                new FocusRequester(focusTarget);
         }
     }
 

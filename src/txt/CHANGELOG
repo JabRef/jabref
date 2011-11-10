@@ -1,5 +1,7 @@
 
 2.8 beta
+    - Integrated the plugin for interaction with OpenOffice/LibreOffice as a standard part
+      of JabRef.
     - Added keyboard shortcuts Ctrl-Up and Ctrl-Down to move file links up and down in a list
       of external links in the entry editor.
     - Applied bjoerntm's patch for making the loading of group information less sensitive

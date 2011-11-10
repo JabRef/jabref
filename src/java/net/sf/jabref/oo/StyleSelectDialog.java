@@ -25,8 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -51,7 +51,8 @@ public class StyleSelectDialog {
     private JTextField directFile = new JTextField(),
         styleDir = new JTextField();
     private JButton browseDirectFile = new JButton(Globals.lang("Browse")),
-        browseStyleDir = new JButton(Globals.lang("Browse"));
+        browseStyleDir = new JButton(Globals.lang("Browse")),
+        showDefaultStyle = new JButton(Globals.lang("View"));
 
     PreviewPanel preview;
 
@@ -93,8 +94,17 @@ public class StyleSelectDialog {
 
         popup.add(edit);
 
-        browseDirectFile.addActionListener(new BrowseAction(null, directFile, false));
-        browseStyleDir.addActionListener(new BrowseAction(null, styleDir, true));
+        BrowseAction dfBrowse = new BrowseAction(null, directFile, false);
+        dfBrowse.setFocusTarget(directFile);
+        browseDirectFile.addActionListener(dfBrowse);
+        BrowseAction sdBrowse = new BrowseAction(null, styleDir, true);
+        sdBrowse.setFocusTarget(setDirectory);
+        browseStyleDir.addActionListener(sdBrowse);
+        showDefaultStyle.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                displayDefaultStyle();
+            }
+        });
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
         edit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -183,9 +193,8 @@ public class StyleSelectDialog {
         readStyles();
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref,4dlu,fill:150dlu,4dlu,fill:pref",""));
-                //"fill:1dlu:grow,
-                 //"fill:pref, fill:pref, fill:270dlu:grow"));
         b.append(useDefault);
+        b.append(showDefaultStyle);
         b.nextLine();
         b.append(chooseDirectly);
         b.append(directFile);
@@ -456,6 +465,53 @@ public class StyleSelectDialog {
     protected void tablePopup(MouseEvent e) {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
+
+    protected void displayDefaultStyle() {
+        try {
+            // Read the contents of the default style file:
+            URL defPath = JabRef.class.getResource(OpenOfficePanel.defaultJStylePath);
+            BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream()));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            while ((line = r.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+
+            // Make a dialog box to display the contents:
+            final JDialog dd = new JDialog(diag, Globals.lang("Default style"), true);
+            JLabel header = new JLabel("<html>"+Globals.lang("The panel below shows the definition of the default style.")
+                //+"<br>"
+                +Globals.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
+                +"</html>");
+
+            header.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            dd.getContentPane().add(header, BorderLayout.NORTH);
+            JTextArea ta = new JTextArea(sb.toString());
+            ta.setEditable(false);
+            JScrollPane sp = new JScrollPane(ta);
+            sp.setPreferredSize(new Dimension(700,500));
+            dd.getContentPane().add(sp, BorderLayout.CENTER);
+            JButton ok = new JButton(Globals.lang("Ok"));
+            ButtonBarBuilder bb = new ButtonBarBuilder();
+            bb.addGlue();
+            bb.addGridded(ok);
+            bb.addGlue();
+            bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+            ok.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    dd.dispose();
+                }
+            });
+            dd.pack();
+            dd.setLocationRelativeTo(diag);
+            dd.setVisible(true);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
 
     /**
      * The listener for the Glazed list monitoring the current selection.
