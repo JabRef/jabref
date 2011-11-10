@@ -17,6 +17,8 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -43,9 +45,15 @@ public class StyleSelectDialog {
     private EventSelectionModel<OOBibStyle> selectionModel;
     private JPopupMenu popup = new JPopupMenu();
     private JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
+    private JRadioButton useDefault = new JRadioButton(Globals.lang("Default style")),
+        chooseDirectly = new JRadioButton(Globals.lang("Choose style file directly")+":"),
+        setDirectory = new JRadioButton(Globals.lang("Choose from a directory")+":");
+    private JTextField directFile = new JTextField(),
+        styleDir = new JTextField();
+    private JButton browseDirectFile = new JButton(Globals.lang("Browse")),
+        browseStyleDir = new JButton(Globals.lang("Browse"));
 
     PreviewPanel preview;
-    StyleDirectoriesPanel dirsPanel;
 
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private JButton ok = new JButton(Globals.lang("Ok")),
@@ -65,7 +73,28 @@ public class StyleSelectDialog {
     private void init(String initSelection) {
         this.initSelection = initSelection;
 
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(useDefault);
+        bg.add(chooseDirectly);
+        bg.add(setDirectory);
+        if (Globals.prefs.getBoolean("ooUseDefaultStyle"))
+            useDefault.setSelected(true);
+        else {
+            if (Globals.prefs.getBoolean("ooChooseStyleDirectly"))
+                chooseDirectly.setSelected(true);
+            else
+                setDirectory.setSelected(true);
+        }
+
+        directFile.setText(Globals.prefs.get("ooDirectFile"));
+        styleDir.setText(Globals.prefs.get("ooStyleDirectory"));
+        directFile.setEditable(false);
+        styleDir.setEditable(false);
+
         popup.add(edit);
+
+        browseDirectFile.addActionListener(new BrowseAction(null, directFile, false));
+        browseStyleDir.addActionListener(new BrowseAction(null, styleDir, true));
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
         edit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -88,14 +117,7 @@ public class StyleSelectDialog {
         });
 
         diag = new JDialog(frame, Globals.lang("Styles"), true);
-        dirsPanel = new StyleDirectoriesPanel(diag, Globals.prefs.getStringArray("ooStyleFileDirectories"));
-        // The dirs panel is used to change the list of files and directories to include.
-        // We register an ActionListener to update the style table when the list changes:
-        dirsPanel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                readStyles();
-            }
-        });
+
         styles = new BasicEventList<OOBibStyle>();
         sortedStyles = new SortedList<OOBibStyle>(styles);
 
@@ -103,7 +125,6 @@ public class StyleSelectDialog {
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
-
 
         tableModel = new EventTableModel<OOBibStyle>(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
@@ -127,32 +148,91 @@ public class StyleSelectDialog {
                     tablePopup(mouseEvent);
             }
         });
+
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
+
+        styleDir.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent documentEvent) {
+                readStyles();
+                setDirectory.setSelected(true);
+            }
+            public void removeUpdate(DocumentEvent documentEvent) {
+                readStyles();
+                setDirectory.setSelected(true);
+            }
+            public void changedUpdate(DocumentEvent documentEvent) {
+                readStyles();
+                setDirectory.setSelected(true);
+            }
+        });
+        directFile.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent documentEvent) {
+                chooseDirectly.setSelected(true);
+            }
+            public void removeUpdate(DocumentEvent documentEvent) {
+                chooseDirectly.setSelected(true);
+            }
+            public void changedUpdate(DocumentEvent documentEvent) {
+                chooseDirectly.setSelected(true);
+            }
+        });
+
         contentPane.setTopComponent(new JScrollPane(table));
         contentPane.setBottomComponent(preview);
 
         readStyles();
-        
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:1dlu:grow",//""));
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref,4dlu,fill:150dlu,4dlu,fill:pref",""));
                 //"fill:1dlu:grow,
+                 //"fill:pref, fill:pref, fill:270dlu:grow"));
+        b.append(useDefault);
+        b.nextLine();
+        b.append(chooseDirectly);
+        b.append(directFile);
+        b.append(browseDirectFile);
+        b.nextLine();
+        b.append(setDirectory);
+        b.append(styleDir);
+        b.append(browseStyleDir);
+        b.nextLine();
+        DefaultFormBuilder b2 = new DefaultFormBuilder(new FormLayout("fill:1dlu:grow",
                  "fill:pref, fill:pref, fill:270dlu:grow"));
-        b.appendSeparator(Globals.lang("Select style"));
-        b.nextLine();
-        b.append(new JLabel("<html>"+Globals.lang("This is the list of available styles. Select the one you want to use.")+"</html>"));
-        b.nextLine();
-        b.append(contentPane);
-        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        diag.add(b.getPanel(), BorderLayout.CENTER);
-        diag.add(dirsPanel.getPanel(), BorderLayout.NORTH);
 
-        ok.addActionListener(new ActionListener() {
+        b2.nextLine();
+        b2.append(new JLabel("<html>"+Globals.lang("This is the list of available styles. Select the one you want to use.")+"</html>"));
+        b2.nextLine();
+        b2.append(contentPane);
+        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        b2.getPanel().setBorder(BorderFactory.createEmptyBorder(15,5,5,5));
+        diag.add(b.getPanel(), BorderLayout.NORTH);
+        diag.add(b2.getPanel(), BorderLayout.CENTER);
+
+        AbstractAction okListener = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                if (!useDefault.isSelected()) {
+                    if (chooseDirectly.isSelected()) {
+                        File f = new File(directFile.getText());
+                        if (!f.exists()) {
+                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use the default style."),
+                                    Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    else {
+                        if (table.getRowCount() == 0 || table.getSelectedRowCount() == 0) {
+                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use the default style."),
+                                    Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                }
                 okPressed = true;
                 storeSettings();
                 diag.dispose();
             }
-        });
+        };
+        ok.addActionListener(okListener);
+
         Action cancelListener = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 diag.dispose();
@@ -172,7 +252,9 @@ public class StyleSelectDialog {
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", cancelListener);
-        
+        im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
+        am.put("enterOk", okListener);
+
         diag.pack();
         diag.setLocationRelativeTo(frame);
         SwingUtilities.invokeLater(new Runnable() {
@@ -197,9 +279,8 @@ public class StyleSelectDialog {
 
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
-        for (StyleDirectoriesPanel.DirElement elm : dirsPanel.getDirElements()) {
-            addStyles(elm.path, elm.recursive);
-        }
+        if (styleDir.getText().length() > 0)
+            addStyles(styleDir.getText(), true);
         styles.getReadWriteLock().writeLock().unlock();
 
         selectLastUsed();
@@ -278,11 +359,19 @@ public class StyleSelectDialog {
     }
 
     public void storeSettings() {
-        String[] dirs = dirsPanel.getStringArray();
-        Globals.prefs.putStringArray("ooStyleFileDirectories", dirs);
         OOBibStyle selected = getSelectedStyle();
-        if (selected != null)
+        Globals.prefs.putBoolean("ooUseDefaultStyle", useDefault.isSelected());
+        Globals.prefs.putBoolean("ooChooseStyleDirectly", chooseDirectly.isSelected());
+        Globals.prefs.put("ooDirectFile", directFile.getText());
+        Globals.prefs.put("ooStyleDirectory", styleDir.getText());
+        if (chooseDirectly.isSelected()) {
+            Globals.prefs.put("ooBibliographyStyleFile", directFile.getText());
+        }
+        else if (setDirectory.isSelected() && (selected != null)) {
             Globals.prefs.put("ooBibliographyStyleFile", selected.getFile().getPath());
+        }
+
+
     }
 
     /**
@@ -296,6 +385,13 @@ public class StyleSelectDialog {
             return null;
     }
 
+    /**
+     * Query whether the radio button for using the default style is selected.
+     * @return True if the default style is selected.
+     */
+    public boolean isDefaultSelected() {
+        return useDefault.isSelected();
+    }
 
     private void setupPrevEntry() {
         prevEntry.setField("author", "Smith, Bill and Jones, Bob and Williams, Jeff");

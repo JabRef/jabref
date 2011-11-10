@@ -49,8 +49,6 @@ public class OOBibStyle implements Comparable {
 
     boolean valid = false;
 
-    List juks = new ArrayList();
-
     final static int NONE = 0, LAYOUT = 1, PROPERTIES=2, CITATION=3, NAME=4, JOURNALS=5;
     final static String LAYOUT_MRK = "LAYOUT",
         PROPERTIES_MARK = "PROPERTIES",

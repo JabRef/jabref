@@ -13,10 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -31,6 +28,7 @@ import java.util.Map;
  */
 public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, PushToApplication {
 
+    public static final String defaultJStylePath = "/resource/openoffice/default.jstyle";
     // This field indicates whether the running JabRef supports post formatters in Layout:
     public static boolean postLayoutSupported;
 
@@ -48,13 +46,13 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     }
 
-    TestPanel comp;
+    OOPanel comp;
     JDialog diag;
     static JButton
         connect,
         manualConnect,
         selectDocument,
-        setStyleFile = new JButton(Globals.lang("Select style file")),
+        setStyleFile = new JButton(Globals.lang("Select style")),
         pushEntries = new JButton(Globals.lang("Cite")),
         pushEntriesInt = new JButton(Globals.lang("Cite in-text")),
         pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation")),
@@ -72,6 +70,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private static JabRefFrame frame;
     private SidePaneManager manager;
     private static OOBibStyle style = null;
+    private static boolean useDefaultStyle = false;
     private StyleSelectDialog styleDialog = null;
     private boolean dialogOkPressed = false, autoDetected = false;
     private String sOffice = null;
@@ -111,8 +110,12 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         Globals.prefs.putDefaultValue("ooStyleFileLastDir", System.getProperty("user.home"));
         Globals.prefs.putDefaultValue("ooInParCitation", true);
         Globals.prefs.putDefaultValue("syncOOWhenCiting", false);
-        Globals.prefs.putDefaultValue("showOOPanel", true);
+        Globals.prefs.putDefaultValue("showOOPanel", false);
         Globals.prefs.putDefaultValue("useAllOpenBases", true);
+        Globals.prefs.putDefaultValue("ooUseDefaultStyle", true);
+        Globals.prefs.putDefaultValue("ooChooseStyleDirectly", false);
+        Globals.prefs.putDefaultValue("ooDirectFile", "");
+        Globals.prefs.putDefaultValue("ooStyleDirectory", "");
         styleFile = Globals.prefs.get("ooBibliographyStyleFile");
 
 
@@ -126,7 +129,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     public void init(JabRefFrame frame, SidePaneManager manager) {
         this.frame = frame;
         this.manager = manager;
-        comp = new TestPanel(manager, GUIGlobals.getIconUrl("openoffice"), Globals.lang("OpenOffice"));
+        comp = new OOPanel(manager, GUIGlobals.getIconUrl("openoffice"), Globals.lang("OpenOffice"));
         try {
             initPanel();
             manager.register(getName(), comp);
@@ -154,6 +157,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     private void initPanel() throws Exception {
 
+        useDefaultStyle = Globals.prefs.getBoolean("ooUseDefaultStyle");
         Action al = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 connect(true);
@@ -186,10 +190,12 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 }
                 styleDialog.setVisible(true);
                 if (styleDialog.isOkPressed()) {
-                    style = styleDialog.getSelectedStyle();
-                    if (style != null) {
-                        styleFile = style.getFile().getPath();
-                        Globals.prefs.put("ooBibliographyStyleFile", styleFile);
+                    useDefaultStyle = Globals.prefs.getBoolean("ooUseDefaultStyle");
+                    styleFile = Globals.prefs.get("ooBibliographyStyleFile");
+                    try {
+                        readStyleFile();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
@@ -380,7 +386,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     }
 
     public void connect(boolean auto) {
-        System.out.println("I am the built-in version");
         /*if (ooBase != null) {
             try {
                 java.util.List<XTextDocument> list = ooBase.getTextDocuments();
@@ -476,10 +481,10 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             }
             addURL(jarList);
 
-            if (styleFile == null) {
+            /*if (styleFile == null) {
                 JOptionPane.showMessageDialog(diag, "You must choose a style file before you can connect.", "No style file selected", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
+            }*/
 
             if (style == null)
                 readStyleFile();
@@ -535,8 +540,14 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
      * @throws Exception
      */
     public void readStyleFile() throws Exception {
-
-        style = new OOBibStyle(new File(styleFile));
+        if (useDefaultStyle) {
+            URL defPath = JabRef.class.getResource(defaultJStylePath);
+            Reader r = new InputStreamReader(defPath.openStream());
+            style = new OOBibStyle(r);
+        }
+        else {
+            style = new OOBibStyle(new File(styleFile));
+        }
     }
 
 
@@ -914,9 +925,9 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         return true;
     }
 
-    class TestPanel extends SidePaneComponent {
+    class OOPanel extends SidePaneComponent {
 
-        public TestPanel(SidePaneManager sidePaneManager, URL url, String s) {
+        public OOPanel(SidePaneManager sidePaneManager, URL url, String s) {
             super(sidePaneManager, url, s);
         }
 
