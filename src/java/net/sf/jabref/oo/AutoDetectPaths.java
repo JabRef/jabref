@@ -9,6 +9,8 @@ import java.io.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -65,12 +67,14 @@ public class AutoDetectPaths extends AbstractWorker {
     public boolean autoDetectPaths() {
 
         if (Globals.ON_WIN) {
-            File progFiles = findProgramFilesDir(),
-                sOffice = null;
+            List<File> progFiles = findProgramFilesDir();
+            File sOffice = null;
             if (fileSearchCancelled)
                 return false;
-            if (progFiles != null) {
-                sOffice = findFileDir(progFiles, "soffice.exe");
+            for (File dir : progFiles) {
+                sOffice = findFileDir(dir, "soffice.exe");
+                if (sOffice != null)
+                    break;
             }
             if (sOffice == null) {
                 JOptionPane.showMessageDialog(parent, Globals.lang("Unable to autodetect OpenOffice installation. Please choose the installation directory manually."),
@@ -248,7 +252,8 @@ public class AutoDetectPaths extends AbstractWorker {
      *   Since we are not including a library for Windows integration, this method can't
      *   find the Program files dir in localized Windows installations.
      */
-    private static File findProgramFilesDir() {
+    private static java.util.List<File> findProgramFilesDir() {
+        List<File> dirList = new ArrayList<File>();
         File root = new File("C:\\");
         File[] dirs = root.listFiles(new FileFilter() {
             public boolean accept(File file) {
@@ -258,9 +263,11 @@ public class AutoDetectPaths extends AbstractWorker {
         for (int i = 0; i < dirs.length; i++) {
             File dir = dirs[i];
             if (dir.getName().toLowerCase().equals("program files"))
-                return dir;
+                dirList.add(dir);
+            else if (dir.getName().toLowerCase().equals("program files (x86)"))
+                dirList.add(dir);
         }
-        return null;
+        return dirList;
     }
 
     public static boolean checkAutoDetectedPaths() {
@@ -288,7 +295,6 @@ public class AutoDetectPaths extends AbstractWorker {
     public File findFileDir(File startDir, String filename) {
         if (fileSearchCancelled)
             return null;
-        //System.out.println("Searching: "+startDir.getPath());
         File[] files = startDir.listFiles();
         if (files == null)
             return null;
