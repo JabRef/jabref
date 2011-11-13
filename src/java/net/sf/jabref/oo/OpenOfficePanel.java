@@ -496,8 +496,11 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();
             diag.dispose();
-            if (ooBase == null)
+            if (ooBase == null) {
+                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to connect. One possible reason is that JabRef "
+                        +"and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
                 throw connectException;
+            }
 
             if (ooBase.isConnectedToDocument())
                 frame.output(Globals.lang("Connected to document")+": "+ooBase.getCurrentDocumentTitle());
