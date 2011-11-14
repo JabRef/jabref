@@ -62,6 +62,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         insertFullRef = new JButton("Insert reference text"),
         merge = new JButton(Globals.lang("Merge citations")),
         settingsB = new JButton(Globals.lang("Settings")),
+        help = new JButton(GUIGlobals.getImage("help")),
         test = new JButton("Test");
     JRadioButton inPar, inText;
     private JPanel settings = null;
@@ -294,6 +295,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             }
         });
 
+        help.addActionListener(new HelpAction(Globals.helpDiag, "OpenOfficeIntegration.html"));
+
         test.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
@@ -335,11 +338,12 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         //ButtonBarBuilder bb = new ButtonBarBuilder();
         DefaultFormBuilder bb = new DefaultFormBuilder(new FormLayout
                 ("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
-                        +"1dlu, fill:pref:grow", ""));
+                        +"1dlu, fill:pref:grow, 1dlu, fill:pref:grow", ""));
         bb.append(connect);
         bb.append(manualConnect);
         bb.append(selectDocument);
         bb.append(update);
+        bb.append(help);
 
         //b.append(connect);
         //b.append(manualConnect);
