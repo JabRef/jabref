@@ -17,7 +17,7 @@
 <h2>Using the OpenOffice/LibreOffice interface</h2>
 
 <p>To communicate with OpenOffice, JabRef must first connect to a running OpenOffice instance. You need to start
-    OpenOffice and enter your document before connecting from JabRef. The plugin needs to know the location of your
+    OpenOffice and enter your document before connecting from JabRef. JabRef needs to know the location of your
     OpenOffice executable (<b>soffice.exe</b> on Windows, and <b>soffice</b> on other platforms), and the directory
     where several OpenOffice jar files reside. If you connect by clicking the <b>Connect</b> button, JabRef will try
     to automatically determine these locations. If this does not work, you need to connect using the <b>Manual
@@ -436,10 +436,6 @@ default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
 <h2>Known issues</h2>
 
 <ul>
-    <li>When running with JabRef versions older than 2.6, institutional authors wrapped in braces, e.g. <code>{World
-        Bank}</code>, are handled as if no braces were added. This happens because the OO-specific formatter, which
-        removes the braces, can only be run after (instead of before) all other formatters in JabRef 2.6 or newer.
-    </li>
     <li>Make sure to save your Writer document in OpenDocument format (odt). Saving to Word format will lose your
         reference marks.
     </li>
@@ -449,11 +445,6 @@ default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
         download the example file from the link in the download section.
     </li>
 </ul>
-
-<h2>Contact</h2>
-
-<p>If you have tested this plugin, and want to give your feedback, or if you want to contribute to the development of
-    the plugin, please contact me at the e-mail address mortenalver at users.sourceforge.net.</p>
 
 </body>
 </html>
