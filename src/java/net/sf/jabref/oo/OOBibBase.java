@@ -77,13 +77,7 @@ public class OOBibBase {
     public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
         this.atEnd = atEnd;
         xDesktop = simpleBootstrap(pathToOO);//getDesktop();
-        try {
-            selectDocument();
-        } catch (Exception ex) {
-            // Could not find a writer document?
-            return;
-        }
-        
+        selectDocument();
     }
 
     public boolean isConnectedToDocument() {

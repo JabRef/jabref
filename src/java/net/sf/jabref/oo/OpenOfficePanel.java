@@ -74,7 +74,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private StyleSelectDialog styleDialog = null;
     private boolean dialogOkPressed = false, autoDetected = false;
     private String sOffice = null;
-    private Exception connectException = null;
+    private Throwable connectException = null;
 
 
     public OpenOfficePanel() {
@@ -497,8 +497,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             progDiag.dispose();
             diag.dispose();
             if (ooBase == null) {
-                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to connect. One possible reason is that JabRef "
-                        +"and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
                 throw connectException;
             }
 
@@ -517,13 +515,18 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             merge.setEnabled(true);
             test.setEnabled(true);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+            if (e instanceof UnsatisfiedLinkError) {
+                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to connect. One possible reason is that JabRef "
+                    +"and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
 
-            JOptionPane.showMessageDialog(frame, Globals.lang("Could not connect to running OpenOffice.\n"
-                +"Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
-                +"\nError message: "+e.getMessage()));
-
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, Globals.lang("Could not connect to running OpenOffice.\n"
+                    +"Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
+                    +"\nError message: "+e.getMessage()));
+            }
         }
     }
 
@@ -531,7 +534,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         try {
             // Connect:
             ooBase = new OOBibBase(sOffice, true);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ooBase = null;
             connectException = e;
             //JOptionPane.showMessageDialog(frame, Globals.lang("Unable to connect"));
