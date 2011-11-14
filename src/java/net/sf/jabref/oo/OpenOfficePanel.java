@@ -495,7 +495,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                     Globals.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();
-            System.out.println("NHEREREWR");
             diag.dispose();
             if (ooBase == null) {
                 throw connectException;
