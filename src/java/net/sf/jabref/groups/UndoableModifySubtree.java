@@ -35,7 +35,7 @@ import net.sf.jabref.Globals;
 
 public class UndoableModifySubtree extends AbstractUndoableEdit {
     /** A backup of the groups before the modification */
-    private final GroupTreeNode m_subtreeBackup;
+    private final GroupTreeNode m_groupRoot, m_subtreeBackup;
     /** The path to the global groups root node */
     private final int[] m_subtreeRootPath;
     private final GroupSelector m_groupSelector;
@@ -50,9 +50,10 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
      *            The root node of the subtree that was modified (this node may
      *            not be modified, it is just used as a convenience handle).
      */
-    public UndoableModifySubtree(GroupSelector groupSelector,
+    public UndoableModifySubtree(GroupSelector groupSelector, GroupTreeNode groupRoot,
             GroupTreeNode subtree, String name) {
         m_subtreeBackup = subtree.deepCopy();
+        m_groupRoot = groupRoot;
         m_subtreeRootPath = subtree.getIndexedPath();
         m_groupSelector = groupSelector;
         m_name = name;
@@ -72,7 +73,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         // remember modified children for redo
         m_modifiedSubtree.clear();
         // get node to edit
-        final GroupTreeNode subtreeRoot = m_groupSelector.getGroupTreeRoot()
+        final GroupTreeNode subtreeRoot = m_groupRoot
                 .getNode(m_subtreeRootPath);
         for (int i = 0; i < subtreeRoot.getChildCount(); ++i)
             m_modifiedSubtree.add(subtreeRoot.getChildAt(i));
@@ -87,7 +88,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
 
     public void redo() {
         super.redo();
-        final GroupTreeNode subtreeRoot = m_groupSelector.getGroupTreeRoot()
+        final GroupTreeNode subtreeRoot = m_groupRoot
                 .getNode(m_subtreeRootPath);
         subtreeRoot.removeAllChildren();
         for (int i = 0; i < m_modifiedSubtree.size(); ++i)

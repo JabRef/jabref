@@ -47,7 +47,6 @@ public class ChangeScanner extends Thread {
         this.mdInMem = bp.metaData();
         // Set low priority:
         setPriority(Thread.MIN_PRIORITY);
-
     }
 
     public void changeScan(File f) {

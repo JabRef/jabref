@@ -1108,7 +1108,7 @@ public class GroupSelector extends SidePaneComponent implements
                     JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableModifySubtree undo = new UndoableModifySubtree(
-                        GroupSelector.this, node,
+                        GroupSelector.this, getGroupTreeRoot(), node,
                         "Remove all subgroups");
                 node.removeAllChildren();
                 revalidateGroups();
@@ -1165,7 +1165,7 @@ public class GroupSelector extends SidePaneComponent implements
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
             final UndoableModifySubtree undo = new UndoableModifySubtree(
-                    GroupSelector.this, node, Globals.lang("sort subgroups"));
+                    GroupSelector.this, getGroupTreeRoot(), node, Globals.lang("sort subgroups"));
             groupsTree.sort(node, false);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -1182,7 +1182,7 @@ public class GroupSelector extends SidePaneComponent implements
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
             final UndoableModifySubtree undo = new UndoableModifySubtree(
-                    GroupSelector.this, node, Globals.lang("sort subgroups"));
+                    GroupSelector.this, getGroupTreeRoot(), node, Globals.lang("sort subgroups"));
             groupsTree.sort(node, true);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged(); // JZTODO lyrics

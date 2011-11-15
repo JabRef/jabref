@@ -1,5 +1,6 @@
 
 2.8 beta
+    - Fixed bug 3434674: Reviewing changes overwrites groups.
     - Integrated the plugin for interaction with OpenOffice/LibreOffice as a standard part
       of JabRef.
     - Added keyboard shortcuts Ctrl-Up and Ctrl-Down to move file links up and down in a list

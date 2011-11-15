@@ -24,9 +24,10 @@ public class GroupChange extends Change {
     }
 
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-        final GroupTreeNode root = panel.getGroupSelector().getGroupTreeRoot();
+        final GroupTreeNode root = panel.metaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
-                panel.getGroupSelector(), root, Globals.lang("Modified groups")); // JZTODO lyrics
+                panel.getGroupSelector(), panel.metaData().getGroups(),
+                root, Globals.lang("Modified groups")); // JZTODO lyrics
         root.removeAllChildren();
         if (m_changedGroups == null) {
             // I think setting root to null is not possible
@@ -41,7 +42,9 @@ public class GroupChange extends Change {
             // We must traverse the tree and refresh all groups:
             root.refreshGroupsForNewDatabase(panel.database());
         }
-        panel.getGroupSelector().revalidateGroups();
+
+        if (panel.getGroupSelector().getGroupTreeRoot() == root)
+            panel.getGroupSelector().revalidateGroups();
         undoEdit.addEdit(undo);
         
         // Update tmp database:
