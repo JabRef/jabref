@@ -368,7 +368,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         content.setLayout(new BorderLayout());
         content.add(b.getPanel(), BorderLayout.CENTER);
 
-        System.out.println("Adding shortcuts");
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.prefs.getKey("Refresh OO"), "Refresh OO");
         frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
@@ -385,7 +384,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         }
         else
             databases.add(frame.basePanel().database());
-        System.out.println(databases.size());
+
         return databases;
     }
 
