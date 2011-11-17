@@ -550,9 +550,9 @@ public class Util {
         if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
             // Find the default directory for this field type:
-			String dir = metaData.getFileDirectory(fieldName);
+			String[] dir = metaData.getFileDirectory(fieldName);
 
-			File file = expandFilename(link, new String[] { dir, "." });
+			File file = expandFilename(link, dir);
 
 			// Check that the file exists:
 			if ((file == null) || !file.exists()) {
@@ -793,17 +793,16 @@ public class Util {
 		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
 			.trim().toLowerCase() : null;
 		// Find the default directory for this field type, if any:
-		String dir = metaData.getFileDirectory(extension);
+		String[] dir = metaData.getFileDirectory(extension);
 		// Include the standard "file" directory:
-        String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
         // Include the directory of the bib file:
-        String[] dirs;
-        if (metaData.getFile() != null) {
-            String databaseDir = metaData.getFile().getParent();
-            dirs = new String[] { dir, fileDir, databaseDir };
-        }
-        else
-            dirs = new String[] { dir, fileDir };
+        ArrayList<String> al = new ArrayList<String>();
+        for (int i = 0; i < dir.length; i++)
+            if (!al.contains(dir[i])) al.add(dir[i]);
+        for (int i = 0; i < fileDir.length; i++)
+            if (!al.contains(fileDir[i])) al.add(fileDir[i]);
+        String[] dirs = al.toArray(new String[al.size()]);
 
         if (!httpLink) {
             File tmp = expandFilename(link, dirs);

@@ -1104,15 +1104,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     entries.add(bes[0]);
                                     ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                                     ArrayList<File> dirs = new ArrayList<File>();
-                                    if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD) != null)
-                                        dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
+                                    if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD).length > 0) {
+                                        String[] mdDirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                                        for (int i = 0; i < mdDirs.length; i++) {
+                                            dirs.add(new File(mdDirs[i]));
+
+                                        }
+                                    }
                                     Collection<String> extensions = new ArrayList<String>();
                                     for (int i = 0; i < types.length; i++) {
                                         final ExternalFileType type = types[i];
                                         extensions.add(type.getExtension());
                                     }
                                     // Run the search operation:
-                                    Map<BibtexEntry, java.util.List<File>> result;
+                                    Map<BibtexEntry, List<File>> result;
                                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
                                         String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                                         result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);

@@ -27,10 +27,7 @@
 package net.sf.jabref;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.VersionHandling;
@@ -142,20 +139,25 @@ public class MetaData implements Iterable<String> {
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
-    public String getFileDirectory(String fieldName) {
+    public String[] getFileDirectory(String fieldName) {
         // There can be up to three directory definitions for these files - the database's
         // metadata can specify a general directory and/or a user-specific directory, or
-	// the preferences can specify one. The settings are prioritized in the following
-	// order and the first defined setting is used: metadata user-specific directory,
-	// metadata general directory, preferences directory.
+        // the preferences can specify one. The settings are prioritized in the following
+        // order and the first defined setting is used: metadata user-specific directory,
+        // metadata general directory, preferences directory.
         String key = Globals.prefs.get("userFileDirIndividual");
-        String dir;
+        List<String> dirs = new ArrayList<String>();
+        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
+            dirs.add(getFile().getParent());
+            System.out.println(dirs.get(0));
+        }
         Vector<String> vec = getData(key);
-	if (vec == null) {
-	    key = Globals.prefs.get("userFileDir");
-	    vec = getData(key);
-	}
+        if (vec == null) {
+            key = Globals.prefs.get("userFileDir");
+            vec = getData(key);
+        }
         if ((vec != null) && (vec.size() > 0)) {
+            String dir;
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
@@ -168,12 +170,15 @@ public class MetaData implements Iterable<String> {
                 if ((new File(relDir)).exists())
                     dir = relDir;
             }
+            dirs.add(dir);
         }
         else {
-            dir = Globals.prefs.get(fieldName + "Directory");
-	}
+            String dir = Globals.prefs.get(fieldName + "Directory");
+            if (dir != null)
+                dirs.add(dir);
+        }
 
-        return dir;
+        return dirs.toArray(new String[dirs.size()]);
     }
 
     private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {

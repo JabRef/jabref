@@ -86,7 +86,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         FieldTextField editor = new FieldTextField(fieldName, "", false);
 
         // Find the default directory for this field type:
-        String dir = panel.metaData().getFileDirectory(fieldName);
+        String[] dirs = panel.metaData().getFileDirectory(fieldName);
 
         // First we try to autoset fields
         if (autoSet) {
@@ -128,7 +128,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
-                    File file = Util.expandFilename(old, new String[]{dir, "."});
+                    File file = Util.expandFilename(old, dirs);
 
                     if ((file == null) || !file.exists()) {
 
@@ -281,9 +281,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             if (visible)
                 canceled = true;
 
-            String dir = panel.metaData().getFileDirectory(fieldName);
+            String[] dirs = panel.metaData().getFileDirectory(fieldName);
 
-            if ((dir == null) || (dir.trim().length() == 0)) {
+            if (dirs.length == 0) {
 
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

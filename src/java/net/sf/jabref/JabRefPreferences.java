@@ -112,7 +112,7 @@ public class JabRefPreferences {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public String fileDirForDatabase = null;
+    public String[] fileDirForDatabase = null;
 
     // Similarly to the previous variable, this is a global that can be used during
     // the export of a database if the database filename should be output. If a database
@@ -434,7 +434,7 @@ public class JabRefPreferences {
         defaults.put("allowFileAutoOpenBrowse", Boolean.TRUE);
         defaults.put("webSearchVisible", Boolean.FALSE);
         defaults.put("selectedFetcherIndex", 0);
-
+        defaults.put("bibLocationAsFileDir", Boolean.TRUE);
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

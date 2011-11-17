@@ -73,7 +73,8 @@ public class SendAsEMailAction extends AbstractWorker {
                 tm.setContent(entry.getField("file"));
                 for (int i=0; i< tm.getRowCount(); i++) {
                 	FileListEntry flEntry = tm.getEntry(i);
-                   	String path = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+                   	String[] dirs = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+                    String path = dirs[0]; // TODO: This needs to be reworked, to handle more than one file dir
                    	path = path.concat(java.io.File.separator);
                    	path = path.concat(flEntry.getLink());
                    	attachments.add(path);

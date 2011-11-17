@@ -160,10 +160,10 @@ public class ExternalFilePanel extends JPanel {
 				output(Globals.lang("Looking for pdf..."));
 				
 				// Find the default directory for this field type, if any:
-				String dir = metaData.getFileDirectory(fieldName);
+				String[] dirs = metaData.getFileDirectory(fieldName);
 				File file = null;
-				if (dir != null) {
-					File tmp = Util.expandFilename(editor.getText(), new String[] { dir, "." });
+				if (dirs.length > 0) {
+					File tmp = Util.expandFilename(editor.getText(), dirs);
 					if (tmp != null)
 						file = tmp;
 				}
@@ -200,7 +200,7 @@ public class ExternalFilePanel extends JPanel {
 
 	public void browseFile(final String fieldName, final FieldEditor editor) {
 
-		String directory = metaData.getFileDirectory(fieldName);
+		String[] directory = metaData.getFileDirectory(fieldName);
 		if ((directory != null) && directory.equals(""))
 			directory = null;
 

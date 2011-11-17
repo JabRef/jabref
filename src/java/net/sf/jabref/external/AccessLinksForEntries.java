@@ -99,14 +99,18 @@ public class AccessLinksForEntries {
                 .trim().toLowerCase() : null;
 
             // Find the default directory for this field type, if any:
-            String dir = metaData.getFileDirectory(extension);
+            String[] dir = metaData.getFileDirectory(extension);
             // Include the standard "file" directory:
-            String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-
+            String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
             // Include the directory of the bib file:
-            String databaseDir = metaData.getFile().getParent();
-            File tmp = Util.expandFilename(entry.getLink(),
-                    new String[] { dir, fileDir, databaseDir });
+            ArrayList<String> al = new ArrayList<String>();
+            for (int i2 = 0; i2 < dir.length; i2++)
+                if (!al.contains(dir[i2])) al.add(dir[i2]);
+            for (int i2 = 0; i2 < fileDir.length; i2++)
+                if (!al.contains(fileDir[i2])) al.add(fileDir[i2]);
+
+            String[] dirs = al.toArray(new String[al.size()]);
+            File tmp = Util.expandFilename(entry.getLink(), dirs);
             if (tmp != null)
                 file = tmp;
 
