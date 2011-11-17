@@ -30,17 +30,7 @@ public class TransferableFileLinkSelection implements Transferable {
             tm.setContent(s);
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
-            String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            // Include the standard "file" directory:
-            String fileDir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            // Include the directory of the bib file:
-            String[] dirs;
-            if (panel.metaData().getFile() != null) {
-                String databaseDir = panel.metaData().getFile().getParent();
-                dirs = new String[] { dir, fileDir, databaseDir };
-            }
-            else
-                dirs = new String[] { dir, fileDir };
+            String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             File expLink = Util.expandFilename(tm.getEntry(0).getLink(), dirs);
             fileList.add(expLink);
 

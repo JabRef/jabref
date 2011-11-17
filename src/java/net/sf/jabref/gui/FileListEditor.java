@@ -471,8 +471,9 @@ public class FileListEditor extends JTable implements FieldEditor,
                 boolean foundAny = false;
                 ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                 ArrayList<File> dirs = new ArrayList<File>();
-                if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD) != null)
-                    dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
+                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                for (int i=0; i<dirsS.length; i++)
+                    dirs.add(new File(dirsS[i]));
                 Collection<String> extensions = new ArrayList<String>();
                 for (int i = 0; i < types.length; i++) {
                     final ExternalFileType type = types[i];

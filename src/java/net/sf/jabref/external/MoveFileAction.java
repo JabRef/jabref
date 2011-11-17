@@ -41,15 +41,21 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        String dir = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-        if ((dir == null) || (dir.trim().length() == 0) || !(new File(dir)).exists()) {
+        String[] dirs = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        int found = -1;
+        for (int i=0; i<dirs.length; i++)
+            if (new File(dirs[i]).exists()) {
+                found = i;
+                break;
+            }
+        if (found < 0) {
             JOptionPane.showMessageDialog(frame, Globals.lang("File_directory_is_not_set_or_does_not_exist!"),
                     Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         File file = new File(ln);
         if (!file.isAbsolute()) {
-            file = Util.expandFilename(ln, new String[]{dir});
+            file = Util.expandFilename(ln, dirs);
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
@@ -78,8 +84,8 @@ public class MoveFileAction extends AbstractAction {
                     if (answer != JOptionPane.YES_OPTION)
                         return;
                     Globals.prefs.putBoolean("renameOnMoveFileToFileDir", cbm.isSelected());
-                    StringBuilder sb = new StringBuilder(dir);
-                    if (!dir.endsWith(File.separator))
+                    StringBuilder sb = new StringBuilder(dirs[found]);
+                    if (!dirs[found].endsWith(File.separator))
                         sb.append(File.separator);
                     if (cbm.isSelected()) {
                         // Rename:
@@ -119,7 +125,7 @@ public class MoveFileAction extends AbstractAction {
                         // Remove the original file:
                         file.delete();
                         // Relativise path, if possible.
-                        String canPath = (new File(dir)).getCanonicalPath();
+                        String canPath = (new File(dirs[found])).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
                             if ((newFile.getCanonicalPath().length() > canPath.length()) &&
                                     (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar))

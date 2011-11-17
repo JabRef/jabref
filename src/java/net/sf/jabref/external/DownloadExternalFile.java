@@ -141,10 +141,12 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = bibtexKey != null ? getSuggestedFileName(suffix) : "";
-        String fDirectory = getFileDirectory(res);
-        if ((fDirectory != null) && fDirectory.trim().equals(""))
-            fDirectory = null;
-        final String directory = fDirectory;
+        String[] fDirectory = getFileDirectory(res);
+        final String directory;
+        if (fDirectory.length == 0)
+            directory = null;
+        else
+            directory = fDirectory[0];
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
         FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getCanonicalPath() : "",
@@ -320,7 +322,7 @@ public class DownloadExternalFile {
 
     }
 
-    public String getFileDirectory(String link) {
+    public String[] getFileDirectory(String link) {
         return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
     }
 

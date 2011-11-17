@@ -268,21 +268,26 @@ public class FileListEntryEditor {
         entry.setDescription(description.getText().trim());
 	// See if we should trim the file link to be relative to the file directory:
 	try {
-        String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        if ((fileDir == null) ||(fileDir.equals(""))) {
+        String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        if (dirs.length == 0) {
             entry.setLink(link.getText().trim());
         } else {
-            String canPath = (new File(fileDir)).getCanonicalPath();
-            File fl = new File(link.getText().trim());
-            if (fl.isAbsolute()) {
-                String flPath = fl.getCanonicalPath();
-                if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                    String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
-                    entry.setLink(relFileName);
-                } else
-                    entry.setLink(link.getText().trim());
+            boolean found = false;
+            for (int i=0; i<dirs.length; i++) {
+                String canPath = (new File(dirs[i])).getCanonicalPath();
+                File fl = new File(link.getText().trim());
+                if (fl.isAbsolute()) {
+                    String flPath = fl.getCanonicalPath();
+                    if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
+                        String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
+                        entry.setLink(relFileName);
+                        found = true;
+                        break;
+                    }
+                }
             }
-            else entry.setLink(link.getText().trim());
+            if (!found)
+                entry.setLink(link.getText().trim());
         }
     } catch (java.io.IOException ex)
 	{ 
@@ -322,9 +327,9 @@ public class FileListEntryEditor {
 
                 // If the file is below the file directory, make the path relative:
                 ArrayList<File> dirs = new ArrayList<File>();
-                String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-                if (fileDir != null)
-                    dirs.add(new File(fileDir));
+                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                for (int i=0; i<dirsS.length; i++)
+                    dirs.add(new File(dirsS[i]));
                 if (dirs.size() > 0) {
                     newFile = FileListEditor.relativizePath(newFile, dirs);
                 }

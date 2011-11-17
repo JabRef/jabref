@@ -200,9 +200,10 @@ public class ExternalFilePanel extends JPanel {
 
 	public void browseFile(final String fieldName, final FieldEditor editor) {
 
-		String[] directory = metaData.getFileDirectory(fieldName);
-		if ((directory != null) && directory.equals(""))
-			directory = null;
+		String[] dirs = metaData.getFileDirectory(fieldName);
+        String directory = null;
+		if (dirs.length > 0)
+			directory = dirs[0]; // Default to the first directory in the list
 
 		String dir = editor.getText(), retVal = null;
 
@@ -304,14 +305,24 @@ public class ExternalFilePanel extends JPanel {
 					String plannedName = getPlannedFileName(res);
 
 					// Find the default directory for this field type:
-					String directory = metaData.getFileDirectory(fieldName);
-
-					if (!new File(directory).exists()) {
-						JOptionPane.showMessageDialog(parent, Globals.lang(
-							"Could not find directory for %0-files: %1", fieldName, directory),
-							Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-						Globals.logger(Globals.lang("Could not find directory for %0-files: %1",
-							fieldName, directory));
+					String[] dirs = metaData.getFileDirectory(fieldName);
+                    String directory = null;
+                    // Look for the first one in the list that exists:
+                    for (int i=0; i<dirs.length; i++) {
+                        if (new File(dirs[i]).exists()) {
+                            directory = dirs[i];
+                            break;
+                        }
+                    }
+					if (directory == null) {
+                        if (dirs.length > 0)
+                            JOptionPane.showMessageDialog(parent, Globals.lang(
+                                "Could not find directory for %0-files: %1", fieldName, dirs[0]),
+                                Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                        else
+                            JOptionPane.showMessageDialog(parent, Globals.lang(
+                                "No directory defined for %0-files", fieldName),
+                                Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					File file = new File(new File(directory), plannedName);
@@ -425,13 +436,10 @@ public class ExternalFilePanel extends JPanel {
 				 * JabRef-directory.
 				 */
 				LinkedList<String> list = new LinkedList<String>();
-				list.add(metaData.getFileDirectory(fieldName));
-
-				/*
-				 * File fileOfDb = frame.basePanel().file(); if (fileOfDb !=
-				 * null){ list.add(fileOfDb.getParentFile().getPath()); }
-				 */
-				list.add(".");
+                String[] dirs = metaData.getFileDirectory(fieldName);
+                for (int i = 0; i < dirs.length; i++) {
+                    list.add(dirs[i]);
+                }
 
 				String found = Util.findPdf(getEntry(), fieldName, list
 					.toArray(new String[list.size()]));// , off);

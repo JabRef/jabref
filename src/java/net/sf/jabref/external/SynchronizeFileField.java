@@ -85,7 +85,7 @@ public class SynchronizeFileField extends AbstractWorker {
         //FieldTextField editor = new FieldTextField(fieldName, "", false);
 
         // Find the default directory for this field type:
-        String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         Set<BibtexEntry> changedEntries = new HashSet<BibtexEntry>();
 
         // First we try to autoset fields
@@ -97,9 +97,8 @@ public class SynchronizeFileField extends AbstractWorker {
 
             // We need to specify which directories to search in:
             ArrayList<File> dirs = new ArrayList<File>();
-            String dr = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            if (dr != null)
-                dirs.add(new File(dr));
+            for (int i=0; i<dirsS.length; i++)
+                dirs.add(new File(dirsS[i]));
 
             // Start the autosetting process:                
             Thread t = FileListEditor.autoSetLinks(entries, ce, changedEntries, dirs);
@@ -156,7 +155,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        File file = Util.expandFilename(flEntry.getLink(), new String[]{dir, "."});
+                        File file = Util.expandFilename(flEntry.getLink(), dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {
@@ -369,8 +368,8 @@ public class SynchronizeFileField extends AbstractWorker {
             if (visible)
                 canceled = true;
 
-            String dir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-            if ((dir == null) || (dir.trim().length() == 0)) {
+            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            if (dirs.length == 0) {
 
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

@@ -35,8 +35,8 @@ public class FindFullTextAction extends AbstractWorker {
         if (result.url != null) {
             //System.out.println("PDF URL: "+result.url);
             String bibtexKey = entry.getCiteKey();
-            String fileDir = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            if (fileDir == null) {
+            String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            if (dirs.length == 0) {
                 // TODO: error message if file dir not defined
                 //JOptionPane.showMessageDialog(frame, Globals.lang);
                 return;

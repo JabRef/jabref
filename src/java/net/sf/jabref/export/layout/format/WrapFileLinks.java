@@ -119,17 +119,17 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             if (flEntry.getLink() == null)
                                 break;
 
-                            String dir;
+                            String[] dirs;
                             // We need to resolve the file directory from the database's metadata,
                             // but that is not available from a formatter. Therefore, as an
                             // ugly hack, the export routine has set a global variable before
                             // starting the export, which contains the database's file directory:
                             if (Globals.prefs.fileDirForDatabase != null)
-                                dir = Globals.prefs.fileDirForDatabase;
+                                dirs = Globals.prefs.fileDirForDatabase;
                             else
-                                dir = Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory");
+                                dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
 
-                            File f = Util.expandFilename(flEntry.getLink(), new String[]{dir});
+                            File f = Util.expandFilename(flEntry.getLink(), dirs);
                             /*
                              * Stumbled over this while investigating
                              *
