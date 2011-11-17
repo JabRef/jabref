@@ -149,7 +149,6 @@ public class MetaData implements Iterable<String> {
         List<String> dirs = new ArrayList<String>();
         if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
             dirs.add(getFile().getParent());
-            System.out.println(dirs.get(0));
         }
         Vector<String> vec = getData(key);
         if (vec == null) {
