@@ -130,6 +130,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                                 dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
 
                             File f = Util.expandFilename(flEntry.getLink(), dirs);
+
                             /*
                              * Stumbled over this while investigating
                              *

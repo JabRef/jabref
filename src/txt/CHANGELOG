@@ -1,5 +1,7 @@
 
 2.8 beta
+    - Added global option to allow file links relative to the bib file location, in addition
+      to the global or database- or user-specific file directory.
     - Fixed bug 3434674: Reviewing changes overwrites groups.
     - Integrated the plugin for interaction with OpenOffice/LibreOffice as a standard part
       of JabRef.
