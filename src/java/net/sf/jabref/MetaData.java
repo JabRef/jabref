@@ -178,7 +178,7 @@ public class MetaData implements Iterable<String> {
         // Check if the bib file location should be included, and if so, if it is set:
         if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean("bibLocationAsPrimaryFileDir"))
+            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir"))
                 dirs.add(0, getFile().getParent());
             else
                 dirs.add(getFile().getParent());
