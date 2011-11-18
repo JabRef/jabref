@@ -435,6 +435,7 @@ public class JabRefPreferences {
         defaults.put("webSearchVisible", Boolean.FALSE);
         defaults.put("selectedFetcherIndex", 0);
         defaults.put("bibLocationAsFileDir", Boolean.TRUE);
+        defaults.put("bibLocationAsPrimaryFileDir", Boolean.FALSE);
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

@@ -147,9 +147,7 @@ public class MetaData implements Iterable<String> {
         // metadata general directory, preferences directory.
         String key = Globals.prefs.get("userFileDirIndividual");
         List<String> dirs = new ArrayList<String>();
-        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
-            dirs.add(getFile().getParent());
-        }
+
         Vector<String> vec = getData(key);
         if (vec == null) {
             key = Globals.prefs.get("userFileDir");
@@ -175,6 +173,15 @@ public class MetaData implements Iterable<String> {
             String dir = Globals.prefs.get(fieldName + "Directory");
             if (dir != null)
                 dirs.add(dir);
+        }
+
+        // Check if the bib file location should be included, and if so, if it is set:
+        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
+            // Check if we should add it as primary file dir (first in the list) or not:
+            if (Globals.prefs.getBoolean("bibLocationAsPrimaryFileDir"))
+                dirs.add(0, getFile().getParent());
+            else
+                dirs.add(getFile().getParent());
         }
 
         return dirs.toArray(new String[dirs.size()]);
