@@ -275,7 +275,8 @@
 				<include name="EndNote.zip" />
 			</fileset>
 			<fileset dir="${txt.dir}">
-				<include name="gpl.txt" />
+				<include name="gpl2.txt" />
+				<include name="gpl3.txt" />
 				<include name="lesser.txt" />
 				<include name="jgoodies.txt" />
 				<include name="README" />
@@ -484,7 +485,8 @@ version=${jabref.version}</echo>
 
 		<copy todir="${win.installer.dir}/dist">
 			<fileset dir="${txt.dir}">
-				<include name="gpl.txt" />
+				<include name="gpl2.txt" />
+				<include name="gpl3.txt" />
 				<include name="lesser.txt" />
 				<include name="README" />
 			</fileset>
@@ -517,7 +519,8 @@ version=${jabref.version}</echo>
 
 		<copy todir="${win.installer.dir}/dist">
 			<fileset dir="${txt.dir}">
-				<include name="gpl.txt" />
+				<include name="gpl2.txt" />
+				<include name="gpl3.txt" />
 				<include name="lesser.txt" />
 				<include name="README" />
 			</fileset>
