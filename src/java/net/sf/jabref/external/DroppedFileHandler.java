@@ -65,7 +65,7 @@ public class DroppedFileHandler {
 
     private JCheckBox renameCheckBox = new JCheckBox();
 
-    private JTextField renameToTextBox = new JTextField(75);
+    private JTextField renameToTextBox = new JTextField(50);
     
     private JPanel optionsPanel = new JPanel();
 
@@ -414,18 +414,9 @@ public class DroppedFileHandler {
 		
         renameCheckBox.setText(Globals.lang("Rename file to").concat(": "));
         
-        // determine targetName
-        String targetName = citeKey == null ? "default" : citeKey;
-		StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-		Layout layout = null;
-		try {
-			layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-		} catch (Exception e) {
-			Globals.logger(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
-		}
-		if (layout != null) {
-			targetName = layout.doLayout(entry, database);
-		}
+        // Determine which name to suggest:
+        String targetName = Util.getLinkedFileName(database, entry);
+
         renameToTextBox.setText(targetName.concat(".").concat(fileType.extension));
 
         linkInPlace.addChangeListener(cl);

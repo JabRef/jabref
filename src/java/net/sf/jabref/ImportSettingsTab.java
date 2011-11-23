@@ -19,14 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import spl.gui.ImportDialog;
 
@@ -40,7 +33,14 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 	public final static int DEFAULT_STYLE = ImportDialog.CONTENT; 
 	
 	public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
-	public final static String DEFAULT_FILENAMEPATTERN = "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}";
+	public final static String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
+            "bibtexkey",
+            "bibtexkey - title",
+    };
+    public final static String[] DEFAULT_FILENAMEPATTERNS = new String[] {
+            "\\bibtexkey",
+            "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"
+    };
 	
     private JRadioButton radioButtonXmp;
 	private JRadioButton radioButtonPDFcontent;
@@ -51,7 +51,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 	private JCheckBox useDefaultPDFImportStyle;
 	
 	private JTextField fileNamePattern;
-	private JButton defaultFileNamePattern;
+	private JButton selectFileNamePattern;
 
 	public ImportSettingsTab() {
         setLayout(new BorderLayout());
@@ -73,10 +73,10 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         useDefaultPDFImportStyle = new JCheckBox(Globals.lang("Always use this PDF import style (and do not ask for each import)"));
 		
         fileNamePattern = new JTextField(50);
-        defaultFileNamePattern = new JButton(Globals.lang("Revert to default"));
-        defaultFileNamePattern.addActionListener(new ActionListener() {
+        selectFileNamePattern = new JButton(Globals.lang("Choose pattern"));
+        selectFileNamePattern.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fileNamePattern.setText(DEFAULT_FILENAMEPATTERN);
+                openFilePatternMenu();
 			}
 		});
 
@@ -114,7 +114,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         JLabel lab = new JLabel(Globals.lang("File name format pattern").concat(":"));
         pan2.add(lab);
         pan2.add(fileNamePattern);
-        pan2.add(defaultFileNamePattern);
+        pan2.add(selectFileNamePattern);
         builder.append(pan2);
 
         pan = builder.getPanel();
@@ -122,7 +122,6 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
 	}
 	
-	@Override
 	public void setValues() {
 		useDefaultPDFImportStyle.setSelected(Globals.prefs.getBoolean(PREF_IMPORT_ALWAYSUSE));
 		int style = Globals.prefs.getInt(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
@@ -153,7 +152,6 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 		fileNamePattern.setText(Globals.prefs.get(PREF_IMPORT_FILENAMEPATTERN));
 	}
 
-	@Override
 	public void storeSettings() {
 		Globals.prefs.putBoolean(PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
 		int style = DEFAULT_STYLE;
@@ -173,14 +171,26 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 		Globals.prefs.put(PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
 	}
 
-	@Override
 	public boolean readyToClose() {
 		return true;
 	}
 
-	@Override
 	public String getTabName() {
 		return Globals.lang("Import");
 	}
 
+    private void openFilePatternMenu() {
+        JPopupMenu popup = new JPopupMenu();
+        for (int i = 0; i < DEFAULT_FILENAMEPATTERNS.length; i++) {
+            final JMenuItem item = new JMenuItem(DEFAULT_FILENAMEPATTERNS_DISPLAY[i]);
+            final String toSet = DEFAULT_FILENAMEPATTERNS[i];
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    fileNamePattern.setText(toSet);
+                }
+            });
+            popup.add(item);
+        }
+        popup.show(selectFileNamePattern, 0, selectFileNamePattern.getHeight());
+    }
 }

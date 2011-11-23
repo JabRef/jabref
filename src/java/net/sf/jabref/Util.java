@@ -30,16 +30,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -82,6 +73,8 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.UnknownExternalFileType;
@@ -2968,4 +2961,18 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
 
 
+    public static String getLinkedFileName(BibtexDatabase database, BibtexEntry entry) {
+        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
+		StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+		Layout layout = null;
+		try {
+			layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+		} catch (Exception e) {
+			Globals.logger(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
+		}
+		if (layout != null) {
+			targetName = layout.doLayout(entry, database);
+		}
+        return targetName;
+    }
 }
