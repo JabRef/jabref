@@ -117,10 +117,12 @@ public class PushToApplicationButton implements ActionListener {
         setSelected(selected);
         pushButton.addActionListener(this);
         pushButton.addMouseListener(new PushButtonMouseListener());
-
+        pushButton.setOpaque(false);
+        menuButton.setOpaque(false);
+        comp.setOpaque(false);
         comp.add(pushButton, BorderLayout.CENTER);
         comp.add(menuButton, BorderLayout.EAST);
-        comp.setBorder(BorderFactory.createLineBorder(Color.gray));
+        //comp.setBorder(BorderFactory.createLineBorder(Color.gray));
         comp.setMaximumSize(comp.getPreferredSize());
 
         optPopup.add(settings);
