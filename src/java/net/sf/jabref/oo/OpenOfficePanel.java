@@ -251,7 +251,17 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         Action updateAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    style.ensureUpToDate();
+                    try {
+                        if (style == null)
+                            readStyleFile();
+                        else
+                            style.ensureUpToDate();
+                    } catch (Throwable ex) {
+                        JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use the default style."),
+                                Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     ooBase.updateSortedReferenceMarks();
 
                     java.util.List<BibtexDatabase> databases = getBaseList();
@@ -498,15 +508,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 jarList[i] = jarFiles[i].toURI().toURL();
             }
             addURL(jarList);
-
-            /*if (styleFile == null) {
-                JOptionPane.showMessageDialog(diag, "You must choose a style file before you can connect.", "No style file selected", JOptionPane.ERROR_MESSAGE);
-                return;
-            }*/
-
-            if (style == null)
-                readStyleFile();
-
 
             // Show progress dialog:
             final JDialog progDiag = (new AutoDetectPaths(diag)).showProgressDialog(diag, Globals.lang("Connecting"),
