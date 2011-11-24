@@ -43,7 +43,9 @@ import java.util.Map;
  */
 public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, PushToApplication {
 
-    public static final String defaultJStylePath = "/resource/openoffice/default.jstyle";
+    public static final String defaultAuthorYearStylePath = "/resource/openoffice/default_authoryear.jstyle";
+    public static final String defaultNumericalStylePath = "/resource/openoffice/default_numerical.jstyle";
+
     // This field indicates whether the running JabRef supports post formatters in Layout:
     public static boolean postLayoutSupported;
 
@@ -86,7 +88,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private static JabRefFrame frame;
     private SidePaneManager manager;
     private static OOBibStyle style = null;
-    private static boolean useDefaultStyle = false;
+    private static boolean useDefaultAuthoryearStyle = false;
+    private static boolean useDefaultNumericalStyle = false;
     private StyleSelectDialog styleDialog = null;
     private boolean dialogOkPressed = false, autoDetected = false;
     private String sOffice = null;
@@ -128,7 +131,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         Globals.prefs.putDefaultValue("syncOOWhenCiting", false);
         Globals.prefs.putDefaultValue("showOOPanel", false);
         Globals.prefs.putDefaultValue("useAllOpenBases", true);
-        Globals.prefs.putDefaultValue("ooUseDefaultStyle", true);
+        Globals.prefs.putDefaultValue("ooUseDefaultAuthoryearStyle", true);
+        Globals.prefs.putDefaultValue("ooUseDefaultNumericalStyle", false);
         Globals.prefs.putDefaultValue("ooChooseStyleDirectly", false);
         Globals.prefs.putDefaultValue("ooDirectFile", "");
         Globals.prefs.putDefaultValue("ooStyleDirectory", "");
@@ -173,7 +177,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     private void initPanel() throws Exception {
 
-        useDefaultStyle = Globals.prefs.getBoolean("ooUseDefaultStyle");
+        useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
+        useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
         Action al = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 connect(true);
@@ -206,7 +211,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 }
                 styleDialog.setVisible(true);
                 if (styleDialog.isOkPressed()) {
-                    useDefaultStyle = Globals.prefs.getBoolean("ooUseDefaultStyle");
+                    useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
+                    useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
                     styleFile = Globals.prefs.get("ooBibliographyStyleFile");
                     try {
                         readStyleFile();
@@ -565,8 +571,13 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
      * @throws Exception
      */
     public void readStyleFile() throws Exception {
-        if (useDefaultStyle) {
-            URL defPath = JabRef.class.getResource(defaultJStylePath);
+        if (useDefaultAuthoryearStyle) {
+            URL defPath = JabRef.class.getResource(defaultAuthorYearStylePath);
+            Reader r = new InputStreamReader(defPath.openStream());
+            style = new OOBibStyle(r);
+        }
+        else if (useDefaultNumericalStyle) {
+            URL defPath = JabRef.class.getResource(defaultNumericalStylePath);
             Reader r = new InputStreamReader(defPath.openStream());
             style = new OOBibStyle(r);
         }
@@ -596,21 +607,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 			throw new IOException("Error, could not add URL to system classloader");
 		}//end try catch
 	}//end method
-
-    public void setStyleFile() {
-        JFileChooser jfc = new JFileChooser(System.getProperty("user.home"));
-        int answer = jfc.showOpenDialog(null);
-        if (answer == JFileChooser.APPROVE_OPTION) {
-            styleFile = jfc.getSelectedFile().getPath();
-            Globals.prefs.put("ooBibliographyStyleFile", styleFile);
-            try {
-                style = new OOBibStyle(new FileReader(styleFile));
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(diag, e.getMessage());
-            }
-        }
-    }
 
     public void updateConnectionParams(String ooPath, String ooExec, String ooJars, boolean oo3) {
         Globals.prefs.put("ooPath", ooPath);

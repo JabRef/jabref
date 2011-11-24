@@ -60,14 +60,16 @@ public class StyleSelectDialog {
     private EventSelectionModel<OOBibStyle> selectionModel;
     private JPopupMenu popup = new JPopupMenu();
     private JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
-    private JRadioButton useDefault = new JRadioButton(Globals.lang("Default style")),
+    private JRadioButton useDefaultAuthoryear = new JRadioButton(Globals.lang("Default style (author-year citations)")),
+        useDefaultNumerical = new JRadioButton(Globals.lang("Default style (numerical citations)")),
         chooseDirectly = new JRadioButton(Globals.lang("Choose style file directly")+":"),
         setDirectory = new JRadioButton(Globals.lang("Choose from a directory")+":");
     private JTextField directFile = new JTextField(),
         styleDir = new JTextField();
     private JButton browseDirectFile = new JButton(Globals.lang("Browse")),
         browseStyleDir = new JButton(Globals.lang("Browse")),
-        showDefaultStyle = new JButton(Globals.lang("View"));
+        showDefaultAuthoryearStyle = new JButton(Globals.lang("View")),
+        showDefaultNumericalStyle = new JButton(Globals.lang("View"));
 
     PreviewPanel preview;
 
@@ -90,11 +92,14 @@ public class StyleSelectDialog {
         this.initSelection = initSelection;
 
         ButtonGroup bg = new ButtonGroup();
-        bg.add(useDefault);
+        bg.add(useDefaultAuthoryear);
+        bg.add(useDefaultNumerical);
         bg.add(chooseDirectly);
         bg.add(setDirectory);
-        if (Globals.prefs.getBoolean("ooUseDefaultStyle"))
-            useDefault.setSelected(true);
+        if (Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle"))
+            useDefaultAuthoryear.setSelected(true);
+        else if (Globals.prefs.getBoolean("ooUseDefaultNumericalStyle"))
+            useDefaultNumerical.setSelected(true);
         else {
             if (Globals.prefs.getBoolean("ooChooseStyleDirectly"))
                 chooseDirectly.setSelected(true);
@@ -115,9 +120,14 @@ public class StyleSelectDialog {
         BrowseAction sdBrowse = new BrowseAction(null, styleDir, true);
         sdBrowse.setFocusTarget(setDirectory);
         browseStyleDir.addActionListener(sdBrowse);
-        showDefaultStyle.addActionListener(new ActionListener() {
+        showDefaultAuthoryearStyle.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                displayDefaultStyle();
+                displayDefaultStyle(true);
+            }
+        });
+        showDefaultNumericalStyle.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                displayDefaultStyle(false);
             }
         });
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
@@ -208,8 +218,11 @@ public class StyleSelectDialog {
         readStyles();
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref,4dlu,fill:150dlu,4dlu,fill:pref",""));
-        b.append(useDefault);
-        b.append(showDefaultStyle);
+        b.append(useDefaultAuthoryear, 3);
+        b.append(showDefaultAuthoryearStyle);
+        b.nextLine();
+        b.append(useDefaultNumerical, 3);
+        b.append(showDefaultNumericalStyle);
         b.nextLine();
         b.append(chooseDirectly);
         b.append(directFile);
@@ -233,18 +246,18 @@ public class StyleSelectDialog {
 
         AbstractAction okListener = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (!useDefault.isSelected()) {
+                if (!useDefaultAuthoryear.isSelected() && !useDefaultNumerical.isSelected()) {
                     if (chooseDirectly.isSelected()) {
                         File f = new File(directFile.getText());
                         if (!f.exists()) {
-                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use the default style."),
+                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
                                     Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                     }
                     else {
                         if (table.getRowCount() == 0 || table.getSelectedRowCount() == 0) {
-                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use the default style."),
+                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
                                     Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -384,7 +397,8 @@ public class StyleSelectDialog {
 
     public void storeSettings() {
         OOBibStyle selected = getSelectedStyle();
-        Globals.prefs.putBoolean("ooUseDefaultStyle", useDefault.isSelected());
+        Globals.prefs.putBoolean("ooUseDefaultAuthoryearStyle", useDefaultAuthoryear.isSelected());
+        Globals.prefs.putBoolean("ooUseDefaultNumericalStyle", useDefaultNumerical.isSelected());
         Globals.prefs.putBoolean("ooChooseStyleDirectly", chooseDirectly.isSelected());
         Globals.prefs.put("ooDirectFile", directFile.getText());
         Globals.prefs.put("ooStyleDirectory", styleDir.getText());
@@ -407,14 +421,6 @@ public class StyleSelectDialog {
             return selectionModel.getSelected().get(0);
         else
             return null;
-    }
-
-    /**
-     * Query whether the radio button for using the default style is selected.
-     * @return True if the default style is selected.
-     */
-    public boolean isDefaultSelected() {
-        return useDefault.isSelected();
     }
 
     private void setupPrevEntry() {
@@ -481,10 +487,11 @@ public class StyleSelectDialog {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
-    protected void displayDefaultStyle() {
+    protected void displayDefaultStyle(boolean authoryear) {
         try {
             // Read the contents of the default style file:
-            URL defPath = JabRef.class.getResource(OpenOfficePanel.defaultJStylePath);
+            URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath) :
+                    JabRef.class.getResource(OpenOfficePanel.defaultNumericalStylePath);
             BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream()));
             String line = null;
             StringBuilder sb = new StringBuilder();
