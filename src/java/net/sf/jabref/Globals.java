@@ -1296,10 +1296,11 @@ public class Globals {
 	}
 
 	public static void initializeJournalNames() {
+
+        // Read internal lists:
+        journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
 		if (prefs.getBoolean("useIEEEAbrv"))
-			journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
-        else
-            journalAbbrev = new JournalAbbreviations();
+			journalAbbrev.readJournalList("/resource/IEEEJournalList.txt");
 
 		// Read external lists, if any (in reverse order, so the upper lists
 		// override the lower):
