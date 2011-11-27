@@ -48,7 +48,6 @@ public class JournalAbbreviations {
     HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
     HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
     TreeMap<String, String> all = new TreeMap<String, String>();
-    CaseChanger caseChanger = new CaseChanger();
 
     public JournalAbbreviations() {
         

@@ -74,7 +74,8 @@ public class ManageJournalsPanel extends JPanel{
         help = new JButton(Globals.lang("Help")),
         browseOld = new JButton(Globals.lang("Browse")),
         browseNew = new JButton(Globals.lang("Browse")),
-        addExt = new JButton(GUIGlobals.getImage("add"));
+        addExt = new JButton(GUIGlobals.getImage("add")),
+        viewBuiltin = new JButton(Globals.lang("View"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -90,8 +91,8 @@ public class ManageJournalsPanel extends JPanel{
         addExtPan.setToolTipText(Globals.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
+                ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
+                        "pref, pref, pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         CellConstraints cc = new CellConstraints();
@@ -99,30 +100,37 @@ public class ManageJournalsPanel extends JPanel{
         /*JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef can switch journal names between "
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
             +"you may need to add your own definitions.")+"</HTML>");*/
-        builder.addSeparator(Globals.lang("Personal journal list"), cc.xyw(2,1,6));
+        builder.addSeparator(Globals.lang("Built-in journal list"), cc.xyw(2,1,6));
+        JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef includes a built-in list of journal abbreviations.")
+            +"<br>"+Globals.lang("You can add additional journal names by setting up a personal journal list,<br>as "
+            +"well as linking to external journal lists.")+"</HTML>");
+        description.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
+        builder.add(description, cc.xyw(2,2,6));
+        builder.add(viewBuiltin, cc.xy(7,2));
+        builder.addSeparator(Globals.lang("Personal journal list"), cc.xyw(2,3,6));
 
         //builder.add(description, cc.xyw(2,1,6));
-        builder.add(newFile, cc.xy(3,2));
-        builder.add(newNameTf, cc.xy(5,2));
-        builder.add(browseNew, cc.xy(7,2));
-        builder.add(oldFile, cc.xy(3,3));
-        builder.add(personalFile, cc.xy(5,3));
+        builder.add(newFile, cc.xy(3,4));
+        builder.add(newNameTf, cc.xy(5,4));
+        builder.add(browseNew, cc.xy(7,4));
+        builder.add(oldFile, cc.xy(3,5));
+        builder.add(personalFile, cc.xy(5,5));
         //BrowseAction action = new BrowseAction(personalFile, false);
         //JButton browse = new JButton(Globals.lang("Browse"));
         //browse.addActionListener(action);
-        builder.add(browseOld, cc.xy(7,3));
+        builder.add(browseOld, cc.xy(7,5));
 
         userPanel.setLayout(new BorderLayout());
         //builtInTable = new JTable(Globals.journalAbbrev.getTableModel());
-        builder.add(userPanel, cc.xyw(2,4,4));
+        builder.add(userPanel, cc.xyw(2,6,4));
         ButtonStackBuilder butBul = new ButtonStackBuilder();
         butBul.addGridded(add);
         butBul.addGridded(remove);
 
         butBul.addGlue();
-        builder.add(butBul.getPanel(), cc.xy(7,4));
+        builder.add(butBul.getPanel(), cc.xy(7,6));
 
-        builder.addSeparator(Globals.lang("External files"), cc.xyw(2,6,6));
+        builder.addSeparator(Globals.lang("External files"), cc.xyw(2,8,6));
         externalFilesPanel.setLayout(new BorderLayout());
         //builder.add(/*new JScrollPane(*/externalFilesPanel/*)*/, cc.xyw(2,8,6));
 
@@ -154,6 +162,15 @@ public class ManageJournalsPanel extends JPanel{
         builder2.append(Globals.lang("ISO abbreviation"));
         builder2.append(abbrTf);
         journalEditPanel = builder2.getPanel();
+
+        viewBuiltin.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JournalAbbreviations abbr = new JournalAbbreviations(Globals.JOURNALS_FILE_BUILTIN);
+                    JTable table = new JTable(abbr.getTableModel());
+                    JScrollPane pane = new JScrollPane(table);
+                    JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
+                }
+            });
 
         browseNew.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
