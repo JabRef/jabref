@@ -161,7 +161,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     public JMenuItem getMenuItem() {
         if (Globals.prefs.getBoolean("showOOPanel"))
             manager.show(getName());
-        JMenuItem item = new JMenuItem("OpenOffice/LibreOffice connection", GUIGlobals.getImage("openoffice"));
+        JMenuItem item = new JMenuItem(Globals.lang("OpenOffice/LibreOffice connection"), GUIGlobals.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 manager.show(getName());
