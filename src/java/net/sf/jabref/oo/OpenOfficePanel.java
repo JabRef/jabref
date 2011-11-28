@@ -95,8 +95,15 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private String sOffice = null;
     private Throwable connectException = null;
 
+    private static OpenOfficePanel instance = null;
 
-    public OpenOfficePanel() {
+    public static OpenOfficePanel getInstance() {
+        if (instance == null)
+            instance = new OpenOfficePanel();
+        return instance;
+    }
+
+    private OpenOfficePanel() {
         ImageIcon connectImage = new ImageIcon(OpenOfficePanel.class.getResource("/images/connect_no.png"));
 
         connect = new JButton(connectImage);
@@ -720,6 +727,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             BibtexEntry[] entries = panel.getSelectedEntries();
             if (entries.length > 0) {
                 try {
+                    if (style == null)
+                        readStyleFile();
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText,
                             pageInfo, Globals.prefs.getBoolean("syncOOWhenCiting"));
                 } catch (ConnectionLostException ex) {
@@ -853,6 +862,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     }
 
     public void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
+
         final BibtexDatabase database = frame.basePanel().database();
         if (entries.length > 0) {
 
@@ -868,8 +878,9 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
             //}
 
-
             try {
+                if (style == null)
+                    readStyleFile();
                 ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, true,
                     pageInfo, Globals.prefs.getBoolean("syncOOWhenCiting"));
             } catch (ConnectionLostException ex) {
@@ -933,8 +944,14 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             connect(true);
         }
         if (ooBase != null) {
+            if (style == null)
+                try {
+                    readStyleFile();
+                    pushEntries(Globals.prefs.getBoolean("ooInParCitation"), entries);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
-            pushEntries(Globals.prefs.getBoolean("ooInParCitation"), entries);
         }
     }
 

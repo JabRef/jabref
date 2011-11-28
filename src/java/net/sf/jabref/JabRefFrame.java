@@ -1266,7 +1266,7 @@ public JabRefPreferences prefs() {
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
 
-      OpenOfficePanel otp = new OpenOfficePanel();
+      OpenOfficePanel otp = OpenOfficePanel.getInstance();
       otp.init(this, sidePaneManager);
       tools.add(otp.getMenuItem());
 
