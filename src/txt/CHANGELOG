@@ -1,5 +1,7 @@
 
 2.8 beta
+    - Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
+      additional minor fix.
     - A large list of journal abbreviations is now loaded by default.
     - Added global option to allow file links relative to the bib file location, in addition
       to the global or database- or user-specific file directory.

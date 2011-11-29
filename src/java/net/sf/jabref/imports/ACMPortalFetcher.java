@@ -27,6 +27,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,29 +48,37 @@ public class ACMPortalFetcher implements EntryFetcher {
 	OutputPrinter status;
     final HTMLConverter htmlConverter = new HTMLConverter();
     private String terms;
+    
     String startUrl = "http://portal.acm.org/";
     String searchUrlPart = "results.cfm?query=";
     String searchUrlPartII = "&dl=";
     String endUrl = "&coll=Portal&short=0";//&start=";
 
+    String bibtexUrl = "exportformats.cfm?id=";
+    String bibtexUrlEnd = "&expformat=bibtex";
+    String abstractUrl = "tab_abstract.cfm?id=";
+    
     private JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
     private JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
     private JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
     
-    private static final int MAX_FETCH = 20; // 20 when short=0
-    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
+    private static final int MAX_FETCH = 100; // 20 when short=0
+    private static final int WAIT_TIME = 1000;
+    private int perPage = 20, hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     private boolean fetchAbstract = false;
     private boolean acmOrGuide = false;
 
-    Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b> of.*");
+    Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
     Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
-    Pattern bibPattern = Pattern.compile(".*(popBibTex.cfm.*)','BibTex'.*");
-    Pattern absPattern = Pattern.compile(".*ABSTRACT</A></span>\\s+<p class=\"abstract\">\\s+(.*)");
+    Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
     
     Pattern fullCitationPattern =
         Pattern.compile("<A HREF=\"(citation.cfm.*)\" class.*");
 
+    Pattern idPattern =
+        Pattern.compile("citation.cfm\\?id=\\d*\\.?(\\d+)&.*");    
+    				
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
         pan.setLayout(new GridLayout(0,1));
@@ -96,7 +105,9 @@ public class ACMPortalFetcher implements EntryFetcher {
         parsed = 0;
         unparseable = 0;
         acmOrGuide = acmButton.isSelected();
-        String address = makeUrl(0);
+        fetchAbstract = absCheckBox.isSelected();
+        int firstEntry = 1;
+        String address = makeUrl(firstEntry);
         try {
             URL url = new URL(address);
 
@@ -111,9 +122,9 @@ public class ACMPortalFetcher implements EntryFetcher {
 				if (index >= 0)
             		page = page.substring(index);
 			}
-            //System.out.println(page);
+			//System.out.println(page);
             //System.out.printf("Hit %d\n", hits);
-            
+			
             if (hits == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
@@ -125,7 +136,6 @@ public class ACMPortalFetcher implements EntryFetcher {
             //System.out.printf("maxHit %d\n", maxHits);
             //String page = getResultsFromFile(new File("/home/alver/div/temp50.txt"));
 
-            //List entries = new ArrayList();
             //System.out.println("Number of hits: "+hits);
             //System.out.println("Maximum returned: "+maxHits);
             if (hits > maxHits)
@@ -138,27 +148,20 @@ public class ACMPortalFetcher implements EntryFetcher {
                         Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 hits = MAX_FETCH;
             }
-        
-            fetchAbstract = absCheckBox.isSelected();
-            //parse(dialog, page, 0, 51);
-            //dialog.setProgress(perPage/2, hits);
-            parse(dialog, page, 0, 1);
-            //System.out.println(page);
-            int firstEntry = perPage;
-            while (shouldContinue && (firstEntry < hits)) {
-                //System.out.println("Fetching from: "+firstEntry);
+            
+            parse(dialog, page, 0, firstEntry);
+        	firstEntry += perPage;
+        	
+            while (shouldContinue && (firstEntry <= hits)) {
                 address = makeUrl(firstEntry);
-                //System.out.println(address);
+                //System.out.println("Fetch stating at " + firstEntry + " from: " + address);
                 page = getResults(new URL(address));
-                
-                //dialog.setProgress(firstEntry+perPage/2, hits);
-                if (!shouldContinue)
-                    break;
-
-                parse(dialog, page, 0, 1+firstEntry);
-                firstEntry += perPage;
+                parse(dialog, page, 0, firstEntry);
+            	firstEntry += perPage;
             }
+            
             return true;
+            
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
@@ -175,7 +178,9 @@ public class ACMPortalFetcher implements EntryFetcher {
     private String makeUrl(int startIndex) {
         StringBuffer sb = new StringBuffer(startUrl).append(searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
+        sb.append("&start=" + String.valueOf(startIndex));
         sb.append(searchUrlPartII);
+  
         if (acmOrGuide)
         	sb.append("ACM");
         else
@@ -190,51 +195,58 @@ public class ACMPortalFetcher implements EntryFetcher {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
         BibtexEntry entry;
-        while (((entry = parseNextEntry(text, piv, entryNumber)) != null)
-            && (shouldContinue)) {
+        while (((entry = parseNextEntry(text, piv, entryNumber)) != null) && shouldContinue) {
             if (entry.getField("title") != null) {
                 dialog.addEntry(entry);
                 dialog.setProgress(parsed + unparseable, hits);
                 parsed++;
             }
             entryNumber++;
-            try {
-            	Thread.sleep(10000);//wait between requests or you will be blocked by ACM
-            } catch (InterruptedException e) {
-            	System.err.println(e.getStackTrace());
-            }
         }
     }
 
     private BibtexEntry parseEntryBibTeX(String fullCitation, boolean abs) throws IOException {
-        URL url;
-        try {
-            url = new URL(startUrl + fullCitation);
-        	String page = getResults(url);
-			Thread.sleep(10000);//wait between requests or you will be blocked by ACM
-			Matcher bibtexAddr = bibPattern.matcher(page);
-			if (bibtexAddr.find()) {
-				URL bibtexUrl = new URL(startUrl + bibtexAddr.group(1));
-				BufferedReader in = new BufferedReader(new InputStreamReader(bibtexUrl.openStream()));
-				ParserResult result = BibtexParser.parse(in);
-				in.close();
-				Collection<BibtexEntry> item = result.getDatabase().getEntries();
-				BibtexEntry entry = item.iterator().next();
-				if (abs == true) {
-					Matcher absMatch = absPattern.matcher(page);
-					if (absMatch.find()) {
-						String absBlock = absMatch.group(1);
-						entry.setField("abstract", convertHTMLChars(absBlock).trim());
-					} else {
-						System.out.println("No abstract matched.");
-						//System.out.println(page);
-					}
-				}
-				
-				Thread.sleep(10000);//wait between requests or you will be blocked by ACM
-				return entry;
-			} else
-				return null;
+    	String bibAddr = "";
+    	String ID = "";
+    	try {
+    		// Get ID
+    		Matcher idMatcher = idPattern.matcher(fullCitation);
+    		if (idMatcher.find()) {
+    			ID = idMatcher.group(1);
+    			//System.out.println("To fetch: " + bibAddr);
+    		}
+    		else {
+    			System.out.println("Did not find ID in: " + fullCitation);
+    			return null;
+    		}
+    		
+    		// fetch bibtex record
+    		bibAddr = bibtexUrl + ID + bibtexUrlEnd;
+			URL bibtexUrl = new URL(startUrl + bibAddr);
+			BufferedReader in = new BufferedReader(new InputStreamReader(bibtexUrl.openStream()));
+			ParserResult result = BibtexParser.parse(in);
+			in.close();
+			Collection<BibtexEntry> item = result.getDatabase().getEntries();
+            if (item.size() == 0)
+                return null;
+			BibtexEntry entry = item.iterator().next();
+			Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
+			
+        	// get abstract
+        	if (abs) {
+        		URL url = new URL(startUrl + abstractUrl + ID);
+	        	String page = getResults(url);
+	        	entry.setField("abstract", convertHTMLChars(page).trim()); 	
+				Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
+        	}
+
+			return entry;
+			
+        } catch (NoSuchElementException e) {
+        	System.out.println("Bad Bibtex record read at: " + startUrl + bibAddr);
+        	System.out.println("link read was: " + fullCitation);
+            e.printStackTrace();
+            return null;
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
@@ -252,9 +264,10 @@ public class ACMPortalFetcher implements EntryFetcher {
 
     private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber) {
         String toFind = new StringBuffer().append("<strong>")
-                .append(entryNumber).append("</strong>").toString();
+                .append(entryNumber).append("</strong><br>").toString();
         int index = allText.indexOf(toFind, startIndex);
         int endIndex = allText.indexOf("</table>", index+1);
+        
         //if (endIndex < 0)
             endIndex = allText.length();
 
@@ -268,7 +281,6 @@ public class ACMPortalFetcher implements EntryFetcher {
 				fullCitationPattern.matcher(text);
 			if (fullCitation.find()) {
 				try {
-					Thread.sleep(10000);//wait between requests or you will be blocked by ACM
 					entry = parseEntryBibTeX(fullCitation.group(1), fetchAbstract);
 				} catch (Exception e) {
 					e.printStackTrace();
