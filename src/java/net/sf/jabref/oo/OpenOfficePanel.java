@@ -270,7 +270,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                         else
                             style.ensureUpToDate();
                     } catch (Throwable ex) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use the default style."),
+                        JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
                                 Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -731,7 +731,12 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                         readStyleFile();
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText,
                             pageInfo, Globals.prefs.getBoolean("syncOOWhenCiting"));
-                } catch (ConnectionLostException ex) {
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
+                            Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
                     reportUndefinedCharacterFormat(ex);
@@ -879,8 +884,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             //}
 
             try {
-                if (style == null)
-                    readStyleFile();
                 ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, true,
                     pageInfo, Globals.prefs.getBoolean("syncOOWhenCiting"));
             } catch (ConnectionLostException ex) {
@@ -944,14 +947,15 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             connect(true);
         }
         if (ooBase != null) {
-            if (style == null)
-                try {
+            try {
+                if (style == null)
                     readStyleFile();
-                    pushEntries(Globals.prefs.getBoolean("ooInParCitation"), entries);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
+                        Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            pushEntries(Globals.prefs.getBoolean("ooInParCitation"), entries);
         }
     }
 
