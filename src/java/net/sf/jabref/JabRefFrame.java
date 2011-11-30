@@ -1300,7 +1300,7 @@ public JabRefPreferences prefs() {
       tools.add(unabbreviate);
       mb.add(tools);
 
-      web.add(fetchCiteSeer);
+      //web.add(fetchCiteSeer);
       
       /*
        * Add all entryFetchers

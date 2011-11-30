@@ -250,7 +250,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         this.fields = fields;
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview1"));
+        preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview0"));
 
         duplLabel.setToolTipText(Globals
             .lang("Possible duplicate of existing entry. Click to resolve."));

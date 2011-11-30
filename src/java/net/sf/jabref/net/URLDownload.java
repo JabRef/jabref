@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.net;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.imports.ImportFormatReader;
 
 import java.awt.Component;
@@ -37,6 +38,7 @@ public class URLDownload {
     private Component parent;
     private String mimeType = null;
     private String content = null;
+    private String encoding = null;
 
     private CookieHandler cm;
 
@@ -64,6 +66,10 @@ public class URLDownload {
         parent = _parent;
 
         setCookieHandler();
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     private void setCookieHandler() {
@@ -185,7 +191,9 @@ public class URLDownload {
     public void copy(InputStream in, Writer out) throws IOException
       {
         InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
-        BufferedReader read = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(_in));
+        Reader r = encoding != null ? new InputStreamReader(_in, encoding) :
+                ImportFormatReader.getReaderDefaultEncoding(_in);
+        BufferedReader read = new BufferedReader(r);
 
         byte[] buffer = new byte[512];
         String line;
