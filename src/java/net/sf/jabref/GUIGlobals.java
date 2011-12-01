@@ -138,7 +138,6 @@ public class GUIGlobals {
 	shortPlainImport="ShortPlainImport.html",
 	importInspectionHelp = "ImportInspectionDialog.html",
 	shortIntegrityCheck="ShortIntegrityCheck.html",
-	shortAuxImport="ShortAuxImport.html",
 	remoteHelp = "RemoteHelp.html",
 	journalAbbrHelp = "JournalAbbreviations.html",
 	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
@@ -148,7 +147,7 @@ public class GUIGlobals {
     autosaveHelp = "Autosave.html";
 
 
-//	Colors.
+    //	Colors.
 	public static Color
 	lightGray = new Color(230, 30, 30), // Light gray background
 	entryEditorLabelColor = new Color(100, 100, 150), // Empty field, blue.
