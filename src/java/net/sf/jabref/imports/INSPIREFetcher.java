@@ -190,7 +190,7 @@ public class INSPIREFetcher implements EntryFetcher {
 	}
 
 	public String getKeyName() {
-		return "Fetch INSPIRE";
+		return "INSPIRE";
 	}
 
 	public JPanel getOptionsPanel() {

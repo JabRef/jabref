@@ -60,7 +60,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Search ScienceDirect";
+        return "ScienceDirect";
     }
 
     public JPanel getOptionsPanel() {

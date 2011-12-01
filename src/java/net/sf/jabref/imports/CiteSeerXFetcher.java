@@ -61,11 +61,11 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return Globals.menuTitle("Search CiteSeer");
+        return "CiteSeer";
     }
 
     public String getKeyName() {
-        return "Search CiteSeer";
+        return "CiteSeer";
     }
 
     public URL getIcon() {
@@ -73,7 +73,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     public String getHelpPage() {
-        return null;
+        return "CiteSeerHelp.html";
     }
 
     public JPanel getOptionsPanel() {

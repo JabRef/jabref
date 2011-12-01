@@ -45,7 +45,6 @@ import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.GeneralFetcher;
 import net.sf.jabref.imports.ImportCustomizationDialog;
@@ -215,9 +214,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                        prefs.getKey("Search")),
       toggleSearch = new GeneralAction("toggleSearch", "Search", Globals.lang("Toggle search panel")),
 
-      fetchCiteSeer = new FetchCiteSeerAction(),
-      importCiteSeer = new ImportCiteSeerAction(),
-      copyKey = new GeneralAction("copyKey", "Copy BibTeX key", 
+      copyKey = new GeneralAction("copyKey", "Copy BibTeX key",
             prefs.getKey("Copy BibTeX key")),
       //"Put a BibTeX reference to the selected entries on the clipboard",
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
@@ -345,8 +342,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     PushToApplicationButton pushExternalButton;
 
-    CiteSeerFetcher citeSeerFetcher;
-    
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
     List<Action> fetcherActions = new LinkedList<Action>();
 
@@ -536,11 +531,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 } 
     	}
         
-        citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);
 
-        sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.register("groups", groupSelector);
         sidePaneManager.register("search", searchManager);
 
@@ -1252,7 +1245,6 @@ public JabRefPreferences prefs() {
       bibtex.add(plainTextImport);
       bibtex.addSeparator();
       bibtex.add(editEntry);
-      bibtex.add(importCiteSeer);
       bibtex.add(editPreamble);
       bibtex.add(editStrings);
       mb.add(bibtex);
@@ -1300,8 +1292,6 @@ public JabRefPreferences prefs() {
       tools.add(unabbreviate);
       mb.add(tools);
 
-      //web.add(fetchCiteSeer);
-      
       /*
        * Add all entryFetchers
        */
@@ -1516,10 +1506,10 @@ public JabRefPreferences prefs() {
         openDatabaseOnlyActions = new LinkedList<Object>();
         openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
             mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
-            redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
+            redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
             selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
-            incrementalSearch, replaceAll, importMenu, exportMenu, fetchCiteSeer,
+            incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
                 openPdf, openUrl, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
@@ -1772,155 +1762,6 @@ public JabRefPreferences prefs() {
         output(Globals.lang("New database created."));
     }
   }
-
-class ImportCiteSeerAction
-        extends MnemonicAwareAction {
-
-    public ImportCiteSeerAction() {
-        super(GUIGlobals.getImage("citeseer"));
-        putValue(NAME, "Import Fields from CiteSeer");
-        putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
-        putValue(ACCELERATOR_KEY, prefs.getKey("Import Fields from CiteSeer")); // Key defined in MenuTitles!
-        }
-
-        public void actionPerformed(ActionEvent e) {
-
-                if(citeSeerFetcher.activateImportFetcher()) {
-
-
-                        (new Thread() {
-
-                                BasePanel currentBp;
-                                int[] clickedOn = null;
-
-                                class UpdateComponent implements Runnable {
-                                        boolean changesMade;
-
-                                        UpdateComponent(boolean changesMade) {
-                                                this.changesMade = changesMade;
-                                        }
-
-                                        public void run() {
-                                            citeSeerFetcher.endImportCiteSeerProgress();
-                                            if (changesMade)
-                                                    currentBp.markBaseChanged();
-                                                //for(int i=0; i < clickedOn.length; i++)
-                                                //        currentBp.entryTable.addRowSelectionInterval(i,i);
-                                                //currentBp.showEntry(toShow);
-                                                output(Globals.lang("Completed Import Fields from CiteSeer."));
-                                        }
-                                }
-
-                            public void run() {
-                                currentBp = (BasePanel) tabbedPane.getSelectedComponent();
-                                        // We demand that at least one row is selected.
-
-                                        int rowCount = currentBp.mainTable.getSelectedRowCount();
-                                        if (rowCount >= 1) {
-                                                clickedOn = currentBp.mainTable.getSelectedRows();
-                                        } else {
-                                                JOptionPane.showMessageDialog(currentBp.frame(),
-                                                Globals.lang("You must select at least one row to perform this operation."),
-                                                Globals.lang("CiteSeer Import Error"),
-                                                JOptionPane.WARNING_MESSAGE);
-                                        }
-                                        if (clickedOn != null) {
-                                                citeSeerFetcher.beginImportCiteSeerProgress();
-                                                NamedCompound citeseerNamedCompound =
-                                                        new NamedCompound(Globals.lang("CiteSeer Import Fields"));
-                                                boolean newValues = citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);
-                                                if (newValues) {
-                                                        citeseerNamedCompound.end();
-                                                        currentBp.undoManager.addEdit(citeseerNamedCompound);
-                                                }
-                                                UpdateComponent updateComponent = new UpdateComponent(newValues);
-                                                SwingUtilities.invokeLater(updateComponent);
-                                        }
-                                        citeSeerFetcher.deactivateImportFetcher();
-                            }
-                        }).start();
-                } else {
-                        JOptionPane.showMessageDialog(tabbedPane.getSelectedComponent(),
-                                        Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
-                                        Globals.lang("Please wait until it has finished."),
-                                        Globals.lang("CiteSeer Import Error"),
-                                        JOptionPane.WARNING_MESSAGE);
-                }
-        }
-}
-
-class FetchCiteSeerAction
-        extends MnemonicAwareAction {
-
-                public FetchCiteSeerAction() {
-                    super(GUIGlobals.getImage("citeseer"));
-                    putValue(NAME, "Fetch citations from CiteSeer");
-
-                    putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
-                    putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
-                }
-
-                public void actionPerformed(ActionEvent e) {
-
-                        if(citeSeerFetcher.activateCitationFetcher()) {
-                                sidePaneManager.show("CiteSeerProgress");
-                                (new Thread() {
-                                        BasePanel newBp;
-                                        BasePanel targetBp;
-                                        BibtexDatabase newDatabase;
-                                        BibtexDatabase targetDatabase;
-
-                                        Runnable updateComponent = new Runnable() {
-
-                                                /* TODO: This should probably be selectable on/off
-                                                 * in the preferences window, but for now all
-                                                 * Citation fetcher operations will sort by citation count.
-                                                 */
-                                                private void setSortingByCitationCount() {
-                                                        newBp.sortingByCiteSeerResults = true;
-                                                }
-
-                                                public void run() {
-                                                        setSortingByCitationCount();
-                                                        tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
-                                                        tabbedPane.setSelectedComponent(newBp);
-                                                        output(Globals.lang("Fetched all citations from target database."));
-                                                        citeSeerFetcher.deactivateCitationFetcher();
-                                                }
-                                        };
-
-                                  public void run() {
-                                        try {
-                                                newBp = new BasePanel(JabRefFrame.this);
-                                                int errorCode;
-                                                targetBp = (BasePanel) tabbedPane.getSelectedComponent();
-                                                newDatabase = newBp.getDatabase();
-                                                targetDatabase = targetBp.getDatabase();
-                                                errorCode = citeSeerFetcher.populate(newDatabase, targetDatabase);
-                                                if (newDatabase.getEntryCount() > 0) {
-                                                        SwingUtilities.invokeLater(updateComponent);
-                                                } else if(errorCode == 0) {
-                                                        SwingUtilities.invokeLater(citeSeerFetcher.getEmptyFetchSetDialog());
-                                            } else {
-                                                    citeSeerFetcher.deactivateCitationFetcher();
-                                            }
-                                        }
-                                        catch (Exception ex) {
-                                          ex.printStackTrace();
-                                        }
-                                  }
-                                }).start();
-                        } else {
-                            JOptionPane.showMessageDialog(tabbedPane.getSelectedComponent(),
-                                                Globals.lang("A CiteSeer fetch operation is currently in progress.") + "  " +
-                                                Globals.lang("Please wait until it has finished."),
-                                                Globals.lang("CiteSeer Fetch Error"),
-                                                JOptionPane.WARNING_MESSAGE);
-                        }
-                }
-        }
-
-
 
     // The action concerned with generate a new (sub-)database from latex aux file.
     class NewSubDatabaseAction extends MnemonicAwareAction

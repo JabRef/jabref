@@ -383,7 +383,7 @@ public class ACMPortalFetcher implements EntryFetcher {
     }
 
 	public String getTitle() {
-	    return Globals.menuTitle("Search ACM Portal");
+	    return "ACM Portal";
 	}
 	
 	
@@ -396,7 +396,7 @@ public class ACMPortalFetcher implements EntryFetcher {
 	}
 	
 	public String getKeyName() {
-	    return "Search ACM Portal";
+	    return "ACM Portal";
 	}
 	
 	// This method is called by the dialog when the user has cancelled the import.
