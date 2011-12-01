@@ -20,6 +20,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.oo.OpenOfficePanel;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
@@ -79,6 +80,7 @@ public class PushToApplicationButton implements ActionListener {
 		    applications.add(new PushToWinEdt());
 		    applications.add(new PushToLatexEditor());
 		    applications.add(new PushToVim());
+            applications.add(OpenOfficePanel.getInstance());
 		
 		    // Finally, sort the entries:
 		    //Collections.sort(applications, new PushToApplicationComparator());

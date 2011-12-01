@@ -62,6 +62,7 @@ public class Globals {
 
 	private static final String buildInfos = "/resource/build.properties";
 
+    public static String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
 	/*
 	 * some extra field definitions
 	 */
@@ -1298,7 +1299,7 @@ public class Globals {
 	public static void initializeJournalNames() {
 
         // Read internal lists:
-        journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
+        journalAbbrev = new JournalAbbreviations(JOURNALS_FILE_BUILTIN);
 		if (prefs.getBoolean("useIEEEAbrv"))
 			journalAbbrev.readJournalList("/resource/IEEEJournalList.txt");
 
