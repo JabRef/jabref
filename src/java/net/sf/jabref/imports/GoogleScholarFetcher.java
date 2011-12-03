@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.Util;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.NameListNormalizer;
 
@@ -30,14 +33,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CiteSeerXFetcher implements EntryFetcher {
+public class GoogleScholarFetcher implements EntryFetcher {
 
     protected static int MAX_PAGES_TO_LOAD = 8;
     final static String QUERY_MARKER = "___QUERY___";
-    final static String URL_START = "http://citeseer.ist.psu.edu";
-    final static String SEARCH_URL = URL_START+"/search?q="+QUERY_MARKER
-            +"&submit=Search&sort=rlv&t=doc";
-    final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
+    final static String URL_START = "http://scholar.google.com";
+    final static String SEARCH_URL = URL_START+"/scholar?q="+QUERY_MARKER
+            +"&amp;hl=en&amp;btnG=Search";
+
+    final static Pattern CITE_LINK_PATTERN = Pattern.compile("<div class=gs_rt><h3><a href=\"([^\"]*)\">");
+    final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
+            "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span class=\"b\">Next</span></a>");
 
     protected boolean stopFetching = false;
 
@@ -45,13 +51,15 @@ public class CiteSeerXFetcher implements EntryFetcher {
         stopFetching = false;
         try {
             List<String> citations = getCitations(query);
+            inspector.setProgress(2, citations.size()+2);
+            int i=0;
             for (String citation : citations) {
                 if (stopFetching)
                     break;
-                BibtexEntry entry = getSingleCitation(citation);
-                //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
 
-                //dialog.setProgress(++i, citations.size());
+                BibtexEntry entry = BibsonomyScraper.getEntry(citation);
+
+                inspector.setProgress((++i)+2, citations.size()+2);
                 if (entry != null)
                     inspector.addEntry(entry);
             }
@@ -64,11 +72,11 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return "CiteSeer";
+        return "Google Scholar";
     }
 
     public String getKeyName() {
-        return "CiteSeer";
+        return "Google Scholar";
     }
 
     public URL getIcon() {
@@ -118,60 +126,18 @@ public class CiteSeerXFetcher implements EntryFetcher {
         URL url = new URL(urlQuery);
         URLDownload ud = new URLDownload(url);
         ud.download();
-
         String cont = ud.getStringContent();
-        //System.out.println(cont);
         Matcher m = CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
-            ids.add(URL_START+m.group(1));
+            ids.add(m.group(1));
         }
 
-        return null;
-    }
-
-    final static String basePattern = "<meta name=\""+QUERY_MARKER+"\" content=\"(.*)\" />";
-    final static Pattern titlePattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_title"));
-    final static Pattern authorPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_authors"));
-    final static Pattern yearPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_year"));
-    final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
-
-    protected BibtexEntry getSingleCitation(String urlString) throws IOException {
-
-        URL url = new URL(urlString);
-        URLDownload ud = new URLDownload(url);
-        ud.setEncoding("UTF8");
-        ud.download();
-
-        String cont = ud.getStringContent();
-
-        // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
-        Matcher m = titlePattern.matcher(cont);
+        m = NEXT_PAGE_PATTERN.matcher(cont);
         if (m.find()) {
-            BibtexEntry entry = new BibtexEntry(Util.createNeutralId());
-            entry.setField("title", m.group(1));
-
-            // Find authors:
-            m = authorPattern.matcher(cont);
-            if (m.find()) {
-                String authors = m.group(1);
-                entry.setField("author", NameListNormalizer.normalizeAuthorList(authors));
-            }
-
-            // Find year:
-            m = yearPattern.matcher(cont);
-            if (m.find())
-                entry.setField("year", m.group(1));
-
-            // Find abstract:
-            m = abstractPattern.matcher(cont);
-            if (m.find())
-                entry.setField("abstract", m.group(1));
-
-            return entry;
+            System.out.println(URL_START+m.group(1).replaceAll("&amp;", "&"));
+            return URL_START+m.group(1).replaceAll("&amp;", "&");
         }
-        else
-            return null;
-
+        else return null;
     }
 
 }
