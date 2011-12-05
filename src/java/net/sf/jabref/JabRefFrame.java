@@ -357,7 +357,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       newDatabaseMenu = subMenu("New database" );
 
   // Other submenus
-  JMenu checkAndFix = subMenu("Scan database...");
+  JMenu checkAndFix = subMenu("Legacy tools...");
 
 
   // The action for adding a new entry of unspecified type.
@@ -1149,10 +1149,11 @@ public JabRefPreferences prefs() {
       JMenu file = subMenu("File"),
               sessions = subMenu("Sessions"),
               edit = subMenu("Edit"),
+              search = subMenu("Search"),
               bibtex = subMenu("BibTeX"),
               view = subMenu("View"),
               tools = subMenu("Tools"),
-              web = subMenu("Web search"),
+              //web = subMenu("Web search"),
               options = subMenu("Options"),
               newSpec = subMenu("New entry..."),
               helpMenu = subMenu("Help");
@@ -1219,6 +1220,25 @@ public JabRefPreferences prefs() {
       edit.addSeparator();
       edit.add(selectAll);
       mb.add(edit);
+
+      search.add(normalSearch);
+      search.add(incrementalSearch);
+      search.add(replaceAll);
+      search.add(massSetField);
+      search.addSeparator();
+      search.add(dupliCheck);
+      search.add(resolveDuplicateKeys);
+      //search.add(strictDupliCheck);
+      search.add(autoSetFile);
+      search.addSeparator();
+      GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
+      search.add(generalFetcher.getAction());
+      if (prefs.getBoolean("webSearchVisible")) {
+          sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
+          sidePaneManager.show(generalFetcher.getTitle());
+      }
+      mb.add(search);
+
       view.add(back);
       view.add(forward);
       view.add(focusTable);
@@ -1249,67 +1269,36 @@ public JabRefPreferences prefs() {
       bibtex.add(editStrings);
       mb.add(bibtex);
 
-      tools.add(normalSearch);
-      tools.add(incrementalSearch);
-      tools.add(replaceAll);
-      tools.add(massSetField);
       tools.add(makeKeyAction);
       //tools.add(downloadFullText);
-      // [kiar] I think we should group these festures
-      tools.add(checkAndFix);
-
+      tools.add(newSubDatabaseAction);
+      tools.add(writeXmpAction);
       OpenOfficePanel otp = OpenOfficePanel.getInstance();
       otp.init(this, sidePaneManager);
       tools.add(otp.getMenuItem());
-
-      checkAndFix.add(dupliCheck);
-      checkAndFix.add(resolveDuplicateKeys);
-      //checkAndFix.add(strictDupliCheck);
-      checkAndFix.add(autoSetFile);
-      checkAndFix.add(autoSetPdf);
-      checkAndFix.add(autoSetPs);
-      checkAndFix.add(integrityCheckAction);
-      checkAndFix.addSeparator();
-      checkAndFix.add(upgradeExternalLinks);
-
+      tools.add(pushExternalButton.getMenuAction());
       tools.addSeparator();
       tools.add(manageSelectors);
-
-      tools.add(pushExternalButton.getMenuAction());
-      tools.add(writeXmpAction);
-
       tools.addSeparator();
       tools.add(openFile);
       tools.add(openPdf);
       tools.add(openUrl);
       //tools.add(openSpires);
-      tools.addSeparator();
-      tools.add(newSubDatabaseAction);
 
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
       tools.add(unabbreviate);
+      tools.addSeparator();
+      checkAndFix.add(autoSetPdf);
+      checkAndFix.add(autoSetPs);
+      checkAndFix.add(integrityCheckAction);
+      //checkAndFix.addSeparator();
+      checkAndFix.add(upgradeExternalLinks);
+      tools.add(checkAndFix);
+
       mb.add(tools);
 
-      /*
-       * Add all entryFetchers
-       */
-      /*for (EntryFetcher fetcher : fetchers){
-    	  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
-          generalFetcher.setHelpResourceOwner(fetcher.getClass());
-    	  web.add(generalFetcher.getAction());
-    	  fetcherActions.add(generalFetcher.getAction());
-      }*/
-      GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
-      web.add(generalFetcher.getAction());
-      if (prefs.getBoolean("webSearchVisible")) {
-          sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
-          sidePaneManager.show(generalFetcher.getTitle());
-      }
-
-
-      mb.add(web);
 
       options.add(showPrefs);
       AbstractAction customizeAction = new CustomizeEntryTypeAction();
