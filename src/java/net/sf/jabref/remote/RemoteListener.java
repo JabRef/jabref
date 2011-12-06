@@ -33,13 +33,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.imports.ParserResult;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Aug 14, 2005
- * Time: 8:11:58 PM
- * To change this template use File | Settings | File Templates.
- */
+import javax.swing.*;
+
 public class RemoteListener extends Thread {
 
     private JabRef jabref;
@@ -111,6 +106,11 @@ public class RemoteListener extends Thread {
                     out.close();
                     newSocket.close();
 
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            jabref.jrf.showIfMinimizedToSysTray();
+                        }
+                    });
                 } catch (SocketTimeoutException ex) {
                     //System.out.println("timeout");
                     in.close();
