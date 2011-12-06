@@ -63,7 +63,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Search JSTOR";
+        return "JSTOR";
     }
 
     public JPanel getOptionsPanel() {
@@ -72,7 +72,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     }
 
     public String getTitle() {
-        return Globals.menuTitle("Search JSTOR");
+        return "JSTOR";
     }
 
     public void stopFetching() {

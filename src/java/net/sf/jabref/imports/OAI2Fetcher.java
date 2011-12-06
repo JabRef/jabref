@@ -257,7 +257,7 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Fetch " + oai2ArchiveName;
+        return oai2ArchiveName;
     }
 
     public JPanel getOptionsPanel() {

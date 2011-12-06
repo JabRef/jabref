@@ -180,7 +180,7 @@ public class SPIRESFetcher implements EntryFetcher {
 	}
 
 	public String getKeyName() {
-		return "Fetch SPIRES";
+		return "SPIRES";
 	}
 
 	public JPanel getOptionsPanel() {

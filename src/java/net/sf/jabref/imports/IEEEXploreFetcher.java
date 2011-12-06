@@ -205,7 +205,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return Globals.menuTitle("Search IEEEXplore");
+        return "IEEEXplore";
     }
 
     public URL getIcon() {
@@ -217,7 +217,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Search IEEEXplore";
+        return "IEEEXplore";
     }
 
     /**

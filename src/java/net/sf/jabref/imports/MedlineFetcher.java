@@ -148,7 +148,7 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Fetch Medline";
+        return "Medline";
     }
 
     public JPanel getOptionsPanel() {
@@ -157,7 +157,7 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return Globals.menuTitle("Search Medline");
+        return "Medline";
     }
 
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {

@@ -83,7 +83,6 @@ import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.NamedCompound;
@@ -575,12 +574,6 @@ public class Util {
 	    if (!link.startsWith("http://")) {
 		link = Globals.ARXIV_LOOKUP_PREFIX + link;
 	    }
-	} else if (fieldName.equals("citeseerurl")) {
-	    fieldName = "url";
-
-	    String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
-	    if (canonicalLink != null)
-		link = canonicalLink;
 	}
 
 		if (fieldName.equals("url")) { // html

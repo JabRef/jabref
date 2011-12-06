@@ -114,6 +114,23 @@
 			value="Fetch Entries from JSTOR." />
 	</extension>
 
+    <extension id="CiteSeerXFetcher" plugin-id="net.sf.jabref.core"
+	       point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+		 value="net.sf.jabref.imports.CiteSeerXFetcher" />
+      <parameter id="name" value="CiteSeerX Entry Fetcher" />
+      <parameter id="description"
+		 value="Fetch Entries from CiteSeer." />
+    </extension>
+
+    <extension id="GoogleScholarFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+		 value="net.sf.jabref.imports.GoogleScholarFetcher" />
+      <parameter id="name" value="Google Scholar Entry Fetcher" />
+      <parameter id="description"
+		 value="Fetch Entries from Google Scholar." />
+    </extension>
     <!--<extension id="ScienceDirectFetcher" plugin-id="net.sf.jabref.core"
         point-id="EntryFetcher">
         <parameter id="entryFetcher"
