@@ -958,7 +958,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Refresh OO", "ctrl alt O");
         defKeyBinds.put("File list editor, move entry up", "ctrl UP");
         defKeyBinds.put("File list editor, move entry down", "ctrl DOWN");
-        
+        defKeyBinds.put("Minimize to system tray", "ctrl alt W");
     }
 
     private String getNextUnit(Reader data) throws IOException {

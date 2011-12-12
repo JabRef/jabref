@@ -110,7 +110,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     boolean addedToPluginMenu = false;
 
     GridBagLayout gbl = new GridBagLayout();
-
     GridBagConstraints con = new GridBagConstraints();
 
     JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
@@ -119,6 +118,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     JProgressBar progressBar = new JProgressBar();
 
     private FileHistory fileHistory = new FileHistory(prefs, this);
+
+    private SysTray sysTray = null;
 
     LabelMaker labelMaker;
 
@@ -392,7 +393,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         macOSXRegistration();
 
         UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
-      
+
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
         // glassPane.setVisible(true);
@@ -1193,6 +1194,7 @@ public JabRefPreferences prefs() {
 
       file.addSeparator();
       file.add(close);
+      file.add(new MinimizeToSysTrayAction());
       file.add(quit);
       mb.add(file);
       //edit.add(test);
@@ -2401,6 +2403,34 @@ class SaveSessionAction
                 baseAt(i).updateTableFont();
             }
         }
+    }
+
+    class MinimizeToSysTrayAction extends MnemonicAwareAction {
+        public MinimizeToSysTrayAction() {
+            putValue(NAME, "Minimize to system tray");
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Minimize to system tray"));
+        }
+        public void actionPerformed(ActionEvent event) {
+            if (sysTray == null)
+                sysTray = new SysTray(JabRefFrame.this);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    sysTray.setTrayIconVisible(true);
+                    JabRefFrame.this.setVisible(false);
+                }
+            });
+        }
+    }
+
+    public void showIfMinimizedToSysTray() {
+        if (sysTray != null)
+            sysTray.setTrayIconVisible(false);
+        setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                toFront();
+            }
+        });
     }
 
     /*private class ForegroundLabel extends JLabel {
