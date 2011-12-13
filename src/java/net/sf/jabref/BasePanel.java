@@ -2103,7 +2103,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void adjustSplitter() {
         int mode = getMode();
         if (mode == SHOWING_PREVIEW) {
-            splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_PANEL_HEIGHT);
+            splitPane.setDividerLocation(splitPane.getHeight()-Globals.prefs.getInt("previewPanelHeight"));
         } else {
             splitPane.setDividerLocation(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
 
@@ -2255,6 +2255,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         int oldSplitterLocation = -1;
         if (mode == SHOWING_EDITOR)
             oldSplitterLocation = splitPane.getDividerLocation();
+        else if (mode == SHOWING_PREVIEW)
+            Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight()-splitPane.getDividerLocation());
         boolean adjustSplitter = (mode == WILL_SHOW_EDITOR);
         mode = SHOWING_EDITOR;
         currentEditor = editor;

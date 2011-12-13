@@ -177,6 +177,7 @@ public class JabRefPreferences {
         defaults.put("sizeY", new Integer(680));
         defaults.put("windowMaximised", Boolean.FALSE);
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
+        defaults.put("previewPanelHeight", GUIGlobals.PREVIEW_PANEL_HEIGHT);
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
