@@ -280,12 +280,13 @@ public class SQLutil {
             fields.clear();
         }
 
-        for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
+        /*for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
             fields = uniqueInsert(fields, val.getRequiredFields());
             fields = uniqueInsert(fields, val.getOptionalFields());
-            fields = uniqueInsert(fields, val.getGeneralFields());
+            //fields = uniqueInsert(fields, val.getGeneralFields());
             fields = uniqueInsert(fields, val.getUtilityFields());
-        }
+        }*/
+        uniqueInsert(fields, BibtexFields.getAllFieldNames());
         //fields = uniqueInsert(fields, new String[] {"owner", "timestamp"});
 
         // create comma separated list of field names
@@ -1065,44 +1066,59 @@ public class SQLutil {
         // loop through entry types
         for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
 
+            ArrayList<String> coveredFields = new ArrayList<String>();
             // set ID for each field corresponding to its relationship to the
             // entry type
             for (int i = 0; i < fieldID.size(); i++) {
                 fieldID.set(i, "");
             }
-            fieldID = setFieldID(fields, fieldID, val.getRequiredFields(),
-                "req");
-            fieldID = setFieldID(fields, fieldID, val.getOptionalFields(),
-                "opt");
-            fieldID = setFieldID(fields, fieldID, val.getGeneralFields(), "gen");
-            fieldID = setFieldID(fields, fieldID, val.getUtilityFields(), "uti");
+            String[] flds = val.getRequiredFields();
+            fieldID = setFieldID(fields, fieldID, flds, "req");
+            for (int i=0; i<flds.length; i++)
+                coveredFields.add(flds[i]);
+            flds = val.getOptionalFields();
+            fieldID = setFieldID(fields, fieldID, flds, "opt");
+            for (int i=0; i<flds.length; i++)
+                coveredFields.add(flds[i]);
+            flds = val.getUtilityFields();
+            fieldID = setFieldID(fields, fieldID, flds, "uti");
+            for (int i=0; i<flds.length; i++)
+                coveredFields.add(flds[i]);
+
+            String[] allFields = BibtexFields.getAllFieldNames();
+            ArrayList<String> generalFields = new ArrayList<String>();
+            for (int i = 0; i < allFields.length; i++) {
+                if (!coveredFields.contains(allFields[i]))
+                    generalFields.add(allFields[i]);
+            }
+            fieldID = setFieldID(fields, fieldID, generalFields.toArray(new String[generalFields.size()]), "gen");
 
             // build DML insert statement
-	    switch (dbtype) {
-	    case MYSQL:
-            dml = insert + "\"" + val.getName().toLowerCase() + "\"";
-            for (int i = 0; i < fieldID.size(); i++) {
-                dml = dml + ", ";
-                if (fieldID.get(i) != "") {
-                    dml = dml + "\"" + fieldID.get(i) + "\"";
-                } else {
-                    dml = dml + "NULL";
+            switch (dbtype) {
+            case MYSQL:
+                dml = insert + "\"" + val.getName().toLowerCase() + "\"";
+                for (int i = 0; i < fieldID.size(); i++) {
+                    dml = dml + ", ";
+                    if (fieldID.get(i) != "") {
+                        dml = dml + "\"" + fieldID.get(i) + "\"";
+                    } else {
+                        dml = dml + "NULL";
+                    }
                 }
-            }
-	    break;
-	    case POSTGRESQL:
-            dml = insert + "\'" + val.getName().toLowerCase() + "\'";
-            for (int i = 0; i < fieldID.size(); i++) {
-                dml = dml + ", ";
-                if (fieldID.get(i) != "") {
-                    dml = dml + "\'" + fieldID.get(i) + "\'";
-                } else {
-                    dml = dml + "NULL";
+            break;
+            case POSTGRESQL:
+                dml = insert + "\'" + val.getName().toLowerCase() + "\'";
+                for (int i = 0; i < fieldID.size(); i++) {
+                    dml = dml + ", ";
+                    if (fieldID.get(i) != "") {
+                        dml = dml + "\'" + fieldID.get(i) + "\'";
+                    } else {
+                        dml = dml + "NULL";
+                    }
                 }
+            break;
+            default:
             }
-	    break;
-	    default:
-	    }
             dml = dml + ");";
 
             // handle DML according to output type

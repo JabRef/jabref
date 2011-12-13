@@ -57,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -548,40 +549,22 @@ public class TextInputDialog
 // ---------------------------------------------------------------------------
   private final String[] getAllFields()
   {
-    int len = 0 ;
-    String dummy[][] = new String[3][] ;
-
-    // fill
-    if ( entry != null )
-    {
-      dummy[0] = entry.getRequiredFields() ;
-      dummy[1] = entry.getGeneralFields() ;
-      dummy[2] = entry.getOptionalFields() ;
-    }
-
-    // get size of new result array
-    for ( int t = 0 ; t < 3 ; t++ )
-    {
-      if ( dummy[t] != null )
-      {
-        len = len + dummy[t].length ;
+      ArrayList<String> f = new ArrayList<String>();
+      String[] req = entry.getRequiredFields();
+      String[] opt = entry.getOptionalFields();
+      String[] allFields = BibtexFields.getAllFieldNames();
+      for (int i=0; i<req.length; i++) {
+          f.add(req[i]);
       }
-    }
-
-    String back[] = new String[len] ;
-    int count = 0 ;
-
-    // put
-    for ( int t = 0 ; t < 3 ; t++ )
-    {
-      if ( dummy[t] != null )
-      {
-        System.arraycopy( dummy[t], 0, back, count, dummy[t].length ) ;
-        count += dummy[t].length ;
+      for (int i=0; i<opt.length; i++) {
+          f.add(opt[i]);
       }
-    }
-    return back ;
-  }
+      for (int i=0; i<allFields.length; i++) {
+          if (!f.contains(allFields[i]))
+              f.add(allFields[i]);
+      }
+      return f.toArray(new String[f.size()]);
+   }
 
 // ---------------------------------------------------------------------------
   class PasteAction

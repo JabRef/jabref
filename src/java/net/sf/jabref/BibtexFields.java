@@ -126,19 +126,10 @@ public class BibtexFields
     add(new BibtexSingleField("pmid", false, GUIGlobals.SMALL_W, 60).setNumeric(true));
 
     // additional fields ------------------------------------------------------
-    dummy =  new BibtexSingleField( "citeseercitationcount", false,
-                                                 GUIGlobals.SMALL_W, 75) ;
-    dummy.setNumeric(true);
-    dummy.setAlternativeDisplayName("Popularity") ;
-    add(dummy) ;
     add( new BibtexSingleField( "location", false ) ) ;
     add( new BibtexSingleField( "abstract", false, GUIGlobals.LARGE_W, 400  ) ) ;
 
     dummy =  new BibtexSingleField( "url", false, GUIGlobals.SMALL_W) ;
-    dummy.setExtras("external");
-    add(dummy) ;
-
-    dummy = new BibtexSingleField( "citeseerurl", false, GUIGlobals.SMALL_W ) ;
     dummy.setExtras("external");
     add(dummy) ;
 
