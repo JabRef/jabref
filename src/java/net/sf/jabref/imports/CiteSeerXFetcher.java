@@ -64,11 +64,11 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     public String getTitle() {
-        return "CiteSeer";
+        return "CiteSeerX";
     }
 
     public String getKeyName() {
-        return "CiteSeer";
+        return "CiteSeerX";
     }
 
     public URL getIcon() {

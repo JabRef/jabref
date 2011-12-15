@@ -236,7 +236,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 pushEntries(true, true, false);
             }
         });
-        pushEntries.setToolTipText(Globals.lang("Cite selected entries with in-text citation"));
+        pushEntriesInt.setToolTipText(Globals.lang("Cite selected entries with in-text citation"));
         pushEntriesInt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 pushEntries(false, true, false);
