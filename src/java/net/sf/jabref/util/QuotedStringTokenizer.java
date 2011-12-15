@@ -50,7 +50,7 @@ public class QuotedStringTokenizer {
         char c;
         StringBuffer sb = new StringBuffer();
         while (m_index < m_contentLength) {
-    		c = m_content.charAt(m_index);
+            c = m_content.charAt(m_index);
     		if (c == m_quoteChar) { // next is quoted
     		    ++m_index;
     		    if (m_index < m_contentLength) // sanity check
@@ -63,7 +63,8 @@ public class QuotedStringTokenizer {
     		    } while (m_index < m_contentLength && isDelimiter(m_content.charAt(m_index)));
     		    return sb.toString();
     		}
-   			sb.append(c);
+   			else
+                sb.append(c);
    			++m_index;
     	}
         return sb.toString();
