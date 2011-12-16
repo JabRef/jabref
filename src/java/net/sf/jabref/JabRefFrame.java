@@ -690,11 +690,13 @@ public JabRefPreferences prefs() {
 
       dispose();
 
+      if (basePanel() != null)
+        basePanel().saveDividerLocation();
       prefs.putInt("posX", JabRefFrame.this.getLocation().x);
       prefs.putInt("posY", JabRefFrame.this.getLocation().y);
       prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
       prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-//      prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
+      //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
       prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
       
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));

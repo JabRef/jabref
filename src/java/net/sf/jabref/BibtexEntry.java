@@ -89,13 +89,6 @@ public class BibtexEntry
     }
 
     /**
-     * Returns an array describing general fields.
-     */
-    public String[] getGeneralFields() {
-        return _type.getGeneralFields();
-    }
-
-    /**
      * Returns an set containing the names of all fields that are
      * set for this particular entry.
      */

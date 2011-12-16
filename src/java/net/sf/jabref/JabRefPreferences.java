@@ -177,6 +177,8 @@ public class JabRefPreferences {
         defaults.put("sizeY", new Integer(680));
         defaults.put("windowMaximised", Boolean.FALSE);
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
+        defaults.put("previewPanelHeight", 200);
+        defaults.put("entryEditorHeight", 400);
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
@@ -263,7 +265,7 @@ public class JabRefPreferences {
         defaults.put("renameOnMoveFileToFileDir", Boolean.TRUE);
 
     // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put("generalFields", "crossref;keywords;file;doi;url;urldate;citeseerurl;"+
+        defaults.put("generalFields", "crossref;keywords;file;doi;url;urldate;"+
                      "pdf;comment;owner");
 
         defaults.put("useCustomIconTheme", Boolean.FALSE);
@@ -306,7 +308,6 @@ public class JabRefPreferences {
         defaults.put("pdfColumn", Boolean.FALSE);
         defaults.put("urlColumn", Boolean.TRUE);
         defaults.put("fileColumn", Boolean.TRUE);
-        defaults.put("citeseerColumn", Boolean.FALSE);
         defaults.put("arxivColumn", Boolean.FALSE);
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("overwriteOwner", Boolean.FALSE);
@@ -468,7 +469,7 @@ public class JabRefPreferences {
 
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
-            defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;citeseerurl;"+
+            defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;"+
                          "comment;owner;timestamp");
 
         // Entry editor tab 1:
@@ -926,12 +927,9 @@ public class JabRefPreferences {
         defKeyBinds.put("Mark entries", "ctrl M");
         defKeyBinds.put("Unmark entries", "ctrl shift M");
         defKeyBinds.put("Fetch Medline", "F5");
-        defKeyBinds.put("Fetch CiteSeer", "F6");
         defKeyBinds.put("Search ScienceDirect", "ctrl F5");
         defKeyBinds.put("Search ADS", "ctrl shift F6");
         defKeyBinds.put("New from plain text", "ctrl shift N");
-        defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
-        defKeyBinds.put("Fetch citations from CiteSeer", "F7");
         defKeyBinds.put("Synchronize files", "ctrl F4");
         defKeyBinds.put("Synchronize PDF", "shift F4");
         defKeyBinds.put("Synchronize PS", "ctrl shift F4");

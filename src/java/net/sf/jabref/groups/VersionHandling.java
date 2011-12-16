@@ -179,7 +179,7 @@ public class VersionHandling {
             for (int i = 0; i < data.size(); ++i) {
                 s = data.elementAt(i).toString();
                 
-             // This allows to read databases that have been modified by, e.g., BibDesk
+                // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();
                 if (s.length() == 0)
                 	continue;

@@ -57,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -326,48 +327,22 @@ public class TextInputDialog
     rawPanel.add( leftPanel, BorderLayout.CENTER ) ;
     rawPanel.add( inputPanel, BorderLayout.EAST ) ;
 
-    // ----------------------------------------------------------------------
-    // add a short info, if available
-    // load the info text from a help-file, the "normal" translation is
-    // to long and unpractical for the properties file (single line)
-    // => try to load the help file text, if it fails, show a short text
-
-    //infoText.setText(Globals.lang("This_is_a_simple_copy_and_paste_dialog._First_load_or_paste_some_"
-    //        +"text_into_the_text_input_area._After_that,_you_can_mark_text_and_assign_it_to_a_bibtex_field."));
-
-    JEditorPane infoText =  new JEditorPane() ;
-
     boolean loaded = false ;
 
-    URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
-                                           +GUIGlobals.shortPlainImport);
+    JLabel desc = new JLabel("<html><h3>"+Globals.lang("Plain text import")+"</h3><p>"
+            +Globals.lang("This is a simple copy and paste dialog. First load or paste some text into "
+            +"the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
+            +"</p></html>");
+    desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    if (infoURL != null)
-    {
-      try
-      {
-         // get the info text from help file
-        infoText.setPage( infoURL ) ;
-        //infoText.setContentType("text/html");
 
-        loaded = true ; // text successfully loaded
-      }
-      catch (Exception e) {}
-    }
-
-    if (!loaded) // only if no help available
-    {
-      infoText.setText(
-         Globals.lang("This_is_a_simple_copy_and_paste_dialog_for_import_some_fields_from_normal_text.") ) ;
-    }
-
-    infoText.setEditable(false);
+    /*infoText.setEditable(false);
     infoText.setBackground(GUIGlobals.infoField);
     infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
     infoText.setPreferredSize( new Dimension(220, 50));
-    infoText.setMinimumSize( new Dimension(180, 50));
+    infoText.setMinimumSize( new Dimension(180, 50));*/
 
-    rawPanel.add( infoText, BorderLayout.SOUTH ) ;
+    rawPanel.add(desc, BorderLayout.SOUTH) ;
   }
 
 // ---------------------------------------------------------------------------
@@ -548,40 +523,22 @@ public class TextInputDialog
 // ---------------------------------------------------------------------------
   private final String[] getAllFields()
   {
-    int len = 0 ;
-    String dummy[][] = new String[3][] ;
-
-    // fill
-    if ( entry != null )
-    {
-      dummy[0] = entry.getRequiredFields() ;
-      dummy[1] = entry.getGeneralFields() ;
-      dummy[2] = entry.getOptionalFields() ;
-    }
-
-    // get size of new result array
-    for ( int t = 0 ; t < 3 ; t++ )
-    {
-      if ( dummy[t] != null )
-      {
-        len = len + dummy[t].length ;
+      ArrayList<String> f = new ArrayList<String>();
+      String[] req = entry.getRequiredFields();
+      String[] opt = entry.getOptionalFields();
+      String[] allFields = BibtexFields.getAllFieldNames();
+      for (int i=0; i<req.length; i++) {
+          f.add(req[i]);
       }
-    }
-
-    String back[] = new String[len] ;
-    int count = 0 ;
-
-    // put
-    for ( int t = 0 ; t < 3 ; t++ )
-    {
-      if ( dummy[t] != null )
-      {
-        System.arraycopy( dummy[t], 0, back, count, dummy[t].length ) ;
-        count += dummy[t].length ;
+      for (int i=0; i<opt.length; i++) {
+          f.add(opt[i]);
       }
-    }
-    return back ;
-  }
+      for (int i=0; i<allFields.length; i++) {
+          if (!f.contains(allFields[i]))
+              f.add(allFields[i]);
+      }
+      return f.toArray(new String[f.size()]);
+   }
 
 // ---------------------------------------------------------------------------
   class PasteAction

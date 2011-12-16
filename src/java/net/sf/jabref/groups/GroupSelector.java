@@ -606,7 +606,7 @@ public class GroupSelector extends SidePaneComponent implements
             this.setTitle("<html><font color='red'>Groups Edit mode</font></html>");
         } else {
             groupsTree.setBorder(null);
-            this.setTitle("Groups");
+            this.setTitle(Globals.lang("Groups"));
         }
         groupsTree.revalidate();
         groupsTree.repaint();

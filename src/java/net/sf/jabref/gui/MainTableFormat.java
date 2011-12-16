@@ -224,8 +224,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             iconCols.put(coln++, PDF);
         if (Globals.prefs.getBoolean("urlColumn"))
             iconCols.put(coln++, URL_);
-        if (Globals.prefs.getBoolean("citeseerColumn"))
-            iconCols.put(coln++, CITESEER);
         if (Globals.prefs.getBoolean("arxivColumn"))
             iconCols.put(coln++, ARXIV);
 

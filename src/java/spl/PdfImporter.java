@@ -6,17 +6,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.EntryTypeDialog;
-import net.sf.jabref.FocusRequester;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.Util;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.ImportSettingsTab;
+import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
@@ -193,9 +183,9 @@ public class PdfImporter {
                             ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
                             list.add(entry);
                             Util.setAutomaticFields(list, true, true, false);
-                            insertFields(entry.getRequiredFields(), entry, document);
-                            insertFields(entry.getGeneralFields(), entry, document);
-                            insertFields(entry.getOptionalFields(), entry, document);
+                            //insertFields(entry.getRequiredFields(), entry, document);
+                            insertFields(BibtexFields.getAllFieldNames(), entry, document);
+                            //insertFields(entry.getOptionalFields(), entry, document);
                             panel.database().insertEntry(entry);
                             dfh = new DroppedFileHandler(frame, panel);
                             dfh.linkPdfToEntry(fileName, entryTable, entry);
@@ -234,9 +224,9 @@ public class PdfImporter {
                                     entry.setType(type);
                                 }
                             }
-                            insertFields(entry.getRequiredFields(), entry, document);
-                            insertFields(entry.getGeneralFields(), entry, document);
-                            insertFields(entry.getOptionalFields(), entry, document);
+                            //insertFields(entry.getRequiredFields(), entry, document);
+                            insertFields(BibtexFields.getAllFieldNames(), entry, document);
+                            //insertFields(entry.getOptionalFields(), entry, document);
 
                             dfh = new DroppedFileHandler(frame, panel);
                             dfh.linkPdfToEntry(fileName, entryTable, dropRow);
