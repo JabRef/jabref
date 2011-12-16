@@ -310,7 +310,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 			sb.append(layout.doLayout(entry, database, wordsToHighlight));
 		}
 		previewPane.setText(sb.toString());
-		previewPane.invalidate();
 		previewPane.revalidate();
 
 		// Scroll to top:
