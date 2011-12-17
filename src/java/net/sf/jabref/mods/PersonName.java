@@ -19,13 +19,17 @@ import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
 
-
 import net.sf.jabref.AuthorList;
 
 /**
  * @author Michael Wrighton, S M Mahbub Murshed
  *
  * S M Mahbub Murshed : added few functions for convenience. May 15, 2007
+ *
+ * History
+ * Dec 16, 2011 - Changed parseName(String) to export authorname with
+ * 				  more than 3 names correctly
+ *
  */
 public class PersonName {
     protected String givenName = null;
@@ -51,18 +55,22 @@ public class PersonName {
             String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
             WSITools.tokenize(v, authorMod, " \n\r");
+            int amountOfNames = v.size();
 
-            if (v.size() == 1)
+            if (amountOfNames == 1)
                 surname = v.get(0);
-            else if (v.size() == 2) {
+            else if (amountOfNames == 2) {
                 givenName = v.get(0);
                 surname = v.get(1);
             }
             else {
                 givenName = v.get(0);
-                middleName = v.get(1);
-                surname = v.get(2);
-            }
+                middleName = "";
+                for (int i = 1; i < amountOfNames - 1 ; i++)
+                	middleName += " " + v.get(i);
+                middleName = middleName.trim();
+                surname = v.get(amountOfNames-1);
+                }
     }
 
     public String getGivenNames() {
