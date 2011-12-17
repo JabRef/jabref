@@ -1342,7 +1342,7 @@ public class Globals {
 		// compile the words to a regex in the form (w1) | (w2) | (w3)
 		String searchPattern = "(".concat(regExSearch?words.get(0):Pattern.quote(words.get(0))).concat(")");
 		for (int i = 1; i < words.size(); i++) {
-			searchPattern = searchPattern.concat(" | (").concat(regExSearch?words.get(i):Pattern.quote(words.get(i))).concat(")");
+			searchPattern = searchPattern.concat("|(").concat(regExSearch?words.get(i):Pattern.quote(words.get(i))).concat(")");
 		}
 
 		Pattern pattern;
