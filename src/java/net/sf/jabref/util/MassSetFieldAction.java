@@ -221,6 +221,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     private String[] getFieldNames(String s) {
-        return s.split("[^a-z]");
+        return s.split("[\\s;,]");
     }
 }
