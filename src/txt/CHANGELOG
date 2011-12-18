@@ -1,4 +1,5 @@
 2.8.1
+    - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
     - Fixed bug in PostgreSQL export/import.
     - Improved handling of file fields written in the style exported from Zotero.
 2.8
