@@ -56,9 +56,9 @@ public class JabRef {
 
 	public static JabRef singleton;
     public static RemoteListener remoteListener = null;
-    public JabRefFrame jrf;
+    public static JabRefFrame jrf;
     public Options options;
-    public Frame splashScreen = null;
+    public static Frame splashScreen = null;
 
     boolean graphicFailure = false;
 
@@ -971,11 +971,11 @@ public class JabRef {
                 try {
                     List<BibtexEntry> entries;
                     if (Globals.ON_WIN) {
-                      entries = Globals.importFormatReader.importFromFile(data[1], data[0]);
+                      entries = Globals.importFormatReader.importFromFile(data[1], data[0], jrf);
                     }
                     else {
                       entries = Globals.importFormatReader.importFromFile( data[1],
-                                data[0].replaceAll("~", System.getProperty("user.home")) );
+                                data[0].replaceAll("~", System.getProperty("user.home")), jrf );
                     }
                     return new ParserResult(entries);
                 } catch (IllegalArgumentException ex) {
@@ -993,7 +993,7 @@ public class JabRef {
                 }
                 else {
                   importResult = Globals.importFormatReader.importUnknownFormat(
-                                 data[0].replaceAll("~", System.getProperty("user.home")) );
+                                 data[0].replaceAll("~", System.getProperty("user.home")));
                 }
             	
             	if (importResult != null){

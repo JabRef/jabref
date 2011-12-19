@@ -8,6 +8,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.imports.CopacImporter;
 
 public class CopacImporterTest extends TestCase {
@@ -49,7 +50,7 @@ public class CopacImporterTest extends TestCase {
 		CopacImporter importer = new CopacImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
-			.getResourceAsStream("CopacImporterTest1.txt"));
+			.getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
 		assertEquals(1, entries.size());
 		BibtexEntry entry = entries.get(0);
 		
@@ -67,7 +68,7 @@ public class CopacImporterTest extends TestCase {
 		CopacImporter importer = new CopacImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
-			.getResourceAsStream("CopacImporterTest2.txt"));
+			.getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
 		assertEquals(2, entries.size());
 		BibtexEntry one = entries.get(0);
 		

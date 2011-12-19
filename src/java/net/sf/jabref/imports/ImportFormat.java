@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Role of an importer for JabRef.
@@ -61,7 +62,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * that no entries were found. If an IOException is thrown, JabRef displays the exception's
      * message in unmodified form.
      */
-    public abstract List<BibtexEntry> importEntries(InputStream in) throws IOException;
+    public abstract List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException;
 
 
     /**

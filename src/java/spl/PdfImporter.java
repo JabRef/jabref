@@ -59,7 +59,7 @@ public class PdfImporter {
      * @param fileNames states the names of the files to import
      * @return list of non-PDF files
      */
-    public String[] importPdfFiles(String[] fileNames){
+    public String[] importPdfFiles(String[] fileNames, OutputPrinter status){
         List<String> files = new ArrayList<String>(Arrays.asList(fileNames));
         List<String> noPdfFiles = new ArrayList<String>();
         PdfFileFilter pdfFilter = new PdfFileFilter();
@@ -69,7 +69,7 @@ public class PdfImporter {
             }
         }
         files.removeAll(noPdfFiles);
-        importPdfFiles(files);
+        importPdfFiles(files, status);
         String[] noPdfFilesArray = new String[noPdfFiles.size()];
         noPdfFiles.toArray(noPdfFilesArray);
         return noPdfFilesArray;
@@ -79,7 +79,7 @@ public class PdfImporter {
      * @param fileNames - PDF files to import
      * @return true if the import succeeded, false otherwise
      */
-    private boolean importPdfFiles(List<String> fileNames){
+    private boolean importPdfFiles(List<String> fileNames, OutputPrinter status){
         if(panel == null) return false;
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
@@ -125,7 +125,7 @@ public class PdfImporter {
 						return true;
 					}
 					try {
-						res = contentImporter.importEntries(in);
+						res = contentImporter.importEntries(in, status);
 					} catch (Exception e) {
 						// import failed -> generate default entry
 						Globals.logger(Globals.lang("Import failed"));

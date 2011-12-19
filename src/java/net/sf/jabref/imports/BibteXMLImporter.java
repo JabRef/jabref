@@ -20,12 +20,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import com.sun.star.logging.LogLevel;
+
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -34,6 +39,8 @@ import net.sf.jabref.BibtexEntry;
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
  */
 public class BibteXMLImporter extends ImportFormat {
+	
+	private static Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
 
     /**
      * Return the name of this import format.
@@ -72,7 +79,7 @@ public class BibteXMLImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
 	ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
 
@@ -94,11 +101,14 @@ public class BibteXMLImporter extends ImportFormat {
 	    bibItems = handler.getItems();
 	    
 	}catch (javax.xml.parsers.ParserConfigurationException e1){
-	    e1.printStackTrace();
+		logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+		status.showMessage(e1.getLocalizedMessage());
 	}catch (org.xml.sax.SAXException e2){
-	    e2.printStackTrace();
+		logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+		status.showMessage(e2.getLocalizedMessage());
 	}catch (java.io.IOException e3){
-	    e3.printStackTrace();
+		logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+		status.showMessage(e3.getLocalizedMessage());
 	}
 	return bibItems;
 	

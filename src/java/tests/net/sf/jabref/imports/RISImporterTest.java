@@ -9,6 +9,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.imports.IsiImporter;
 import net.sf.jabref.imports.RisImporter;
 
@@ -87,7 +88,7 @@ public class RISImporterTest extends TestCase {
 		RisImporter importer = new RisImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(RISImporterTest.class
-			.getResourceAsStream("RisImporterTest1.ris"));
+			.getResourceAsStream("RisImporterTest1.ris"), new OutputPrinterToNull());
 		assertEquals(1, entries.size());
 		BibtexEntry entry = entries.get(0);
 		assertEquals("Editorial: Open Source and Empirical Software Engineering", entry

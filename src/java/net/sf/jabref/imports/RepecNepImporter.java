@@ -31,9 +31,12 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
 
 
@@ -158,6 +161,8 @@ import net.sf.jabref.Util;
  * @author andreas_sf at rudert-home dot de
  */
 public class RepecNepImporter extends ImportFormat {
+
+  private static Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
 
   private final static Collection<String> recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL", "By"});
   
@@ -423,7 +428,7 @@ public class RepecNepImporter extends ImportFormat {
    *  (non-Javadoc)
    * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
    */
-  public List<BibtexEntry> importEntries(InputStream stream) throws IOException {    
+  public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {    
   	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     String paperNoStr = null;
     this.line = 0;
@@ -469,7 +474,7 @@ public class RepecNepImporter extends ImportFormat {
         message += ", paper no. " + paperNoStr + ": ";
       }
       message += e.getMessage();
-      System.err.println(message);
+      logger.log(Level.SEVERE, message, e);
       if (!(e instanceof IOException)) {
         e.printStackTrace();
         e = new IOException(message);

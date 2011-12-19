@@ -104,14 +104,14 @@ public class ImportFormatReader {
     return null;
   }
   
-  public List<BibtexEntry> importFromStream(String format, InputStream in)
+  public List<BibtexEntry> importFromStream(String format, InputStream in, OutputPrinter status)
     throws IOException {
     ImportFormat importer = getByCliId(format);
 
     if (importer == null)
       throw new IllegalArgumentException("Unknown import format: " + format);
 
-    List<BibtexEntry> res = importer.importEntries(in);
+    List<BibtexEntry> res = importer.importEntries(in, status);
 
     // Remove all empty entries
     if (res != null)
@@ -120,17 +120,17 @@ public class ImportFormatReader {
     return res;
   }
 
-  public List<BibtexEntry> importFromFile(String format, String filename)
+  public List<BibtexEntry> importFromFile(String format, String filename, OutputPrinter status)
     throws IOException {
     ImportFormat importer = getByCliId(format);
 
     if (importer == null)
       throw new IllegalArgumentException("Unknown import format: " + format);
 
-    return importFromFile(importer, filename);
+    return importFromFile(importer, filename, status);
   }
 
-    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename) throws IOException {
+    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         List<BibtexEntry> result = null;
         InputStream stream = null;
         try {
@@ -142,7 +142,7 @@ public class ImportFormatReader {
 
             stream = new FileInputStream(file);
 
-            result = importer.importEntries(stream);
+            result = importer.importEntries(stream, status);
         } finally {
 
             try {
@@ -398,6 +398,11 @@ public class ImportFormatReader {
 
 		Pair<String, ParserResult> result = null;
 		
+		// we don't use a provided OutputPrinter (such as the JabRef frame),
+		// as we don't want to see any outputs from failed importers:
+		// we expect failures and do not want to report them to the user
+		OutputPrinterToNull nullOutput = new OutputPrinterToNull();
+		
 		// Cycle through all importers:
 		int bestResult = 0;
 
@@ -405,7 +410,7 @@ public class ImportFormatReader {
 
             try {
 
-                List<BibtexEntry> entries = importFromFile(imFo, filename);
+                List<BibtexEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 if (entries != null)
                     purgeEmptyEntries(entries);

@@ -129,7 +129,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 						// Specific importer:
 						ParserResult pr = new ParserResult(
 							Globals.importFormatReader.importFromFile(importer,
-								filename));
+								filename, frame));
 
 						imports.add(new Pair<String, ParserResult>(importer
 							.getFormatName(), pr));

@@ -23,6 +23,7 @@ import java.util.*;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -58,7 +59,7 @@ public class BiblioscapeImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));

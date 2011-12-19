@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
 import net.sf.jabref.util.CaseChanger;
 
@@ -154,7 +155,7 @@ public class IsiImporter extends ImportFormat {
 	 * Parse the entries in the source, and return a List of BibtexEntry
 	 * objects.
 	 */
-	public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 		if (stream == null) {
 			throw new IOException("No stream given.");
 		}
