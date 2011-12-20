@@ -36,6 +36,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -205,7 +206,7 @@ public class PdfContentImporter extends ImportFormat {
 	}
 	
 	@Override
-	public List<BibtexEntry> importEntries(InputStream in) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 		ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
 		
 		PDDocument document = null;
@@ -467,6 +468,12 @@ public class PdfContentImporter extends ImportFormat {
 			entry.setField("review", textResult);
 
 			res.add(entry);
+		} catch (NoClassDefFoundError e) {
+			if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
+				status.showMessage(Globals.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
+			} else {
+				logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
 		} finally {
 			document.close();
 		}

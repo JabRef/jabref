@@ -169,7 +169,7 @@ public class MedlineFetcher implements EntryFetcher {
         if (query.matches("\\d+[,\\d+]*")) {
             frame.setStatus(Globals.lang("Fetching Medline by id..."));
 
-            List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query);
+            List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frame);
 
             if (bibs.size() == 0) {
             	frame.showMessage(Globals.lang("No references found"));
@@ -226,7 +226,7 @@ public class MedlineFetcher implements EntryFetcher {
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);
 
-                List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids);
+                List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids, frame);
                 for (BibtexEntry entry : bibs){
                     dialog.addEntry(entry);
                 }

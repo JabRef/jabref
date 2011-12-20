@@ -24,6 +24,7 @@ import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.AuthorList;
+import net.sf.jabref.OutputPrinter;
 
 import java.util.regex.Pattern;
 import net.sf.jabref.BibtexFields;
@@ -78,7 +79,7 @@ public class InspecImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuffer sb = new StringBuffer();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));

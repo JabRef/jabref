@@ -379,7 +379,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 		new Thread(new Runnable() {
 			public void run() {
 				// Done by MrDlib
-                final String[] newfileNames = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames);
+                final String[] newfileNames = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
                 if(newfileNames.length > 0){
                     loadOrImportFiles(newfileNames, dropRow);
                 }

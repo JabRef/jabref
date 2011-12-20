@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
@@ -78,7 +79,7 @@ public class MsBibImporter extends ImportFormat {
 		return "msbib";
 	}
 
-    public List<BibtexEntry> importEntries(InputStream in) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 
         MSBibDatabase dbase = new MSBibDatabase();
 

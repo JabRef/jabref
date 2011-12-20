@@ -518,7 +518,10 @@ public class LayoutEntry {
     /** 
      * Will return the text that was called by the method with HTML tags 
      * to highlight each word the user has searched for and will skip
-     * the highlight process if the first Char isn't a letter or a digit
+     * the highlight process if the first Char isn't a letter or a digit.
+     * 
+     * This check is a quick hack to avoid highlighting of HTML tags
+     * It does not always work, but it does its job mostly  
      * 
      * @param text This is a String in which we search for different words
      * @param toHighlight List of all words which must be highlighted

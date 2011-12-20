@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
 import net.sf.jabref.AuthorList;
 
@@ -59,7 +60,7 @@ public class JstorImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
     ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     String s = "";
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));

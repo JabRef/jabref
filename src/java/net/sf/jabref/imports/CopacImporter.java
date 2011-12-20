@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexFields;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Importer for COPAC format.
@@ -78,7 +79,7 @@ public class CopacImporter extends ImportFormat {
 	 * Parse the entries in the source, and return a List of BibtexEntry
 	 * objects.
 	 */
-	public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 		if (stream == null)
 			throw new IOException("No stream given.");
 

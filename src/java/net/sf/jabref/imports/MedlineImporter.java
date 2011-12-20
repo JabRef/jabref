@@ -20,11 +20,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.OutputPrinter;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -34,6 +37,8 @@ import net.sf.jabref.BibtexEntry;
  */
 public class MedlineImporter extends ImportFormat {
 
+	private static Logger logger = Logger.getLogger(MedlineImporter.class.toString());
+	
     /**
      * Return the name of this import format.
      */
@@ -76,13 +81,13 @@ public class MedlineImporter extends ImportFormat {
      * 
      * @return Will return an empty list on error.
      */
-    public static List<BibtexEntry> fetchMedline(String id) {
+    public static List<BibtexEntry> fetchMedline(String id, OutputPrinter status) {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
             id;
         try {
             URL url = new URL(baseUrl);
             URLConnection data = url.openConnection();
-            return new MedlineImporter().importEntries(data.getInputStream());
+            return new MedlineImporter().importEntries(data.getInputStream(), status);
         } catch (IOException e) {
             return new ArrayList<BibtexEntry>();
         }
@@ -92,7 +97,7 @@ public class MedlineImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -126,13 +131,16 @@ public class MedlineImporter extends ImportFormat {
             // When you're done, report the results stored by your handler
             // object
             bibItems = handler.getItems();
-        } catch (javax.xml.parsers.ParserConfigurationException e1) {
-            e1.printStackTrace();
-        } catch (org.xml.sax.SAXException e2) {
-            e2.printStackTrace();
-        } catch (java.io.IOException e3) {
-            e3.printStackTrace();
-        }
+    	}catch (javax.xml.parsers.ParserConfigurationException e1){
+    		logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+    		status.showMessage(e1.getLocalizedMessage());
+    	}catch (org.xml.sax.SAXException e2){
+    		logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+    		status.showMessage(e2.getLocalizedMessage());
+    	}catch (java.io.IOException e3){
+    		logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+    		status.showMessage(e3.getLocalizedMessage());
+    	}
 
         return bibItems;
     }

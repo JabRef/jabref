@@ -9,6 +9,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.imports.IsiImporter;
 
 /**
@@ -96,7 +97,7 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter importer = new IsiImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
-			.getResourceAsStream("IsiImporterTest1.isi"));
+			.getResourceAsStream("IsiImporterTest1.isi"), new OutputPrinterToNull());
 		assertEquals(1, entries.size());
 		BibtexEntry entry = entries.get(0);
 		assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry
@@ -119,7 +120,7 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter importer = new IsiImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
-			.getResourceAsStream("IsiImporterTestInspec.isi"));
+			.getResourceAsStream("IsiImporterTestInspec.isi"), new OutputPrinterToNull());
 
 		assertEquals(2, entries.size());
 		BibtexEntry a = entries.get(0);
@@ -204,7 +205,7 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter importer = new IsiImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
-			.getResourceAsStream("IsiImporterTestWOS.isi"));
+			.getResourceAsStream("IsiImporterTestWOS.isi"), new OutputPrinterToNull());
 
 		assertEquals(2, entries.size());
 		BibtexEntry a = entries.get(0);
@@ -275,7 +276,7 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter importer = new IsiImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
-			.getResourceAsStream("IEEEImport1.txt"));
+			.getResourceAsStream("IEEEImport1.txt"), new OutputPrinterToNull());
 
 		assertEquals(1, entries.size());
 		BibtexEntry a = entries.get(0);
@@ -326,7 +327,7 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter importer = new IsiImporter();
 
 		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
-			.getResourceAsStream("IsiImporterTestMedline.isi"));
+			.getResourceAsStream("IsiImporterTestMedline.isi"), new OutputPrinterToNull());
 
 		assertEquals(2, entries.size());
 		BibtexEntry a = entries.get(0);
