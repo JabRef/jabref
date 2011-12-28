@@ -8,6 +8,65 @@
 
   <h1>Historique des r&eacute;visions (en anglais)</h1>
 
+<h3>Version 2.8 beta</h3>
+  <ul><li>Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
+      additional minor fix.</li>
+    <li>A large list of journal abbreviations is now loaded by default.</li>
+    <li>Added global option to allow file links relative to the bib file location, in addition
+      to the global or database- or user-specific file directory.</li>
+    <li>Fixed bug 3434674: Reviewing changes overwrites groups.</li>
+    <li>Integrated the plugin for interaction with OpenOffice/LibreOffice as a standard part
+      of JabRef.</li>
+    <li>Added keyboard shortcuts Ctrl-Up and Ctrl-Down to move file links up and down in a list
+      of external links in the entry editor.</li>
+    <li>Applied "bjoerntm"'s patch for making the loading of group information less sensitive
+      to white space, in order to prevent trouble loading files written by other tools.</li>
+    <li>Added optional autocompletion of author/editor last names in search field.</li>
+    <li>Changed entry fetcher system so all fetchers are accessed from a single side pane
+      component with a selector.</li>
+    <li>Added INSPIRE fetcher by Sheer El-Showk.</li>
+    <li>Improved error handling when importing in specific format.</li>
+    <li>Prevented crash when calling invalid import format on startup.</li>
+    <li>Improved duplicate detection.</li>
+    <li>Added markers \filename and \filepath for ".begin.layout" and ".end.layout" files
+      in order to output the name or full path of the bib file of the exported database.</li>
+    <li>Fixed possible array index exception in LastPage formatter.</li>
+    <li>Improved author/editor normalization in entry editor.</li>
+    <li>Added metadata extraction from text when PDFs are dragged into JabRef.</li>
+    <li>The filename pattern for renaming a file when dropping a PDF can now be
+      configured at "Options"/"Preferences"/"Import"/"File name format pattern".</li>
+    <li>The defaults of the ImportDialog shown when PDFs are dragged into JabRef
+      can now be configured at "Options"/"Preferences"/"Import". It is possible to
+      override showing the ImportDialog.</li>
+    <li>An entry can be sent by a right click on an entry and select "Send as Email"
+      (patch 3306271).</li>
+    <li>Added option to "copy BibTeX key and title" (patch 3370471).</li>
+    <li>The command for pushing to emacs can be configured now. New command for Emacs 23.
+      New default for Windows: emacsclient.</li>
+    <li>Added export support for DIN1505 style (based on patch 1874662).</li>
+    <li>Added support for PostgreSQL import/export (patch 3368760 by Fred Stevens).</li>
+    <li>Added formatter "JournalAbbreviator" (patch 3013311 by Meigel).</li>
+    <li>RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
+      (patch 2905383 by Russell Almond).</li>
+    <li>Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).</li>
+    <li>ToggleButton added to GroupSelector to ease adding/removing references to/from groups
+      (based on patch 3313564 updated by Andreas Schlicker).</li>
+    <li>Export filter "tablerefsandbib" updated to contain links to files and notes
+      (patch 2787096 by Thomas Arildsen).</li>
+    <li>"of" added to the list of skip words (patch 2781830).</li>
+    <li>Added cli-function for exporting entries filtered by a search term
+      (patch 1817093 by Silberer, Zirn)</li>
+    <li>Added highlighting in textarea for search text (patch 3117881 by Ben).
+      Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
+      "Clear" also clears the highlighting.</li>
+    <li>Added highlighting in preview area for search text (based on patch 3121914 by
+      Maximilian Lengsfeld).</li>
+    <li>Switched from PDFBox 0.7.3 to PDFBox 1.6.0.</li>
+  </ul>
+
+<h3>Version 2.7.2</h3>
+    <ul><li>Fixed bug that prevented search functions from working under Java 7.</li></ul>
+
 <h3>Version 2.7.1</h3>
     <ul>
     <li>Fixed problem with search function under Java 7.</li>
