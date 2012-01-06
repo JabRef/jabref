@@ -93,7 +93,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    JTabbedPane tabbedPane = new JTabbedPane();
+    JTabbedPane tabbedPane = new DragDropPane(); //This creates the Drag&Drop JTabbedPane
     
     final Insets marg = new Insets(1,0,2,0);
 
