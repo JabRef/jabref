@@ -18,6 +18,7 @@ package net.sf.jabref.mods;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
+import net.sf.jabref.export.layout.format.XMLChars;
 
 import net.sf.jabref.AuthorList;
 
@@ -51,9 +52,12 @@ public class PersonName {
 
     protected void parseName(String author) {
             // TODO: replace special characters
-            Vector<String> v = new Vector<String>();
+    		Vector<String> v = new Vector<String>();
             String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
-
+           
+            XMLChars xmlChars = new XMLChars();
+            authorMod = xmlChars.format(authorMod);
+            
             WSITools.tokenize(v, authorMod, " \n\r");
             int amountOfNames = v.size();
 

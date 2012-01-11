@@ -687,96 +687,131 @@ public class Globals {
         HTMLCHARS.put("%", "%"); // percent sign
 
         XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
-		XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
-		XML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&#x00EB;");
-		XML_CHARS.put("\\{\\\\\\\"\\{E\\}\\}", "&#x00CB;");
-		XML_CHARS.put("\\{\\\\\\\"\\{i\\}\\}", "&#x00EF;");
-		XML_CHARS.put("\\{\\\\\\\"\\{I\\}\\}", "&#x00CF;");
-		XML_CHARS.put("\\{\\\\\\\"\\{o\\}\\}", "&#x00F6;");
-		XML_CHARS.put("\\{\\\\\\\"\\{O\\}\\}", "&#x00D6;");
-		XML_CHARS.put("\\{\\\\\\\"\\{u\\}\\}", "&#x00FC;");
-		XML_CHARS.put("\\{\\\\\\\"\\{U\\}\\}", "&#x00DC;");
+        XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
+        XML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&#x00EB;");
+        XML_CHARS.put("\\{\\\\\\\"\\{E\\}\\}", "&#x00CB;");
+        XML_CHARS.put("\\{\\\\\\\"\\{i\\}\\}", "&#x00EF;");
+        XML_CHARS.put("\\{\\\\\\\"\\{I\\}\\}", "&#x00CF;");
+        XML_CHARS.put("\\{\\\\\\\"\\{o\\}\\}", "&#x00F6;");
+        XML_CHARS.put("\\{\\\\\\\"\\{O\\}\\}", "&#x00D6;");
+        XML_CHARS.put("\\{\\\\\\\"\\{u\\}\\}", "&#x00FC;");
+        XML_CHARS.put("\\{\\\\\\\"\\{U\\}\\}", "&#x00DC;");
 
-		XML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&#x00E8;");
-		XML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&#x00C8;");
-		XML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&#x00EC;");
-		XML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&#x00CC;");
-		XML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&#x00F2;");
-		XML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&#x00D2;");
-		XML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&#x00F9;");
-		XML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&#x00D9;");
-		XML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&#x00E9;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&#x00C9;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&#x00ED;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&#x00CD;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{o\\}\\}", "&#x00F3;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{O\\}\\}", "&#x00D3;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{u\\}\\}", "&#x00FA;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{U\\}\\}", "&#x00DA;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&#x00E1;");
-		XML_CHARS.put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&#x00C1;");
+        //next 2 rows were missing...
+        XML_CHARS.put("\\{\\\\\\`\\{a\\}\\}", "&#x00E0;");
+        XML_CHARS.put("\\{\\\\\\`\\{A\\}\\}", "&#x00C0;");
 
-		XML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&#x00F4;");
-		XML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&#x00D4;");
-		XML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&#x00F9;");
-		XML_CHARS.put("\\{\\\\\\^\\{U\\}\\}", "&#x00D9;");
-		XML_CHARS.put("\\{\\\\\\^\\{e\\}\\}", "&#x00EA;");
-		XML_CHARS.put("\\{\\\\\\^\\{E\\}\\}", "&#x00CA;");
-		XML_CHARS.put("\\{\\\\\\^\\{i\\}\\}", "&#x00EE;");
-		XML_CHARS.put("\\{\\\\\\^\\{I\\}\\}", "&#x00CE;");
-		XML_CHARS.put("\\{\\\\\\~\\{o\\}\\}", "&#x00F5;");
-		XML_CHARS.put("\\{\\\\\\~\\{O\\}\\}", "&#x00D5;");
-		XML_CHARS.put("\\{\\\\\\~\\{n\\}\\}", "&#x00F1;");
-		XML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&#x00D1;");
-		XML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&#x00E3;");
-		XML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&#x00C3;");
+        XML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&#x00E8;");
+        XML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&#x00C8;");
+        XML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&#x00EC;");
+        XML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&#x00CC;");
+        XML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&#x00F2;");
+        XML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&#x00D2;");
+        XML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&#x00F9;");
+        XML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&#x00D9;");
+ 
+        //corrected these 10 lines below...
+        XML_CHARS.put("\\{\\\\\\'\\{a\\}\\}", "&#x00E1;");
+        XML_CHARS.put("\\{\\\\\\'\\{A\\}\\}", "&#x00C1;");
+        XML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&#x00E9;");
+        XML_CHARS.put("\\{\\\\\\'\\{E\\}\\}", "&#x00C9;");
+        XML_CHARS.put("\\{\\\\\\'\\{i\\}\\}", "&#x00ED;");
+        XML_CHARS.put("\\{\\\\\\'\\{I\\}\\}", "&#x00CD;");
+        XML_CHARS.put("\\{\\\\\\'\\{o\\}\\}", "&#x00F3;");
+        XML_CHARS.put("\\{\\\\\\'\\{O\\}\\}", "&#x00D3;");
+        XML_CHARS.put("\\{\\\\\\'\\{u\\}\\}", "&#x00FA;");
+        XML_CHARS.put("\\{\\\\\\'\\{U\\}\\}", "&#x00DA;");
+        //added next four chars...
+        XML_CHARS.put("\\{\\\\\\'\\{c\\}\\}", "&#x0107;");
+        XML_CHARS.put("\\{\\\\\\'\\{C\\}\\}", "&#x0106;");
+        XML_CHARS.put("\\{\\\\c\\{c\\}\\}", "&#x00E7;");
+        XML_CHARS.put("\\{\\\\c\\{C\\}\\}", "&#x00C7;");
 
-		XML_CHARS.put("\\{\\\\\\\"a\\}", "&#x00E4;");
-		XML_CHARS.put("\\{\\\\\\\"A\\}", "&#x00C4;");
-		XML_CHARS.put("\\{\\\\\\\"e\\}", "&#x00EB;");
-		XML_CHARS.put("\\{\\\\\\\"E\\}", "&#x00CB;");
-		XML_CHARS.put("\\{\\\\\\\"i\\}", "&#x00EF;");
-		XML_CHARS.put("\\{\\\\\\\"I\\}", "&#x00CF;");
-		XML_CHARS.put("\\{\\\\\\\"o\\}", "&#x00F6;");
-		XML_CHARS.put("\\{\\\\\\\"O\\}", "&#x00D6;");
-		XML_CHARS.put("\\{\\\\\\\"u\\}", "&#x00FC;");
-		XML_CHARS.put("\\{\\\\\\\"U\\}", "&#x00DC;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&#x00C9;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&#x00ED;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&#x00CD;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{o\\}\\}", "&#x00F3;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{O\\}\\}", "&#x00D3;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{u\\}\\}", "&#x00FA;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{U\\}\\}", "&#x00DA;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&#x00E1;");
+        XML_CHARS.put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&#x00C1;");
 
-		XML_CHARS.put("\\{\\\\\\`e\\}", "&#x00E8;");
-		XML_CHARS.put("\\{\\\\\\`E\\}", "&#x00C8;");
-		XML_CHARS.put("\\{\\\\\\`i\\}", "&#x00EC;");
-		XML_CHARS.put("\\{\\\\\\`I\\}", "&#x00CC;");
-		XML_CHARS.put("\\{\\\\\\`o\\}", "&#x00F2;");
-		XML_CHARS.put("\\{\\\\\\`O\\}", "&#x00D2;");
-		XML_CHARS.put("\\{\\\\\\`u\\}", "&#x00F9;");
-		XML_CHARS.put("\\{\\\\\\`U\\}", "&#x00D9;");
-		XML_CHARS.put("\\{\\\\\\'e\\}", "&#x00E9;");
-		XML_CHARS.put("\\{\\\\\\'E\\}", "&#x00C9;");
-		XML_CHARS.put("\\{\\\\\\'i\\}", "&#x00ED;");
-		XML_CHARS.put("\\{\\\\\\'I\\}", "&#x00CD;");
-		XML_CHARS.put("\\{\\\\\\'o\\}", "&#x00F3;");
-		XML_CHARS.put("\\{\\\\\\'O\\}", "&#x00D3;");
-		XML_CHARS.put("\\{\\\\\\'u\\}", "&#x00FA;");
-		XML_CHARS.put("\\{\\\\\\'U\\}", "&#x00DA;");
-		XML_CHARS.put("\\{\\\\\\'a\\}", "&#x00E1;");
-		XML_CHARS.put("\\{\\\\\\'A\\}", "&#x00C1;");
+        //next 2 rows were missing...
+        XML_CHARS.put("\\{\\\\\\^\\{a\\}\\}", "&#x00E2;");
+        XML_CHARS.put("\\{\\\\\\^\\{A\\}\\}", "&#x00C2;");
 
-		XML_CHARS.put("\\{\\\\\\^a\\}", "&#x00F4;");
-		XML_CHARS.put("\\{\\\\\\^A\\}", "&#x00D4;");
-		XML_CHARS.put("\\{\\\\\\^o\\}", "&#x00F4;");
-		XML_CHARS.put("\\{\\\\\\^O\\}", "&#x00D4;");
-		XML_CHARS.put("\\{\\\\\\^u\\}", "&#x00F9;");
-		XML_CHARS.put("\\{\\\\\\^U\\}", "&#x00D9;");
-		XML_CHARS.put("\\{\\\\\\^e\\}", "&#x00EA;");
-		XML_CHARS.put("\\{\\\\\\^E\\}", "&#x00CA;");
-		XML_CHARS.put("\\{\\\\\\^i\\}", "&#x00EE;");
-		XML_CHARS.put("\\{\\\\\\^I\\}", "&#x00CE;");
-		XML_CHARS.put("\\{\\\\\\~o\\}", "&#x00F5;");
-		XML_CHARS.put("\\{\\\\\\~O\\}", "&#x00D5;");
-		XML_CHARS.put("\\{\\\\\\~n\\}", "&#x00F1;");
-		XML_CHARS.put("\\{\\\\\\~N\\}", "&#x00D1;");
-		XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
-		XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
+        XML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&#x00F4;");
+        XML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&#x00D4;");
+        XML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&#x00F9;");
+        XML_CHARS.put("\\{\\\\\\^\\{U\\}\\}", "&#x00D9;");
+        XML_CHARS.put("\\{\\\\\\^\\{e\\}\\}", "&#x00EA;");
+        XML_CHARS.put("\\{\\\\\\^\\{E\\}\\}", "&#x00CA;");
+        XML_CHARS.put("\\{\\\\\\^\\{i\\}\\}", "&#x00EE;");
+        XML_CHARS.put("\\{\\\\\\^\\{I\\}\\}", "&#x00CE;");
+
+        XML_CHARS.put("\\{\\\\\\~\\{o\\}\\}", "&#x00F5;");
+        XML_CHARS.put("\\{\\\\\\~\\{O\\}\\}", "&#x00D5;");
+        XML_CHARS.put("\\{\\\\\\~\\{n\\}\\}", "&#x00F1;");
+        XML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&#x00D1;");
+        XML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&#x00E3;");
+        XML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&#x00C3;");
+
+        XML_CHARS.put("\\{\\\\\\\"a\\}", "&#x00E4;");
+        XML_CHARS.put("\\{\\\\\\\"A\\}", "&#x00C4;");
+        XML_CHARS.put("\\{\\\\\\\"e\\}", "&#x00EB;");
+        XML_CHARS.put("\\{\\\\\\\"E\\}", "&#x00CB;");
+        XML_CHARS.put("\\{\\\\\\\"i\\}", "&#x00EF;");
+        XML_CHARS.put("\\{\\\\\\\"I\\}", "&#x00CF;");
+        XML_CHARS.put("\\{\\\\\\\"o\\}", "&#x00F6;");
+        XML_CHARS.put("\\{\\\\\\\"O\\}", "&#x00D6;");
+        XML_CHARS.put("\\{\\\\\\\"u\\}", "&#x00FC;");
+        XML_CHARS.put("\\{\\\\\\\"U\\}", "&#x00DC;");
+
+        //next 2 rows were missing...
+        XML_CHARS.put("\\{\\\\\\`a\\}", "&#x00E0;");
+        XML_CHARS.put("\\{\\\\\\`A\\}", "&#x00C0;");
+
+        XML_CHARS.put("\\{\\\\\\`e\\}", "&#x00E8;");
+        XML_CHARS.put("\\{\\\\\\`E\\}", "&#x00C8;");
+        XML_CHARS.put("\\{\\\\\\`i\\}", "&#x00EC;");
+        XML_CHARS.put("\\{\\\\\\`I\\}", "&#x00CC;");
+        XML_CHARS.put("\\{\\\\\\`o\\}", "&#x00F2;");
+        XML_CHARS.put("\\{\\\\\\`O\\}", "&#x00D2;");
+        XML_CHARS.put("\\{\\\\\\`u\\}", "&#x00F9;");
+        XML_CHARS.put("\\{\\\\\\`U\\}", "&#x00D9;");
+        XML_CHARS.put("\\{\\\\\\'e\\}", "&#x00E9;");
+        XML_CHARS.put("\\{\\\\\\'E\\}", "&#x00C9;");
+        XML_CHARS.put("\\{\\\\\\'i\\}", "&#x00ED;");
+        XML_CHARS.put("\\{\\\\\\'I\\}", "&#x00CD;");
+        XML_CHARS.put("\\{\\\\\\'o\\}", "&#x00F3;");
+        XML_CHARS.put("\\{\\\\\\'O\\}", "&#x00D3;");
+        XML_CHARS.put("\\{\\\\\\'u\\}", "&#x00FA;");
+        XML_CHARS.put("\\{\\\\\\'U\\}", "&#x00DA;");
+        XML_CHARS.put("\\{\\\\\\'a\\}", "&#x00E1;");
+        XML_CHARS.put("\\{\\\\\\'A\\}", "&#x00C1;");
+        //added next two chars...
+        XML_CHARS.put("\\{\\\\\\'c\\}", "&#x0107;");
+        XML_CHARS.put("\\{\\\\\\'C\\}", "&#x0106;");
+
+        //next two lines were wrong...
+        XML_CHARS.put("\\{\\\\\\^a\\}", "&#x00E2;");
+        XML_CHARS.put("\\{\\\\\\^A\\}", "&#x00C2;");
+
+        XML_CHARS.put("\\{\\\\\\^o\\}", "&#x00F4;");
+        XML_CHARS.put("\\{\\\\\\^O\\}", "&#x00D4;");
+        XML_CHARS.put("\\{\\\\\\^u\\}", "&#x00F9;");
+        XML_CHARS.put("\\{\\\\\\^U\\}", "&#x00D9;");
+        XML_CHARS.put("\\{\\\\\\^e\\}", "&#x00EA;");
+        XML_CHARS.put("\\{\\\\\\^E\\}", "&#x00CA;");
+        XML_CHARS.put("\\{\\\\\\^i\\}", "&#x00EE;");
+        XML_CHARS.put("\\{\\\\\\^I\\}", "&#x00CE;");
+        XML_CHARS.put("\\{\\\\\\~o\\}", "&#x00F5;");
+        XML_CHARS.put("\\{\\\\\\~O\\}", "&#x00D5;");
+        XML_CHARS.put("\\{\\\\\\~n\\}", "&#x00F1;");
+        XML_CHARS.put("\\{\\\\\\~N\\}", "&#x00D1;");
+        XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
+        XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
 
 		ASCII2XML_CHARS.put("<", "&lt;");
 		ASCII2XML_CHARS.put("\"", "&quot;");
