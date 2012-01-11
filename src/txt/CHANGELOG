@@ -1,3 +1,4 @@
+    - Fixed bug 3146059: Error in translating author field to MS Office
     - Fixed bug: entering field names containing capital letters in table columns tab
       in Preferences makes the columns empty.
 2.8 beta

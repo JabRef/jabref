@@ -51,14 +51,21 @@ public class PersonName {
     }
 
     protected void parseName(String author) {
-            // TODO: replace special characters
     		Vector<String> v = new Vector<String>();
-            String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
-           
+            String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
+             
+            //Formating names and replacing escape Char for ',' back to a comma
             XMLChars xmlChars = new XMLChars();
-            authorMod = xmlChars.format(authorMod);
+            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
+ 
+            int endOfLastName = authorMod.indexOf(",");
+
+            // Tokenize just the firstName and middleNames as we have the surname
+            // before the comma.
+            WSITools.tokenize(v, authorMod.substring(endOfLastName+1).trim(), " \n\r");
+            if (endOfLastName>=0) // comma is found
+            	v.add(authorMod.substring(0, endOfLastName));
             
-            WSITools.tokenize(v, authorMod, " \n\r");
             int amountOfNames = v.size();
 
             if (amountOfNames == 1)
