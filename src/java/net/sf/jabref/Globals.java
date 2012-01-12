@@ -268,7 +268,7 @@ public class Globals {
 	}
 
 	public static void setLanguage(String language, String country) {
-		locale = new Locale(language, country);
+        locale = new Locale(language, country);
 		messages = ResourceBundle.getBundle(resourcePrefix, locale);
 		menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale);
 		intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale);
