@@ -59,7 +59,7 @@
     <p>Um eine neue Erweiterungs-M&ouml;glichkeit hinzuzuf&uuml;gen, m&uuml;ssen Sie diese in der plugin.xml des core-plugins
     deklarieren. Hier ist ein Beispiel:</p>
 
-<code><pre>
+<pre>
 &lt;extension-point id=&quot;PushToApplication&quot;&gt;
 	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
 		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
@@ -69,7 +69,7 @@
 			multiplicity=&quot;none-or-one&quot; /&gt;
 			--&gt;
 &lt;/extension-point&gt;
-</pre></code>
+</pre>
 
 	<p>Anschlie&szlig;end m&uuml;ssen Sie den Plugin-Code-Generator "<code>ant generate</code>" aufrufen,
     der die Klasse "<code>net.sf.jabref.plugin.core.generated</code>" neu erstellt, so dass sie
@@ -78,7 +78,7 @@
 
     <p>Diese Liste kann dann folgenderma&szlig;en genutzt werden (als Beispiel dient die EntryFetcher-Erweiterung):</p>
 
-<code><pre>
+<pre>
 /*
  * Load fetchers that are plug-in extensions
  */
@@ -99,7 +99,7 @@ for (EntryFetcher fetcher : fetchers){
   web.add(generalFetcher.getAction());
   fetcherActions.add(generalFetcher.getAction());
 }
-</pre></code>
+</pre>
 
 </body>
 </html>

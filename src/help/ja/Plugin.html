@@ -50,7 +50,7 @@
     
     <p>新しい拡張点を加えるには、以下に示すように、この拡張点をコアプラグインのplugin.xmlの中で宣言する必要があります。</p>
     
-<code><pre>    
+<pre>
 &lt;extension-point id=&quot;PushToApplication&quot;&gt;
 	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
 		custom-data=&quot;&lt;プラグインプロバイダが実装する必要のあるインタフェースのクラス名&gt;&quot; /&gt;
@@ -60,13 +60,13 @@
 			multiplicity=&quot;none-or-one&quot; /&gt;
 			--&gt;
 &lt;/extension-point&gt;
-</pre></code>
+</pre>
 
         <p>その後、プラグインコード生成子"<code>ant generate</code>"を再度実行する必要があります。これは"<code>net.sf.jabref.plugin.core.generated</code>"中にヘルパークラスを再生成し、システムに登録されたPushToTalk拡張の全リストを返す<code>getPushToApplicationExtensions()</code>メソッドをインクルードします。</p>
 
     <p>そうすれば、このリストを以下のように使用することができます(これはEntryFetcher拡張の場合の例です)。</p>
 
-<code><pre> 
+<pre> 
 /*
  * プラグイン拡張である取得子を読み込む
  */
@@ -87,7 +87,7 @@ for (EntryFetcher fetcher : fetchers){
   web.add(generalFetcher.getAction());
   fetcherActions.add(generalFetcher.getAction());
 }
-</pre></code>
+</pre>
 
 </body>
 </html>

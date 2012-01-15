@@ -52,7 +52,7 @@
 
     <p>Pour ajouter un nouveau point d'extension, vous devez d&eacute;clarer ce point d'extension dans le plugin.xml du "core plugin" de fa&ccedil;on similaire &agrave; ceci&nbsp;:</p>
 
-<code><pre>
+<pre>
 &lt;extension-point id=&quot;PushToApplication&quot;&gt;
 	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
 		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
@@ -62,13 +62,13 @@
 			multiplicity=&quot;none-or-one&quot; /&gt;
 			--&gt;
 &lt;/extension-point&gt;
-</pre></code>
+</pre>
 
 	<p>Ensuite, vous devez relancer le g&eacute;n&eacute;rateur de code de greffon "<code>ant generate</code>", qui recr&eacute;era la classe "helper" dans  "<code>net.sf.jabref.plugin.core.generated</code>" afin qu'il inclut une m&eacute;thode <code>getPushToApplicationExtensions()</code> qui renvoie une liste de toutes les extensions PushToTalk r&eacute;f&eacute;renc&eacute;es dans votre syst&egrave;me.</p>
 
     <p>Cette liste peut ensuite &ecirc;tre utilis&eacute;e comme ceci (un exemple de ce que nous faisons avec les extensiosn "entry fetcher")&nbsp;:</p>
 
-<code><pre>
+<pre>
 /*
  * Load fetchers that are plug-in extensions
  */
@@ -89,7 +89,7 @@ for (EntryFetcher fetcher : fetchers){
   web.add(generalFetcher.getAction());
   fetcherActions.add(generalFetcher.getAction());
 }
-</pre></code>
+</pre>
 
 </body>
 </html> 

@@ -60,7 +60,7 @@
     
     <p>To add a new extension-point, you need to declare this extension-point in the plugin.xml of the core plugin similar to this:</p>
     
-<code><pre>    
+<pre>    
 &lt;extension-point id=&quot;PushToApplication&quot;&gt;
 	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
 		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
@@ -70,7 +70,7 @@
 			multiplicity=&quot;none-or-one&quot; /&gt;
 			--&gt;
 &lt;/extension-point&gt;
-</pre></code>
+</pre>
 
 	<p>Then you need to re-run the plugin code generator "<code>ant generate</code>", which will re-create the helper class in 
 	"<code>net.sf.jabref.plugin.core.generated</code>" so that it includes a method <code>getPushToApplicationExtensions()</code> which 
@@ -78,7 +78,7 @@
  
     <p>This list then can be used like this (here an example what we do with the entry fetcher extensions):</p>
 
-<code><pre> 
+<pre> 
 /*
  * Load fetchers that are plug-in extensions
  */
@@ -99,7 +99,7 @@ for (EntryFetcher fetcher : fetchers){
   web.add(generalFetcher.getAction());
   fetcherActions.add(generalFetcher.getAction());
 }
-</pre></code>
+</pre>
 
 </body>
 </html>
