@@ -479,7 +479,6 @@ public class SearchManager2 extends SidePaneComponent
 
     public void actionPerformed(ActionEvent e) {
 
-        fireSearchlistenerEvent(searchField.getText());
     if (e.getSource() == escape) {
         incSearch = false;
         clearSearchLater();
@@ -489,11 +488,14 @@ public class SearchManager2 extends SidePaneComponent
          && (panel != null)) {
 
         updatePrefs(); // Make sure the user's choices are recorded.
-            if (searchField.getText().equals("")) {
-              // An empty search field should cause the search to be cleared.
-              clearSearchLater();
-              return;
-            }
+        if (searchField.getText().equals("")) {
+            // An empty search field should cause the search to be cleared.
+            clearSearchLater();
+            return;
+        }
+
+        fireSearchlistenerEvent(searchField.getText());
+            
         // Setup search parameters common to both normal and float.
         Hashtable<String, String> searchOptions = new Hashtable<String, String>();
         searchOptions.put("option",searchField.getText()) ;
