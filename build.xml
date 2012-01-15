@@ -255,8 +255,6 @@
 			<fileset dir="${build.dir}">
 				<include name="images/**" />
 				<include name="help/**" />
-				<include name="help/de/**" />
-				<include name="help/no/**" />
 				<include name="resource/**" />
 			</fileset>
 
