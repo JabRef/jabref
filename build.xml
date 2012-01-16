@@ -48,7 +48,9 @@
 
 	<!-- some version information -->
 	<property name="jabref.version" value="2.8b" />
+	<property name="jabref.year" value="2012" />
 	<property name="jabref.placeholder.version" value="@version@" />
+	<property name="jabref.placeholder.year" value="@year@" />
 	<!-- used by replace task -->
 
 	<!-- Set the properties for intermediate directory -->
@@ -310,7 +312,13 @@
 		</copy>
 
 		<!-- Insert version informations -->
-		<replace dir="${build.help}" token="${jabref.placeholder.version}" value="${jabref.version}">
+		<replace dir="${build.help}">
+		    <replacefilter
+			    token="${jabref.placeholder.version}" 
+				value="${jabref.version}" />
+		    <replacefilter
+			    token="${jabref.placeholder.year}" 
+				value="${jabref.year}" />
 			<include name="**/About.html" />
 		</replace>
 		<replace dir="${build.openoffice.meta}" token="${jabref.placeholder.version}" value="${jabref.version}">
