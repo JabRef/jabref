@@ -1,3 +1,4 @@
+    - Fixed bug: "Send as Email" did not handle absolute paths correctly.
     - Fixed bug 3472991: Search : "Highlight Words" inconsistent
     - Fixed bug 2933201: Exporting InProceedings to Word 2007
     - Fixed bug 3146059: Error in translating author field to MS Office

@@ -13,13 +13,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
 // created by : Morten O. Alver 2003
-//
-// function : utility functions
-//
-// modified :  - r.nagel 20.04.2006
-//               make the DateFormatter abstract and splitt the easyDate methode
-//               (now we cannot change the dateformat dynamicly, sorry)
+
 package net.sf.jabref;
 
 import java.awt.BorderLayout;
@@ -92,10 +88,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * Describe class <code>Util</code> here.
- * 
- * @author <a href="mailto:"> </a>
- * @version 1.0
+ * utility functions
  */
 public class Util {
 
