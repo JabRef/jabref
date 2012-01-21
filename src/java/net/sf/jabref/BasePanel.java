@@ -27,6 +27,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -42,10 +43,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -882,6 +886,89 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             frame.unblock();
         }
     });
+         
+        
+     // The action for cleaning up entry.
+        actions.put("Cleanup", new AbstractWorker() {
+        //int[] rows;
+        List<BibtexEntry> entries;
+        int numSelected;
+        boolean cancelled = false;
+
+        // Run first, in EDT:
+        public void init() {
+                    entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
+                   //rows = entryTable.getSelectedRows() ;
+                    numSelected = entries.size();
+
+                    if (entries.size() == 0) { // None selected. Inform the user to select entries first.
+                        JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries that you want to do a cleanup for."), 
+                                                      Globals.lang("Cleanup Entry"), JOptionPane.INFORMATION_MESSAGE);
+                        return ;
+                    }
+            frame.block();
+            output(Globals.lang("Do a Cleanup for")+" "+	
+                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
+                                            : Globals.lang("entry"))+"...");
+        }
+
+        // Run second, on a different thread:
+                public void run() {
+                    database.setFollowCrossrefs(false);
+                    BibtexEntry bes = null ;
+                    NamedCompound ce = new NamedCompound(Globals.lang("Cleanup Entry"));
+
+                    // Remove the http://... for each DOI
+                    for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                        bes = i.next();
+                        // First check if the DOI Field is empty
+                        if (bes.getField("doi") != null) {
+                            // Replace http://... 
+                            bes.setField("doi", Util.parseDOI(bes.getField("doi")));
+                        
+                        } else {
+                        	// As the DOI field is empty we now check if Notes or URL contains a DOI
+                        	if (bes.getField("note") != null) {
+                        		if (Util.checkForDOI(bes.getField("note"))){
+                            		bes.setField("doi", Util.parseDOI(bes.getField("note")));
+									// Clear Note and URL if DOI has been changed and Preferences has been set
+									if (Globals.prefs.getBoolean("clearNoteURLifDOIexists")){
+										bes.clearField("note");
+									}
+                            	} 
+                        	}
+                        	if (bes.getField("url") != null) {
+                        		if (Util.checkForDOI(bes.getField("url"))) {
+                        			bes.setField("doi", Util.parseDOI(bes.getField("url")));
+									// Clear Note and URL if DOI has been changed and Preferences has been set
+									if (Globals.prefs.getBoolean("clearNoteURLifDOIexists")){
+										bes.clearField("url");
+									}
+                        		}
+                        	}
+                        }
+                    }
+                    
+                    ce.end();
+                    undoManager.addEdit(ce);
+        }
+
+        // Run third, on EDT:
+        public void update() {
+            database.setFollowCrossrefs(true);
+            if (cancelled) {
+                frame.unblock();
+                return;
+            }
+            markBaseChanged() ;
+            numSelected = entries.size();
+
+            output(Globals.lang("Did a Cleanup for")+" "+
+               numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
+                                    : Globals.lang("entry")));
+            frame.unblock();
+        }
+    });
 
         actions.put("search", new BaseAction() {
                 public void action() {
@@ -894,6 +981,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
             });
 
+        actions.put("search", new BaseAction() {
+                public void action() {
+                    //sidePaneManager.togglePanel("search");
+                    sidePaneManager.show("search");
+                    //boolean on = sidePaneManager.isPanelVisible("search");
+                    frame.searchToggle.setSelected(true);
+                    if (true)
+                      frame.getSearchManager().startSearch();
+                }
+            });
+        
         actions.put("toggleSearch", new BaseAction() {
                 public void action() {
                     //sidePaneManager.togglePanel("search");

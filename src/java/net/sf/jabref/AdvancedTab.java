@@ -37,7 +37,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         lnf = new JPanel();
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
-            useIEEEAbrv, biblatexMode;
+            useIEEEAbrv, biblatexMode, clearNoteURLifDOIexists ;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -59,6 +59,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
+    clearNoteURLifDOIexists = new JCheckBox(Globals.lang("Clear Note and URL if DOI exists"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -140,6 +141,11 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.appendSeparator(Globals.lang("BibLaTeX mode"));
     builder.append(new JPanel());
     builder.append(biblatexMode);
+    
+    builder.nextLine();
+    builder.appendSeparator(Globals.lang("Cleanup Settings"));
+    builder.append(new JPanel());
+    builder.append(clearNoteURLifDOIexists);
 
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -162,9 +168,11 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
+        clearNoteURLifDOIexists.setSelected(Globals.prefs.getBoolean("clearNoteURLifDOIexists"));
     }
 
     public void storeSettings() {
+        _prefs.putBoolean("clearNoteURLifDOIexists", clearNoteURLifDOIexists.isSelected());
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
         _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());

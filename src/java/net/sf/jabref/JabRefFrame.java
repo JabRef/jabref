@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -38,6 +39,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.sciplore.beans.Url;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
@@ -136,7 +139,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   // References to the toggle buttons in the toolbar:
   public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,
       highlightAll;
-
   OpenDatabaseAction
       open = new OpenDatabaseAction(this, true);
   AbstractAction
@@ -265,7 +267,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                         Globals.lang("Autogenerate BibTeX keys"),
                                         prefs.getKey("Autogenerate BibTeX keys")),
 
-
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
@@ -329,6 +330,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     dbExport = new GeneralAction("dbExport", "Export to external SQL database",
          Globals.lang("Export to external SQL database"), 
           GUIGlobals.getIconUrl("dbExport") ),
+
+    Cleanup = new GeneralAction("Cleanup", "Cleanup entries", 
+					Globals.lang("Cleanup Entry"), 
+					GUIGlobals.getIconUrl("cleanupentries") ),
+					
     dbImport = new DbImportAction(this).getAction(),
     //downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
     //        Globals.lang("Follow DOI or URL link and try to locate PDF full text document")),
@@ -1274,6 +1280,7 @@ public JabRefPreferences prefs() {
       mb.add(bibtex);
 
       tools.add(makeKeyAction);
+      tools.add(Cleanup);
       //tools.add(downloadFullText);
       tools.add(newSubDatabaseAction);
       tools.add(writeXmpAction);
@@ -1410,6 +1417,7 @@ public JabRefPreferences prefs() {
     tlb.addAction(editPreamble);
     tlb.addAction(editStrings);
     tlb.addAction(makeKeyAction);
+    tlb.addAction(Cleanup);
 
 
     tlb.addSeparator();
@@ -1460,7 +1468,6 @@ public JabRefPreferences prefs() {
       tlb.addAction(openFile);
     //tlb.addAction(openPdf);
     //tlb.addAction(openUrl);
-
 
     //tlb.addSeparator();
     //tlb.addAction(showPrefs);

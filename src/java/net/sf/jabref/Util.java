@@ -2968,4 +2968,76 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		}
         return targetName;
     }
+    
+    /**
+   	 * Check if the String matches a DOI (with http://...)
+   	 */
+    public static boolean checkForDOI(String check){
+		boolean returnValue = false;
+	// Check http://... .doi. ... .<end> first
+		// .ORG
+		if (check.matches("http:\\/\\/.*\\.doi\\..*\\.org/.*")) {
+		returnValue = true;
+	}
+	// .DE
+		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.de/.*")) {
+		returnValue = true;
+	} 
+	// .NET
+		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.net/.*")) {
+		returnValue = true;
+	} 
+	// .COM
+		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.com/.*")) {
+		returnValue = true;
+		} 
+	// Check http://doi. ... .<end> now
+		// .ORG
+		if (check.matches("http:\\/\\/doi\\..*\\.org/.*")) {
+		returnValue = true;
+	}
+	// .DE
+		else if (check.matches("http:\\/\\/doi\\..*\\.de/.*")) {
+		returnValue = true;
+	} 
+	// .NET
+		else if (check.matches("http:\\/\\/doi\\..*\\.net/.*")) {
+		returnValue = true;
+	} 
+	// .COM
+		else if (check.matches("http:\\/\\/doi\\.com/.*")) {
+		returnValue = true;
+		} 
+	// Check http://... .doi.<end> now
+		// .ORG
+		if (check.matches("http:\\/\\/.*\\.doi\\.org/.*")) {
+		returnValue = true;
+	}
+	// .DE
+		else if (check.matches("http:\\/\\/.*\\.doi\\.de/.*")) {
+		returnValue = true;
+	} 
+	// .NET
+		else if (check.matches("http:\\/\\/.*\\.doi\\.net/.*")) {
+		returnValue = true;
+	} 
+	// .COM
+		else if (check.matches("http:\\/\\/.*\\.doi\\.com/.*")) {
+		returnValue = true;
+		} 
+		return returnValue;
+	}
+       
+    /**
+   	 * Remove the http://... from DOI
+   	 * @param doi
+   	 * @return
+   	 */
+   	public static String parseDOI(String doi){
+   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.org/", "");
+   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.com/", "");
+   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.net/", "");
+   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.de/", "");
+   		return doi;
+   	}
 }

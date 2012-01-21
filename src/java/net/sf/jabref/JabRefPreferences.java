@@ -425,7 +425,11 @@ public class JabRefPreferences {
         defaults.put("selectedFetcherIndex", 0);
         defaults.put("bibLocationAsFileDir", Boolean.TRUE);
         defaults.put("bibLocAsPrimaryDir", Boolean.FALSE);
+        defaults.put("AskAutoNamingPDFsAgain", Boolean.TRUE);
+        
         //defaults.put("lastAutodetectedImport", "");
+        
+        defaults.put("clearNoteURLifDOIexists", Boolean.FALSE);
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
         //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
