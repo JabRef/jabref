@@ -890,7 +890,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         
      // The action for cleaning up entry.
         actions.put("Cleanup", new AbstractWorker() {
-        //int[] rows;
         List<BibtexEntry> entries;
         int numSelected;
         boolean cancelled = false;
@@ -898,7 +897,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Run first, in EDT:
         public void init() {
                     entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
-                   //rows = entryTable.getSelectedRows() ;
                     numSelected = entries.size();
 
                     if (entries.size() == 0) { // None selected. Inform the user to select entries first.
@@ -932,7 +930,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         		if (Util.checkForDOI(bes.getField("note"))){
                             		bes.setField("doi", Util.parseDOI(bes.getField("note")));
 									// Clear Note and URL if DOI has been changed and Preferences has been set
-									if (Globals.prefs.getBoolean("clearNoteURLifDOIexists")){
+									if (Globals.prefs.getBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS)){
 										bes.clearField("note");
 									}
                             	} 
@@ -941,7 +939,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         		if (Util.checkForDOI(bes.getField("url"))) {
                         			bes.setField("doi", Util.parseDOI(bes.getField("url")));
 									// Clear Note and URL if DOI has been changed and Preferences has been set
-									if (Globals.prefs.getBoolean("clearNoteURLifDOIexists")){
+									if (Globals.prefs.getBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS)){
 										bes.clearField("url");
 									}
                         		}

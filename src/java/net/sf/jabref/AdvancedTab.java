@@ -59,7 +59,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
-    clearNoteURLifDOIexists = new JCheckBox(Globals.lang("Clear Note and URL if DOI exists"));
+    clearNoteURLifDOIexists = new JCheckBox(Globals.lang("Clear note and URL if DOI exists"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -143,7 +143,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.append(biblatexMode);
     
     builder.nextLine();
-    builder.appendSeparator(Globals.lang("Cleanup Settings"));
+    builder.appendSeparator(Globals.lang("Cleanup settings"));
     builder.append(new JPanel());
     builder.append(clearNoteURLifDOIexists);
 
@@ -168,11 +168,11 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
-        clearNoteURLifDOIexists.setSelected(Globals.prefs.getBoolean("clearNoteURLifDOIexists"));
+        clearNoteURLifDOIexists.setSelected(Globals.prefs.getBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS));
     }
 
     public void storeSettings() {
-        _prefs.putBoolean("clearNoteURLifDOIexists", clearNoteURLifDOIexists.isSelected());
+        _prefs.putBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS, clearNoteURLifDOIexists.isSelected());
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
         _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());

@@ -61,7 +61,8 @@ public class JabRefPreferences {
         EMACS_PATH = "emacsPath",
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
-        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
+        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
+        CLEAR_NOTE_URL_IF_DOI_EXISTS = "clearNoteURLifDOIexists";
     
 
     // This String is used in the encoded list in prefs of external file type
