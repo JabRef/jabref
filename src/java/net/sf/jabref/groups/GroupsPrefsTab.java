@@ -39,6 +39,8 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 			Globals.lang("Automatically show groups interface when switching to a database that contains groups"));
 	private final JCheckBox autoHide = new JCheckBox(
 			Globals.lang("Automatically hide groups interface when switching to a database that contains no groups"));
+	private final JCheckBox autoAssignGroup = new JCheckBox(
+			Globals.lang("Automatically assign new entry to selected groups"));
 	private JTextField groupingField = new JTextField(20);
 	private JTextField keywordSeparator = new JTextField(2);
 
@@ -83,6 +85,10 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 		builder.append(autoHide);
 		builder.nextLine();
 		builder.nextLine();
+		builder.nextColumn();
+		builder.append(autoAssignGroup);
+		builder.nextLine();
+		builder.nextLine();
 		builder.appendSeparator(Globals.lang("Dynamic groups"));
 		builder.nextLine();
 		builder.nextLine();
@@ -113,6 +119,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 		autoShow.setSelected(prefs.getBoolean("groupAutoShow"));
 		autoHide.setSelected(prefs.getBoolean("groupAutoHide"));
 		keywordSeparator.setText(prefs.get("groupKeywordSeparator"));
+		autoAssignGroup.setSelected(prefs.getBoolean("autoAssignGroup")); 
 	}
 
 	public void storeSettings() {
@@ -122,6 +129,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 		prefs.put("groupsDefaultField", groupingField.getText().trim());
 		prefs.putBoolean("groupAutoShow", autoShow.isSelected());
 		prefs.putBoolean("groupAutoHide", autoHide.isSelected());
+		prefs.putBoolean("autoAssignGroup", autoAssignGroup.isSelected());
 		prefs.put("groupKeywordSeparator", keywordSeparator.getText());
 	}
 

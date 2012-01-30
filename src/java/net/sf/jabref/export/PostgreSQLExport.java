@@ -20,7 +20,7 @@ import java.util.Set;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.sql.SQLutil;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -51,7 +51,7 @@ public class PostgreSQLExport extends ExportFormat {
         final MetaData metaData, final String file, final String encoding,
         Set<String> keySet) throws Exception {
 
-        SQLutil.exportDatabase(database, metaData, keySet, file, SQLutil.DBTYPE.POSTGRESQL);
+    	new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet, file);
 
     }
 

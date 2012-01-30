@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -111,6 +110,8 @@ public class GroupSelector extends SidePaneComponent implements
             false), select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
     JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
                     Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
+	JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
+			Globals.lang("Automatically assign new entry to selected groups")); 
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
     ButtonGroup nonHits = new ButtonGroup();
@@ -122,7 +123,7 @@ public class GroupSelector extends SidePaneComponent implements
     boolean editModeIndicator;
     SidePaneManager manager;
 
-    /**
+     /**
      * The first element for each group defines which field to use for the
      * quicksearch. The next two define the name and regexp for the group.
      *
@@ -198,11 +199,19 @@ public class GroupSelector extends SidePaneComponent implements
             andCb.setSelected(false);
         }
 
+        
+        autoAssignGroup.addChangeListener(new ChangeListener() {
+        	public void stateChanged(ChangeEvent event) {
+                Globals.prefs.putBoolean("autoAssignGroup", autoAssignGroup.isSelected());
+            }
+        });
+        
         invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean("groupShowOverlapping"));
         select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
+        autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
 
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(andCb);
@@ -218,7 +227,8 @@ public class GroupSelector extends SidePaneComponent implements
         settings.add(hideNonHits);
         settings.addSeparator();
         settings.add(showOverlappingGroups);
-
+        settings.addSeparator();
+        settings.add(autoAssignGroup);
         // settings.add(moreRow);
         // settings.add(lessRow);
         openset.addActionListener(new ActionListener() {
@@ -229,6 +239,7 @@ public class GroupSelector extends SidePaneComponent implements
                     // settings.setVisible(false);
                 } else {
                     JButton src = (JButton) e.getSource();
+                    autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup")); 
                     settings.show(src, 0, openset.getHeight());
                 }
             }
@@ -1523,4 +1534,10 @@ public class GroupSelector extends SidePaneComponent implements
       }
       groupsTree.setHighlight2Cells(vec.toArray());
     }
+
+    public GroupsTree getGroupsTree()
+    {
+    	return this.groupsTree;
+    }
+
 }

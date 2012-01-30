@@ -76,6 +76,7 @@ import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.UpgradeExternalLinks;
 import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.groups.AddToGroupAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
@@ -92,7 +93,9 @@ import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
-import net.sf.jabref.sql.SQLutil;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.SQLUtil;
+import net.sf.jabref.sql.exporter.DBExporter;
 import net.sf.jabref.undo.CountingUndoManager;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableChangeType;
@@ -595,6 +598,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               // ones.
                               be.setId(Util.createNeutralId());
                               database.insertEntry(be);
+                              
+                              addToSelectedGroup(be); 
                               ce.addEdit(new UndoableInsertEntry
                                          (database, be, BasePanel.this));
                             } catch (KeyCollisionException ex) {
@@ -724,14 +729,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     try {
 
                         frame.output(Globals.lang("Attempting SQL export..."));
-                        SQLutil.exportDatabase(database, metaData, null, dbs);
+                        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
+                        DBExporter exporter = factory.getExporter(dbs.getServerType());
+                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs);
                         dbs.isConfigValid(true);
 
                     } catch (Exception ex) {
-
-                        errorMessage = SQLutil.getExceptionMessage(ex,SQLutil.DBTYPE.MYSQL);
+                        String preamble = "Could not export to SQL database for the following reason:";
+                        errorMessage = SQLUtil.getExceptionMessage(ex);
                         dbs.isConfigValid(false);
-
+                        JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
+                                + "\n" +errorMessage, Globals.lang("Export to SQL database"),
+                                JOptionPane.ERROR_MESSAGE);
                     }
 
                     metaData.setDBStrings(dbs);
@@ -743,12 +752,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // run third, on EDT:
             public void update() {
 
-                String url = SQLutil.createJDBCurl(metaData.getDBStrings());
-
                 // if no error, report success
                 if (errorMessage == null) {
                     if (connectToDB) {
-                        frame.output(Globals.lang("%0 export successful", url));
+                        frame.output(Globals.lang("%0 export successful"));
                     }
                 }
 
@@ -1712,14 +1719,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             type = etd.getChoice();
         }
         if (type != null) { // Only if the dialog was not cancelled.
-            String id = Util.createNeutralId();
+            String id = Util.createNeutralId();            
             final BibtexEntry be = new BibtexEntry(id, type);
             try {
                 database.insertEntry(be);
-
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
-                list.add(be);
+                list.add(be);                
                 Util.setAutomaticFields(list, true, true, false);
 
                 // Create an UndoableInsertEntry object.
@@ -1745,7 +1751,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 markBaseChanged(); // The database just changed.
-                new FocusRequester(getEntryEditor(be));
+                new FocusRequester(getEntryEditor(be));              
+
+                //Add the new entry to the group(s) selected in the Group Panel
+                addToSelectedGroup(be);
+                
                 return be;
             } catch (KeyCollisionException ex) {
                 Util.pr(ex.getMessage());
@@ -1754,7 +1764,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return null;
     }
 
-
+    /**
+     * This method is called to add a new entry to a group (or a set of groups)
+     * in case the Group View is selected and one or more groups are marked
+     * @param bibEntry The new entry.
+     */    
+	private void addToSelectedGroup(final BibtexEntry bibEntry) {
+		if (Globals.prefs.getBoolean("autoAssignGroup")){
+			if (frame.groupToggle.isSelected()){
+				BibtexEntry[] entries = {bibEntry};
+				TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
+				for (TreePath tree : selection){
+					((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
+				}
+				this.updateEntryEditorIfShowing();
+				this.getGroupSelector().valueChanged(null);
+			}
+		}
+	}
 
     /**
      * This method is called from JabRefFrame when the user wants to

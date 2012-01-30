@@ -15,14 +15,12 @@
 */
 package net.sf.jabref.export;
 
-
-
 import java.util.Set;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.sql.SQLutil;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -51,8 +49,8 @@ public class MySQLExport extends ExportFormat {
     public void performExport(final BibtexDatabase database,
         final MetaData metaData, final String file, final String encoding,
         Set<String> keySet) throws Exception {
-
-        SQLutil.exportDatabase(database, metaData, keySet, file, SQLutil.DBTYPE.MYSQL);
+    	
+        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file);
 
     }
 

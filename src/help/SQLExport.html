@@ -10,21 +10,7 @@
     <p> JabRef is capable of
         exporting the contents of the BibTeX database, along with groups
     	information, to an external MySQL or PostgreSQL database.</p>
-
-    <h3>MySQL</h3>
-    <ol> 
-      <li> Using your favorite MySQL administration tool, create an empty MySQL database.</li>
-      <li> Make sure there is a user for this database that has <em>full privileges</em>.</li>
-    </ol>
-    <h3>PostgreSQL</h3>
-    <ol> 
-      <li> Using your favorite PostgreSQL administration tool (PGAdminIII, PHPpgadmin, etc.), create an empty PostgreSQL database.  Alternately, the command line utility <em>createdb</em> may be used as follows:</li>
-      <b>createdb -h [HOST] -U [USERNAME] [DBNAME] -E UTF8 --lc-ctype=en_US.utf-8 -T template0</b>
-
-	<p>The assumption being that the language is english and the locale is US. If a password is required, the server will prompt for one from the command line.  See the createdb man page for more information.</p>
-      </li>
-      <li> Make sure there is a user for this database that has <em>full privileges</em>.</li>
-    </ol>
+	<p>You just need to be sure you have an user/password with full privileges on a MySQL or PostgreSQL server</p>
 
     <h2>Export</h2>
     <ol>
@@ -34,14 +20,18 @@
     </ol>
 
 		<p>
-		JabRef will then connect to the specified database, <b><em>drop the existing tables</em></b>, create new
-		tables, and populate those tables with entries and groups information.  Note that you will
-		not be prompted for the connection information on subsequent exports.  If you would like to
+		JabRef will then connect to the specified database, create new tables, and populate those tables with entries and groups information.
+		You will be able to export as many JabRef bib databases as you want without losing the previously explored data.
+		The system recognize a database uniquely by its full path (directory structure + filename). In case you export the same JabRef database 
+		more than once, the data of that database will be update in the SQL database.
+		Note that you will not be prompted for the connection information on subsequent exports.  If you would like to
 		export to a different database, you can change the connection information by choosing <b>File -&gt;
 		Connect to external SQL database</b> (or by clicking the associated toolbar button), and then
 		performing an export.
-    </p>
+		Since version 2.8 tables are not dropped, and user is able to store more than one JabRef database into a single SQL database.
+    </p>	
 
+	<p>When importing a database from an SQL database (<b>File -&gt; Import from external SQL database</b>), JabRef will place each database found in a different tab.
   </body>
 
 </html>

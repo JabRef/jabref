@@ -44,8 +44,10 @@ public class DBStrings {
         this.isConfigValid(false);
     }
 
+   /**
+    * Initializes the variables needed with defaults
+    */
     public void initialize() {
-        //String [] servers = {Globals.lang("MySQL"), Globals.lang("Derby")};
         String [] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
         setServerTypes(servers);
         setServerType(Globals.lang("MySQL"));

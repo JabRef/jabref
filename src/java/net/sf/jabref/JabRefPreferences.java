@@ -252,6 +252,7 @@ public class JabRefPreferences {
         defaults.put("groupExpandTree", Boolean.TRUE);
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
+        defaults.put("autoAssignGroup", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
