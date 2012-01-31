@@ -103,7 +103,7 @@ public class SearchResultsDialog {
         entryTable.setDefaultRenderer(String.class, renderer);
         setWidths();
         TableComparatorChooser<BibtexEntry> tableSorter =
-                new TableComparatorChooser<BibtexEntry>(entryTable, sortedEntries,
+                TableComparatorChooser.install(entryTable, sortedEntries,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
@@ -194,7 +194,7 @@ public class SearchResultsDialog {
     @SuppressWarnings("unchecked")
     protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
-        java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser
+        java.util.List<Comparator> comparators = comparatorChooser
             .getComparatorsForColumn(0);
         comparators.clear();
 
