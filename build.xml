@@ -93,9 +93,8 @@
 	</condition>
 
 	<fileset id="jarsFileset" dir="${lib.dir}">
-		<!--<include name="antlr.jar" />-->
-		<!--<include name="antlr-3.0b5.jar" />-->
-        <include name="antlr-3.4-complete.jar" />
+		<include name="antlr.jar" />
+		<include name="antlr-3.0b5.jar" />
 		<include name="looks-2.3.1.jar" />
 		<include name="forms-1.1.0.jar" />
 		<include name="spin.jar" />
