@@ -426,6 +426,10 @@ public class JabRefPreferences {
         defaults.put("selectedFetcherIndex", 0);
         defaults.put("bibLocationAsFileDir", Boolean.TRUE);
         defaults.put("bibLocAsPrimaryDir", Boolean.FALSE);
+        defaults.put("dbConnectServerType", "MySQL");
+        defaults.put("dbConnectHostname", "localhost");
+        defaults.put("dbConnectDatabase", "jabref");
+        defaults.put("dbConnectUsername", "root");
         //defaults.put("lastAutodetectedImport", "");
 
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

@@ -737,6 +737,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     } catch (Exception ex) {
                         String preamble = "Could not export to SQL database for the following reason:";
                         errorMessage = SQLUtil.getExceptionMessage(ex);
+                        ex.printStackTrace();
                         dbs.isConfigValid(false);
                         JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
                                 + "\n" +errorMessage, Globals.lang("Export to SQL database"),

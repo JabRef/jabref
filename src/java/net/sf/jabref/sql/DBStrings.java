@@ -50,10 +50,10 @@ public class DBStrings {
     public void initialize() {
         String [] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
         setServerTypes(servers);
-        setServerType(Globals.lang("MySQL"));
-        setServerHostname(Globals.lang("localhost"));
-        setDatabase(Globals.lang("jabref"));
-        setUsername(Globals.lang("root"));
+        setServerType(Globals.prefs.get("dbConnectServerType"));
+        setServerHostname(Globals.prefs.get("dbConnectHostname"));
+        setDatabase(Globals.prefs.get("dbConnectDatabase"));
+        setUsername(Globals.prefs.get("dbConnectUsername"));
         setPassword("");
         isInitialized(true);
     }
@@ -122,4 +122,13 @@ public class DBStrings {
         this.configValid = configValid;
     }
 
+    /**
+     * Store these db strings into JabRef preferences.
+     */
+    public void storeToPreferences() {
+        Globals.prefs.put("dbConnectServerType", getServerType());
+        Globals.prefs.put("dbConnectHostname", getServerHostname());
+        Globals.prefs.put("dbConnectDatabase", getDatabase());
+        Globals.prefs.put("dbConnectUsername", getUsername());
+    }
 }
