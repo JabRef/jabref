@@ -733,10 +733,15 @@ public class JabRefPreferences {
         return ks;
       }
       else {
+    	int modifiers = 0;
         if ((ks.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-          return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask()+KeyEvent.SHIFT_MASK);
+          modifiers = modifiers | KeyEvent.SHIFT_MASK;
         }
-        return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask());
+        if ((ks.getModifiers() & KeyEvent.ALT_MASK) != 0) {
+            modifiers = modifiers | KeyEvent.ALT_MASK;
+        }
+        
+        return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask()+modifiers);
       }
     }
 
