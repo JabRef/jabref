@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -129,7 +129,7 @@ public class Util {
     public static Pattern markNumberPattern = Pattern.compile(Globals.prefs.MARKING_WITH_NUMBER_PATTERN);
 
 
-	static {
+    static {
 		idFormat = NumberFormat.getInstance();
 		idFormat.setMinimumIntegerDigits(8);
 		idFormat.setGroupingUsed(false);
@@ -2969,75 +2969,53 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         return targetName;
     }
     
+    
+    private static String REGEXP_DOI_WITH_HTTP_PREFIX = "[^\\s]+?(10\\.[^/]+/([^(\\s\\>\\\"\\<})])+)";
+    private static String REGEXP_PLAINDOI = "(10\\.[^/]+/([^(\\s\\>\\\"\\<})])+)";
+
     /**
    	 * Check if the String matches a DOI (with http://...)
    	 */
-    public static boolean checkForDOI(String check){
-		boolean returnValue = false;
-	// Check http://... .doi. ... .<end> first
-		// .ORG
-		if (check.matches("http:\\/\\/.*\\.doi\\..*\\.org/.*")) {
-		returnValue = true;
+    public static boolean checkForDOIwithHTTPprefix(String check) {
+    	if (check == null)
+    		return false;
+    	else
+    		return check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
 	}
-	// .DE
-		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.de/.*")) {
-		returnValue = true;
-	} 
-	// .NET
-		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.net/.*")) {
-		returnValue = true;
-	} 
-	// .COM
-		else if (check.matches("http:\\/\\/.*\\.doi\\..*\\.com/.*")) {
-		returnValue = true;
-		} 
-	// Check http://doi. ... .<end> now
-		// .ORG
-		if (check.matches("http:\\/\\/doi\\..*\\.org/.*")) {
-		returnValue = true;
-	}
-	// .DE
-		else if (check.matches("http:\\/\\/doi\\..*\\.de/.*")) {
-		returnValue = true;
-	} 
-	// .NET
-		else if (check.matches("http:\\/\\/doi\\..*\\.net/.*")) {
-		returnValue = true;
-	} 
-	// .COM
-		else if (check.matches("http:\\/\\/doi\\.com/.*")) {
-		returnValue = true;
-		} 
-	// Check http://... .doi.<end> now
-		// .ORG
-		if (check.matches("http:\\/\\/.*\\.doi\\.org/.*")) {
-		returnValue = true;
-	}
-	// .DE
-		else if (check.matches("http:\\/\\/.*\\.doi\\.de/.*")) {
-		returnValue = true;
-	} 
-	// .NET
-		else if (check.matches("http:\\/\\/.*\\.doi\\.net/.*")) {
-		returnValue = true;
-	} 
-	// .COM
-		else if (check.matches("http:\\/\\/.*\\.doi\\.com/.*")) {
-		returnValue = true;
-		} 
-		return returnValue;
-	}
+    
+    /**
+     * 
+     * @param check - string to check
+     * @return true if "check" contains a DOI
+     */
+    public static boolean checkForPlainDOI(String check) {
+    	if (check == null)
+    		return false;
+    	else
+    		return check.matches(".*" + REGEXP_PLAINDOI + ".*");
+    }
        
     /**
    	 * Remove the http://... from DOI
+   	 * 
    	 * @param doi
-   	 * @return
+   	 * @return DOI without http://... prefix
    	 */
-   	public static String parseDOI(String doi){
-   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.org/", "");
-   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.com/", "");
-   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.net/", "");
-   		doi = doi.replaceAll("http:\\/\\/.*doi.*\\.de/", "");
+   	public static String getDOI(String doi){
+   		doi = doi.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "$1");
    		return doi;
    	}
+
+	public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
+		String origValue = bes.getField(fieldName);
+		String value = origValue;
+		value = value.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "");
+		value = value.replaceAll(REGEXP_PLAINDOI, "");
+		value = value.trim(); 
+		if (value.isEmpty()) value = null;
+		if (!origValue.equals(value)) {
+			ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
+			bes.setField(fieldName, value);
+		}
+	}
 }

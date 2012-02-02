@@ -439,34 +439,35 @@ public class UtilTest extends TestCase {
      * Tests Util.checkForDOI(...) for right functionality 
      */
 	public void testCheckForDoi(){
-		assertEquals(true, Util.checkForDOI("http://doi.acm.org/10.1145/1294928.1294933"));
-		assertEquals(true, Util.checkForDOI("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));	
-		assertEquals(true, Util.checkForDOI("http://dx.doi.org/10.1000/182"));	
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://doi.acm.org/10.1145/1294928.1294933"));
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));	
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.doi.org/10.1000/182"));	
 		
-		assertEquals(false, Util.checkForDOI("http://www.xyz.com"));	
-		assertEquals(false, Util.checkForDOI("http://dx.doing.org/fjdlfdsjfdlfdj.htm"));	
-		assertEquals(false, Util.checkForDOI("thfjtfjglkjjlkkölm5476576658796"));	
+		assertEquals(false, Util.checkForDOIwithHTTPprefix("http://www.xyz.com"));	
+		assertEquals(false, Util.checkForDOIwithHTTPprefix("http://dx.doing.org/fjdlfdsjfdlfdj.htm"));	
+		assertEquals(false, Util.checkForDOIwithHTTPprefix("thfjtfjglkjjlkkölm5476576658796"));	
 
-		assertEquals(false, Util.checkForDOI("http://doii.acm.org/10.1145/1294928.1294933"));
-		assertEquals(false, Util.checkForDOI("http://dx.ddoi.org/10.1007/978-3-642-15618-2_19"));	
-		assertEquals(false, Util.checkForDOI("http://dx.eoi.org/10.1000/182"));	
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://doii.acm.org/10.1145/1294928.1294933"));
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.ddoi.org/10.1007/978-3-642-15618-2_19"));	
+		assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.eoi.org/10.1000/182"));	
 	}
 	
     /**
      * Tests Util.parseDOI(...) for right functionality 
      */
 	public void testParseDoi(){
-		assertEquals("10.1145/1294928.1294933", Util.parseDOI("http://doi.acm.org/10.1145/1294928.1294933"));
-		assertEquals("10.1145/1294928.1294933", Util.parseDOI("http://doi.acm.net/10.1145/1294928.1294933"));
-		assertEquals("10.1145/1294928.1294933", Util.parseDOI("http://doi.acm.com/10.1145/1294928.1294933"));
-		assertEquals("10.1145/1294928.1294933", Util.parseDOI("http://doi.acm.de/10.1145/1294928.1294933"));
+		assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.org/10.1145/1294928.1294933"));
+		assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.net/10.1145/1294928.1294933"));
+		assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.com/10.1145/1294928.1294933"));
+		assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.de/10.1145/1294928.1294933"));
 		
-		assertEquals("10.1007/978-3-642-15618-2_19", Util.parseDOI("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));
-		assertEquals("10.1007/978-3-642-15618-2_19", Util.parseDOI("http://dx.doi.net/10.1007/978-3-642-15618-2_19"));
-		assertEquals("10.1007/978-3-642-15618-2_19", Util.parseDOI("http://dx.doi.com/10.1007/978-3-642-15618-2_19"));
-		assertEquals("10.1007/978-3-642-15618-2_19", Util.parseDOI("http://dx.doi.de/10.1007/978-3-642-15618-2_19"));
+		assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));
+		assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.net/10.1007/978-3-642-15618-2_19"));
+		assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.com/10.1007/978-3-642-15618-2_19"));
+		assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.de/10.1007/978-3-642-15618-2_19"));
 
-		assertEquals("10.1000/182", Util.parseDOI("http://dx.doi.org/10.1000/182"));
-		
+		assertEquals("10.1000/182", Util.getDOI("http://dx.doi.org/10.1000/182"));
+
+		assertEquals("10.4108/ICST.COLLABORATECOM2009.8275", Util.getDOI("http://dx.doi.org/10.4108/ICST.COLLABORATECOM2009.8275"));
 	}
 }

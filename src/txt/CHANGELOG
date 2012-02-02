@@ -1,4 +1,5 @@
-
+    - Added functionality "clean up entries" by Florian Straﬂer and Marius Kleiner.
+      Currently, move of DOIs from ee, note, and url field is supported.
 2.8 beta
     - Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
       additional minor fix.

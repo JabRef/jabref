@@ -61,9 +61,7 @@ public class JabRefPreferences {
         EMACS_PATH = "emacsPath",
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
-        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
-        CLEAR_NOTE_URL_IF_DOI_EXISTS = "clearNoteURLifDOIexists";
-    
+        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -426,12 +424,8 @@ public class JabRefPreferences {
         defaults.put("selectedFetcherIndex", 0);
         defaults.put("bibLocationAsFileDir", Boolean.TRUE);
         defaults.put("bibLocAsPrimaryDir", Boolean.FALSE);
-        defaults.put("AskAutoNamingPDFsAgain", Boolean.TRUE);
-        
         //defaults.put("lastAutodetectedImport", "");
         
-        defaults.put("clearNoteURLifDOIexists", Boolean.FALSE);
-
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
         //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
         

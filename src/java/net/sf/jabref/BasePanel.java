@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -100,6 +100,7 @@ import net.sf.jabref.sql.SQLutil;
 import net.sf.jabref.undo.CountingUndoManager;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableChangeType;
+import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -905,7 +906,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         return ;
                     }
             frame.block();
-            output(Globals.lang("Do a Cleanup for")+" "+	
+            output(Globals.lang("Do a cleanup for")+" "+	
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
                                             : Globals.lang("entry"))+"...");
         }
@@ -919,36 +920,51 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Remove the http://... for each DOI
                     for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
                         bes = i.next();
+                        
+                        // fields to check
+                    	String[] fields = {"note", "url", "ee"};
+
                         // First check if the DOI Field is empty
                         if (bes.getField("doi") != null) {
-                            // Replace http://... 
-                            bes.setField("doi", Util.parseDOI(bes.getField("doi")));
-                        
+                        	String doiFieldValue = bes.getField("doi");
+                        	if (Util.checkForDOIwithHTTPprefix(bes.getField(doiFieldValue))) {
+                        		String newValue = Util.getDOI(doiFieldValue);
+                        		ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
+                        		bes.setField("doi", newValue);
+                        	};
+                        	if (Util.checkForPlainDOI(doiFieldValue)) {
+                        		// DOI field seems to contain DOI
+                        		// cleanup note, url, ee field
+                        		// we do NOT copy values to the DOI field as the DOI field contains a DOI!
+                            	for (String field: fields) {
+                            		if (Util.checkForPlainDOI(bes.getField(field))){
+                            			Util.removeDOIfromBibtexEntryField(bes, field, ce);
+                            		}
+                            	}
+                        	}
                         } else {
-                        	// As the DOI field is empty we now check if Notes or URL contains a DOI
-                        	if (bes.getField("note") != null) {
-                        		if (Util.checkForDOI(bes.getField("note"))){
-                            		bes.setField("doi", Util.parseDOI(bes.getField("note")));
-									// Clear Note and URL if DOI has been changed and Preferences has been set
-									if (Globals.prefs.getBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS)){
-										bes.clearField("note");
-									}
-                            	} 
-                        	}
-                        	if (bes.getField("url") != null) {
-                        		if (Util.checkForDOI(bes.getField("url"))) {
-                        			bes.setField("doi", Util.parseDOI(bes.getField("url")));
-									// Clear Note and URL if DOI has been changed and Preferences has been set
-									if (Globals.prefs.getBoolean(JabRefPreferences.CLEAR_NOTE_URL_IF_DOI_EXISTS)){
-										bes.clearField("url");
-									}
+                        	// As the DOI field is empty we now check if note, url, or ee field contains a DOI
+                        	
+                        	for (String field: fields) {
+                        		if (Util.checkForPlainDOI(bes.getField(field))){
+                        			// update DOI
+                                	String oldValue = bes.getField("doi");
+                                	String newValue = Util.getDOI(bes.getField(field));                                	
+                        			ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
+                        			bes.setField("doi", newValue);
+                        			
+                        			Util.removeDOIfromBibtexEntryField(bes, field, ce);
                         		}
-                        	}
+                            } 
                         }
                     }
                     
                     ce.end();
-                    undoManager.addEdit(ce);
+                    if (ce.hasEdits()) {
+                    	updateEntryEditorIfShowing();
+                    	undoManager.addEdit(ce);
+                    	System.out.println(undoManager.toString());
+                    }
         }
 
         // Run third, on EDT:
@@ -961,7 +977,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             markBaseChanged() ;
             numSelected = entries.size();
 
-            output(Globals.lang("Did a Cleanup for")+" "+
+            output(Globals.lang("Did a cleanup for")+" "+
                numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
                                     : Globals.lang("entry")));
             frame.unblock();
