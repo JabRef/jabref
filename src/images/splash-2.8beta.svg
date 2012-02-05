@@ -13,7 +13,7 @@
    inkscape:export-ydpi="90.000000"
    inkscape:export-xdpi="90.000000"
    inkscape:export-filename="/home/alver/jabref_head/jabref/src/images/jabref_splash-2.2.png"
-   sodipodi:docname="splash-2.7beta.svg"
+   sodipodi:docname="splash-2.8beta.svg"
    inkscape:version="0.48.1 r9760"
    sodipodi:version="0.32"
    id="svg2138"
@@ -78,18 +78,18 @@
        width="572.00000"
        patternUnits="userSpaceOnUse">
       <image
-         sodipodi:absref="/home/alver/jabref-head/src/images/behandlet.png"
+         sodipodi:absref="/home/alver/jabref/jabref/src/images/behandlet.png"
          xlink:href="behandlet.png"
-         transform="translate(-231.0000,-284.3622)"
-         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
-         inkscape:export-ydpi="90.000000"
-         inkscape:export-xdpi="90.000000"
-         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
-         y="284.36218"
-         x="231.00000"
-         width="572.00000"
+         id="image9050"
          height="428.00000"
-         id="image9050" />
+         width="572.00000"
+         x="231.00000"
+         y="284.36218"
+         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
+         inkscape:export-xdpi="90.000000"
+         inkscape:export-ydpi="90.000000"
+         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
+         transform="translate(-231.0000,-284.3622)" />
     </pattern>
     <radialGradient
        inkscape:collect="always"
@@ -135,9 +135,9 @@
        r="135.88549" />
   </defs>
   <sodipodi:namedview
-     inkscape:window-y="-3"
-     inkscape:window-x="-3"
-     inkscape:window-height="721"
+     inkscape:window-y="30"
+     inkscape:window-x="0"
+     inkscape:window-height="705"
      inkscape:window-width="1366"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
@@ -160,7 +160,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -179,16 +179,16 @@
        id="rect6833"
        style="opacity:1.0000000;fill:#6b6b75;fill-opacity:1.0000000;stroke:none;stroke-width:5.0000000;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000" />
     <image
-       sodipodi:absref="/home/alver/jabref-head/src/images/splashBackground.png"
+       sodipodi:absref="/home/alver/jabref/jabref/src/images/splashBackground.png"
        xlink:href="splashBackground.png"
-       id="image1821"
-       height="428"
-       width="572"
-       x="79"
-       y="172.36218"
-       inkscape:export-filename="/home/alver/jabref/src/images/splash.png"
+       inkscape:export-ydpi="75"
        inkscape:export-xdpi="75"
-       inkscape:export-ydpi="75" />
+       inkscape:export-filename="/home/alver/jabref/src/images/splash.png"
+       y="172.36218"
+       x="79"
+       width="572"
+       height="428"
+       id="image1821" />
     <flowRoot
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
@@ -228,7 +228,7 @@
    id="rect3080" />
       </flowRegion><flowPara
          id="flowPara1339">This program is distributed under the terms of the General Public License.</flowPara><flowPara
-         id="flowPara1341">Copyright (2003-2011) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
+         id="flowPara1341">Copyright (2003-2012) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
        inkscape:export-filename="/home/alver/jabref/src/images/splash.png"
