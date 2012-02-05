@@ -22,6 +22,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -34,10 +36,22 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     	autoCompFirstNameMode_Full, autoCompFirstNameMode_Abbr, autoCompFirstNameMode_Both;
     boolean oldAutoCompFF, oldAutoCompLF,
     	oldAutoCompFModeAbbr, oldAutoCompFModeFull;
+    private JSpinner shortestToComplete;
 
     private JTextField autoCompFields;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
+    
+    private void setAutoCompleteElementsEnabled(boolean enabled) {
+        autoCompFields.setEnabled(enabled);
+        autoCompLF.setEnabled(enabled);
+        autoCompFF.setEnabled(enabled);
+        autoCompBoth.setEnabled(enabled);
+        autoCompFirstNameMode_Abbr.setEnabled(enabled);
+        autoCompFirstNameMode_Full.setEnabled(enabled);
+        autoCompFirstNameMode_Both.setEnabled(enabled);
+        shortestToComplete.setEnabled(enabled);
+    }
 
     public EntryEditorPrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
@@ -51,6 +65,8 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         editSource = new JCheckBox(Globals.lang("Enable source editing"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
+        
+        shortestToComplete = new JSpinner(new SpinnerNumberModel(prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE), 1, 5, 1));
         
         // allowed name formats
         autoCompFF = new JRadioButton(Globals.lang("Autocomplete names in 'Firstname Lastname' format only"));
@@ -86,14 +102,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // autoCompFields text field:
         autoComplete.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-            	boolean enabled = autoComplete.isSelected();
-                autoCompFields.setEnabled(enabled);
-                autoCompLF.setEnabled(enabled);
-                autoCompFF.setEnabled(enabled);
-                autoCompBoth.setEnabled(enabled);
-                autoCompFirstNameMode_Abbr.setEnabled(enabled);
-                autoCompFirstNameMode_Full.setEnabled(enabled);
-                autoCompFirstNameMode_Both.setEnabled(enabled);
+            	setAutoCompleteElementsEnabled(autoComplete.isSelected());
             }
         }
         );
@@ -116,13 +125,16 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         
         builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 11, 5));
         builder.add(autoComplete, cc.xy(2, 13));
+        
+        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields")+":");
-        DefaultFormBuilder builder3 = new DefaultFormBuilder
-                (new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         builder3.append(label);
         builder3.append(autoCompFields);
+        JLabel label2 = new JLabel(Globals.lang("Autocomplete after following number of characters")+":");
+        builder3.append(label2);
+        builder3.append(shortestToComplete);
         builder.add(builder3.getPanel(), cc.xyw(2, 15, 3));
-        
+
         builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 17, 4));
         builder.add(autoCompFF, cc.xy(2,18));
         builder.add(autoCompLF, cc.xy(2,19));
@@ -146,12 +158,8 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
         autoComplete.setSelected(_prefs.getBoolean("autoComplete"));
         autoCompFields.setText(_prefs.get("autoCompleteFields"));
-        // Two choices only make sense when the source panel is visible:
-        defSource.setEnabled(showSource.isSelected());
-        editSource.setEnabled(showSource.isSelected());
-        // Autocomplete fields is only enabled when autocompletion is:
-        autoCompFields.setEnabled(autoComplete.isSelected());
-
+        shortestToComplete.setValue(_prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE));
+        
         if (_prefs.getBoolean("autoCompFF"))
             autoCompFF.setSelected(true);
         else if (_prefs.getBoolean("autoCompLF"))
@@ -170,6 +178,12 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // one field less than the option is enough. If one filed changes, another one also changes.
         oldAutoCompFModeAbbr = autoCompFirstNameMode_Abbr.isSelected();
         oldAutoCompFModeFull = autoCompFirstNameMode_Full.isSelected();
+
+        // Two choices only make sense when the source panel is visible:
+        defSource.setEnabled(showSource.isSelected());
+        editSource.setEnabled(showSource.isSelected());
+        // Autocomplete fields is only enabled when autocompletion is:
+        setAutoCompleteElementsEnabled(autoComplete.isSelected());
     }
 
     public void storeSettings() {
@@ -181,6 +195,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         boolean oldAutoComplete = _prefs.getBoolean("autoComplete");
         boolean oldShowSource = _prefs.getBoolean("showSource");
         String oldAutoCompFields = _prefs.get("autoCompleteFields");
+        _prefs.putInt(JabRefPreferences.SHORTEST_TO_COMPLETE, (Integer)shortestToComplete.getValue());
         _prefs.putBoolean("autoComplete", autoComplete.isSelected());
         _prefs.put("autoCompleteFields", autoCompFields.getText());
         _prefs.putBoolean("showSource", showSource.isSelected());
@@ -215,7 +230,8 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 	            bp.entryEditors.clear();
             }
         }
-
+        // the autocompleter has to be updated to the new min length to complete 
+        AbstractAutoCompleter.SHORTEST_TO_COMPLETE = (Integer)shortestToComplete.getValue();
     }
 
     public boolean readyToClose() {

@@ -24,6 +24,8 @@ import java.util.TreeSet;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * An autocompleter delivers possible completions for a given String. There are
@@ -36,7 +38,7 @@ import net.sf.jabref.BibtexEntry;
  */
 public abstract class AbstractAutoCompleter {
 
-	public static final int SHORTEST_TO_COMPLETE = 2;
+	public static int SHORTEST_TO_COMPLETE = Globals.prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE);
 	public static final int SHORTEST_WORD = 4;
 
 	// stores the strings as is

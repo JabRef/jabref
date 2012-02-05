@@ -1,6 +1,8 @@
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
       autocompletion does not show these braces
+    - Autocompletion: the amount of characters to trigger autocompletion may now be configured
+      (default is 2)
     - Autocompletion: in case lower case letters are used, the search is case-insenstive,
       otherwise the search is case sensitive.
     - Autocompletion: new preference to choose how to deal with first names 

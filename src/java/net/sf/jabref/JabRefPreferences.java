@@ -63,6 +63,7 @@ public class JabRefPreferences {
         EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
         
+        SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
         // here are the possible values for _MODE:
         AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both",
@@ -245,6 +246,7 @@ public class JabRefPreferences {
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(SHORTEST_TO_COMPLETE, new Integer(2));
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
