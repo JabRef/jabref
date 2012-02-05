@@ -18,6 +18,7 @@ public class AllTests {
 		//$JUnit-END$
 
 		suite.addTest(tests.net.sf.jabref.export.layout.format.AllTests.suite());
+		suite.addTest(tests.net.sf.jabref.gui.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.imports.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.search.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.util.AllTests.suite());

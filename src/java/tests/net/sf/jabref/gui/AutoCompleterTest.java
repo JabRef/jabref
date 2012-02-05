@@ -34,6 +34,7 @@ public class AutoCompleterTest extends TestCase {
 	public static final String PATH_TO_TEST_BIBTEX = "src/tests/net/sf/jabref/bibtexFiles/test.bib";
 
 	public void testAutoCompleterFactory() {
+		Globals.prefs = JabRefPreferences.getInstance();
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AUTHOR_FIELD);
 		assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
 
@@ -83,10 +84,22 @@ public class AutoCompleterTest extends TestCase {
 	}
 
 	public void testNameFieldCompleter() {
+		Globals.prefs = JabRefPreferences.getInstance();
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AUTHOR_FIELD);
 		for (BibtexEntry entry : getDatabse().getEntries()) {
 			autoCompleter.addBibtexEntry(entry);
 		}
+		
+		// tweak preferences to match test cases
+		boolean oldAutocomplete = Globals.prefs.getBoolean("autoComplete");
+		Globals.prefs.putBoolean("autoComplete", Boolean.TRUE);
+		boolean oldAutoCompFF = Globals.prefs.getBoolean("autoCompLF");
+		Globals.prefs.putBoolean("autoCompFF", Boolean.FALSE);
+		boolean oldAutoCompLF = Globals.prefs.getBoolean("autoCompLF");
+		Globals.prefs.putBoolean("autoCompLF", Boolean.FALSE);
+		String oldACFM = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE);
+		Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+		
 		assertEquals("Kostakos, V.", autoCompleter.complete("Kostakos")[0]);
 		assertEquals(2, autoCompleter.complete("Kostakos").length);
 		assertEquals("Kostakos, V.", autoCompleter.complete("Kosta")[0]);
@@ -119,6 +132,12 @@ public class AutoCompleterTest extends TestCase {
 		assertEquals(1, autoCompleter.complete("Jr.").length);
 		assertEquals("Sherry, John F., J.", autoCompleter.complete("Sherry")[0]);
 		assertEquals(2, autoCompleter.complete("Sherry").length);
+		
+		// restore settings
+		Globals.prefs.putBoolean("autoComplete", oldAutocomplete);
+		Globals.prefs.putBoolean("autoCompFF", oldAutoCompFF);
+		Globals.prefs.putBoolean("autoCompLF", oldAutoCompLF);
+		Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, oldACFM);
 	}
 
 	public void testEntryEditorForNameFieldAutoCompleter() {
