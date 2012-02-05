@@ -30,8 +30,10 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, showSource,
         defSource, editSource, disableOnMultiple, autoComplete;
-    private JRadioButton autoCompBoth, autoCompFF, autoCompLF;
-    boolean oldAutoCompFF, oldAutoCompLF;
+    private JRadioButton autoCompBoth, autoCompFF, autoCompLF, 
+    	autoCompFirstNameMode_Full, autoCompFirstNameMode_Abbr, autoCompFirstNameMode_Both;
+    boolean oldAutoCompFF, oldAutoCompLF,
+    	oldAutoCompFModeAbbr, oldAutoCompFModeFull;
 
     private JTextField autoCompFields;
     JabRefPreferences _prefs;
@@ -49,6 +51,8 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         editSource = new JCheckBox(Globals.lang("Enable source editing"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
+        
+        // allowed name formats
         autoCompFF = new JRadioButton(Globals.lang("Autocomplete names in 'Firstname Lastname' format only"));
         autoCompLF = new JRadioButton(Globals.lang("Autocomplete names in 'Lastname, Firstname' format only"));
         autoCompBoth = new JRadioButton(Globals.lang("Autocomplete names in both formats"));
@@ -56,6 +60,16 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         bg.add(autoCompLF);
         bg.add(autoCompFF);
         bg.add(autoCompBoth);
+        
+        // treatment of first name
+        autoCompFirstNameMode_Full = new JRadioButton(Globals.lang("Use full firstname whenever possible"));
+        autoCompFirstNameMode_Abbr = new JRadioButton(Globals.lang("Use abbreviated firstname whenever possible"));
+        autoCompFirstNameMode_Both = new JRadioButton(Globals.lang("Use abbreviated and full firstname"));
+        ButtonGroup bg_firstNameMode = new ButtonGroup();
+        bg_firstNameMode.add(autoCompFirstNameMode_Full);
+        bg_firstNameMode.add(autoCompFirstNameMode_Abbr);
+        bg_firstNameMode.add(autoCompFirstNameMode_Both);
+        
         autoCompFields = new JTextField(40);
         Insets marg = new Insets(0,12,3,0);
         editSource.setMargin(marg);
@@ -72,36 +86,56 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // autoCompFields text field:
         autoComplete.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                autoCompFields.setEnabled(autoComplete.isSelected());
+            	boolean enabled = autoComplete.isSelected();
+                autoCompFields.setEnabled(enabled);
+                autoCompLF.setEnabled(enabled);
+                autoCompFF.setEnabled(enabled);
+                autoCompBoth.setEnabled(enabled);
+                autoCompFirstNameMode_Abbr.setEnabled(enabled);
+                autoCompFirstNameMode_Full.setEnabled(enabled);
+                autoCompFirstNameMode_Both.setEnabled(enabled);
             }
         }
         );
 
         FormLayout layout = new FormLayout
                 ("8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
-                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
+                 // rows  1 to 10
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
+                 // rows 11 to 20
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, pref, pref, pref, " +
+                 // rows 21 to 26
+                 "6dlu, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
-        builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1,1, 5));
+        builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1, 1, 5));
         builder.add(autoOpenForm, cc.xy(2, 3));
         builder.add(disableOnMultiple, cc.xy(2, 5));
         builder.add(showSource, cc.xy(2, 7));
         builder.add(defSource, cc.xy(2, 9));
-        builder.add(autoComplete, cc.xy(2, 11));
+        
+        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 11, 5));
+        builder.add(autoComplete, cc.xy(2, 13));
         JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields")+":");
         DefaultFormBuilder builder3 = new DefaultFormBuilder
                 (new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         builder3.append(label);
         builder3.append(autoCompFields);
-        builder.add(builder3.getPanel(), cc.xyw(2, 13, 3));
-        builder.add(autoCompFF, cc.xy(2,15));
-        builder.add(autoCompLF, cc.xy(2,17));
-        builder.add(autoCompBoth, cc.xy(2,19));
+        builder.add(builder3.getPanel(), cc.xyw(2, 15, 3));
+        
+        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 17, 4));
+        builder.add(autoCompFF, cc.xy(2,18));
+        builder.add(autoCompLF, cc.xy(2,19));
+        builder.add(autoCompBoth, cc.xy(2,20));
+        
+        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 22, 4));
+        builder.add(autoCompFirstNameMode_Abbr, cc.xy(2,23));
+        builder.add(autoCompFirstNameMode_Full, cc.xy(2,24));
+        builder.add(autoCompFirstNameMode_Both, cc.xy(2,25));
+        
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
-
     }
 
     public void setValues() {
@@ -117,6 +151,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         editSource.setEnabled(showSource.isSelected());
         // Autocomplete fields is only enabled when autocompletion is:
         autoCompFields.setEnabled(autoComplete.isSelected());
+
         if (_prefs.getBoolean("autoCompFF"))
             autoCompFF.setSelected(true);
         else if (_prefs.getBoolean("autoCompLF"))
@@ -125,6 +160,16 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             autoCompBoth.setSelected(true);
         oldAutoCompFF = autoCompFF.isSelected();
         oldAutoCompLF = autoCompLF.isSelected();
+
+        if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR))
+        	autoCompFirstNameMode_Abbr.setSelected(true);
+        else if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL))
+        	autoCompFirstNameMode_Full.setSelected(true);
+        else
+        	autoCompFirstNameMode_Both.setSelected(true);
+        // one field less than the option is enough. If one filed changes, another one also changes.
+        oldAutoCompFModeAbbr = autoCompFirstNameMode_Abbr.isSelected();
+        oldAutoCompFModeFull = autoCompFirstNameMode_Full.isSelected();
     }
 
     public void storeSettings() {
@@ -151,11 +196,20 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             _prefs.putBoolean("autoCompFF", false);
             _prefs.putBoolean("autoCompLF", true);
         }
+        if (autoCompFirstNameMode_Abbr.isSelected())
+        	_prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
+        else if (autoCompFirstNameMode_Full.isSelected())
+        	_prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
+        else
+        	_prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
         if ((oldShowSource != showSource.isSelected()) || (oldAutoComplete != autoComplete.isSelected())
                 || (!oldAutoCompFields.equals(autoCompFields.getText())) ||
-                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected())) {
+                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
+                (oldAutoCompFModeAbbr != autoCompFirstNameMode_Abbr.isSelected()) ||
+                (oldAutoCompFModeFull != autoCompFirstNameMode_Full.isSelected())) {
             for (int j=0; j<_frame.getTabbedPane().getTabCount(); j++) {
 	            BasePanel bp = (BasePanel)_frame.getTabbedPane().getComponentAt(j);
 	            bp.entryEditors.clear();

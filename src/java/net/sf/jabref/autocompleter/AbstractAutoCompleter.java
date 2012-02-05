@@ -62,7 +62,7 @@ public abstract class AbstractAutoCompleter {
 		return subset.toArray(new String[0]);
 	}
 
-	/*
+	/**
 	 * Increments the last character of a string.
 	 * 
 	 * Example: incrementLastCharacter("abc") returns "abd".

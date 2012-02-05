@@ -61,7 +61,13 @@ public class JabRefPreferences {
         EMACS_PATH = "emacsPath",
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
-        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
+        EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
+        
+        AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
+        // here are the possible values for _MODE:
+        AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both",
+        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly",
+        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -179,12 +185,12 @@ public class JabRefPreferences {
         defaults.put("previewPanelHeight", 200);
         defaults.put("entryEditorHeight", 400);
         defaults.put("tableColorCodesOn", Boolean.TRUE);
-        defaults.put("namesAsIs", Boolean.FALSE);
-        defaults.put("namesFf", Boolean.FALSE);
-        defaults.put("namesLf", Boolean.FALSE);
-        defaults.put("namesNatbib", Boolean.TRUE);
-        defaults.put("abbrAuthorNames", Boolean.TRUE);
-        defaults.put("namesLastOnly", Boolean.TRUE);
+        defaults.put("namesAsIs", Boolean.FALSE); // "Show names unchanged"
+        defaults.put("namesFf", Boolean.FALSE); // "Show 'Firstname Lastname'"
+        defaults.put("namesLf", Boolean.FALSE); // "Show 'Lastname, Firstname'"
+        defaults.put("namesNatbib", Boolean.TRUE);  // "Natbib style"
+        defaults.put("abbrAuthorNames", Boolean.TRUE); // "Abbreviate names"
+        defaults.put("namesLastOnly", Boolean.TRUE); // "Show last names only"
         defaults.put("language", "en");
         defaults.put("showShort", Boolean.TRUE);
         defaults.put("priSort", "author");
@@ -237,8 +243,9 @@ public class JabRefPreferences {
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
-        defaults.put("autoCompFF", Boolean.FALSE);
-        defaults.put("autoCompLF", Boolean.FALSE);
+        defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
+        defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,9 +18,10 @@ package net.sf.jabref.autocompleter;
 import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
- * Interpretes the given values as names and stores them in different
+ * Interprets the given values as names and stores them in different
  * permutations so we can complete by beginning with last name or first name.
  * 
  * @author kahlert, cordes
@@ -84,12 +85,26 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
                             addWordToIndex(author.getLastOnly());
                         } else {
                             if (autoCompLF) {
-                                addWordToIndex(author.getLastFirst(true));
-                                addWordToIndex(author.getLastFirst(false));
+                            	if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
+                            		addWordToIndex(author.getLastFirst(true));
+                            	} else if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
+                            		addWordToIndex(author.getLastFirst(false));
+                            	} else {
+                            		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                            		addWordToIndex(author.getLastFirst(true));
+                            		addWordToIndex(author.getLastFirst(false));
+                            	}
                             }
                             if (autoCompFF) {
-                                addWordToIndex(author.getFirstLast(true));
-                                addWordToIndex(author.getFirstLast(false));
+                            	if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
+                            		addWordToIndex(author.getFirstLast(true));
+                            	} else if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
+                            		addWordToIndex(author.getFirstLast(false));
+                            	} else {
+                            		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                                    addWordToIndex(author.getFirstLast(true));
+                                    addWordToIndex(author.getFirstLast(false));
+                            	}
                             }
                         }
                     }
