@@ -1023,11 +1023,99 @@ public class AuthorList {
 		 *            several tokens, like "Jr. III" in "Smith, Jr. III, John")
 		 */
 		public Author(String first, String firstabbr, String von, String last, String jr) {
-			first_part = first;
-			first_abbr = firstabbr;
-			von_part = von;
-			last_part = last;
-			jr_part = jr;
+			first_part = removeStartAndEndBraces(first);
+			first_abbr = removeStartAndEndBraces(firstabbr);
+			von_part = removeStartAndEndBraces(von);
+			last_part = removeStartAndEndBraces(last);
+			jr_part = removeStartAndEndBraces(jr);
+		}
+		
+		/**
+		 * 
+		 * @return true if the brackets in s are properly paired
+		 */
+		private boolean properBrackets(String s) {
+			// nested construct is there, check for "proper" nesting
+			int i = 1;
+			int level = 0;
+			loop: do {
+				char c = s.charAt(i);
+				switch (c) {
+				case '{':
+					level++;
+					break;
+				case '}':
+					level--;
+					if (level==-1) {
+						// the improper nesting
+						break loop;
+					}
+					break;
+				}
+				i++;
+			} while (i<s.length()-1);
+			return (level == 0);
+		}
+		
+		/**
+		 * Removes start and end brace at a string
+		 * 
+		 * E.g., 
+		 *   * {Vall{\'e}e Poussin} -> Vall{\'e}e Poussin
+		 *   * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
+		 *   * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
+		 */
+		private String removeStartAndEndBraces(String name) {
+			if (name == null)
+				return null;
+			if (!name.contains("{"))
+				return name;
+			
+			String[] split = name.split(" ");
+			StringBuilder b = new StringBuilder();
+			for (String s: split) {
+				if (s.length()>2) {
+					if (s.startsWith("{") && s.endsWith("}")) {
+						// quick solution (which we don't do: just remove first "{" and last "}"
+						// however, it might be that s is like {A}bbb{c}, where braces may not be removed
+						
+						// inner 
+						String inner = s.substring(1, s.length()-1);
+						
+						if (inner.contains("}")) {
+							if (properBrackets(inner)) {
+								s = inner;
+							} else {
+								// no proper brackets if inner string: s is left untouched
+							}
+						} else {
+							//  no inner curly brackets found, no check needed, inner can just be used as s
+							s = inner;
+						}
+					}
+				}
+				b.append(s);
+				b.append(" ");
+			}
+			// delete last
+			b.deleteCharAt(b.length()-1);
+			
+			// now, all inner words are cleared
+			// case {word word word} remains
+			// as above, we have to be aware of {w}ord word wor{d} and {{w}ord word word}
+			
+			name = b.toString();
+			
+			if (name.startsWith("{") && name.endsWith("}")) {
+				String inner = name.substring(1, name.length()-1);
+				if (properBrackets(inner)) {
+					return inner;
+				} else {
+					return name;
+				}
+			} else {
+				return name;
+			}
 		}
 
 		/**

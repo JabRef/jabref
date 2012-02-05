@@ -543,5 +543,14 @@ public class AuthorListTest extends TestCase {
 			.getAuthorList("John von Neumann and John Smith and de Black Brown, Jr., Peter")
 			.getAuthorsForAlphabetization());
 	}
+	
+	public void testRemoveStartAndEndBraces() {
+		assertEquals("{A}bbb{c}", AuthorList.getAuthorList("{A}bbb{c}").getAuthorsLastOnly(false));
+		assertEquals("Vall{\\'e}e Poussin", AuthorList.getAuthorList("{Vall{\\'e}e Poussin}").getAuthorsLastOnly(false));
+		assertEquals("Poussin", AuthorList.getAuthorList("{Vall{\\'e}e} {Poussin}").getAuthorsLastOnly(false));
+		assertEquals("Poussin", AuthorList.getAuthorList("Vall{\\'e}e Poussin").getAuthorsLastOnly(false));
+		assertEquals("Lastname", AuthorList.getAuthorList("Firstname {Lastname}").getAuthorsLastOnly(false));
+		assertEquals("Firstname Lastname", AuthorList.getAuthorList("{Firstname Lastname}").getAuthorsLastOnly(false));
+	}
 
 }
