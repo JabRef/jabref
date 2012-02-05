@@ -33,7 +33,6 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
     private boolean lastNameOnly;
     private String prefix = "";
     private boolean autoCompFF, autoCompLF;
-    private boolean caseSensitive = true;
 
 	/**
 	 * @see AutoCompleterFactory
@@ -41,10 +40,6 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
     protected NameFieldAutoCompleter(String fieldName) {
         this(new String[] {fieldName}, false);
 
-    }
-
-    public void setCaseSensitive(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
     }
 
 	public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnly) {
@@ -114,8 +109,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 	}
 
 	public String[] complete(String str) {
-        str = str.toLowerCase();
-        int index = str.lastIndexOf(" and ");
+        int index = str.toLowerCase().lastIndexOf(" and ");
         if (index >= 0) {
             prefix = str.substring(0, index+5);
             str = str.substring(index+5);
@@ -135,8 +129,4 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return prefix;
     }
 
-    @Override
-    public void addWordToIndex(String word) {
-        super.addWordToIndex(word.toLowerCase());
-    }
 }

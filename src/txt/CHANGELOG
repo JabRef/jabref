@@ -1,3 +1,5 @@
+    - Autocompletion: in case lower case letters are used, the search is case-insenstive,
+      otherwise the search is case sensitive.
     - Autocompletion: new preference to choose how to deal with first names 
       (always full/always abbreviated/both full and abbreviated)
     - Added functionality "clean up entries" by Florian Straﬂer and Marius Kleiner.

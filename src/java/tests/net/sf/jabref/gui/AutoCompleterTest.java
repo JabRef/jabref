@@ -50,7 +50,8 @@ public class AutoCompleterTest extends TestCase {
 		assertEquals("authentication", autoCompleter.complete("authentication")[0]);
 		assertEquals(1, autoCompleter.complete("authentication").length);
 		assertEquals("authentication", autoCompleter.complete("aut")[0]);
-		assertEquals(1, autoCompleter.complete("aut").length);
+		assertEquals(2, autoCompleter.complete("aut").length); // 1 for case-sensitive search, 2 for case insensitive search (Authornames also included)
+		assertEquals(1, autoCompleter.complete("Aut").length); // "Aut" triggers case-sensitive search, now only "Authornames" is returned 
 		assertEquals("context", autoCompleter.complete("con")[0]);
 		assertEquals(1, autoCompleter.complete("con").length);
 		assertEquals(0, autoCompleter.complete("osta").length);

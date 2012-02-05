@@ -45,11 +45,9 @@ public class CrossrefAutoCompleter extends AbstractAutoCompleter {
 	@Override
 	public void addBibtexEntry(BibtexEntry entry) {
 		if (entry != null) {
-			if (entry != null) {
-				String key = entry.getCiteKey();
-				if (key != null)
-					addWordToIndex(key.trim());
-			}
+			String key = entry.getCiteKey();
+			if (key != null)
+				addWordToIndex(key.trim());
 		}
 	}
 }
