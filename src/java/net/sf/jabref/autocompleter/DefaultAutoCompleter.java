@@ -52,7 +52,7 @@ public class DefaultAutoCompleter extends AbstractAutoCompleter {
 			if (fieldValue == null) {
 				return;
 			} else {
-				StringTokenizer tok = new StringTokenizer(fieldValue.toString(), " .,\n");
+				StringTokenizer tok = new StringTokenizer(fieldValue.toString(), " ;.,\n");
 				while (tok.hasMoreTokens()) {
 					String word = tok.nextToken();
 					addWordToIndex(word);
