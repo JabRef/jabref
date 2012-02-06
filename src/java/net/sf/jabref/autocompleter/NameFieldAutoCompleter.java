@@ -32,7 +32,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 	private String[] fieldNames;
     private boolean lastNameOnly;
     private String prefix = "";
-    private boolean autoCompFF, autoCompLF;
+    private boolean autoCompFF, autoCompLF, autoCompFullFirstOnly, autoCompShortFirstOnly;
 
 	/**
 	 * @see AutoCompleterFactory
@@ -57,15 +57,12 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
             autoCompFF = true;
             autoCompLF = true;
         }
-
+        autoCompShortFirstOnly = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
+        autoCompFullFirstOnly = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
 	}
 
 	public boolean isSingleUnitField() {
 		return true;
-	}
-
-	public void addBibtexEntry(String fieldValue, BibtexEntry entry) {
-		addBibtexEntry(entry);
 	}
 
 	public void addBibtexEntry(BibtexEntry entry) {
@@ -80,9 +77,9 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
                             addWordToIndex(author.getLastOnly());
                         } else {
                             if (autoCompLF) {
-                            	if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
+                            	if (autoCompShortFirstOnly) {
                             		addWordToIndex(author.getLastFirst(true));
-                            	} else if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
+                            	} else if (autoCompFullFirstOnly) {
                             		addWordToIndex(author.getLastFirst(false));
                             	} else {
                             		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
@@ -91,9 +88,9 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
                             	}
                             }
                             if (autoCompFF) {
-                            	if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
+                            	if (autoCompShortFirstOnly) {
                             		addWordToIndex(author.getFirstLast(true));
-                            	} else if (Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
+                            	} else if (autoCompFullFirstOnly) {
                             		addWordToIndex(author.getFirstLast(false));
                             	} else {
                             		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
