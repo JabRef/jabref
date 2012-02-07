@@ -439,7 +439,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             _prefs.putInt("numberColWidth", ncWidth);
             for (i=0; i<tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);
-                names[i] = tr.name;
+                names[i] = tr.name.toLowerCase();
                 nWidths[i] = tr.length;
                 widths[i] = ""+tr.length;
                 //Util.pr(names[i]+"   "+widths[i]);

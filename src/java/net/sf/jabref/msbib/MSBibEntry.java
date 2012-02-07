@@ -60,6 +60,8 @@ import org.w3c.dom.NodeList;
  * 				  except LCID which must be an integer.
  * 				  To avoid exception during integer parsing
  *				  the exception is caught and LCID is set to zero.
+ * Jan 06, 2012 - Changed the XML element ConferenceName to present
+ * 				  the Booktitle instead of the organization field content
  */
 public class MSBibEntry {
 	protected String sourceType = "Misc";
@@ -363,8 +365,8 @@ public class MSBibEntry {
 		if (bibtex.getField(MSBIB+"periodical") != null)
 			periodicalTitle = bibtex.getField(MSBIB+"periodical").toString();
 		
-		if (bibtex.getField("organization") != null)
-			conferenceName = bibtex.getField("organization").toString();
+		if (bibtex.getField("booktitle") != null)
+			conferenceName = bibtex.getField("booktitle").toString();
 		if (bibtex.getField("school") != null)
 			department = bibtex.getField("school").toString();
 		if (bibtex.getField("institution") != null)

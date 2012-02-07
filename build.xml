@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Filename: $RCSfile$
+   Filename: build.xml
    Purpose:  Ant build file for Jabref.
 
              Ant-Download: http://jakarta.apache.org/ant
              Ant-Manual:   http://jakarta.apache.org/ant/manual/index.html
 
-             Jabref-Homepage:    http://jabref.sourceforge.net
-             Jabref@SourceForge: http://sourceforge.net/projects/jabref
-             Jabref@FreshMeat:   http://freshmeat.net
-             Jabref-CVSRoot:     :pserver:anonymous@cvs.jabref.sourceforge.net:/cvsroot/jabref
+             Jabref homepage:       http://jabref.sourceforge.net
+             Jabref@SourceForge:    http://sourceforge.net/projects/jabref
+             Jabref@FreeCode:       http://apps.freecode.com/projects/jabref
+             Jabref git repository: git://jabref.git.sourceforge.net/gitroot/jabref/jabref
 
              Further questions:
-               help mailing list:      must be inserted
+               help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
 
    Precondition: 1. Ant should be installed.
                  2. JAVA_HOME environment variable contains the path to JDK1.5 or higher
@@ -22,21 +22,8 @@
    Compiler: Ant
    Authors:  Joerg K. Wegner, wegnerj@informatik.uni-tuebingen.de
              Morten O. Alver
-   Version:  $Revision$
-             $Date$
-             $Author$
 
-   modified:
-             23.11.2006 c.oezbek
-             - tried to fix classpath issues
-             28.07.2005 r.nagel
-             - insert dynamic build info generation (resource/build.properties)
-             - copy fonts directory, used by the new about dialog
-             - change static "version" into mainfest file into ${jabref.version}
-             09.06.2005 r.nagel
-             - bugfix, first it should be made a rebuild of the build directory
-             and then a jar should be generated from this directory
-             - take all files for the jar archive !!! FROM BUILD directory !!!
+   modified: see at git checkout and "gitk build.xml"
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
@@ -113,7 +100,7 @@
 		<include name="looks-2.3.1.jar" />
 		<include name="forms-1.1.0.jar" />
 		<include name="spin.jar" />
-		<include name="glazedlists-1.7.0_java15.jar" />
+		<include name="glazedlists-1.8.0_java15.jar" />
 		<include name="microba.jar" />
 		<include name="pdfbox-1.6.0.jar" />
 		<include name="jempbox-1.6.0.jar" />

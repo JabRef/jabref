@@ -18,6 +18,7 @@ package net.sf.jabref.mods;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
+import net.sf.jabref.export.layout.format.XMLChars;
 
 import net.sf.jabref.AuthorList;
 
@@ -50,11 +51,21 @@ public class PersonName {
     }
 
     protected void parseName(String author) {
-            // TODO: replace special characters
-            Vector<String> v = new Vector<String>();
-            String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
+    		Vector<String> v = new Vector<String>();
+            String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
+             
+            //Formating names and replacing escape Char for ',' back to a comma
+            XMLChars xmlChars = new XMLChars();
+            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
+ 
+            int endOfLastName = authorMod.indexOf(",");
 
-            WSITools.tokenize(v, authorMod, " \n\r");
+            // Tokenize just the firstName and middleNames as we have the surname
+            // before the comma.
+            WSITools.tokenize(v, authorMod.substring(endOfLastName+1).trim(), " \n\r");
+            if (endOfLastName>=0) // comma is found
+            	v.add(authorMod.substring(0, endOfLastName));
+            
             int amountOfNames = v.size();
 
             if (amountOfNames == 1)

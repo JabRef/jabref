@@ -1,3 +1,4 @@
+[master branch]
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
       autocompletion does not show these braces
@@ -10,6 +11,15 @@
       (always full/always abbreviated/both full and abbreviated)
     - Added functionality "clean up entries" by Florian Straﬂer and Marius Kleiner.
       Currently, move of DOIs from ee, note, and url field is supported.
+2.8 beta [development]
+    - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
+    - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
+    - Fixed bug: "Send as Email" did not handle absolute paths correctly.
+    - Fixed bug 3472991: Search : "Highlight Words" inconsistent
+    - Fixed bug 2933201: Exporting InProceedings to Word 2007
+    - Fixed bug 3146059: Error in translating author field to MS Office
+    - Fixed bug: entering field names containing capital letters in table columns tab
+      in Preferences makes the columns empty.
 2.8 beta
     - Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
       additional minor fix.

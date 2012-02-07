@@ -66,7 +66,7 @@ import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstallerAction;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
-import net.sf.jabref.sql.DbImportAction;
+import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;

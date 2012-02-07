@@ -251,6 +251,9 @@ public class DBConnectDialog extends JDialog {
         dbStrings.setDatabase(txtDatabase.getText());
         dbStrings.setUsername(txtUsername.getText());
 
+        // Store these settings so they appear as default next time:
+        dbStrings.storeToPreferences();
+
         char[] pwd = pwdPassword.getPassword();
         String tmp = "";
         for (int i=0; i<pwd.length; i++) {

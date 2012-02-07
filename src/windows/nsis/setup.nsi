@@ -34,7 +34,7 @@ Name "JabRef ${VERSION}"
 !define PRODUCT_REGNAME "BibTeX.Document"
 !define PRODUCT_EXT ".bib"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\gpl.txt"
+!define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
 
 
 ; registry preparations

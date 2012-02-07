@@ -260,6 +260,7 @@ public class JabRefPreferences {
         defaults.put("groupExpandTree", Boolean.TRUE);
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
+        defaults.put("autoAssignGroup", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
@@ -433,6 +434,10 @@ public class JabRefPreferences {
         defaults.put("selectedFetcherIndex", 0);
         defaults.put("bibLocationAsFileDir", Boolean.TRUE);
         defaults.put("bibLocAsPrimaryDir", Boolean.FALSE);
+        defaults.put("dbConnectServerType", "MySQL");
+        defaults.put("dbConnectHostname", "localhost");
+        defaults.put("dbConnectDatabase", "jabref");
+        defaults.put("dbConnectUsername", "root");
         //defaults.put("lastAutodetectedImport", "");
         
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
@@ -736,10 +741,15 @@ public class JabRefPreferences {
         return ks;
       }
       else {
+    	int modifiers = 0;
         if ((ks.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-          return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask()+KeyEvent.SHIFT_MASK);
+          modifiers = modifiers | KeyEvent.SHIFT_MASK;
         }
-        return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask());
+        if ((ks.getModifiers() & KeyEvent.ALT_MASK) != 0) {
+            modifiers = modifiers | KeyEvent.ALT_MASK;
+        }
+        
+        return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask()+modifiers);
       }
     }
 

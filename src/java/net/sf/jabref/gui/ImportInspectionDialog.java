@@ -254,7 +254,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         selectionModel = new EventSelectionModel<BibtexEntry>(sortedList);
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
-        comparatorChooser = new TableComparatorChooser<BibtexEntry>(glTable, sortedList,
+        comparatorChooser = TableComparatorChooser.install(glTable, sortedList,
             TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
@@ -1324,7 +1324,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
     @SuppressWarnings("unchecked")
     protected void setupComparatorChooser() {
         // First column:
-        java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser
+        java.util.List<Comparator> comparators = comparatorChooser
             .getComparatorsForColumn(0);
         comparators.clear();
 

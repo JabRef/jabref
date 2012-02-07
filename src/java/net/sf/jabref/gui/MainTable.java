@@ -339,7 +339,7 @@ public class MainTable extends JTable {
     @SuppressWarnings("unchecked")
 	private void setupComparatorChooser() {
         // First column:
-        List<Comparator<BibtexEntry>> comparators = comparatorChooser.getComparatorsForColumn(0);
+        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
         comparators.add(new FirstColumnComparator(panel.database()));
 
@@ -640,7 +640,7 @@ public class MainTable extends JTable {
      */
     @SuppressWarnings("unchecked")
 	public Comparator<BibtexEntry> getComparatorForColumn(int index) {
-        List<Comparator<BibtexEntry>> l = comparatorChooser.getComparatorsForColumn(index);
+        List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
         return l.size() == 0 ? null : l.get(0);
     }
 

@@ -88,19 +88,19 @@ public class SendAsEMailAction extends AbstractWorker {
                 tm.setContent(entry.getField("file"));
                 for (int i=0; i< tm.getRowCount(); i++) {
                 	FileListEntry flEntry = tm.getEntry(i);
-                   	String[] dirs = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-                    String path = dirs[0]; // TODO: This needs to be reworked, to handle more than one file dir
-                   	path = path.concat(java.io.File.separator);
-                   	path = path.concat(flEntry.getLink());
-                   	attachments.add(path);
-                   	if (openFolders) {
-               			File fn = new File(path);
-                   		if (isWindows) {
-                   			String command = "explorer.exe /select,".concat(fn.getAbsolutePath());
-                   			Runtime.getRuntime().exec(command);
-                   		} else {
-                   			directories.add(fn.getParentFile());
-                   		}
+                	
+                	File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+                	if (f != null) {
+                		// file exists
+                		attachments.add(f.getPath());
+                		if (openFolders) {
+                			if (isWindows) {
+                				String command = "explorer.exe /select,\"".concat(f.getAbsolutePath().concat("\""));
+                				Runtime.getRuntime().exec(command);
+                			} else {
+                				directories.add(f.getParentFile());
+                			}
+                		}
                    	}
                 }
 			} catch (Exception e) {
