@@ -30,7 +30,7 @@ import net.sf.jabref.JabRefPreferences;
 public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
 	private String[] fieldNames;
-    private boolean lastNameOnly;
+    private boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "
     private String prefix = "";
     private boolean autoCompFF, autoCompLF, autoCompFullFirstOnly, autoCompShortFirstOnly;
 
@@ -42,9 +42,9 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     }
 
-	public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnly) {
+	public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace) {
 		this.fieldNames = fieldNames;
-        this.lastNameOnly = lastNameOnly;
+        this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
         if (Globals.prefs.getBoolean("autoCompFF")) {
             autoCompFF = true;
             autoCompLF = false;
@@ -62,7 +62,15 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 	}
 
 	public boolean isSingleUnitField() {
-		return true;
+		// quick hack
+		// when used at entry fields (!this.lastNameOnlyAndSeparationBySpace), this is a single unit field
+		// when used at the search form (this.lastNameOnlyAndSeparationBySpace), this is NOT a single unit field
+		// reason: search keywords are separated by space. 
+		//    This is OK for last names without prefix. "Lastname" works perfectly.
+		//    querying for "van der Lastname" can be interpreted as
+		//      a) "van" "der" "Lastname"
+		//      b) "van der Lastname" (autocompletion lastname)
+		return !this.lastNameOnlyAndSeparationBySpace;
 	}
 
 	public void addBibtexEntry(BibtexEntry entry) {
@@ -73,7 +81,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
                     AuthorList authorList = AuthorList.getAuthorList(fieldValue);
                     for (int j = 0; j < authorList.size(); j++) {
                         AuthorList.Author author = authorList.getAuthor(j);
-                        if (lastNameOnly) {
+                        if (lastNameOnlyAndSeparationBySpace) {
                             addWordToIndex(author.getLastOnly());
                         } else {
                             if (autoCompLF) {
@@ -104,15 +112,49 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
             }
 		}
 	}
-
-	public String[] complete(String str) {
+	
+	/**
+	 * SIDE EFFECT: sets class variable prefix
+	 * Delimiter: " and "
+	 * 
+	 * @return String without prefix
+	 */
+	private String determinePrefixAndReturnRemainder_AND(String str) {
         int index = str.toLowerCase().lastIndexOf(" and ");
         if (index >= 0) {
             prefix = str.substring(0, index+5);
             str = str.substring(index+5);
+        } else {
+        	prefix = "";
         }
-        else prefix = "";
+        return str;
+	}
 
+	/**
+	 * SIDE EFFECT: sets class variable prefix
+	 * Delimiter: " "
+	 * 
+	 * @return String without prefix
+	 */
+	private String determinePrefixAndReturnRemainder_SPACE(String str) {
+        int index = str.lastIndexOf(" ");
+        if (index >= 0) {
+            prefix = str.substring(0, index+1);
+            str = str.substring(index+1);
+        } else {
+        	prefix = "";
+        }
+        return str;
+	}
+
+	public String[] complete(String str) {
+		// Normally, one would implement that using 
+		// class inheritance. But this seemed to overengineered
+		if (this.lastNameOnlyAndSeparationBySpace) {
+			str = determinePrefixAndReturnRemainder_SPACE(str);
+		} else {
+			str = determinePrefixAndReturnRemainder_AND(str);
+		}
         String[] res = super.complete(str);
         return res;
 	}

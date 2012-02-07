@@ -36,7 +36,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 	private static Logger logger = Logger.getLogger(AutoCompleteListener.class.getName());
 
     AbstractAutoCompleter completer;
-    protected String toSetIn = null,
+
+    // These variables keep track of the situation from time to time.
+    protected String toSetIn = null, // null indicates that there are no completions available
             lastBeginning = null;
     protected int lastCaretPosition = -1;
     protected Object[] lastCompletions = null;
@@ -47,8 +49,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     // after finishing. This is needed because the autocomplete listener must
     // run before the focus listener responsible for storing the current edit.
     protected FocusListener nextFocusListener = null;
-
-    // These variables keep track of the situation from time to time.
 
     public AutoCompleteListener(AbstractAutoCompleter completer) {
 //    	if (logger.getHandlers().length == 0) {
@@ -86,6 +86,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             JTextComponent comp = (JTextComponent) e.getSource();
             int end = comp.getSelectionEnd();
             comp.select(end, end);
+            toSetIn = null;
             if (consumeEnterKey)
                 e.consume();
             return;
@@ -236,6 +237,10 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     public void keyTyped(KeyEvent e) {
         char ch = e.getKeyChar();
+    	if (ch == '\n')
+    		// this case is handled at keyPressed(e)
+    		return;
+    	
         
         if ((e.getModifiers() | KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {
         	// plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
@@ -249,6 +254,14 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             	else
             		logger.finest("toSetIn: >" + toSetIn + "<");
         	}
+            if (Character.isWhitespace(ch) && !completer.isSingleUnitField()) {
+            	// start a new search if end-of-field is reached
+
+            	// replace displayed letters with typed letters 
+            	setUnmodifiedTypedLetters((JTextComponent) e.getSource(), false);
+            	toSetIn = null;
+                return;
+            }
             
         	// The case-insensitive system is a bit tricky here
         	// If keyword is "TODO" and user types "tO", then this is treated as "continue" as the "O" matches the "O"
@@ -351,8 +364,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         }
         }
         toSetIn = null;
-        lastCompletions = null;
-
     }
 
     protected Object[] findCompletions(String beginning, JTextComponent comp) {        
@@ -420,7 +431,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     public void focusLost(FocusEvent event) {
-        if (lastCompletions != null) {
+        if (toSetIn != null) {
             JTextComponent comp = (JTextComponent)event.getSource();
             clearCurrentSuggestion(comp);
         }
@@ -429,7 +440,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     public void clearCurrentSuggestion(JTextComponent comp) {
-         if (lastCompletions != null) {
+         if (toSetIn != null) {
             int selStart = comp.getSelectionStart();
             String text = comp.getText();
             comp.setText(text.substring(0, selStart) + text.substring(comp.getSelectionEnd()));
