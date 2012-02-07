@@ -1,3 +1,4 @@
+2.8 beta [development]
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
     - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
     - Fixed bug: "Send as Email" did not handle absolute paths correctly.
