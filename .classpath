@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf-boot.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/JPFCodeGenerator-rt.jar" sourcepath="/JPFCodeGenerator/src"/>
-	<classpathentry exported="true" kind="lib" path="lib/glazedlists-1.7.0_java15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/glazedlists-1.8.0_java15.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.7-bin.jar"/>
 	<classpathentry kind="lib" path="lib/spl/sciplore/xstream-1.4.1.jar"/>
