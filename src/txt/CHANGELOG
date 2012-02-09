@@ -11,6 +11,7 @@
       (always full/always abbreviated/both full and abbreviated)
     - Added functionality "clean up entries" by Florian Straﬂer and Marius Kleiner.
       Currently, move of DOIs from ee, note, and url field is supported.
+    - Added support for drag'n'drop of tabs by Florian Straﬂer and Marius Kleiner.
 2.8 beta [development]
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
     - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
