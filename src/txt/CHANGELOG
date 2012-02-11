@@ -1,4 +1,6 @@
 [master branch]
+    - Added button to rename PDF of entry according to configured PDF-naming-scheme
+      (by Florian Straﬂer and Marius Kleiner)
     - Added small popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Braces around author names are now dropped internally. They remain in the .bib though

@@ -991,16 +991,107 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     });
 
-        actions.put("search", new BaseAction() {
-                public void action() {
-                    //sidePaneManager.togglePanel("search");
-                    sidePaneManager.show("search");
-                    //boolean on = sidePaneManager.isPanelVisible("search");
-                    frame.searchToggle.setSelected(true);
-                    if (true)
-                      frame.getSearchManager().startSearch();
-                }
-            });
+        // The action for auto-generating PDF-Names.
+        actions.put("makePDFname", new AbstractWorker() {
+        List<BibtexEntry> entries;
+        int numSelected;
+        boolean cancelled = false;
+
+        public void init() {
+                    entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
+                    numSelected = entries.size();
+
+                    if (entries.size() == 0) { // Empty selection. Inform the user to select entries first.
+                        JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want Auto-PDF-Names to be generated for."),
+                                                      Globals.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
+                        return ;
+                    }
+            frame.block();
+            output(Globals.lang("Generating Auto-PDF-Names for")+" "+
+                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
+                                            : Globals.lang("entry"))+"...");  
+        }
+
+        // Run second, on a different thread:
+                public void run() {
+                    database.setFollowCrossrefs(false);
+                    BibtexEntry bes = null ;
+                    
+					// Ask if undoable action should be continued
+                    if (Globals.prefs.getBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN) && !entries.isEmpty()) {
+	                    CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+	                    		Globals.lang("Disable this confirmation dialog"), false);
+	                    int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Autogenerate PDF Names"),
+	                            JOptionPane.YES_NO_OPTION);
+	                    if (cbm.isSelected())
+	                        Globals.prefs.putBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, false);
+	                    if (answer == JOptionPane.NO_OPTION) {
+	                        // Ok, break off the operation.
+	                        cancelled = true;
+	                        return;
+	                    }
+                    }
+                    int notSuccesfullRenames = 0;
+                    for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                        bes = i.next();
+            			
+            			String oldFilename = bes.getField(GUIGlobals.FILE_FIELD);
+            			String newFilename = Util.getLinkedFileName(database, bes);
+            			
+            			//Extract the Path
+            			FileListTableModel flModel = new FileListTableModel();
+            			flModel.setContent(bes.getField(GUIGlobals.FILE_FIELD));
+            			
+            			if(flModel.getRowCount() == 0) { //if the entry is not linked with a pdf
+            				continue;
+            			}
+            			String realOldFilename = flModel.getEntry(0).getLink();
+            			
+            			//Add extension to newFilename
+            			newFilename = newFilename + "." + flModel.getEntry(0).getType().getExtension();
+            			
+            			//get new Filename with path
+            			String newPath = Util.renamePath(realOldFilename, newFilename);
+            			
+            			//do rename
+            			boolean renameSuccesfull = Util.renameFile(realOldFilename, newPath);
+            			
+            			if(renameSuccesfull) {
+            				//Change the path for this entry
+            				String description = flModel.getEntry(0).getDescription();
+            				ExternalFileType type = flModel.getEntry(0).getType();
+            				flModel.removeEntry(0);
+            		        flModel.addEntry(0, new FileListEntry(description, newPath, type));
+            		        String newValue = flModel.getStringRepresentation();
+            				bes.setField(GUIGlobals.FILE_FIELD, newValue);
+            			}
+            			else {
+            				notSuccesfullRenames++; //Count this not succesfull rename
+            			}
+                    }
+                    if(notSuccesfullRenames>0) { //Rename failed for at least one entry
+	                    JOptionPane.showMessageDialog(frame, Globals.lang("File rename failed for")+" "
+	                    		+ notSuccesfullRenames 
+	                    		+ " "+Globals.lang("entries") + ".",
+	                            Globals.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
+                    }
+        }
+
+        // Run third, on EDT:
+        public void update() {
+            database.setFollowCrossrefs(true);
+            if (cancelled) {
+                frame.unblock();
+                return;
+            }
+            markBaseChanged() ;
+            numSelected = entries.size();
+            output(Globals.lang("Generated Auto-PDF-Names for")+" "+
+               numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
+                                    : Globals.lang("entry")));
+            frame.unblock();
+        }
+    });
 
         actions.put("search", new BaseAction() {
                 public void action() {

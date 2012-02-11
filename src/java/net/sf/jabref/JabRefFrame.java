@@ -263,6 +263,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
        makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
                                         Globals.lang("Autogenerate BibTeX keys"),
                                         prefs.getKey("Autogenerate BibTeX keys")),
+                                        
+      autoNamepdf = new GeneralAction("makePDFname", 
+    		  									Globals.lang("Autogenerate PDF Names"), 
+            		  							Globals.lang("Autogenerate PDF Names"), 
+            		  							GUIGlobals.getIconUrl("autonamePDF")),
 
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
@@ -1290,6 +1295,7 @@ public JabRefPreferences prefs() {
       tools.add(manageSelectors);
       tools.addSeparator();
       tools.add(openFile);
+      tools.add(autoNamepdf);
       tools.add(openPdf);
       tools.add(openUrl);
       //tools.add(openSpires);
@@ -1467,6 +1473,8 @@ public JabRefPreferences prefs() {
     //tlb.addAction(openPdf);
     //tlb.addAction(openUrl);
 
+    tlb.addAction(autoNamepdf);
+
     //tlb.addSeparator();
     //tlb.addAction(showPrefs);
     tlb.add(Box.createHorizontalGlue());
@@ -1506,7 +1514,7 @@ public JabRefPreferences prefs() {
             mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
             redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
             selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-            makeKeyAction, normalSearch,
+            makeKeyAction, autoNamepdf, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */

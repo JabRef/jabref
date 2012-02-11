@@ -62,6 +62,7 @@ public class JabRefPreferences {
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
+        AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain",
         
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
@@ -438,6 +439,8 @@ public class JabRefPreferences {
         defaults.put("dbConnectHostname", "localhost");
         defaults.put("dbConnectDatabase", "jabref");
         defaults.put("dbConnectUsername", "root");
+        defaults.put(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
+        
         //defaults.put("lastAutodetectedImport", "");
         
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);

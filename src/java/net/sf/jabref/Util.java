@@ -3011,9 +3011,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		if (layout != null) {
 			targetName = layout.doLayout(entry, database);
 		}
+		//Removes illegal characters from filename
+		String[] illegalChars = {"\\","/",":","*","?","\"","<",">","|"};
+		for(String s : illegalChars) {
+			targetName = targetName.replace(s, "");
+		}
         return targetName;
     }
-    
     
     private static String REGEXP_DOI_WITH_HTTP_PREFIX = "[^\\s]+?(10\\.[^/]+/([^(\\s\\>\\\"\\<})])+)";
     private static String REGEXP_PLAINDOI = "(10\\.[^/]+/([^(\\s\\>\\\"\\<})])+)";
@@ -3063,4 +3067,37 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			bes.setField(fieldName, value);
 		}
 	}
+    
+    public static String renamePath(String filePath, String fileNewName)
+    {    	
+    	//Create a file Object from filePath
+    	File fromFile = new File(filePath);
+    	
+    	//Create new Path based on old Path and new filename
+    	String newPath = fromFile.getAbsolutePath().replace(fromFile.getName(), fileNewName);
+    	
+    	return newPath;
+    }
+    
+    /**
+     * 
+     * @param fileName
+     * @param fileType
+     * @param destFilename
+     * @param edits
+     * @return
+     */
+    public static boolean renameFile(String fileName, String destFilename)
+    {
+    	// File (or directory) with old name
+    	File fromFile = new File(fileName);
+
+    	// File (or directory) with new name
+    	File toFile = new File(destFilename);
+    	
+    	// Rename file (or directory)
+    	boolean success = fromFile.renameTo(toFile);
+    	return success;
+    }
+
 }
