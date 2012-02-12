@@ -56,11 +56,6 @@ import net.sf.jabref.util.XMPUtil;
  * @author alver
  * @version Date: May 7, 2005 Time: 7:17:42 PM
  * 
- * Current Version:
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class ExternalFilePanel extends JPanel {
 

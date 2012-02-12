@@ -95,7 +95,7 @@ import net.sf.jabref.undo.UndoableRemoveEntry;
  * events whenever a field of the entry changes, enabling the text fields to
  * update themselves if the change is made from somewhere else.
  */
-public class EntryEditor extends JPanel implements VetoableChangeListener {
+public class EntryEditor extends JPanel implements VetoableChangeListener, EntryContainer {
 
     // A reference to the entry this object works on.
     private BibtexEntry entry;

@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2012 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref;
 
 import java.awt.*;
@@ -20,16 +35,12 @@ import javax.swing.event.HyperlinkListener;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.gui.FileListEditorTransferHandler;
 
 /**
  * Displays an BibtexEntry using the given layout format.
- * 
- * @author $Author$
- * @version $Revision$ ($Date: 2007-08-01 20:23:38 +0200 (Mi, 01 Aug
- *          2007) $)
- * 
  */
-public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener {
+public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
 
 	/**
 	 * The bibtex entry currently shown
@@ -93,6 +104,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		this.metaData = metaData;
 		this.layoutFile = layoutFile;
 		this.previewPane = createPreviewPane();
+		this.previewPane.setTransferHandler(new FileListEditorTransferHandler(panel.frame(), this));
 
 		// Set up scroll pane for preview pane
 		scrollPane = new JScrollPane(previewPane,
@@ -286,6 +298,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 			ex.printStackTrace();
 		}
 	}
+    
+    public BibtexEntry getEntry() {
+    	return this.entry;
+    }
 
 	public void update() {
 

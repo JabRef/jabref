@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -155,8 +155,8 @@ public class FileListEditor extends JTable implements FieldEditor,
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
 
-	TransferHandler th = new FileListEditorTransferHandler();
-	setTransferHandler(th);
+        TransferHandler th = new FileListEditorTransferHandler(frame, entryEditor);
+        setTransferHandler(th);
         panel.setTransferHandler(th);
 
         // Add an input/action pair for deleting entries:
@@ -640,127 +640,6 @@ public class FileListEditor extends JTable implements FieldEditor,
                 menu.show(FileListEditor.this, e.getX(), e.getY());
             }
         }
-    }
-
-
-    class FileListEditorTransferHandler extends TransferHandler {
-
-        protected DataFlavor urlFlavor;
-        protected DataFlavor stringFlavor;
-
-        public FileListEditorTransferHandler() {
-            stringFlavor = DataFlavor.stringFlavor;
-            try {
-                urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
-            } catch (ClassNotFoundException e) {
-                Globals.logger("Unable to configure drag and drop for file link table");
-                e.printStackTrace();
-            }
-        }
-        /**
-         * Overriden to indicate which types of drags are supported (only LINK).
-         *
-         * @override
-         */
-        public int getSourceActions(JComponent c) {
-            return DnDConstants.ACTION_LINK;
-        }
-
-        /*public boolean importData(TransferSupport transferSupport) {
-
-            return importData(FileListEditor.this, transferSupport.getTransferable());
-        }*/
-
-        @SuppressWarnings("unchecked")
-        public boolean importData(JComponent comp, Transferable t) {
-            // If the drop target is the main table, we want to record which
-            // row the item was dropped on, to identify the entry if needed:
-
-            try {
-		
-                List<File> files = null;
-                // This flavor is used for dragged file links in Windows:
-                if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    // JOptionPane.showMessageDialog(null, "Received
-                    // javaFileListFlavor");
-                    files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                }
-
-                if (t.isDataFlavorSupported(urlFlavor)) {
-                    URL dropLink = (URL) t.getTransferData(urlFlavor);
-                    System.out.println("URL: "+dropLink);
-                    //return handleDropTransfer(dropLink, dropRow);
-                }
-
-                // This is used when one or more files are pasted from the file manager
-                // under Gnome. The data consists of the file paths, one file per line:
-                if (t.isDataFlavorSupported(stringFlavor)) {
-                    String dropStr = (String)t.getTransferData(stringFlavor);
-                    files = EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr);
-                }
-
-		        if (files != null) {
-		            final List<File> theFiles = files;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            //addAll(files);
-                            for (File f : theFiles){
-                                // Find the file's extension, if any:
-                                String name = f.getAbsolutePath();
-                                String extension = "";
-                                ExternalFileType fileType = null;
-                                int index = name.lastIndexOf('.');
-                                if ((index >= 0) && (index < name.length())) {
-                                    extension = name.substring(index + 1).toLowerCase();
-                                    fileType = Globals.prefs.getExternalFileTypeByExt(extension);
-                                }
-                                if (fileType != null) {
-                                    DroppedFileHandler dfh = new DroppedFileHandler(frame, frame.basePanel());
-                                    dfh.handleDroppedfile(name, fileType, true, entryEditor.getEntry());
-                                }
-                            }
-                        }
-                    });
-                    return true;
-                }
-
-            } catch (IOException ioe) {
-                System.err.println("failed to read dropped data: " + ioe.toString());
-            } catch (UnsupportedFlavorException ufe) {
-                System.err.println("drop type error: " + ufe.toString());
-            }
-
-            // all supported flavors failed
-            System.err.println("can't transfer input: ");
-            DataFlavor inflavs[] = t.getTransferDataFlavors();
-            for (int i = 0; i < inflavs.length; i++) {
-                System.out.println("  " + inflavs[i].toString());
-            }
-
-            return false;
-        }
-
-        /**
-         * This method is called to query whether the transfer can be imported.
-         *
-         * Will return true for urls, strings, javaFileLists
-         *
-         * @override
-         */
-        public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-
-            // accept this if any input flavor matches any of our supported flavors
-            for (int i = 0; i < transferFlavors.length; i++) {
-                DataFlavor inflav = transferFlavors[i];
-                if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor))
-                    return true;
-            }
-
-            // nope, never heard of this type
-            return false;
-        }
-
     }
 
     public boolean hasUndoInformation() {
