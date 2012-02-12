@@ -157,7 +157,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = fileName;
+            destFilename = Util.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
             destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
             if (copyRadioButton.isSelected()) {
@@ -204,7 +204,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = fileName;
+            destFilename = Util.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
             destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
             if (copyRadioButton.isSelected()) {
@@ -235,7 +235,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = fileName;
+            destFilename = Util.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -327,7 +327,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = fileName;
+            destFilename = Util.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;

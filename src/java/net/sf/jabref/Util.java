@@ -1612,7 +1612,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		return null;
 	}
-
+	
 	/**
 	 * Converts a relative filename to an absolute one, if necessary. Returns
 	 * null if the file does not exist.
@@ -1659,6 +1659,58 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         }
         return file;
     }
+	
+	/**
+	 * Converts an absolute filename to a relative one, if necessary.
+	 * 
+	 * This method works correctly only if dirs are sorted decent in their length
+	 * i.e. /home/user/literature/important before /home/user/literature 
+	 * 
+	 * @param dirs: directories to check. 
+	 */
+	public static File shortenFileName(File fileName, String[] dirs) {
+		if (fileName == null || fileName.length() == 0)
+			return fileName;
+		if (!fileName.isAbsolute() || (dirs == null)) 
+			return fileName;
+		
+		for (String dir: dirs) {
+			if (dir!=null) {
+				File result = shortenFileName(fileName, dir);
+				if ((result != null) && (!result.equals(fileName)))
+					return result;
+			}
+		}
+		return fileName;
+	}
+
+	public static File shortenFileName(File fileName, String dir) {
+		if (fileName == null || fileName.length() == 0)
+			return fileName;
+		if (!fileName.isAbsolute() || dir == null) 
+			return fileName;
+
+		String longName;
+        if (Globals.ON_WIN) {
+        	// case-insensitive matching on Windows
+        	longName = fileName.toString().toLowerCase();
+        	dir = dir.toLowerCase();
+        } else {
+        	longName = fileName.toString();
+        }
+        
+		if (!dir.endsWith(System.getProperty("file.separator")))
+			dir = dir.concat(System.getProperty("file.separator"));
+
+		if (longName.toString().startsWith(dir)) {
+			// result is based on original name, not on lower-cased name
+			String newName = fileName.toString().substring(dir.length());
+			return new File(newName);
+		} else {
+			return fileName;
+		}
+	}
+
 
 	private static String findInDir(String key, String dir, OpenFileFilter off, int count) {
         if (count > 20)
