@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -39,8 +38,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.sciplore.beans.Url;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
@@ -93,7 +90,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    JTabbedPane tabbedPane = new DragDropPane(); //This creates the Drag&Drop JTabbedPane
+    JTabbedPane tabbedPane; // initialized at constructor
     
     final Insets marg = new Insets(1,0,2,0);
 
@@ -395,6 +392,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   }
 
   private void init() {
+	    tabbedPane = new DragDropPopupPane(databaseProperties);
 
         macOSXRegistration();
 
