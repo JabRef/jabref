@@ -128,9 +128,7 @@ public class DbImportAction extends AbstractWorker {
 					metaData = (MetaData) res[1];
 					dbs.isConfigValid(true);
 				}
-				JOptionPane.showMessageDialog(frame, databases.size()
-						+ " databases will be imported", "Database Import",
-						JOptionPane.INFORMATION_MESSAGE);
+				frame.output(databases.size() + " databases will be imported");
 			} catch (Exception ex) {
 				String preamble = "Could not import from SQL database for the following reason:";
 				errorMessage = SQLUtil.getExceptionMessage(ex);
