@@ -811,7 +811,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Run second, on a different thread:
                 public void run() {
-                    database.setFollowCrossrefs(false);
                     BibtexEntry bes = null ;
                     NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
 
@@ -821,7 +820,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = i.next();
                         if (bes.getField(BibtexFields.KEY_FIELD) != null) {
                             if (Globals.prefs.getBoolean("avoidOverwritingKey"))
-                                // Rmove the entry, because its key is already set:
+                                // Remove the entry, because its key is already set:
                                 i.remove();
                             else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
                                 // Ask if the user wants to cancel the operation:

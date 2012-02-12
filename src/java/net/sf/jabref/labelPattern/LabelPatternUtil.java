@@ -126,7 +126,7 @@ public class LabelPatternUtil {
         try {
             // get the type of entry
             String _type = _entry.getType().getName().toLowerCase();
-            // Get the arrayList corrosponding to the type
+            // Get the arrayList corresponding to the type
             _al = table.getValue(_type);
             int _alSize = _al.size();
             boolean field = false;
