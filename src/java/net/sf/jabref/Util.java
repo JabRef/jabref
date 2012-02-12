@@ -1662,6 +1662,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	
 	/**
 	 * Converts an absolute filename to a relative one, if necessary.
+	 * Returns the parameter fileName itself if no shortening is possible 
 	 * 
 	 * This method works correctly only if dirs are sorted decent in their length
 	 * i.e. /home/user/literature/important before /home/user/literature 
@@ -3067,17 +3068,6 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			bes.setField(fieldName, value);
 		}
 	}
-    
-    public static String renamePath(String filePath, String fileNewName)
-    {    	
-    	//Create a file Object from filePath
-    	File fromFile = new File(filePath);
-    	
-    	//Create new Path based on old Path and new filename
-    	String newPath = fromFile.getAbsolutePath().replace(fromFile.getName(), fileNewName);
-    	
-    	return newPath;
-    }
     
     /**
      * 

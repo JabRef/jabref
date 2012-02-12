@@ -45,6 +45,7 @@ import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
@@ -62,7 +63,6 @@ public class JabRefPreferences {
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
-        AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain",
         
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
@@ -439,7 +439,7 @@ public class JabRefPreferences {
         defaults.put("dbConnectHostname", "localhost");
         defaults.put("dbConnectDatabase", "jabref");
         defaults.put("dbConnectUsername", "root");
-        defaults.put(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
+        CleanUpAction.putDefaults(defaults);        
         
         //defaults.put("lastAutodetectedImport", "");
         

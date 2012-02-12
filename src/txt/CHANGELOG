@@ -1,6 +1,4 @@
 [master branch]
-    - Added button to rename PDF of entry according to configured PDF-naming-scheme
-      (by Florian Straﬂer and Marius Kleiner)
     - Added small popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Braces around author names are now dropped internally. They remain in the .bib though
@@ -13,8 +11,14 @@
       otherwise the search is case sensitive.
     - Autocompletion: new preference to choose how to deal with first names 
       (always full/always abbreviated/both full and abbreviated)
-    - Added functionality "clean up entries" by Florian Straﬂer and Marius Kleiner.
-      Currently, move of DOIs from ee, note, and url field is supported.
+    - Added functionality "clean up entries" 
+      - Includes clean up DOI functionality by Florian Straﬂer and Marius Kleiner
+        (move of DOIs from ee, note, and url field is supported)
+      - Option to ename PDF of entry according to configured PDF-naming-scheme
+        (by Florian Straﬂer and Marius Kleiner)
+      - clean up month (functionality based on patch 3470076 by Mathias Walter)
+      - clean up pages
+      - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straﬂer and Marius Kleiner.
 2.8 beta [development]
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.

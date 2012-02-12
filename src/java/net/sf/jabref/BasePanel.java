@@ -198,7 +198,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Keeps track of the string dialog if it is open.
 
     SaveDatabaseAction saveAction;
-
+    CleanUpAction cleanUpAction;
+    
     /**
      * The group selector component for this database. Instantiated by the
      * SidePaneManager if necessary, or from this class if merging groups from a
@@ -330,6 +331,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void setupActions() {
         saveAction = new SaveDatabaseAction(this);
+        cleanUpAction = new CleanUpAction(this);
         
         actions.put("undo", undoAction);
         actions.put("redo", redoAction);
@@ -897,201 +899,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
          
         
      // The action for cleaning up entry.
-        actions.put("Cleanup", new AbstractWorker() {
-        List<BibtexEntry> entries;
-        int numSelected;
-        boolean cancelled = false;
-
-        // Run first, in EDT:
-        public void init() {
-                    entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
-                    numSelected = entries.size();
-
-                    if (entries.size() == 0) { // None selected. Inform the user to select entries first.
-                        JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries that you want to do a cleanup for."), 
-                                                      Globals.lang("Cleanup Entry"), JOptionPane.INFORMATION_MESSAGE);
-                        return ;
-                    }
-            frame.block();
-            output(Globals.lang("Do a cleanup for")+" "+	
-                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
-                                            : Globals.lang("entry"))+"...");
-        }
-
-        // Run second, on a different thread:
-                public void run() {
-                    database.setFollowCrossrefs(false);
-                    BibtexEntry bes = null ;
-                    NamedCompound ce = new NamedCompound(Globals.lang("Cleanup Entry"));
-
-                    // Remove the http://... for each DOI
-                    for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
-                        bes = i.next();
-                        
-                        // fields to check
-                    	String[] fields = {"note", "url", "ee"};
-
-                        // First check if the DOI Field is empty
-                        if (bes.getField("doi") != null) {
-                        	String doiFieldValue = bes.getField("doi");
-                        	if (Util.checkForDOIwithHTTPprefix(bes.getField(doiFieldValue))) {
-                        		String newValue = Util.getDOI(doiFieldValue);
-                        		ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
-                        		bes.setField("doi", newValue);
-                        	};
-                        	if (Util.checkForPlainDOI(doiFieldValue)) {
-                        		// DOI field seems to contain DOI
-                        		// cleanup note, url, ee field
-                        		// we do NOT copy values to the DOI field as the DOI field contains a DOI!
-                            	for (String field: fields) {
-                            		if (Util.checkForPlainDOI(bes.getField(field))){
-                            			Util.removeDOIfromBibtexEntryField(bes, field, ce);
-                            		}
-                            	}
-                        	}
-                        } else {
-                        	// As the DOI field is empty we now check if note, url, or ee field contains a DOI
-                        	
-                        	for (String field: fields) {
-                        		if (Util.checkForPlainDOI(bes.getField(field))){
-                        			// update DOI
-                                	String oldValue = bes.getField("doi");
-                                	String newValue = Util.getDOI(bes.getField(field));                                	
-                        			ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
-                        			bes.setField("doi", newValue);
-                        			
-                        			Util.removeDOIfromBibtexEntryField(bes, field, ce);
-                        		}
-                            } 
-                        }
-                    }
-                    
-                    ce.end();
-                    if (ce.hasEdits()) {
-                    	updateEntryEditorIfShowing();
-                    	undoManager.addEdit(ce);
-                    	System.out.println(undoManager.toString());
-                    }
-        }
-
-        // Run third, on EDT:
-        public void update() {
-            database.setFollowCrossrefs(true);
-            if (cancelled) {
-                frame.unblock();
-                return;
-            }
-            markBaseChanged() ;
-            numSelected = entries.size();
-
-            output(Globals.lang("Did a cleanup for")+" "+
-               numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
-                                    : Globals.lang("entry")));
-            frame.unblock();
-        }
-    });
-
-        // The action for auto-generating PDF-Names.
-        actions.put("makePDFname", new AbstractWorker() {
-        List<BibtexEntry> entries;
-        int numSelected;
-        boolean cancelled = false;
-
-        public void init() {
-                    entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
-                    numSelected = entries.size();
-
-                    if (entries.size() == 0) { // Empty selection. Inform the user to select entries first.
-                        JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want Auto-PDF-Names to be generated for."),
-                                                      Globals.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
-                        return ;
-                    }
-            frame.block();
-            output(Globals.lang("Generating Auto-PDF-Names for")+" "+
-                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
-                                            : Globals.lang("entry"))+"...");  
-        }
-
-        // Run second, on a different thread:
-                public void run() {
-                    database.setFollowCrossrefs(false);
-                    BibtexEntry bes = null ;
-                    
-					// Ask if undoable action should be continued
-                    if (Globals.prefs.getBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN) && !entries.isEmpty()) {
-	                    CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-	                    		Globals.lang("Disable this confirmation dialog"), false);
-	                    int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Autogenerate PDF Names"),
-	                            JOptionPane.YES_NO_OPTION);
-	                    if (cbm.isSelected())
-	                        Globals.prefs.putBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, false);
-	                    if (answer == JOptionPane.NO_OPTION) {
-	                        // Ok, break off the operation.
-	                        cancelled = true;
-	                        return;
-	                    }
-                    }
-                    int notSuccesfullRenames = 0;
-                    for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
-                        bes = i.next();
-            			
-            			String oldFilename = bes.getField(GUIGlobals.FILE_FIELD);
-            			String newFilename = Util.getLinkedFileName(database, bes);
-            			
-            			//Extract the Path
-            			FileListTableModel flModel = new FileListTableModel();
-            			flModel.setContent(bes.getField(GUIGlobals.FILE_FIELD));
-            			
-            			if(flModel.getRowCount() == 0) { //if the entry is not linked with a pdf
-            				continue;
-            			}
-            			String realOldFilename = flModel.getEntry(0).getLink();
-            			
-            			//Add extension to newFilename
-            			newFilename = newFilename + "." + flModel.getEntry(0).getType().getExtension();
-            			
-            			//get new Filename with path
-            			String newPath = Util.renamePath(realOldFilename, newFilename);
-            			
-            			//do rename
-            			boolean renameSuccesfull = Util.renameFile(realOldFilename, newPath);
-            			
-            			if(renameSuccesfull) {
-            				//Change the path for this entry
-            				String description = flModel.getEntry(0).getDescription();
-            				ExternalFileType type = flModel.getEntry(0).getType();
-            				flModel.removeEntry(0);
-            		        flModel.addEntry(0, new FileListEntry(description, newPath, type));
-            		        String newValue = flModel.getStringRepresentation();
-            				bes.setField(GUIGlobals.FILE_FIELD, newValue);
-            			}
-            			else {
-            				notSuccesfullRenames++; //Count this not succesfull rename
-            			}
-                    }
-                    if(notSuccesfullRenames>0) { //Rename failed for at least one entry
-	                    JOptionPane.showMessageDialog(frame, Globals.lang("File rename failed for")+" "
-	                    		+ notSuccesfullRenames 
-	                    		+ " "+Globals.lang("entries") + ".",
-	                            Globals.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
-                    }
-        }
-
-        // Run third, on EDT:
-        public void update() {
-            database.setFollowCrossrefs(true);
-            if (cancelled) {
-                frame.unblock();
-                return;
-            }
-            markBaseChanged() ;
-            numSelected = entries.size();
-            output(Globals.lang("Generated Auto-PDF-Names for")+" "+
-               numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
-                                    : Globals.lang("entry")));
-            frame.unblock();
-        }
-    });
+        actions.put("Cleanup", cleanUpAction);
 
         actions.put("search", new BaseAction() {
                 public void action() {
@@ -2884,7 +2692,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight()-splitPane.getDividerLocation());
     }
 
-    class UndoAction extends BaseAction {
+	class UndoAction extends BaseAction {
         public void action() {
             try {
                 JComponent focused = Globals.focusListener.getFocused();
