@@ -20,7 +20,7 @@ import net.sf.jabref.BibtexEntry;
 import java.util.Comparator;
 
 /**
- * Comparator that handles icon columns.
+ * Comparator that handles icon columns. 
  */
 public class IconComparator implements Comparator<BibtexEntry> {
 
@@ -30,6 +30,10 @@ public class IconComparator implements Comparator<BibtexEntry> {
         this.fields = fields;
     }
 
+    /**
+     * Replaced old Method (see below) to give this Comparator the
+     * capability to sort with more levels than "HasGotOrHasNot"
+     *
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
         for (int i=0; i<fields.length; i++) {
@@ -42,6 +46,41 @@ public class IconComparator implements Comparator<BibtexEntry> {
                 if (val2 == null)
                     return -1;
             }
+        }
+        return 0;
+    }
+    */
+    
+    /**
+     * Replacement of old Method - Works slightly different
+     */
+    public int compare(BibtexEntry e1, BibtexEntry e2) {
+    	// First get the Field Values
+        for (int i=0; i<fields.length; i++) {
+            String val1 = e1.getField(fields[i]),
+                    val2 = e2.getField(fields[i]);
+            // Try to cast the Field Values to an Integer
+            // Leave at "0" if casting failed
+            int v1 = 0;
+            try{
+            	v1 = Integer.valueOf(val1);
+            }catch(Exception e){
+            	
+            }
+            int v2 = 0;
+            try{
+            	v2 = Integer.valueOf(val2);
+            }catch(Exception e){
+            	
+            }
+            // Compare Values like a usual Integer
+    		if (v1 < v2) {
+    			return -1;
+    		}else if (v1 > v2) {
+    			return 1;
+    		}else {
+    			return 0;
+    		}
         }
         return 0;
     }

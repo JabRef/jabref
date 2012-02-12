@@ -109,6 +109,27 @@ public class BibtexFields
     add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
     add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ).setNumeric(true) ) ;
 
+    dummy =  new BibtexSingleField( "ranking" , false) ;
+    dummy.setPrivate();
+    dummy.setWriteable(true); // This field must be written to file!
+    dummy.setDisplayable(false);
+    add(dummy) ;
+    dummy =  new BibtexSingleField( "priority" , false) ;
+    dummy.setPrivate();
+    dummy.setWriteable(true); // This field must be written to file!
+    dummy.setDisplayable(false);
+    add(dummy) ;
+    dummy =  new BibtexSingleField( "relevant" , false) ;
+    dummy.setPrivate();
+    dummy.setWriteable(true); // This field must be written to file!
+    dummy.setDisplayable(false);
+    add(dummy) ;
+    dummy =  new BibtexSingleField( "quality" , false) ;
+    dummy.setPrivate();
+    dummy.setWriteable(true); // This field must be written to file!
+    dummy.setDisplayable(false);
+    add(dummy) ;
+    
     // some semi-standard fields
     dummy = new BibtexSingleField( KEY_FIELD, true ) ;
     dummy.setPrivate();
@@ -125,7 +146,7 @@ public class BibtexFields
 
     add(new BibtexSingleField("pmid", false, GUIGlobals.SMALL_W, 60).setNumeric(true));
 
-    // additional fields ------------------------------------------------------
+    // additional fields ------------------------------------------------------ 
     add( new BibtexSingleField( "location", false ) ) ;
     add( new BibtexSingleField( "abstract", false, GUIGlobals.LARGE_W, 400  ) ) ;
 

@@ -41,12 +41,17 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     public static final String[]
-            PDF = {"pdf", "ps"}
-    ,
-    URL_ = {"url", "doi"}
-    ,
+    PDF = {"pdf", "ps"},
+    URL_ = {"url", "doi"},
     CITESEER = {"citeseerurl"},
     ARXIV = {"eprint"},
+    
+    // Values to gather iconImages for those Columns 
+    RANKING = {"ranking"},
+    PRIORITY = {"priority"},
+    RELEVANT = {"relevant"},
+    QUALITY = {"quality"},
+    
     FILE = {GUIGlobals.FILE_FIELD};
 
     BasePanel panel;
@@ -121,10 +126,25 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
         return -1;
     }
-
+    
+    /**
+     * Checks, if the Column (int col) is a Ranking-Column
+     * @param col Column Number
+     * @return Is Ranking-Column or not?
+     */
+    public boolean isRankingColumn(int col) {
+    	if (iconCols.get(col) != null) {
+    		if (iconCols.get(col)[0] == RANKING[0]){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     public Object getColumnValue(BibtexEntry be, int col) {
         Object o = null;
         String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
+        
         if (col == 0) {
             o = "#";// + (row + 1);
         }
@@ -136,10 +156,37 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     hasField = i;
             if (hasField < 0)
                 return null;
-
+            
             // Ok, so we are going to display an icon. Find out which one, and return it:
             if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
                 o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
+
+            // Handle priority column special
+            // Extra handling because the icon depends on a FieldValue
+            }else if (iconType[hasField].equals(PRIORITY[0])){
+            	// Check priority level
+            	int priorityValue = 1;
+            	try {
+            		priorityValue = Integer.parseInt(be.getField("priority"));
+            	}catch (Exception e) {
+            		// Should never happen
+            	}
+            	// No need to check for == null, since it's been done in hasField(...) already
+            	o = GUIGlobals.getTablePriorityIcon(priorityValue);
+            	
+        	// Handle ranking column special
+            // Extra handling because the icon depends on a FieldValue
+            }else if (iconType[hasField].equals(RANKING[0])){
+            	// Check ranking level
+            	int entryRankingValue = 1;
+            	try {
+            		entryRankingValue = Integer.parseInt(be.getField("ranking"));
+            	}catch (Exception e) {
+            		// Should never happen
+            	}
+            	// No need to check for == null, since it's been done in hasField(...) already
+            	o = GUIGlobals.getTableRankingIcon(entryRankingValue);
+            	
             } else
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
         } else {
@@ -226,6 +273,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             iconCols.put(coln++, URL_);
         if (Globals.prefs.getBoolean("arxivColumn"))
             iconCols.put(coln++, ARXIV);
+        
+        // Add special Icon Columns
+        if (Globals.prefs.getBoolean("showRanking"))
+            iconCols.put(coln++, RANKING);
+        if (Globals.prefs.getBoolean("showRelevant"))
+            iconCols.put(coln++, RELEVANT);
+        if (Globals.prefs.getBoolean("showQuality"))
+            iconCols.put(coln++, QUALITY);
+        if (Globals.prefs.getBoolean("showPriority"))
+            iconCols.put(coln++, PRIORITY);
 
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();

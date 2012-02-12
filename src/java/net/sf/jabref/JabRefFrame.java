@@ -87,7 +87,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     
     private int lastTabbedPanelSelectionIndex = -1 ;
 
-    // The sidepane manager takes care of populating the sidepane.
+    // The sidepane manager takes care of populating the sidepane. 
     public SidePaneManager sidePaneManager;
 
     JTabbedPane tabbedPane; // initialized at constructor
@@ -203,6 +203,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   Globals.lang("Unmark entries"),
                                   prefs.getKey("Unmark entries")),
+       relevant = new GeneralAction("setRelevant", "Set to relevant",
+                                          Globals.lang("Set to relevant")),
+                                          
+       irelevant = new GeneralAction("setIrelevant", "Set to irelevant",
+                                          Globals.lang("Set to irelevant")),
+                                          
+		goodQuality = new GeneralAction("setGoodQuality", "Set quality to good",
+		                                            Globals.lang("Set quality to good")),
+			                                              
+		badQuality = new GeneralAction("setBadQuality", "Set quality to good",
+		                                            Globals.lang("Set quality to good")),
+			                                              
+		priority = new GeneralAction("setPriority", "Set Priority",
+		                                            Globals.lang("Set Priority")),
+                                                  
+		exportToKeywords = new GeneralAction("exportToKeywords", "Export Keywords to Keyword Field",
+									Globals.lang("Export Keywords to Keyword Field")),
+                                    
+		importFromKeywords = new GeneralAction("importFromKeywords", "Import Keywords from Keyword Field",
+									Globals.lang("Import Keywords from Keyword Field")),
+                                  
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
       saveSessionAction = new SaveSessionAction(),
@@ -389,6 +410,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   public JabRefFrame() {
     init();
     updateEnabledState();
+    
+    
   }
 
   private void init() {
@@ -1224,7 +1247,26 @@ public JabRefPreferences prefs() {
           markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
       edit.add(markSpecific);
       edit.add(unmark);
-      edit.add(unmarkAll);
+      edit.add(unmarkAll); 
+      edit.addSeparator();
+      // Add Ranking Menu
+      JMenu chooseRanking = subMenu(Globals.lang("Ranking"));
+      chooseRanking.setIcon((new ImageIcon(GUIGlobals.getIconUrl("rank1"))));
+      for (int i = 0; i <= 5; i++)
+    	  chooseRanking.add(new RankEntriesAction(this, i).getMenuItem());	
+      edit.add(chooseRanking);
+      // Add Priorities Menu
+      JMenu choosePriority = subMenu(Globals.lang("Priority"));
+      choosePriority.setIcon((new ImageIcon(GUIGlobals.getIconUrl("priority"))));
+      for (int i = 0; i <= 3; i++)
+    	  choosePriority.add(new PriorityEntriesAction(this, i).getMenuItem());
+      edit.add(choosePriority);
+	  edit.add(relevant);
+	  edit.add(irelevant);
+      edit.add(goodQuality);
+      edit.add(badQuality);
+      edit.add(exportToKeywords);
+      edit.add(importFromKeywords);
       edit.addSeparator();
       edit.add(selectAll);
       mb.add(edit);
@@ -1420,6 +1462,19 @@ public JabRefPreferences prefs() {
     tlb.addSeparator();
     tlb.addAction(mark);
     tlb.addAction(unmark);
+    tlb.addSeparator();
+    // Ranking Menu
+    RankingDropDownButton rankButton = new RankingDropDownButton(this);
+    tlb.add(rankButton.getComponent());
+    // Priority Menu
+    PriorityDropDownButton prioButton = new PriorityDropDownButton(this);
+    tlb.add(prioButton.getComponent());
+    tlb.addAction(relevant);
+    tlb.addAction(irelevant);
+    tlb.addAction(goodQuality);
+    tlb.addAction(badQuality);
+    tlb.addAction(exportToKeywords);
+    tlb.addAction(importFromKeywords);
 
     tlb.addSeparator();
     searchToggle = new JToggleButton(toggleSearch);

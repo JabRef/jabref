@@ -34,7 +34,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	JabRefPreferences _prefs;
 
     private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
-	fileColumn, arxivColumn;
+	fileColumn, arxivColumn, rankingColumn, qualityColumn, priorityColumn, relevantColumn;
 
 	private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
 		lastNamesOnly;
@@ -81,6 +81,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
 		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
 		arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
+		rankingColumn = new JCheckBox(Globals.lang("Show ranking column"));	
+		qualityColumn = new JCheckBox(Globals.lang("Show quality column"));	
+		priorityColumn = new JCheckBox(Globals.lang("Show priority column"));
+		relevantColumn = new JCheckBox(Globals.lang("Show relevant column"));
 
 		floatMarked = new JCheckBox(Globals.lang("Float marked entries"));
 
@@ -141,15 +145,19 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		builder.nextLine();
 		builder.append(pan);
 		builder.append(fileColumn);
+		builder.append(rankingColumn);
 		builder.nextLine();
         builder.append(pan);
         builder.append(pdfColumn);
+		builder.append(qualityColumn);
         builder.nextLine();
         builder.append(pan);
         builder.append(urlColumn);
+		builder.append(priorityColumn);
 		builder.nextLine();
 		builder.append(pan);
 		builder.append(arxivColumn);
+		builder.append(relevantColumn);
 		builder.nextLine();
 		builder.appendSeparator(Globals.lang("Format of author and editor names"));
 		DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
@@ -234,6 +242,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
         fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
+        rankingColumn.setSelected(_prefs.getBoolean("showRanking"));
+        qualityColumn.setSelected(_prefs.getBoolean("showQuality"));
+        priorityColumn.setSelected(_prefs.getBoolean("showPriority"));
+        relevantColumn.setSelected(_prefs.getBoolean("showRelevant"));
 
 		priField.setText(_prefs.get("priSort"));
 		secField.setText(_prefs.get("secSort"));
@@ -290,6 +302,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
 		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
+		_prefs.putBoolean("showRanking",rankingColumn.isSelected());
+		_prefs.putBoolean("showPriority",priorityColumn.isSelected());
+		_prefs.putBoolean("showQuality",qualityColumn.isSelected());
+		_prefs.putBoolean("showRelevant",relevantColumn.isSelected());
 		_prefs.putInt("autoResizeMode",
 			autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
 		_prefs.putBoolean("priDescending", priDesc.isSelected());

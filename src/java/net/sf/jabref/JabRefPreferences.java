@@ -319,6 +319,11 @@ public class JabRefPreferences {
         defaults.put("urlColumn", Boolean.TRUE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("arxivColumn", Boolean.FALSE);
+        defaults.put("showRanking", Boolean.FALSE);
+        defaults.put("showPriority", Boolean.FALSE);
+        defaults.put("showRelevant", Boolean.TRUE);
+        defaults.put("showQuality", Boolean.FALSE);
+        
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("overwriteOwner", Boolean.FALSE);
         defaults.put("allowTableEditing", Boolean.FALSE);
@@ -878,7 +883,7 @@ public class JabRefPreferences {
     private void setDefaultKeyBindings() {
         keyBinds = defKeyBinds;
     }
-
+ 
     private void defineDefaultKeyBindings() {
         defKeyBinds.put("Push to application","ctrl L");
       defKeyBinds.put("Push to LyX","ctrl L");

@@ -62,7 +62,7 @@ public class SearchResultsDialog {
 
     private JDialog diag;
     private String[] fields = new String[]{
-            "author", "title", "year", "journal"
+            "author", "title", "year", "journal" 
     };
     protected final int FILE_COL = 0, URL_COL = 1,
         PAD = 2;
@@ -231,10 +231,20 @@ public class SearchResultsDialog {
     protected void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
-            // Lock the width of icon columns.
-            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        	// Check if the Column is a RankingColumn
+        	// If this is the case, set a certain Column-width,
+        	// because the RankingIconColumn needs some more width
+        	if (frame.basePanel().tableFormat.isRankingColumn(i)) {
+        		// Lock the width of ranking icon column.
+                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+        	} else {
+        		// Lock the width of icon columns.
+                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);	
+        	}
         }
 
         for (int i = 0; i < fields.length; i++) {

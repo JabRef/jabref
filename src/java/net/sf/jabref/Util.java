@@ -101,7 +101,7 @@ public class Util {
 
 	/*
 	 * Colors are defined here.
-	 * 
+	 *  
 	 */
 	public static Color fieldsCol = new Color(180, 180, 200);
 
@@ -111,6 +111,20 @@ public class Util {
 	 */
 	final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
 		EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
+	
+	// Keyword Strings
+	// Change these if you want to change keywords representing FieldValues
+	public static String
+	PRIORITY1 = "priority1",
+	PRIORITY2 = "priority2",
+	PRIORITY3 = "priority3",
+	RANKING1 = "ranking1",
+	RANKING2 = "ranking2",
+	RANKING3 = "ranking3",
+	RANKING4 = "ranking4",
+	RANKING5 = "ranking5",
+	QUALITY = "qualitative",
+	RELEVANT = "relevant";
 
 	final static NumberFormat idFormat;
 
@@ -3145,6 +3159,196 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		if ((oldValue==null) || (!oldValue.equals(newValue))) {
 			be.setField(field, newValue);
 			ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+		}
+	}
+
+	/**
+	 * Set Entry to relevant
+	 */
+	public static void relevantEntry(BibtexEntry bibtexEntry, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		bibtexEntry.setField("relevant", "1");
+	}
+	
+	/**
+	 * Set Entry to irelevant
+	 */
+	public static void irelevantEntry(BibtexEntry bibtexEntry, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		bibtexEntry.setField("relevant", null);
+	}
+	
+	/**
+	 * Set Entry to good quality
+	 */
+	public static void goodQualityEntry(BibtexEntry bibtexEntry, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		bibtexEntry.setField("quality", "1");
+	}
+	
+	/**
+	 * Set Entry to bad quality
+	 */
+	public static void badQualityEntry(BibtexEntry bibtexEntry, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		bibtexEntry.setField("quality", null);
+	}
+	
+	/**
+	 * Set Entry ranking to value of int i
+	 */
+	public static void setRanking(BibtexEntry be, boolean b,
+			BibtexDatabase database, NamedCompound ce, int i) {
+		be.setField("ranking", String.valueOf(i));
+	}
+	
+	/**
+	 * Set Entry ranking to null
+	 */
+	public static void resetRanking(BibtexEntry be, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		be.setField("ranking", null);
+	}
+	
+	/**
+	 * Set Entry priority to value of int i
+	 */
+	public static void setPriorityEntry(BibtexEntry be, boolean b, 
+			BibtexDatabase database, NamedCompound ce, int priority) {
+		be.setField("priority", String.valueOf(priority));
+	}
+	
+	/**
+	 * Set Entry priority to null
+	 */
+	public static void resetPriorityEntry(BibtexEntry be, boolean b,
+			BibtexDatabase database, NamedCompound ce) {
+		be.setField("priority", null);
+	}
+	
+	/**
+	 * Export Keywords
+	 * Put Keywords from FieldValues to Keywords
+	 */
+	public static void exportKeywords(BibtexEntry be, boolean b,
+			BibtexDatabase database, NamedCompound ce){
+		// Create Keyword Array
+		String[] keywords = null;
+		ArrayList<String> keywordList = new ArrayList<String>();;
+		// Check if null
+		if (be.getField("keywords") == null){
+			keywords = null;
+		}else{
+			// Gather Keywords in Array
+			keywords = be.getField("keywords").replace(" ", "").split(",");
+			for (String string : keywords) {
+				keywordList.add(string);
+			}
+		}
+		// Check Priority
+		keywordList.remove(PRIORITY1);
+		keywordList.remove(PRIORITY2);
+		keywordList.remove(PRIORITY3);
+		if (be.getField("priority") != null){
+			if (be.getField("priority").equals("1")) {
+				keywordList.add(PRIORITY1);		
+			}else if (be.getField("priority").equals("2")) {
+				keywordList.add(PRIORITY2);		
+			}else if (be.getField("priority").equals("3")) {
+				keywordList.add(PRIORITY3);		
+			}
+		}
+		// Check Ranking
+		keywordList.remove(RANKING1);
+		keywordList.remove(RANKING2);
+		keywordList.remove(RANKING3);
+		keywordList.remove(RANKING4);
+		keywordList.remove(RANKING5);
+		if (be.getField("ranking") != null){
+			if (be.getField("ranking").equals("1")) {
+				keywordList.add(RANKING1);		
+			}else if (be.getField("ranking").equals("2")) {
+				keywordList.add(RANKING2);	
+			}else if (be.getField("ranking").equals("3")) {
+				keywordList.add(RANKING3);	
+			}else if (be.getField("ranking").equals("4")) {
+				keywordList.add(RANKING4);	
+			}else if (be.getField("ranking").equals("5")) {
+				keywordList.add(RANKING5);	
+			}
+		}
+		// Check Relevant
+		keywordList.remove(RELEVANT);
+		if (be.getField("relevant") != null){
+			if (be.getField("relevant").equals("1")) {
+				keywordList.add(RELEVANT);		
+			}
+		}
+		// Check Quality
+		keywordList.remove(QUALITY);
+		if (be.getField("quality") != null){
+			if (be.getField("quality").equals("1")) {
+				keywordList.add(QUALITY);		
+			}
+		}
+		// Set Keyword Field
+		String keywordString = "";
+		if (keywordList.size() > 0) {
+			for (int i = 0; i < keywordList.size()-1; i++){
+				keywordString = keywordString + keywordList.get(i) + ", ";
+			}
+			keywordString = keywordString + keywordList.get(keywordList.size()-1);
+		}
+		be.setField("keywords", keywordString);
+	}
+	
+
+	/**
+	 * Import Keywords
+	 * Put Keywords to FieldValues from Keywords
+	 */
+	public static void importKeywords(BibtexEntry be, boolean b,
+			BibtexDatabase database, NamedCompound ce){
+		// Gather Keywords in Array
+		ArrayList<String> keywordList = new ArrayList<String>();
+		if (be.getField("keywords") != null) {
+
+			String[] keywords = be.getField("keywords").replace(" ", "").split(",");
+			for (String string : keywords) {
+				keywordList.add(string);
+			}
+		}
+		// Check Priority
+		be.setField("priority", null);
+		if (keywordList.contains(PRIORITY1)){
+			be.setField("priority", "1");
+		}else if (keywordList.contains(PRIORITY2)){
+			be.setField("priority", "2");
+		}else if (keywordList.contains(PRIORITY3)){
+			be.setField("priority", "3");
+		}
+		// Check Ranking
+		be.setField("ranking", null);
+		if (keywordList.contains(RANKING1)){
+			be.setField("ranking", "1");
+		}else if (keywordList.contains(RANKING2)){
+			be.setField("ranking", "2");
+		}else if (keywordList.contains(RANKING3)){
+			be.setField("ranking", "3");
+		}else if (keywordList.contains(RANKING4)){
+			be.setField("ranking", "4");
+		}else if (keywordList.contains(RANKING5)){
+			be.setField("ranking", "5");
+		}
+		// Check Quality
+		be.setField("quality", null);
+		if (keywordList.contains(QUALITY)){
+			be.setField("quality", "1");
+		}
+		// Check Relevant
+		be.setField("relevant", null);
+		if (keywordList.contains(RELEVANT)){
+			be.setField("relevant", "1");
 		}
 	}
 }

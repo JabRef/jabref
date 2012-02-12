@@ -90,7 +90,9 @@ public class GUIGlobals {
 	pre = "/images/",
 	helpPre = "/help/",
 	fontPath = "/images/font/";
-
+	
+	static HashMap<String, JLabel> rankTableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings for ranking icons. Set up
+	static HashMap<String, JLabel> prioTableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings for priority icons. Set up
 	static HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
 	// further below.
 	public static Color activeEditor = new Color(230, 230, 255);
@@ -104,7 +106,63 @@ public class GUIGlobals {
 			return null;
 		} else return (JLabel)o;
 	}
-
+	
+	/**
+	 * Returns rankingIcons depending und rankingLevel
+	 * @param rankingLevel Level of Ranking
+	 * @return rankingIcon
+	 */
+	public static JLabel getTableRankingIcon(int rankingLevel) {
+		Object o = rankTableIcons.get("rank" + rankingLevel);
+		if (o == null) {
+			Globals.logger("Error: no table icon defined for type '"+ "rank" + rankingLevel +"'.");
+			return null;
+		} else return (JLabel)o;
+	}
+	
+	/**
+	 * Returns priorityIcons depending und priorityLevel
+	 * @param priorityLevel Level of Priority
+	 * @return priorityIcon
+	 */
+	public static JLabel getTablePriorityIcon(int rankingLevel) {
+		Object o = null;
+		//
+		if (rankingLevel == 1) {
+			o = prioTableIcons.get("red");
+		}else if (rankingLevel == 2) {
+			o = prioTableIcons.get("orange");
+		}else if (rankingLevel == 3) {
+			o = prioTableIcons.get("green");
+		}
+		//
+		if (o == null) {
+			Globals.logger("Error: no table icon defined for type '"+ "priority" + rankingLevel +"'.");
+			return null;
+		} else return (JLabel)o;
+	}
+	
+    public static String getIconString(int priorityLevel) {
+    	if (priorityLevel == 1) {
+			return "red";
+		}else if (priorityLevel == 2) {
+			return "orange";
+		}else if (priorityLevel == 3) {
+			return "green";
+		}
+    	return "red";
+    }
+    
+    public static String getPrioString(int priorityLevel) {
+    	if (priorityLevel == 1) {
+			return "Low";
+		}else if (priorityLevel == 2) {
+			return "Middle";
+		}else if (priorityLevel == 3) {
+			return "High";
+		}
+    	return "red";
+    }
 
 	//Help files (in HTML format):
 	public static String
@@ -192,6 +250,7 @@ public class GUIGlobals {
 
 	public static int DEFAULT_FIELD_LENGTH = 100,
 	NUMBER_COL_LENGTH = 32,
+	WIDTH_ICON_COL_RANKING = 35,	// Width of Ranking Icon Column
 	WIDTH_ICON_COL = 19;
 
 	// Column widths for export customization dialog table:
@@ -408,9 +467,40 @@ public class GUIGlobals {
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
         tableIcons.put(GUIGlobals.FILE_FIELD, lab);
+        lab = new JLabel(getImage("relevant"));
+        lab.setToolTipText(Globals.lang("Relevant?!"));
+        tableIcons.put("relevant", lab);
+        lab = new JLabel(getImage("quality"));
+        lab.setToolTipText(Globals.lang("good Quality?!"));
+        tableIcons.put("quality", lab);
+        // Create a ranking dummy Icon
+        lab = new JLabel(getImage("rank1"));
+        lab.setToolTipText(Globals.lang("Ranking1"));
+        lab.setName("0");
+        tableIcons.put("rank1", lab);	
+        // Ranking icons in own List
+        for (int i = 1; i <= 5; i++) {
+        	lab = new JLabel(getImage("rank" + i));
+        	lab.setToolTipText(Globals.lang("Ranking" + i));
+        	lab.setName("i");
+        	rankTableIcons.put("rank" + i, lab);
+        }
+        // Create a priority dummy Icon
+        lab = new JLabel(getImage("priority"));
+        lab.setToolTipText(Globals.lang("Priority"));
+        tableIcons.put("priority", lab);
+        // Priority Icons in own List
+        lab = new JLabel(getImage("red"));
+    	lab.setToolTipText(Globals.lang("Priority Low"));
+    	prioTableIcons.put("red", lab);
+    	lab = new JLabel(getImage("orange"));
+    	lab.setToolTipText(Globals.lang("Priority Middle"));
+    	prioTableIcons.put("orange", lab);
+    	lab = new JLabel(getImage("green"));
+    	lab.setToolTipText(Globals.lang("Priority High"));
+    	prioTableIcons.put("green", lab);
 
-
-        //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
+        //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
 	}
 
 }

@@ -121,7 +121,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
     
-    /*
+    /* 
      * The database shown in this panel.
      */
     BibtexDatabase database;
@@ -283,6 +283,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         file);
             } catch (IOException ex) {
             }
+        
     }
 
     public boolean isBaseChanged(){
@@ -1516,7 +1517,283 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   markBaseChanged();
                 }
               });
-
+              
+              actions.put("setRelevant", new BaseAction() {
+                  public void action() {
+                      try {
+                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries to relevant"));
+                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    	  if (bes == null)
+                    		  return;
+                    	  for (int i=0; i<bes.length; i++) {
+                    		  Util.relevantEntry(bes[i], false, database, ce);
+                    	  }
+                    	  ce.end();
+                    	  undoManager.addEdit(ce);
+                    	  markBaseChanged();
+                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("to relevant"));	
+                      } catch (Throwable ex) { 
+                    	  ex.printStackTrace(); 
+                      }
+                  }
+                });
+              
+              actions.put("setIrelevant", new BaseAction() {
+                  public void action() {
+                      try {
+                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries to irelevant"));
+                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    	  if (bes == null)
+                    		  return;
+                    	  for (int i=0; i<bes.length; i++) {
+                    		  Util.irelevantEntry(bes[i], false, database, ce);
+                    	  }
+                    	  ce.end();
+                    	  undoManager.addEdit(ce);
+                    	  markBaseChanged();
+                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("to irelevant"));
+                      } catch (Throwable ex) { 
+                    	  ex.printStackTrace(); 
+                      }
+                  }
+                });
+              
+              actions.put("setGoodQuality", new BaseAction() {
+                  public void action() {
+                      try {
+                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries quality to good"));
+                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    	  if (bes == null)
+                    		  return;
+                    	  for (int i=0; i<bes.length; i++) {
+                    		  Util.goodQualityEntry(bes[i], false, database, ce);
+                    	  }
+                    	  ce.end();
+                    	  undoManager.addEdit(ce);
+                    	  markBaseChanged();
+                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("quality to good"));
+                      } catch (Throwable ex) { 
+                    	  ex.printStackTrace(); 
+                      }
+                  }
+                });
+              
+              actions.put("setBadQuality", new BaseAction() {
+                  public void action() {
+                      try {
+                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries quality to bad"));
+                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    	  if (bes == null)
+                    		  return;
+                    	  for (int i=0; i<bes.length; i++) {
+                    		  Util.badQualityEntry(bes[i], false, database, ce);
+                    	  }
+                    	  ce.end();
+                    	  undoManager.addEdit(ce);
+                    	  markBaseChanged();
+                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("quality to bad"));
+                      } catch (Throwable ex) { 
+                    	  ex.printStackTrace(); 
+                      }
+                  }
+                });
+              
+              actions.put("setPriority1", new BaseAction() {
+                  public void action() {
+                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 1"));
+                    BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    if (bes == null)
+              		  return;
+              	  	for (int i=0; i<bes.length; i++) {
+                    	Util.setPriorityEntry(bes[i], false, database, ce, 1);
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setPriority2", new BaseAction() {
+                  public void action() {
+                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 2"));
+                    BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    if (bes == null)
+              		  return;
+              	  	for (int i=0; i<bes.length; i++) {
+                    	Util.setPriorityEntry(bes[i], false, database, ce, 2);
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setPriority3", new BaseAction() {
+                  public void action() {
+                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 3"));
+                    BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    if (bes == null)
+              		  return;
+              	  	for (int i=0; i<bes.length; i++) {
+                    	Util.setPriorityEntry(bes[i], false, database, ce, 3);
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("resetPriority", new BaseAction() {
+                  public void action() {
+                    NamedCompound ce = new NamedCompound(Globals.lang("Reset Priority"));
+                    BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    if (bes == null)
+              		  return;
+              	  	for (int i=0; i<bes.length; i++) {
+                    	Util.resetPriorityEntry(bes[i], false, database, ce);
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Reset priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setPriority0", actions.get("resetPriority"));
+              
+              actions.put("setRanking1", new BaseAction() {
+                  public void action() {
+                    NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 1"));
+                    BibtexEntry[] bes = mainTable.getSelectedEntries();
+                    if (bes == null)
+              		  return;
+              	  	for (int i=0; i<bes.length; i++) {
+                    	Util.setRanking(bes[i], false, database, ce, 1);
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setRanking2", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 2"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.setRanking(bes[i], false, database, ce, 2);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setRanking3", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 3"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.setRanking(bes[i], false, database, ce, 3);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setRanking4", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 4"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.setRanking(bes[i], false, database, ce, 4);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setRanking5", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 5"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.setRanking(bes[i], false, database, ce, 5);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("resetRanking", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Reset Ranking"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.resetRanking(bes[i], false, database, ce);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Reset Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("setRanking0", actions.get("resetRanking"));
+              
+              actions.put("exportToKeywords", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Export Keywords to Keyword Field"));
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.exportKeywords(bes[i], false, database, ce);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Exported Keywords for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
+              actions.put("importFromKeywords", new BaseAction() {
+                  public void action() {
+                	  NamedCompound ce = new NamedCompound(Globals.lang("Import Keywords from Keyword Field"));	
+                      BibtexEntry[] bes = mainTable.getSelectedEntries();
+                      if (bes == null)
+                		  return;
+                	  	for (int i=0; i<bes.length; i++) {
+                      	Util.importKeywords(bes[i], false, database, ce);
+                      }
+                      ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    output(Globals.lang("Imported Keywords for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  }
+                });
+              
               actions.put("togglePreview", new BaseAction() {
                       public void action() {
                           boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
@@ -1786,6 +2063,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 //Add the new entry to the group(s) selected in the Group Panel
                 addToSelectedGroup(be);
+
+                // Set Self-Created entries to have a high quality
+                be.setField("quality", "1");
                 
                 return be;
             } catch (KeyCollisionException ex) {
