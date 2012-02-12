@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -111,7 +111,7 @@ public class Globals {
     // String array that maps from month number to month string label:
 	public static String[] MONTHS = new String[] { "jan", "feb", "mar", "apr", "may", "jun", "jul",
 		"aug", "sep", "oct", "nov", "dec" };
-
+	
 	// Map that maps from month string labels to
 	public static Map<String, String> MONTH_STRINGS = new HashMap<String, String>();
 	static {
@@ -175,11 +175,14 @@ public class Globals {
 
 	public static HelpDialog helpDiag = null;
 
-	public static String osName = System.getProperty("os.name", "def");
+	public static final String osName = System.getProperty("os.name", "def");
 
-	public static boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows");
+	public static final boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows");
 
-	public static String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
+	public static final String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
+	
+	public static final String SEPARATING_CHARS         = ";.,\n ";
+	public static final String SEPARATING_CHARS_NOSPACE = ";.,\n";
 
 	public static SidePaneManager sidePaneManager;
 

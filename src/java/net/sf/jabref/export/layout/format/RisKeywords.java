@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.export.layout.format;
 
+import java.util.List;
+
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.*;
 
@@ -24,11 +26,11 @@ public class RisKeywords implements LayoutFormatter {
 		if (s == null)
 			return "";
 		StringBuilder sb = new StringBuilder();
-		String[] keywords = s.split(",[ ]*");
-		for (int i=0; i<keywords.length; i++) {
+		List<String> keywords = Util.getSeparatedKeywords(s);
+		for (int i=0; i<keywords.size(); i++) {
 			sb.append("KW  - ");
-			sb.append(keywords[i]);
-			if (i < keywords.length-1)
+			sb.append(keywords.get(i));
+			if (i < keywords.size()-1)
 				sb.append(Globals.NEWLINE);
 		}
 		return sb.toString();

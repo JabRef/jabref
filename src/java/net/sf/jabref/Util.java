@@ -3090,4 +3090,61 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     	return success;
     }
 
+	public static ArrayList<String> getSeparatedKeywords(String keywords) {
+		ArrayList<String> res = new ArrayList<String>();
+		if (keywords == null) return res;
+		// _NOSPACE is a hack to support keywords such as "choreography transactions"
+		// a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
+		// if nothing is found, " " is likely to be the separating char.
+		// solution by RisKeywords.java: s.split(",[ ]*")
+		StringTokenizer tok = new StringTokenizer(keywords, Globals.SEPARATING_CHARS_NOSPACE);
+		while (tok.hasMoreTokens()) {
+			String word = tok.nextToken().trim();
+			res.add(word);
+		}
+		return res;
+	}
+	
+	public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
+		return getSeparatedKeywords(be.getField("keywords"));
+	}
+	
+	public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
+		// Set Keyword Field
+		String oldValue = entry.getField("keywords");
+		String newValue;
+		if (keywords.size() > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (String keyword: keywords) {
+				sb.append(keyword);
+				sb.append(", ");
+			}
+			sb.delete(sb.length()-2, sb.length());
+			newValue = sb.toString();
+		} else {
+			newValue = null;
+		}
+		if (!oldValue.equals(newValue)) {
+			entry.setField("keywords", newValue);
+			ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
+		}
+	}
+	
+	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
+		updateField(be, field, newValue, ce, false);
+	}
+
+	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
+		String oldValue = be.getField(field);
+		if (nullFieldIfValueIsTheSame && (oldValue != null) && (oldValue.equals(newValue))) {
+			// if oldValue == newValue then reset field if required by parameter
+			newValue = null;
+		}
+		if ((oldValue == null) && (newValue == null))
+			return;
+		if ((oldValue==null) || (!oldValue.equals(newValue))) {
+			be.setField(field, newValue);
+			ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+		}
+	}
 }

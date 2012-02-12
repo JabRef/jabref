@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,9 +18,10 @@ package net.sf.jabref.autocompleter;
 import java.util.StringTokenizer;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 /**
- * Stores all words which are separated by ' ','.',',' and '\n'. This
+ * Stores all words which are separated by Globals.SEPARATING_CHARS. This
  * autocompleter only processes the field which is given by the fieldname.
  * 
  * @author kahlert, cordes
@@ -52,7 +53,7 @@ public class DefaultAutoCompleter extends AbstractAutoCompleter {
 			if (fieldValue == null) {
 				return;
 			} else {
-				StringTokenizer tok = new StringTokenizer(fieldValue.toString(), " ;.,\n");
+				StringTokenizer tok = new StringTokenizer(fieldValue.toString(), Globals.SEPARATING_CHARS);
 				while (tok.hasMoreTokens()) {
 					String word = tok.nextToken();
 					addWordToIndex(word);
