@@ -260,7 +260,7 @@ public class CleanUpAction extends AbstractWorker {
         // First check if the DOI Field is empty
         if (bes.getField("doi") != null) {
         	String doiFieldValue = bes.getField("doi");
-        	if (Util.checkForDOIwithHTTPprefix(bes.getField(doiFieldValue))) {
+        	if (Util.checkForDOIwithHTTPprefix(doiFieldValue)) {
         		String newValue = Util.getDOI(doiFieldValue);
         		ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
         		bes.setField("doi", newValue);
