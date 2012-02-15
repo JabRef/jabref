@@ -452,7 +452,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         //This is for selecting and displaying the first entry in the glTable
         this.glTable.repaint();
         if(this.glTable.getSelectedRowCount() == 0) //Only if no row selection is done, until now
-        	this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
+        	if (this.glTable.getRowCount()>0)
+        		this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
     }
 
     /**
