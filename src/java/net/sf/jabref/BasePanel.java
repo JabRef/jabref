@@ -94,6 +94,14 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.specialfields.SpecialFieldAction;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
@@ -1518,281 +1526,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
               });
               
-              actions.put("setRelevant", new BaseAction() {
-                  public void action() {
-                      try {
-                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries to relevant"));
-                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    	  if (bes == null)
-                    		  return;
-                    	  for (int i=0; i<bes.length; i++) {
-                    		  Util.relevantEntry(bes[i], false, database, ce);
-                    	  }
-                    	  ce.end();
-                    	  undoManager.addEdit(ce);
-                    	  markBaseChanged();
-                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("to relevant"));	
-                      } catch (Throwable ex) { 
-                    	  ex.printStackTrace(); 
-                      }
-                  }
-                });
+              actions.put(Relevance.getInstance().getValues().get(0).getActionName(), 
+                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), "Marked %0 entries as relevant"));
+              actions.put(Quality.getInstance().getValues().get(0).getActionName(),
+                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), "Set quality of %0 entries to good"));
               
-              actions.put("setIrelevant", new BaseAction() {
-                  public void action() {
-                      try {
-                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries to irelevant"));
-                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    	  if (bes == null)
-                    		  return;
-                    	  for (int i=0; i<bes.length; i++) {
-                    		  Util.irelevantEntry(bes[i], false, database, ce);
-                    	  }
-                    	  ce.end();
-                    	  undoManager.addEdit(ce);
-                    	  markBaseChanged();
-                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("to irelevant"));
-                      } catch (Throwable ex) { 
-                    	  ex.printStackTrace(); 
-                      }
-                  }
-                });
+              for (SpecialFieldValue prio: Priority.getInstance().getValues()) {
+	              actions.put(prio.getActionName(), prio.getAction(this.frame));
+//	            		  new SpecialFieldAction(frame, Priority.getInstance(), strPrio, false, 
+//	            				  Globals.lang("Set priority to").concat(" ").concat(strPrio), "Set priority %0 for %1 entries"));
+              }
               
-              actions.put("setGoodQuality", new BaseAction() {
-                  public void action() {
-                      try {
-                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries quality to good"));
-                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    	  if (bes == null)
-                    		  return;
-                    	  for (int i=0; i<bes.length; i++) {
-                    		  Util.goodQualityEntry(bes[i], false, database, ce);
-                    	  }
-                    	  ce.end();
-                    	  undoManager.addEdit(ce);
-                    	  markBaseChanged();
-                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("quality to good"));
-                      } catch (Throwable ex) { 
-                    	  ex.printStackTrace(); 
-                      }
-                  }
-                });
-              
-              actions.put("setBadQuality", new BaseAction() {
-                  public void action() {
-                      try {
-                    	  NamedCompound ce = new NamedCompound(Globals.lang("Set entries quality to bad"));
-                    	  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    	  if (bes == null)
-                    		  return;
-                    	  for (int i=0; i<bes.length; i++) {
-                    		  Util.badQualityEntry(bes[i], false, database, ce);
-                    	  }
-                    	  ce.end();
-                    	  undoManager.addEdit(ce);
-                    	  markBaseChanged();
-                    	  output(Globals.lang("Set")+" "+Globals.lang(bes.length>0?"entry":"entries") + " " + Globals.lang("quality to bad"));
-                      } catch (Throwable ex) { 
-                    	  ex.printStackTrace(); 
-                      }
-                  }
-                });
-              
-              actions.put("setPriority1", new BaseAction() {
-                  public void action() {
-                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 1"));
-                    BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    if (bes == null)
-              		  return;
-              	  	for (int i=0; i<bes.length; i++) {
-                    	Util.setPriorityEntry(bes[i], false, database, ce, 1);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setPriority2", new BaseAction() {
-                  public void action() {
-                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 2"));
-                    BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    if (bes == null)
-              		  return;
-              	  	for (int i=0; i<bes.length; i++) {
-                    	Util.setPriorityEntry(bes[i], false, database, ce, 2);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setPriority3", new BaseAction() {
-                  public void action() {
-                    NamedCompound ce = new NamedCompound(Globals.lang("Set Priority to 3"));
-                    BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    if (bes == null)
-              		  return;
-              	  	for (int i=0; i<bes.length; i++) {
-                    	Util.setPriorityEntry(bes[i], false, database, ce, 3);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("resetPriority", new BaseAction() {
-                  public void action() {
-                    NamedCompound ce = new NamedCompound(Globals.lang("Reset Priority"));
-                    BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    if (bes == null)
-              		  return;
-              	  	for (int i=0; i<bes.length; i++) {
-                    	Util.resetPriorityEntry(bes[i], false, database, ce);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Reset priority for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setPriority0", actions.get("resetPriority"));
-              
-              actions.put("setRanking1", new BaseAction() {
-                  public void action() {
-                    NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 1"));
-                    BibtexEntry[] bes = mainTable.getSelectedEntries();
-                    if (bes == null)
-              		  return;
-              	  	for (int i=0; i<bes.length; i++) {
-                    	Util.setRanking(bes[i], false, database, ce, 1);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setRanking2", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 2"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.setRanking(bes[i], false, database, ce, 2);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setRanking3", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 3"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.setRanking(bes[i], false, database, ce, 3);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setRanking4", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 4"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.setRanking(bes[i], false, database, ce, 4);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setRanking5", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Set Ranking to 5"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.setRanking(bes[i], false, database, ce, 5);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Set Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("resetRanking", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Reset Ranking"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.resetRanking(bes[i], false, database, ce);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Reset Ranking for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("setRanking0", actions.get("resetRanking"));
-              
-              actions.put("exportToKeywords", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Export Keywords to Keyword Field"));
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.exportKeywords(bes[i], false, database, ce);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Exported Keywords for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
-              
-              actions.put("importFromKeywords", new BaseAction() {
-                  public void action() {
-                	  NamedCompound ce = new NamedCompound(Globals.lang("Import Keywords from Keyword Field"));	
-                      BibtexEntry[] bes = mainTable.getSelectedEntries();
-                      if (bes == null)
-                		  return;
-                	  	for (int i=0; i<bes.length; i++) {
-                      	Util.importKeywords(bes[i], false, database, ce);
-                      }
-                      ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    output(Globals.lang("Imported Keywords for")+" "+Globals.lang(bes.length>0?"entry":"entries"));
-                  }
-                });
+              for (SpecialFieldValue prio: Rank.getInstance().getValues()) {
+	              actions.put(prio.getActionName(), prio.getAction(this.frame));
+//	              actions.put(prio.getActionName(),
+//	            		  new SpecialFieldAction(frame, Priority.getInstance(), strPrio, false, 
+//	            				  Globals.lang("Set ranking to").concat(" ").concat(strPrio), "Set rank %0 for %1 entries"));
+              }
               
               actions.put("togglePreview", new BaseAction() {
                       public void action() {
@@ -2139,6 +1889,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Must initialize sort columns somehow:
 
         database.addDatabaseChangeListener(eventList);
+        database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<BibtexEntry>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
         searchFilterList = new FilterList<BibtexEntry>(groupFilterList, NoSearchMatcher.INSTANCE);
         //final SortedList sortedList = new SortedList(searchFilterList, null);

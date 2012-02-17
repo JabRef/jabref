@@ -27,6 +27,10 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.SearchRuleSet;
 import net.sf.jabref.Util;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
 
@@ -47,10 +51,10 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     ARXIV = {"eprint"},
     
     // Values to gather iconImages for those Columns 
-    RANKING = {"ranking"},
-    PRIORITY = {"priority"},
-    RELEVANT = {"relevant"},
-    QUALITY = {"quality"},
+    RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING},
+    PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY},
+    RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE},
+    QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY},
     
     FILE = {GUIGlobals.FILE_FIELD};
 
@@ -75,7 +79,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (col == 0) {
             return GUIGlobals.NUMBER_COL;
         } else if (getIconTypeForColumn(col) != null) {
-            return "";
+            return getIconTypeForColumn(col)[0].substring(0,1).toUpperCase();
         }
         else // try to find an alternative fieldname (for display)
         {
@@ -163,32 +167,22 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
             // Handle priority column special
             // Extra handling because the icon depends on a FieldValue
-            }else if (iconType[hasField].equals(PRIORITY[0])){
-            	// Check priority level
-            	int priorityValue = 1;
-            	try {
-            		priorityValue = Integer.parseInt(be.getField("priority"));
-            	}catch (Exception e) {
-            		// Should never happen
+            } else if (iconType[hasField].equals(PRIORITY[0])) {
+            	SpecialFieldValue prio = Priority.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
+            	if (prio != null) {
+            		// prio might be null if fieldvalue is an invalid value, therefor we check for != null
+            		o = prio.createLabel();
             	}
-            	// No need to check for == null, since it's been done in hasField(...) already
-            	o = GUIGlobals.getTablePriorityIcon(priorityValue);
-            	
         	// Handle ranking column special
             // Extra handling because the icon depends on a FieldValue
-            }else if (iconType[hasField].equals(RANKING[0])){
-            	// Check ranking level
-            	int entryRankingValue = 1;
-            	try {
-            		entryRankingValue = Integer.parseInt(be.getField("ranking"));
-            	}catch (Exception e) {
-            		// Should never happen
+            } else if (iconType[hasField].equals(RANKING[0])) {
+            	SpecialFieldValue rank = Rank.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
+            	if (rank != null) {
+            		o = rank.createLabel();
             	}
-            	// No need to check for == null, since it's been done in hasField(...) already
-            	o = GUIGlobals.getTableRankingIcon(entryRankingValue);
-            	
-            } else
+            } else {
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
+            }
         } else {
             String[] fld = columns[col - padleft];
             // Go through the fields until we find one with content:
@@ -275,14 +269,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             iconCols.put(coln++, ARXIV);
         
         // Add special Icon Columns
-        if (Globals.prefs.getBoolean("showRanking"))
-            iconCols.put(coln++, RANKING);
-        if (Globals.prefs.getBoolean("showRelevant"))
-            iconCols.put(coln++, RELEVANT);
-        if (Globals.prefs.getBoolean("showQuality"))
-            iconCols.put(coln++, QUALITY);
-        if (Globals.prefs.getBoolean("showPriority"))
-            iconCols.put(coln++, PRIORITY);
+        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
+	            iconCols.put(coln++, RANKING);
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
+	            iconCols.put(coln++, RELEVANCE);
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
+	            iconCols.put(coln++, QUALITY);
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
+	            iconCols.put(coln++, PRIORITY);
+        }
 
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();

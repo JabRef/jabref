@@ -65,7 +65,12 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
             list.remove(e.getEntry());
         } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
             int index = list.indexOf(e.getEntry());
-            list.set(index, e.getEntry());
+            if (index != -1) {
+            	// SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
+            	// DatabaseChangeEvent.ADDED_ENTRY
+            	// thus, 
+            	list.set(index, e.getEntry());
+            }
         }
         list.getReadWriteLock().writeLock().unlock();
 

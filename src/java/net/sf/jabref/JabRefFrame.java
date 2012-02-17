@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -63,6 +64,13 @@ import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstallerAction;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldAction;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
@@ -203,28 +211,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   Globals.lang("Unmark entries"),
                                   prefs.getKey("Unmark entries")),
-       relevant = new GeneralAction("setRelevant", "Set to relevant",
-                                          Globals.lang("Set to relevant")),
-                                          
-       irelevant = new GeneralAction("setIrelevant", "Set to irelevant",
-                                          Globals.lang("Set to irelevant")),
-                                          
-		goodQuality = new GeneralAction("setGoodQuality", "Set quality to good",
-		                                            Globals.lang("Set quality to good")),
-			                                              
-		badQuality = new GeneralAction("setBadQuality", "Set quality to good",
-		                                            Globals.lang("Set quality to good")),
-			                                              
-		priority = new GeneralAction("setPriority", "Set Priority",
-		                                            Globals.lang("Set Priority")),
-                                                  
-		exportToKeywords = new GeneralAction("exportToKeywords", "Export Keywords to Keyword Field",
-									Globals.lang("Export Keywords to Keyword Field")),
-                                    
-		importFromKeywords = new GeneralAction("importFromKeywords", "Import Keywords from Keyword Field",
-									Globals.lang("Import Keywords from Keyword Field")),
-                                  
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
+       toggleRelevance = new GeneralAction(
+    		   Relevance.getInstance().getValues().get(0).getActionName(), 
+    		   Relevance.getInstance().getValues().get(0).getMenuString(),
+    		   Relevance.getInstance().getValues().get(0).getToolTipText()),
+       toggleQualityAssured = new GeneralAction(
+				Quality.getInstance().getValues().get(0).getActionName(),
+				Quality.getInstance().getValues().get(0).getMenuString(),
+				Quality.getInstance().getValues().get(0).getToolTipText()),
+//    	priority = new GeneralAction("setPriority", "Set priority",
+//    			                                            Globals.lang("Set priority")),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
@@ -1249,24 +1246,25 @@ public JabRefPreferences prefs() {
       edit.add(unmark);
       edit.add(unmarkAll); 
       edit.addSeparator();
-      // Add Ranking Menu
-      JMenu chooseRanking = subMenu(Globals.lang("Ranking"));
-      chooseRanking.setIcon((new ImageIcon(GUIGlobals.getIconUrl("rank1"))));
-      for (int i = 0; i <= 5; i++)
-    	  chooseRanking.add(new RankEntriesAction(this, i).getMenuItem());	
-      edit.add(chooseRanking);
-      // Add Priorities Menu
-      JMenu choosePriority = subMenu(Globals.lang("Priority"));
-      choosePriority.setIcon((new ImageIcon(GUIGlobals.getIconUrl("priority"))));
-      for (int i = 0; i <= 3; i++)
-    	  choosePriority.add(new PriorityEntriesAction(this, i).getMenuItem());
-      edit.add(choosePriority);
-	  edit.add(relevant);
-	  edit.add(irelevant);
-      edit.add(goodQuality);
-      edit.add(badQuality);
-      edit.add(exportToKeywords);
-      edit.add(importFromKeywords);
+      if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+    	  JMenu m;
+    	  if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+	    	  m = new JMenu();
+	    	  RightClickMenu.populateSpecialFieldMenu(m, Rank.getInstance(), this);
+	    	  edit.add(m);
+    	  }
+    	  if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+    		  edit.add(toggleRelevance);
+    	  }
+    	  if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+    		  edit.add(toggleQualityAssured);
+    	  }
+    	  if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+    		  m = new JMenu();
+    		  RightClickMenu.populateSpecialFieldMenu(m, Priority.getInstance(), this);
+    		  edit.add(m);
+    	  }
+      }
       edit.addSeparator();
       edit.add(selectAll);
       mb.add(edit);
@@ -1463,18 +1461,20 @@ public JabRefPreferences prefs() {
     tlb.addAction(mark);
     tlb.addAction(unmark);
     tlb.addSeparator();
-    // Ranking Menu
-    RankingDropDownButton rankButton = new RankingDropDownButton(this);
-    tlb.add(rankButton.getComponent());
-    // Priority Menu
-    PriorityDropDownButton prioButton = new PriorityDropDownButton(this);
-    tlb.add(prioButton.getComponent());
-    tlb.addAction(relevant);
-    tlb.addAction(irelevant);
-    tlb.addAction(goodQuality);
-    tlb.addAction(badQuality);
-    tlb.addAction(exportToKeywords);
-    tlb.addAction(importFromKeywords);
+    if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+    	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+    		tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this));
+    	}
+    	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+    		tlb.addAction(toggleRelevance);
+    	}
+    	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+    		tlb.addAction(toggleQualityAssured);
+    	}
+    	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+    		tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this));
+    	}
+    }
 
     tlb.addSeparator();
     searchToggle = new JToggleButton(toggleSearch);

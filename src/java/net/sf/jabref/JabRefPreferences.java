@@ -50,6 +50,7 @@ import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class JabRefPreferences {
 
@@ -319,10 +320,14 @@ public class JabRefPreferences {
         defaults.put("urlColumn", Boolean.TRUE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("arxivColumn", Boolean.FALSE);
-        defaults.put("showRanking", Boolean.FALSE);
-        defaults.put("showPriority", Boolean.FALSE);
-        defaults.put("showRelevant", Boolean.TRUE);
-        defaults.put("showQuality", Boolean.FALSE);
+        
+        defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
+        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
+        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
+        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING_DEFAULT);
+        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
+        defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
+    	defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
         
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("overwriteOwner", Boolean.FALSE);

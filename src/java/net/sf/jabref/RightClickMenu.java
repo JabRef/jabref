@@ -24,6 +24,13 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.groups.*;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class RightClickMenu extends JPopupMenu
         implements PopupMenuListener {
@@ -33,8 +40,8 @@ public class RightClickMenu extends JPopupMenu
     JMenu groupAddMenu = new JMenu(Globals.lang("Add to group")),
             groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
             groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")), // JZTODO lyrics
-            rankingMenu = new JMenu(Globals.lang("Ranking")),
-            priorityMenu = new JMenu(Globals.lang("Priority")),
+            rankingMenu = new JMenu(),
+            priorityMenu = new JMenu(),
             typeMenu = new JMenu(Globals.lang("Change entry type"));
     JCheckBoxMenuItem
             floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
@@ -155,112 +162,29 @@ public class RightClickMenu extends JPopupMenu
             addSeparator();
         }
 
-        // Build RankingMenu
-        populateRankingMenu();
-        add(this.rankingMenu);
-        // Build PriorityMenu
-        populatePriorityMenu();
-        add(this.priorityMenu);
-        
-        // Relevant
-        if (multiple) {
-        	add(new AbstractAction(Globals.lang("Set to relevant"), GUIGlobals.getImage("relevant")) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand("setRelevant");
-                    } catch (Throwable ex) {}
-                }
-            });
-        	
-        	add(new AbstractAction(Globals.lang("Set to irelevant"), GUIGlobals.getImage("irelevant")) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand("setIrelevant");
-                    } catch (Throwable ex) {}
-                }
-            });
-        
-        }else if (be != null){
-        	if (be.getField("relevant") == null) {
-        		add(new AbstractAction(Globals.lang("Set to relevant"), GUIGlobals.getImage("relevant")) {
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand("setRelevant");
-                        } catch (Throwable ex) {}
-                    }
-                });
-        	} else {
-        		add(new AbstractAction(Globals.lang("Set to irelevant"), GUIGlobals.getImage("irelevant")) {
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand("setIrelevant");
-                        } catch (Throwable ex) {}
-                    }
-                });
-        		
+        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+        		populateSpecialFieldMenu(this.rankingMenu, Rank.getInstance(), panel.frame);
+    	        add(this.rankingMenu);
         	}
-        }
-        
-        // Quality
-        if (multiple) {
-        	add(new AbstractAction(Globals.lang("Set quality to good"), GUIGlobals.getImage("quality")) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand("setGoodQuality");
-                    } catch (Throwable ex) {}
-                }
-            });
-        	
-        	add(new AbstractAction(Globals.lang("Set quality to bad"), GUIGlobals.getImage("badQuality")) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand("setBadQuality");
-                    } catch (Throwable ex) {}
-                }
-            });
-        
-        }else{
-        	if (be.getField("quality") == null) {
-        		add(new AbstractAction(Globals.lang("Set quality to good"), GUIGlobals.getImage("quality")) {
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand("setGoodQuality");
-                        } catch (Throwable ex) {}
-                    }
-                });
-        		
-        	} else {
-        		
-        		add(new AbstractAction(Globals.lang("Set quality to bad"), GUIGlobals.getImage("badQuality")) {	
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            panel.runCommand("setBadQuality");
-                        } catch (Throwable ex) {}
-                    }
-                });
-        		
+	        
+	        // TODO: multiple handling for relevance and quality-assurance
+	        // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
+	        // if one value is selected either set or clear should be offered
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+        		add(Relevance.getInstance().getValues().get(0).getMenuAction(panel.frame));
         	}
-        }
-        
-        // Export Keyword
-        add(new AbstractAction(Globals.lang("Export Keywords to Keyword Field"), GUIGlobals.getImage("exportToKeywords")) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand("exportToKeywords");
-                } catch (Throwable ex) {}
-            }
-        });
-        
-        // Import Keyword
-        add(new AbstractAction(Globals.lang("Import Keywords from Keyword Field"), GUIGlobals.getImage("importFromKeywords")) {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    panel.runCommand("importFromKeywords");
-                } catch (Throwable ex) {}
-            }
-        });
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+        		add(Quality.getInstance().getValues().get(0).getMenuAction(panel.frame));
+        	}
 
-        addSeparator();
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+		        populateSpecialFieldMenu(this.priorityMenu, Priority.getInstance(), panel.frame);
+		        add(this.priorityMenu);
+        	}
+	        
+	        addSeparator();
+        }
         
         add(new AbstractAction(Globals.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
             public void actionPerformed(ActionEvent e) {
@@ -323,7 +247,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
     }
-
+    
     /**
      * Remove all types from the menu. Then cycle through all available
      * types, and add them.
@@ -337,33 +261,18 @@ public class RightClickMenu extends JPopupMenu
     }
     
     /**
-     * Remove all types from the menu. Then cycle through all available
-     * rankings, and add them.
+     * Remove all types from the menu. 
+     * Then cycle through all available values, and add them.
      */
-    public void populateRankingMenu() {
-        rankingMenu.removeAll();
-        rankingMenu.setIcon((new ImageIcon(GUIGlobals.getIconUrl("rank1"))));
-        rankingMenu.add(new ResetRankingAction(panel));
-        int[] ranking_values = {1,2,3,4,5};
-        for (int value : ranking_values){
-        	rankingMenu.add(new ChangeRankingAction(value, panel));
+    public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
+        //menu.removeAll();
+    	menu.setText(field.getMenuString());
+        menu.setIcon(field.getRepresentingIcon());
+        for (SpecialFieldValue val: field.getValues()) {
+        	menu.add(val.getMenuAction(frame));
         }
     }
     
-    /**
-     * Remove all types from the menu. Then cycle through all available
-     * priorities, and add them.
-     */
-    public void populatePriorityMenu() {
-    	priorityMenu.removeAll();
-        priorityMenu.setIcon((new ImageIcon(GUIGlobals.getIconUrl("priority"))));
-        priorityMenu.add(new ResetPriorityAction(panel));
-        int[] priority_values = {1,2,3};
-        for (int value : priority_values){
-        	priorityMenu.add(new ChangePriorityAction(value, panel));
-        }
-    }
-
     /**
      * Set the dynamic contents of "Add to group ..." submenu.
      */
@@ -504,95 +413,4 @@ public class RightClickMenu extends JPopupMenu
         }
     }
     
-    /**
-     * Ranking Action for RankingMenu
-     *
-     */
-    public class ChangeRankingAction extends AbstractAction {
-    	int rankingAmount;
-        BasePanel panel;
-
-        /**
-         * Create a Action for Ranking Menu
-         * @param value RankingLevel
-         * @param bp BasePanel
-         */
-        public ChangeRankingAction(int value, BasePanel bp) {
-        	super((Globals.lang("Set Ranking to") + " " + value), new ImageIcon(GUIGlobals.getIconUrl("rank" + value)));
-            this.rankingAmount = value;
-            panel = bp;
-        }
-        public void actionPerformed(ActionEvent evt) {
-        	try {
-        		panel.runCommand("setRanking" + rankingAmount);
-        	}catch (Exception e){
-        		panel.runCommand("setRanking1");
-        	}
-        }
-    }
-    
-    /**
-     * Reset Ranking Action for RankingMenu
-     *
-     */
-    class ResetRankingAction extends AbstractAction {
-        BasePanel panel;
-
-        /**
-         * Create a Action for Ranking Menu (reset)
-         */
-        public ResetRankingAction(BasePanel bp) {
-        	super((Globals.lang("Reset Ranking")));
-            panel = bp;
-        }
-        public void actionPerformed(ActionEvent evt) {
-        	panel.runCommand("resetRanking");
-        }
-    }
-    
-    /**
-     * Priority Action for PriorityMenu
-     *
-     */
-    public class ChangePriorityAction extends AbstractAction {
-    	int priorityAmount;
-        BasePanel panel;
-
-        /**
-         * Create a Action for Priority Menu
-         * @param value PriorityLevel
-         * @param bp BasePanel
-         */
-        public ChangePriorityAction(int value, BasePanel bp) {
-        	super((Globals.lang("Set Priority to") + " " + GUIGlobals.getPrioString(value)), new ImageIcon(GUIGlobals.getIconUrl(GUIGlobals.getIconString(value))));
-            this.priorityAmount = value;
-            panel = bp;
-        }
-        public void actionPerformed(ActionEvent evt) {
-        	try {
-        		panel.runCommand("setPriority" + priorityAmount);
-        	}catch (Exception e){
-        		panel.runCommand("setPriority1");
-        	}
-        }
-    }
-    
-    /**
-     * Reset Priority Action for PriorityMenu
-     *
-     */
-    class ResetPriorityAction extends AbstractAction {
-        BasePanel panel;
-
-        /**
-         * Create a Action for Priority Menu (reset)
-         */
-        public ResetPriorityAction(BasePanel bp) {
-        	super((Globals.lang("Reset Priority")));
-            panel = bp;
-        }
-        public void actionPerformed(ActionEvent evt) {
-        	panel.runCommand("resetPriority");
-        }
-    }
 }

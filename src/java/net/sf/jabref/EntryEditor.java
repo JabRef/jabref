@@ -79,6 +79,7 @@ import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableChangeType;
 import net.sf.jabref.undo.UndoableFieldChange;
@@ -203,6 +204,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         type = entry.getType();
 
         entry.addPropertyChangeListener(this);
+        entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
 
         helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
         closeAction = new CloseAction();

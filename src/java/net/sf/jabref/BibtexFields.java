@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
 
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.TXMLReader;
 
 import org.w3c.dom.Element;
@@ -109,25 +110,34 @@ public class BibtexFields
     add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
     add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ).setNumeric(true) ) ;
 
-    dummy =  new BibtexSingleField( "ranking" , false) ;
-    dummy.setPrivate();
-    dummy.setWriteable(true); // This field must be written to file!
-    dummy.setDisplayable(false);
+    // custom fields not displayed at editor, but as columns in the UI
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_RANKING , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
     add(dummy) ;
-    dummy =  new BibtexSingleField( "priority" , false) ;
-    dummy.setPrivate();
-    dummy.setWriteable(true); // This field must be written to file!
-    dummy.setDisplayable(false);
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_PRIORITY , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
     add(dummy) ;
-    dummy =  new BibtexSingleField( "relevant" , false) ;
-    dummy.setPrivate();
-    dummy.setWriteable(true); // This field must be written to file!
-    dummy.setDisplayable(false);
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_RELEVANCE , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
     add(dummy) ;
-    dummy =  new BibtexSingleField( "quality" , false) ;
-    dummy.setPrivate();
-    dummy.setWriteable(true); // This field must be written to file!
-    dummy.setDisplayable(false);
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_QUALITY , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
     add(dummy) ;
     
     // some semi-standard fields

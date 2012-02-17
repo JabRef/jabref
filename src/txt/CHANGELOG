@@ -1,4 +1,7 @@
 ﻿[master branch]
+    - Added special field functionality for ranking, marking as relevant, 
+      marking as quality assured, and prioritizing.
+      Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
     - Added small popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Braces around author names are now dropped internally. They remain in the .bib though
