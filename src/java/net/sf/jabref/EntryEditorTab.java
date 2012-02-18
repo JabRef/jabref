@@ -47,10 +47,6 @@ import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class EntryEditorTab {
 

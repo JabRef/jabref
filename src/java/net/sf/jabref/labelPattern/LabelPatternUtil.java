@@ -419,13 +419,14 @@ public class LabelPatternUtil {
                 int num = Integer.parseInt(val.substring(7));
                 String kw = getField(_entry, "keywords");
                 if (kw != null) {
+                	// TODO: merge this functionality with Util.getSeparatedKeywords
                     String[] keywords = kw.split("[,;]\\s*");
                     if ((num > 0) && (num < keywords.length))
                         sb.append(keywords[num - 1].trim());
                 }
                 return sb.toString();
             } else {
-                // we havent seen any special demands
+                // we haven't seen any special demands
                 return getField(_entry, val);
             }
         } catch (NullPointerException ex) {
