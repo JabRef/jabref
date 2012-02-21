@@ -35,6 +35,7 @@ MinimumGroupingCount="3"
 FormatCitations="false"
 CitationCharacterFormat="Default"
 MultiCiteChronological="true"
+PageInfoSeparator="; "
 
 LAYOUT
 article=<b>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
