@@ -256,8 +256,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:
-            JOptionPane.showMessageDialog(null, Globals.lang("You have changed the language setting. "
-                    + "You must restart JabRef for this to come into effect."), Globals.lang("Changed language settings"),
+            JOptionPane.showMessageDialog(null, 
+            		Globals.lang("You have changed the language setting.")
+            		.concat(" ")
+                    .concat(Globals.lang("You must restart JabRef for this to come into effect.")),
+                    Globals.lang("Changed language settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
     }

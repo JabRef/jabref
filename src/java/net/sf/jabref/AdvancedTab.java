@@ -202,14 +202,19 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
         if ((useDefault.isSelected() == oldUseDef) ||
             !oldLnf.equals(className.getText())) {
-            JOptionPane.showMessageDialog(null, Globals.lang("You have changed the look and feel setting. "
-                                                             +"You must restart JabRef for this to come into effect."), Globals.lang("Changed look and feel settings"),
-                                          JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, 
+            		Globals.lang("You have changed the look and feel setting.")
+            		.concat(" ")
+            		.concat(Globals.lang("You must restart JabRef for this to come into effect.")),
+            		Globals.lang("Changed look and feel settings"),
+            		JOptionPane.WARNING_MESSAGE);
         }
 
         if (biblatexMode.isSelected() != oldBiblMode) {
-            JOptionPane.showMessageDialog(null, Globals.lang("You have toggled the BibLaTeX mode. "
-                    +"You must restart JabRef for this change to come into effect."),
+            JOptionPane.showMessageDialog(null, 
+            		Globals.lang("You have toggled the BibLaTeX mode.")
+            		.concat(" ")
+            		.concat("You must restart JabRef for this change to come into effect."),
                     Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
     }

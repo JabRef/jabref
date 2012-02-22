@@ -175,8 +175,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
                     (size != oldMenuFontSize)) {
                 _prefs.putInt("menuFontSize", size);
-                JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
-                        + "You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
+                JOptionPane.showMessageDialog(null, 
+                		Globals.lang("You have changed the menu and label font size.")
+                		.concat(" ")
+                        .concat(Globals.lang("You must restart JabRef for this to come into effect.")), 
+                        Globals.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);
             }
 
