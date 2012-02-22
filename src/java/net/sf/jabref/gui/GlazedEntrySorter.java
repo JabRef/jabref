@@ -59,11 +59,11 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
     public void databaseChanged(DatabaseChangeEvent e) {
         list.getReadWriteLock().writeLock().lock();
-        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
+        if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
             list.add(e.getEntry());
-        } else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
+        } else if (e.getType() == DatabaseChangeEvent.ChangeType.REMOVED_ENTRY) {
             list.remove(e.getEntry());
-        } else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
+        } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
             int index = list.indexOf(e.getEntry());
             list.set(index, e.getEntry());
         }

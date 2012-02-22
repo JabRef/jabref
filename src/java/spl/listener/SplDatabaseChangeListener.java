@@ -30,7 +30,7 @@ public class SplDatabaseChangeListener implements DatabaseChangeListener {
 
     @Override
     public void databaseChanged(DatabaseChangeEvent e) {
-        if(e.getType() == DatabaseChangeEvent.ADDED_ENTRY){
+        if(e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY){
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
             dfh.linkPdfToEntry(fileName, entryTable, e.getEntry());
             panel.database().removeDatabaseChangeListener(this);

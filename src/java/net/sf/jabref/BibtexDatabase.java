@@ -87,7 +87,7 @@ public class BibtexDatabase {
                 throws PropertyVetoException
             {
                 if (pce.getPropertyName() == null)
-                    fireDatabaseChanged (new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
+                    fireDatabaseChanged (new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
                 else if ("id".equals(pce.getPropertyName()))
                 {
                     // locate the entry under its old key
@@ -116,7 +116,7 @@ public class BibtexDatabase {
                     _entries.put((String) pce.getNewValue(),
                         (BibtexEntry) pce.getSource());
                 } else {
-                    fireDatabaseChanged (new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.CHANGED_ENTRY, (BibtexEntry)pce.getSource()));
+                    fireDatabaseChanged (new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry)pce.getSource()));
                     //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
                     //    +"\n"+pce.getNewValue());
                 }
@@ -231,7 +231,7 @@ public class BibtexDatabase {
 
         _entries.put(id, entry);
 
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ADDED_ENTRY, entry));
+        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
 
         return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
@@ -250,7 +250,7 @@ public class BibtexDatabase {
         
         removeKeyFromSet(oldValue.getCiteKey());
         oldValue.removePropertyChangeListener(listener);
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.REMOVED_ENTRY, oldValue));
+        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
 
         return oldValue;
     }

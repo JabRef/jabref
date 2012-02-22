@@ -111,28 +111,31 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public void databaseChanged(DatabaseChangeEvent e) {
         synchronized(set) {
-	        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
-                int pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
+        	int pos;
+        	switch (e.getType()) {
+        	case ADDED_ENTRY:
+                pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
                 set.add(pos, e.getEntry());
                 //addEntry(e.getEntry());
                 //set.add(e.getEntry());
                 //changed = true;
                 //Collections.sort(set, comp);
-            }
-	        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
+                break;
+        	case REMOVED_ENTRY:
 	            set.remove(e.getEntry());
                 changed = true;
-            }
-	        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
+                break;
+            case CHANGED_ENTRY:
                 // Entry changed. Resort list:
                 //Collections.sort(set, comp);
-                int pos = Collections.binarySearch(set, e.getEntry(), comp);
+                pos = Collections.binarySearch(set, e.getEntry(), comp);
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
                     set.remove(posOld);
                     set.add(-pos-1, e.getEntry());
                 }
                 //changed = true;
+                break;
             }
 
     	}
