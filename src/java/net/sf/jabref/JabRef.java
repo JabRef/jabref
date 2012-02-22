@@ -925,7 +925,7 @@ public class JabRef {
             ParserResult pr = new ParserResult(null, null, null);
             pr.setFile(file);
             pr.setInvalid(true);
-            System.err.println(Globals.lang("Error:")+" "+Globals.lang("File not found"));
+            System.err.println(Globals.lang("Error")+": "+Globals.lang("File not found"));
             return pr;
 
         }

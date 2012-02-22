@@ -128,7 +128,7 @@ public class DbImportAction extends AbstractWorker {
 					metaData = (MetaData) res[1];
 					dbs.isConfigValid(true);
 				}
-				frame.output(databases.size() + " databases will be imported");
+				frame.output(Globals.lang("%0 databases will be imported", Integer.toString(databases.size())));
 			} catch (Exception ex) {
 				String preamble = "Could not import from SQL database for the following reason:";
 				errorMessage = SQLUtil.getExceptionMessage(ex);
@@ -156,8 +156,7 @@ public class DbImportAction extends AbstractWorker {
 				pan.markBaseChanged();
 			}
 		}
-		frame.output(Globals.lang("Imported " + databases.size()
-				+ " databases successfully"));
+		frame.output(Globals.lang("Imported %0 databases successfully", Integer.toString(databases.size())));
 	}
 
 }

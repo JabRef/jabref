@@ -142,7 +142,7 @@ public class CleanUpAction extends AbstractWorker {
 	}
 
 	private int showCleanUpDialog() {
-    	String dialogTitle = Globals.lang("Clean up entries");
+    	String dialogTitle = Globals.lang("Cleanup entries");
 
     	Object[] messages = {Globals.lang("What would you like to clean up?"), optionsPanel}; 
         return JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
