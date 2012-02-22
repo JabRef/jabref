@@ -1795,8 +1795,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			if (frame.groupToggle.isSelected()){
 				BibtexEntry[] entries = {bibEntry};
 				TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
-				for (TreePath tree : selection){
-					((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
+				if (selection != null) {
+					// it is possible that the user selected nothing. Therefore, checked for "!= null"
+					for (TreePath tree : selection){
+						((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
+					}
 				}
 				this.updateEntryEditorIfShowing();
 				this.getGroupSelector().valueChanged(null);
