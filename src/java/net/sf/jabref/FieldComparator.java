@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.gui.MainTableFormat;
 
+import java.text.Collator;
 import java.util.Comparator;
 
 /**
@@ -37,6 +38,12 @@ import java.util.Comparator;
  * 
  */
 public class FieldComparator implements Comparator<BibtexEntry> {
+
+    private static Collator collator;
+
+    static {
+        collator = Collator.getInstance();
+    }
 
 	private String[] field;
     private String fieldName;
@@ -157,7 +164,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 			result = -(((Integer) f1).compareTo(f2AsInteger));
 		} else {
 			String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
-            result = ours.compareTo(theirs);
+            result = collator.compare(ours, theirs);//ours.compareTo(theirs);
 		}
 
 		return result * localMultiplier;
