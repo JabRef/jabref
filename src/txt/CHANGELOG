@@ -21,6 +21,8 @@
       - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straﬂer and Marius Kleiner.
 2.8 beta [development]
+    - When using the preferences import command line option, preferences are now imported
+      before load/import/export operations are handled.
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
     - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
     - Fixed bug: "Send as Email" did not handle absolute paths correctly.

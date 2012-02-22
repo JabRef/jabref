@@ -270,6 +270,18 @@ public class JabRef {
             }
         }
 
+        // Check if we should import preferences from a file:
+        if (importPrefs.isInvoked()) {
+            try {
+                Globals.prefs.importPreferences(importPrefs.getStringValue());
+                BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
+                ExportFormats.initAllExports();
+            }
+            catch (IOException ex) {
+            Util.pr(ex.getMessage());
+            }
+        }
+
         // Vector to put imported/loaded database(s) in.
         Vector<ParserResult> loaded = new Vector<ParserResult>();
         Vector<String> toImport = new Vector<String>();
@@ -464,17 +476,6 @@ public class JabRef {
             }
         }
 
-
-	if (importPrefs.isInvoked()) {
-	    try {
-		    Globals.prefs.importPreferences(importPrefs.getStringValue());
-		    BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports();
-	    }
-	    catch (IOException ex) {
-		Util.pr(ex.getMessage());
-	    }
-	}
 
         if (!blank.isInvoked() && auxImExport.isInvoked()) {
             boolean usageMsg = false;

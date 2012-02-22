@@ -734,13 +734,33 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     DBStrings dbs = metaData.getDBStrings();
 
                     try {
-
-                        frame.output(Globals.lang("Attempting SQL export..."));
-                        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                        DBExporter exporter = factory.getExporter(dbs.getServerType());
-                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs);
-                        dbs.isConfigValid(true);
-
+                    	boolean okToExport = null!=metaData.getFile();
+                    	if (!okToExport)
+                    	{
+                    		okToExport = false;
+                    		int response = JOptionPane.showConfirmDialog(null, "You need to save your database in the disk \n" +
+                    				"before saving. Save it now?", "Database is not saved",
+                    		        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    			if(response == JOptionPane.YES_OPTION)
+                    			{
+                    				try {
+                    					saveAction.saveAs();
+                    					okToExport = (null!=metaData.getFile());
+                    				} catch (Throwable e) {
+                    				e.printStackTrace();
+                    			}
+                    		}
+                    	}
+                    	if (okToExport)
+                    	{
+	                        frame.output(Globals.lang("Attempting SQL export..."));
+	                        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
+	                        DBExporter exporter = factory.getExporter(dbs.getServerType());
+	                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs);
+	                        dbs.isConfigValid(true);
+                    	}
+                    	else
+                    		errorMessage = "Database was not exported. Your database must be saved \nbefore exporting to a SQL database";
                     } catch (Exception ex) {
                         String preamble = "Could not export to SQL database for the following reason:";
                         errorMessage = SQLUtil.getExceptionMessage(ex);
@@ -1785,8 +1805,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			if (frame.groupToggle.isSelected()){
 				BibtexEntry[] entries = {bibEntry};
 				TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
-				for (TreePath tree : selection){
-					((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
+				if (selection != null) {
+					// it is possible that the user selected nothing. Therefore, checked for "!= null"
+					for (TreePath tree : selection){
+						((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
+					}
 				}
 				this.updateEntryEditorIfShowing();
 				this.getGroupSelector().valueChanged(null);
