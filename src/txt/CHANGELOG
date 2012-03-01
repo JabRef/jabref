@@ -1,4 +1,6 @@
 2.8 beta [development]
+    - Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
+      and returns original field content if only one page number is found.
     - When using the preferences import command line option, preferences are now imported
       before load/import/export operations are handled.
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
