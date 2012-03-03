@@ -181,6 +181,12 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         comp.setText(text.substring(0, endIndex).
         		concat(lastBeginning).
                 concat(text.substring(lastCaretPosition)));
+        if (lastBeginningContainsTypedCharacter) {
+            // the current letter is NOT contained in comp.getText()
+        	// Thus, cursor position also did not get updated
+        	lastCaretPosition++;
+        }
+        comp.setCaretPosition(lastCaretPosition);
         lastBeginning = null;
     }
     
