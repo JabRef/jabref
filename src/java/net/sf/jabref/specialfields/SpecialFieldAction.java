@@ -61,15 +61,20 @@ public class SpecialFieldAction extends BaseAction {
       		  SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
       	  }
       	  ce.end();
-      	  frame.basePanel().undoManager.addEdit(ce);
-      	  frame.basePanel().markBaseChanged();
-      	  frame.basePanel().updateEntryEditorIfShowing();
-      	  String outText;
-      	  if (nullFieldIfValueIsTheSame)
-      		  outText = Globals.lang(doneTextPattern, Integer.toString(bes.length));
-      	  else
-      		  outText = Globals.lang(doneTextPattern, value, Integer.toString(bes.length));
-      	  frame.output(outText);	
+      	  if (ce.hasEdits()) {
+	      	  frame.basePanel().undoManager.addEdit(ce);
+	      	  frame.basePanel().markBaseChanged();
+	      	  frame.basePanel().updateEntryEditorIfShowing();
+	      	  String outText;
+	      	  if (nullFieldIfValueIsTheSame)
+	      		  outText = Globals.lang(doneTextPattern, Integer.toString(bes.length));
+	      	  else
+	      		  outText = Globals.lang(doneTextPattern, value, Integer.toString(bes.length));
+	      	  frame.output(outText);
+      	  } else {
+      		  // if user does not change anything with his action, we do not do anything either
+      		  // even no output message
+      	  }
         } catch (Throwable ex) { 
       	  ex.printStackTrace(); 
         }
