@@ -317,7 +317,7 @@ public class CleanUpAction extends AbstractWorker {
 	private void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField("pages");		
 		if (oldValue == null) return;
-		String newValue = oldValue.replaceAll("(\\d+)-(\\d+)", "$1--$2");
+		String newValue = oldValue.replaceAll("(\\d+) *- *(\\d+)", "$1--$2");
 		if (!oldValue.equals(newValue)) {
 			entry.setField("pages", newValue);
 			ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
