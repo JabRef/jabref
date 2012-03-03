@@ -16,12 +16,14 @@
 
 package net.sf.jabref.gui;
 
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
@@ -44,10 +46,18 @@ public class FileListEditorTransferHandler extends TransferHandler {
     protected DataFlavor stringFlavor;
 	protected JabRefFrame frame;
 	protected EntryContainer entryContainer;
+	private TransferHandler textTransferHandler;
 
-    public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer) {
+	/**
+	 * 
+	 * @param frame
+	 * @param entryContainer
+	 * @param transferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
+	 */
+    public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
     	this.frame = frame;
     	this.entryContainer = entryContainer;
+    	this.textTransferHandler = textTransferHandler;
         stringFlavor = DataFlavor.stringFlavor;
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
@@ -56,19 +66,22 @@ public class FileListEditorTransferHandler extends TransferHandler {
             e.printStackTrace();
         }
     }
+    
     /**
-     * Overriden to indicate which types of drags are supported (only LINK).
-     *
-     * @override
+     * Overridden to indicate which types of drags are supported (only LINK + COPY).
+     * COPY is supported as no support disables CTRL+C (copy of text)
      */
+    @Override
     public int getSourceActions(JComponent c) {
-        return DnDConstants.ACTION_LINK;
+        return DnDConstants.ACTION_LINK | DnDConstants.ACTION_COPY;
     }
-
-    /*public boolean importData(TransferSupport transferSupport) {
-
-        return importData(FileListEditor.this, transferSupport.getTransferable());
-    }*/
+    
+    @Override
+    public void exportToClipboard(JComponent comp, Clipboard clip, int action) {
+    	if (this.textTransferHandler != null) {
+    		this.textTransferHandler.exportToClipboard(comp, clip, action);
+    	}
+    }
 
     @SuppressWarnings("unchecked")
     public boolean importData(JComponent comp, Transferable t) {

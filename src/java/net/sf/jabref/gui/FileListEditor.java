@@ -155,7 +155,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
 
-        TransferHandler th = new FileListEditorTransferHandler(frame, entryEditor);
+        TransferHandler th = new FileListEditorTransferHandler(frame, entryEditor, null);
         setTransferHandler(th);
         panel.setTransferHandler(th);
 

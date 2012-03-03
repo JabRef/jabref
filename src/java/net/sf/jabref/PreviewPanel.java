@@ -107,7 +107,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		if (panel != null) {
 			// dropped files handler only created for main window
 			// not for Windows as like the search results window
-			this.previewPane.setTransferHandler(new FileListEditorTransferHandler(panel.frame(), this));
+			this.previewPane.setTransferHandler(new FileListEditorTransferHandler(panel.frame(), this, this.previewPane.getTransferHandler()));
 		}
 
 		// Set up scroll pane for preview pane
