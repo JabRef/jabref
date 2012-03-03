@@ -28,10 +28,10 @@ public class FirstPage implements LayoutFormatter {
     public String format(String s) {
         if (s == null)
 			return "";
-		String[] pageParts = s.split("[\\-]+");
+		String[] pageParts = s.split("[ \\-]+");
 		if (pageParts.length == 2)
             return pageParts[0];
-        else return "";
+        else return s;
 
     }
 }

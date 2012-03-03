@@ -21,12 +21,14 @@
       - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
 2.8 beta [development]
+    - Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
+      and returns original field content if only one page number is found.
     - When using the preferences import command line option, preferences are now imported
       before load/import/export operations are handled.
     - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
     - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
     - Fixed bug: "Send as Email" did not handle absolute paths correctly.
-    - Fixed bug 3472991: Search : "Highlight Words" inconsistent
+    - Fixed bug 3472991: Search: "Highlight Words" inconsistent
     - Fixed bug 2933201: Exporting InProceedings to Word 2007
     - Fixed bug 3146059: Error in translating author field to MS Office
     - Fixed bug: entering field names containing capital letters in table columns tab
@@ -461,7 +463,6 @@
     - Fixed bug where selection would jump back if an entry of different type was selected
       by mouse click while editing a field of the current entry.
     - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
->>>>>>> .merge-right.r2733
 2.4b
     - Added Export to SQL database feature. Supports MySQL.
     - Added "protection" flag in Database properties. When this flag is set, JabRef will
@@ -1085,5 +1086,3 @@
         - Enabled customization of existing entry types, and definition of
           new types.
 1.0:	First release.
-
->>>>>>> .merge-right.r3689
