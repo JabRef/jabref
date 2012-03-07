@@ -32,6 +32,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.search.HitOrMissComparator;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -360,8 +361,12 @@ public class MainTable extends JTable {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             String[] iconField = tableFormat.getIconTypeForColumn(i);
-
-            comparators.add(new IconComparator(iconField));
+            
+            if (iconField[0].equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
+            	comparators.add(new RankingFieldComparator());
+            } else {
+            	comparators.add(new IconComparator(iconField));
+            }
         }
         // Remaining columns:
         for (int i = tableFormat.padleft; i < tableFormat.getColumnCount(); i++) {
