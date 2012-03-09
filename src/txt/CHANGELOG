@@ -1,4 +1,5 @@
 2.8 beta [development]
+    - "abbr" modifier in BibTeX key generator now skips parentheses.
     - Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
       and returns original field content if only one page number is found.
     - When using the preferences import command line option, preferences are now imported
