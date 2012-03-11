@@ -67,7 +67,7 @@
     dans les styles de citation. Vous pouvez changer de fichier de style &agrave;
     tout moment et utiliser le bouton <b>Mettre &agrave; jour</b> pour que votre
     bibliographie suive ce nouveau style.</p>
-<p>En cliquant sur le bouton <b>Sélectionner le style</b> vous pouvez ouvrir
+<p>En cliquant sur le bouton <b>S&eacute;lectionner le style</b> vous pouvez ouvrir
     une fen&ecirc;tre qui permet de s&eacute;lectionner soit le style par d&eacute;faut soit un
     fichier de style externe. Si vous voulez cr&eacute;er un nouveau style bas&eacute; sur
     celui par d&eacute;faut, vous pouvez cliquer sur le bouton <b>Aper&ccedil;u</b> afin
@@ -103,6 +103,7 @@ MaxAuthorsFirst="3"
 AuthorSeparator=", "
 AuthorLastSeparator=" &amp; "
 EtAlString=" et al."
+ItalicEtAl="true"
 YearSeparator=" "
 InTextYearSeparator=" "
 BracketBefore="["
@@ -116,6 +117,7 @@ MinimumGroupingCount="3"
 FormatCitations="false"
 CitationCharacterFormat="Default"
 MultiCiteChronological="false"
+PageInfoSeparator="; "
 
 LAYOUT
 article=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
@@ -327,6 +329,12 @@ default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
             avant l'ann&eacute;e dans les citations dans le texte.</td>
     </tr>
     <tr>
+        <td>ItalicEtAl</td>
++       <td>boolean</td>
++       <td><code>true</code></td>
++       <td>Si <code>true</code>, la cha&icirc;ne "et al." dans les marqueurs de citation est mis en italique.</td>
++   </tr>
++   <tr>
         <td>MaxAuthors</td>
         <td>integer</td>
         <td><code>3</code></td>
@@ -358,6 +366,16 @@ default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
             alphab&eacute;tiquement.
         </td>
     </tr>
+    <tr>
+        <td>PageInfoSeparator</td>
++       <td>cha&icirc;ne</td>
++       <td><code>; </code></td>
++       <td>Pour des citations avec des informations compl&eacute;mentaires, par exemple des num&eacute;ros de page,
+            cette cha&icirc;ne est ins&eacute;r&eacute;e entre l'ann&eacute;e (pour les citations auteur-ann&eacute;e)
+            ou le num&eacute;ro de citation (pour les citations num&eacute;rot&eacute;es) et les informations compl&eacute;mentaires.
+            Par exemple, le texte entre <code>2001</code> et <code>p. 301</code> dans <code>[Smith 2001; p. 301]</code>.
++       </td>
++   </tr>
     <tr>
         <td>UniquefierSeparator</td>
         <td>cha&icirc;ne</td>
