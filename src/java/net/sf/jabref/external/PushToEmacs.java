@@ -81,7 +81,7 @@ public class PushToEmacs implements PushToApplication {
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Globals.lang("Path to gnuclient.exe or emacsclient.exe").concat(":")));
+        builder.append(new JLabel(Globals.lang("Path to gnuclient or emacsclient").concat(":")));
         builder.append(emacsPath);
         BrowseAction action = new BrowseAction(null, emacsPath, false);
         JButton browse = new JButton(Globals.lang("Browse"));

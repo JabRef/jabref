@@ -145,6 +145,8 @@ public class DbImportAction extends AbstractWorker {
 
 	// run third, on EDT:
 	public void update() {
+        if (!connectToDB)
+            return;
 		for (Object[] res : databases) {
 			database = (BibtexDatabase) res[0];
 			metaData = (MetaData) res[1];
