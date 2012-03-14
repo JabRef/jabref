@@ -20,7 +20,9 @@
       - clean up pages
       - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
-2.8 beta [development]
+2.8 beta 2
+    - Improvements to SQL export and import. Fixed bug where subsequent exports to same
+      database would fail. Can now save multiple bib bases to a single SQL database.
     - "abbr" modifier in BibTeX key generator now skips parentheses.
     - Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
       and returns original field content if only one page number is found.
