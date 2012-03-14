@@ -90,7 +90,7 @@ def handleJavaCode(filename, lines, keyList, notTermList):
             found = theSpan[spanInner[0]+1:spanInner[1]-1].replace(" ", "_")
             #found = lines[i][span[0]+startLen:span[1]-2].replace(" ", "_")
             if not found == "" and found not in keyList:
-                keyList.append(found)
+		keyList.append(found)
             #else:
             #   print "Not adding: "+found
                 
@@ -151,10 +151,10 @@ def findNewKeysInJavaCode(mainFile, dir, update):
     
     #to process properly column character
     for key in keys:
-       keystempo.append(key.replace("\:",":"))  
+       keystempo.append(key.replace("\\:",":").replace("\\=", "="))
     keys=keystempo
     for key in keyList:
-       keyListtempo.append(key.replace("\:",":"))  
+       keyListtempo.append(key.replace("\\:",":").replace("\\=", "="))
     keyList=keyListtempo
     
     # Open the file again, for appending:
@@ -166,8 +166,11 @@ def findNewKeysInJavaCode(mainFile, dir, update):
     for key in keyList:
         if key not in keys:
             print "Missing key: "+key
+	    value = key
+	    key = key.replace(":", "\\:").replace("=", "\\=")
+
             if update:
-                f1.write(key+"="+key+"\n")
+                f1.write(key+"="+value+"\n")
     
     # Look for keys in the language file that are not used in the code:
     for key in keys:
