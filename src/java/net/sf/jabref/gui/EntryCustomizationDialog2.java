@@ -35,14 +35,17 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
-    protected FieldSetComponent reqComp, optComp;
+    protected FieldSetComponent reqComp, optComp, optComp2;
     protected EntryTypeList typeComp;
     protected JButton ok, cancel, apply, helpButton, delete, importTypes, exportTypes;
     protected final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
     protected String lastSelected = null;
     protected Map<String, List<String>> reqLists = new HashMap<String, List<String>>(),
-            optLists = new HashMap<String, List<String>>();
+            optLists = new HashMap<String, List<String>>(),
+            opt2Lists = new HashMap<String, List<String>>();
     protected Set<String> defaulted = new HashSet<String>(), changed = new HashSet<String>();
+
+    boolean biblatexMode;
 
     /** Creates a new instance of EntryCustomizationDialog2 */
     public EntryCustomizationDialog2(JabRefFrame frame) {
@@ -56,10 +59,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         Container pane = getContentPane();
         pane.setLayout(new BorderLayout());
 
+        biblatexMode = Globals.prefs.getBoolean("biblatexMode");
+
         JPanel main = new JPanel(), buttons = new JPanel(),
                 right = new JPanel();
         main.setLayout(new BorderLayout());
-        right.setLayout(new GridLayout(1, 2));
+        right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         java.util.List<String> entryTypes = new ArrayList<String>();
         for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
@@ -84,6 +89,16 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         optComp.addListDataListener(dataListener);
         right.add(reqComp);
         right.add(optComp);
+
+        if (biblatexMode) {
+            optComp2 = new FieldSetComponent(Globals.lang("Optional fields")+" 2", new ArrayList<String>(), preset, true, true);
+            optComp2.setEnabled(false);
+            optComp2.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            optComp2.addListDataListener(dataListener);
+            right.add(new JPanel());
+            right.add(optComp2);
+        }
+
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
         ok = new JButton("OK");
@@ -133,6 +148,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             // for that type in our two maps.
             reqLists.put(lastSelected, reqComp.getFields());
             optLists.put(lastSelected, optComp.getFields());
+            if (biblatexMode)
+                opt2Lists.put(lastSelected, optComp2.getFields());
         }
 
         String s = typeComp.getFirstSelected();
@@ -149,10 +166,26 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     req = java.util.Arrays.asList(rf);
                 else
                     req = new ArrayList<String>();
-                if (of != null)
-                    opt = java.util.Arrays.asList(of);
-                else
-                    opt = new ArrayList<String>();
+
+                if (!biblatexMode) {
+                    if (of != null)
+                        opt = java.util.Arrays.asList(of);
+                    else
+                        opt = new ArrayList<String>();
+                } else {
+                    String[] priOf = type.getPrimaryOptionalFields();
+                    if (priOf != null)
+                        opt = java.util.Arrays.asList(priOf);
+                    else
+                        opt = new ArrayList<String>();
+                    List<String> opt2 = new ArrayList<String>();
+                    if (of != null)
+                        for (int i=0; i<of.length; i++)
+                            if (!opt.contains(of[i]))
+                                opt2.add(of[i]);
+                    optComp2.setFields(opt2);
+                    optComp2.setEnabled(true);
+                }
 
                 reqComp.setFields(req);
                 reqComp.setEnabled(true);
@@ -187,10 +220,16 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
             List<String> reqFields = reqLists.get(typeName);
             List<String> optFields = optLists.get(typeName);
+            List<String> opt2Fields = opt2Lists.get(typeName);
             String[] reqStr = new String[reqFields.size()];
             reqStr = reqFields.toArray(reqStr);
             String[] optStr = new String[optFields.size()];
             optStr = optFields.toArray(optStr);
+            String[] opt2Str;
+            if (opt2Fields != null)
+                opt2Str = opt2Fields.toArray(new String[opt2Fields.size()]);
+            else
+                opt2Str = new String[0];
 
             // If this type is already existing, check if any changes have
             // been made
@@ -210,13 +249,35 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (oldType != null) {
                 String[] oldReq = oldType.getRequiredFields(),
                         oldOpt = oldType.getOptionalFields();
-                if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr))
-                    changesMade = false;
+                if (biblatexMode) {
+                    String[] priOpt = oldType.getPrimaryOptionalFields();
+                    ArrayList<String> secOpt = new ArrayList<String>();
+                    for (int j = 0; j < oldOpt.length; j++) {
+                        boolean inPri = false;
+                        for (int k = 0; k < priOpt.length; k++) {
+                            if (priOpt[k].equals(oldOpt[j])) {
+                                inPri = true;
+                                break;
+                            }
+                        }
+                        if (!inPri)
+                            secOpt.add(oldOpt[j]);
+                    }
+                    String[] secOptArray = secOpt.toArray(new String[secOpt.size()]);
+                    if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr) &&
+                            equalArrays(secOptArray, opt2Str))
+                        changesMade = false;
+                } else
+                    if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr))
+                        changesMade = false;
             }
 
             if (changesMade) {
                 //System.out.println("Updating: "+typeName);
-                CustomEntryType typ = new CustomEntryType(Util.nCase(typeName), reqStr, optStr);
+                CustomEntryType typ = biblatexMode ?
+                        new CustomEntryType(Util.nCase(typeName), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(Util.nCase(typeName), reqStr, optStr);
+
                 BibtexEntryType.ALL_TYPES.put(typeName.toLowerCase(), typ);
                 updateTypesForEntries(typ.getName());
             }

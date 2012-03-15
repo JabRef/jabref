@@ -117,7 +117,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     fontButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            // JDialog dl = new EntryCustomizationDialog(ths);
             Font f=new FontSelectorDialog
                 (null, GUIGlobals.CURRENTFONT).getSelectedFont();
             if(f==null)

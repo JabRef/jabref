@@ -1339,7 +1339,6 @@ public JabRefPreferences prefs() {
 
       /*options.add(new AbstractAction("Font") {
       public void actionPerformed(ActionEvent e) {
-          // JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
           Font f=new FontSelectorDialog
         (JabRefFrame.this, GUIGlobals.CURRENTFONT).getSelectedFont();
        if(f==null)
