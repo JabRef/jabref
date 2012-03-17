@@ -26,13 +26,23 @@ import java.util.ArrayList;
 public class CustomEntryType extends BibtexEntryType {
 
     private String name;
-    private String[] req, opt;
+    private String[] req, opt, priOpt;
     private String[][] reqSets = null; // Sets of either-or required fields, if any
 
-    public CustomEntryType(String name_, String[] req_, String[] opt_) {
+    public CustomEntryType(String name_, String[] req_, String[] opt_, String[] opt2_) {
         name = name_;
         parseRequiredFields(req_);
-        opt = opt_;
+        ArrayList<String> allOpt = new ArrayList<String>();
+        for (int i = 0; i < opt_.length; i++)
+            allOpt.add(opt_[i]);
+        for (int i=0; i<opt2_.length; i++)
+            allOpt.add(opt2_[i]);
+        opt = allOpt.toArray(new String[allOpt.size()]);
+        priOpt = opt_;
+    }
+
+    public CustomEntryType(String name_, String[] req_, String[] opt_) {
+        this(name_, req_, opt_, new String[0]);
     }
 
     public CustomEntryType(String name_, String reqStr, String optStr) {
@@ -82,6 +92,11 @@ public class CustomEntryType extends BibtexEntryType {
     }
     public String[] getRequiredFields() {
 	return req;
+    }
+
+    @Override
+    public String[] getPrimaryOptionalFields() {
+        return priOpt;
     }
 
     public String[] getRequiredFieldsForCustomization() {
