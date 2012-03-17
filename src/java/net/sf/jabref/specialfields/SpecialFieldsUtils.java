@@ -104,6 +104,8 @@ public class SpecialFieldsUtils {
 	
 	/**
 	 * Update keywords according to values of special fields
+	 * 
+	 * @param nc indicates the undo named compound. May be null
 	 */
 	public static void syncKeywordsFromSpecialFields(BibtexEntry be, NamedCompound nc) {
 		exportFieldToKeywords(Priority.getInstance(), be, nc);
@@ -126,6 +128,8 @@ public class SpecialFieldsUtils {
 
 	/**
 	 * updates field values according to keywords
+	 * 
+	 * @param nc indicates the undo named compound. May be null
 	 */
 	public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
 		if (be.getField("keywords") == null)

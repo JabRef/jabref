@@ -29,6 +29,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
@@ -43,7 +44,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	private JComboBox priSort, secSort, terSort;
 
+	/*** begin: special fields ***/
 	private JTextField priField, secField, terField, numericFields;
+	private JCheckBox specialFieldsEnabled, rankingColumn, qualityColumn, priorityColumn, relevanceColumn, syncKeywords, writeSpecialFields;
+	private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldQualityColumn, oldPriorityColumn, oldRelevanceColumn, oldSyncKeyWords, oldWriteSpecialFields;
+	private final JButton hlb; 
+	/*** end: special fields ***/
 
 	/**
 	 * Customization of external program paths.
@@ -139,20 +145,64 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 		JLabel lab;
 		JPanel pan = new JPanel();
+		
+		/*** begin: special table columns and special fields ***/
+
+		HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, "Help on key patterns");
+	    hlb = new JButton(GUIGlobals.getImage("helpSmall"));
+	    hlb.setToolTipText(Globals.lang("Help on special fields"));
+	    hlb.addActionListener(help);
+		
+		specialFieldsEnabled = new JCheckBox(Globals.lang("Enable special fields"));
+//		.concat(". ").concat(Globals.lang("You must restart JabRef for this to come into effect.")));
+		specialFieldsEnabled.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent event) {
+				boolean isEnabled = specialFieldsEnabled.isSelected();
+				rankingColumn.setEnabled(isEnabled);
+				qualityColumn.setEnabled(isEnabled);
+				priorityColumn.setEnabled(isEnabled);
+				relevanceColumn.setEnabled(isEnabled);
+				syncKeywords.setEnabled(isEnabled);
+				writeSpecialFields.setEnabled(isEnabled);
+			}
+		});
+		rankingColumn = new JCheckBox(Globals.lang("Show ranking"));	
+		qualityColumn = new JCheckBox(Globals.lang("Show quality"));	
+		priorityColumn = new JCheckBox(Globals.lang("Show priority"));
+		relevanceColumn = new JCheckBox(Globals.lang("Show relevance"));
+		syncKeywords = new JCheckBox(Globals.lang("Synchronize with keywords"));
+		writeSpecialFields = new JCheckBox(Globals.lang("Write values of special fields as separate fields to BibTeX"));
+		
 		builder.appendSeparator(Globals.lang("Special table columns"));
 		builder.nextLine();
 		builder.append(pan);
-		builder.append(fileColumn);
+
+		DefaultFormBuilder specialTableColumnsBuilder = new DefaultFormBuilder(new FormLayout(
+				"8dlu, left:pref, 8dlu, left:pref", "pref pref pref pref pref pref pref pref"));
+
+		//FormLayout layout = new FormLayout("12dlu pref", "pref pref pref pref pref pref pref pref");
+		//DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        CellConstraints cc = new CellConstraints();
+		
+        specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 2));
+        specialTableColumnsBuilder.add(rankingColumn, cc.xy(2, 2));
+        specialTableColumnsBuilder.add(relevanceColumn, cc.xy(2, 3));
+        specialTableColumnsBuilder.add(qualityColumn, cc.xy(2, 4));
+        specialTableColumnsBuilder.add(priorityColumn, cc.xy(2, 5));
+        specialTableColumnsBuilder.add(syncKeywords, cc.xy(2, 6));
+        specialTableColumnsBuilder.add(writeSpecialFields, cc.xy(2, 7));
+		specialTableColumnsBuilder.add(hlb, cc.xy(1, 8));
+
+		specialTableColumnsBuilder.add(fileColumn, cc.xy(4, 1));	
+		specialTableColumnsBuilder.add(pdfColumn, cc.xy(4, 2));	
+		specialTableColumnsBuilder.add(urlColumn, cc.xy(4, 3));	
+		specialTableColumnsBuilder.add(arxivColumn, cc.xy(4, 4));	
+
+		builder.append(specialTableColumnsBuilder.getPanel());
 		builder.nextLine();
-        builder.append(pan);
-        builder.append(pdfColumn);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(urlColumn);
-		builder.nextLine();
-		builder.append(pan);
-		builder.append(arxivColumn);
-		builder.nextLine();
+
+		/*** end: special table columns and special fields ***/
+		
 		builder.appendSeparator(Globals.lang("Format of author and editor names"));
 		DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
 			"left:pref, 8dlu, left:pref", ""));
@@ -273,6 +323,32 @@ class TablePrefsTab extends JPanel implements PrefsTab {
             numericFields.setText("");
         else
             numericFields.setText(numF);
+
+        /*** begin: special fields ***/
+
+        oldRankingColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
+        rankingColumn.setSelected(oldRankingColumn);
+		
+        oldQualityColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
+        qualityColumn.setSelected(oldQualityColumn);
+        
+		oldPriorityColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY);
+        priorityColumn.setSelected(oldPriorityColumn);
+		
+		oldRelevanceColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE);
+        relevanceColumn.setSelected(oldRelevanceColumn);
+		
+		oldSyncKeyWords = _prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+		syncKeywords.setSelected(oldSyncKeyWords);
+		
+		oldWriteSpecialFields = _prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS);
+		writeSpecialFields.setSelected(oldWriteSpecialFields);
+
+		// has to be called as last to correctly enable/disable the other settings
+		oldSpecialFieldsEnabled = _prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED);
+		specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled);
+		
+        /*** end: special fields ***/
 	}
 
 	/**
@@ -319,6 +395,42 @@ class TablePrefsTab extends JPanel implements PrefsTab {
             BibtexFields.setNumericFieldsFromPrefs();
         }
 
+        /*** begin: special fields ***/
+        
+		boolean 
+		newSpecialFieldsEnabled = specialFieldsEnabled.isSelected(),
+		newRankingColumn = rankingColumn.isSelected(),
+		newQualityColumn = qualityColumn.isSelected(), 
+		newPriorityColumn = priorityColumn.isSelected(), 
+		newRelevanceColumn = relevanceColumn.isSelected(), 
+		newSyncKeyWords = syncKeywords.isSelected(), 
+		newWriteSpecialFields = writeSpecialFields.isSelected();
+		
+		if ((oldSpecialFieldsEnabled != newSpecialFieldsEnabled) ||
+				(oldRankingColumn != newRankingColumn) ||
+				(oldQualityColumn != newQualityColumn) ||
+				(oldPriorityColumn != newPriorityColumn) ||
+				(oldRelevanceColumn != newRelevanceColumn) ||
+				(oldSyncKeyWords != newSyncKeyWords) ||
+				(oldWriteSpecialFields != newWriteSpecialFields)) {
+			
+	        JOptionPane.showMessageDialog(null, 
+	        		Globals.lang("You have changed settings for special fields.")
+	        		.concat(" ")
+	        		.concat(Globals.lang("You must restart JabRef for this to come into effect.")),
+	        		Globals.lang("Changed special field settings"),
+	        		JOptionPane.WARNING_MESSAGE);
+	
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newQualityColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newPriorityColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
+		}
+		
+        /*** end: special fields ***/
 	}
 
 	public boolean readyToClose() {

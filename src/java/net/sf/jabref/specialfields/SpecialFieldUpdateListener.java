@@ -22,9 +22,7 @@ import java.beans.VetoableChangeListener;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.undo.NamedCompound;
 
 /**
  * Listener triggering 
@@ -35,13 +33,8 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 	
 	private static SpecialFieldUpdateListener INSTANCE = null;
 	
-	// vetoableChange is also called if we call SpecialFieldsUtils.importKeywords
-	// therefore, we have to avoid cyclic calls...
-	private static boolean noUpdate = false; 
-
 	public void vetoableChange(PropertyChangeEvent e)
 			throws PropertyVetoException {
-		if (noUpdate) return;
 		final BibtexEntry entry = (BibtexEntry) e.getSource();
 		final String fieldName = e.getPropertyName();
 		// Source editor cycles through all entries
@@ -50,32 +43,26 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 		// e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed. 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-				// Generating an instance of a NamedCompound and adding it as edit is a quick hack. 
-				// The current infrastructure does not foresee to pass a named component to the vetoable change
-				// A "good" infrastructure would offer update listeners after calling the VetoableChangeListeners
-				// The parameters for them would offer a named component where the methods could add edits.
 				if (fieldName.equals("keywords")) {
-					NamedCompound nc = new NamedCompound(Globals.lang("Synchronized special fields based on keywords"));
-					noUpdate = true;
-					SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-					JabRef.jrf.basePanel().undoManager.addEdit(nc);
+					// we do NOT pass a named component indicating that we do not want to have undo capabilities
+					// if the user undoes the change in the keyword field, this method is also called and 
+					// the special fields are updated accordingly 
+					SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
 		            SwingUtilities.invokeLater(new Runnable() {
 		                public void run() {
 					    	JabRef.jrf.basePanel().updateEntryEditorIfShowing();
-					    	noUpdate = false;
 		                }
 		            });
 				} else {
 					SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName);
 					if (field != null) {
-						NamedCompound nc = new NamedCompound(Globals.lang("Synchronized keywords from special fields"));
-						noUpdate = true;
-						SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc);
-						JabRef.jrf.basePanel().undoManager.addEdit(nc);
+						// we do NOT pass a named component indicating that we do not want to have undo capabilities
+						// if the user undoes the change in the sepcial field, this method is also called and 
+						// the keyword field is updated accordingly 
+						SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, null);
 			            SwingUtilities.invokeLater(new Runnable() {
 			                public void run() {
 						    	JabRef.jrf.basePanel().updateEntryEditorIfShowing();
-						    	noUpdate = false;
 			                }
 			            });
 					}

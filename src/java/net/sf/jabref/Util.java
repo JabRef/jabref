@@ -3128,14 +3128,20 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			return;
 		if ((oldValue == null) || (!oldValue.equals(newValue))) {
 			entry.setField("keywords", newValue);
-			ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
+			if (ce!=null) ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
 		}
 	}
 	
+	/**
+	 * @param nc indicates the undo named compound. May be null
+	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
 		updateField(be, field, newValue, ce, false);
 	}
 
+	/**
+	 * @param nc indicates the undo named compound. May be null
+	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
 		String oldValue = be.getField(field);
 		if (nullFieldIfValueIsTheSame && (oldValue != null) && (oldValue.equals(newValue))) {
@@ -3146,7 +3152,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			return;
 		if ((oldValue==null) || (!oldValue.equals(newValue))) {
 			be.setField(field, newValue);
-			ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+			if (ce!=null) ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
 		}
 	}
 }

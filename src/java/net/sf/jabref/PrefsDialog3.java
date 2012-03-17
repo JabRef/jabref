@@ -33,7 +33,6 @@ import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.specialfields.SpecialFieldsPrefsTab;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -85,7 +84,6 @@ public class PrefsDialog3 extends JDialog {
 		tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
 		tabs.add(new TablePrefsTab(prefs, parent));
 		tabs.add(new TableColumnsTab(prefs, parent));
-		tabs.add(new SpecialFieldsPrefsTab(prefs, parent.helpDiag));
 		tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
 		tabs.add(new PreviewPrefsTab(prefs));
 		tabs.add(new NameFormatterTab(parent.helpDiag));
