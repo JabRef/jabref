@@ -249,7 +249,7 @@ public class LabelPatternUtil {
                     // System.out.println(_sbvalue.toString());
                     StringBuffer abbr = new StringBuffer();
                     String[] words = label.toString().replaceAll("[\\{\\}']","")
-                            .split("[ \r\n\"]");
+                            .split("[\\(\\) \r\n\"]");
                     for (int word = 0; word < words.length; word++)
                         if (words[word].length() > 0)
                             abbr.append(words[word].charAt(0));

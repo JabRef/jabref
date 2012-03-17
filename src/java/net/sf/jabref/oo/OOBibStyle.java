@@ -121,6 +121,7 @@ public class OOBibStyle implements Comparable {
         citProperties.put("SubscriptCitations", Boolean.FALSE);
         citProperties.put("MultiCiteChronological", Boolean.TRUE);
         citProperties.put("BibtexKeyCitations", Boolean.FALSE);
+        citProperties.put("ItalicEtAl", Boolean.FALSE);
 
         initialize(in);
 

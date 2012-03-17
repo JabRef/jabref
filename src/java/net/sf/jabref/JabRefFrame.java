@@ -448,6 +448,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int posX = prefs.getInt("posX");
         int posY = prefs.getInt("posY");
 
+        /*
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+
+
+        // Get size of each screen
+        for (int i=0; i<gs.length; i++) {
+            DisplayMode dm = gs[i].getDisplayMode();
+            int screenWidth = dm.getWidth();
+            int screenHeight = dm.getHeight();
+            System.out.println(gs[i].getDefaultConfiguration().getBounds());
+        }*/
+
         //
         // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
         //
@@ -458,10 +471,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //
         if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1){
 
+            Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+                    .getDefaultConfiguration().getBounds();
             Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+            // Make sure we are not above or to the left of the screen bounds:
+            if (posX < bounds.x)
+                posX = bounds.x;
+            if (posY < bounds.y)
+                posY = bounds.y;
 
             int height = (int) dim.getHeight();
             int width = (int) dim.getWidth();
+
+            //if (posX < )
 
             if (posX + sizeX > width) {
                 if (sizeX <= width) {
@@ -1361,7 +1384,6 @@ public JabRefPreferences prefs() {
 
       /*options.add(new AbstractAction("Font") {
       public void actionPerformed(ActionEvent e) {
-          // JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
           Font f=new FontSelectorDialog
         (JabRefFrame.this, GUIGlobals.CURRENTFONT).getSelectedFont();
        if(f==null)

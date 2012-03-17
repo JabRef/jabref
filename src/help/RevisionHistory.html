@@ -6,7 +6,23 @@
 <body>
 
   <h1>Revision history</h1>
-
+  <h3>Version 2.8 beta 2</h3>
+  <ul><li>Improvements to SQL export and import. Fixed bug where subsequent exports to same
+      database would fail. Can now save multiple bib bases to a single SQL database.</li>
+    <li>"abbr" modifier in BibTeX key generator now skips parentheses.</li>
+    <li>Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
+      and returns original field content if only one page number is found.</li>
+    <li>When using the preferences import command line option, preferences are now imported
+      before load/import/export operations are handled.</li>
+    <li>Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.</li>
+    <li>Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.</li>
+    <li>Fixed bug: "Send as Email" did not handle absolute paths correctly.</li>
+    <li>Fixed bug 3472991: Search: "Highlight Words" inconsistent.</li>
+    <li>Fixed bug 2933201: Exporting InProceedings to Word 2007.</li>
+    <li>Fixed bug 3146059: Error in translating author field to MS Office.</li>
+    <li>Fixed bug: entering field names containing capital letters in table columns tab
+      in Preferences makes the columns empty.</li>
+  </ul>
   <h3>Version 2.8 beta</h3>
   <ul><li>Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
       additional minor fix.</li>

@@ -79,6 +79,7 @@ MaxAuthorsFirst="3"
 AuthorSeparator=", "
 AuthorLastSeparator=" &amp; "
 EtAlString=" et al."
+ItalicEtAl="true"
 YearSeparator=" "
 InTextYearSeparator=" "
 BracketBefore="["
@@ -283,6 +284,12 @@ default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
         <td>string</td>
         <td>Single Space</td>
         <td>Text inserted between author names and starting bracket before year in in-text citations.</td>
+    </tr>
+    <tr>
+        <td>ItalicEtAl</td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>If true, the "et al." string in citation markers is italicized.</td>
     </tr>
     <tr>
         <td>MaxAuthors</td>

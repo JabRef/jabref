@@ -20,11 +20,9 @@ import com.sun.star.awt.XWindow;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.PropertyValue;
-import com.sun.star.beans.XPropertySetInfo;
 import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.container.*;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.document.XDocumentProperties;
 import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.frame.*;
 import com.sun.star.lang.*;
@@ -43,11 +41,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sf.jabref.oo.ComparableMark;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -1198,18 +1193,15 @@ public class OOBibBase {
 
         Object bookmark = mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
         // Name the reference
-        XNamed xNamed = (XNamed) UnoRuntime.queryInterface(
-                XNamed.class, bookmark);
+        XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
         xNamed.setName(name);
         // get XTextContent interface
         if (true) {
 
-            XTextContent xTextContent = (XTextContent) UnoRuntime.queryInterface(
-                    XTextContent.class, bookmark);
+            XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, bookmark);
             if (withText) {
                 position.setString(citText);
-                XPropertySet xCursorProps = (XPropertySet) UnoRuntime.queryInterface(
-                    XPropertySet.class, position);
+                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, position);
 
                 // Set language to [None]:
                 xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
@@ -1221,45 +1213,38 @@ public class OOBibBase {
                         throw new UndefinedCharacterFormatException(charStyle);
                     }
                 }
-                // See if we should format the citation marker or not:
-                /*if (style.isFormatCitations()) {
-
-                    if (style.getBooleanCitProperty("SuperscriptCitations")) {
-                        xCursorProps.setPropertyValue("CharEscapement",
-                                (byte)101);
-                        xCursorProps.setPropertyValue("CharEscapementHeight",
-                                (byte)58);
-                    }
-                    else if (style.getBooleanCitProperty("SubscriptCitations")) {
-                        xCursorProps.setPropertyValue("CharEscapement",
-                                (byte)-101);
-                        xCursorProps.setPropertyValue("CharEscapementHeight",
-                                (byte)58);
-                    }
-                    else {
-                        xCursorProps.setPropertyValue("CharEscapement",
-                                (byte)0);
-                        xCursorProps.setPropertyValue("CharEscapementHeight",
-                                (byte)0);
-                    }
-
-                    xCursorProps.setPropertyValue("CharPosture",
-                            style.isItalicCitations() ? com.sun.star.awt.FontSlant.ITALIC :
-                                com.sun.star.awt.FontSlant.NONE);
-                    xCursorProps.setPropertyValue("CharWeight",
-                            style.isBoldCitations() ? com.sun.star.awt.FontWeight.BOLD :
-                                com.sun.star.awt.FontWeight.NORMAL);
-                    
-                } */
             }
             else
                 position.setString("");
 
-
             position.getText().insertTextContent(position, xTextContent, true);
+
+            // Check if we should italicize the "et al." string in citations:
+            boolean italicize = style.getBooleanCitProperty("ItalicEtAl");
+            if (italicize) {
+                String etAlString = style.getStringCitProperty("EtAlString");
+                int index = citText.indexOf(etAlString);
+                if (index >= 0) {
+                    italicizeOrBold(position, true, index, index+etAlString.length());
+                }
+            }
+
         }
         position.collapseToEnd();
 
+    }
+
+    private void italicizeOrBold(XTextCursor position, boolean italicize,
+                                 int start, int end) throws Exception {
+        XTextRange rng = position.getStart();
+        XTextCursor cursor = position.getText().createTextCursorByRange(rng);
+        cursor.goRight((short)start, false);
+        cursor.goRight((short)(end-start), true);
+        XPropertySet xcp = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        if (italicize)
+            xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
+        else
+            xcp.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
     }
 
     public void testFootnote() throws Exception {

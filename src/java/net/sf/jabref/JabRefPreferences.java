@@ -58,6 +58,7 @@ public class JabRefPreferences {
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
         CUSTOM_TYPE_OPT = "customTypeOpt_",
+        CUSTOM_TYPE_PRIOPT = "customTypePriOpt_",
         CUSTOM_TAB_NAME = "customTabName_",
         CUSTOM_TAB_FIELDS = "customTabFields_",
         EMACS_PATH = "emacsPath",
@@ -1041,6 +1042,7 @@ public class JabRefPreferences {
         put(CUSTOM_TYPE_NAME+nr, tp.getName());
         put(CUSTOM_TYPE_REQ+nr, tp.getRequiredFieldsString());//tp.getRequiredFields());
         putStringArray(CUSTOM_TYPE_OPT+nr, tp.getOptionalFields());
+        putStringArray(CUSTOM_TYPE_PRIOPT+nr, tp.getPrimaryOptionalFields());
 
     }
 
@@ -1054,11 +1056,22 @@ public class JabRefPreferences {
             name = get(CUSTOM_TYPE_NAME+nr);
         String[]
             req = getStringArray(CUSTOM_TYPE_REQ+nr),
-            opt = getStringArray(CUSTOM_TYPE_OPT+nr);
+            opt = getStringArray(CUSTOM_TYPE_OPT+nr),
+            priOpt = getStringArray(CUSTOM_TYPE_PRIOPT+nr);
         if (name == null)
             return null;
-        else return new CustomEntryType
-            (Util.nCase(name), req, opt);
+        if (priOpt == null) {
+            return new CustomEntryType(Util.nCase(name), req, opt);
+        }
+        ArrayList<String> secOpt = new ArrayList<String>();
+        for (int i = 0; i < opt.length; i++) {
+            secOpt.add(opt[i]);
+        }
+        for (int i = 0; i < priOpt.length; i++) {
+            secOpt.remove(priOpt[i]);
+        }
+        return new CustomEntryType(Util.nCase(name), req, priOpt,
+                secOpt.toArray(new String[secOpt.size()]));
 
 
     }
@@ -1295,16 +1308,10 @@ public class JabRefPreferences {
      * @param number or higher.
      */
     public void purgeCustomEntryTypes(int number) {
-    purgeSeries(CUSTOM_TYPE_NAME, number);
-    purgeSeries(CUSTOM_TYPE_REQ, number);
-    purgeSeries(CUSTOM_TYPE_OPT, number);
-
-        /*while (get(CUSTOM_TYPE_NAME+number) != null) {
-            remove(CUSTOM_TYPE_NAME+number);
-            remove(CUSTOM_TYPE_REQ+number);
-            remove(CUSTOM_TYPE_OPT+number);
-            number++;
-            }*/
+        purgeSeries(CUSTOM_TYPE_NAME, number);
+        purgeSeries(CUSTOM_TYPE_REQ, number);
+        purgeSeries(CUSTOM_TYPE_OPT, number);
+        purgeSeries(CUSTOM_TYPE_PRIOPT, number);
     }
 
     /**
