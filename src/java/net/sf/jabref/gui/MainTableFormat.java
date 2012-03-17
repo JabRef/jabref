@@ -259,15 +259,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // We add those that are enabled in preferences.
         iconCols.clear();
         int coln = 1;
-        if (Globals.prefs.getBoolean("fileColumn"))
-            iconCols.put(coln++, FILE);
-        if (Globals.prefs.getBoolean("pdfColumn"))
-            iconCols.put(coln++, PDF);
-        if (Globals.prefs.getBoolean("urlColumn"))
-            iconCols.put(coln++, URL_);
-        if (Globals.prefs.getBoolean("arxivColumn"))
-            iconCols.put(coln++, ARXIV);
-        
+
         // Add special Icon Columns
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
 	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
@@ -280,6 +272,15 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 	            iconCols.put(coln++, PRIORITY);
         }
 
+        if (Globals.prefs.getBoolean("fileColumn"))
+            iconCols.put(coln++, FILE);
+        if (Globals.prefs.getBoolean("pdfColumn"))
+            iconCols.put(coln++, PDF);
+        if (Globals.prefs.getBoolean("urlColumn"))
+            iconCols.put(coln++, URL_);
+        if (Globals.prefs.getBoolean("arxivColumn"))
+            iconCols.put(coln++, ARXIV);
+        
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();
 
