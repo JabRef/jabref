@@ -48,7 +48,6 @@ public class BibsonomyScraper {
             ud.setEncoding("UTF8");
             ud.download();
             String bibtex = ud.getStringContent();
-            System.out.println(bibtex);
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
@@ -57,6 +56,9 @@ public class BibsonomyScraper {
             else return null;
 
         } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        } catch (RuntimeException ex) {
             ex.printStackTrace();
             return null;
         }
