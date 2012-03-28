@@ -438,10 +438,9 @@ public class ManageJournalsPanel extends JPanel{
                 URLDownload ud = new URLDownload(comp, url, toFile);
                 ud.download();
                 comp.setText(toFile.getPath());
-            } catch (MalformedURLException ex) {
-                ex.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (IOException ex2) {
-                ex2.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, Globals.lang("Error downloading file '%0'", chosen),
+                        Globals.lang("Download failed"), JOptionPane.ERROR_MESSAGE);
             }
         }
     }

@@ -153,7 +153,6 @@ public class OOBibBase {
 
     public XDesktop simpleBootstrap(String pathToExecutable) throws Exception {
 
-
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
             URLClassLoader cl = (URLClassLoader) loader;
@@ -162,7 +161,6 @@ public class OOBibBase {
 
                  Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
                  method.setAccessible(true);
-                
                  method.invoke(cl, new Object[]{new File(pathToExecutable).toURI().toURL()});
              } catch (Throwable t) {
                  t.printStackTrace();
@@ -175,14 +173,11 @@ public class OOBibBase {
 
          //Get the office component context:
          XComponentContext xContext = Bootstrap.bootstrap();
-
          //Get the office service manager:
          XMultiComponentFactory xServiceManager = xContext.getServiceManager();
-
          //Create the desktop, which is the root frame of the
          //hierarchy of frames that contain viewable components:
          Object desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
-
         XDesktop xD = (XDesktop) UnoRuntime.queryInterface(XDesktop.class, desktop);
 
         xComponentLoader = (XComponentLoader)UnoRuntime.queryInterface(
