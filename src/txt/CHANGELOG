@@ -26,6 +26,7 @@
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
 2.8 [dev]
     - Fixed customization of entries in Biblatex mode.
+    - Modified Google Scholar fetcher to adapt to changes to web site.
 2.8 beta 2
     - Improvements to SQL export and import. Fixed bug where subsequent exports to same
       database would fail. Can now save multiple bib bases to a single SQL database.

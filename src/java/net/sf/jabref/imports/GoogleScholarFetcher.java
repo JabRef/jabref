@@ -15,14 +15,12 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.NameListNormalizer;
 
 import javax.swing.*;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -41,9 +39,9 @@ public class GoogleScholarFetcher implements EntryFetcher {
     final static String SEARCH_URL = URL_START+"/scholar?q="+QUERY_MARKER
             +"&amp;hl=en&amp;btnG=Search";
 
-    final static Pattern CITE_LINK_PATTERN = Pattern.compile("<div class=gs_rt><h3><a href=\"([^\"]*)\">");
+    final static Pattern CITE_LINK_PATTERN = Pattern.compile("<div class=gs_r><h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
-            "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span class=\"b\">Next</span></a>");
+            "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
     protected boolean stopFetching = false;
 
@@ -51,6 +49,7 @@ public class GoogleScholarFetcher implements EntryFetcher {
         stopFetching = false;
         try {
             List<String> citations = getCitations(query);
+            int entriesAdded = 0;
             inspector.setProgress(2, citations.size()+2);
             int i=0;
             for (String citation : citations) {
@@ -60,8 +59,17 @@ public class GoogleScholarFetcher implements EntryFetcher {
                 BibtexEntry entry = BibsonomyScraper.getEntry(citation);
 
                 inspector.setProgress((++i)+2, citations.size()+2);
-                if (entry != null)
+                if (entry != null) {
                     inspector.addEntry(entry);
+                    entriesAdded++;
+                }
+            }
+
+            if (entriesAdded < citations.size()) {
+                JOptionPane.showMessageDialog(null,
+                        Globals.lang("%0 entries were found, but only %1 of these could be resolved.",
+                                String.valueOf(citations.size()), String.valueOf(entriesAdded)),
+                        Globals.lang("Incomplete search results"), JOptionPane.WARNING_MESSAGE);
             }
 
             return true;
@@ -134,7 +142,7 @@ public class GoogleScholarFetcher implements EntryFetcher {
 
         m = NEXT_PAGE_PATTERN.matcher(cont);
         if (m.find()) {
-            System.out.println(URL_START+m.group(1).replaceAll("&amp;", "&"));
+            System.out.println("NEXT: "+URL_START+m.group(1).replaceAll("&amp;", "&"));
             return URL_START+m.group(1).replaceAll("&amp;", "&");
         }
         else return null;
