@@ -2308,16 +2308,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
         else if (mode == SHOWING_PREVIEW)
             Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight()-splitPane.getDividerLocation());
-        boolean adjustSplitter = (mode == WILL_SHOW_EDITOR);
         mode = SHOWING_EDITOR;
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
         if (editor.getEntry() != getShowing())
             newEntryShowing(editor.getEntry());
-        if (adjustSplitter) {
-            adjustSplitter();
-            //new FocusRequester(editor);
-        }
+        adjustSplitter();
+
     }
 
     /**

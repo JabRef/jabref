@@ -78,6 +78,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         update,
         insertFullRef = new JButton("Insert reference text"),
         merge = new JButton(Globals.lang("Merge citations")),
+        manageCitations = new JButton(Globals.lang("Manage citations")),
         settingsB = new JButton(Globals.lang("Settings")),
         help = new JButton(GUIGlobals.getImage("help")),
         test = new JButton("Test");
@@ -335,12 +336,21 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
         help.addActionListener(new HelpAction(Globals.helpDiag, "OpenOfficeIntegration.html"));
 
-        test.addActionListener(new ActionListener() {
+        manageCitations.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     CitationManager cm = new CitationManager(frame, ooBase);
                     cm.showDialog();
-                    //pushEntries(false, true, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        test.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                            //pushEntries(false, true, true);
 
                     //ooBase.testFrameHandling();
 
@@ -366,6 +376,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         update.setEnabled(false);
         insertFullRef.setEnabled(false);
         merge.setEnabled(false);
+        manageCitations.setEnabled(false);
         test.setEnabled(false);
         diag = new JDialog((JFrame)null, "OpenOffice panel", false);
 
@@ -393,6 +404,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         b.append(pushEntriesAdvanced);
         b.append(pushEntriesEmpty);
         b.append(merge);
+        b.append(manageCitations);
         b.append(settingsB);
         //b.append(focus);
         //b.append(update);
@@ -545,6 +557,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             update.setEnabled(true);
             insertFullRef.setEnabled(true);
             merge.setEnabled(true);
+            manageCitations.setEnabled(true);
             test.setEnabled(true);
 
         } catch (Throwable e) {
