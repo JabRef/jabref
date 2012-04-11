@@ -10,20 +10,20 @@
  {\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}} (Hrsg.)
 \end{editor}
 \begin{organization}
-, \organization
+, \format[RTFChars]{\organization}
 \end{organization}
 \begin{institution}
-, Bericht, \institution
+, Bericht, \format[RTFChars]{\institution}
 \end{institution}
 
 \begin{school}
 , Dissertation
  (\type)
-, \school
+, \format[RTFChars]{\school}
 \end{school}
 
 \begin{howpublished}
-, \howpublished
+, \format[RTFChars]{\howpublished}
 \end{howpublished}
 
 \begin{address}
