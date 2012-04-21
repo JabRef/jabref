@@ -174,7 +174,8 @@ public class PdfContentImporter extends ImportFormat {
 					} else {
 						// last name found
 						res = res.concat(removeNonLettersAtEnd(splitNames[i]));
-						if (Character.isLowerCase(splitNames[i].charAt(0))) {
+						
+						if (splitNames[i].length() > 0 && Character.isLowerCase(splitNames[i].charAt(0))) {
 							// it is probably be "van", "vom", ...
 							// we just rely on the fact that these things are written in lower case letters
 							// do NOT finish name
