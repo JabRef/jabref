@@ -1,10 +1,14 @@
 package net.sf.jabref.imports;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -12,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.util.EncryptionNotSupportedException;
 import net.sf.jabref.util.XMPUtil;
@@ -26,6 +31,8 @@ import net.sf.jabref.util.XMPUtil;
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 
+	private static Logger logger = Logger.getLogger(EntryFromPDFCreator.class.getName());
+	
 	public EntryFromPDFCreator() {
 		super(getPDFExternalFileType());
 	}
@@ -60,14 +67,30 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 		BibtexEntry entry = new BibtexEntry();
 
 		// Read pdf specific metadata
-		addEntryDataFromPDDocumentInformation(pdfFile, entry);
+		// use PdfContentImporter
+		PdfContentImporter pci = new PdfContentImporter();
+		try {
+			ArrayList<BibtexEntry> list =  (ArrayList<BibtexEntry>) pci.importEntries(new FileInputStream(pdfFile), new OutputPrinterToNull());
+			// there should only be one entry in the arraylist
+			if(list != null && !list.isEmpty()) {
+				return list.iterator().next();
+			}
+		} catch (FileNotFoundException e) {
+			logger.info("FileNotFound");
+		} catch (IOException e) {
+			logger.info("IOException");
+		}
+		
+		return null;
+		
+		/*addEntryDataFromPDDocumentInformation(pdfFile, entry);
 		addEntyDataFromXMP(pdfFile, entry);
 
 		if (entry.getField("title") == null) {
 			entry.setField("title", pdfFile.getName());
 		}
 
-		return entry;
+		return entry;*/
 	}
 
 	/** Adds entry data read from the PDDocument information of the file.

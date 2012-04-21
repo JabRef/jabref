@@ -79,6 +79,11 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
 			return null;
 		}
 		BibtexEntry newEntry = createBibtexEntry(f);
+		
+		if(newEntry == null) {
+			return null;
+		}
+		
 		if (addPathTokensAsKeywords) {
 			appendToField(newEntry, "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
 		}
