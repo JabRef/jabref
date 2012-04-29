@@ -546,28 +546,21 @@ public class Util {
 			}
 
         } else if (fieldName.equals("doi")) {
-	    fieldName = "url";
-			
-	    link = sanitizeUrl(link);
-			
-	    // Check to see if link field already contains a well formated URL
-	    if (!link.startsWith("http://")) {
-		// Remove possible 'doi:'
-		if (link.matches("^doi:/*.*")){
-		    link = link.replaceFirst("^doi:/*", "");
-		}
-		link = Globals.DOI_LOOKUP_PREFIX + link;
-	    }
+            fieldName = "url";
+            
+            // sanitizing is done below at the treatment of "URL"
+            // in sanatizeUrl a doi-link is correctly treated
+
         } else if (fieldName.equals("eprint")) {
-	    fieldName = "url";
-			
-	    link = sanitizeUrl(link);
-			
-	    // Check to see if link field already contains a well formated URL
-	    if (!link.startsWith("http://")) {
-		link = Globals.ARXIV_LOOKUP_PREFIX + link;
-	    }
-	}
+            fieldName = "url";
+
+            link = sanitizeUrl(link);
+
+            // Check to see if link field already contains a well formated URL
+            if (!link.startsWith("http://")) {
+                link = Globals.ARXIV_LOOKUP_PREFIX + link;
+            }
+        }
 
 		if (fieldName.equals("url")) { // html
 			try {
@@ -936,15 +929,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
 	 * 
-	 * A call to this method will also remove \\url{} enclosings and clean doi links.
+	 * A call to this method will also remove \\url{} enclosings and clean DOI links.
 	 * 
-	 * Old Version can be found in CVS version 114 of Util.java.
-	 * 
-	 * @param link
-	 *            The URL to sanitize.
+	 * @param link :the URL to sanitize.
 	 * @return Sanitized URL
 	 */
 	public static String sanitizeUrl(String link) {
+	    link = link.trim();
 
 	    // First check if it is enclosed in \\url{}. If so, remove
         // the wrapper.
@@ -956,17 +947,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             link = link.replaceFirst("^doi:/*", "");
             link = Globals.DOI_LOOKUP_PREFIX + link;
         }
-        
-        /*
-         * Poor man's DOI detection
-         * 
-         * Fixes
-         * https://sourceforge.net/tracker/index.php?func=detail&aid=1709449&group_id=92314&atid=600306
-         */
-        if (link.startsWith("10.")) {
-            link = Globals.DOI_LOOKUP_PREFIX + link;
+
+        // converts doi-only link to full http address
+        if (checkForPlainDOI(link)) {
+            link = Globals.DOI_LOOKUP_PREFIX + getDOI(link);
         }
-	    
+        
 		link = link.replaceAll("\\+", "%2B");
 
 		try {
@@ -3049,11 +3035,11 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     /**
    	 * Remove the http://... from DOI
    	 * 
-   	 * @param doi
-   	 * @return DOI without http://... prefix
+   	 * @param doi - may not be null
+   	 * @return first DOI in the given String (without http://... prefix)
    	 */
    	public static String getDOI(String doi){
-   		doi = doi.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "$1");
+   		doi = doi.replaceAll(REGEXP_PLAINDOI, "$1");
    		return doi;
    	}
 
