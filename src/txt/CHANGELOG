@@ -1,5 +1,6 @@
 2.8
     - Applied Oscar Gustafsson's fix for IEEEXplore fetcher.
+    - Added capability to remove databases from SQL database.
     - Fixed customization of entries in Biblatex mode.
     - Modified Google Scholar fetcher to adapt to changes to web site.
 2.8 beta 2
