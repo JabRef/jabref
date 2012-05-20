@@ -282,7 +282,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    public BasePanel addNewDatabase(ParserResult pr, File file,
+    public BasePanel addNewDatabase(ParserResult pr, final File file,
                                boolean raisePanel) {
 
         String fileName = file.getPath();
@@ -305,7 +305,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Globals.lang("Warnings"),
+                            Globals.lang("Warnings")+" ("+file.getName()+")",
                             JOptionPane.WARNING_MESSAGE);
                 }
             }).start();

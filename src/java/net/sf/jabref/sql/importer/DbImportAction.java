@@ -16,7 +16,10 @@
 package net.sf.jabref.sql.importer;
 
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -31,8 +34,9 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
 import net.sf.jabref.sql.DBConnectDialog;
-import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.DBImportExportDialog;
+import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
@@ -117,25 +121,65 @@ public class DbImportAction extends AbstractWorker {
 
 	// run second, on a different thread:
 	public void run() {
+		performImport();
+	}
+
+	private void performImport() {
 		if (connectToDB) {
 			try {
 				frame.output(Globals.lang("Attempting SQL import..."));
 				DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
 				DBImporter importer = factory.getImporter(dbs.getServerType());
-				databases = importer.performImport(null, dbs);
-				for (Object[] res : databases) {
-					database = (BibtexDatabase) res[0];
-					metaData = (MetaData) res[1];
-					dbs.isConfigValid(true);
+				Connection conn = importer.connectToDB(dbs);
+				ResultSet rs = SQLUtil.queryAllFromTable(conn,
+						"jabref_database");
+				Vector<String> v;
+				Vector<Vector<String>> matrix = new Vector<Vector<String>>();
+
+				while (rs.next()) {
+					v = new Vector<String>();
+					v.add(rs.getString("database_name"));
+					matrix.add(v);
 				}
-				frame.output(Globals.lang("%0 databases will be imported", Integer.toString(databases.size())));
+
+				if (matrix.size() > 0) {
+					DBImportExportDialog dialogo = new DBImportExportDialog(
+							frame, matrix,
+							DBImportExportDialog.DialogType.IMPORTER);
+
+					if (dialogo.removeAction) {
+						String dbName = dialogo.selectedDB;
+						importer.removeDB(dialogo, dbName, conn, metaData);
+						performImport();
+					} else {
+						if (dialogo.moreThanOne) {
+							databases = importer.performImport(null, dbs,
+									dialogo.listOfDBs);
+							for (Object[] res : databases) {
+								database = (BibtexDatabase) res[0];
+								metaData = (MetaData) res[1];
+								dbs.isConfigValid(true);
+							}
+							frame.output(Globals.lang(
+									"%0 databases will be imported",
+									Integer.toString(databases.size())));
+						} else {
+							frame.output(Globals.lang("Importing cancelled"));
+						}
+					}
+				} else {
+					JOptionPane.showMessageDialog(frame, Globals.lang("There are no available databases to be imported"),
+							Globals.lang("Import from SQL database"),
+							JOptionPane.INFORMATION_MESSAGE);					
+				}
+
 			} catch (Exception ex) {
 				String preamble = "Could not import from SQL database for the following reason:";
 				errorMessage = SQLUtil.getExceptionMessage(ex);
 				dbs.isConfigValid(false);
 				JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
 						+ "\n" + errorMessage,
-						Globals.lang("Export to SQL database"),
+						Globals.lang("Import from SQL database"),
 						JOptionPane.ERROR_MESSAGE);
 				frame.output(Globals.lang("Error importing from database"));
 				ex.printStackTrace();
@@ -145,8 +189,8 @@ public class DbImportAction extends AbstractWorker {
 
 	// run third, on EDT:
 	public void update() {
-        if (!connectToDB)
-            return;
+		if (databases == null)
+			return;
 		for (Object[] res : databases) {
 			database = (BibtexDatabase) res[0];
 			metaData = (MetaData) res[1];
@@ -158,7 +202,8 @@ public class DbImportAction extends AbstractWorker {
 				pan.markBaseChanged();
 			}
 		}
-		frame.output(Globals.lang("Imported %0 databases successfully", Integer.toString(databases.size())));
+		frame.output(Globals.lang("Imported %0 databases successfully",
+				Integer.toString(databases.size())));
 	}
 
 }

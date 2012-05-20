@@ -866,7 +866,7 @@ public class JabRef {
                         wrn.deleteCharAt(wrn.length() - 1);
                     jrf.showBaseAt(i);
                     JOptionPane.showMessageDialog(jrf, wrn.toString(),
-                        Globals.lang("Warnings"),
+                        Globals.lang("Warnings")+" ("+pr.getFile().getName()+")",
                         JOptionPane.WARNING_MESSAGE);
                 }
             }

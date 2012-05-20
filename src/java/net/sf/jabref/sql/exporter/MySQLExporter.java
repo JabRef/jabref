@@ -82,7 +82,6 @@ public class MySQLExporter extends DBExporter {
 						+ "database_id INT UNSIGNED NOT NULL AUTO_INCREMENT, \n"
 						+ "database_name VARCHAR(64) NOT NULL, \n"
 						+ "md5_path VARCHAR(32) NOT NULL, \n"
-						+ "UNIQUE INDEX `path_UNIQUE` (md5_path ASC), \n"
 						+ "PRIMARY KEY (database_id)\n );");
 		SQLUtil.processQuery(
 				out,

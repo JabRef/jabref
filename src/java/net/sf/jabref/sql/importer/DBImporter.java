@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.BibtexDatabase;
@@ -39,6 +40,7 @@ import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.groups.SearchGroup;
+import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -55,7 +57,7 @@ import net.sf.jabref.sql.SQLUtil;
  *         (bib) database, presented on a new tab
  * 
  */
-public abstract class DBImporter {
+public abstract class DBImporter extends DBImporterExporter{
 
 	private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<String>(
 			Arrays.asList("cite_key", "entry_types_id", "database_id",
@@ -95,13 +97,21 @@ public abstract class DBImporter {
 	 *         a String with the bib database name stored in the DBMS
 	 * @throws Exception
 	 */
-	public ArrayList<Object[]> performImport(Set<String> keySet, DBStrings dbs)
+	public ArrayList<Object[]> performImport(Set<String> keySet, DBStrings dbs, List<String> listOfDBs)
 			throws Exception {
 		ArrayList<Object[]> result = new ArrayList<Object[]>();
 		Connection conn = this.connectToDB(dbs);
 
+        Iterator<String> itLista = listOfDBs.iterator();
+        String jabrefDBs = "(";   
+        while (itLista.hasNext())
+        {
+        	jabrefDBs += "'" + itLista.next() + "',";
+        }
+        jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ")";
+		
 		ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
-				"jabref_database");
+				"jabref_database WHERE database_name IN "+jabrefDBs);
 		while (rsDatabase.next()) {
 			BibtexDatabase database = new BibtexDatabase();
 			// Find entry type IDs and their mappings to type names:
@@ -272,4 +282,5 @@ public abstract class DBImporter {
 		}
 		rsGroups.getStatement().close();
 	}
+
 }

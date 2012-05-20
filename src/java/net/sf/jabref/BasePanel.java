@@ -734,7 +734,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     DBStrings dbs = metaData.getDBStrings();
 
                     try {
-                    	boolean okToExport = null!=metaData.getFile();
+                    	/*boolean okToExport = null!=metaData.getFile();
                     	if (!okToExport)
                     	{
                     		okToExport = false;
@@ -752,15 +752,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     		}
                     	}
                     	if (okToExport)
-                    	{
+                    	{*/
 	                        frame.output(Globals.lang("Attempting SQL export..."));
 	                        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
 	                        DBExporter exporter = factory.getExporter(dbs.getServerType());
-	                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs);
+	                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs, frame);
 	                        dbs.isConfigValid(true);
-                    	}
-                    	else
-                    		errorMessage = "Database was not exported. Your database must be saved \nbefore exporting to a SQL database";
+                    	//}
+                    	//else
+                    	//	errorMessage = "Database was not exported. Your database must be saved \nbefore exporting to a SQL database";
                     } catch (Exception ex) {
                         String preamble = "Could not export to SQL database for the following reason:";
                         errorMessage = SQLUtil.getExceptionMessage(ex);

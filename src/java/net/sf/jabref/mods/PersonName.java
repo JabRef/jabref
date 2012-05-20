@@ -55,8 +55,8 @@ public class PersonName {
             String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
              
             //Formating names and replacing escape Char for ',' back to a comma
-            XMLChars xmlChars = new XMLChars();
-            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
+//            XMLChars xmlChars = new XMLChars();
+//            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
  
             int endOfLastName = authorMod.indexOf(",");
 

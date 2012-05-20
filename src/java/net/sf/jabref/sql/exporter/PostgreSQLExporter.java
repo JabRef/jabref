@@ -108,7 +108,7 @@ public class PostgreSQLExporter extends DBExporter {
 				"SELECT create_table_if_not_exists ('CREATE TABLE jabref_database ( \n"
 						+ "database_id SERIAL NOT NULL, \n"
 						+ "database_name VARCHAR(64) NOT NULL, \n"
-						+ "md5_path VARCHAR(32) NOT NULL UNIQUE, \n"
+						+ "md5_path VARCHAR(32) NOT NULL, \n"
 						+ "PRIMARY KEY (database_id)\n );')");
 		SQLUtil.processQuery(
 				out,
