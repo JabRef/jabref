@@ -42,7 +42,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 /**
  * Dialog to manage custom importers.
@@ -244,16 +244,16 @@ public class ImportCustomizationDialog extends JDialog {
     am.put("close", closeAction);
     mainPanel.setLayout(new BorderLayout());
     mainPanel.add(sp, BorderLayout.CENTER);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(addFromFolderButton);
-    bb.addGridded(addFromJarButton);
-    bb.addGridded(showDescButton);
-    bb.addGridded(removeButton);
-    bb.addGridded(closeButton);
+    bb.addButton(addFromFolderButton);
+    bb.addButton(addFromJarButton);
+    bb.addButton(showDescButton);
+    bb.addButton(removeButton);
+    bb.addButton(closeButton);
     bb.addUnrelatedGap();
-    bb.addGridded(helpButton);
+    bb.addButton(helpButton);
     bb.addGlue();
 
     getContentPane().add(mainPanel, BorderLayout.CENTER);

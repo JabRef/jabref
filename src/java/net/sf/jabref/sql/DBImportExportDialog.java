@@ -47,7 +47,7 @@ import org.w3c.dom.views.AbstractView;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 /**
  * 
@@ -159,17 +159,17 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
 		diag.getContentPane().add(pan, BorderLayout.CENTER);
 
-		ButtonBarBuilder b = new ButtonBarBuilder();
+		ButtonBarBuilder2 b = new ButtonBarBuilder2();
 		b.addGlue();
 		if (dialogType.equals(DialogType.IMPORTER))
-			b.addGridded(importButton);
+			b.addButton(importButton);
 		else
-			b.addGridded(exportButton);
+			b.addButton(exportButton);
 
 		b.addRelatedGap();
-		b.addGridded(cancelButton);
+		b.addButton(cancelButton);
 		b.addRelatedGap();
-		b.addGridded(removeButton);
+		b.addButton(removeButton);
 
 		b.addGlue();
 		b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

@@ -29,7 +29,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -110,10 +110,10 @@ public class FieldWeightDialog extends JDialog {
             }
         });
 
-        ButtonBarBuilder builder = new ButtonBarBuilder();
+        ButtonBarBuilder2 builder = new ButtonBarBuilder2();
         builder.addGlue();
-        builder.addGridded(ok);
-        builder.addGridded(cancel);
+        builder.addButton(ok);
+        builder.addButton(cancel);
         builder.addGlue();
         return builder.getPanel();
     }

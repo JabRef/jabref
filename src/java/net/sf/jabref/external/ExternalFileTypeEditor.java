@@ -33,7 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 
 /**
@@ -149,17 +149,17 @@ public class ExternalFileTypeEditor extends JDialog {
         getContentPane().add(upper, BorderLayout.CENTER);
 
         ButtonStackBuilder bs = new ButtonStackBuilder();
-        bs.addGridded(add);
-        bs.addGridded(remove);
-        bs.addGridded(edit);
+        bs.addButton(add);
+        bs.addButton(remove);
+        bs.addButton(edit);
         bs.addRelatedGap();
-        bs.addGridded(toDefaults);
+        bs.addButton(toDefaults);
         upper.add(bs.getPanel(), BorderLayout.EAST);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

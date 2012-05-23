@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.external;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -215,12 +215,12 @@ public class PushToApplicationButton implements ActionListener {
         final JDialog diag = dg;
         options.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         JButton ok = new JButton(Globals.lang("Ok"));
         JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

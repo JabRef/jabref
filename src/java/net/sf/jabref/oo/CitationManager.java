@@ -20,7 +20,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
@@ -66,10 +66,10 @@ public class CitationManager {
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag.add(bb.getPanel(), BorderLayout.SOUTH);
@@ -216,10 +216,10 @@ public class CitationManager {
             b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
             diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
-            ButtonBarBuilder bb = new ButtonBarBuilder();
+            ButtonBarBuilder2 bb = new ButtonBarBuilder2();
             bb.addGlue();
-            bb.addGridded(ok);
-            bb.addGridded(cancel);
+            bb.addButton(ok);
+            bb.addButton(cancel);
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
             diag.add(bb.getPanel(), BorderLayout.SOUTH);

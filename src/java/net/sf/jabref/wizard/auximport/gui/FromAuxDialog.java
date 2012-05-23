@@ -78,7 +78,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class FromAuxDialog
         extends JDialog {
@@ -134,15 +134,15 @@ public class FromAuxDialog
         initPanels(parent);
 
         // insert the buttons
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         JPanel buttonPanel = bb.getPanel();
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         bb.addGlue();
-        bb.addGridded(generateButton);
+        bb.addButton(generateButton);
         bb.addRelatedGap();
-        bb.addGridded(okButton);
-        bb.addGridded(cancelButton);
+        bb.addButton(okButton);
+        bb.addButton(cancelButton);
         bb.addGlue();
         this.setModal(true);
         this.setResizable(true);

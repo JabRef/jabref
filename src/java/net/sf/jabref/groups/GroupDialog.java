@@ -53,7 +53,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -188,10 +188,10 @@ class GroupDialog extends JDialog {
                 // ... for buttons panel
                 FormLayout layoutBP = new FormLayout("pref, 4dlu, pref", "p");
                 layoutBP.setColumnGroups(new int[][] { { 1, 3 } });
-                ButtonBarBuilder builderBP = new ButtonBarBuilder();
+                ButtonBarBuilder2 builderBP = new ButtonBarBuilder2();
                 builderBP.addGlue();
-                builderBP.addGridded(m_ok);
-                builderBP.addGridded(m_cancel);
+                builderBP.addButton(m_ok);
+                builderBP.addButton(m_cancel);
                 builderBP.addGlue();
                 builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 

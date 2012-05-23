@@ -34,7 +34,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -149,10 +149,10 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
         // add buttons are added in a similar way:
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(btnConnect);
-        bb.addGridded(btnCancel);
+        bb.addButton(btnConnect);
+        bb.addButton(btnCancel);
         bb.addGlue();
 
         // add the buttons to the SOUTH of your dialog:

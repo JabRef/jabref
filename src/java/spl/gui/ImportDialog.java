@@ -1,6 +1,6 @@
 package spl.gui;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
@@ -103,10 +103,10 @@ public class ImportDialog extends JDialog {
         b.append(checkBoxDoNotShowAgain);
         b.append(useDefaultPDFImportStyle);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(buttonOK);
-        bb.addGridded(buttonCancel);
+        bb.addButton(buttonOK);
+        bb.addButton(buttonCancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         

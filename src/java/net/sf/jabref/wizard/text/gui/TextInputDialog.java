@@ -73,7 +73,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class TextInputDialog
     extends JDialog implements ActionListener
@@ -357,11 +357,11 @@ public class TextInputDialog
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
     cancelButton.addActionListener( this ) ;
 
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(okButton);
-    bb.addGridded(cancelButton);
+    bb.addButton(okButton);
+    bb.addButton(cancelButton);
     bb.addGlue();
 
   }

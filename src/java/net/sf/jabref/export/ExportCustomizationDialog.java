@@ -27,7 +27,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 
@@ -137,15 +137,15 @@ public class ExportCustomizationDialog extends JDialog {
     //am.put("close", closeAction);
     main.setLayout(new BorderLayout());
     main.add(sp, BorderLayout.CENTER);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(addExport);
-    bb.addGridded(modify);
-    bb.addGridded(remove);
-    bb.addGridded(close);
+    bb.addButton(addExport);
+    bb.addButton(modify);
+    bb.addButton(remove);
+    bb.addButton(close);
     bb.addUnrelatedGap();
-    bb.addGridded(help);
+    bb.addButton(help);
     bb.addGlue();
 
     getContentPane().add(main, BorderLayout.CENTER);

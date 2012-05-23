@@ -28,7 +28,7 @@ import javax.swing.*;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 /**
  * Dialog box for choosing an icon for an external file type.
@@ -128,10 +128,10 @@ public class IconSelection extends JDialog {
         icons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         icons.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 

@@ -20,7 +20,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -92,14 +92,14 @@ public class ManagePluginsDialog {
 
         diag.getContentPane().add(pan, BorderLayout.CENTER);
         
-        ButtonBarBuilder b = new ButtonBarBuilder();
+        ButtonBarBuilder2 b = new ButtonBarBuilder2();
         b.addGlue();
-        b.addGridded(install);
-        b.addGridded(download);
-        b.addGridded(remove);
-        b.addGridded(close);
+        b.addButton(install);
+        b.addButton(download);
+        b.addButton(remove);
+        b.addButton(close);
         b.addRelatedGap();
-        b.addGridded(help);
+        b.addButton(help);
         
         b.addGlue();
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

@@ -97,8 +97,9 @@
 	<fileset id="jarsFileset" dir="${lib.dir}">
 		<include name="antlr.jar" />
 		<include name="antlr-3.0b5.jar" />
-		<include name="looks-2.3.1.jar" />
-		<include name="forms-1.1.0.jar" />
+        <include name="jgoodies-common-1.3.1.jar" />
+		<include name="jgoodies-looks-2.5.1.jar" />
+		<include name="jgoodies-forms-1.5.1.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
 		<include name="microba.jar" />

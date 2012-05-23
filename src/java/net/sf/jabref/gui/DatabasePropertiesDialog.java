@@ -24,7 +24,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -100,10 +100,10 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.appendSeparator(Globals.lang("Database protection"));
         builder.nextLine();
         builder.append(protect,3);
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
 
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);

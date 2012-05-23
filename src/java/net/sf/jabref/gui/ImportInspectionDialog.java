@@ -84,7 +84,7 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
@@ -291,25 +291,25 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(stop);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(stop);
+        bb.addButton(cancel);
         bb.addRelatedGap();
-        bb.addGridded(help);
+        bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
-        builder.addGridded(selectAll);
-        builder.addGridded(deselectAll);
-        builder.addGridded(deselectAllDuplicates);
+        builder.addButton(selectAll);
+        builder.addButton(deselectAll);
+        builder.addButton(deselectAllDuplicates);
         builder.addRelatedGap();
-        builder.addGridded(delete);
+        builder.addButton(delete);
         builder.addRelatedGap();
-        builder.addGridded(autoGenerate);
-        builder.addGridded(generate);
+        builder.addFixed(autoGenerate);
+        builder.addButton(generate);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         centerPan.add(builder.getPanel(), BorderLayout.WEST);
 
