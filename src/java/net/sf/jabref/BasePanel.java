@@ -72,14 +72,7 @@ import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.FindFullTextAction;
-import net.sf.jabref.external.RegExpFileSearch;
-import net.sf.jabref.external.SynchronizeFileField;
-import net.sf.jabref.external.UpgradeExternalLinks;
-import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.external.*;
 import net.sf.jabref.groups.AddToGroupAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -1215,6 +1208,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }).start();
             }
         });
+
+        actions.put("addFileLink", new AttachFileAction(this));
 
         actions.put("openExternalFile", new BaseAction() {
             public void action() {

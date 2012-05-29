@@ -161,13 +161,20 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("openFile")) {
+        add(new AbstractAction(Globals.lang("Attach file"), GUIGlobals.getImage("open")) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand("addFileLink");
+                } catch (Throwable ex) {}
+            }
+        });
+        /*add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("openFile")) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openFile");
                 } catch (Throwable ex) {}
             }
-        });
+        });*/
 
         add(new AbstractAction(Globals.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
             public void actionPerformed(ActionEvent e) {
