@@ -1614,11 +1614,6 @@ public JabRefPreferences prefs() {
     }
   }
 
-  public BasePanel addTab(BibtexDatabase db, File file, HashMap<String, String> meta, String encoding, boolean raisePanel) {
-      BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
-      addTab(bp, file, raisePanel);
-      return bp;
-  }
 
     public BasePanel addTab(BibtexDatabase db, File file, MetaData meta, String encoding, boolean raisePanel) {
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
@@ -1777,7 +1772,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        addTab(database, null, (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"), true);
+        addTab(database, null, new MetaData(), Globals.prefs.get("defaultEncoding"), true);
         output(Globals.lang("New database created."));
     }
   }
@@ -1807,7 +1802,7 @@ public JabRefPreferences prefs() {
           BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database
                                         null,                     // file
-                                        (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"));                     // meta data
+                                        new MetaData(), Globals.prefs.get("defaultEncoding"));                     // meta data
           tabbedPane.add( Globals.lang( GUIGlobals.untitledTitle ), bp ) ;
           tabbedPane.setSelectedComponent( bp ) ;
           output( Globals.lang( "New database created." ) ) ;
@@ -1949,10 +1944,9 @@ public JabRefPreferences prefs() {
           System.err.println("KeyCollisionException [ addBibEntries(...) ]");
         }
       }
-      HashMap<String, String> meta = new HashMap<String, String>();
       // Metadata are only put in bibtex files, so we will not find it
-      // in imported files. Instead we pass an empty HashMap.
-      BasePanel bp = new BasePanel(JabRefFrame.this, database, null, meta, Globals.prefs.get("defaultEncoding"));
+      // in imported files. We therefore pass in an empty MetaData:
+      BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get("defaultEncoding"));
       /*
             if (prefs.getBoolean("autoComplete")) {
             db.setCompleters(autoCompleters);

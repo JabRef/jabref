@@ -28,13 +28,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
@@ -287,7 +281,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         String fileName = file.getPath();
         BibtexDatabase db = pr.getDatabase();
-        HashMap<String, String> meta = pr.getMetaData();
+        MetaData meta = pr.getMetaData();
 
         if (pr.hasWarnings()) {
             final String[] wrns = pr.warnings();
@@ -369,6 +363,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         ParserResult pr = bp.parse();
         pr.setEncoding(encoding);
         pr.setFile(fileToOpen);
+
+        if (!pr.getMetaData().isGroupTreeValid())
+            pr.addWarning(Globals.lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
+
         return pr;
     }
 

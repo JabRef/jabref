@@ -695,7 +695,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
-                    panel = new BasePanel(frame, base, null, new HashMap<String, String>(),
+                    panel = new BasePanel(frame, base, null, new MetaData(),
                         Globals.prefs.get("defaultEncoding"));
                 }
 

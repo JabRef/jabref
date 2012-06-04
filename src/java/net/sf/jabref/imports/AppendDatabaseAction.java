@@ -123,7 +123,7 @@ public class AppendDatabaseAction extends BaseAction {
           BibtexDatabase database = panel.database();
           BibtexEntry originalEntry;
           NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
-          MetaData meta = new MetaData(pr.getMetaData(), pr.getDatabase());
+          MetaData meta = pr.getMetaData();
 
           if (importEntries) { // Add entries
               boolean overwriteOwner = Globals.prefs.getBoolean("overwriteOwner");

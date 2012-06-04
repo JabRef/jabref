@@ -381,7 +381,7 @@ public class JabRef {
 	                    // We have an ExportFormat instance:
 	                    try {
 		                System.out.println(Globals.lang("Exporting") + ": " + data[1]);
-	                        format.performExport(newBase, new MetaData(pr.getMetaData(), pr.getDatabase()), data[1], pr.getEncoding(), null);
+	                        format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(), null);
 	                    } catch (Exception ex) {
 	                        System.err.println(Globals.lang("Could not export file")
 	                            + " '" + data[1] + "': " + ex.getMessage());
@@ -412,7 +412,7 @@ public class JabRef {
                             try {
                                 System.out.println(Globals.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
-                                    new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
+                                    pr.getMetaData(), new File(data[0]), Globals.prefs,
                                     false, false, Globals.prefs.get("defaultEncoding"), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll())
@@ -439,7 +439,7 @@ public class JabRef {
                     File theFile = pr.getFile();
                     if (!theFile.isAbsolute())
                         theFile = theFile.getAbsoluteFile();
-                    MetaData metaData = new MetaData(pr.getMetaData(), pr.getDatabase());
+                    MetaData metaData = pr.getMetaData();
                     metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                     Globals.prefs.databaseFile = metaData.getFile();
@@ -449,8 +449,7 @@ public class JabRef {
                         // We have an ExportFormat instance:
                         try {
                             format.performExport(pr.getDatabase(), 
-                                    new MetaData(pr.getMetaData(), pr.getDatabase()),
-                                    data[0], pr.getEncoding(), null);
+                                    pr.getMetaData(), data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
                             System.err.println(Globals.lang("Could not export file")
                                 + " '" + data[0] + "': " + ex.getMessage());

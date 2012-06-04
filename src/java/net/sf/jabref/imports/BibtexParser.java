@@ -37,18 +37,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.CustomEntryType;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.UnknownEntryType;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 /**
  * Class for importing BibTeX-files.
@@ -242,7 +231,7 @@ public class BibtexParser {
         _db = new BibtexDatabase(); // Bibtex related contents.
 		_meta = new HashMap<String, String>(); // Metadata in comments for Bibkeeper.
 		entryTypes = new HashMap<String, BibtexEntryType>(); // To store custem entry types parsed.
-		_pr = new ParserResult(_db, _meta, entryTypes);
+		_pr = new ParserResult(_db, null, entryTypes);
 
         // First see if we can find the version number of the JabRef version that
         // wrote the file:
@@ -391,6 +380,9 @@ public class BibtexParser {
 			// Before returning the database, update entries with unknown type
 			// based on parsed type definitions, if possible.
 			checkEntryTypes(_pr);
+
+            // Instantiate meta data:
+            _pr.setMetaData(new MetaData(_meta, _db));
 
 			return _pr;
 		} catch (KeyCollisionException kce) {

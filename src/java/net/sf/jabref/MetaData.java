@@ -28,6 +28,7 @@ public class MetaData implements Iterable<String> {
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
+    private boolean groupTreeValid = true;
 
     private DBStrings dbStrings = new DBStrings();
 
@@ -78,7 +79,12 @@ public class MetaData implements Iterable<String> {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
         
         if (!groupsTreePresent && flatGroupsData != null) {
-            groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
+            try {
+                groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
+                groupTreeValid = true;
+            } catch (IllegalArgumentException ex) {
+                groupTreeValid = true;
+            }
         }
     }
 
@@ -176,13 +182,22 @@ public class MetaData implements Iterable<String> {
         return dirs.toArray(new String[dirs.size()]);
     }
 
+    /**
+     * Parse the groups metadata string
+     * @param orderedData The vector of metadata strings
+     * @param db The BibtexDatabase this metadata belongs to
+     * @param version The group tree version
+     * @return true if parsing was successful, false otherwise
+     */
     private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db, 
                     version);
+            groupTreeValid = true;
         } catch (Exception e) {
             // we cannot really do anything about this here
             System.err.println(e);
+            groupTreeValid = false;
         }
     }
 
@@ -196,6 +211,7 @@ public class MetaData implements Iterable<String> {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
+        groupTreeValid = true;
     }
 
     /**
@@ -297,5 +313,9 @@ public class MetaData implements Iterable<String> {
 
     public void setDBStrings(DBStrings dbStrings) {
         this.dbStrings = dbStrings;
+    }
+
+    public boolean isGroupTreeValid() {
+        return groupTreeValid;
     }
 }

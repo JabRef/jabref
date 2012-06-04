@@ -238,18 +238,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
-                     HashMap<String, String> meta, String encoding) {
-        this.database = db;
-        if (meta != null)
-            parseMetaData(meta);
-        else {
-            metaData = new MetaData();
-            metaData.initializeNewDatabase();
-        }
-        init(frame, db, file, metaData, encoding);
-    }
-
-    public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      MetaData metaData, String encoding) {
         init(frame, db, file, metaData, encoding);
     }
@@ -2102,20 +2090,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     }
 
-
-    /**
-     * This method is called after a database has been parsed. The
-     * hashmap contains the contents of all comments in the .bib file
-     * that started with the meta flag (GUIGlobals.META_FLAG).
-     * In this method, the meta data are input to their respective
-     * handlers.
-     *
-     * @param meta Metadata to input.
-     */
-    public void parseMetaData(HashMap<String, String> meta) {
-        metaData = new MetaData(meta,database());
-
-    }
 
     /*
     public void refreshTable() {
