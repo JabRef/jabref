@@ -1,3 +1,5 @@
+2.8.1
+    - Fixed bug in PostgreSQL export/import.
 2.8
     - Applied Oscar Gustafsson's fix for IEEEXplore fetcher.
     - Added capability to remove databases from SQL database.
