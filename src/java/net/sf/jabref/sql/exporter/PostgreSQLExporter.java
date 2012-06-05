@@ -54,7 +54,7 @@ public class PostgreSQLExporter extends DBExporter {
 	@Override
 	public Connection connectToDB(DBStrings dbstrings) throws Exception {
 		this.dbStrings = dbstrings;
-		String url = SQLUtil.createJDBCurl(dbstrings, false);
+		String url = SQLUtil.createJDBCurl(dbstrings, true);
 		String drv = "org.postgresql.Driver";
 
 		Class.forName(drv).newInstance();
