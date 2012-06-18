@@ -45,6 +45,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 import spin.Spin;
 
@@ -63,7 +64,7 @@ public class JabRef {
     boolean graphicFailure = false;
 
     StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine, exportMatches;
-    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
+    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash, defPrefs;
 
     private final static String exportMatchesSyntax = "[".concat(Globals.lang("field")).concat("]").concat("searchTerm").concat(",").concat("outputFile").concat(": ").concat(Globals.lang("file")).concat("[,").concat(Globals.lang("exportFormat")).concat("]");
 
@@ -188,6 +189,7 @@ public class JabRef {
         showVersion = new BooleanOption();
         exportPrefs = new StringOption("jabref_prefs.xml");
         importPrefs = new StringOption("jabref_prefs.xml");
+        defPrefs = new BooleanOption();
         auxImExport = new StringOption("");
         importToOpenBase = new StringOption("");
         fetcherEngine = new StringOption("");
@@ -216,6 +218,8 @@ public class JabRef {
             exportPrefs);
         options.register("primp", 'p', Globals.lang("Import preferences from file"),
             importPrefs);
+        options.register("prdef", 'd', Globals.lang("Reset all preferences to default values"),
+            defPrefs);
         options.register("aux", 'a',
             Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
             auxImExport);
@@ -267,6 +271,16 @@ public class JabRef {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
                     + ".");
+            }
+        }
+
+        // Check if we should reset all preferences to default values:
+        if (defPrefs.isInvoked()) {
+            try {
+                Globals.prefs.clear();
+            } catch (BackingStoreException e) {
+                System.err.println(Globals.lang("Unable to clear preferences."));
+                e.printStackTrace();
             }
         }
 

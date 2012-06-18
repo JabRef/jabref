@@ -1,4 +1,5 @@
 [master branch]
+    - Added command line argument -d/-prdef for resetting all preferences to default values.
     - Added small popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Braces around author names are now dropped internally. They remain in the .bib though
