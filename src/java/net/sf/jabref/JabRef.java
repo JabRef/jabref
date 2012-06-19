@@ -63,8 +63,9 @@ public class JabRef {
 
     boolean graphicFailure = false;
 
-    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine, exportMatches;
-    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash, defPrefs;
+    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase,
+            fetcherEngine, exportMatches, defPrefs;
+    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
 
     private final static String exportMatchesSyntax = "[".concat(Globals.lang("field")).concat("]").concat("searchTerm").concat(",").concat("outputFile").concat(": ").concat(Globals.lang("file")).concat("[,").concat(Globals.lang("exportFormat")).concat("]");
 
@@ -189,7 +190,7 @@ public class JabRef {
         showVersion = new BooleanOption();
         exportPrefs = new StringOption("jabref_prefs.xml");
         importPrefs = new StringOption("jabref_prefs.xml");
-        defPrefs = new BooleanOption();
+        defPrefs = new StringOption("");
         auxImExport = new StringOption("");
         importToOpenBase = new StringOption("");
         fetcherEngine = new StringOption("");
@@ -218,7 +219,7 @@ public class JabRef {
             exportPrefs);
         options.register("primp", 'p', Globals.lang("Import preferences from file"),
             importPrefs);
-        options.register("prdef", 'd', Globals.lang("Reset all preferences to default values"),
+        options.register("prdef", 'd', Globals.lang("Reset preferences (key1,key2,... or 'all')"),
             defPrefs);
         options.register("aux", 'a',
             Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
@@ -276,12 +277,32 @@ public class JabRef {
 
         // Check if we should reset all preferences to default values:
         if (defPrefs.isInvoked()) {
-            try {
-                Globals.prefs.clear();
-            } catch (BackingStoreException e) {
-                System.err.println(Globals.lang("Unable to clear preferences."));
-                e.printStackTrace();
+            String value = defPrefs.getStringValue();
+            if (value.trim().equals("all")) {
+                try {
+                    System.out.println(Globals.lang("Setting all preferences to default values."));
+                    Globals.prefs.clear();
+                } catch (BackingStoreException e) {
+                    System.err.println(Globals.lang("Unable to clear preferences."));
+                    e.printStackTrace();
+                }
+            } else {
+                String[] keys = value.split(",");
+                for (int i=0; i<keys.length; i++) {
+                    try {
+                        if (Globals.prefs.hasKey(keys[i].trim())) {
+                            System.out.println(Globals.lang("Resetting preference key '%0'", keys[i].trim()));
+                            Globals.prefs.clear(keys[i].trim());
+                        } else {
+                            System.out.println(Globals.lang("Unknown preference key '%0'", keys[i].trim()));
+                        }
+                    } catch (BackingStoreException e) {
+                        System.err.println(Globals.lang("Unable to clear preferences."));
+                        e.printStackTrace();
+                    }
+                }
             }
+
         }
 
         // Check if we should import preferences from a file:

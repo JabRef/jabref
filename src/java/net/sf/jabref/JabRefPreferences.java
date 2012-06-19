@@ -464,7 +464,7 @@ public class JabRefPreferences {
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
-        MARKING_WITH_NUMBER_PATTERN = "\\["+get("defaultOwner")+":(\\d+)\\]";
+        MARKING_WITH_NUMBER_PATTERN = "\\["+get("defaultOwner").replaceAll("\\\\","\\\\\\\\")+":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -771,6 +771,18 @@ public class JabRefPreferences {
         return defKeyBinds;
     }
 
+
+    /**
+     * Clear all preferences.
+     * @throws BackingStoreException
+     */
+    public void clear() throws BackingStoreException {
+        prefs.clear();
+    }
+
+    public void clear(String key) throws BackingStoreException {
+        prefs.remove(key);
+    }
     /**
      * Calling this method will write all preferences into the preference store.
      */
