@@ -110,6 +110,9 @@ public class LabelPatternUtil {
     /**
      * Generates a BibTeX label according to the pattern for a given entry type, and
      * returns the <code>Bibtexentry</code> with the unique label.
+     * 
+     * The given database is used to avoid duplicate keys.
+     * 
      * @param table a <code>LabelPattern</code>
      * @param database a <code>BibtexDatabase</code>
      * @param _entry a <code>BibtexEntry</code>
@@ -195,8 +198,14 @@ public class LabelPatternUtil {
 
         if (!alwaysAddLetter && (occurences == 0)) {
             // No dupes found, so we can just go ahead.
-            if (!_label.equals(oldKey))
-                _db.setCiteKeyForEntry(_entry.getId(), _label);
+            if (!_label.equals(oldKey)) {
+                if (_db.getEntryById(_entry.getId()) == null) {
+                    // entry does not (yet) exist in the database, just update the entry
+                    _entry.setField(BibtexFields.KEY_FIELD, _label);
+                } else {
+                    _db.setCiteKeyForEntry(_entry.getId(), _label);
+                }
+            }
 
         } else {
             // The key is already in use, so we must modify it.
@@ -220,7 +229,12 @@ public class LabelPatternUtil {
             }
 
             if (!moddedKey.equals(oldKey)) {
-                _db.setCiteKeyForEntry(_entry.getId(), moddedKey);
+                if (_db.getEntryById(_entry.getId()) == null) {
+                    // entry does not (yet) exist in the database, just update the entry
+                    _entry.setField(BibtexFields.KEY_FIELD, moddedKey);
+                } else {
+                    _db.setCiteKeyForEntry(_entry.getId(), moddedKey);
+                }
             }
         }
 
