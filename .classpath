@@ -12,7 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf-boot.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/JPFCodeGenerator-rt.jar" sourcepath="/JPFCodeGenerator/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/glazedlists-1.8.0_java15.jar"/>
-	<classpathentry kind="lib" path="lib/forms-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.7-bin.jar"/>
 	<classpathentry kind="lib" path="lib/spl/sciplore/xstream-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/spl/sciplore/mrDlib-serialization-api.jar" sourcepath="/Serialization API"/>
@@ -22,7 +21,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="lib/looks-2.3.1.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/sciplore"/>
 	<classpathentry kind="lib" path="lib/spl/jersey/jersey-client-1.1.5.1.jar"/>
@@ -38,5 +36,8 @@
 	<classpathentry kind="lib" path="lib/oo/ridl.jar"/>
 	<classpathentry kind="lib" path="lib/oo/unoil.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/jgoodies-common-1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jgoodies-forms-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jgoodies-looks-2.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
