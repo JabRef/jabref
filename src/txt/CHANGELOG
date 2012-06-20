@@ -1,4 +1,6 @@
 [master branch]
+    - Text-based citations can now be imported using FreeCite by Brown University
+      (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
     - Added command line argument -d/-prdef for resetting preferences to default values. Can
       reset a comma-separated list of preference values, or all values.
     - Added small popup menu at each tab
