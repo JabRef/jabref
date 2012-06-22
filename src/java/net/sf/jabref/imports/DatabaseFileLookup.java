@@ -1,16 +1,15 @@
 package net.sf.jabref.imports;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.logging.Logger;
-
-import org.apache.commons.io.FileUtils;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -32,7 +31,11 @@ public class DatabaseFileLookup {
 
 	private static Logger logger = Logger.getLogger(DatabaseFileLookup.class.getName());
 	
-	private final BibtexDatabase database;
+	private final HashMap<File, Boolean> fileToFound = new HashMap<File, Boolean>();
+
+    private final Collection<BibtexEntry> entries;
+
+    private final String[] possibleFilePaths;
 
 	/**
 	 * Creates an instance by passing a {@link BibtexDatabase} which will be
@@ -44,7 +47,8 @@ public class DatabaseFileLookup {
 	public DatabaseFileLookup(BibtexDatabase aDatabase) {
 		if (aDatabase == null)
 			throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
-		this.database = aDatabase;
+		entries = aDatabase.getEntries();
+        possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
 	}
 	
 	/**
@@ -62,13 +66,20 @@ public class DatabaseFileLookup {
 	 *         entry in the database, otherwise <code>false</code>.
 	 */
 	public boolean lookupDatabase(File aFile) {
-		Collection<BibtexEntry> entries = database.getEntries();
-		for (BibtexEntry entry : entries) {
-			if (lookupEntry(aFile, entry)) {
-				return true;
-			}
-		}
-		return false;
+	    if (fileToFound.containsKey(aFile)) {
+	        return fileToFound.get(aFile); 
+	    } else {
+	        Boolean res = false;
+    		for (BibtexEntry entry : entries) {
+    			if (lookupEntry(aFile, entry)) {
+    				res = true;
+    				break;
+    			}
+    		}
+    		fileToFound.put(aFile,  res);
+    		//System.out.println(aFile);
+    		return res;
+	    }
 	}
 
 	/**
@@ -96,7 +107,6 @@ public class DatabaseFileLookup {
 		String fileField = anEntry.getField(KEY_FILE_FIELD);
 		model.setContent(fileField);
 		
-		File asFile = null;
 		for (int i = 0; i < model.getRowCount(); i++) {
 			FileListEntry flEntry = model.getEntry(i);
 			String link = flEntry.getLink();
@@ -105,35 +115,11 @@ public class DatabaseFileLookup {
 				break;
 			}
 			
-			String[] possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-			try {
-				asFile = new File(link);
-				boolean exists = false;
-				
-				if(asFile.exists()) {
-					exists = true;
-				}else {
-					// bibtexfilepath is relative path
-					// so try to get full path from possibleFilePaths
-					exists = false;
-					for(String s : possibleFilePaths) {
-						//System.out.println("trying: " + s+File.separatorChar+link);
-						asFile = new File(s+File.separatorChar+link);
-						if(asFile.exists()) {
-							// leave loop if file exists
-							exists = true;
-							break;
-						}	
-					}
-				}
-				// file was found creating some possible absolute path for it
-				if (exists && FileUtils.contentEquals(aFile, asFile)) {
-					return true;
-				}
-				
-			} catch (IOException e) {
-				logger.info("IOException");
-			} 
+            File expandedFilename = Util.expandFilename(link, possibleFilePaths);
+			if (expandedFilename != null // file exists
+			    && expandedFilename.equals(aFile)) {
+			    return true;
+			}
 		}
 		
 		return false;

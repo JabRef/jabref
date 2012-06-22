@@ -22,35 +22,6 @@ import net.sf.jabref.FindUnlinkedFilesDialog.FileNodeWrapper;
 public class UnlinkedFilesCrawler {
 
 	/**
-	 * {@link FileFilter} implementation, that allowes only files which are not
-	 * linked in any of the {@link BibtexEntry}s of the specified
-	 * {@link BibtexDatabase}. <br>
-	 * <br>
-	 * This {@link FileFilter} sits on top of another {@link FileFilter}
-	 * -implementation, which it first consults. Only if this major filefilter
-	 * has accepted a file, this implementation will verify on that file.
-	 * 
-	 * @author Nosh&Dan
-	 * @version 12.11.2008 | 02:00:15
-	 * 
-	 */
-	public static class UnlinkedPDFFileFilter implements FileFilter {
-		private final DatabaseFileLookup lookup;
-		private final FileFilter fileFilter;
-
-		public UnlinkedPDFFileFilter(FileFilter aFileFilter, BibtexDatabase database) {
-			this.fileFilter = aFileFilter;
-			this.lookup = new DatabaseFileLookup(database);
-		}
-
-		public boolean accept(File pathname) {
-			if (fileFilter.accept(pathname))
-				return !lookup.lookupDatabase(pathname);
-			return false;
-		}
-	};
-
-	/**
 	 * File filter, that accepts directorys only.
 	 */
 	public final FileFilter directoryFilter = new FileFilter() {
@@ -72,7 +43,8 @@ public class UnlinkedFilesCrawler {
 	}
 	
 	public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter) {
-		return searchDirectory(directory,aFileFilter, new int[] {1}, null);
+	    UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
+		return searchDirectory(directory, ff, new int[] {1}, null);
 	}
 
 	/**
@@ -92,7 +64,7 @@ public class UnlinkedFilesCrawler {
 	 * the recursion running. When the states value changes, the methode will
 	 * resolve its recursion and return what it has saved so far.
 	 */
-	public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter, int[] state, ChangeListener changeListener) {
+	public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
 		/* Cancellation of the search from outside! */
 		if (state == null || state.length < 1 || state[0] != 1) {
 			return null;
@@ -102,8 +74,6 @@ public class UnlinkedFilesCrawler {
 			return null;
 		}
 		
-		FileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
-
 		File[] files = directory.listFiles(ff);
 		CheckableTreeNode root = new CheckableTreeNode(null);
 

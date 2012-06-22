@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -76,9 +77,9 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 				return list.iterator().next();
 			}
 		} catch (FileNotFoundException e) {
-			logger.info("FileNotFound");
+		    logger.log(Level.SEVERE, "File not found", e);
 		} catch (IOException e) {
-			logger.info("IOException");
+            logger.log(Level.SEVERE, "Error opening file", e);
 		}
 		
 		return null;

@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -132,7 +135,10 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
 	protected void addFileInfo(BibtexEntry entry, File file) {
 		JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
 		ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt(externalFileType.getFieldName());
-		FileListEntry fileListEntry = new FileListEntry("", file.getAbsolutePath(), fileType);
+		
+		String[] possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+		File shortenedFileName = Util.shortenFileName(file, possibleFilePaths);
+		FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
 		FileListTableModel model = new FileListTableModel();
 		model.addEntry(0, fileListEntry);

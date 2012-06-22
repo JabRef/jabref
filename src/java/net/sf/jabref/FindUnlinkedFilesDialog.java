@@ -23,12 +23,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -60,11 +62,13 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.sun.istack.internal.logging.Logger;
 
 import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
 import net.sf.jabref.imports.UnlinkedFilesCrawler;
+import net.sf.jabref.imports.UnlinkedPDFFileFilter;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -74,6 +78,7 @@ import net.sf.jabref.imports.UnlinkedFilesCrawler;
  *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
+    private static final Logger logger = Logger.getLogger(FindUnlinkedFilesDialog.class);
 
 	private static final long serialVersionUID = -5778378185253640030L;
 	
@@ -488,16 +493,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		threadState = new int[] {1};
 		new Thread(new Runnable() {
 			public void run() {
-				CheckableTreeNode rootNode = crawler.searchDirectory(directory, selectedFileFilter, threadState, new ChangeListener() {
+			    UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
+				CheckableTreeNode rootNode = crawler.searchDirectory(directory, ff, threadState, new ChangeListener() {
 					int counter = 0;
 					public void stateChanged(ChangeEvent e) {
 						progressBarSearching.setString(++counter + " files found");
 					}
 				});
-				try {
-					Thread.sleep(500l);
-				} catch (InterruptedException e1) {
-				}
 				searchFinishedHandler(rootNode);
 			}
 		}).start();
@@ -555,10 +557,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
 						progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
 					}
 				});
-				try {
-					Thread.sleep(500l);
-				} catch (InterruptedException e1) {
-				}
 				importFinishedHandler(errors);
 			}
 		}).start();
@@ -587,14 +585,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
                     JOptionPane.WARNING_MESSAGE);
 		}
 		
-		buttonOk.removeActionListener(actionListenerImportEntrys);
-		buttonOk.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
-		
-		
 		progressBarImporting.setVisible(false);
 		labelImportingInfo.setVisible(false);
 		buttonOk.setVisible(true);
@@ -602,8 +592,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		
 		disOrEnableDialog(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
-		startSearch();
 	}
 	
 	/**
@@ -681,6 +669,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * <code>Selected</code> nodes correspond to those entries in the tree,
 	 * whose checkbox is <code>checked</code>.
 	 * 
+	 * SIDE EFFECT: The checked nodes are removed from the tree.
+	 * 
 	 * @param node
 	 *            The root node representing a tree structure.
 	 * @return A list of files of all checked leaf nodes.
@@ -689,15 +679,37 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	private List<File> getFileListFromNode(CheckableTreeNode node) {
 		List<File> filesList = new ArrayList<File>();
 		Enumeration<CheckableTreeNode> childs = node.depthFirstEnumeration();
+		ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<FindUnlinkedFilesDialog.CheckableTreeNode>();
 		while (childs.hasMoreElements()) {
 			CheckableTreeNode child = childs.nextElement();
 			if (child.isLeaf() && child.getSelected()) {
 				File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
 				if (nodeFile != null && nodeFile.isFile()) {
 					filesList.add(nodeFile);
+					nodesToRemove.add(child);
 				}
 			}
 		}
+
+		// remove imported files from tree
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+		for (CheckableTreeNode nodeToRemove: nodesToRemove) {
+		    DefaultMutableTreeNode parent = (DefaultMutableTreeNode) nodeToRemove.getParent();
+		    model.removeNodeFromParent(nodeToRemove);
+		    
+		    // remove empty parent node
+		    while (parent != null && parent.isLeaf()) {
+		        DefaultMutableTreeNode pp = (DefaultMutableTreeNode) parent.getParent();
+		        if (pp != null) {
+		            model.removeNodeFromParent(parent);
+		        }
+		        parent = pp;
+		    } 
+            // TODO: update counter / see: getTreeCellRendererComponent for label generation
+		}
+        tree.invalidate();
+		tree.repaint();
+		    
 		return filesList;
 	}
 
@@ -866,11 +878,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		addComponent(gbl, getContentPane(), panelButtons, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, new Insets(10, 6, 10, 6),
 				0, 3, 1, 1, 0, 0, 0, 0);
 		
-		ButtonBarBuilder bb = new ButtonBarBuilder();
+	    ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(buttonOk);
-        bb.addGridded(buttonCancel);
+        bb.addButton(buttonOk);
+        bb.addButton(buttonCancel);
         bb.addGlue();
+
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));        
         panelImportArea.add(bb.getPanel(), GridBagConstraints.NONE);
         pack();
@@ -959,10 +972,22 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 				TreePath path = tree.getPathForRow(row);
 				if (path != null) {
-					CheckableTreeNode node = (CheckableTreeNode) path.getLastPathComponent();
-					node.check();
-					tree.invalidate();
-					tree.repaint();
+                    CheckableTreeNode node = (CheckableTreeNode) path.getLastPathComponent();
+				    if (e.getClickCount() == 2) {
+				        Object userObject = node.getUserObject();
+				        if (userObject instanceof FileNodeWrapper && node.isLeaf()) {
+				            FileNodeWrapper fnw = (FileNodeWrapper) userObject;
+				            try {
+                                Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
+                            } catch (IOException e1) {
+                                logger.log(Level.SEVERE, "Error opening file", e1);
+                            }
+				        }
+				    } else {
+    					node.check();
+    					tree.invalidate();
+    					tree.repaint();
+				    }
 				}
 			}
 
