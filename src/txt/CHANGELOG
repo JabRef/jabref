@@ -1,6 +1,8 @@
 [master branch]
     - Text-based citations can now be imported using FreeCite by Brown University
       (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
+    - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".
+      Based on patch 3122104. 
     - Added command line argument -d/-prdef for resetting preferences to default values. Can
       reset a comma-separated list of preference values, or all values.
     - Added small popup menu at each tab
@@ -18,7 +20,7 @@
     - Added functionality "clean up entries" 
       - Includes clean up DOI functionality by Florian Straßer and Marius Kleiner
         (move of DOIs from ee, note, and url field is supported)
-      - Option to ename PDF of entry according to configured PDF-naming-scheme
+      - Option to rename PDF of entry according to configured PDF-naming-scheme
         (by Florian Straßer and Marius Kleiner)
       - clean up month (functionality based on patch 3470076 by Mathias Walter)
       - clean up pages
