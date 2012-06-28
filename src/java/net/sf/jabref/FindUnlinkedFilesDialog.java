@@ -1,6 +1,5 @@
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -30,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -63,7 +61,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder2;
-import com.sun.istack.internal.logging.Logger;
 
 import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
@@ -78,8 +75,6 @@ import net.sf.jabref.imports.UnlinkedPDFFileFilter;
  *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
-    private static final Logger logger = Logger.getLogger(FindUnlinkedFilesDialog.class);
-
 	private static final long serialVersionUID = -5778378185253640030L;
 	
 	/**
@@ -980,7 +975,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 				            try {
                                 Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
-                                logger.log(Level.SEVERE, "Error opening file", e1);
+                                Globals.logger("Error opening file");
                             }
 				        }
 				    } else {
