@@ -154,9 +154,15 @@ public class MetaData implements Iterable<String> {
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
             if (!(new File(dir)).isAbsolute() && (file != null)) {
-                String relDir = new StringBuffer(file.getParent()).
-                        append(System.getProperty("file.separator")).
-                        append(dir).toString();
+                String relDir;
+                if (dir.equals(".")) {
+                    // if dir is only "current" directory, just use its parent (== real current directory) as path
+                    relDir = file.getParent().toString(); 
+                } else {
+                    relDir = new StringBuffer(file.getParent()).
+                            append(System.getProperty("file.separator")).
+                            append(dir).toString();
+                }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
                 if ((new File(relDir)).exists())
