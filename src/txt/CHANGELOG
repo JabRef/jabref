@@ -1,5 +1,4 @@
 [master branch]
-    - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
     - Text-based citations can now be imported using FreeCite by Brown University
       (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
     - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".
@@ -27,6 +26,11 @@
       - clean up pages
       - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
+2.8.1
+    - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
+    - Disabled ACM portal fetcher to avoid users of getting banned.
+    - Fixed bug in PostgreSQL export/import.
+    - Improved handling of file fields written in the style exported from Zotero.
 2.8
     - Applied Oscar Gustafsson's fix for IEEEXplore fetcher.
     - Added capability to remove databases from SQL database.
