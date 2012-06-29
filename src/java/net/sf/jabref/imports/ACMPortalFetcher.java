@@ -44,39 +44,42 @@ import net.sf.jabref.OutputPrinter;
 
 public class ACMPortalFetcher implements EntryFetcher {
 
-	ImportInspector dialog = null;
-	OutputPrinter status;
-    final HTMLConverter htmlConverter = new HTMLConverter();
+	private ImportInspector dialog = null;
+	private OutputPrinter status;
+    private final HTMLConverter htmlConverter = new HTMLConverter();
     private String terms;
     
-    String startUrl = "http://portal.acm.org/";
-    String searchUrlPart = "results.cfm?query=";
-    String searchUrlPartII = "&dl=";
-    String endUrl = "&coll=Portal&short=0";//&start=";
+    private static final String startUrl = "http://portal.acm.org/";
+    private static final String searchUrlPart = "results.cfm?query=";
+    private static final String searchUrlPartII = "&dl=";
+    private static final String endUrl = "&coll=Portal&short=0";//&start=";
 
-    String bibtexUrl = "exportformats.cfm?id=";
-    String bibtexUrlEnd = "&expformat=bibtex";
-    String abstractUrl = "tab_abstract.cfm?id=";
+    private static final String bibtexUrl = "exportformats.cfm?id=";
+    private static final String bibtexUrlEnd = "&expformat=bibtex";
+    private static final String abstractUrl = "tab_abstract.cfm?id=";
     
-    private JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
-    private JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
-    private JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
+    private final JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
+    private final JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
+    private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
     
-    private static final int MAX_FETCH = 100; // 20 when short=0
+    private static final int perPage = 20;
+    private static final int MAX_FETCH = perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 1000;
-    private int perPage = 20, hits = 0, unparseable = 0, parsed = 0;
+    private int hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
+    
+    // user settings
     private boolean fetchAbstract = false;
     private boolean acmOrGuide = false;
 
-    Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
-    Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
-    Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
+    private static final Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
+    private static final Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
+    private static final Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
     
-    Pattern fullCitationPattern =
+    private static final Pattern fullCitationPattern =
         Pattern.compile("<A HREF=\"(citation.cfm.*)\" class.*");
 
-    Pattern idPattern =
+    private static final Pattern idPattern =
         Pattern.compile("citation.cfm\\?id=\\d*\\.?(\\d+)&.*");    
     				
     public JPanel getOptionsPanel() {
@@ -189,7 +192,7 @@ public class ACMPortalFetcher implements EntryFetcher {
         return sb.toString();
     }
 
-    int piv = 0;
+    private int piv = 0;
 
     private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
         piv = startIndex;
