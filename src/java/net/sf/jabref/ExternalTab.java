@@ -180,6 +180,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         addSettingsButton(new PushToWinEdt(), builder);
         addSettingsButton(new PushToVim(), builder);
         addSettingsButton(new PushToLatexEditor(), builder);
+        addSettingsButton(new PushToTeXstudio(), builder);
 
         //builder.nextLine();
         builder.append(pan);

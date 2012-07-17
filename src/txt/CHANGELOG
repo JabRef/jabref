@@ -1,4 +1,5 @@
 [master branch]
+    - Added support for pushing citations to TeXstudio (requires TeXstudio >=2.4)
     - Text-based citations can now be imported using FreeCite by Brown University
       (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
     - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".

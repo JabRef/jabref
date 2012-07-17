@@ -81,6 +81,7 @@ public class PushToApplicationButton implements ActionListener {
 		    applications.add(new PushToLatexEditor());
 		    applications.add(new PushToVim());
             applications.add(OpenOfficePanel.getInstance());
+            applications.add(new PushToTeXstudio());
 		
 		    // Finally, sort the entries:
 		    //Collections.sort(applications, new PushToApplicationComparator());
