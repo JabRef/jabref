@@ -250,6 +250,7 @@ public class AuthorList {
 		// clean-up
 		orig = null;
 		tokens = null;
+
 	}
 
 	/**
@@ -392,7 +393,7 @@ public class AuthorList {
 			}
 		}// end token_loop
 
-		// Second step: split name into parts (here: calculate indices
+        // Second step: split name into parts (here: calculate indices
 		// of parts in 'tokens' Vector)
 		if (tokens.size() == 0)
 			return null; // no author information
@@ -583,7 +584,13 @@ public class AuthorList {
 			if (first_letter_is_found && token_abbr < 0 && braces_level == 0)
 				token_abbr = token_end;
 			if (!first_letter_is_found && current_backslash < 0 && Character.isLetter(c)) {
-				token_case = Character.isUpperCase(c);
+                if (braces_level == 0)
+				    token_case = Character.isUpperCase(c);
+                else
+                    // If this is a particle in braces, always treat it as if it starts with
+                    // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
+                    // will not yield a proper last name:
+                    token_case = true;
 				first_letter_is_found = true;
 			}
 			if (current_backslash >= 0 && !Character.isLetter(c)) {
