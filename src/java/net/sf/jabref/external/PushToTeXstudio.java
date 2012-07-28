@@ -27,7 +27,7 @@ public class PushToTeXstudio implements PushToApplication {
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
-        return Globals.menuTitle("Insert selected citations into TeXstudio") ;
+        return Globals.lang("Insert selected citations into TeXstudio") ;
     }
 
     public String getApplicationName() {
