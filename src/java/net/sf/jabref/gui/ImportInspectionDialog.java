@@ -45,24 +45,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.CheckBoxMessage;
-import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.DuplicateResolverDialog;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.GeneralRenderer;
-import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.groups.AbstractGroup;
@@ -115,7 +98,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  *          2007) $)
  * 
  */
-public class ImportInspectionDialog extends JDialog implements ImportInspector {
+public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
 
     public static interface CallBack {
 
@@ -1483,5 +1466,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
 
     public void toFront() {
         super.toFront();
+    }
+
+    public void setStatus(String s) {
+        frame.setStatus(s);
+    }
+
+    public void showMessage(Object message, String title, int msgType) {
+        System.out.println("ping");
+        JOptionPane.showMessageDialog(this, message, title, msgType);
+    }
+
+    public void showMessage(String message) {
+        System.out.println("pingi");
+        JOptionPane.showMessageDialog(this, message);
     }
 }
