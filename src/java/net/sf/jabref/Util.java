@@ -3007,8 +3007,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
     
     // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
-    private static final String REGEXP_PLAINDOI = "(\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'<>])\\S)+)\\b)";
-    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "[^\\s]+?" + REGEXP_PLAINDOI;
+    private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'<>])\\S)+)\\b";
+    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
+    private static final Pattern PATTERN_PLAINDOI = Pattern.compile(REGEXP_PLAINDOI);
 
     /**
    	 * Check if the String matches a DOI (with http://...)
@@ -3038,9 +3039,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
    	 * @param doi - may not be null
    	 * @return first DOI in the given String (without http://... prefix)
    	 */
-   	public static String getDOI(String doi){
-   		doi = doi.replaceAll(REGEXP_PLAINDOI, "$1");
-   		return doi;
+   	public static String getDOI(String doi) {
+        Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
+        if (matcher.find()) {
+            return matcher.group();
+        } else {
+            return doi;
+        }
    	}
 
 	public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {

@@ -469,5 +469,6 @@ public class UtilTest extends TestCase {
 		assertEquals("10.1000/182", Util.getDOI("http://dx.doi.org/10.1000/182"));
 
 		assertEquals("10.4108/ICST.COLLABORATECOM2009.8275", Util.getDOI("http://dx.doi.org/10.4108/ICST.COLLABORATECOM2009.8275"));
+        assertEquals("10.1109/MIC.2012.43", Util.getDOI("http://doi.ieeecomputersociety.org/10.1109/MIC.2012.43"));
 	}
 }
