@@ -1394,6 +1394,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // within the tab
                 Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
 
+                if (oldValue != null) {
+                   if (Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                       panel.output(Globals.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
+                       return;
+                   }
+                   else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
+                       CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("The current BibTeX key will be overwritten. Continue?"),
+                               Globals.lang("Disable this confirmation dialog"), false);
+                       int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite key"),
+                               JOptionPane.YES_NO_OPTION);
+                       if (cbm.isSelected())
+                           Globals.prefs.putBoolean("warnBeforeOverwritingKey", false);
+                       if (answer == JOptionPane.NO_OPTION) {
+                           // Ok, break off the operation.
+                           return;
+                       }
+                   }
+                }
+
                 // entry = frame.labelMaker.applyRule(entry, panel.database) ;
                 LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
 
