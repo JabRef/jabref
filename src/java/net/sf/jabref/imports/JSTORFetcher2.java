@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 public class JSTORFetcher2 implements EntryFetcher {
 
+    protected static final String CANCELLED = "__CANCELLED__";
     protected static int MAX_PAGES_TO_LOAD = 8;
     protected static int MAX_REFS = 7 * 25;
     protected static int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
@@ -143,6 +144,9 @@ public class JSTORFetcher2 implements EntryFetcher {
             String nextPage = null;
             while ((count <= Math.min(MAX_PAGES_TO_LOAD, numberOfPagesRequested))
                     && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
+                // If user has cancelled the import, return null to signal this:
+                if ((count == 1) && (nextPage.equals(CANCELLED)))
+                    return null;
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + numberOfRefs[0]);
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
                 refsRequested = Integer.valueOf(numberOfRefs[1]);
@@ -192,7 +196,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
                 if (strCount == null) {
                     status.setStatus(Globals.lang("JSTOR import cancelled"));
-                    return null;
+                    return CANCELLED;
                 }
 
                 try {
