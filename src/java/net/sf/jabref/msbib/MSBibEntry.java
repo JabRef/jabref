@@ -1084,6 +1084,8 @@ public class MSBibEntry {
 			hm.put("journal",journalName);
 		if(issue !=null )
 			hm.put("number",issue);
+        if(month !=null )
+            hm.put("month",month);
 		if(periodicalTitle !=null )
 			hm.put("organization",periodicalTitle);
 		if(conferenceName !=null )
