@@ -28,17 +28,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -279,11 +269,15 @@ class GroupDialog extends JDialog {
                 m_keywordsRadioButton.addItemListener(radioButtonItemListener);
                 m_searchRadioButton.addItemListener(radioButtonItemListener);
 
-                m_cancel.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                dispose();
-                        }
-                });
+                Action cancelAction = new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        dispose();
+                    }
+                };
+                m_cancel.addActionListener(cancelAction);
+                builderAll.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                        .put(Globals.prefs.getKey("Close dialog"), "close");
+                builderAll.getPanel().getActionMap().put("close", cancelAction);
 
                 m_ok.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -328,6 +322,7 @@ class GroupDialog extends JDialog {
                                 dispose();
                         }
                 });
+
 
                 CaretListener caretListener = new CaretListener() {
                         public void caretUpdate(CaretEvent e) {

@@ -1,4 +1,5 @@
 [master branch]
+    - Group edit dialog now closes when Escape is pressed.
     - Fixed MS bib import, month was lost on import.
     - Generate key action in entry editor now honours key overwrite settings.
     - Fixed bug when importing XMP data from PDF, file will now be linked from the new entry.
