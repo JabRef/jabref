@@ -423,7 +423,8 @@ public class DroppedFileHandler {
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
-        	Object[] messages = {"How would you like to link to " + linkFileName + "?", optionsPanel}; 
+        	Object[] messages = {Globals.lang("How would you like to link to '%0'?", linkFileName),
+                    optionsPanel};
             return JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
         } finally {
