@@ -15,46 +15,105 @@
 */
 package net.sf.jabref;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JTextArea;
+import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 public class JTextAreaWithHighlighting extends JTextArea implements SearchTextListener {
 
 	private ArrayList<String> wordsToHighlight;
 
+    private UndoManager undo;
+
+
 	public JTextAreaWithHighlighting() {
 		super();
+        setupUndoRedo();
 	}
 
 	public JTextAreaWithHighlighting(String text) {
 		super(text);
+        setupUndoRedo();
 	}
 
 	public JTextAreaWithHighlighting(Document doc) {
 		super(doc);
+        setupUndoRedo();
 	}
 
 	public JTextAreaWithHighlighting(int rows, int columns) {
 		super(rows, columns);
+        setupUndoRedo();
 	}
 
 	public JTextAreaWithHighlighting(String text, int rows, int columns) {
 		super(text, rows, columns);
+        setupUndoRedo();
 	}
 
 	public JTextAreaWithHighlighting(Document doc, String text, int rows,
 			int columns) {
 		super(doc, text, rows, columns);
+        setupUndoRedo();
 	}
-	
-	/**
+
+    protected void setupUndoRedo() {
+        undo = new UndoManager();
+        Document doc = getDocument();
+
+        // Listen for undo and redo events
+        doc.addUndoableEditListener(new UndoableEditListener() {
+            public void undoableEditHappened(UndoableEditEvent evt) {
+                undo.addEdit(evt.getEdit());
+            }
+        });
+
+        // Create an undo action and add it to the text component
+        getActionMap().put("Undo",
+                new AbstractAction("Undo") {
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            if (undo.canUndo()) {
+                                undo.undo();
+                            }
+                        } catch (CannotUndoException e) {
+                        }
+                    }
+                });
+
+        // Bind the undo action to ctl-Z
+        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
+
+        // Create a redo action and add it to the text component
+        getActionMap().put("Redo",
+                new AbstractAction("Redo") {
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            if (undo.canRedo()) {
+                                undo.redo();
+                            }
+                        } catch (CannotRedoException e) {
+                        }
+                    }
+                });
+
+        // Bind the redo action to ctl-Y
+        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
+    }
+
+    /**
 	 * Highlight words in the Textarea
 	 * 
 	 * @param words to highlight
@@ -91,9 +150,9 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 		if (Globals.prefs.getBoolean("highLightWords")) {
 			highLight(wordsToHighlight);
 		}
+        if (undo != null) undo.discardAllEdits();
 	}
 
-	@Override
 	public void searchText(ArrayList<String> words) {
 		// words have to be stored in class variable as 
 		// setText() makes use of them

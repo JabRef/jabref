@@ -19,13 +19,15 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.SearchTextListener;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.regex.Pattern;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.event.UndoableEditEvent;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
+import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.CannotUndoException;
 
@@ -53,7 +55,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
 	private AutoCompleteListener autoCompleteListener = null;
 
-	// protected UndoManager undo = new UndoManager();
+    // protected UndoManager undo = new UndoManager();
 
 	public FieldTextArea(String fieldName_, String content) {
 		super(content);
@@ -88,7 +90,8 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 		FieldTextMenu popMenu = new FieldTextMenu(this);
 		this.addMouseListener(popMenu);
 		label.addMouseListener(popMenu);
-	}
+
+    }
 
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -100,7 +103,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 	 * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
 	 */
 
-	public String getFieldName() {
+    public String getFieldName() {
 		return fieldName;
 	}
 
