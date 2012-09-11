@@ -158,6 +158,7 @@ public class FreeCiteImporter extends ImportFormat {
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
                             } else if ( ln.equals("doi")
+                                     || ln.equals("institution")
                                      || ln.equals("location")
                                      || ln.equals("number")
                                      || ln.equals("note") 
