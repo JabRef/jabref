@@ -748,25 +748,8 @@ public class Util {
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
 
-		// We try to check the extension for the file:
-		String name = file.getName();
-		int pos = name.lastIndexOf('.');
-		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
-			.trim().toLowerCase() : null;
-		// Find the default directory for this field type, if any:
-		String[] dir = metaData.getFileDirectory(extension);
-		// Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
-        for (int i = 0; i < dir.length; i++)
-            if (!al.contains(dir[i])) al.add(dir[i]);
-        for (int i = 0; i < fileDir.length; i++)
-            if (!al.contains(fileDir[i])) al.add(fileDir[i]);
-        String[] dirs = al.toArray(new String[al.size()]);
-
         if (!httpLink) {
-            File tmp = expandFilename(link, dirs);
+            File tmp = expandFilename(metaData, link);
             if (tmp != null)
                 file = tmp;
         }
@@ -1576,6 +1559,41 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			sb.append(strings[i]).append(separator);
 		}
 		return sb.append(strings[to - 1]).toString();
+	}
+
+   /**
+    * Converts a relative filename to an absolute one, if necessary. Returns
+    * null if the file does not exist.<br/>
+    * 
+    * Uses <ul>
+    * <li>the default directory associated with the extension of the file</li>
+    * <li>the standard file directory</li>
+    * <li>the directory of the bib file</li>
+    * </ul>
+    * 
+    * @param metaData
+    *            The MetaData for the database this file belongs to.
+    * @param name
+    *            The file name, may also be a relative path to the file
+    */
+	public static File expandFilename(final MetaData metaData, String name) {
+        int pos = name.lastIndexOf('.');
+        String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name
+                .substring(pos + 1).trim().toLowerCase() : null;
+        // Find the default directory for this field type, if any:
+        String[] dir = metaData.getFileDirectory(extension);
+        // Include the standard "file" directory:
+        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        // Include the directory of the bib file:
+        ArrayList<String> al = new ArrayList<String>();
+        for (int i = 0; i < dir.length; i++)
+            if (!al.contains(dir[i]))
+                al.add(dir[i]);
+        for (int i = 0; i < fileDir.length; i++)
+            if (!al.contains(fileDir[i]))
+                al.add(fileDir[i]);
+        String[] dirs = al.toArray(new String[al.size()]);
+        return expandFilename(name, dirs);
 	}
 
 	/**
