@@ -65,6 +65,8 @@ public class JabRefPreferences {
         EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
         
+        PDF_PREVIEW = "pdfPreview",
+        
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
         // here are the possible values for _MODE:
@@ -175,6 +177,7 @@ public class JabRefPreferences {
         	defaults.put(EMACS_23, false);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
+        defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
         defaults.put("vim", "vim");

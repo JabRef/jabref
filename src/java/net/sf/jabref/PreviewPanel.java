@@ -36,6 +36,8 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.gui.FileListEditorTransferHandler;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
 
 /**
  * Displays an BibtexEntry using the given layout format.
@@ -62,11 +64,30 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 	public JEditorPane previewPane;
 
 	JScrollPane scrollPane;
+	PdfPreviewPanel pdfPreviewPanel;
 
 	BasePanel panel;
 
-	/**
-	 * 
+    /**
+     * @param database
+     *            (may be null) Optionally used to resolve strings.
+     * @param entry
+     *            (may be null) If given this entry is shown otherwise you have
+     *            to call setEntry to make something visible.
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
+     */
+    public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
+        BasePanel panel, MetaData metaData, String layoutFile) {
+        this(database, entry, panel, metaData, layoutFile, false);
+    }
+
+    /**
 	 * @param database
 	 *            (may be null) Optionally used to resolve strings.
 	 * @param entry
@@ -79,15 +100,30 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 	 *            (must be given) Used for resolving pdf directories for links.
 	 * @param layoutFile
 	 *            (must be given) Used for layout
+	 * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel
 	 */
 	public PreviewPanel(BibtexDatabase database, BibtexEntry entry,
-		BasePanel panel, MetaData metaData, String layoutFile) {
-		this(panel, metaData, layoutFile);
+		BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
+		this(panel, metaData, layoutFile, withPDFPreview);
 		this.database = database;
 		setEntry(entry);
 	}
+	
+    /**
+     * 
+     * @param panel
+     *            (may be null) If not given no toolbar is shown on the right
+     *            hand side.
+     * @param metaData
+     *            (must be given) Used for resolving pdf directories for links.
+     * @param layoutFile
+     *            (must be given) Used for layout
+     */
+    public PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile) {
+        this(panel, metaData, layoutFile, false);
+    }
 
-	/**
+    /**
 	 * 
 	 * @param panel
 	 *            (may be null) If not given no toolbar is shown on the right
@@ -96,14 +132,23 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 	 *            (must be given) Used for resolving pdf directories for links.
 	 * @param layoutFile
 	 *            (must be given) Used for layout
-	 */
-	public PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile) {
+     * @param withPDFPreview if true, a PDF preview is included in the PreviewPanel. 
+     * The user can override this setting by setting the config setting JabRefPreferences.PDF_PREVIEW to false.
+     */
+	private PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile, boolean withPDFPreview) {
 		super(new BorderLayout(), true);
 
+		withPDFPreview = withPDFPreview && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PDF_PREVIEW);
+		
 		this.panel = panel;
 		this.metaData = metaData;
 		this.layoutFile = layoutFile;
 		this.previewPane = createPreviewPane();
+		if (withPDFPreview) {
+			this.pdfPreviewPanel = new PdfPreviewPanel(metaData);
+		} else {
+			this.pdfPreviewPanel = null;
+		}
 		if (panel != null) {
 			// dropped files handler only created for main window
 			// not for Windows as like the search results window
@@ -125,9 +170,30 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 			add(createToolBar(), BorderLayout.LINE_START);
 		}
 
-		add(scrollPane, BorderLayout.CENTER);
-	}
+		if (withPDFPreview) {
+			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+					scrollPane, pdfPreviewPanel);
+			splitPane.setOneTouchExpandable(true);
+			
+			// int oneThird = panel.getWidth()/3;
+			int oneThird = 400; // arbitrarily set as panel.getWidth() always
+								// returns 0 at this point
+			splitPane.setDividerLocation(oneThird*2);
 
+			// Provide minimum sizes for the two components in the split pane
+//			Dimension minimumSize = new Dimension(oneThird * 2, 50);
+//			scrollPane.setMinimumSize(minimumSize);
+//			minimumSize = new Dimension(oneThird, 50);
+//			pdfScrollPane.setMinimumSize(minimumSize);
+			add(splitPane);
+		} else {
+			add(scrollPane, BorderLayout.CENTER);
+		}
+
+
+
+	}
+	
 	class PrintAction extends AbstractAction {
 
 		public PrintAction() {
@@ -324,7 +390,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 				bar.setValue(0);
 			}
 		});
+		
+		// update pdf preview
+		if (pdfPreviewPanel != null) {
+			pdfPreviewPanel.updatePanel(entry);
+		}
 	}
+
 
 	public boolean hasEntry() {
 		return (entry != null);

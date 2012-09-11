@@ -1,6 +1,7 @@
 [master branch]
     - Replaced window icon with 48x48 image.
     - [experimental] Added local undo/redo handling for entry editor text fields.
+    - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
     - Group edit dialog now closes when Escape is pressed.
     - Fixed MS bib import, month was lost on import.
     - Generate key action in entry editor now honours key overwrite settings.
