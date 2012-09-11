@@ -24,6 +24,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -90,7 +91,7 @@ public class FreeCiteImporter extends ImportFormat {
             // write parameters
             writer.write(data);
             writer.flush();
-        } catch (SocketException e) {
+        } catch (IOException e) {
             status.showMessage(Globals.lang("Unable to connect to freecite online service."));
             return null;
         } catch (Exception ex) {

@@ -509,17 +509,19 @@ public class TextInputDialog
       insertTextForTag() ;
     }
     else if (source == this.parseWithFreeCiteButton) {
-    	parseWithFreeCiteAndAddEntries();    	
-    	okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
-    	dispose();
+        if (parseWithFreeCiteAndAddEntries()) {    	
+            okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
+        	dispose();
+        }
     }
   }
 
   
-  	/**
-  	 * tries to parse the pasted reference with freecite
-  	 */
-  private void parseWithFreeCiteAndAddEntries() {
+    /**
+     * tries to parse the pasted reference with freecite
+     * @return true if successful, false otherwise
+     */
+  private boolean parseWithFreeCiteAndAddEntries() {
         FreeCiteImporter fimp = new FreeCiteImporter();
         String text = textPane.getText();
         
@@ -537,6 +539,9 @@ public class TextInputDialog
             for (BibtexEntry e: importedEntries) {
                 JabRef.jrf.basePanel().insertEntry(e);
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
