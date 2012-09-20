@@ -36,6 +36,8 @@
       - clean up pages
       - make file paths relative      
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
+    - PDF import dialog now always stores settings: checkbox removed
+    - float search now also jumps to first entry if entry editor is opened
 2.8.1
     - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
     - Disabled ACM portal fetcher to avoid users of getting banned.
