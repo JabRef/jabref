@@ -4,7 +4,7 @@
     - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
     - Group edit dialog now closes when Escape is pressed.
     - Fixed MS bib import, month was lost on import.
-    - Generate key action in entry editor now honours key overwrite settings.
+    - Generate key action in entry editor now honors key overwrite settings.
     - Fixed bug when importing XMP data from PDF, file will now be linked from the new entry.
     - Fixed bug in layout processing - quoted formatter argments are now handled correctly.
     - Fixed bug 3545394: null and curly brackets in custom export filter.
@@ -17,6 +17,7 @@
       reset a comma-separated list of preference values, or all values.
     - Added small popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
+    - Drag'n'drop of text from the preview panel to other applications is now working
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
       autocompletion does not show these braces

@@ -35,9 +35,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.gui.FileListEditorTransferHandler;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.PreviewPanelTransferHandler;
 
 /**
  * Displays an BibtexEntry using the given layout format.
@@ -152,7 +150,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		if (panel != null) {
 			// dropped files handler only created for main window
 			// not for Windows as like the search results window
-			this.previewPane.setTransferHandler(new FileListEditorTransferHandler(panel.frame(), this, this.previewPane.getTransferHandler()));
+			this.previewPane.setTransferHandler(new PreviewPanelTransferHandler(panel.frame(), this, this.previewPane.getTransferHandler()));
 		}
 
 		// Set up scroll pane for preview pane
@@ -312,6 +310,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		previewPane.setComponentPopupMenu(createPopupMenu());
 		
 		previewPane.setEditable(false);
+		previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
 		previewPane.setContentType("text/html");
 		previewPane.addHyperlinkListener(new HyperlinkListener() {
 			public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
