@@ -15,7 +15,7 @@
       Based on patch 3122104. 
     - Added command line argument -d/-prdef for resetting preferences to default values. Can
       reset a comma-separated list of preference values, or all values.
-    - Added small popup menu at each tab
+    - Added small right-click popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Drag'n'drop of text from the preview panel to other applications is now working
     - Braces around author names are now dropped internally. They remain in the .bib though
