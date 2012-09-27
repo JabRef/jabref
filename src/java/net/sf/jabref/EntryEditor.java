@@ -1524,9 +1524,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Globals.lang("Warning") + ": " + Globals.lang("Duplicate BibTeX key."));
+        panel.output(Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
 
-        if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+        /*if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."),
@@ -1536,14 +1536,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (jcb.isSelected())
                 prefs.putBoolean("dialogWarningForDuplicateKey", false);
-        }
+        }*/
     }
 
     private void warnEmptyBibtexkey() {
         // JZTODO lyrics
-        panel.output(Globals.lang("Warning") + ": " + Globals.lang("Empty BibTeX key."));
+        panel.output(Globals.lang("Empty BibTeX key. Grouping may not work for this entry."));
 
-        if (prefs.getBoolean("dialogWarningForEmptyKey")) {
+        /*if (prefs.getBoolean("dialogWarningForEmptyKey")) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."), Globals
@@ -1553,7 +1553,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (jcb.isSelected())
                 prefs.putBoolean("dialogWarningForEmptyKey", false);
-        }
+        }*/
     }
 
 

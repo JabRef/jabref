@@ -1,4 +1,6 @@
 [master branch]
+    - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
+      to prevent lockup if Save button is pressed directly.
     - Replaced window icon with 48x48 image.
     - [experimental] Added local undo/redo handling for entry editor text fields.
     - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
