@@ -20,15 +20,22 @@ import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.VersionHandling;
+import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
+    private static final String PREFIX_KEYPATTERN = "keypattern_";
+    private static final String KEYPATTERNDEFAULT = "keypatterndefault";
+
     private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
     private boolean groupTreeValid = true;
+    
+    private LabelPattern labelPattern = null;
 
     private DBStrings dbStrings = new DBStrings();
 
@@ -106,14 +113,29 @@ public class MetaData implements Iterable<String> {
         metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<String>());
     }
 
+    /**
+     * @return Iterator on all keys stored in the metadata
+     */
     public Iterator<String> iterator() {
         return metaData.keySet().iterator();
     }
 
+    /**
+     * Retrieves the stored meta data.
+     * 
+     * @param key the key to look up
+     * @return null if no data is found
+     */
     public Vector<String> getData(String key) {
         return metaData.get(key);
     }
 
+    /**
+     * Removes the given key from metadata.
+     * Nothing is done if key is not found.
+     * 
+     * @param key the key to remove
+     */
     public void remove(String key) {
         metaData.remove(key);
     }
@@ -324,4 +346,75 @@ public class MetaData implements Iterable<String> {
     public boolean isGroupTreeValid() {
         return groupTreeValid;
     }
+    
+    /**
+     * @return the stored label patterns
+     */
+    public LabelPattern getLabelPattern() {
+        if (labelPattern != null) {
+            return labelPattern;
+        }
+        
+        labelPattern = new LabelPattern();
+        
+        // the parent label pattern of a BibTeX data base is the global pattern stored in the preferences
+        labelPattern.setParent(Globals.prefs.getKeyPattern());
+        
+        Iterator<String> iterator = iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
+                Vector<String> value = getData(key);
+                String type = key.substring(PREFIX_KEYPATTERN.length());
+                labelPattern.addLabelPattern(type, value.get(0));
+            }
+        }
+        
+        Vector<String> defaultPattern = getData(KEYPATTERNDEFAULT);
+        if (defaultPattern != null) {
+            labelPattern.setDefaultValue(defaultPattern.get(0));
+        }
+        
+        return labelPattern;
+    }
+
+    /**
+     * Updates the stored key patterns to the given key patterns.
+     * 
+     * @param labelPattern the key patterns to update to. <br />
+     * A reference to this object is stored internally and is returned at getLabelPattern();
+     */
+    public void setLabelPattern(LabelPattern labelPattern) {
+        // remove all keypatterns from metadata
+        Iterator<String> iterator = this.iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
+                iterator.remove();
+            }
+        }
+
+        // set new value if it is not a default value
+        for (String key : labelPattern.keySet()) {
+            String metaDataKey = PREFIX_KEYPATTERN + key;
+            ArrayList<String> value = labelPattern.get(key);
+            if (value != null) {
+                Vector<String> data = new Vector<String>();
+                data.add(value.get(0));
+                this.putData(metaDataKey, data);
+            }
+        }
+
+        // store default pattern
+        if (labelPattern.getDefaultValue() == null) {
+            this.remove(KEYPATTERNDEFAULT);
+        } else {
+            Vector<String> data = new Vector<String>();
+            data.add(labelPattern.getDefaultValue().get(0));
+            this.putData(KEYPATTERNDEFAULT, data);
+        }
+        
+        this.labelPattern = labelPattern;
+    }
+
 }

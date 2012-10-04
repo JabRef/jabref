@@ -315,6 +315,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
+    bibtexKeyPattern = new BibtexKeyPatternAction(),
     upgradeExternalLinks = new GeneralAction("upgradeLinks", "Upgrade external links",
             Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD)),
       errorConsole = Globals.errorConsole.getAction(this),
@@ -400,7 +401,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   }
 
   private void init() {
-	    tabbedPane = new DragDropPopupPane(databaseProperties);
+	    tabbedPane = new DragDropPopupPane(databaseProperties, bibtexKeyPattern);
 
         macOSXRegistration();
 
@@ -2398,6 +2399,28 @@ class SaveSessionAction
             Util.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
+       
+    }
+    
+    class BibtexKeyPatternAction extends MnemonicAwareAction {
+        BibtexKeyPatternDialog bibtexKeyPatternDialog = null;
+        public BibtexKeyPatternAction() {
+            putValue(NAME, "Bibtexkey patterns");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+        	final JabRefPreferences prefs = JabRefPreferences.getInstance();
+            if (bibtexKeyPatternDialog == null) {
+                // if no instance of BibtexKeyPatternDialog exists, create new one
+            	bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, basePanel());
+            } else {
+                // BibtexKeyPatternDialog allows for updating content based on currently selected panel
+                bibtexKeyPatternDialog.setPanel(basePanel());
+            }
+            Util.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
+            bibtexKeyPatternDialog.setVisible(true);
+        }
+       
     }
 
     class IncreaseTableFontSizeAction extends MnemonicAwareAction {

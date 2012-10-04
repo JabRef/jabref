@@ -26,8 +26,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
 
 /**
  * Adds popup functionality to DragDropPane 
@@ -38,11 +36,13 @@ public class DragDropPopupPane extends DragDropPane {
 	
 	private JPopupMenu popupMenu = null;
 	private AbstractAction databasePropertiesAction = null;
+	private AbstractAction bibtexKeyPatternAction = null;
 	
-	public DragDropPopupPane(AbstractAction databasePropertiesAction) {
+	public DragDropPopupPane(AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
 		super();
 		
 		this.databasePropertiesAction = databasePropertiesAction;
+		this.bibtexKeyPatternAction = bibtexKeyPatternAction;
 
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -59,6 +59,10 @@ public class DragDropPopupPane extends DragDropPane {
 		JMenuItem databasePropertiesBtn = new JMenuItem(Globals.lang("Database properties"));
 		databasePropertiesBtn.addActionListener(databasePropertiesAction);
 		popupMenu.add(databasePropertiesBtn);
+		
+		JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtexkey patterns"));
+		bibtexKeyPatternBtn.addActionListener(bibtexKeyPatternAction);
+		popupMenu.add(bibtexKeyPatternBtn);
 		
 		JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
 		closeBtn.addActionListener(new ActionListener() {

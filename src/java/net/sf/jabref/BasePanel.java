@@ -866,7 +866,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Finally, set the new keys:
                     for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
                         bes = i.next();
-                        bes = LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                        bes = LabelPatternUtil.makeLabel(metaData, database, bes);
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldvals.get(bes),
                                     bes.getField(BibtexFields.KEY_FIELD)));
@@ -2452,7 +2452,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.statusLine.getText().startsWith("Saved database"))
+        if (frame.statusLine.getText().startsWith(Globals.lang("Saved database")));
             frame.output(" ");
     }
 
@@ -2651,7 +2651,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibtexEntry bes : database.getEntries()){
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || (oldKey.equals(""))) {
-                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                    LabelPatternUtil.makeLabel(metaData, database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
                         bes.getField(BibtexFields.KEY_FIELD)));
                     any = true;

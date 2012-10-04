@@ -1414,7 +1414,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // entry = frame.labelMaker.applyRule(entry, panel.database) ;
-                LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
+                LabelPatternUtil.makeLabel(panel.metaData, panel.database, entry);
 
                 // Store undo information:
                 panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),

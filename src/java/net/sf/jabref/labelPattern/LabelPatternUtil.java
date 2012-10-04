@@ -55,7 +55,7 @@ public class LabelPatternUtil {
      * @param labelPattern a <code>String</code>
      * @return an <code>ArrayList</code> The first item of the list
      * is a string representation of the key pattern (the parameter),
-     * the second item is the spacer character (a <code>String</code>).
+     * the remaining items are the fields
      */
     public static ArrayList<String> split(String labelPattern) {
         // A holder for fields of the entry to be used for the key
@@ -113,13 +113,11 @@ public class LabelPatternUtil {
      * 
      * The given database is used to avoid duplicate keys.
      * 
-     * @param table a <code>LabelPattern</code>
      * @param database a <code>BibtexDatabase</code>
      * @param _entry a <code>BibtexEntry</code>
      * @return modified Bibtexentry
      */
-    public static BibtexEntry makeLabel(LabelPattern table,
-        BibtexDatabase database, BibtexEntry _entry) {
+    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase database, BibtexEntry _entry) {
         _db = database;
         ArrayList<String> _al;
         String _label;
@@ -130,7 +128,7 @@ public class LabelPatternUtil {
             // get the type of entry
             String _type = _entry.getType().getName().toLowerCase();
             // Get the arrayList corresponding to the type
-            _al = table.getValue(_type);
+            _al = metaData.getLabelPattern().getValue(_type);
             int _alSize = _al.size();
             boolean field = false;
             for (int i = 1; i < _alSize; i++) {

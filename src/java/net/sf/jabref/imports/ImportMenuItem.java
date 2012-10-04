@@ -228,7 +228,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                     toAddTo.insertEntry(entry);
                                     // Generate key, if we are supposed to:
                                     if (generateKeys) {
-                                        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), toAddTo, entry);
+                                        LabelPatternUtil.makeLabel(bibtexResult.getMetaData(), toAddTo, entry);
                                         //System.out.println("gen:"+entry.getCiteKey());
                                     }
                                     // Let the autocompleters, if any, harvest words from the entry: 

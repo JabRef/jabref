@@ -468,13 +468,18 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             return;
         BibtexEntry entry = selectionModel.getSelected().get(0);
         entries.getReadWriteLock().writeLock().lock();
-        BibtexDatabase database = null;
-        // Relate to the existing database, if any:
-        if (panel != null)
+
+        BibtexDatabase database;
+        MetaData metaData;
+        
+        // Relate to existing database, if any:
+        if (panel != null) {
             database = panel.database();
-        // ... or create a temporary one:
-        else
+            metaData = panel.metaData();
+        } else {
             database = new BibtexDatabase();
+            metaData = new MetaData();
+        }
         try {
             entry.setId(Util.createNeutralId());
             // Add the entry to the database we are working with:
@@ -483,7 +488,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             ex.printStackTrace();
         }
         // Generate a unique key:
-        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+        LabelPatternUtil.makeLabel(metaData, database, entry);
         // Remove the entry from the database again, since we only added it in
         // order to
         // make sure the key was unique:
@@ -500,13 +505,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     public void generateKeys(boolean addColumn) {
         entries.getReadWriteLock().writeLock().lock();
-        BibtexDatabase database = null;
-        // Relate to the existing database, if any:
-        if (panel != null)
+
+        BibtexDatabase database;
+        MetaData metaData;
+        
+        // Relate to existing database, if any:
+        if (panel != null) {
             database = panel.database();
-        // ... or create a temporary one:
-        else
+            metaData = panel.metaData();
+        } else {
             database = new BibtexDatabase();
+            metaData = new MetaData();
+        }
+
         List<String> keys = new ArrayList<String>(entries.size());
         // Iterate over the entries, add them to the database we are working
         // with,
@@ -521,7 +532,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 ex.printStackTrace();
             }
             // }
-            LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+            LabelPatternUtil.makeLabel(metaData, database, entry);
             // Add the generated key to our list:
             keys.add(entry.getCiteKey());
         }

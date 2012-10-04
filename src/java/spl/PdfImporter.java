@@ -190,7 +190,7 @@ public class PdfImporter {
 					
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
+                    LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
 					dfh = new DroppedFileHandler(frame, panel);
 					dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);
@@ -230,7 +230,7 @@ public class PdfImporter {
                             panel.database().insertEntry(entry);
                             dfh = new DroppedFileHandler(frame, panel);
                             dfh.linkPdfToEntry(fileName, entryTable, entry);
-                            LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
+                            LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
                         }
                         else{
                             createNewBlankEntry(fileName);

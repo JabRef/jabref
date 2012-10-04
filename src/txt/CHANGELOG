@@ -20,6 +20,7 @@
     - Added small right-click popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Drag'n'drop of text from the preview panel to other applications is now working
+    - BibTeX key generator patterns can now be stored in per database (implements feature 3495993)
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
       autocompletion does not show these braces

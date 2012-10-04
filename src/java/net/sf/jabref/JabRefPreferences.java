@@ -48,7 +48,6 @@ import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
-import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
 
 public class JabRefPreferences {
@@ -87,7 +86,6 @@ public class JabRefPreferences {
         defKeyBinds = new HashMap<String, String>();
     private HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
     private HashSet<String> nonWrappableFields = new HashSet<String>(5);
-    private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
     // Object containing custom export formats:
@@ -829,9 +827,14 @@ public class JabRefPreferences {
     }
 
 
+        /**
+         * Fetches key patterns from preferences
+         * Not cached
+         * 
+         * @return LabelPattern containing all keys. Returned LabelPattern has no parent
+         */
         public LabelPattern getKeyPattern(){
-
-            keyPattern = new LabelPattern(KEY_PATTERN);
+            keyPattern = new LabelPattern();
             Preferences pre = Preferences.userNodeForPackage
                 (net.sf.jabref.labelPattern.LabelPattern.class);
             try {
@@ -841,20 +844,17 @@ public class JabRefPreferences {
             } catch (BackingStoreException ex) {
                 Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
             }
-
-            ///
-            //keyPattern.addLabelPattern("article", "[author][year]");
-            //putKeyPattern(keyPattern);
-            ///
-
             return keyPattern;
         }
 
+        /**
+         * Adds the given key pattern to the preferences
+         * 
+         * @param pattern the pattern to store
+         */
         public void putKeyPattern(LabelPattern pattern){
             keyPattern = pattern;
             LabelPattern parent = pattern.getParent();
-            if (parent == null)
-                return;
 
             // Store overridden definitions to Preferences.
             Preferences pre = Preferences.userNodeForPackage
@@ -865,9 +865,14 @@ public class JabRefPreferences {
                 Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
             }
 
-            for (String s: pattern.keySet()){
-                if (!(pattern.get(s)).equals(parent.get(s)))
-                    pre.put(s, pattern.getValue(s).get(0).toString());
+            for (String s: pattern.keySet()) {
+                ArrayList<String> value = pattern.get(s);
+                if (value != null) {
+                    // no default value
+                    // the first entry in the array is the full pattern
+                    // see net.sf.jabref.labelPattern.LabelPatternUtil.split(String)
+                    pre.put(s, value.get(0));
+                }
             }
         }
 
