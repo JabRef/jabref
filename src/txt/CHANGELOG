@@ -36,9 +36,10 @@
         (move of DOIs from ee, note, and url field is supported)
       - Option to rename PDF of entry according to configured PDF-naming-scheme
         (by Florian Straßer and Marius Kleiner)
+      - make file paths relative
       - clean up month (functionality based on patch 3470076 by Mathias Walter)
       - clean up pages
-      - make file paths relative      
+      - fix superscripts
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
     - PDF import dialog now always stores settings: checkbox removed
     - float search now also jumps to first entry if entry editor is opened
