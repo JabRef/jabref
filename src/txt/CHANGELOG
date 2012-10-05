@@ -20,6 +20,9 @@
     - Added small right-click popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
     - Drag'n'drop of text from the preview panel to other applications is now working
+    - Added highlighting in preview area for search text (based on patch 3121914 by
+      Maximilian Lengsfeld).
+    - New context menu option "Switch preview layout" in the preview panel. 
     - BibTeX key generator patterns can now be stored in per database (implements feature 3495993)
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
@@ -119,8 +122,6 @@
     - Added highlighting in textarea for search text (patch 3117881 by Ben).
       Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
       "Clear" also clears the highlighting.
-    - Added highlighting in preview area for search text (based on patch 3121914 by
-      Maximilian Lengsfeld). 
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.2
     - Fixed bug that prevented search functions from working under Java 7.

@@ -257,7 +257,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 	JPopupMenu createPopupMenu() {
 		JPopupMenu menu = new JPopupMenu();
 		menu.add(getPrintAction());
-
+		menu.add(panel.frame.switchPreview);
 		return menu;
 	}
 
