@@ -152,11 +152,7 @@ public class FieldContentSelector extends JComponent {
 
 		manage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// I don't get the difference here:
-				ContentSelectorDialog2 csd = FieldContentSelector.this.owner instanceof Frame ? new ContentSelectorDialog2(
-					(Frame) FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName())
-					: new ContentSelectorDialog2((Dialog) FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData,
-						editor.getFieldName());
+				ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
 				Util.placeDialog(csd, FieldContentSelector.this.frame);
 
 				// Calling setVisible(true) will open the modal dialog and block
