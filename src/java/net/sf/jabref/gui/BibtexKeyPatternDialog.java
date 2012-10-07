@@ -36,6 +36,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
 
@@ -89,7 +90,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			    metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
-			    panel.markBaseChanged();
+			    panel.markNonUndoableBaseChanged();
 				dispose();
 			}
 		});
@@ -105,12 +106,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         cancel.setAction(cancelAction);
         cancel.setText(Globals.lang("Cancel"));
         
-		// Bind ESC-Key to cancel
-		JRootPane root = this.getRootPane();
-		InputMap im = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionMap am = root.getActionMap();
-	    im.put(this.panel.prefs().getKey("Close dialog"), "close");
-	    am.put("close", cancelAction);
+        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 	}
 
 	public void setVisible(boolean visible) {

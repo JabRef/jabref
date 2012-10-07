@@ -401,7 +401,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   }
 
   private void init() {
-	    tabbedPane = new DragDropPopupPane(databaseProperties, bibtexKeyPattern);
+	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
         macOSXRegistration();
 

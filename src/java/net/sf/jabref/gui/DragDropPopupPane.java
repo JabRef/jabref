@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
 
 /**
  * Adds popup functionality to DragDropPane 
@@ -35,25 +36,20 @@ import net.sf.jabref.Globals;
 public class DragDropPopupPane extends DragDropPane {
 	
 	private JPopupMenu popupMenu = null;
-	private AbstractAction databasePropertiesAction = null;
-	private AbstractAction bibtexKeyPatternAction = null;
-	
-	public DragDropPopupPane(AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
+
+	public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
 		super();
 		
-		this.databasePropertiesAction = databasePropertiesAction;
-		this.bibtexKeyPatternAction = bibtexKeyPatternAction;
-
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				tabClicked(e);
 			}
 		});
-
-		initPopupMenu();
+		
+		initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction);
 	}
 	
-	private void initPopupMenu() {
+	private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
 		popupMenu = new JPopupMenu();
 		
 		JMenuItem databasePropertiesBtn = new JMenuItem(Globals.lang("Database properties"));
@@ -63,6 +59,10 @@ public class DragDropPopupPane extends DragDropPane {
 		JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtexkey patterns"));
 		bibtexKeyPatternBtn.addActionListener(bibtexKeyPatternAction);
 		popupMenu.add(bibtexKeyPatternBtn);
+
+		JMenuItem manageSelectorsBtn = new JMenuItem(Globals.lang("Manage content selectors"));
+		manageSelectorsBtn.addActionListener(manageSelectorsAction);
+		popupMenu.add(manageSelectorsBtn);
 		
 		JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
 		closeBtn.addActionListener(new ActionListener() {
@@ -81,8 +81,6 @@ public class DragDropPopupPane extends DragDropPane {
 	private void tabClicked(MouseEvent e) {
 		if (e.getButton() != MouseEvent.BUTTON1 && e.getClickCount() == 1) {   // if is right-click
     	  
-			if (popupMenu == null) initPopupMenu();
-      
 			// display popup near location of mouse click
 			popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);
 		}

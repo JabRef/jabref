@@ -56,12 +56,17 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Box;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -132,19 +137,8 @@ public class Util {
 		return idFormat.getMinimumIntegerDigits();
 	}
 
-	public static void bool(boolean b) {
-		if (b)
-			System.out.println("true");
-		else
-			System.out.println("false");
-	}
-
 	public static void pr(String s) {
-		System.out.println(s);
-	}
-
-	public static void pr_(String s) {
-		System.out.print(s);
+		Globals.logger(s);
 	}
 
 	public static String nCase(String s) {
@@ -3157,4 +3151,17 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
 		}
 	}
+
+	/**
+	 * Binds ESC-Key to cancel button
+	 * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
+	 * @param cancelAction the action to bind
+	 */
+	public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane,
+            Action cancelAction) {
+		InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap am = rootPane.getActionMap();
+	    im.put(Globals.prefs.getKey("Close dialog"), "close");
+	    am.put("close", cancelAction);
+    }
 }
