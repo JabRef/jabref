@@ -43,7 +43,7 @@ import spl.SplWebClient;
 import spl.listener.LabelLinkListener;
 import spl.localization.LocalizationSupport;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class MetaDataListDialog extends JDialog {
     private JPanel contentPane;
@@ -282,11 +282,11 @@ public class MetaDataListDialog extends JDialog {
         buttonOK = new JButton(Globals.lang("Ok"));
         buttonCancel = new JButton(Globals.lang("Cancel"));
         moreInformationButton = new JButton(Globals.lang("More information"));
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(moreInformationButton);
-        bb.addGridded(buttonOK);
-        bb.addGridded(buttonCancel);
+        bb.addButton(moreInformationButton);
+        bb.addButton(buttonOK);
+        bb.addButton(buttonCancel);
         bb.addGlue();
         blankButton = new JButton();
         blankButton.setText("");

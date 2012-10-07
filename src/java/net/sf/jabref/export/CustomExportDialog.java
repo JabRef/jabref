@@ -30,7 +30,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileDialogs;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 /**
  * Dialog for creating or modifying custom exports.
@@ -176,11 +176,11 @@ class CustomExportDialog extends JDialog {
     gbl.setConstraints(extension, con);
     main.add(extension);
 
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(ok);
-    bb.addGridded(cancel);
+    bb.addButton(ok);
+    bb.addButton(cancel);
     bb.addGlue();
     
     getContentPane().add(main, BorderLayout.CENTER);

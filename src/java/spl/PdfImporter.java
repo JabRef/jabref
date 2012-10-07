@@ -1,5 +1,6 @@
 package spl;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,9 +9,14 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.PdfContentImporter;
+import net.sf.jabref.imports.PdfXmpImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
@@ -21,10 +27,6 @@ import spl.filter.PdfFileFilter;
 import spl.gui.ImportDialog;
 import spl.gui.MetaDataListDialog;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +86,15 @@ public class PdfImporter {
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
         boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
-        int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE); 
+        int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+
+        // Get a list of file directories:
+        ArrayList<File> dirs = new ArrayList<File>();
+        String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        for (int i=0; i<dirsS.length; i++) {
+            dirs.add(new File(dirsS[i]));
+        }
+
         for(String fileName : fileNames){
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
@@ -101,20 +111,51 @@ public class PdfImporter {
             	DroppedFileHandler dfh;
             	BibtexEntry entry;
             	BibtexEntryType type;
+                InputStream in = null;
+                List<BibtexEntry> res = null;
             	MetaDataListDialog metaDataListDialog;
                 switch (choice) {
     			case ImportDialog.XMP:
                     //SplDatabaseChangeListener dataListener = new SplDatabaseChangeListener(frame, panel, entryTable, fileName);
                     //panel.database().addDatabaseChangeListener(dataListener);
-                    ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
-			        importer.automatedImport(new String[]{ fileName });
+                    //ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
+                    PdfXmpImporter importer = new PdfXmpImporter();
+                    try {
+                        in = new FileInputStream(fileName);
+                        res = importer.importEntries(in, frame);
+                        //importer.automatedImport(new String[]{ fileName });
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        try { in.close(); } catch (Exception f) {}
+                    }
+
+                    // import failed -> generate default entry
+                    if ((res == null) || (res.size() == 0)) {
+                        createNewBlankEntry(fileName);
+                        return true;
+                    }
+
+                    // only one entry is imported
+                    entry = res.get(0);
+
+                    // insert entry to database and link file
+                    panel.database().insertEntry(entry);
+                    panel.markBaseChanged();
+                    FileListTableModel tm = new FileListTableModel();
+                    File toLink = new File(fileName);
+                    tm.addEntry(0, new FileListEntry(toLink.getName(),
+                            FileListEditor.relativizePath(toLink, dirs).getPath(),
+                            Globals.prefs.getExternalFileTypeByName("pdf")));
+                    entry.setField(GUIGlobals.FILE_FIELD, tm.getStringRepresentation());
+
 			        break;
+
     			case ImportDialog.CONTENT:
                 	PdfContentImporter contentImporter = new PdfContentImporter();
                 	
                 	File file = new File (fileName);
-                	InputStream in = null;
-                	List<BibtexEntry> res = null;
+
                 	try {
 						in = new FileInputStream(file);
 					} catch (Exception e) {
@@ -149,7 +190,7 @@ public class PdfImporter {
 					
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
+                    LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
 					dfh = new DroppedFileHandler(frame, panel);
 					dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);
@@ -189,7 +230,7 @@ public class PdfImporter {
                             panel.database().insertEntry(entry);
                             dfh = new DroppedFileHandler(frame, panel);
                             dfh.linkPdfToEntry(fileName, entryTable, entry);
-                            LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), panel.database(), entry);
+                            LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
                         }
                         else{
                             createNewBlankEntry(fileName);

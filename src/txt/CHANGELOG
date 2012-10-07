@@ -3,8 +3,31 @@
       marking as quality assured, and prioritizing.
       Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
 [master branch]
-    - Added small popup menu at each tab
+    - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
+      to prevent lockup if Save button is pressed directly.
+    - Replaced window icon with 48x48 image.
+    - [experimental] Added local undo/redo handling for entry editor text fields.
+    - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
+    - Group edit dialog now closes when Escape is pressed.
+    - Fixed MS bib import, month was lost on import.
+    - Generate key action in entry editor now honors key overwrite settings.
+    - Fixed bug when importing XMP data from PDF, file will now be linked from the new entry.
+    - Fixed bug in layout processing - quoted formatter argments are now handled correctly.
+    - Fixed bug 3545394: null and curly brackets in custom export filter.
+    - Added support for pushing citations to TeXstudio (requires TeXstudio >=2.4)
+    - Text-based citations can now be imported using FreeCite by Brown University
+      (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
+    - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".
+      Based on patch 3122104. 
+    - Added command line argument -d/-prdef for resetting preferences to default values. Can
+      reset a comma-separated list of preference values, or all values.
+    - Added small right-click popup menu at each tab
     - A PDF can also be dropped to the preview panel to trigger linking it
+    - Drag'n'drop of text from the preview panel to other applications is now working
+    - Added highlighting in preview area for search text (based on patch 3121914 by
+      Maximilian Lengsfeld).
+    - New context menu option "Switch preview layout" in the preview panel. 
+    - BibTeX key generator patterns can now be stored in per database (implements feature 3495993)
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
       autocompletion does not show these braces
@@ -18,15 +41,25 @@
     - Added functionality "clean up entries" 
       - Includes clean up DOI functionality by Florian Straßer and Marius Kleiner
         (move of DOIs from ee, note, and url field is supported)
-      - Option to ename PDF of entry according to configured PDF-naming-scheme
+      - Option to rename PDF of entry according to configured PDF-naming-scheme
         (by Florian Straßer and Marius Kleiner)
+      - make file paths relative
       - clean up month (functionality based on patch 3470076 by Mathias Walter)
       - clean up pages
-      - make file paths relative      
+      - fix superscripts
     - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
-2.8 [dev]
+    - PDF import dialog now always stores settings: checkbox removed
+    - float search now also jumps to first entry if entry editor is opened
+    - usability improvements of "content selectors"
+2.8.1
+    - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
+    - Disabled ACM portal fetcher to avoid users of getting banned.
+    - Fixed bug in PostgreSQL export/import.
+    - Improved handling of file fields written in the style exported from Zotero.
+2.8
+    - Applied Oscar Gustafsson's fix for IEEEXplore fetcher.
+    - Added capability to remove databases from SQL database.
     - Fixed customization of entries in Biblatex mode.
-    - Modified Google Scholar fetcher to adapt to changes to web site.
 2.8 beta 2
     - Improvements to SQL export and import. Fixed bug where subsequent exports to same
       database would fail. Can now save multiple bib bases to a single SQL database.
@@ -94,8 +127,6 @@
     - Added highlighting in textarea for search text (patch 3117881 by Ben).
       Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
       "Clear" also clears the highlighting.
-    - Added highlighting in preview area for search text (based on patch 3121914 by
-      Maximilian Lengsfeld). 
     - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
 2.7.2
     - Fixed bug that prevented search functions from working under Java 7.

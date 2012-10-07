@@ -21,20 +21,11 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import net.sf.jabref.Globals;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -110,11 +101,13 @@ public class DBConnectDialog extends JDialog {
         btnCancel.setText(Globals.lang("Cancel"));
 
         // init input fields to current DB strings
+        String srvSel = dbStrings.getServerType();
         String[] srv = dbStrings.getServerTypes();
         for (int i=0; i<srv.length; i++) {
            cmbServerType.addItem(srv[i]);
         }
 
+        cmbServerType.setSelectedItem(srvSel);
         txtServerHostname.setText(dbStrings.getServerHostname());
         txtDatabase.setText(dbStrings.getDatabase());
         txtUsername.setText(dbStrings.getUsername());
@@ -149,10 +142,10 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
         // add buttons are added in a similar way:
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(btnConnect);
-        bb.addGridded(btnCancel);
+        bb.addButton(btnConnect);
+        bb.addButton(btnCancel);
         bb.addGlue();
 
         // add the buttons to the SOUTH of your dialog:
@@ -182,14 +175,20 @@ public class DBConnectDialog extends JDialog {
         txtUsername.addActionListener(connectAction);
         pwdPassword.addActionListener(connectAction);
 
-        btnCancel.addActionListener(new ActionListener() {
+        AbstractAction cancelAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();
                 setConnectToDB(false);
             }
-        });
+        };
+        btnCancel.addActionListener(cancelAction);
 
+        // Key bindings:
+        ActionMap am = builder.getPanel().getActionMap();
+        InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", cancelAction);
     }
 
     /**

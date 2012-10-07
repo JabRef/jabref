@@ -59,9 +59,10 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         radioButtonNoMeta = new JRadioButton(Globals.lang("Create_blank_entry_linking_the_PDF"));
         radioButtonXmp = new JRadioButton(Globals.lang("Create_entry_based_on_XMP_data"));
         radioButtonPDFcontent = new JRadioButton(Globals.lang("Create_entry_based_on_content"));
-        radioButtonMrDlib = new JRadioButton(Globals.lang("Create_entry_based_on_data_fetched_from"));
+        radioButtonMrDlib = new JRadioButton(Globals.lang("Create_entry_based_on_data_fetched_from")+" Mr.DLib");
         radioButtononlyAttachPDF = new JRadioButton(Globals.lang("Only_attach_PDF"));
-        radioButtonUpdateEmptyFields = new JRadioButton(Globals.lang("Update_empty_fields_with_data_fetched_from"));
+        radioButtonUpdateEmptyFields = new JRadioButton(Globals.lang("Update_empty_fields_with_data_fetched_from")
+            +" Mr.DLib");
         ButtonGroup bg = new ButtonGroup();
         bg.add(radioButtonNoMeta);
         bg.add(radioButtonXmp);

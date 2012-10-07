@@ -27,19 +27,7 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.DuplicateResolverDialog;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
@@ -240,7 +228,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                     toAddTo.insertEntry(entry);
                                     // Generate key, if we are supposed to:
                                     if (generateKeys) {
-                                        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), toAddTo, entry);
+                                        LabelPatternUtil.makeLabel(bibtexResult.getMetaData(), toAddTo, entry);
                                         //System.out.println("gen:"+entry.getCiteKey());
                                     }
                                     // Let the autocompleters, if any, harvest words from the entry: 
@@ -348,7 +336,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            ParserResult pr = new ParserResult(database, new HashMap<String, String>(), new HashMap<String, BibtexEntryType>());
+            ParserResult pr = new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
             return pr;
 
         }

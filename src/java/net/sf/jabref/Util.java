@@ -56,12 +56,17 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Box;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -132,19 +137,8 @@ public class Util {
 		return idFormat.getMinimumIntegerDigits();
 	}
 
-	public static void bool(boolean b) {
-		if (b)
-			System.out.println("true");
-		else
-			System.out.println("false");
-	}
-
 	public static void pr(String s) {
-		System.out.println(s);
-	}
-
-	public static void pr_(String s) {
-		System.out.print(s);
+		Globals.logger(s);
 	}
 
 	public static String nCase(String s) {
@@ -546,28 +540,21 @@ public class Util {
 			}
 
         } else if (fieldName.equals("doi")) {
-	    fieldName = "url";
-			
-	    link = sanitizeUrl(link);
-			
-	    // Check to see if link field already contains a well formated URL
-	    if (!link.startsWith("http://")) {
-		// Remove possible 'doi:'
-		if (link.matches("^doi:/*.*")){
-		    link = link.replaceFirst("^doi:/*", "");
-		}
-		link = Globals.DOI_LOOKUP_PREFIX + link;
-	    }
+            fieldName = "url";
+            
+            // sanitizing is done below at the treatment of "URL"
+            // in sanatizeUrl a doi-link is correctly treated
+
         } else if (fieldName.equals("eprint")) {
-	    fieldName = "url";
-			
-	    link = sanitizeUrl(link);
-			
-	    // Check to see if link field already contains a well formated URL
-	    if (!link.startsWith("http://")) {
-		link = Globals.ARXIV_LOOKUP_PREFIX + link;
-	    }
-	}
+            fieldName = "url";
+
+            link = sanitizeUrl(link);
+
+            // Check to see if link field already contains a well formated URL
+            if (!link.startsWith("http://")) {
+                link = Globals.ARXIV_LOOKUP_PREFIX + link;
+            }
+        }
 
 		if (fieldName.equals("url")) { // html
 			try {
@@ -755,25 +742,8 @@ public class Util {
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
 
-		// We try to check the extension for the file:
-		String name = file.getName();
-		int pos = name.lastIndexOf('.');
-		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
-			.trim().toLowerCase() : null;
-		// Find the default directory for this field type, if any:
-		String[] dir = metaData.getFileDirectory(extension);
-		// Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
-        for (int i = 0; i < dir.length; i++)
-            if (!al.contains(dir[i])) al.add(dir[i]);
-        for (int i = 0; i < fileDir.length; i++)
-            if (!al.contains(fileDir[i])) al.add(fileDir[i]);
-        String[] dirs = al.toArray(new String[al.size()]);
-
         if (!httpLink) {
-            File tmp = expandFilename(link, dirs);
+            File tmp = expandFilename(metaData, link);
             if (tmp != null)
                 file = tmp;
         }
@@ -936,15 +906,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
 	 * 
-	 * A call to this method will also remove \\url{} enclosings and clean doi links.
+	 * A call to this method will also remove \\url{} enclosings and clean DOI links.
 	 * 
-	 * Old Version can be found in CVS version 114 of Util.java.
-	 * 
-	 * @param link
-	 *            The URL to sanitize.
+	 * @param link :the URL to sanitize.
 	 * @return Sanitized URL
 	 */
 	public static String sanitizeUrl(String link) {
+	    link = link.trim();
 
 	    // First check if it is enclosed in \\url{}. If so, remove
         // the wrapper.
@@ -956,17 +924,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             link = link.replaceFirst("^doi:/*", "");
             link = Globals.DOI_LOOKUP_PREFIX + link;
         }
-        
-        /*
-         * Poor man's DOI detection
-         * 
-         * Fixes
-         * https://sourceforge.net/tracker/index.php?func=detail&aid=1709449&group_id=92314&atid=600306
-         */
-        if (link.startsWith("10.")) {
-            link = Globals.DOI_LOOKUP_PREFIX + link;
+
+        // converts doi-only link to full http address
+        if (checkForPlainDOI(link)) {
+            link = Globals.DOI_LOOKUP_PREFIX + getDOI(link);
         }
-	    
+        
 		link = link.replaceAll("\\+", "%2B");
 
 		try {
@@ -1590,6 +1553,41 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			sb.append(strings[i]).append(separator);
 		}
 		return sb.append(strings[to - 1]).toString();
+	}
+
+   /**
+    * Converts a relative filename to an absolute one, if necessary. Returns
+    * null if the file does not exist.<br/>
+    * 
+    * Uses <ul>
+    * <li>the default directory associated with the extension of the file</li>
+    * <li>the standard file directory</li>
+    * <li>the directory of the bib file</li>
+    * </ul>
+    * 
+    * @param metaData
+    *            The MetaData for the database this file belongs to.
+    * @param name
+    *            The file name, may also be a relative path to the file
+    */
+	public static File expandFilename(final MetaData metaData, String name) {
+        int pos = name.lastIndexOf('.');
+        String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name
+                .substring(pos + 1).trim().toLowerCase() : null;
+        // Find the default directory for this field type, if any:
+        String[] dir = metaData.getFileDirectory(extension);
+        // Include the standard "file" directory:
+        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        // Include the directory of the bib file:
+        ArrayList<String> al = new ArrayList<String>();
+        for (int i = 0; i < dir.length; i++)
+            if (!al.contains(dir[i]))
+                al.add(dir[i]);
+        for (int i = 0; i < fileDir.length; i++)
+            if (!al.contains(fileDir[i]))
+                al.add(fileDir[i]);
+        String[] dirs = al.toArray(new String[al.size()]);
+        return expandFilename(name, dirs);
 	}
 
 	/**
@@ -3020,9 +3018,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         return targetName;
     }
     
-    // DOI-regexp provided by http://stackoverflow.com/a/10300246/873282
-    private static final String REGEXP_PLAINDOI = "(10[.][0-9]{4,}[^\\s\"/<>]*/[^\\s\"<>]+)";
-    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "[^\\s]+?" + REGEXP_PLAINDOI;
+    // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
+    private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'<>])\\S)+)\\b";
+    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
+    private static final Pattern PATTERN_PLAINDOI = Pattern.compile(REGEXP_PLAINDOI);
 
     /**
    	 * Check if the String matches a DOI (with http://...)
@@ -3049,12 +3048,16 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     /**
    	 * Remove the http://... from DOI
    	 * 
-   	 * @param doi
-   	 * @return DOI without http://... prefix
+   	 * @param doi - may not be null
+   	 * @return first DOI in the given String (without http://... prefix)
    	 */
-   	public static String getDOI(String doi){
-   		doi = doi.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "$1");
-   		return doi;
+   	public static String getDOI(String doi) {
+        Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
+        if (matcher.find()) {
+            return matcher.group();
+        } else {
+            return doi;
+        }
    	}
 
 	public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
@@ -3156,5 +3159,18 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			if (ce!=null) ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
 		}
 	}
+
+	/**
+	 * Binds ESC-Key to cancel button
+	 * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
+	 * @param cancelAction the action to bind
+	 */
+	public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane,
+            Action cancelAction) {
+		InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap am = rootPane.getActionMap();
+	    im.put(Globals.prefs.getKey("Close dialog"), "close");
+	    am.put("close", cancelAction);
+    }
 }
 

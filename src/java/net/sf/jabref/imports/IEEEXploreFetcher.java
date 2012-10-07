@@ -78,9 +78,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private String searchUrl;
     private final String importUrl = "http://ieeexplore.ieee.org/xpls/downloadCitations";
     
-    private final Pattern hitsPattern = Pattern.compile("([0-9,]+) results");
-    private final Pattern idPattern = Pattern.compile("<input name=\"\" type=\"checkbox\" value=\"\"\\s*" +
-    		"id=\"([0-9]+)\"/>");
+    private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
+    private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" + 
+						      "value=\'\'\\s*id=\'([0-9]+)\'/>");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
     private HashMap<String, String> fieldPatterns = new HashMap<String, String>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
@@ -91,7 +91,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
     Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     Pattern abstractLinkPattern = Pattern.compile(
-            "<a href=\"(.+)\" class=\"bodyCopySpaced\">Abstract</a>");
+	   "<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
     String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
@@ -100,7 +100,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	super();
     	
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
-        fieldPatterns.put("author", "<p>\\s+(.+)");
+        fieldPatterns.put("author", "</h3>\\s+(.+)<br />");
         fieldPatterns.put("volume", "Volume:\\s*(\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
@@ -406,12 +406,19 @@ public class IEEEXploreFetcher implements EntryFetcher {
 					entry.setField("year", "to be published");
 					entry.clearField("month");
 					entry.clearField("pages");
+					entry.clearField("number");
 				}
 		        String[] parts = fullName.split("[\\[\\]]"); //[see also...], [legacy...]
 		        fullName = parts[0];
 		        if (parts.length == 3) {
 					fullName += parts[2];
 				}
+			if(entry.getField("note") ==  "Early Access") {
+					entry.setField("year", "to be published");
+					entry.clearField("month");
+					entry.clearField("pages");
+					entry.clearField("number");
+			}
 	        } else {
 	        	fullName = fullName.replace("Conference Proceedings", "Proceedings").
 	        			replace("Proceedings of", "Proceedings").replace("Proceedings.", "Proceedings");
@@ -444,7 +451,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 				}
 			}
 			if (type.getName() == "Article") {
-				fullName = fullName.replace("- ", "-"); //IEE Proceedings-
+				fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 				
 				fullName = fullName.trim();
 				if (Globals.prefs.getBoolean("useIEEEAbrv")) {
@@ -529,21 +536,21 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Matcher typeMatcher = typePattern.matcher(text);
             if (typeMatcher.find()) {
 	            typeName = typeMatcher.group(1);
-	            if (typeName.equalsIgnoreCase("IEEE Journals") || typeName.equalsIgnoreCase("IEEE Early Access") ||
-	            		typeName.equalsIgnoreCase("IET Journals") || typeName.equalsIgnoreCase("AIP Journals") ||
-					   	typeName.equalsIgnoreCase("AVS Journals") || typeName.equalsIgnoreCase("IBM Journals")) {
+	            if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
+	            		typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
+					   	typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines")) {
 	                type = BibtexEntryType.getType("article");
 	                sourceField = "journal";
-	            } else if (typeName.equalsIgnoreCase("IEEE Conferences") || typeName.equalsIgnoreCase("IET Conferences")) {
+	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications")) {
 	                type = BibtexEntryType.getType("inproceedings");
 	                sourceField = "booktitle";
 		        } else if (typeName.equalsIgnoreCase("IEEE Standards")) {
 	                type = BibtexEntryType.getType("standard");
 	                sourceField = "number";
-		        } else if (typeName.equalsIgnoreCase("IEEE Educational Courses")) {
+		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
 		        	type = BibtexEntryType.getType("Electronic");
 		        	sourceField = "note";
-		        } else if (typeName.equalsIgnoreCase("IEEE Book Chapter")) {
+		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
@@ -563,11 +570,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
             	entry.setField("organization", "IEEE");
             }
             
-            if (typeName.equalsIgnoreCase("IEEE Book Chapter")) {
-            	entry.setField("publisher", "IEEE");
+            if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
+            	entry.setField("publisher", "Wiley-IEEE Press");
             }
             
-            if (typeName.equalsIgnoreCase("IEEE Early Access")) {
+            if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
             	entry.setField("note", "Early Access");
             }
             
@@ -594,7 +601,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
         
             if (includeAbstract) {
-            	index = allText.indexOf("<div class=\"abstract RevealContent", piv);
+            	index = allText.indexOf("<div class=\"abstract", piv);
 	            if (index >= 0) {
 	            	endIndex = allText.indexOf("</div>", index) + 6;
 		            piv = endIndex;

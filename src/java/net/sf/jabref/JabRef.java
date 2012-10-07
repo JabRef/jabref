@@ -45,6 +45,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 import spin.Spin;
 
@@ -62,7 +63,8 @@ public class JabRef {
 
     boolean graphicFailure = false;
 
-    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase, fetcherEngine, exportMatches;
+    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase,
+            fetcherEngine, exportMatches, defPrefs;
     BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
 
     private final static String exportMatchesSyntax = "[".concat(Globals.lang("field")).concat("]").concat("searchTerm").concat(",").concat("outputFile").concat(": ").concat(Globals.lang("file")).concat("[,").concat(Globals.lang("exportFormat")).concat("]");
@@ -188,6 +190,7 @@ public class JabRef {
         showVersion = new BooleanOption();
         exportPrefs = new StringOption("jabref_prefs.xml");
         importPrefs = new StringOption("jabref_prefs.xml");
+        defPrefs = new StringOption("");
         auxImExport = new StringOption("");
         importToOpenBase = new StringOption("");
         fetcherEngine = new StringOption("");
@@ -216,6 +219,8 @@ public class JabRef {
             exportPrefs);
         options.register("primp", 'p', Globals.lang("Import preferences from file"),
             importPrefs);
+        options.register("prdef", 'd', Globals.lang("Reset preferences (key1,key2,... or 'all')"),
+            defPrefs);
         options.register("aux", 'a',
             Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
             auxImExport);
@@ -268,6 +273,36 @@ public class JabRef {
                 System.err.println(Globals.lang("Unable to create graphical interface")
                     + ".");
             }
+        }
+
+        // Check if we should reset all preferences to default values:
+        if (defPrefs.isInvoked()) {
+            String value = defPrefs.getStringValue();
+            if (value.trim().equals("all")) {
+                try {
+                    System.out.println(Globals.lang("Setting all preferences to default values."));
+                    Globals.prefs.clear();
+                } catch (BackingStoreException e) {
+                    System.err.println(Globals.lang("Unable to clear preferences."));
+                    e.printStackTrace();
+                }
+            } else {
+                String[] keys = value.split(",");
+                for (int i=0; i<keys.length; i++) {
+                    try {
+                        if (Globals.prefs.hasKey(keys[i].trim())) {
+                            System.out.println(Globals.lang("Resetting preference key '%0'", keys[i].trim()));
+                            Globals.prefs.clear(keys[i].trim());
+                        } else {
+                            System.out.println(Globals.lang("Unknown preference key '%0'", keys[i].trim()));
+                        }
+                    } catch (BackingStoreException e) {
+                        System.err.println(Globals.lang("Unable to clear preferences."));
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
 
         // Check if we should import preferences from a file:
@@ -381,7 +416,7 @@ public class JabRef {
 	                    // We have an ExportFormat instance:
 	                    try {
 		                System.out.println(Globals.lang("Exporting") + ": " + data[1]);
-	                        format.performExport(newBase, new MetaData(pr.getMetaData(), pr.getDatabase()), data[1], pr.getEncoding(), null);
+	                        format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(), null);
 	                    } catch (Exception ex) {
 	                        System.err.println(Globals.lang("Could not export file")
 	                            + " '" + data[1] + "': " + ex.getMessage());
@@ -412,7 +447,7 @@ public class JabRef {
                             try {
                                 System.out.println(Globals.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
-                                    new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
+                                    pr.getMetaData(), new File(data[0]), Globals.prefs,
                                     false, false, Globals.prefs.get("defaultEncoding"), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll())
@@ -439,7 +474,7 @@ public class JabRef {
                     File theFile = pr.getFile();
                     if (!theFile.isAbsolute())
                         theFile = theFile.getAbsoluteFile();
-                    MetaData metaData = new MetaData(pr.getMetaData(), pr.getDatabase());
+                    MetaData metaData = pr.getMetaData();
                     metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                     Globals.prefs.databaseFile = metaData.getFile();
@@ -449,8 +484,7 @@ public class JabRef {
                         // We have an ExportFormat instance:
                         try {
                             format.performExport(pr.getDatabase(), 
-                                    new MetaData(pr.getMetaData(), pr.getDatabase()),
-                                    data[0], pr.getEncoding(), null);
+                                    pr.getMetaData(), data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
                             System.err.println(Globals.lang("Could not export file")
                                 + " '" + data[0] + "': " + ex.getMessage());
@@ -866,7 +900,7 @@ public class JabRef {
                         wrn.deleteCharAt(wrn.length() - 1);
                     jrf.showBaseAt(i);
                     JOptionPane.showMessageDialog(jrf, wrn.toString(),
-                        Globals.lang("Warnings"),
+                        Globals.lang("Warnings")+" ("+pr.getFile().getName()+")",
                         JOptionPane.WARNING_MESSAGE);
                 }
             }

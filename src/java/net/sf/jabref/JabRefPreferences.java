@@ -48,7 +48,6 @@ import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
-import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -65,6 +64,8 @@ public class JabRefPreferences {
         EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
         EMACS_23 = "emacsUseV23InsertString",
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
+        
+        PDF_PREVIEW = "pdfPreview",
         
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
@@ -86,7 +87,6 @@ public class JabRefPreferences {
         defKeyBinds = new HashMap<String, String>();
     private HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
     private HashSet<String> nonWrappableFields = new HashSet<String>(5);
-    private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
     // Object containing custom export formats:
@@ -176,6 +176,7 @@ public class JabRefPreferences {
         	defaults.put(EMACS_23, false);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
+        defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
         defaults.put("vim", "vim");
@@ -349,8 +350,8 @@ public class JabRefPreferences {
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
-                     +"\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
-                     +"\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} "
+                     +"\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                     +"\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
                      +"<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
                      +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
                      +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
@@ -368,8 +369,8 @@ public class JabRefPreferences {
         defaults.put("preview1", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
-                     +"\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}__NEWLINE__"
-                     +"\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} "
+                     +"\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                     +"\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
                      +"<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
                      +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
                      +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
@@ -474,7 +475,7 @@ public class JabRefPreferences {
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
-        MARKING_WITH_NUMBER_PATTERN = "\\["+get("defaultOwner")+":(\\d+)\\]";
+        MARKING_WITH_NUMBER_PATTERN = "\\["+get("defaultOwner").replaceAll("\\\\","\\\\\\\\")+":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -781,6 +782,18 @@ public class JabRefPreferences {
         return defKeyBinds;
     }
 
+
+    /**
+     * Clear all preferences.
+     * @throws BackingStoreException
+     */
+    public void clear() throws BackingStoreException {
+        prefs.clear();
+    }
+
+    public void clear(String key) throws BackingStoreException {
+        prefs.remove(key);
+    }
     /**
      * Calling this method will write all preferences into the preference store.
      */
@@ -824,9 +837,14 @@ public class JabRefPreferences {
     }
 
 
+        /**
+         * Fetches key patterns from preferences
+         * Not cached
+         * 
+         * @return LabelPattern containing all keys. Returned LabelPattern has no parent
+         */
         public LabelPattern getKeyPattern(){
-
-            keyPattern = new LabelPattern(KEY_PATTERN);
+            keyPattern = new LabelPattern();
             Preferences pre = Preferences.userNodeForPackage
                 (net.sf.jabref.labelPattern.LabelPattern.class);
             try {
@@ -836,20 +854,17 @@ public class JabRefPreferences {
             } catch (BackingStoreException ex) {
                 Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
             }
-
-            ///
-            //keyPattern.addLabelPattern("article", "[author][year]");
-            //putKeyPattern(keyPattern);
-            ///
-
             return keyPattern;
         }
 
+        /**
+         * Adds the given key pattern to the preferences
+         * 
+         * @param pattern the pattern to store
+         */
         public void putKeyPattern(LabelPattern pattern){
             keyPattern = pattern;
             LabelPattern parent = pattern.getParent();
-            if (parent == null)
-                return;
 
             // Store overridden definitions to Preferences.
             Preferences pre = Preferences.userNodeForPackage
@@ -860,9 +875,14 @@ public class JabRefPreferences {
                 Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
             }
 
-            for (String s: pattern.keySet()){
-                if (!(pattern.get(s)).equals(parent.get(s)))
-                    pre.put(s, pattern.getValue(s).get(0).toString());
+            for (String s: pattern.keySet()) {
+                ArrayList<String> value = pattern.get(s);
+                if (value != null) {
+                    // no default value
+                    // the first entry in the array is the full pattern
+                    // see net.sf.jabref.labelPattern.LabelPatternUtil.split(String)
+                    pre.put(s, value.get(0));
+                }
             }
         }
 
@@ -981,6 +1001,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Forward", "alt RIGHT");
         defKeyBinds.put("Import into current database", "ctrl I");
         defKeyBinds.put("Import into new database", "ctrl alt I");
+        defKeyBinds.put(FindUnlinkedFilesDialog.ACTION_COMMAND, "");
         defKeyBinds.put("Increase table font size", "ctrl PLUS");
         defKeyBinds.put("Decrease table font size", "ctrl MINUS");
         defKeyBinds.put("Automatically link files", "alt F");

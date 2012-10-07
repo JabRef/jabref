@@ -28,17 +28,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -53,7 +43,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -188,10 +178,10 @@ class GroupDialog extends JDialog {
                 // ... for buttons panel
                 FormLayout layoutBP = new FormLayout("pref, 4dlu, pref", "p");
                 layoutBP.setColumnGroups(new int[][] { { 1, 3 } });
-                ButtonBarBuilder builderBP = new ButtonBarBuilder();
+                ButtonBarBuilder2 builderBP = new ButtonBarBuilder2();
                 builderBP.addGlue();
-                builderBP.addGridded(m_ok);
-                builderBP.addGridded(m_cancel);
+                builderBP.addButton(m_ok);
+                builderBP.addButton(m_cancel);
                 builderBP.addGlue();
                 builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
@@ -279,11 +269,15 @@ class GroupDialog extends JDialog {
                 m_keywordsRadioButton.addItemListener(radioButtonItemListener);
                 m_searchRadioButton.addItemListener(radioButtonItemListener);
 
-                m_cancel.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                                dispose();
-                        }
-                });
+                Action cancelAction = new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        dispose();
+                    }
+                };
+                m_cancel.addActionListener(cancelAction);
+                builderAll.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                        .put(Globals.prefs.getKey("Close dialog"), "close");
+                builderAll.getPanel().getActionMap().put("close", cancelAction);
 
                 m_ok.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -328,6 +322,7 @@ class GroupDialog extends JDialog {
                                 dispose();
                         }
                 });
+
 
                 CaretListener caretListener = new CaretListener() {
                         public void caretUpdate(CaretEvent e) {

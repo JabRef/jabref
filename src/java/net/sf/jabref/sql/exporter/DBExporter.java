@@ -29,11 +29,16 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexString;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
 import net.sf.jabref.export.FileActions;
@@ -43,6 +48,8 @@ import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.groups.SearchGroup;
+import net.sf.jabref.sql.DBImportExportDialog;
+import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -59,10 +66,11 @@ import net.sf.jabref.sql.SQLUtil;
  * 
  */
 
-public abstract class DBExporter {
+public abstract class DBExporter extends DBImporterExporter{
 
 	String fieldStr = SQLUtil.getFieldStr();
 	DBStrings dbStrings = null;
+	ArrayList<String> dbNames = new ArrayList<String>();
 
 	/**
 	 * Method for the exportDatabase methods.
@@ -79,16 +87,16 @@ public abstract class DBExporter {
 	 *            The output (PrintStream or Connection) object to which the DML
 	 *            should be written.
 	 */
+
 	private void performExport(final BibtexDatabase database,
-			final MetaData metaData, Set<String> keySet, Object out)
-			throws Exception {
+			final MetaData metaData, Set<String> keySet, Object out,
+			String dbName) throws Exception {
 
 		List<BibtexEntry> entries = FileActions.getSortedEntries(database,
 				keySet, false);
 		GroupTreeNode gtn = metaData.getGroups();
 
-		createTables(out);
-		int database_id = getDatabaseIDByPath(metaData, out);
+		int database_id = getDatabaseIDByName(metaData, out, dbName);
 		removeAllRecordsForAGivenDB(out, database_id);
 		populateEntryTypesTable(out);
 		populateEntriesTable(database_id, entries, out);
@@ -141,25 +149,6 @@ public abstract class DBExporter {
 		}
 	}
 
-	/**
-	 * This method creates a new row into jabref_database table enabling to
-	 * export more than one .bib
-	 * 
-	 * @param metaData
-	 *            The MetaData object containing the groups information
-	 * @param out
-	 *            The output (PrintStream or Connection) object to which the DML
-	 *            should be written.
-	 * 
-	 * @throws SQLException
-	 */
-	private void insertJabRefDatabase(final MetaData metaData, Object out)
-			throws SQLException {
-		SQLUtil.processQuery(out,
-				"INSERT INTO jabref_database(database_name, md5_path) VALUES ('"
-						+ metaData.getFile().getName() + "', md5('"
-						+ metaData.getFile().getAbsolutePath() + "'));");
-	}
 
 	/**
 	 * Recursive method to include a tree of groups.
@@ -473,7 +462,7 @@ public abstract class DBExporter {
 		writer = new BufferedOutputStream(new FileOutputStream(outfile));
 		PrintStream fout = null;
 		fout = new PrintStream(writer);
-		performExport(database, metaData, keySet, fout);
+		performExport(database, metaData, keySet, fout, "file");
 		fout.close();
 	}
 
@@ -492,20 +481,32 @@ public abstract class DBExporter {
 	 *            The necessary database connection information
 	 */
 	public void exportDatabaseToDBMS(final BibtexDatabase database,
-			final MetaData metaData, Set<String> keySet, DBStrings dbStrings)
-			throws Exception {
-
+			final MetaData metaData, Set<String> keySet, DBStrings dbStrings,
+			JabRefFrame frame) throws Exception {
+		String dbName = "";
 		Connection conn = null;
+		boolean redisplay = false;
 		try {
 			conn = this.connectToDB(dbStrings);
-
-			performExport(database, metaData, keySet, conn);
-
+			createTables(conn);
+			Vector<Vector<String>> matrix = createExistentDBNamesMatrix(dbStrings);
+			DBImportExportDialog dialogo = new DBImportExportDialog(frame,
+					matrix, DBImportExportDialog.DialogType.EXPORTER);
+			if (dialogo.removeAction) {
+				dbName = getDBName(matrix, dbStrings, frame, dialogo);
+				removeDB(dialogo, dbName, conn, metaData);
+				redisplay = true;
+			} else if (dialogo.hasDBSelected){
+				dbName = getDBName(matrix, dbStrings, frame, dialogo);
+				performExport(database, metaData, keySet, conn, dbName);
+			}
 			if (!conn.getAutoCommit()) {
 				conn.commit();
 				conn.setAutoCommit(true);
 			}
 			conn.close();
+			if (redisplay)
+				exportDatabaseToDBMS(database, metaData, keySet, dbStrings, frame);
 		} catch (SQLException ex) {
 			if (conn != null) {
 				if (!conn.getAutoCommit()) {
@@ -515,6 +516,74 @@ public abstract class DBExporter {
 			throw ex;
 		}
 	}
+
+	private String getDBName(Vector<Vector<String>> matrix,
+			DBStrings dbStrings, JabRefFrame frame, DBImportExportDialog dialogo)
+			throws SQLException, Exception {
+		String dbName = "";
+		if (matrix.size() > 1) {
+			if (dialogo.hasDBSelected) {
+				dbName = dialogo.selectedDB;
+				if ((dialogo.selectedInt == 0) && (!dialogo.removeAction)) {
+					dbName = JOptionPane.showInputDialog(dialogo.getDiag(),
+							"Please enter the desired name:", "SQL Export",
+							JOptionPane.INFORMATION_MESSAGE);
+					if (dbName != null) {
+						while (!isValidDBName(dbNames, dbName)) {
+							dbName = JOptionPane
+									.showInputDialog(
+											dialogo.getDiag(),
+											"You have entered an invalid or already existent DB name.\n Please enter the desired name:",
+											"SQL Export",
+											JOptionPane.ERROR_MESSAGE);
+						}
+					} else {
+						getDBName(
+								matrix,
+								dbStrings,
+								frame,
+								new DBImportExportDialog(
+										frame,
+										matrix,
+										DBImportExportDialog.DialogType.EXPORTER));
+					}
+				}
+			}
+		} else
+			dbName = JOptionPane.showInputDialog(frame,
+					"Please enter the desired name:", "SQL Export",
+					JOptionPane.INFORMATION_MESSAGE);
+		return dbName;
+	}
+
+	private Vector<Vector<String>> createExistentDBNamesMatrix(
+			DBStrings dbStrings) throws SQLException, Exception {
+		ResultSet rs = SQLUtil.queryAllFromTable(this.connectToDB(dbStrings),
+				"jabref_database");
+		Vector<String> v;
+		Vector<Vector<String>> matrix = new Vector<Vector<String>>();
+		dbNames.clear();
+		v = new Vector<String>();
+		v.add(Globals.lang("< CREATE NEW DATABASE >"));
+		matrix.add(v);
+		while (rs.next()) {
+			v = new Vector<String>();
+			v.add(rs.getString("database_name"));
+			matrix.add(v);
+			dbNames.add(rs.getString("database_name"));
+		}
+		return matrix;
+	}
+
+	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName)
+			throws SQLException {
+		if (desiredName.trim().length() <= 1)
+			return false;
+		if (dbNames.contains(desiredName))
+			return false;
+		return true;
+	}
+
 
 	/**
 	 * Returns a Jabref Database ID from the database in case the DB is already
@@ -530,46 +599,19 @@ public abstract class DBExporter {
 	 * @return The ID of database row of the jabref database being exported
 	 * @throws SQLException
 	 */
-	public int getDatabaseIDByPath(MetaData metaData, Object out)
-			throws SQLException {
-
-		if (out instanceof Connection) {
-			Object response = SQLUtil.processQueryWithResults(out,
-					"SELECT database_id FROM jabref_database WHERE md5_path=md5('"
-							+ metaData.getFile().getAbsolutePath() + "');");
-			ResultSet rs = ((Statement) response).getResultSet();
-			if (rs.next())
-				return rs.getInt("database_id");
-			else {
-				insertJabRefDatabase(metaData, out);
-				return getDatabaseIDByPath(metaData, out);
-			}
-		}
-		// in case of text export there will be only 1 bib exported
-		else {
-			insertJabRefDatabase(metaData, out);
-			return 1;
-		}
-	}
-
-	/**
-	 * Removes all records for the database being exported in case it was
-	 * exported before.
+	/*
+	 * public int getDatabaseIDByPath(MetaData metaData, Object out, String
+	 * dbName) throws SQLException {
 	 * 
-	 * @param out
-	 *            The output (PrintStream or Connection) object to which the DML
-	 *            should be written.
-	 * @param database_id
-	 * 			  Id of the database being exported.
-	 * @throws SQLException
+	 * if (out instanceof Connection) { Object response =
+	 * SQLUtil.processQueryWithResults(out,
+	 * "SELECT database_id FROM jabref_database WHERE md5_path=md5('" +
+	 * metaData.getFile().getAbsolutePath() + "');"); ResultSet rs =
+	 * ((Statement) response).getResultSet(); if (rs.next()) return
+	 * rs.getInt("database_id"); else { insertJabRefDatabase(metaData, out,
+	 * dbName); return getDatabaseIDByPath(metaData, out, dbName); } } // in
+	 * case of text export there will be only 1 bib exported else {
+	 * insertJabRefDatabase(metaData, out, dbName); return 1; } }
 	 */
-	public void removeAllRecordsForAGivenDB(Object out, int database_id)
-			throws SQLException {
-		SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='"
-				+ database_id + "';");
-		SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='"
-				+ database_id + "';");
-		SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='"
-				+ database_id + "';");
-	}
+
 }

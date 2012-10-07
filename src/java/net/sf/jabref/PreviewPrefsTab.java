@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +15,11 @@
 */
 package net.sf.jabref;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,9 +44,11 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		def2 = new JButton(Globals.lang("Default")), test1 = new JButton(Globals.lang("Test")),
 		test2 = new JButton(Globals.lang("Test")), help;
 
-	JPanel p1 = new JPanel(), p2 = new JPanel();
+	JPanel p1 = new JPanel(), p2 = new JPanel(), p3 = new JPanel(new BorderLayout());
 
 	JScrollPane sp1 = new JScrollPane(layout1), sp2 = new JScrollPane(layout2);
+	
+	JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
 
 	private static BibtexEntry entry;
 
@@ -103,16 +107,6 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		gbl.setConstraints(pan, con);
 		p2.add(pan);
 
-		{ // Help Button
-			HelpAction helpAction = new HelpAction(Globals.helpDiag, GUIGlobals.previewHelp,
-				Globals.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
-			JButton help = helpAction.getIconButton();
-			con.weightx = 0;
-			con.gridwidth = GridBagConstraints.REMAINDER;
-			gbl.setConstraints(help, con);
-			p2.add(help);
-		}
-
 		con.weightx = 1;
 		con.weighty = 0;
 		con.fill = GridBagConstraints.BOTH;
@@ -133,6 +127,20 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		con.weighty = 1;
 		gbl.setConstraints(p2, con);
 		add(p2);
+		
+        // PDF Preview button
+        p3.add(pdfPreview, BorderLayout.WEST);
+
+        { // Help Button
+            HelpAction helpAction = new HelpAction(Globals.helpDiag, GUIGlobals.previewHelp,
+                Globals.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
+            JButton help = helpAction.getIconButton();
+            p3.add(help, BorderLayout.EAST);
+        }
+
+        con.weighty = 0;
+        gbl.setConstraints(p3, con);
+        add(p3);
 
 		def1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -224,11 +232,13 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
 		layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
+		pdfPreview.setSelected(_prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
 	}
 
 	public void storeSettings() {
 		_prefs.put("preview0", layout1.getText().replaceAll("\n", "__NEWLINE__"));
 		_prefs.put("preview1", layout2.getText().replaceAll("\n", "__NEWLINE__"));
+		_prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
 	}
 
 	public boolean readyToClose() {

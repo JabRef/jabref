@@ -196,20 +196,27 @@ public class FileListTableModel extends AbstractTableModel {
     private FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
         ExternalFileType type = Globals.prefs.getExternalFileTypeByName
                         (getElementIfAvailable(contents, 2));
+
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
-            // on the extension:
-            ExternalFileType typeGuess = null;
-            String link = getElementIfAvailable(contents, 1);
-            int index = link.lastIndexOf('.');
-            if ((index >= 0) && (index < link.length()-1)) {
-                String extension = link.substring(index+1);
-                typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
+            // on mime type:
+            type = Globals.prefs.getExternalFileTypeByMimeType
+                        (getElementIfAvailable(contents, 2));
+            if (type == null) {
+                // No type could be found from mime type on the extension:
+                //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
+                ExternalFileType typeGuess = null;
+                String link = getElementIfAvailable(contents, 1);
+                int index = link.lastIndexOf('.');
+                if ((index >= 0) && (index < link.length()-1)) {
+                    String extension = link.substring(index+1);
+                    typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
+                }
+                if (typeGuess != null)
+                    type = typeGuess;
             }
-            if (typeGuess != null)
-                type = typeGuess;
-
         }
+
         return new FileListEntry(getElementIfAvailable(contents, 0),
                 getElementIfAvailable(contents, 1),
                 type);

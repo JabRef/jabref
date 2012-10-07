@@ -87,7 +87,7 @@ public class RisImporter extends ImportFormat {
             sb.append(str);
             sb.append("\n");
         }
-        String[] entries = sb.toString().split("ER  -.*\\n");
+        String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("ER  -.*\\n");
 
         for (int i = 0; i < entries.length; i++){
 

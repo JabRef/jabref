@@ -78,11 +78,11 @@ public class ChangeScanner extends Thread {
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
             Globals.prefs.get("defaultEncoding"));
             inTemp = pr.getDatabase();
-            mdInTemp = new MetaData(pr.getMetaData(),inTemp);
+            mdInTemp = pr.getMetaData();
             // Parse the modified file.
             pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
             BibtexDatabase onDisk = pr.getDatabase();
-            MetaData mdOnDisk = new MetaData(pr.getMetaData(),onDisk);
+            MetaData mdOnDisk = pr.getMetaData();
 
             // Sort both databases according to a common sort key.
             EntryComparator comp = new EntryComparator(false, true, sortBy[2]);

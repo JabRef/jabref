@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.oo;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
@@ -384,7 +384,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 //"p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu"));
                 "p,p,p,p,p,p,p,p,p,p"));
 
-        //ButtonBarBuilder bb = new ButtonBarBuilder();
+        //ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         DefaultFormBuilder bb = new DefaultFormBuilder(new FormLayout
                 ("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
                         +"1dlu, fill:pref:grow, 1dlu, fill:pref:grow", ""));
@@ -668,7 +668,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             builder.nextLine();
         }
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         JButton ok = new JButton(Globals.lang("Ok"));
         JButton cancel = new JButton(Globals.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
@@ -698,8 +698,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         });
         bb.addGlue();
         bb.addRelatedGap();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));

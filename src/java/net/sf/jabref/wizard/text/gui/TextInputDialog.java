@@ -58,22 +58,22 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.*;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.imports.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class TextInputDialog
     extends JDialog implements ActionListener
@@ -81,6 +81,7 @@ public class TextInputDialog
   private JButton okButton = new JButton() ;
   private JButton cancelButton = new JButton() ;
   private JButton insertButton = new JButton() ;
+  private JButton parseWithFreeCiteButton = new JButton();
   private JPanel panel1 = new JPanel() ;
   private JPanel buttons = new JPanel() ;
   private JPanel rawPanel = new JPanel() ;
@@ -279,6 +280,11 @@ public class TextInputDialog
     // insert buttons
     insertButton.setText( Globals.lang( "Insert" ) ) ;
     insertButton.addActionListener( this ) ;
+    
+    // parse with FreeCite button
+    parseWithFreeCiteButton.setText(Globals.lang("Parse with FreeCite"));
+    parseWithFreeCiteButton.addActionListener(this);
+    
 
     // Radio buttons
     appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
@@ -357,11 +363,12 @@ public class TextInputDialog
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
     cancelButton.addActionListener( this ) ;
 
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(okButton);
-    bb.addGridded(cancelButton);
+    bb.addButton(okButton);
+    bb.addButton(parseWithFreeCiteButton);
+    bb.addButton(cancelButton);
     bb.addGlue();
 
   }
@@ -501,7 +508,42 @@ public class TextInputDialog
     {
       insertTextForTag() ;
     }
+    else if (source == this.parseWithFreeCiteButton) {
+        if (parseWithFreeCiteAndAddEntries()) {    	
+            okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
+        	dispose();
+        }
+    }
   }
+
+  
+    /**
+     * tries to parse the pasted reference with freecite
+     * @return true if successful, false otherwise
+     */
+  private boolean parseWithFreeCiteAndAddEntries() {
+        FreeCiteImporter fimp = new FreeCiteImporter();
+        String text = textPane.getText();
+        
+        // we have to remove line breaks (but keep empty lines)
+        // otherwise, the result is broken
+        text = text.replace(Globals.NEWLINE.concat(Globals.NEWLINE), "##NEWLINE##");
+        // possible URL line breaks are removed completely.
+        text = text.replace("/".concat(Globals.NEWLINE), "/");
+        text = text.replace(Globals.NEWLINE, " ");
+        text = text.replace("##NEWLINE##", Globals.NEWLINE);
+        
+        List<BibtexEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        if (importedEntries != null) {
+            Util.setAutomaticFields(importedEntries, false, false, true);
+            for (BibtexEntry e: importedEntries) {
+                JabRef.jrf.basePanel().insertEntry(e);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 // ---------------------------------------------------------------------------
   // update the bibtex source view and available List

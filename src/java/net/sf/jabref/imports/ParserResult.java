@@ -22,13 +22,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.MetaData;
 
 public class ParserResult {
 
     public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static ParserResult FILE_LOCKED = new ParserResult(null, null, null);
     private BibtexDatabase base;
-    private HashMap<String, String> metaData;
+    private MetaData metaData;
     private HashMap<String, BibtexEntryType> entryTypes;
 
 
@@ -52,7 +53,7 @@ public class ParserResult {
     	this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
     }
     
-    public ParserResult(BibtexDatabase base, HashMap<String, String> metaData, HashMap<String, BibtexEntryType> entryTypes) {
+    public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, BibtexEntryType> entryTypes) {
 		this.base = base;
 		this.metaData = metaData;
 		this.entryTypes = entryTypes;
@@ -116,8 +117,12 @@ public class ParserResult {
     	return base;
     }
 
-    public HashMap<String, String> getMetaData() {
-	return metaData;
+    public MetaData getMetaData() {
+	    return metaData;
+    }
+
+    public void setMetaData(MetaData md) {
+        this.metaData = md;
     }
 
     public HashMap<String, BibtexEntryType> getEntryTypes() {

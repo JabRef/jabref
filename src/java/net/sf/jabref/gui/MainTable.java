@@ -500,8 +500,10 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || (y > vert.getValue() + vert.getVisibleAmount()))
-            scrollToCenter(row, 1);
+		if ((y < vert.getValue()) || (y > vert.getValue() + vert.getVisibleAmount()) && !showingFloatSearch) {
+			scrollToCenter(row, 1);
+		}
+            
     }
 
     public void scrollToCenter(int rowIndex, int vColIndex) {

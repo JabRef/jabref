@@ -333,6 +333,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
+    bibtexKeyPattern = new BibtexKeyPatternAction(),
     upgradeExternalLinks = new GeneralAction("upgradeLinks", "Upgrade external links",
             Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD)),
       errorConsole = Globals.errorConsole.getAction(this),
@@ -362,6 +363,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     MassSetFieldAction massSetField = new MassSetFieldAction(this);
 
+	GeneralAction findUnlinkedFiles = new GeneralAction(
+  			FindUnlinkedFilesDialog.ACTION_COMMAND,
+  			FindUnlinkedFilesDialog.ACTION_TITLE,
+  			FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
+  			FindUnlinkedFilesDialog.ACTION_ICON,
+  			prefs.getKey(FindUnlinkedFilesDialog.ACTION_COMMAND)
+  	);
+    
     PushToApplicationButton pushExternalButton;
 
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
@@ -412,7 +421,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   }
 
   private void init() {
-	    tabbedPane = new DragDropPopupPane(databaseProperties);
+	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
         macOSXRegistration();
 
@@ -423,7 +432,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
-        setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
+        //setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
+        setIconImage(GUIGlobals.getImage("jabrefIcon48").getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -1339,7 +1349,7 @@ public JabRefPreferences prefs() {
       bibtex.add(editPreamble);
       bibtex.add(editStrings);
       mb.add(bibtex);
-
+      
       tools.add(makeKeyAction);
       tools.add(Cleanup);
       //tools.add(downloadFullText);
@@ -1356,7 +1366,7 @@ public JabRefPreferences prefs() {
       tools.add(openPdf);
       tools.add(openUrl);
       //tools.add(openSpires);
-
+      tools.add(findUnlinkedFiles);
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
@@ -1669,11 +1679,6 @@ public JabRefPreferences prefs() {
     }
   }
 
-  public BasePanel addTab(BibtexDatabase db, File file, HashMap<String, String> meta, String encoding, boolean raisePanel) {
-      BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
-      addTab(bp, file, raisePanel);
-      return bp;
-  }
 
     public BasePanel addTab(BibtexDatabase db, File file, MetaData meta, String encoding, boolean raisePanel) {
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
@@ -1832,7 +1837,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        addTab(database, null, (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"), true);
+        addTab(database, null, new MetaData(), Globals.prefs.get("defaultEncoding"), true);
         output(Globals.lang("New database created."));
     }
   }
@@ -1862,7 +1867,7 @@ public JabRefPreferences prefs() {
           BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database
                                         null,                     // file
-                                        (HashMap<String,String>)null, Globals.prefs.get("defaultEncoding"));                     // meta data
+                                        new MetaData(), Globals.prefs.get("defaultEncoding"));                     // meta data
           tabbedPane.add( Globals.lang( GUIGlobals.untitledTitle ), bp ) ;
           tabbedPane.setSelectedComponent( bp ) ;
           output( Globals.lang( "New database created." ) ) ;
@@ -2004,10 +2009,9 @@ public JabRefPreferences prefs() {
           System.err.println("KeyCollisionException [ addBibEntries(...) ]");
         }
       }
-      HashMap<String, String> meta = new HashMap<String, String>();
       // Metadata are only put in bibtex files, so we will not find it
-      // in imported files. Instead we pass an empty HashMap.
-      BasePanel bp = new BasePanel(JabRefFrame.this, database, null, meta, Globals.prefs.get("defaultEncoding"));
+      // in imported files. We therefore pass in an empty MetaData:
+      BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get("defaultEncoding"));
       /*
             if (prefs.getBoolean("autoComplete")) {
             db.setCompleters(autoCompleters);
@@ -2450,6 +2454,28 @@ class SaveSessionAction
             Util.placeDialog(propertiesDialog, JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
+       
+    }
+    
+    class BibtexKeyPatternAction extends MnemonicAwareAction {
+        BibtexKeyPatternDialog bibtexKeyPatternDialog = null;
+        public BibtexKeyPatternAction() {
+            putValue(NAME, "Bibtexkey patterns");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+        	final JabRefPreferences prefs = JabRefPreferences.getInstance();
+            if (bibtexKeyPatternDialog == null) {
+                // if no instance of BibtexKeyPatternDialog exists, create new one
+            	bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, basePanel());
+            } else {
+                // BibtexKeyPatternDialog allows for updating content based on currently selected panel
+                bibtexKeyPatternDialog.setPanel(basePanel());
+            }
+            Util.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
+            bibtexKeyPatternDialog.setVisible(true);
+        }
+       
     }
 
     class IncreaseTableFontSizeAction extends MnemonicAwareAction {

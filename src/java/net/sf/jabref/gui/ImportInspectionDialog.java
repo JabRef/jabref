@@ -45,24 +45,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.CheckBoxMessage;
-import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.DuplicateResolverDialog;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.GeneralRenderer;
-import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.groups.AbstractGroup;
@@ -84,7 +67,7 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
@@ -115,7 +98,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  *          2007) $)
  * 
  */
-public class ImportInspectionDialog extends JDialog implements ImportInspector {
+public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
 
     public static interface CallBack {
 
@@ -291,25 +274,25 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(stop);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(stop);
+        bb.addButton(cancel);
         bb.addRelatedGap();
-        bb.addGridded(help);
+        bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
-        builder.addGridded(selectAll);
-        builder.addGridded(deselectAll);
-        builder.addGridded(deselectAllDuplicates);
+        builder.addButton(selectAll);
+        builder.addButton(deselectAll);
+        builder.addButton(deselectAllDuplicates);
         builder.addRelatedGap();
-        builder.addGridded(delete);
+        builder.addButton(delete);
         builder.addRelatedGap();
-        builder.addGridded(autoGenerate);
-        builder.addGridded(generate);
+        builder.addFixed(autoGenerate);
+        builder.addButton(generate);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         centerPan.add(builder.getPanel(), BorderLayout.WEST);
 
@@ -485,13 +468,18 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
             return;
         BibtexEntry entry = selectionModel.getSelected().get(0);
         entries.getReadWriteLock().writeLock().lock();
-        BibtexDatabase database = null;
-        // Relate to the existing database, if any:
-        if (panel != null)
+
+        BibtexDatabase database;
+        MetaData metaData;
+        
+        // Relate to existing database, if any:
+        if (panel != null) {
             database = panel.database();
-        // ... or create a temporary one:
-        else
+            metaData = panel.metaData();
+        } else {
             database = new BibtexDatabase();
+            metaData = new MetaData();
+        }
         try {
             entry.setId(Util.createNeutralId());
             // Add the entry to the database we are working with:
@@ -500,7 +488,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
             ex.printStackTrace();
         }
         // Generate a unique key:
-        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+        LabelPatternUtil.makeLabel(metaData, database, entry);
         // Remove the entry from the database again, since we only added it in
         // order to
         // make sure the key was unique:
@@ -517,13 +505,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
      */
     public void generateKeys(boolean addColumn) {
         entries.getReadWriteLock().writeLock().lock();
-        BibtexDatabase database = null;
-        // Relate to the existing database, if any:
-        if (panel != null)
+
+        BibtexDatabase database;
+        MetaData metaData;
+        
+        // Relate to existing database, if any:
+        if (panel != null) {
             database = panel.database();
-        // ... or create a temporary one:
-        else
+            metaData = panel.metaData();
+        } else {
             database = new BibtexDatabase();
+            metaData = new MetaData();
+        }
+
         List<String> keys = new ArrayList<String>(entries.size());
         // Iterate over the entries, add them to the database we are working
         // with,
@@ -538,7 +532,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
                 ex.printStackTrace();
             }
             // }
-            LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+            LabelPatternUtil.makeLabel(metaData, database, entry);
             // Add the generated key to our list:
             keys.add(entry.getCiteKey());
         }
@@ -695,7 +689,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
-                    panel = new BasePanel(frame, base, null, new HashMap<String, String>(),
+                    panel = new BasePanel(frame, base, null, new MetaData(),
                         Globals.prefs.get("defaultEncoding"));
                 }
 
@@ -1493,5 +1487,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector {
 
     public void toFront() {
         super.toFront();
+    }
+
+    public void setStatus(String s) {
+        frame.setStatus(s);
+    }
+
+    public void showMessage(Object message, String title, int msgType) {
+        System.out.println("ping");
+        JOptionPane.showMessageDialog(this, message, title, msgType);
+    }
+
+    public void showMessage(String message) {
+        System.out.println("pingi");
+        JOptionPane.showMessageDialog(this, message);
     }
 }

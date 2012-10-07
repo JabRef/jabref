@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+// with gradle 1.1, Sonar 3.2 is not working. One needs Sonar 3.1.1
+apply plugin: 'sonar'
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/java'
+		}
+		resources {
+			srcDir 'src/resource'
+		}
+	}
+}

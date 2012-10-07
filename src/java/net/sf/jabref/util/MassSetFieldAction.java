@@ -28,7 +28,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -121,10 +121,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.append(overwrite, 3);
 
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));

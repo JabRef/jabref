@@ -172,6 +172,7 @@ public class LayoutHelper {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
+        boolean inQuotes = false;
         boolean doneWithOptions = false;
         String option = null;
         String tmp;
@@ -204,7 +205,7 @@ public class LayoutHelper {
 
                 return null;
             }
-            if ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))
+            if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}')))))
             //if ((c == '{') || (c == '}') || (c == ']') || (c == '['))
             {
                 if ((c == ']') || (doneWithOptions && (c == '}')))
@@ -256,6 +257,15 @@ public class LayoutHelper {
                 {
                     start = true;
                 }
+            }
+            else if (c == '"') {
+                if (!inQuotes)
+                    inQuotes = true;
+                else inQuotes = false;
+
+                if (buffer == null)
+                    buffer = new StringBuffer(100);
+                buffer.append('"');
             }
             else
             {

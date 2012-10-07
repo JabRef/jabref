@@ -51,6 +51,8 @@
 			value="Fetch Entries from IEEE Xplore." />
 	</extension>
 
+    <!-- ACM Portal Fetcher disabled as the current implementation gets users banned -->
+    <!--
 	<extension id="ACMPortalFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
@@ -59,6 +61,7 @@
 		<parameter id="description"
 			value="Fetch Entries from ACM Portal." />
 	</extension>
+	-->
 	
 	<extension id="CiteSeerFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
@@ -122,15 +125,24 @@
       <parameter id="description"
 		 value="Fetch Entries from CiteSeer." />
     </extension>
+    
+    <extension id="DBLPFetcher" plugin-id="net.sf.jabref.core"
+       point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+        value="net.sf.jabref.imports.DBLPFetcher" />
+      <parameter id="name" value="DBLP Entry Fetcher" />
+      <parameter id="description"
+        value="Fetch Entries from DBLP." />
+    </extension>
 
-    <extension id="GoogleScholarFetcher" plugin-id="net.sf.jabref.core"
+    <!--<extension id="GoogleScholarFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
       <parameter id="entryFetcher"
 		 value="net.sf.jabref.imports.GoogleScholarFetcher" />
       <parameter id="name" value="Google Scholar Entry Fetcher" />
       <parameter id="description"
 		 value="Fetch Entries from Google Scholar." />
-    </extension>
+    </extension>-->
     <!--<extension id="ScienceDirectFetcher" plugin-id="net.sf.jabref.core"
         point-id="EntryFetcher">
         <parameter id="entryFetcher"

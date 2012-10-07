@@ -67,12 +67,14 @@ Function GetParameters
 FunctionEnd
 
 Function GetJRE
+!include x64.nsh
 ;
 ;  Find JRE (Java.exe)
 ;  1 - in .\jre directory (JRE Installed with application)
 ;  2 - in JAVA_HOME environment variable
 ;  3 - in the registry
-;  4 - assume java.exe in current dir or PATH
+;  4 - in the 64bit registry for 64bit Java
+;  5 - assume java.exe in current dir or PATH
   Push $R0
   Push $R1
 
@@ -90,6 +92,14 @@ Function GetJRE
   ReadRegStr $R1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $R0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$R1" "JavaHome"
   StrCpy $R0 "$R0\bin\javaw.exe"
+  
+  ${If} ${RunningX64}
+   SetRegView 64
+   ClearErrors
+   ReadRegStr $R1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+   ReadRegStr $R0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$R1" "JavaHome"
+   StrCpy $R0 "$R0\bin\javaw.exe"
+  ${EndIf}
 
   IfErrors 0 JreFound
   Sleep 800

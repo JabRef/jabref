@@ -31,7 +31,7 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.util.XMPUtil;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 /**
  * 
@@ -244,11 +244,11 @@ public class WriteXMPAction extends AbstractWorker {
 
 			// progressArea.setPreferredSize(new Dimension(300, 300));
 
-			ButtonBarBuilder bb = new ButtonBarBuilder();
+			ButtonBarBuilder2 bb = new ButtonBarBuilder2();
 			bb.addGlue();
-			bb.addGridded(okButton);
+			bb.addButton(okButton);
 			bb.addRelatedGap();
-			bb.addGridded(cancelButton);
+			bb.addButton(cancelButton);
 			bb.addGlue();
 			JPanel bbPanel = bb.getPanel();
 			bbPanel.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 3));

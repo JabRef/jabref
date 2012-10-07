@@ -26,7 +26,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 
@@ -79,10 +79,10 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	cancel.getActionMap().put("close", cancelAction);
 
 	//buttons.add(ok);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     //buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(cancel);
+    bb.addButton(cancel);
     bb.addGlue();
 
     getContentPane().add(buttons, BorderLayout.SOUTH);

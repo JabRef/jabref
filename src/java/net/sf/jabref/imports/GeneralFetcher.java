@@ -211,7 +211,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         new Thread(new Runnable(){
             public void run(){
                 
-                if (activeFetcher.processQuery(tf.getText().trim(), dialog, frame)){
+                if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)){
                     dialog.entryListComplete();
                 } else {
                     dialog.dispose();

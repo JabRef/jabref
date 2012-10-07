@@ -24,7 +24,7 @@ import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.layout.Sizes;
 
 /**
@@ -92,14 +92,14 @@ public class GenFieldsCustomizer extends JDialog {
     revert.setText(Globals.lang("Default"));
     revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
     this.getContentPane().add(buttons, BorderLayout.SOUTH);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
-    bb.addGridded(ok);
-    bb.addGridded(revert);
-    bb.addGridded(cancel);
+    bb.addButton(ok);
+    bb.addButton(revert);
+    bb.addButton(cancel);
     bb.addStrut(Sizes.DLUX5);
-    bb.addGridded(helpBut);
+    bb.addButton(helpBut);
     bb.addGlue();
     
     this.getContentPane().add(jPanel3, BorderLayout.CENTER);

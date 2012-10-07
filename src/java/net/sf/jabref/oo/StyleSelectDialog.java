@@ -23,7 +23,7 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
@@ -277,10 +277,10 @@ public class StyleSelectDialog {
         };
         cancel.addActionListener(cancelListener);
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag.add(bb.getPanel(), BorderLayout.SOUTH);
@@ -515,9 +515,9 @@ public class StyleSelectDialog {
             sp.setPreferredSize(new Dimension(700,500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
             JButton ok = new JButton(Globals.lang("Ok"));
-            ButtonBarBuilder bb = new ButtonBarBuilder();
+            ButtonBarBuilder2 bb = new ButtonBarBuilder2();
             bb.addGlue();
-            bb.addGridded(ok);
+            bb.addButton(ok);
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
             dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

@@ -68,7 +68,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 	 */
 	public static AbstractGroup fromString(String s, BibtexDatabase db,
 			int version) throws Exception {
-		if (!s.startsWith(ID))
+        if (!s.startsWith(ID))
 			throw new Exception(
 					"Internal error: KeywordGroup cannot be created from \""
 							+ s
@@ -99,15 +99,15 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 					AbstractGroup.INDEPENDENT);
 		}
 		case 3: {
-			String name = tok.nextToken();
-			int context = Integer.parseInt(tok.nextToken());
-			String field = tok.nextToken();
-			String expression = tok.nextToken();
-			boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-			boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-			return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
-					.unquote(field, QUOTE_CHAR), Util.unquote(expression,
-					QUOTE_CHAR), caseSensitive, regExp, context);
+            String name = tok.nextToken();
+            int context = Integer.parseInt(tok.nextToken());
+            String field = tok.nextToken();
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
+                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
+                    QUOTE_CHAR), caseSensitive, regExp, context);
 		}
 		default:
 			throw new UnsupportedVersionException("KeywordGroup", version);

@@ -72,14 +72,7 @@ import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.FindFullTextAction;
-import net.sf.jabref.external.RegExpFileSearch;
-import net.sf.jabref.external.SynchronizeFileField;
-import net.sf.jabref.external.UpgradeExternalLinks;
-import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.external.*;
 import net.sf.jabref.groups.AddToGroupAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -250,18 +243,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       setupMainPanel();
         encoding = Globals.prefs.get("defaultEncoding");
         //System.out.println("Default: "+encoding);
-    }
-
-    public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
-                     HashMap<String, String> meta, String encoding) {
-        this.database = db;
-        if (meta != null)
-            parseMetaData(meta);
-        else {
-            metaData = new MetaData();
-            metaData.initializeNewDatabase();
-        }
-        init(frame, db, file, metaData, encoding);
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
@@ -743,7 +724,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     DBStrings dbs = metaData.getDBStrings();
 
                     try {
-                    	boolean okToExport = null!=metaData.getFile();
+                    	/*boolean okToExport = null!=metaData.getFile();
                     	if (!okToExport)
                     	{
                     		okToExport = false;
@@ -761,15 +742,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     		}
                     	}
                     	if (okToExport)
-                    	{
+                    	{*/
 	                        frame.output(Globals.lang("Attempting SQL export..."));
 	                        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
 	                        DBExporter exporter = factory.getExporter(dbs.getServerType());
-	                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs);
+	                        exporter.exportDatabaseToDBMS(database, metaData, null, dbs, frame);
 	                        dbs.isConfigValid(true);
-                    	}
-                    	else
-                    		errorMessage = "Database was not exported. Your database must be saved \nbefore exporting to a SQL database";
+                    	//}
+                    	//else
+                    	//	errorMessage = "Database was not exported. Your database must be saved \nbefore exporting to a SQL database";
                     } catch (Exception ex) {
                         String preamble = "Could not export to SQL database for the following reason:";
                         errorMessage = SQLUtil.getExceptionMessage(ex);
@@ -813,7 +794,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
         });
-
+        	
+        actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, new BaseAction() {
+      	  	@Override
+      	  	public void action() throws Throwable {
+					FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
+					Util.placeDialog(dialog, frame);
+					dialog.setVisible(true);
+				}
+          });
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
@@ -886,7 +875,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Finally, set the new keys:
                     for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
                         bes = i.next();
-                        bes = LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                        bes = LabelPatternUtil.makeLabel(metaData, database, bes);
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldvals.get(bes),
                                     bes.getField(BibtexFields.KEY_FIELD)));
@@ -1224,6 +1213,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }).start();
             }
         });
+
+        actions.put("addFileLink", new AttachFileAction(this));
 
         actions.put("openExternalFile", new BaseAction() {
             public void action() {
@@ -2139,20 +2130,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    /**
-     * This method is called after a database has been parsed. The
-     * hashmap contains the contents of all comments in the .bib file
-     * that started with the meta flag (GUIGlobals.META_FLAG).
-     * In this method, the meta data are input to their respective
-     * handlers.
-     *
-     * @param meta Metadata to input.
-     */
-    public void parseMetaData(HashMap<String, String> meta) {
-        metaData = new MetaData(meta,database());
-
-    }
-
     /*
     public void refreshTable() {
         //System.out.println("hiding="+hidingNonHits+"\tlastHits="+lastSearchHits);
@@ -2506,7 +2483,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.statusLine.getText().startsWith("Saved database"))
+        if (frame.statusLine.getText().startsWith(Globals.lang("Saved database")));
             frame.output(" ");
     }
 
@@ -2705,7 +2682,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibtexEntry bes : database.getEntries()){
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || (oldKey.equals(""))) {
-                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                    LabelPatternUtil.makeLabel(metaData, database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
                         bes.getField(BibtexFields.KEY_FIELD)));
                     any = true;

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.external;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
@@ -368,10 +368,10 @@ public class SynchronizeFileField extends AbstractWorker {
             JPanel main = builder.getPanel();
             main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            ButtonBarBuilder bb = new ButtonBarBuilder();
+            ButtonBarBuilder2 bb = new ButtonBarBuilder2();
             bb.addGlue();
-            bb.addGridded(ok);
-            bb.addGridded(cancel);
+            bb.addButton(ok);
+            bb.addButton(cancel);
             bb.addGlue();
             getContentPane().add(main, BorderLayout.CENTER);
             getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

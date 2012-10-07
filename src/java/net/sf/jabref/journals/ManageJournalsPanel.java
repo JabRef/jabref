@@ -36,7 +36,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -124,8 +124,8 @@ public class ManageJournalsPanel extends JPanel{
         //builtInTable = new JTable(Globals.journalAbbrev.getTableModel());
         builder.add(userPanel, cc.xyw(2,6,4));
         ButtonStackBuilder butBul = new ButtonStackBuilder();
-        butBul.addGridded(add);
-        butBul.addGridded(remove);
+        butBul.addButton(add);
+        butBul.addButton(remove);
 
         butBul.addGlue();
         builder.add(butBul.getPanel(), cc.xy(7,6));
@@ -138,12 +138,12 @@ public class ManageJournalsPanel extends JPanel{
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));//createMatteBorder(1,1,1,1,Color.green));
         add(builder.getPanel(), BorderLayout.NORTH);
         add(externalFilesPanel, BorderLayout.CENTER);
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(cancel);
         bb.addUnrelatedGap();
-        bb.addGridded(help);
+        bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         dialog = new JDialog(frame, Globals.lang("Journal abbreviations"), false);

@@ -26,6 +26,8 @@ import java.util.Hashtable;
  */
 public class LabelPattern extends Hashtable<String, ArrayList<String>> {
 
+    private ArrayList<String> defaultPattern = null;
+    
     /**
      * The parent of this LabelPattern.
      */
@@ -86,27 +88,32 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      * Gets an object for a desired label from this LabelPattern or one of it's
      * parents. This method first tries to obtain the object from this
      * LabelPattern via the <code>get</code> method of <code>Hashtable</code>.
-     * If this fails, we try the parent.
+     * If this fails, we try the default.<br />
+     * If that fails, we try the parent.<br />
+     * If that fails, we return the DEFAULT_LABELPATTERN<br />
      * 
-     * @param key
-     *            a <code>String</code>
-     * @return the object for the given key
-     * @throws NullPointerException
+     * @param key a <code>String</code>
+     * @return the list of Strings for the given key
      */
     public final ArrayList<String> getValue(String key) {
-        ArrayList<String> result = get(key); // throws the
-                                                // NullPointerException
+        ArrayList<String> result = get(key);
         // Test to see if we found anything
         if (result == null) {
-            if (parent != null) {
-                result = parent.getValue(key);
-            }
+            // check default value
+            result = getDefaultValue();
             if (result == null) {
-                // Not found - return the default value
-                return LabelPatternUtil.DEFAULT_LABELPATTERN;
+                // no default value, ask parent
+                if (parent != null) {
+                    result = parent.getValue(key);
+                    // parent will definitely return something != null
+                } else {
+                    // we are the "last" parent
+                    // we don't have anything left
+                    // return the global default pattern
+                    return LabelPatternUtil.DEFAULT_LABELPATTERN;
+                }
             }
         }
-
         return result;
     }
 
@@ -116,5 +123,22 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
     public final boolean isDefaultValue(String key) {
         Object _obj = get(key);
         return _obj == null;
+    }
+    
+    /**
+     * This method is called "...Value" to be in line with the other methods
+     * @return
+     */
+    public ArrayList<String> getDefaultValue() {
+        return this.defaultPattern;
+    }
+
+    /**
+     * Sets the DEFAULT PATTERN for this label pattern
+     * @param pattern the pattern to store
+     */
+    public void setDefaultValue(String labelPattern) {
+        ArrayList<String> split = LabelPatternUtil.split(labelPattern);
+        this.defaultPattern = split;
     }
 }

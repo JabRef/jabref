@@ -306,8 +306,19 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
                     }
                     //System.out.println("Index now: "+lastShownCompletion);
-                    if (toSetIn.length() < 2)
-                        toSetIn = null;
+                    if (toSetIn.length() < 2) {
+                    	// User typed the last character of the autocompleted word
+                    	// We have to replace the automcompletion word by the typed word.
+                    	// This helps if the user presses "space" after the completion
+                    	// "space" indicates that the user does NOT want the autocompletion,
+                    	// but the typed word
+                        String text = comp.getText();
+                        comp.setText(text.substring(0, lastCaretPosition - lastBeginning.length())
+                                + lastBeginning
+                                + text.substring(lastCaretPosition));
+                        // there is no selected text, therefore we are not updating the selection
+                    	toSetIn = null;
+                    }
                     return;
                 }
             }

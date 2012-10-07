@@ -61,10 +61,12 @@ public class CleanUpAction extends AbstractWorker {
 		CLEANUP_PAGENUMBERS = "CleanUpPageNumbers",
 		CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative",
 		CLEANUP_RENAMEPDF = "CleanUpRenamePDF",
-		CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
+		CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths",
+		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
 	
 	public static void putDefaults(HashMap<String, Object> defaults) {
 		defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
+		defaults.put(CLEANUP_SUPERSCRIPTS, Boolean.TRUE);
 		defaults.put(CLEANUP_DOI, Boolean.TRUE);
 		defaults.put(CLEANUP_MONTH, Boolean.TRUE);
 		defaults.put(CLEANUP_PAGENUMBERS, Boolean.TRUE);
@@ -73,6 +75,7 @@ public class CleanUpAction extends AbstractWorker {
 		defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
 	}
 	
+	private JCheckBox cleanUpSuperscrips;
 	private JCheckBox cleanUpDOI;
 	private JCheckBox cleanUpMonth;
 	private JCheckBox cleanUpPageNumbers;
@@ -93,6 +96,7 @@ public class CleanUpAction extends AbstractWorker {
 	}
 	
 	private void initOptionsPanel() {
+	    cleanUpSuperscrips = new JCheckBox(Globals.lang("Convert 1st, 2nd, ... to real superscripts"));
 		cleanUpDOI = new JCheckBox(Globals.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
 		cleanUpMonth = new JCheckBox(Globals.lang("Format content of month field to #mon#"));
 		cleanUpPageNumbers = new JCheckBox(Globals.lang("Ensure that page ranges are of the form num1--num2"));
@@ -108,21 +112,23 @@ public class CleanUpAction extends AbstractWorker {
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
-		FormLayout layout = new FormLayout("left:15dlu,pref", "pref, pref, pref, pref, pref, pref, pref");
+		FormLayout layout = new FormLayout("left:15dlu,pref", "pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.setDefaultDialogBorder();
         CellConstraints cc = new CellConstraints();
-        builder.add(cleanUpDOI, cc.xyw(1,1,2));
-        builder.add(cleanUpMonth, cc.xyw(1,2,2));
-        builder.add(cleanUpPageNumbers, cc.xyw(1,3,2));
-        builder.add(cleanUpMakePathsRelative, cc.xyw(1,4,2));
-        builder.add(cleanUpRenamePDF, cc.xyw(1,5,2));
+        builder.add(cleanUpSuperscrips, cc.xyw(1,1,2));
+        builder.add(cleanUpDOI, cc.xyw(1,2,2));
+        builder.add(cleanUpMonth, cc.xyw(1,3,2));
+        builder.add(cleanUpPageNumbers, cc.xyw(1,4,2));
+        builder.add(cleanUpMakePathsRelative, cc.xyw(1,5,2));
+        builder.add(cleanUpRenamePDF, cc.xyw(1,6,2));
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern), cc.xyw(2, 6, 1));
-        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,7,1));
+        builder.add(new JLabel(currentPattern), cc.xyw(2,7,1));
+        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,8,1));
 	}
 	
 	private void retrieveSettings() {
+	    cleanUpSuperscrips.setSelected(Globals.prefs.getBoolean(CLEANUP_SUPERSCRIPTS));
 		cleanUpDOI.setSelected(Globals.prefs.getBoolean(CLEANUP_DOI));
 		cleanUpMonth.setSelected(Globals.prefs.getBoolean(CLEANUP_MONTH));
 		cleanUpPageNumbers.setSelected(Globals.prefs.getBoolean(CLEANUP_PAGENUMBERS));
@@ -133,6 +139,7 @@ public class CleanUpAction extends AbstractWorker {
 	}
 	
 	private void storeSettings() {
+	    Globals.prefs.putBoolean(CLEANUP_SUPERSCRIPTS, cleanUpSuperscrips.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_DOI, cleanUpDOI.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_MONTH, cleanUpMonth.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_PAGENUMBERS, cleanUpPageNumbers.isSelected());
@@ -176,7 +183,8 @@ public class CleanUpAction extends AbstractWorker {
     		return;
     	}
     	storeSettings();
-    	boolean 
+    	boolean
+    	    choiceCleanUpSuperscripts = cleanUpSuperscrips.isSelected(),
     		choiceCleanUpDOI = cleanUpDOI.isSelected(),
     		choiceCleanUpMonth = cleanUpMonth.isSelected(),
     		choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected(),
@@ -200,6 +208,7 @@ public class CleanUpAction extends AbstractWorker {
     		// undo granularity is on entry level
         	NamedCompound ce = new NamedCompound(Globals.lang("Cleanup entry"));
         	
+        	if (choiceCleanUpSuperscripts) doCleanUpSuperscripts(entry, ce);
         	if (choiceCleanUpDOI) doCleanUpDOI(entry, ce);
         	if (choiceCleanUpMonth) doCleanUpMonth(entry, ce);
         	if (choiceCleanUpPageNumbers) doCleanUpPageNumbers(entry, ce);
@@ -245,6 +254,20 @@ public class CleanUpAction extends AbstractWorker {
     	}
         panel.output(message);
         frame.unblock();
+    }
+	
+	/**
+	 * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
+	 */
+    private void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
+        final String field = "booktitle";
+        String oldValue = entry.getField(field);
+        if (oldValue == null) return;
+        String newValue = oldValue.replaceAll(" (\\d+)(st|nd|rd|th) ", " $1\\\\textsuperscript{$2} ");
+        if (!oldValue.equals(newValue)) {
+            entry.setField(field, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+        }
     }
 
     /**

@@ -12,22 +12,22 @@
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}
 \begin{organization}
-, \organization
+, \format[RTFChars]{\organization}
 \end{organization}
 \begin{institution}
-, Technical report, \institution
+, Technical report, \format[RTFChars]{\institution}
 \end{institution}
 \begin{publisher}
 , \format[RTFChars]{\publisher}
 \end{publisher}
 \begin{howpublished}
-, \howpublished
+, \format[RTFChars]{\howpublished}
 \end{howpublished}
 \begin{address}
 , \format[RTFChars]{\address}
 \end{address}
 \begin{note}
-, \note
+, \format[RTFChars]{\note}
 \end{note}
 \begin{pages}
 , \pages

@@ -293,6 +293,7 @@ IEEE Computer=#IEEE_M_C#
 IEEE Computer Applications in Power=#IEEE_M_CAP#
 IEEE Computer Graphics and Applications=#IEEE_M_CGA#
 IEEE Concurrency=#IEEE_M_CONC#
+IEEE Control Systems=#IEEE_M_CS#
 IEEE Control Systems Magazine=#IEEE_M_CS#
 IEEE Design and Test of Computers=#IEEE_M_DTC#
 IEEE Electrical Insulation Magazine=#IEEE_M_EI#

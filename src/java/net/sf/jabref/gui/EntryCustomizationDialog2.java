@@ -28,7 +28,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
@@ -107,12 +107,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         ok.addActionListener(this);
         apply.addActionListener(this);
         cancel.addActionListener(this);
-        ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         bb.addGlue();
-        bb.addGridded(ok);
-        bb.addGridded(apply);
-        bb.addGridded(cancel);
+        bb.addButton(ok);
+        bb.addButton(apply);
+        bb.addButton(cancel);
         bb.addGlue();
                 
         AbstractAction closeAction = new AbstractAction() {

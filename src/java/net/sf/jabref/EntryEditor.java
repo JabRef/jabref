@@ -1396,8 +1396,27 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // within the tab
                 Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
 
+                if (oldValue != null) {
+                   if (Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                       panel.output(Globals.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
+                       return;
+                   }
+                   else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
+                       CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("The current BibTeX key will be overwritten. Continue?"),
+                               Globals.lang("Disable this confirmation dialog"), false);
+                       int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite key"),
+                               JOptionPane.YES_NO_OPTION);
+                       if (cbm.isSelected())
+                           Globals.prefs.putBoolean("warnBeforeOverwritingKey", false);
+                       if (answer == JOptionPane.NO_OPTION) {
+                           // Ok, break off the operation.
+                           return;
+                       }
+                   }
+                }
+
                 // entry = frame.labelMaker.applyRule(entry, panel.database) ;
-                LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
+                LabelPatternUtil.makeLabel(panel.metaData, panel.database, entry);
 
                 // Store undo information:
                 panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
@@ -1507,9 +1526,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Globals.lang("Warning") + ": " + Globals.lang("Duplicate BibTeX key."));
+        panel.output(Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
 
-        if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+        /*if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."),
@@ -1519,14 +1538,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (jcb.isSelected())
                 prefs.putBoolean("dialogWarningForDuplicateKey", false);
-        }
+        }*/
     }
 
     private void warnEmptyBibtexkey() {
         // JZTODO lyrics
-        panel.output(Globals.lang("Warning") + ": " + Globals.lang("Empty BibTeX key."));
+        panel.output(Globals.lang("Empty BibTeX key. Grouping may not work for this entry."));
 
-        if (prefs.getBoolean("dialogWarningForEmptyKey")) {
+        /*if (prefs.getBoolean("dialogWarningForEmptyKey")) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."), Globals
@@ -1536,7 +1555,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (jcb.isSelected())
                 prefs.putBoolean("dialogWarningForEmptyKey", false);
-        }
+        }*/
     }
 
 
