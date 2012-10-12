@@ -312,20 +312,18 @@ public class BibtexParser {
 							// will have been inserted
 							// to prevent too long lines when the file was
 							// saved, and are not part of the data.
-						}
-
-						/**
-						 * A custom entry type can also be stored in a
-						 * 
-						 * @comment:
-						 */
-						if (comment.substring(0,
+							
+						} else if (comment.substring(0,
 							Math.min(comment.length(), GUIGlobals.ENTRYTYPE_FLAG.length())).equals(
 							GUIGlobals.ENTRYTYPE_FLAG)) {
-
+							 // A custom entry type can also be stored in a
+							 // "@comment"
 							CustomEntryType typ = CustomEntryType.parseEntryType(comment);
 							entryTypes.put(typ.getName().toLowerCase(), typ);
-
+						} else {
+							// FIXME: user comments are simply dropped
+							// at least, we log that we ignored the comment
+							Globals.logger(Globals.lang("Dropped comment from database") + ":" + comment);
 						}
 					} else {
 						// The entry type was not recognized. This may mean that
