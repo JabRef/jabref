@@ -240,21 +240,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 processPopupTrigger(e, row);
             else
                 showIconRightClickMenu(e, row, iconType);
-        } else if (iconType != null) {
-        	// left click on icon field
-        	SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
-        	if (field != null) {
-        		if (field.isSingleValueField()) {
-        			// directly execute toggle action instead of showing a menu with one action
-        			field.getValues().get(0).getAction(panel.frame()).action();
-        		} else {
-	        		JPopupMenu menu = new JPopupMenu();
-	                for (SpecialFieldValue val: field.getValues()) {
-	                	menu.add(val.getMenuAction(panel.frame()));
-	                }
-	        		menu.show(table, e.getX(), e.getY());
-        		}
-        	}
         }
     }
     
@@ -285,8 +270,23 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1))
             return;
 
-
         if (iconType != null) {
+        	// left click on icon field
+        	SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
+        	if ((e.getClickCount() == 1) && (field != null)) {
+        		// special field found
+        		if (field.isSingleValueField()) {
+        			// directly execute toggle action instead of showing a menu with one action
+        			field.getValues().get(0).getAction(panel.frame()).action();
+        		} else {
+	        		JPopupMenu menu = new JPopupMenu();
+	                for (SpecialFieldValue val: field.getValues()) {
+	                	menu.add(val.getMenuAction(panel.frame()));
+	                }
+	        		menu.show(table, e.getX(), e.getY());
+        		}
+        		return;
+        	}
 
             Object value = table.getValueAt(row, col);
             if (value == null) return; // No icon here, so we do nothing.

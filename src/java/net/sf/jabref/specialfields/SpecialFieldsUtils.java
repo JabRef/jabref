@@ -20,7 +20,6 @@ import java.util.List;
 
 import net.sf.jabref.Util;
 
-import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.undo.NamedCompound;
@@ -33,10 +32,13 @@ public class SpecialFieldsUtils {
 	public final static String FIELDNAME_QUALITY = "qualityassured";
 
 	public final static String  PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
-	public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.TRUE;
+	public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
 	
 	public final static String  PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
 	public final static Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
+	
+	public final static String  PREF_RANKING_COMPACT = "compactRankingColumn";
+	public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.FALSE;
 
 	public final static String  PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
 	public final static Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
@@ -141,6 +143,10 @@ public class SpecialFieldsUtils {
 		importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
 	}
 	
+	/**
+	 * @param fieldName the fieldName
+	 * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
+	 */
 	public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
 		if (fieldName.equals(FIELDNAME_PRIORITY)) {
 			return Priority.getInstance();
@@ -153,6 +159,14 @@ public class SpecialFieldsUtils {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * @param fieldName the name of the field to check
+	 * @return true if given field is a special field, false otherwise
+	 */
+	public static boolean isSpecialField(String fieldName) {
+		return (getSpecialFieldInstanceFromFieldName(fieldName) != null);
 	}
 	
 	public static boolean keywordSyncEnabled() {

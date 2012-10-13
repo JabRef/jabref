@@ -286,10 +286,10 @@ public class MainTable extends JTable {
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < tableFormat.padleft; i++) {
         	
-        	// Check if the Column is a RankingColumn
+        	// Check if the Column is an extended RankingColumn (and not a compact-ranking column) 
         	// If this is the case, set a certain Column-width,
         	// because the RankingIconColumn needs some more width
-        	if (tableFormat.isRankingColumn(i)) {
+        	if (tableFormat.isRankingColumn(i) && !Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT)) {
         		// Lock the width of ranking icon column.
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
