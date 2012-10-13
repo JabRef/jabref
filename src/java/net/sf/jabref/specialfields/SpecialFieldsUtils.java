@@ -48,10 +48,10 @@ public class SpecialFieldsUtils {
 	public final static Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
 	
 	public final static String  PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
-	public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.TRUE;
+	public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
 	
 	public final static String  PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-	public final static Boolean  PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.FALSE;
+	public final static Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
 	
 	/****************************************************/
 	/** generic treatment                              **/
