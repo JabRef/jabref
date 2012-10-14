@@ -43,6 +43,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JabRefFrame frame;
 
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
+    
+    private JCheckBox showOneLetterHeadingForIconColumns;
+    private boolean oldShowOneLetterHeadingForIconColumns;
 
 	/*** begin: special fields ***/
 	private JCheckBox specialFieldsEnabled, rankingColumn, compactRankingColumn, qualityColumn, priorityColumn, relevanceColumn;
@@ -174,6 +177,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         //tlb.addSeparator();
         //tlb.add(new UpdateWidthsAction());
         tabPanel.add(tlb, BorderLayout.EAST);
+        
+        showOneLetterHeadingForIconColumns = new JCheckBox(Globals.lang("Show one letter heading for icon columns"));
 
         fileColumn = new JCheckBox(Globals.lang("Show file column"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
@@ -182,7 +187,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
 		/*** begin: special table columns and special fields ***/
 
-		HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, "Help on key patterns");
+		HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
 	    hlb = new JButton(GUIGlobals.getImage("helpSmall"));
 	    hlb.setToolTipText(Globals.lang("Help on special fields"));
 	    hlb.addActionListener(help);
@@ -226,7 +231,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		builder.append(pan);
 
 		DefaultFormBuilder specialTableColumnsBuilder = new DefaultFormBuilder(new FormLayout(
-				"8dlu, 8dlu, 8cm, 8dlu, left:pref", "pref, pref, pref, pref, pref, pref, pref, pref, pref"));
+				"8dlu, 8dlu, 8cm, 8dlu, left:pref", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
         CellConstraints cc = new CellConstraints();
 		
         specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
@@ -237,7 +242,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 6, 2));
         specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 7, 2));
         specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 8, 2));
-		specialTableColumnsBuilder.add(hlb, cc.xyw(1, 9, 2));
+        specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 9, 5));
+		specialTableColumnsBuilder.add(hlb, cc.xyw(1, 10, 2));
 
 		specialTableColumnsBuilder.add(fileColumn, cc.xy(5, 1));	
 		specialTableColumnsBuilder.add(pdfColumn, cc.xy(5, 2));	
@@ -304,6 +310,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled);
 		
         /*** end: special fields ***/
+		
+		oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS);
+		showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
 		tableRows.clear();
 	String[] names = _prefs.getStringArray("columnNames"),
@@ -533,6 +542,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
 		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
+		
+		_prefs.putBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS, showOneLetterHeadingForIconColumns.isSelected());
 
         /*** begin: special fields ***/
         

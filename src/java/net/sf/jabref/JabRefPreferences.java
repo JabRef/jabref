@@ -66,7 +66,9 @@ public class JabRefPreferences {
         EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
         
         PDF_PREVIEW = "pdfPreview",
-        
+
+        SHOWONELETTERHEADINGFORICONCOLUMNS = "showOneLetterHeadingForIconColumns",
+
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
         // here are the possible values for _MODE:
@@ -331,6 +333,8 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
     	defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+    	
+    	defaults.put(SHOWONELETTERHEADINGFORICONCOLUMNS, Boolean.FALSE);
         
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("overwriteOwner", Boolean.FALSE);

@@ -235,7 +235,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         final String[] iconType = table.getIconTypeForColumn(col);
         
         // Check if the user has right-clicked. If so, open the right-click menu.
-        if (e.isPopupTrigger()) {
+        if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
             if (iconType == null)
                 processPopupTrigger(e, row);
             else
