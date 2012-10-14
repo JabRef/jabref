@@ -1368,7 +1368,7 @@ public class Globals {
 	}
 
 	/**
-	 * Returns a reg exp pattern in the form (w1) | (w2) | ...
+	 * Returns a reg exp pattern in the form (w1)|(w2)| ...
 	 * wi are escaped if no regex search is enabled
 	 */
 	public static Pattern getPatternForWords(ArrayList<String> words) {
@@ -1384,10 +1384,10 @@ public class Globals {
 		}
 
 		Pattern pattern;
-		if (!Globals.prefs.getBoolean("caseSensitiveSearch")) {
-			pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
-		} else {
+		if (Globals.prefs.getBoolean("caseSensitiveSearch")) {
 			pattern = Pattern.compile(searchPattern);
+		} else {
+			pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
 		}
 		
 		return pattern;

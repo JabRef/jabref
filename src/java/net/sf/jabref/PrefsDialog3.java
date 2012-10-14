@@ -148,10 +148,7 @@ public class PrefsDialog3 extends JDialog {
 		// lower.add(cancel);
 
 		// Key bindings:
-		ActionMap am = chooser.getActionMap();
-		InputMap im = chooser.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		im.put(frame.prefs().getKey("Close dialog"), "close");
-		am.put("close", cancelAction);
+		Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
 		// Import and export actions:
 		exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
