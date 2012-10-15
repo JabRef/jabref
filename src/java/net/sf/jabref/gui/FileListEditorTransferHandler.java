@@ -47,6 +47,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
 	protected JabRefFrame frame;
 	protected EntryContainer entryContainer;
 	private TransferHandler textTransferHandler;
+	private DroppedFileHandler dfh = null;
 
 	/**
 	 * 
@@ -127,7 +128,9 @@ public class FileListEditorTransferHandler extends TransferHandler {
                                 fileType = Globals.prefs.getExternalFileTypeByExt(extension);
                             }
                             if (fileType != null) {
-                                DroppedFileHandler dfh = new DroppedFileHandler(frame, frame.basePanel());
+                            	if (dfh == null) {
+                            		dfh = new DroppedFileHandler(frame, frame.basePanel());
+                            	}
                                 dfh.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
                             }
                         }

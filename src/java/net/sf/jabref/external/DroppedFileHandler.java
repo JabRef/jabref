@@ -54,6 +54,11 @@ import com.jgoodies.forms.layout.FormLayout;
  * 3) Move the file to ??? directory, rename after bibtex key, and extension
  */
 public class DroppedFileHandler {
+	public static final String DFH_LEAVE = "DroppedFileHandler_LeaveFileInDir";
+	public static final String DFH_COPY = "DroppedFileHandler_CopyFile";
+	public static final String DFH_MOVE = "DroppedFileHandler_MoveFile";
+	public static final String DFH_RENAME = "DroppedFileHandler_RenameFile";
+	
     private JabRefFrame frame;
 
     private BasePanel panel;
@@ -78,7 +83,6 @@ public class DroppedFileHandler {
         grp.add(linkInPlace);
         grp.add(copyRadioButton);
         grp.add(moveRadioButton);
-        copyRadioButton.setSelected(true);
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref","bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
@@ -88,7 +92,7 @@ public class DroppedFileHandler {
         
         builder.add(linkInPlace, cc.xyw(1, 1, 4));
         builder.add(destDirLabel, cc.xyw(1, 2, 4));
-        builder.add(copyRadioButton, cc.xyw(2, 3, 3));        
+        builder.add(copyRadioButton, cc.xyw(2, 3, 3));
         builder.add(moveRadioButton, cc.xyw(2, 4, 3));
         builder.add(renameCheckBox, cc.xyw(2, 5, 1));
         builder.add(renameToTextBox, cc.xyw(4, 5, 1));
@@ -143,9 +147,7 @@ public class DroppedFileHandler {
         // Show dialog
         boolean newEntry = false;
         String citeKey = entry.getCiteKey();
-        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database());
-
-        if (reply != JOptionPane.OK_OPTION)
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database()))
             return;
 
         /*
@@ -190,9 +192,7 @@ public class DroppedFileHandler {
         // Show dialog
         boolean newEntry = false;
         String citeKey = entry.getCiteKey();
-        int reply = showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database());
-
-        if (reply != JOptionPane.OK_OPTION)
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database()))
             return;
 
         /*
@@ -362,7 +362,10 @@ public class DroppedFileHandler {
         return true;
     }
 
-    public int showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
+    /**
+     * @return true if user pushed "OK", false otherwise
+     */
+    public boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
         BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
     	String citeKey = entry.getCiteKey();
     	
@@ -419,14 +422,29 @@ public class DroppedFileHandler {
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.extension));
 
+        linkInPlace.setSelected(frame.prefs().getBoolean(DFH_LEAVE));
+        copyRadioButton.setSelected(frame.prefs().getBoolean(DFH_COPY));
+        moveRadioButton.setSelected(frame.prefs().getBoolean(DFH_MOVE));
+        renameCheckBox.setSelected(frame.prefs().getBoolean(DFH_RENAME));
+
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
         	Object[] messages = {Globals.lang("How would you like to link to '%0'?", linkFileName),
                     optionsPanel};
-            return JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
+        	int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        	if (reply == JOptionPane.OK_OPTION) {
+        		// store user's choice
+        		frame.prefs().putBoolean(DFH_LEAVE, linkInPlace.isSelected());
+        		frame.prefs().putBoolean(DFH_COPY, copyRadioButton.isSelected());
+        		frame.prefs().putBoolean(DFH_MOVE, moveRadioButton.isSelected());
+        		frame.prefs().putBoolean(DFH_RENAME, renameCheckBox.isSelected());
+        		return true;
+        	} else {
+        		return false;
+        	}
         } finally {
             linkInPlace.removeChangeListener(cl);
         }

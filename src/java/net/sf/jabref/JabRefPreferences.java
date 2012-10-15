@@ -43,6 +43,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
+import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.CleanUpAction;
@@ -441,7 +442,13 @@ public class JabRefPreferences {
         defaults.put("dbConnectHostname", "localhost");
         defaults.put("dbConnectDatabase", "jabref");
         defaults.put("dbConnectUsername", "root");
-        CleanUpAction.putDefaults(defaults);        
+        CleanUpAction.putDefaults(defaults);
+        
+        // defaults for DroppedFileHandler UI
+    	defaults.put(DroppedFileHandler.DFH_LEAVE, Boolean.FALSE);
+    	defaults.put(DroppedFileHandler.DFH_COPY, Boolean.TRUE);
+    	defaults.put(DroppedFileHandler.DFH_MOVE, Boolean.FALSE);
+    	defaults.put(DroppedFileHandler.DFH_RENAME, Boolean.FALSE);
         
         //defaults.put("lastAutodetectedImport", "");
         
