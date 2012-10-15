@@ -38,7 +38,7 @@ public class SpecialFieldsUtils {
 	public final static Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
 	
 	public final static String  PREF_RANKING_COMPACT = "compactRankingColumn";
-	public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.FALSE;
+	public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
 
 	public final static String  PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
 	public final static Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
