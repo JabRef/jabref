@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,22 +26,23 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
 	JabRefPreferences _prefs;
 
-    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
-	fileColumn, arxivColumn;
+    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked;
 
 	private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
 		lastNamesOnly;
 
-	private JComboBox priSort, secSort, terSort;
-
 	private JTextField priField, secField, terField, numericFields;
+	private JComboBox priSort, secSort, terSort;
 
 	/**
 	 * Customization of external program paths.
@@ -77,10 +78,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		noAbbrNames = new JRadioButton(Globals.lang("Do not abbreviate names"));
 		abbrNames = new JRadioButton(Globals.lang("Abbreviate names"));
 		lastNamesOnly = new JRadioButton(Globals.lang("Show last names only"));
-        fileColumn = new JCheckBox(Globals.lang("Show file column"));
-        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
-		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
-		arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
 
 		floatMarked = new JCheckBox(Globals.lang("Float marked entries"));
 
@@ -137,20 +134,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 		JLabel lab;
 		JPanel pan = new JPanel();
-		builder.appendSeparator(Globals.lang("Special table columns"));
-		builder.nextLine();
-		builder.append(pan);
-		builder.append(fileColumn);
-		builder.nextLine();
-        builder.append(pan);
-        builder.append(pdfColumn);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(urlColumn);
-		builder.nextLine();
-		builder.append(pan);
-		builder.append(arxivColumn);
-		builder.nextLine();
+
 		builder.appendSeparator(Globals.lang("Format of author and editor names"));
 		DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
 			"left:pref, 8dlu, left:pref", ""));
@@ -229,11 +213,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		autoResizeMode
 			.setSelected((_prefs.getInt("autoResizeMode") == JTable.AUTO_RESIZE_ALL_COLUMNS));
-		fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
-        pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
-		urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
-        fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
-        arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
 
 		priField.setText(_prefs.get("priSort"));
 		secField.setText(_prefs.get("secSort"));
@@ -271,6 +250,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
             numericFields.setText("");
         else
             numericFields.setText(numF);
+
 	}
 
 	/**
@@ -286,10 +266,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		_prefs.putBoolean("namesLastOnly", lastNamesOnly.isSelected());
 		_prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
 
-        _prefs.putBoolean("fileColumn", fileColumn.isSelected());
-        _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
-		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
-		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
 		_prefs.putInt("autoResizeMode",
 			autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
 		_prefs.putBoolean("priDescending", priDesc.isSelected());

@@ -32,6 +32,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.search.HitOrMissComparator;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -284,10 +285,22 @@ public class MainTable extends JTable {
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < tableFormat.padleft; i++) {
-            // Lock the width of icon columns.
-            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        	
+        	// Check if the Column is an extended RankingColumn (and not a compact-ranking column) 
+        	// If this is the case, set a certain Column-width,
+        	// because the RankingIconColumn needs some more width
+        	if (tableFormat.isRankingColumn(i) && !Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT)) {
+        		// Lock the width of ranking icon column.
+                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+        	} else {
+        		// Lock the width of icon columns.
+                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);	
+        	}
+        	
         }
         for (int i = tableFormat.padleft; i < getModel().getColumnCount(); i++) {
             try {
@@ -348,7 +361,12 @@ public class MainTable extends JTable {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             String[] iconField = tableFormat.getIconTypeForColumn(i);
-            comparators.add(new IconComparator(iconField));
+            
+            if (iconField[0].equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
+            	comparators.add(new RankingFieldComparator());
+            } else {
+            	comparators.add(new IconComparator(iconField));
+            }
         }
         // Remaining columns:
         for (int i = tableFormat.padleft; i < tableFormat.getColumnCount(); i++) {
@@ -660,7 +678,7 @@ public class MainTable extends JTable {
     }
     
     public PersistenceTableColumnListener getTableColumnListener() {
-		return tableColumnListener;
+		return tableColumnListener; 
 	}
 
 

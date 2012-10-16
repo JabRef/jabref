@@ -1,3 +1,7 @@
+[specialfields branch]
+    - Added special field functionality for ranking, marking as relevant, 
+      marking as quality assured, and prioritizing.
+      Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
 [master branch]
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
       to prevent lockup if Save button is pressed directly.

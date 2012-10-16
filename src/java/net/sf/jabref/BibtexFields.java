@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
 
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.TXMLReader;
 
 import org.w3c.dom.Element;
@@ -109,6 +110,36 @@ public class BibtexFields
     add( new BibtexSingleField( "volume", true, GUIGlobals.SMALL_W, 60  ).setNumeric(true) ) ;
     add( new BibtexSingleField( "year", true, GUIGlobals.SMALL_W, 60 ).setNumeric(true) ) ;
 
+    // custom fields not displayed at editor, but as columns in the UI
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_RANKING , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_PRIORITY , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_RELEVANCE , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_QUALITY , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
+    
     // some semi-standard fields
     dummy = new BibtexSingleField( KEY_FIELD, true ) ;
     dummy.setPrivate();
@@ -125,7 +156,7 @@ public class BibtexFields
 
     add(new BibtexSingleField("pmid", false, GUIGlobals.SMALL_W, 60).setNumeric(true));
 
-    // additional fields ------------------------------------------------------
+    // additional fields ------------------------------------------------------ 
     add( new BibtexSingleField( "location", false ) ) ;
     add( new BibtexSingleField( "abstract", false, GUIGlobals.LARGE_W, 400  ) ) ;
 

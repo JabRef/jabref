@@ -106,7 +106,7 @@ public class Util {
 
 	/*
 	 * Colors are defined here.
-	 * 
+	 *  
 	 */
 	public static Color fieldsCol = new Color(180, 180, 200);
 
@@ -116,7 +116,7 @@ public class Util {
 	 */
 	final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
 		EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
-
+	
 	final static NumberFormat idFormat;
 
     public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
@@ -3128,16 +3128,24 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		} else {
 			newValue = null;
 		}
-		if (!oldValue.equals(newValue)) {
+		if ((oldValue == null) && (newValue == null))
+			return;
+		if ((oldValue == null) || (!oldValue.equals(newValue))) {
 			entry.setField("keywords", newValue);
-			ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
+			if (ce!=null) ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
 		}
 	}
 	
+	/**
+	 * @param nc indicates the undo named compound. May be null
+	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
 		updateField(be, field, newValue, ce, false);
 	}
 
+	/**
+	 * @param nc indicates the undo named compound. May be null
+	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
 		String oldValue = be.getField(field);
 		if (nullFieldIfValueIsTheSame && (oldValue != null) && (oldValue.equals(newValue))) {
@@ -3148,7 +3156,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			return;
 		if ((oldValue==null) || (!oldValue.equals(newValue))) {
 			be.setField(field, newValue);
-			ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+			if (ce!=null) ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
 		}
 	}
 
@@ -3165,3 +3173,4 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	    am.put("close", cancelAction);
     }
 }
+

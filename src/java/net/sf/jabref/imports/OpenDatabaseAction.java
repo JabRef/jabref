@@ -29,11 +29,14 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
+
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 import net.sf.jabref.label.HandleDuplicateWarnings;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.undo.NamedCompound;
 
 // The action concerned with opening an existing database.
 
@@ -281,6 +284,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         String fileName = file.getPath();
         BibtexDatabase db = pr.getDatabase();
+        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+			NamedCompound nc = new NamedCompound(Globals.lang("Synchronized special fields based on keywords"));
+        	for (BibtexEntry entry: db.getEntries()) {
+        		SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
+        	}
+        	JabRef.jrf.basePanel().undoManager.addEdit(nc);
+        }
         MetaData meta = pr.getMetaData();
 
         if (pr.hasWarnings()) {

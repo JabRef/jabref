@@ -28,6 +28,12 @@ import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
 /**
  * Static variables for graphics files and keyboard shortcuts.
  */
@@ -90,7 +96,7 @@ public class GUIGlobals {
 	pre = "/images/",
 	helpPre = "/help/",
 	fontPath = "/images/font/";
-
+	
 	static HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
 	// further below.
 	public static Color activeEditor = new Color(230, 230, 255);
@@ -104,10 +110,9 @@ public class GUIGlobals {
 			return null;
 		} else return (JLabel)o;
 	}
-
-
+	
 	//Help files (in HTML format):
-	public static String
+	public static final String
 	baseFrameHelp = "BaseFrameHelp.html",
 	entryEditorHelp = "EntryEditorHelp.html",
 	stringEditorHelp = "StringEditorHelp.html",
@@ -116,6 +121,7 @@ public class GUIGlobals {
 	groupsHelp = "GroupsHelp.html",
 	customEntriesHelp = "CustomEntriesHelp.html",
 	contentSelectorHelp = "ContentSelectorHelp.html",
+	specialFieldsHelp = "SpecialFieldsHelp.html",
 	labelPatternHelp = "LabelPatterns.html",
 	ownerHelp = "OwnerHelp.html",
 	timeStampHelp = "TimeStampHelp.html",
@@ -192,6 +198,7 @@ public class GUIGlobals {
 
 	public static int DEFAULT_FIELD_LENGTH = 100,
 	NUMBER_COL_LENGTH = 32,
+	WIDTH_ICON_COL_RANKING = 35,	// Width of Ranking Icon Column
 	WIDTH_ICON_COL = 19;
 
 	// Column widths for export customization dialog table:
@@ -408,9 +415,28 @@ public class GUIGlobals {
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
         tableIcons.put(GUIGlobals.FILE_FIELD, lab);
+        
+        lab = new JLabel(Relevance.getInstance().getRepresentingIcon());
+        lab.setToolTipText(Relevance.getInstance().getToolTip());
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, lab);
+        
+        lab = new JLabel(Quality.getInstance().getRepresentingIcon());
+        lab.setToolTipText(Quality.getInstance().getToolTip());
+        //tableIcons.put("quality", lab);
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_QUALITY, lab);
+        
+        // Ranking item in the menu uses one star
+        lab = new JLabel(Rank.getInstance().getRepresentingIcon());
+        lab.setToolTipText(Rank.getInstance().getToolTip());
+//        lab.setName("0");
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_RANKING, lab);	
 
-
-        //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
+        // Priority icon used for the menu
+        lab = new JLabel(Priority.getInstance().getRepresentingIcon());
+        lab.setToolTipText(Rank.getInstance().getToolTip());
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
+        
+        //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
 	}
 
 }

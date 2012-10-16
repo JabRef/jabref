@@ -32,10 +32,10 @@ import javax.swing.Timer;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldTextArea;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
@@ -43,7 +43,9 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
@@ -225,40 +227,24 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     public void mouseReleased(MouseEvent e) {
-        // First find the row on which the user has clicked.
-        final int row = table.rowAtPoint(e.getPoint());
+        // First find the column and row on which the user has clicked.
+        final int col = table.columnAtPoint(e.getPoint()),
+                  row = table.rowAtPoint(e.getPoint());
 
-
+        // Check if the user has clicked on an icon cell to open url or pdf.
+        final String[] iconType = table.getIconTypeForColumn(col);
+        
         // Check if the user has right-clicked. If so, open the right-click menu.
-        if (e.isPopupTrigger()) {
-            final int col = table.columnAtPoint(e.getPoint());
-            // Check if the user has clicked on an icon cell to open url or pdf.
-            final String[] iconType = table.getIconTypeForColumn(col);
-            
+        if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
             if (iconType == null)
                 processPopupTrigger(e, row);
             else
                 showIconRightClickMenu(e, row, iconType);
         }
     }
-
+    
     public void mousePressed(MouseEvent e) {
-        // First find the column on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()),
-                row = table.rowAtPoint(e.getPoint());
-
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
-        
-        // Check if the user has right-clicked. If so, open the right-click menu.
-        if (e.isPopupTrigger()) {
-            if (iconType == null)
-                processPopupTrigger(e, row);
-            else
-                showIconRightClickMenu(e, row, iconType);
-
-            return;
-        }
+    	// all handling is done in "mouseReleased"
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -284,8 +270,23 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1))
             return;
 
-
         if (iconType != null) {
+        	// left click on icon field
+        	SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
+        	if ((e.getClickCount() == 1) && (field != null)) {
+        		// special field found
+        		if (field.isSingleValueField()) {
+        			// directly execute toggle action instead of showing a menu with one action
+        			field.getValues().get(0).getAction(panel.frame()).action();
+        		} else {
+	        		JPopupMenu menu = new JPopupMenu();
+	                for (SpecialFieldValue val: field.getValues()) {
+	                	menu.add(val.getMenuAction(panel.frame()));
+	                }
+	        		menu.show(table, e.getX(), e.getY());
+        		}
+        		return;
+        	}
 
             Object value = table.getValueAt(row, col);
             if (value == null) return; // No icon here, so we do nothing.
@@ -379,19 +380,19 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      }
 
     /**
-     * Process popup trigger events occuring on an icon cell in the table. Show
+     * Process popup trigger events occurring on an icon cell in the table. Show
      * a menu where the user can choose which external resource to open for the
      * entry. If no relevant external resources exist, let the normal popup trigger
      * handler do its thing instead.
      * @param e The mouse event defining this popup trigger.
-     * @param row The row where the event occured.
+     * @param row The row where the event occurred.
      * @param iconType A string array containing the resource fields associated with
      *  this table cell.
      */
     private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
         BibtexEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
-        int count = 0;
+        boolean showDefaultPopup = true;
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
@@ -409,26 +410,33 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
                         flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
                         flEntry.getType()));
-                count++;
+                showDefaultPopup = false;
             }
-
-        }
-        else {
-            for (int i=0; i<iconType.length; i++) {
-                Object o = entry.getField(iconType[i]);
-                if (o != null) {
-                    menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String)o, (String)o,
-                            GUIGlobals.getTableIcon(iconType[i]).getIcon(),
-                            panel.metaData(), iconType[i]));
-                    count++;
-                }
+        } else {
+        	SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(iconType[0]);
+        	if (field != null) {
+//                for (SpecialFieldValue val: field.getValues()) {
+//                	menu.add(val.getMenuAction(panel.frame()));
+//                }
+        		// full pop should be shown as left click already shows short popup
+                showDefaultPopup = true;
+        	} else {
+	            for (int i=0; i<iconType.length; i++) {
+	                Object o = entry.getField(iconType[i]);
+	                if (o != null) {
+	                    menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String)o, (String)o,
+	                            GUIGlobals.getTableIcon(iconType[i]).getIcon(),
+	                            panel.metaData(), iconType[i]));
+	                    showDefaultPopup = false;
+	                }
+	            }
             }
         }
-        if (count == 0) {
+        if (showDefaultPopup) {
             processPopupTrigger(e, row);
-            return;
+        } else {
+        	menu.show(table, e.getX(), e.getY());
         }
-        menu.show(table, e.getX(), e.getY());
     }
 
     public void entryEditorClosing(EntryEditor editor) {

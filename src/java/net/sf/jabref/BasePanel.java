@@ -87,6 +87,14 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.specialfields.SpecialFieldAction;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
@@ -114,7 +122,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
     
-    /*
+    /* 
      * The database shown in this panel.
      */
     BibtexDatabase database;
@@ -264,6 +272,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         file);
             } catch (IOException ex) {
             }
+        
     }
 
     public boolean isBaseChanged(){
@@ -1507,7 +1516,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   markBaseChanged();
                 }
               });
-
+              
+              actions.put(Relevance.getInstance().getValues().get(0).getActionName(), 
+                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), "Marked %0 entries as relevant"));
+              actions.put(Quality.getInstance().getValues().get(0).getActionName(),
+                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), "Set quality of %0 entries to good"));
+              
+              for (SpecialFieldValue prio: Priority.getInstance().getValues()) {
+	              actions.put(prio.getActionName(), prio.getAction(this.frame));
+//	            		  new SpecialFieldAction(frame, Priority.getInstance(), strPrio, false, 
+//	            				  Globals.lang("Set priority to").concat(" ").concat(strPrio), "Set priority %0 for %1 entries"));
+              }
+              
+              for (SpecialFieldValue prio: Rank.getInstance().getValues()) {
+	              actions.put(prio.getActionName(), prio.getAction(this.frame));
+//	              actions.put(prio.getActionName(),
+//	            		  new SpecialFieldAction(frame, Priority.getInstance(), strPrio, false, 
+//	            				  Globals.lang("Set ranking to").concat(" ").concat(strPrio), "Set rank %0 for %1 entries"));
+              }
+              
               actions.put("togglePreview", new BaseAction() {
                       public void action() {
                           boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
@@ -1777,6 +1804,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 //Add the new entry to the group(s) selected in the Group Panel
                 addToSelectedGroup(be);
+
+                // Set Self-Created entries to have a high quality
+                be.setField("quality", "1");
                 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1850,6 +1880,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Must initialize sort columns somehow:
 
         database.addDatabaseChangeListener(eventList);
+        database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<BibtexEntry>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
         searchFilterList = new FilterList<BibtexEntry>(groupFilterList, NoSearchMatcher.INSTANCE);
         //final SortedList sortedList = new SortedList(searchFilterList, null);

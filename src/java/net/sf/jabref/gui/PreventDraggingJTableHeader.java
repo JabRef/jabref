@@ -22,6 +22,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**
  * Related to <code>MainTable</code> class. <br/>
@@ -58,9 +59,27 @@ public class PreventDraggingJTableHeader extends JTableHeader {
             }
 
             // prevent dragging of unnamed (aka special) columns
+            // in the most recent JabRef, the special columns have a one letter heading,
+            // therefore, isUnnamed will always return "false"
+            // to be safe, we keep this call nevertheless
+            // (this is the null check for getHeaderValue())
             if (isUnnamed(column)) {
                 return;
             }
+            
+            // prevent dragging of special field columns
+            String headerValue = column.getHeaderValue().toString();
+            if (headerValue.equals("P") || headerValue.equals("Q") || headerValue.equals("R")) {
+            	// the letters are guessed. Don't know, where they are set in the code.
+            	return;
+            }
+            
+            // other icon columns should also not be dragged
+            // note that "P" is used for "PDF" and "Priority"
+            if (headerValue.equals("F") || headerValue.equals("U")) {
+            	return;
+            }
+            
         }
 
         super.setDraggedColumn(column);
@@ -101,6 +120,19 @@ public class PreventDraggingJTableHeader extends JTableHeader {
         if (Globals.prefs.getBoolean("arxivColumn")) {
             count++;
         }
+        
+        // special field columns may also not be dragged
+        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
+	            count++;
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
+	            count++;
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
+	            count++;
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
+	            count++;
+        }
+
         return count;
     }
 

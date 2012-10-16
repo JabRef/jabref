@@ -346,6 +346,14 @@ public class CleanUpAction extends AbstractWorker {
 			ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
 		}
 	}
+	
+	private void doExportToKeywords(BibtexEntry entry, NamedCompound ce) {
+		
+	}
+	
+	private void doImportFromKeywords(BibtexEntry entry, NamedCompound ce) {
+		
+	}
 
 	private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
