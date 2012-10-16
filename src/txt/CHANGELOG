@@ -1,12 +1,11 @@
-[specialfields branch]
-    - Added special field functionality for ranking, marking as relevant, 
-      marking as quality assured, and prioritizing.
-      Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
 [master branch]
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
       to prevent lockup if Save button is pressed directly.
     - Replaced window icon with 48x48 image.
     - [experimental] Added local undo/redo handling for entry editor text fields.
+    - Added special field functionality for ranking, marking as relevant,
+      marking as quality assured, and prioritizing. Can be enabled by "Entry table columns".
+      Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
     - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
     - Group edit dialog now closes when Escape is pressed.
     - Fixed MS bib import, month was lost on import.
