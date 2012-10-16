@@ -1101,10 +1101,13 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall"));
         list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall"));
         list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice"));
+        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice"));
         list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice"));
         list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice"));
+        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice"));
         list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice"));
+        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice"));
         list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture"));
@@ -1112,11 +1115,11 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture"));
         list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall"));
         list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs"));
-        list.add(new ExternalFileType("LaTeX", "tex", "", "emacs", "emacs"));
-        list.add(new ExternalFileType("CHM", "chm", "", "gnochm", "www"));
+        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs"));
+        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www"));
         list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture"));
-        ExternalFileType tp = new ExternalFileType("URL", "html", "text/html", "firefox", "www");
-        list.add(tp);
+        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www"));
+        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www"));
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:
