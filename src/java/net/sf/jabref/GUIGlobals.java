@@ -308,10 +308,7 @@ public class GUIGlobals {
 					System.err.println(Globals.lang("Could not find image file")+" '"+path+"'");
 				return url;
 		}
-		else {
-			System.err.println(Globals.lang("No icon found for %0", name));
-			return null;
-		}
+		else return null;
 	}
 
 	/**
