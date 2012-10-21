@@ -953,7 +953,7 @@ public class JabRef {
     }
 
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
-        System.out.println(Globals.lang("Opening") + ": " + name);
+    	Globals.logger(Globals.lang("Opening") + ": " + name);
         File file = new File(name);
         if (!file.exists()) {
             ParserResult pr = new ParserResult(null, null, null);
