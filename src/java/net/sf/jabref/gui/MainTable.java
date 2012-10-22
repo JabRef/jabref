@@ -337,7 +337,9 @@ public class MainTable extends JTable {
         List<String> fields = new ArrayList<String>();
         for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
             int i =  iterator.next();
-            fields.add(tableFormat.getColumnName(i).toLowerCase());
+            String name = tableFormat.getColumnName(i);
+            if (name != null)
+                fields.add(name.toLowerCase());
         }
         return fields;
     }
