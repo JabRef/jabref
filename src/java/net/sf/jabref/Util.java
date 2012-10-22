@@ -2068,16 +2068,16 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		return "\\Q" + s.replaceAll("\\\\E", "\\\\E\\\\\\\\E\\\\Q") + "\\E" + bs.toString();
 	}
 
-	/*
+	/**
 	 * This method "tidies" up e.g. a keyword string, by alphabetizing the words
 	 * and removing all duplicates.
+	 *
+	 * Currently not used anywhere
 	 */
 	public static String sortWordsAndRemoveDuplicates(String text) {
-
-		String[] words = text.split(", ");
-		SortedSet<String> set = new TreeSet<String>();
-		for (int i = 0; i < words.length; i++)
-			set.add(words[i]);
+		ArrayList<String> words = getSeparatedKeywords(text);
+		// by adding the words to a set, they are automatically sorted
+		TreeSet<String> set = new TreeSet<String>(words);
 		StringBuffer sb = new StringBuffer();
 		for (Iterator<String> i = set.iterator(); i.hasNext();) {
 			sb.append(i.next());
