@@ -46,6 +46,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     // author is not set):
     public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
+    public static final String ICON_COLUMN_PREFIX = "iconcol:";
+
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
     public static final String[]
@@ -110,6 +112,23 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
           } */
         }
         //return Util.nCase(columns[col - padleft]);
+    }
+
+    /**
+     * Get the column title, or a string identifying the column if it is an icon
+     * column without a title.
+     * @param col The column number
+     * @return the String identifying the column
+     */
+    public String getColumnType(int col) {
+        String name = getColumnName(col);
+        if (name != null)
+            return name;
+        String[] icon = getIconTypeForColumn(col);
+        if ((icon != null) && (icon.length > 0)) {
+            return ICON_COLUMN_PREFIX+icon[0];
+        }
+        return null;
     }
 
     /**

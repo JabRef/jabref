@@ -337,7 +337,7 @@ public class MainTable extends JTable {
         List<String> fields = new ArrayList<String>();
         for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
             int i =  iterator.next();
-            String name = tableFormat.getColumnName(i);
+            String name = tableFormat.getColumnType(i);
             if (name != null)
                 fields.add(name.toLowerCase());
         }
@@ -388,7 +388,17 @@ public class MainTable extends JTable {
 
         sortedForTable.getReadWriteLock().writeLock().lock();
         for (int i=0; i<sortFields.length; i++) {
-            int index = tableFormat.getColumnIndex(sortFields[i]);
+            int index = -1;
+            if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
+                index = tableFormat.getColumnIndex(sortFields[i]);
+            else {
+                for (int j=0; j<tableFormat.getColumnCount(); j++) {
+                    if (sortFields[i].equals(tableFormat.getColumnType(j))) {
+                        index = j;
+                        break;
+                    }
+                }
+            }
             if (index >= 0) {
                 comparatorChooser.appendComparator(index, 0, sortDirections[i]);
             }
