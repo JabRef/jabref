@@ -181,8 +181,8 @@ public class Globals {
 
 	public static final String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
 	
-	public static final String SEPARATING_CHARS         = ";.,\n ";
-	public static final String SEPARATING_CHARS_NOSPACE = ";.,\n";
+	public static final String SEPARATING_CHARS         = ";,\n ";
+	public static final String SEPARATING_CHARS_NOSPACE = ";,\n";
 
 	public static SidePaneManager sidePaneManager;
 
