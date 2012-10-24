@@ -23,6 +23,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,6 +43,7 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -145,8 +148,25 @@ public class EntryEditorTab {
                 ta = new FieldTextArea(fields[i], null);
                 frame.getSearchManager().addSearchListener((FieldTextArea)ta);
                 defaultHeight = ta.getPane().getPreferredSize().height;
+                if ((SpecialFieldsUtils.keywordSyncEnabled()) && (fields[i].equals("keywords"))) {
+                	// if a keyword field is changed, immediatly synchronize the columns
+                	
+                	((FieldTextArea) ta).addKeyListener(new KeyListener() {
+						@Override
+						public void keyTyped(KeyEvent e) {
+							SpecialFieldsUtils.syncSpecialFieldsFromKeywords(getEntry(), null);
+						}
+						
+						@Override
+						public void keyReleased(KeyEvent e) {}
+						
+						@Override
+						public void keyPressed(KeyEvent e) {}
+					});
+                }
             }
             //ta.addUndoableEditListener(bPanel.undoListener);
+            
             
             JComponent ex = parent.getExtra(fields[i], ta);
 
