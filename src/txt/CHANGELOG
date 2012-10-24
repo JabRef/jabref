@@ -14,6 +14,7 @@
     - Fixed bug when importing XMP data from PDF, file will now be linked from the new entry.
     - Fixed bug in layout processing - quoted formatter argments are now handled correctly.
     - Fixed bug 3545394: null and curly brackets in custom export filter.
+    - Added "Manage keywords" popup menu to manage common keywords of selected entries.
     - Added support for pushing citations to TeXstudio (requires TeXstudio >=2.4)
     - Text-based citations can now be imported using FreeCite by Brown University
       (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
