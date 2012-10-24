@@ -75,8 +75,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     // keyword to add
     private JTextField keyword;
 
-    private DefaultListModel<String> keywordListModel;
-    private JList<String> keywordList;
+    private DefaultListModel keywordListModel;
+    private JList keywordList;
     private JScrollPane kPane;
     
     private JButton ok, cancel, add, remove;
@@ -92,8 +92,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private void createDialog() {
         keyword = new JTextField();
 
-        keywordListModel = new DefaultListModel<String>();
-        keywordList = new JList<String>(keywordListModel);
+        keywordListModel = new DefaultListModel();
+        keywordList = new JList(keywordListModel);
+        keywordList.setVisibleRowCount(8);
         kPane = new JScrollPane(keywordList);
 
         diag = new JDialog(frame, Globals.lang("Manage keywords"), true);
@@ -106,7 +107,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keywordList.setVisibleRowCount(10);
         
         DefaultFormBuilder builder = new DefaultFormBuilder(
-        		new FormLayout("fill:100dlu, 8dlu, left:pref, 8dlu, left:pref", ""));
+        		new FormLayout("fill:100dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
         builder.appendSeparator(Globals.lang("Common keywords of selected entries"));
         builder.append(kPane,3);
         builder.add(remove);
@@ -118,14 +119,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
         bb.addButton(ok);
-        bb.addGlue();
         bb.addButton(cancel);
         bb.addGlue();
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
-        diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        diag.pack();
 
         ok.addActionListener(new ActionListener() {
            public void actionPerformed(ActionEvent e) {
@@ -143,7 +140,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         cancel.addActionListener(cancelAction);
         
         final ActionListener addActionListener = new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String text = keyword.getText().trim();
 				if (text.equals("")) {
@@ -154,13 +150,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 					keywordListModel.addElement(text);
 				} else {
 					int idx = 0;
-					while ((idx < keywordListModel.size()) && (keywordListModel.getElementAt(idx).compareTo(text) < 0)) {
+                    String element = (String)keywordListModel.getElementAt(idx);
+					while ((idx < keywordListModel.size()) &&
+                            (element.compareTo(text) < 0)) {
 						idx++;
 					}
 					if (idx == keywordListModel.size()) {
 						// list is empty or word is greater than last word in list
 						keywordListModel.addElement(text);
-					} else if (keywordListModel.getElementAt(idx).compareTo(text) == 0) {
+					} else if (element.compareTo(text) == 0) {
 						// nothing to do, word already in table
 					} else {
 						keywordListModel.add(idx, text);
@@ -173,10 +171,13 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         add.addActionListener(addActionListener);
 
         final ActionListener removeActionListenter = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
+
+            public void actionPerformed(ActionEvent arg0) {
 				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-				List<String> selectedValuesList = keywordList.getSelectedValuesList();
+                Object[] values = keywordList.getSelectedValues();
+				List<String> selectedValuesList = new ArrayList<String>();
+                for (int i=0; i<values.length; i++)
+                    selectedValuesList.add((String)values[i]);
 				for (String val: selectedValuesList) {
 					keywordListModel.removeElement(val);
 				}
@@ -185,13 +186,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         remove.addActionListener(removeActionListenter);
         keywordList.addKeyListener(new KeyListener() {
 			
-			@Override
 			public void keyTyped(KeyEvent arg0) {}
 			
-			@Override
 			public void keyReleased(KeyEvent arg0) {}
 			
-			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
 					removeActionListenter.actionPerformed(null);
@@ -205,13 +203,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keyword.addFocusListener(acl);
         keyword.addKeyListener(new KeyListener() {
 			
-			@Override
 			public void keyTyped(KeyEvent e) {}
 			
-			@Override
 			public void keyReleased(KeyEvent e) {}
 			
-			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					addActionListener.actionPerformed(null);
@@ -224,6 +219,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", cancelAction);
+
+        diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
+        diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+        //diag.pack();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -255,7 +254,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
         	keywordListModel.addElement(s);
         }
-        
+
+        diag.pack();
         Util.placeDialog(diag, frame);
         diag.setVisible(true);
         if (cancelled)
@@ -264,8 +264,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
-        	String keyword = keywords.nextElement();
+        for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
+        	String keyword = (String)keywords.nextElement();
         	userSelectedKeywords.add(keyword);
         	if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
         		keywordsToAdd.add(keyword);
