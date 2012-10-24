@@ -75,6 +75,7 @@ import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
@@ -362,6 +363,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
               prefs.getKey("Resolve duplicate BibTeX keys"));
 
     MassSetFieldAction massSetField = new MassSetFieldAction(this);
+    ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
 	GeneralAction findUnlinkedFiles = new GeneralAction(
   			FindUnlinkedFilesDialog.ACTION_COMMAND,
@@ -1299,6 +1301,7 @@ public JabRefPreferences prefs() {
     	  }
       }
       edit.addSeparator();
+      edit.add(manageKeywords);
       edit.add(selectAll);
       mb.add(edit);
 
@@ -1597,7 +1600,7 @@ public JabRefPreferences prefs() {
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
                 openPdf, openUrl, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-            highlightAny, newEntryAction, plainTextImport, massSetField,
+            highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
             abbreviateMedline, unabbreviate, exportAll, exportSelected,

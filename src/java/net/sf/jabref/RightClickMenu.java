@@ -245,6 +245,10 @@ public class RightClickMenu extends JPopupMenu
                 } catch (Throwable ex) {}
             }
         });
+        
+        add(JabRef.jrf.massSetField);
+        add(JabRef.jrf.manageKeywords);
+        
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
         floatMarked.addActionListener(new ActionListener() {
