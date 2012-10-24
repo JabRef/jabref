@@ -27,10 +27,6 @@ import javax.swing.event.UndoableEditListener;
 
 /**
  * FieldEditors is a common interface between the FieldTextField and FieldTextArea.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- *
  */
 public interface FieldEditor {
 

@@ -267,6 +267,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     public void keyTyped(KeyEvent e) {
+    	logger.finest("key typed event caught");
         char ch = e.getKeyChar();
     	if (ch == '\n')
     		// this case is handled at keyPressed(e)
