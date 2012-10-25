@@ -30,14 +30,18 @@ import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -58,6 +62,7 @@ import net.sf.jabref.undo.NamedCompound;
 import com.jgoodies.forms.builder.ButtonBarBuilder2;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.bridge.oleautomation.Date;
 
 /**
  * An Action for launching mass field.
@@ -79,6 +84,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private JList keywordList;
     private JScrollPane kPane;
     
+	private JRadioButton intersectKeywords, mergeKeywords;
+
     private JButton ok, cancel, add, remove;
 	private boolean cancelled;
 
@@ -106,10 +113,28 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         
         keywordList.setVisibleRowCount(10);
         
+        intersectKeywords = new JRadioButton("Display keywords appearing in ALL entries");
+        mergeKeywords = new JRadioButton("Display keywords appearing in at least one entry");
+		ButtonGroup group = new ButtonGroup();
+		group.add(intersectKeywords);
+		group.add(mergeKeywords);
+		ActionListener stateChanged = new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+		        fillKeyWordList();
+			}
+		};
+		intersectKeywords.addActionListener(stateChanged);
+		mergeKeywords.addActionListener(stateChanged);
+		intersectKeywords.setSelected(true);
+
         DefaultFormBuilder builder = new DefaultFormBuilder(
-        		new FormLayout("fill:100dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
-        builder.appendSeparator(Globals.lang("Common keywords of selected entries"));
-        builder.append(kPane,3);
+        		new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
+        builder.appendSeparator(Globals.lang("Keywords of selected entries"));
+        builder.append(intersectKeywords, 5);
+        builder.nextLine();
+        builder.append(mergeKeywords, 5);
+        builder.nextLine();
+        builder.append(kPane, 3);
         builder.add(remove);
         builder.nextLine();
         builder.append(keyword, 3);
@@ -167,7 +192,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 				keyword.setText(null);
 				keyword.requestFocusInWindow();
 			}
-		};        
+		};
         add.addActionListener(addActionListener);
 
         final ActionListener removeActionListenter = new ActionListener() {
@@ -229,31 +254,19 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         BasePanel bp = frame.basePanel();
         if (bp == null)
             return;
-        BibtexEntry[] entries = bp.getSelectedEntries();
+        if (bp.getSelectedEntries().length == 0) {
+        	// no entries selected, silently ignore action
+        	return;
+        }
+
         // Lazy creation of the dialog:
         if (diag == null) {
             createDialog();
         }
+
         cancelled = true;
-        
-        // fill dialog with values
-        keywordListModel.clear();
-        sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
-        for (BibtexEntry entry : entries) {
-        	ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
-        	if (sortedKeywordsOfAllEntriesBeforeUpdateByUser.isEmpty()) {
-        		// until now, no keywords are available
-        		// just add all keywords from the current entry
-        		sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
-        	} else {
-        		// keywords are available
-        		// intersect with the keywords of the current entry
-        		sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
-        	}
-        }
-        for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-        	keywordListModel.addElement(s);
-        }
+
+        fillKeyWordList();
 
         diag.pack();
         Util.placeDialog(diag, frame);
@@ -323,6 +336,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 	        }
         }
 
+        BibtexEntry[] entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Globals.lang("Update keywords"));
         for (BibtexEntry entry: entries) {
             ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
@@ -349,6 +363,42 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         ce.end();
         bp.undoManager.addEdit(ce);
         bp.markBaseChanged();
+    }
+
+	private void fillKeyWordList() {
+        BasePanel bp = frame.basePanel();
+        BibtexEntry[] entries = bp.getSelectedEntries();
+
+        // fill dialog with values
+        keywordListModel.clear();
+        sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
+        
+        if (mergeKeywords.isSelected()) {
+            for (BibtexEntry entry : entries) {
+            	ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+            	sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+            }
+        } else {
+        	assert(intersectKeywords.isSelected());
+        	
+        	// all keywords from first entry have to be added
+        	BibtexEntry firstEntry = entries[0];
+        	ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(firstEntry);
+        	sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+        	
+        	// for the remaining entries, intersection has to be used
+        	// this approach ensures that one empty keyword list leads to an empty set of common keywords
+        	for (int i = 1; i<entries.length; i++) {
+        		BibtexEntry entry = entries[i];
+        		separatedKeywords = Util.getSeparatedKeywords(entry);
+        		sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
+        	}
+        	System.out.println("finished step 1");
+        }
+        for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+        	keywordListModel.addElement(s);
+        }
+    	System.out.println("finished step 2");
     }
 
 }
