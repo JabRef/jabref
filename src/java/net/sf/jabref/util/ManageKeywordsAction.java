@@ -114,7 +114,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keywordList.setVisibleRowCount(10);
         
         intersectKeywords = new JRadioButton("Display keywords appearing in ALL entries");
-        mergeKeywords = new JRadioButton("Display keywords appearing in at least one entry");
+        mergeKeywords = new JRadioButton("Display keywords appearing in ANY entry");
 		ButtonGroup group = new ButtonGroup();
 		group.add(intersectKeywords);
 		group.add(mergeKeywords);
@@ -393,12 +393,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         		separatedKeywords = Util.getSeparatedKeywords(entry);
         		sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
         	}
-        	System.out.println("finished step 1");
         }
         for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
         	keywordListModel.addElement(s);
         }
-    	System.out.println("finished step 2");
     }
 
 }
