@@ -49,15 +49,7 @@ public class GUIGlobals {
 	helpTitle = "JabRef help",
 	TYPE_HEADER = "entrytype",
 	NUMBER_COL = "#",
-	encPrefix = "Encoding: ", // Part of the signature in written bib files.
-	linuxDefaultLookAndFeel = "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
-
-    //linuxDefaultLookAndFeel = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
-    //linuxDefaultLookAndFeel = "org.jvnet.substance.skin.SubstanceCremeCoffeeLookAndFeel",
-    //linuxDefaultLookAndFeel = "org.jvnet.substance.skin.SubstanceNebulaLookAndFeel",
-    //linuxDefaultLookAndFeel = "org.jvnet.substance.skin.SubstanceBusinessLookAndFeel",
-    windowsDefaultLookAndFeel = "com.jgoodies.looks.windows.WindowsLookAndFeel";
-    //windowsDefaultLookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+	encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
 	public static Font CURRENTFONT,
 	typeNameFont,

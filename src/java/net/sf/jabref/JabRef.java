@@ -15,39 +15,47 @@
 */
 package net.sf.jabref;
 
-import com.jgoodies.looks.FontPolicies;
-import com.jgoodies.looks.FontPolicy;
-import com.jgoodies.looks.FontSet;
-import com.jgoodies.looks.FontSets;
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
-import net.sf.jabref.export.*;
-import net.sf.jabref.imports.*;
+
+import java.awt.Font;
+import java.awt.Frame;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+import java.util.prefs.BackingStoreException;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.IExportFormat;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.imports.AutosaveStartupPrompter;
+import net.sf.jabref.imports.EntryFetcher;
+import net.sf.jabref.imports.ImportInspectionCommandLine;
+import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.SidePanePlugin;
 import net.sf.jabref.plugin.PluginInstaller;
+import net.sf.jabref.plugin.SidePanePlugin;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
-
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.prefs.BackingStoreException;
-
-import spin.Spin;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -623,6 +631,14 @@ public class JabRef {
 
         return new ParserResult(result);
     }
+    
+    private String getLookAndFeel() {
+        // * Look first into the Preferences
+        // * Fallback to the System Look & Fell
+    	if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
+            return Globals.prefs.get("lookAndFeel");
+    	return UIManager.getSystemLookAndFeelClassName();
+    }
 
 	public void openWindow(Vector<ParserResult> loaded) {
         if (!graphicFailure && !disableGui.isInvoked()) {
@@ -646,135 +662,13 @@ public class JabRef {
             // Set antialiasing on everywhere. This only works in JRE >= 1.5.
             // Or... it doesn't work, period.
             //System.setProperty("swing.aatext", "true");
-            // If we are not on Mac, deal with font sizes and LookAndFeels:
-            if (!Globals.ON_MAC) {
-                int fontSizes = Globals.prefs.getInt("menuFontSize");
-                boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
-                String defaultLookAndFeel;
+            // TODO test and maybe remove this! I found this commented out with no additional info ( payload@lavabit.com )
 
-                if (Globals.ON_WIN)
-                    defaultLookAndFeel = GUIGlobals.windowsDefaultLookAndFeel;
-                else
-                    defaultLookAndFeel = GUIGlobals.linuxDefaultLookAndFeel;
-
-                String lookAndFeel = null;
-
-                if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
-                    lookAndFeel = Globals.prefs.get("lookAndFeel");
-                else
-                    lookAndFeel = defaultLookAndFeel;
-
-                LookAndFeel lnf = null;
-                Object objLnf = null;
-
-
-                try {
-                    if (lookAndFeel != null)
-                        objLnf = Class.forName(lookAndFeel).newInstance();
-                    else
-                        objLnf = Class.forName(defaultLookAndFeel).newInstance();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    if (splashScreen != null) {// do this only if splashscreen was actually created
-                        splashScreen.dispose();
-                        splashScreen = null;
-                    }
-                    JOptionPane.showMessageDialog(null, Globals.lang("Error setting look and feel")+
-                        ": "+lookAndFeel);
-                    try {
-                        objLnf = Class.forName(defaultLookAndFeel).newInstance();
-                    } catch (Exception ex2) {
-                    }
-                }
-
-                if (objLnf != null)
-                    lnf = (LookAndFeel) objLnf;
-
-                // Set font sizes if we are using a JGoodies look and feel.
-                if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
-
-                    //UIManager.put("jgoodies.popupDropShadowEnabled", Boolean.TRUE);
-                    MetalLookAndFeel.setCurrentTheme(new
-                     com.jgoodies.looks.plastic.theme.SkyBluer());
-
-                    // Set a "model" icon size, so menu items are evenly spaced even though
-                    // only some items have icons. We load an arbitrary icon and look at
-                    // its size to determine what size to use:
-                    int defaultIconSize = GUIGlobals.getImage("open").getIconWidth();
-                    com.jgoodies.looks.Options.setDefaultIconSize
-                            (new Dimension(defaultIconSize, defaultIconSize));
-
-
-                    if (overrideDefaultFonts) {
-                        FontSet fontSet = FontSets.createDefaultFontSet(
-                            new Font("Tahoma", Font.PLAIN, fontSizes),    // control font
-                            new Font("Tahoma", Font.PLAIN, fontSizes),    // menu font
-                            new Font("Tahoma", Font.BOLD, fontSizes)     // title font
-                            );
-                        FontPolicy fixedPolicy = FontPolicies.createFixedPolicy(fontSet);
-                        Plastic3DLookAndFeel.setFontPolicy(fixedPolicy);
-                    }
-
-                    //Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel) lnf;
-                }
-                else if ((lnf != null) && (lnf instanceof WindowsLookAndFeel)) {
-
-                    // Set a "model" icon size, so menu items are evenly spaced even though
-                    // only some items have icons. We load an arbitrary icon and look at
-                    // its size to determine what size to use:
-                    int defaultIconSize = GUIGlobals.getImage("open").getIconWidth();
-                    com.jgoodies.looks.Options.setDefaultIconSize
-                        (new Dimension(defaultIconSize, defaultIconSize));
-
-                    if (overrideDefaultFonts) {
-                        FontSet fontSet = FontSets.createDefaultFontSet(
-                            new Font("Tahoma", Font.PLAIN, fontSizes),    // control font
-                            new Font("Tahoma", Font.PLAIN, fontSizes),    // menu font
-                            new Font("Tahoma", Font.BOLD, fontSizes)     // title font
-                            );
-                        FontPolicy fixedPolicy = FontPolicies.createFixedPolicy(fontSet);
-                        WindowsLookAndFeel.setFontPolicy(fixedPolicy);
-                    }
-
-                    //WindowsLookAndFeel plLnf = (WindowsLookAndFeel) lnf;
-                }
-
-                if (lnf != null) {
-                    try {
-
-                        UIManager.setLookAndFeel(lnf);
-
-                        if (!Globals.ON_WIN) {
-                            UIManager.put("SimpleInternalFrame.activeTitleBackground", GUIGlobals.gradientBlue);
-                        }
-
-                        if (!Globals.ON_WIN && !Globals.ON_MAC) {
-                            // For Linux, add Enter as button click key:
-                            UIDefaults def = UIManager.getDefaults();
-                            InputMap im = (InputMap)def.get("Button.focusInputMap");
-                            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "pressed");
-                            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released");
-                        }
-                    } catch (Throwable ex) {
-                        ex.printStackTrace();
-                        System.err.println("Trying to set system default Look&Feel...");
-
-                        // if desired lnf could not be set, try system default
-                        try {
-                            UIManager.setLookAndFeel(UIManager
-                                .getSystemLookAndFeelClassName());
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
-                    //Look1AndFeel lnf = new
-                    // com.incors.plaf.kunststoff.KunststoffLookAndFeel();
-                    //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new
-                    // com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
-                }
-
+            // Set the Look & Feel for Swing.
+            try {
+                UIManager.setLookAndFeel(getLookAndFeel());
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
 
 
