@@ -160,7 +160,7 @@
 	<!-- Classpath for tests -->
 	<path id="classpathTest">
 		<path refid="classpath" />
-		<pathelement location="${lib.dir}/junit.jar" />
+		<pathelement location="${buildlib.dir}/junit.jar" />
 	</path>
 
 	<target name="run" depends="build">
