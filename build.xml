@@ -75,6 +75,7 @@
 	<property name="extensions.dir" value="${src.dir}/extensions" />
 	<property name="layout.dir" value="${src.dir}/resource/layout" />
 	<property name="lib.dir" value="lib" />
+	<property name="buildlib.dir" value="buildlib" />
 	<property name="tests.dir" value="${src.dir}/tests" />
 
 	<property name="osxbin.dir" value="osx" />
@@ -653,6 +654,9 @@ Number (CCN)           maintenance
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
+				<fileset dir="${buildlib.dir}">
+					<include name="*.jar" />
+				</fileset>
 			</classpath>
 		</taskdef>
 		<jalopy fileformat="unix" convention="${src.dir}/java/jalopy.format.convention.xml" history="file" historymethod="adler32" loglevel="error" threads="2" classpathref="classpath" backup="bak">
@@ -662,6 +666,6 @@ Number (CCN)           maintenance
 		</jalopy>
 	</target>
 
-	<taskdef name="jarbundler" classpath="buildlib/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
+	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 </project>
