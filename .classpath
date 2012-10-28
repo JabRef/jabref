@@ -6,7 +6,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/spin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/microba.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/antlr-3.0b5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/jpf-boot.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/plugin/JPFCodeGenerator-rt.jar" sourcepath="/JPFCodeGenerator/src"/>
@@ -37,5 +36,6 @@
 	<classpathentry kind="lib" path="lib/spl/jersey/jersey-client-1.14.jar"/>
 	<classpathentry kind="lib" path="lib/spl/jersey/jersey-core-1.14.jar"/>
 	<classpathentry kind="lib" path="lib/spl/jersey/jersey-multipart-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.4-complete.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
