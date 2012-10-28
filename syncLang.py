@@ -7,9 +7,12 @@ def indexFile(lines):
     allKeys = []
     for line in lines:
         comment = line.find("#")
-        index = line.find("=")
-        if (comment != 0) and (index > 0):
-            allKeys.append(line[0:index])
+        if (comment != 0):
+            index = line.find("=")
+            while ((index > 0) and (line[index-1]=="\\")):
+                index = line.find("=", index+1)
+            if (index > 0):
+                allKeys.append(line[0:index])
     allKeys.sort()
     return allKeys
         
@@ -88,9 +91,11 @@ def handleJavaCode(filename, lines, keyList, notTermList):
             theSpan = lines[span[0]:span[1]]
             spanInner = pattInner.search(theSpan).span() # We know there's a match here.
             found = theSpan[spanInner[0]+1:spanInner[1]-1].replace(" ", "_")
+            #replace characters that need to be escaped in the language file
+            found = found.replace("=", "\=").replace(":","\:")
             #found = lines[i][span[0]+startLen:span[1]-2].replace(" ", "_")
             if not found == "" and found not in keyList:
-		keyList.append(found)
+                keyList.append(found)
             #else:
             #   print "Not adding: "+found
                 
