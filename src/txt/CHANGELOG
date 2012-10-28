@@ -1,3 +1,5 @@
+[master]
+    - Changed internal look&feel setting (patch 3580605)
 2.9 beta
     - Replaced notification dialog after moving/renaming linked file by status message.
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
