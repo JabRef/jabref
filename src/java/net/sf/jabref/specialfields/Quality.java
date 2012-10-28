@@ -29,7 +29,7 @@ public class Quality extends SpecialField {
 
 	public Quality() {
 		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-    	values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Globals.lang("Toogle quality assured"), GUIGlobals.getImage("qualityAssured"), Globals.lang("Toogle quality assured marking")));
+    	values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Globals.lang("Toogle quality assured"), GUIGlobals.getImage("qualityAssured"), Globals.lang("Toogle quality assured")));
 		this.setValues(values);
 		TEXT_DONE_PATTERN = "Toggled quality for %0 entries";
 	}

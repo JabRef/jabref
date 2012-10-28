@@ -429,8 +429,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 					// No error message, since we want to try importing the
 					// file?
 					//
-					// Util.showQuickErrorDialog(frame, Globals.lang("Open
-					// database"), e);
+					// Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
 				}
 				continue;
 			}
@@ -483,7 +482,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
 					BibtexDatabase database = frame.basePanel().database();
 
-					NamedCompound ce = new NamedCompound(Globals.lang("Drog PDF"));
+					NamedCompound ce = new NamedCompound(Glbals.lang("Drop PDF"));
 
 					while (it.hasNext()) {
 						BibtexEntry e = (BibtexEntry) it.next();

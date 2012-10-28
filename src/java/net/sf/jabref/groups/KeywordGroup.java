@@ -373,15 +373,21 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
 		else
 			sb.append(Util.quoteForHTML(getName()));
-        sb.append(Globals.lang("</b> - dynamic group (<b>")).append(m_searchField).
-            append(Globals.lang("</b> contains <b>")).
-            append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
+			sb.append("</b> - ");
+            sb.append(Globals.lang("dynamic group"));
+            sb.append("<b>");
+            sb.append(m_searchField);
+            sb.append("</b>");
+            sb.append(Globals.lang("contains"));
+            sb.append(" <b>");
+            sb.append(Util.quoteForHTML(m_searchExpression));
+            sb.append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
-			sb.append(Globals.lang(", includes subgroups"));
+            sb.append(", ").append(Globals.lang("includes subgroups"));
 			break;
 		case AbstractGroup.REFINING:
-			sb.append(Globals.lang(", refines supergroup"));
+        	sb.append(", ").append(Globals.lang("refines supergroup"));
 			break;
 		default:
 			break;

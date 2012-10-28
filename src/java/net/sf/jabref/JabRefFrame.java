@@ -2463,7 +2463,7 @@ class SaveSessionAction
     class BibtexKeyPatternAction extends MnemonicAwareAction {
         BibtexKeyPatternDialog bibtexKeyPatternDialog = null;
         public BibtexKeyPatternAction() {
-            putValue(NAME, "Bibtexkey patterns");
+            putValue(NAME, "Bibtex key patterns");
         }
 
         public void actionPerformed(ActionEvent e) {

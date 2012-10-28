@@ -56,7 +56,7 @@ public class DragDropPopupPane extends DragDropPane {
 		databasePropertiesBtn.addActionListener(databasePropertiesAction);
 		popupMenu.add(databasePropertiesBtn);
 		
-		JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtexkey patterns"));
+		JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtex key patterns"));
 		bibtexKeyPatternBtn.addActionListener(bibtexKeyPatternAction);
 		popupMenu.add(bibtexKeyPatternBtn);
 

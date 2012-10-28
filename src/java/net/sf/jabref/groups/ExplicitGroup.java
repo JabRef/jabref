@@ -221,13 +221,13 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     public String getShortDescription() {
         StringBuffer sb = new StringBuffer();
-        sb.append("<b>").append(getName()).append(Globals.lang("</b> - static group"));
+        sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:
-            sb.append(Globals.lang(", includes subgroups"));
+            sb.append(", ").append(Globals.lang("includes subgroups"));
             break;
         case AbstractGroup.REFINING:
-            sb.append(Globals.lang(", refines supergroup"));
+        	sb.append(", ").append(Globals.lang("refines supergroup"));
             break;
         default:
             break;

@@ -168,9 +168,8 @@ public class RemoteListener extends Thread {
             }
 
             if (!IDENTIFIER.equals(sb.toString())) {
-                String error = Globals.lang("Cannot use port %0 for remote operation; another "
-                    +"application may be using it. Try specifying another port.",
-                        new String[] {String.valueOf(Globals.prefs.getInt("remoteServerPort"))});
+            	String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
+                String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
                 System.out.println(error);
                 return false;
             }

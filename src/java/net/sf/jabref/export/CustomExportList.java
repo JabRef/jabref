@@ -70,8 +70,8 @@ public class CustomExportList {
                 formats.put(format.getConsoleName(), format);
     			list.add(s);
             } else {
-                System.out.println(Globals.lang("Error initializing custom export format from string '%0'",
-                    Globals.prefs.get("customExportFormat" + i)));
+            	String customExportFormat = Globals.prefs.get("customExportFormat" + i);
+                System.out.println(Globals.lang("Error initializing custom export format from string '%0'", customExportFormat));
             }
 			i++;
 		}

@@ -206,13 +206,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 				writeSpecialFields.setEnabled(isEnabled);
 			}
 		});
-		rankingColumn = new JCheckBox(Globals.lang("Show ranking"));
+		rankingColumn = new JCheckBox(Globals.lang("Show rank"));
 		rankingColumn.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent event) {
 				compactRankingColumn.setEnabled(rankingColumn.isSelected());
 			}
 		});
-		compactRankingColumn = new JCheckBox(Globals.lang("Compact ranking"));
+		compactRankingColumn = new JCheckBox(Globals.lang("Compact rank"));
 		qualityColumn = new JCheckBox(Globals.lang("Show quality"));
 		priorityColumn = new JCheckBox(Globals.lang("Show priority"));
 		relevanceColumn = new JCheckBox(Globals.lang("Show relevance"));

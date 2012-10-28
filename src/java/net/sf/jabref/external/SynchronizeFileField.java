@@ -355,8 +355,7 @@ public class SynchronizeFileField extends AbstractWorker {
             builder.appendSeparator(Globals.lang("Check links"));
 
             description = new JLabel("<HTML>" +
-                    Globals.lang("This makes JabRef look up each %0 extension and check if the file exists. If not, you will "
-                            + "be given options<BR>to resolve the problem.", fn)
+                    Globals.lang("This makes JabRef look up each %0 extension and check if the file exists. If not, you will be given options<BR>to resolve the problem.", fn)
                     + "</HTML>");
             builder.append(description);
             builder.nextLine();

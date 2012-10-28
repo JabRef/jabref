@@ -62,9 +62,7 @@ public class VersionHandling {
         case 3:
             return Version2_3.fromString(orderedData, db, version);
         default:
-            throw new IllegalArgumentException(Globals.lang(
-                    "Failed to read groups data (unsupported version: %0)",
-                    "" + version));
+            throw new IllegalArgumentException(Globals.lang("Failed to read groups data (unsupported version: %0)", Integer.toString(version)));
         }
     }
 
