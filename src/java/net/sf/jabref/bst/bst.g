@@ -11,19 +11,25 @@ tokens {
 	COMMANDS;
 }
 
+// applies only to the parser:
+@header {package net.sf.jabref.bst;}
+
+// applies only to the lexer:
+@lexer::header {package net.sf.jabref.bst;}
+
 program : commands+ -> ^(COMMANDS commands+);
 
 commands 
-	: STRINGS^^ idList
-	| INTEGERS^^ idList
-	| FUNCTION^^ id stack
-	| MACRO^^ id '{'! STRING '}'!
-	| READ^^
-	| EXECUTE^^ '{'! function '}'!
-	| ITERATE^^ '{'! function '}'!
-	| REVERSE^^ '{'! function '}'!
-	| ENTRY^^ idList0 idList0 idList0
-	| SORT^^;
+	: STRINGS^ idList
+	| INTEGERS^ idList
+	| FUNCTION^ id stack
+	| MACRO^ id '{'! STRING '}'!
+	| READ^
+	| EXECUTE^ '{'! function '}'!
+	| ITERATE^ '{'! function '}'!
+	| REVERSE^ '{'! function '}'!
+	| ENTRY^ idList0 idList0 idList0
+	| SORT^;
 
 identifier 
 	: IDENTIFIER;
@@ -80,9 +86,9 @@ fragment NUMERAL
 	: ('0'..'9');
 	
 WS
-	: (' '|'\t'|'\n')+ {channel=99;} ;
+	: (' '|'\t'|'\n')+ {_channel=99;} ;
 	
 LINE_COMMENT
-    : '%' ~('\n'|'\r')* '\r'? '\n' {channel=99;}
+    : '%' ~('\n'|'\r')* '\r'? '\n' {_channel=99;}
     ;
 	
