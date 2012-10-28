@@ -570,60 +570,6 @@ version=${jabref.version}</echo>
         What's about the software design ?!;-)
     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-	<target name="pmd" description="SOFTWAREDESIGN: Project Mess Detector !;-)">
-		<echo>Checking Project Mess Detection (PMD) rulesets.</echo>
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
-			<classpath>
-				<pathelement path="${classpath}" />
-				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<!-- allowed Pretty Much Done rulsets -->
-		<!-- rulesets/basic.xml -->
-		<!-- rulesets/braces.xml -->
-		<!-- rulesets/codesize.xml-->
-		<!-- rulesets/controversial.xml-->
-		<!-- rulesets/coupling.xml-->
-		<!-- rulesets/design.xml -->
-		<!-- rulesets/experimental.xml -->
-		<!-- rulesets/favorites.xml -->
-		<!-- rulesets/imports.xml -->
-		<!-- rulesets/naming.xml -->
-		<!-- rulesets/javabean.xml -->
-		<!-- rulesets/junit.xml -->
-		<!-- rulesets/scratchpad.xml -->
-		<!-- rulesets/strictexception.xml -->
-		<!-- rulesets/strings.xml -->
-		<!-- rulesets/unusedcode.xml -->
-
-		<pmd rulesetfiles="rulesets/unusedcode.xml,rulesets/basic.xml" failonerror="no">
-			<formatter type="html" toFile="${build.dir}/pmd_report.html" />
-			<fileset dir="${src.dir}">
-				<include name="**/*.java" />
-			</fileset>
-		</pmd>
-
-		<!-- check for duplicated code -->
-		<echo>WARNING: use environment variable: ANT_OPTS=-Xmx512m or this task will fail.</echo>
-		<echo>Checking for duplicated code using the Copy/Paste Detector (CPD).</echo>
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask">
-			<classpath>
-				<pathelement path="${classpath}" />
-				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<cpd format="text" minimumTokenCount="100" outputFile="${build.dir}/duplicated_code_report.txt">
-			<fileset dir="${src.dir}">
-				<include name="**/*.java" />
-			</fileset>
-		</cpd>
-	</target>
-
-
 	<target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
 		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
 			<classpath>
