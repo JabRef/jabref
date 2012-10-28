@@ -662,6 +662,6 @@ Number (CCN)           maintenance
 		</jalopy>
 	</target>
 
-	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
+	<taskdef name="jarbundler" classpath="buildlib/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 </project>
