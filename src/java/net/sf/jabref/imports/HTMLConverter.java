@@ -64,7 +64,7 @@ public class HTMLConverter implements LayoutFormatter {
         	text = text.replaceAll(pattern, escapedSymbols.get(pattern));
         }
         
-        Pattern escapedPattern = Pattern.compile("&#([x]*\\d+);");
+        Pattern escapedPattern = Pattern.compile("&#([x]*\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
         while (m.find()) {
         	int num = Integer.decode(m.group(1).replace("x", "#"));
@@ -76,10 +76,10 @@ public class HTMLConverter implements LayoutFormatter {
         		text = text.replaceAll("&#" + m.group(1) + ";", "&");
         		break;
         	case 916:
-        		text = text.replaceAll("&#" + m.group(1) + ";", "$\\delta$");
+        		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\delta\\$");
         		break;
-        	case 956:
-        		text = text.replaceAll("&#" + m.group(1) + ";", "$\\mu$");
+		case 956: case 181:
+        		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\mu\\$");
         		break;
         	case 8208:
         		text = text.replaceAll("&#" + m.group(1) + ";", "-");
@@ -93,10 +93,26 @@ public class HTMLConverter implements LayoutFormatter {
         	case 8217:
         		text = text.replaceAll("&#" + m.group(1) + ";", "'");
         		break;
+        	case 8730:
+        		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\sqrt{}\\$");
+        		break;
         	default:
         		System.err.println("HTML escaped char not converted " + m.group(1) + ": " + Integer.toString(num));
         	}
         }
+
+	// Also match special characters with alphabetic codes
+        escapedPattern = Pattern.compile("&(\\w+);");
+        m = escapedPattern.matcher(text);
+        while (m.find()) {
+	  String match = m.group(1).toLowerCase();
+	  if (match.equals("mu"))
+	    text = text.replaceAll("&" + m.group(1) + ";", "\\$\\\\mu\\$");
+	  else if (match.equals("radic"))
+	    text = text.replaceAll("&" + m.group(1) + ";", "\\$\\\\sqrt{}\\$");
+	  else
+	    System.err.println("HTML escaped char not converted " + m.group(1));
+	}
 
         return text.trim();
     }
