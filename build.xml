@@ -77,6 +77,8 @@
 	<property name="lib.dir" value="lib" />
 	<property name="tests.dir" value="${src.dir}/tests" />
 
+	<property name="osxbin.dir" value="osx" />
+
 	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
 	<property name="nsis.executable.linux" value="makensis"/>
 
@@ -229,7 +231,7 @@
 	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
 	<target name="non_osx">
 		<mkdir dir="${build.osx}" />
-		<copy file="${lib.dir}/OSXAdapter.class" todir="${build.osx}" />
+		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.osx}" />
 	</target>
 
 	<!-- Jars up project -->
@@ -444,8 +446,8 @@ version=${jabref.version}</echo>
                     jars="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
-                    jvmversion="1.4+"
-                    stubfile="${lib.dir}/JavaApplicationStub"
+                    jvmversion="1.5+"
+                    stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">
             <documenttype name="BibTeX file" extensions="bib" role="Editor"
                           iconFile="${images.dir}/JabRef-Logo.icns"/>
