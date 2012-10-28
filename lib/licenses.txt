@@ -93,12 +93,12 @@ License: BSD (http://xstream.codehaus.org/license.html)
 Main Directory
 --------------
 
-Path:    antlr-3.0b5.jar
+Path:    antlr.jar
 Project: ANTLR
 URL:     http://www.antlr.org/
 License: BSD
 
-Path:    antlr.jar
+Path:    antlr-3.4-complete.jar
 Project: ANTLR
 URL:     http://www.antlr.org/
 License: BSD
