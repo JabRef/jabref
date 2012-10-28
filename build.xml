@@ -624,29 +624,6 @@ version=${jabref.version}</echo>
 	</target>
 
 
-	<target name="javancss" description="SOFTWAREDESIGN: Determining the NCSS and CCN code metrics for JOELib.">
-		<taskdef name="javancss" classname="javancss.JavancssAntTask">
-			<classpath>
-				<pathelement path="${classpath}" />
-				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<echo>Cyclomatic
-Complexity             Ease of       Risk
-Number (CCN)           maintenance
-(McCabe metric)
----------------------------------------------
-1-10, simple           easy          minimum
-11-20, complex         moderate      moderate
-21-50, more complex    hard          high
->50, unstable          very hard     very high
-
-</echo>
-		<javancss srcdir="${src.dir}" includes="**/*.java" excludes="jama/**/*.java, jmat/**/*.java, cformat/**/*.java" abortOnFail="false" ccnPerFuncMax="30" generateReport="true" outputfile="${build.dir}/javancss_report.plain" format="plain" packageMetrics="true" classMetrics="false" functionMetrics="false" />
-	</target>
-
 	<target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
 		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
 			<classpath>

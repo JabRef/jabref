@@ -13,3 +13,51 @@ sourceSets {
 		}
 	}
 }
+
+repositories {
+	mavenCentral()
+}
+
+
+/*
+ Code for JavaNCSS adapted from http://gradle.codehaus.org/Cookbook#Cookbook-usingJavaNCSS
+ JavaNCSS: http://www.kclee.de/clemens/java/javancss/
+
+Cyclomatic
+Complexity             Ease of       Risk
+Number (CCN)           maintenance
+(McCabe metric)
+---------------------------------------------
+1-10, simple           easy          minimum
+11-20, complex         moderate      moderate
+21-50, more complex    hard          high
+>50, unstable          very hard     very high
+*/
+
+configurations {
+    javancssConf
+}
+
+dependencies {
+    javancssConf 'org.codehaus.javancss:javancss:32.53'
+}
+
+task javancss << {
+    println 'Running javancss quality metrics tool'
+    ant {
+        taskdef(name:'javancss', classname:'javancss.JavancssAntTask', classpath: configurations.javancssConf.asPath)
+        javancss(
+			srcdir:'src/java',
+			includes:'**/*.java',
+			excludes:'jama/**/*.java, jmat/**/*.java, cformat/**/*.java',
+			abortOnFail:'false',
+			generateReport:'true',
+			outputfile:'build/javancss_report.plain',
+			ccnPerFuncMax:'30',
+			format:'plain',
+			packageMetrics:'true',
+			classMetrics:'false',
+			functionMetrics:'false'
+		)
+    }
+}
