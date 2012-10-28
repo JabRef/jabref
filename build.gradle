@@ -18,6 +18,31 @@ repositories {
 	mavenCentral()
 }
 
+/* ANTLR support for Bst.g
+Source: http://fenrock.wordpress.com/2012/05/17/gradle-and-antlr-3-x/
+*/
+
+configurations {
+	antlr3
+}
+
+dependencies {
+	compile 'org.antlr:antlr-runtime:3.4'
+	antlr3 'org.antlr:antlr:3.4'
+}
+task generateGrammarSource(type: JavaExec) {
+    def antlrSource = 'src/java/net/sf/jabref/bst'
+    destinationDir = antlrSource
+
+    inputs.dir file(antlrSource)
+    outputs.dir file(destinationDir)
+
+    def grammars = fileTree(antlrSource).include('**/*.g')
+
+    main = 'org.antlr.Tool'
+    classpath = configurations.antlr3
+    args = ["-o", "${destinationDir}", grammars.files].flatten()
+}
 
 /*
  Code for JavaNCSS adapted from http://gradle.codehaus.org/Cookbook#Cookbook-usingJavaNCSS
