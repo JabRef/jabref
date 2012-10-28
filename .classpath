@@ -23,10 +23,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/sciplore"/>
-	<classpathentry kind="lib" path="lib/spl/jersey/jersey-client-1.1.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/spl/jersey/jersey-core-1.1.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/spl/jersey/jersey-multipart-1.1.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/spl/jersey/jsr311-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/spl/jersey/mimepull-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jempbox-1.6.0.jar"/>
@@ -39,5 +35,8 @@
 	<classpathentry kind="lib" path="lib/jgoodies-forms-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/jgoodies-looks-2.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.1-902.jdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/spl/jersey/jersey-client-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/spl/jersey/jersey-core-1.14.jar"/>
+	<classpathentry kind="lib" path="lib/spl/jersey/jersey-multipart-1.14.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
