@@ -2,24 +2,24 @@ Directory oo/
 -------------
 
 Path:    oo/juh.jar
-Project:
-URL:
-License:
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
 
 Path:    oo/jurt.jar
-Project:
-URL:
-License:
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
 
 Path:    oo/ridl.jar
-Project:
-URL:
-License:
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
 
 Path:    oo/unoil.jar
-Project:
-URL:
-License:
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
 
 
 Directory plugin/
