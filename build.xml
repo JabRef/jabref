@@ -112,7 +112,6 @@
 		<include name="zoom-java.jar" />
     	<include name="mysql-connector-java-5.0.7-bin.jar" />
 		<include name="postgresql-9.1-902.jdbc4.jar" />
-        <!--<include name="substance-4.1.jar" />-->
         <!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />
