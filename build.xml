@@ -452,6 +452,11 @@ version=${jabref.version}</echo>
             <documenttype name="BibTeX file" extensions="bib" role="Editor"
                           iconFile="${images.dir}/JabRef-Logo.icns"/>
         </jarbundler>
+        <!-- After running jarbundler we need to hack the Info.plist file: -->
+        <replace file="${build.lib}/JabRef.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
+            value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
+   &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
+   &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
 	</target>
 
 
