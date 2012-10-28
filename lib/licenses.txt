@@ -1,0 +1,9 @@
+Path:    jempbox-1.6.0.jar
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Path:    pdfbox-1.6.0.jar
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
