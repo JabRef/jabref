@@ -15,7 +15,7 @@
 */
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ActionListener;
@@ -174,15 +174,19 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.appendSeparator(Globals.lang("External programs"));
 
 		builder.nextLine();
-		
-        addSettingsButton(new PushToLyx(), builder);
-        addSettingsButton(new PushToEmacs(), builder);
-        addSettingsButton(new PushToWinEdt(), builder);
-        addSettingsButton(new PushToVim(), builder);
-        addSettingsButton(new PushToLatexEditor(), builder);
-        addSettingsButton(new PushToTeXstudio(), builder);
 
-        //builder.nextLine();
+        JPanel butpan = new JPanel();
+        butpan.setLayout(new GridLayout(2,3));
+        addSettingsButton(new PushToLyx(), butpan);
+        addSettingsButton(new PushToEmacs(), butpan);
+        addSettingsButton(new PushToWinEdt(), butpan);
+        addSettingsButton(new PushToVim(), butpan);
+        addSettingsButton(new PushToLatexEditor(), butpan);
+        addSettingsButton(new PushToTeXstudio(), butpan);
+        builder.append(new JPanel());
+        builder.append(butpan, 3);
+
+        builder.nextLine();
         builder.append(pan);
         builder.append(editFileTypes);
         
@@ -192,18 +196,25 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
     }
 
-    private void addSettingsButton(final PushToApplication pt, DefaultFormBuilder b) {
-        b.append(new JPanel());
-        b.append(Globals.lang("Settings for %0", pt.getName())+":");
-        JButton button = new JButton(pt.getIcon());
+    private void addSettingsButton(final PushToApplication pt, JPanel p) {
+        //if (b.getColumn() < 2)
+        //    b.append(new JPanel());
+        //JPanel pan = new JPanel();
+        //pan.setLayout(new BorderLayout());
+        //pan.add(new JLabel(Globals.lang("Settings for %0", pt.getApplicationName())), BorderLayout.CENTER);
+        JButton button = new JButton(Globals.lang("Settings for %0", pt.getApplicationName()),
+                pt.getIcon());
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 PushToApplicationButton.showSettingsDialog(_frame, pt, pt.getSettingsPanel());
             }
         });
-
-        b.append(button);
-        b.nextLine();
+        p.add(button);//, BorderLayout.CENTER);
+        //b.append(button);
+        //b.nextLine();
+        //b.append(pan);
+        //if (b.getColumn() >= 6)
+        //    b.nextLine();
     }
 
 	public void setValues() {
