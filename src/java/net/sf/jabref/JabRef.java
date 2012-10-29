@@ -637,7 +637,12 @@ public class JabRef {
         // * Fallback to the System Look & Fell
     	if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
             return Globals.prefs.get("lookAndFeel");
-    	return UIManager.getSystemLookAndFeelClassName();
+    	String systemLnF = UIManager.getSystemLookAndFeelClassName();
+        // At all cost, avoid ending up with the Metal look and feel:
+        if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+            systemLnF = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+        }
+        return systemLnF;
     }
 
 	public void openWindow(Vector<ParserResult> loaded) {
