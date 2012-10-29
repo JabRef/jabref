@@ -77,9 +77,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     if (!Globals.ON_MAC) {
         builder.appendSeparator(Globals.lang("Look and feel"));
-        JLabel lab = new JLabel(Globals.lang("Default look and feel")+": "
-                 +(Globals.ON_WIN ? GUIGlobals.windowsDefaultLookAndFeel :
-                   GUIGlobals.linuxDefaultLookAndFeel));
+        JLabel lab = new JLabel(Globals.lang("Default look and feel")+": "+UIManager.getSystemLookAndFeelClassName());
         builder.nextLine();
         builder.append(pan);
         builder.append(lab);
