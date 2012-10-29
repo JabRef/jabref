@@ -45,6 +45,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 		close.setMargin(new Insets(0, 0, 0, 0));
 		// tlb.setOpaque(false);
 		close.setBorder(null);
+        tlb.setFloatable(false);
 		tlb.add(close);
 		close.addActionListener(new CloseButtonListener());
 		setToolBar(tlb);

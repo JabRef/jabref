@@ -343,11 +343,7 @@ public class GroupSelector extends SidePaneComponent implements
 
         JPanel main = new JPanel();
         main.setLayout(gbl);
-        /*SidePaneHeader header = new SidePaneHeader("Groups",
-                GUIGlobals.groupsIconFile, this);
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        gbl.setConstraints(header, con);
-        main.add(header);*/
+
         con.fill = GridBagConstraints.BOTH;
         //con.insets = new Insets(0, 0, 2, 0);
         con.weightx = 1;

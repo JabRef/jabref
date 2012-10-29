@@ -244,14 +244,10 @@ public class SearchManager2 extends SidePaneComponent
 
     JPanel main = new JPanel();
     main.setLayout(gbl);
-    //SidePaneHeader header = new SidePaneHeader("Search", GUIGlobals.searchIconFile, this);
     con.gridwidth = GridBagConstraints.REMAINDER;
     con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
-    //con.insets = new Insets(0, 0, 2,  0);
-    //gbl.setConstraints(header, con);
-    //add(header);
-        //con.insets = new Insets(0, 0, 0,  0);
+
         gbl.setConstraints(searchField,con);
         main.add(searchField) ;
         //con.gridwidth = 1;
