@@ -1,5 +1,5 @@
 /*  Copyright (C) 2012 Sarel Botha
-    This class has been copied from http://stackoverflow.com/a/5626340/873282
+    This class is based on http://stackoverflow.com/a/5626340/873282
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,12 +23,21 @@ final static int[] illegalChars = {34, 60, 62, 124, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 static {
     Arrays.sort(illegalChars);
 }
+
+/**
+ * Replaces illegal characters in given fileName by '_'
+ * 
+ * @param badFileName the fileName to clean
+ * @return a clean filename
+ */
 public static String cleanFileName(String badFileName) {
     StringBuilder cleanName = new StringBuilder();
     for (int i = 0; i < badFileName.length(); i++) {
         int c = (int)badFileName.charAt(i);
         if (Arrays.binarySearch(illegalChars, c) < 0) {
             cleanName.append((char)c);
+        } else {
+        	cleanName.append('_');
         }
     }
     return cleanName.toString();

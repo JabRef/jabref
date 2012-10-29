@@ -88,6 +88,7 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.util.FileNameCleaner;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -2998,6 +2999,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
 
 
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database the database, where the entry is located
+     * @param entry the entry to which the file should be linked to
+     * @return a suggested fileName
+     */
     public static String getLinkedFileName(BibtexDatabase database, BibtexEntry entry) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
 		StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
@@ -3011,10 +3019,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			targetName = layout.doLayout(entry, database);
 		}
 		//Removes illegal characters from filename
-		String[] illegalChars = {"\\","/",":","*","?","\"","<",">","|"};
-		for(String s : illegalChars) {
-			targetName = targetName.replace(s, "");
-		}
+		targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
     
