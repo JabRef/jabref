@@ -52,11 +52,9 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field")),
         authors = new JRadioButton(Globals.lang("Generate groups for author last names")),
         editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
-    JCheckBox nd = new JCheckBox(Globals.lang(
-    		"Use the following delimiter character(s)")
-            + ":"); // JZTODO lyrics
-    JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
-            .lang("Cancel"));
+    JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
+    JButton ok = new JButton(Globals.lang("Ok")), 
+    		cancel = new JButton(Globals.lang("Cancel"));
     JPanel main = new JPanel(), opt = new JPanel();
     private boolean ok_pressed = false;
     private GroupTreeNode m_groupsRoot;

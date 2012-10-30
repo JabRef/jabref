@@ -175,7 +175,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             int port = Integer.parseInt(remoteServerPort.getText());
             if (port != oldPort) {
                 _prefs.putInt("remoteServerPort", port);
-                /*JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
+                /*JOptionPane.showMessageDialog(null, Glbals.lang("You have changed the menu and label font size. "
                         + "You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);*/
             }

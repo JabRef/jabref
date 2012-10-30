@@ -43,8 +43,8 @@ public class AddToGroupAction extends AbstractAction {
         m_panel = panel;
     }
     public AddToGroupAction(boolean move) {
-        super(Globals.lang(move ? "Assign entry selection exclusively to this group"
-                : "Add entry selection to this group")); // JZTODO lyrics
+        super(move?Globals.lang("Assign entry selection exclusively to this group")
+                  :Globals.lang("Add entry selection to this group"));
         m_move = move;
     }
     public void setBasePanel(BasePanel panel) {

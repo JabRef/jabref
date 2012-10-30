@@ -189,18 +189,18 @@ public class ExternalFilePanel extends JPanel {
 					XMPUtil.writeXMP(finalFile, getEntry(), getDatabase());
 					output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
 				} catch (IOException e) {
-					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
-						"Error writing XMP to file: %0", e.getLocalizedMessage()), Globals
-						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(editor.getParent(), 
+            Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()), 
+					  Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
 					Globals.logger(Globals.lang("Error writing XMP to file: %0", finalFile
 						.getAbsolutePath()));
 					output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
 					
 				} catch (TransformerException e) {
-					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
-						"Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), Globals
-						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-					Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
+					JOptionPane.showMessageDialog(editor.getParent(), 
+            Globals.lang("Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), 
+            Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+					  Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
 						finalFile.getAbsolutePath()));
 					output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
 				}
@@ -326,12 +326,10 @@ public class ExternalFilePanel extends JPanel {
                     }
 					if (directory == null) {
                         if (dirs.length > 0)
-                            JOptionPane.showMessageDialog(parent, Globals.lang(
-                                "Could not find directory for %0-files: %1", fieldName, dirs[0]),
+                            JOptionPane.showMessageDialog(parent, Globals.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
                                 Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         else
-                            JOptionPane.showMessageDialog(parent, Globals.lang(
-                                "No directory defined for %0-files", fieldName),
+                            JOptionPane.showMessageDialog(parent, Globals.lang("No directory defined for %0-files", fieldName),
                                 Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
 						return;
 					}
