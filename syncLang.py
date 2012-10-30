@@ -2,6 +2,8 @@ import sys
 import os
 import re
 
+keyFiles = {}
+
 # Builds a list of all translation keys in the list of lines.
 def indexFile(lines):
     allKeys = []
@@ -73,53 +75,37 @@ def handleFileSet(mainFile, files, changeFiles):
             #       removeRedundantKeys(files[i], redundant)
             print ""
         
-                
 def handleJavaCode(filename, lines, keyList, notTermList):
-    
-    startLen = 14;
-    while len(lines) > 0:
-        
-        #print lines[0:100].strip()
-    
-        patt = re.compile(r'Globals\s*.lang\s*\(\s*"[^"]*"[^"]*\)')
-        pattInner = re.compile(r'"[^"]*"')
-        patt2 = re.compile(r'Globals\s*.lang\s*\(\s*"[^"]*"')
-        result = patt.search(lines)
-        result2 = patt2.search(lines)
+    #Extract first string parameter from Globals.lang call. E.g., Globals.lang("Default")
+    patt = re.compile(r'Globals\s*\.\s*lang\s*\(\s*"((\\"|[^"])*)"[^"]*')
+    #Find multiline Globals lang statements. E.g.:
+    #Globals.lang("This is my string" +
+    # "with a long text")
+    patt2 = re.compile(r'Globals\s*\.\s*lang\s*\(([^)])*$')
+
+    for linenum, curline in enumerate(lines.split("\n")):
+        #Remove Java single line comments
+        if curline.find("http://") < 0:
+            curline = re.sub("//.*", "", curline)
+
+        result = patt.search(curline)
+        result2 = patt2.search(curline)
         if result:
-            span = result.span()
-            theSpan = lines[span[0]:span[1]]
-            spanInner = pattInner.search(theSpan).span() # We know there's a match here.
-            found = theSpan[spanInner[0]+1:spanInner[1]-1].replace(" ", "_")
+            found = result.group(1)
+            found = found.replace(" ", "_")
             #replace characters that need to be escaped in the language file
-            found = found.replace("=", "\=").replace(":","\:")
-            #found = lines[i][span[0]+startLen:span[1]-2].replace(" ", "_")
+            found = found.replace("=", r"\=").replace(":",r"\:")
+            #replace Java-escaped " to plain "
+            found = found.replace(r'\"','"')
             if not found == "" and found not in keyList:
                 keyList.append(found)
+                keyFiles[found] = (filename, linenum)
+                #print "Adding ", found
             #else:
             #   print "Not adding: "+found
                 
-            # Remove the part of the file we have treated:
-            if span[1] < len(lines):
-                lines = lines[span[1]+1:]
-            else:
-                lines = ""
-
-        elif result2:
-            span = result2.span()
-            theSpan = lines[span[0]:span[1]]
-            spanInner = pattInner.search(theSpan).span() # We know there's a match here.
-            found = theSpan[spanInner[0]+1:spanInner[1]-1].replace(" ", "_")
-            print "Not terminated: "+found
-            
-            # Remove the part of the file we have treated:
-            if span[1] < len(lines):
-                lines = lines[span[1]+1:]
-            else:
-                lines = ""
-        else:
-            lines = "" # End search
-            
+        if result2 and curline.find('",') < 0:
+            print "%s:%d: Not terminated: %s"%(filename, linenum+1, curline)
             
 # Find all Java source files in the given directory, and read the lines of each,
 # calling handleJavaCode on the contents:   
@@ -131,7 +117,7 @@ def handleDir(lists, dirname, fnames):
             lines = fl.read()
             fl.close()
             #print "Checking Java file '"+file+"'"
-            handleJavaCode(file, lines, keyList, notTermList)
+            handleJavaCode(dirname + "/" + file, lines, keyList, notTermList)
 
             
 # Go through subdirectories and call handleDir on all diroctories:                      
@@ -153,24 +139,18 @@ def findNewKeysInJavaCode(mainFile, dir, update):
     f1.close()
     keys = indexFile(lines)
     keyList = traverseFileTree(dir)
-    
-    #to process properly column character
-    for key in keys:
-       keystempo.append(key.replace("\\:",":").replace("\\=", "="))
-    keys=keystempo
-    for key in keyList:
-       keyListtempo.append(key.replace("\\:",":").replace("\\=", "="))
-    keyList=keyListtempo
-    
+   
     # Open the file again, for appending:
     if update:
         f1 = open(mainFile, "a")
         f1.write("\n")
         
     # Look for keys that are used in the code, but not present in the language file:
-    for key in keyList:
+    for keyOrig in keyList:
+        key = keyOrig.replace("\\:",":").replace("\\=", "=")
         if key not in keys:
-            print "Missing key: "+key
+            fileName, lineNum = keyFiles[keyOrig]
+            print "%s:%i:Missing key: %s"%(fileName, lineNum + 1, key)
 	    value = key
 	    key = key.replace(":", "\\:").replace("=", "\\=")
 
