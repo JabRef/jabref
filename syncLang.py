@@ -100,7 +100,6 @@ def handleJavaCode(filename, lines, keyList, notTermList):
             curline = re.sub("//.*", "", curline)
 
         while (curline != ""):
-
             result = patt.search(curline)
             if (not result):
                 result = patta.search(curline)
@@ -178,6 +177,9 @@ def handleJavaCode(filename, lines, keyList, notTermList):
             #Prepare a possible second run (multiple Globals.lang on this line)
             if result:
                 lastPos = result.span()[1]
+                #regular expression is greedy. It will match until Globals.lang("
+                #therefore, we have to adjust lastPos
+                lastPos = lastPos - 14
                 if len(curline) <= lastPos:
                     curline = ""
                 else:
