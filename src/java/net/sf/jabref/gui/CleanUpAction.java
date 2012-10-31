@@ -48,6 +48,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.imports.HTMLConverter;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
@@ -62,7 +63,8 @@ public class CleanUpAction extends AbstractWorker {
 		CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative",
 		CLEANUP_RENAMEPDF = "CleanUpRenamePDF",
 		CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths",
-		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
+		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts",
+		CLEANUP_HTML = "CleanUpHTML";
 	
 	public static void putDefaults(HashMap<String, Object> defaults) {
 		defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
@@ -73,6 +75,8 @@ public class CleanUpAction extends AbstractWorker {
 		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
 		defaults.put(CLEANUP_RENAMEPDF, Boolean.TRUE);
 		defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
+		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
+                defaults.put(CLEANUP_HTML, Boolean.TRUE);
 	}
 	
 	private JCheckBox cleanUpSuperscrips;
@@ -82,6 +86,7 @@ public class CleanUpAction extends AbstractWorker {
 	private JCheckBox cleanUpMakePathsRelative;
 	private JCheckBox cleanUpRenamePDF;
 	private JCheckBox cleanUpRenamePDFonlyRelativePaths;
+	private JCheckBox cleanUpHTML;
 	private JPanel optionsPanel = new JPanel();
 	private BasePanel panel;
 	private JabRefFrame frame;
@@ -109,10 +114,11 @@ public class CleanUpAction extends AbstractWorker {
 			}
 		});
 		cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Globals.lang("Rename only PDFs having a relative path"));
+		cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
-		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref");
+		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.setDefaultDialogBorder();
         CellConstraints cc = new CellConstraints();
@@ -125,6 +131,7 @@ public class CleanUpAction extends AbstractWorker {
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern), cc.xyw(2,7,1));
         builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,8,1));
+        builder.add(cleanUpHTML, cc.xyw(1,9,2));
 	}
 	
 	private void retrieveSettings() {
@@ -136,6 +143,7 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpRenamePDF.setSelected(Globals.prefs.getBoolean(CLEANUP_RENAMEPDF));
 		cleanUpRenamePDFonlyRelativePaths.setSelected(Globals.prefs.getBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS));
 		cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
+                cleanUpHTML.setSelected(Globals.prefs.getBoolean(CLEANUP_HTML));
 	}
 	
 	private void storeSettings() {
@@ -146,6 +154,7 @@ public class CleanUpAction extends AbstractWorker {
 		Globals.prefs.putBoolean(CLEANUP_MAKEPATHSRELATIVE, cleanUpMakePathsRelative.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF, cleanUpRenamePDF.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, cleanUpRenamePDFonlyRelativePaths.isSelected());
+                Globals.prefs.putBoolean(CLEANUP_HTML, cleanUpHTML.isSelected());
 	}
 
 	private int showCleanUpDialog() {
@@ -189,7 +198,8 @@ public class CleanUpAction extends AbstractWorker {
     		choiceCleanUpMonth = cleanUpMonth.isSelected(),
     		choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected(),
     		choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected(),
-    		choiceRenamePDF = cleanUpRenamePDF.isSelected();
+		choiceRenamePDF = cleanUpRenamePDF.isSelected(),
+                choiceConvertHTML = cleanUpHTML.isSelected();
     	
     	if (choiceRenamePDF && Globals.prefs.getBoolean(AKS_AUTO_NAMING_PDFS_AGAIN)) { 
 	        CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
@@ -214,6 +224,7 @@ public class CleanUpAction extends AbstractWorker {
         	if (choiceCleanUpPageNumbers) doCleanUpPageNumbers(entry, ce);
         	if (choiceMakePathsRelative) doMakePathsRelative(entry, ce);
         	if (choiceRenamePDF) doRenamePDFs(entry, ce);
+		if (choiceConvertHTML) doConvertHTML(entry, ce);
         	
             ce.end();
             if (ce.hasEdits()) {
@@ -450,4 +461,19 @@ public class CleanUpAction extends AbstractWorker {
 			ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
 		}
 	}
+	/**
+	 * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
+	 */
+    private void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
+        final String field = "title";
+        final HTMLConverter htmlConverter = new HTMLConverter();
+        String oldValue = entry.getField(field);
+        if (oldValue == null) return;
+        String newValue = htmlConverter.format(oldValue);
+        if (!oldValue.equals(newValue)) {
+            entry.setField(field, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+        }
+    }
+
 }

@@ -43,6 +43,12 @@ public class HTMLConverter implements LayoutFormatter {
 		escapedSymbols.put("&amp;", "&");
 		escapedSymbols.put("&lt;", "<");
 		escapedSymbols.put("&gt;", ">");
+                escapedSymbols.put("&mu;", "\\$\\\\mu\\$");
+		escapedSymbols.put("&times;", "\\$\\\\times\\$");
+		escapedSymbols.put("&Sigma;", "\\{\\$\\\\Sigma\\$\\}");
+		escapedSymbols.put("&Delta;", "\\{\\$\\\\Delta\\$\\}");
+		escapedSymbols.put("&radic;", "\\$\\\\sqrt{}\\$");
+
 	}
     public String format(String text) {
         if (text == null)
@@ -75,11 +81,29 @@ public class HTMLConverter implements LayoutFormatter {
         	case 38:
         		text = text.replaceAll("&#" + m.group(1) + ";", "&");
         		break;
+		case 176:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\deg\\$");
+			break;
+		case 181: case 956:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\mu\\$");
+			break;
+		case 215:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\times\\$");
+			break;
+		case 769:
+			text = text.replaceAll("&#" + m.group(1) + ";", "'"); // Can be solved better as it is a combining accent
+			break;
         	case 916:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\{\\$\\\\Delta\\$\\}");
+			break;
+		case 931:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\{\\$\\\\Sigma\\$\\}");
+			break;
+		case 948:
         		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\delta\\$");
         		break;
-		case 956: case 181:
-        		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\mu\\$");
+		case 963:
+			text = text.replaceAll("&#" + m.group(1) + ";", "\\{\\$\\\\sigma\\$\\}");
         		break;
         	case 8208:
         		text = text.replaceAll("&#" + m.group(1) + ";", "-");
@@ -93,24 +117,17 @@ public class HTMLConverter implements LayoutFormatter {
         	case 8217:
         		text = text.replaceAll("&#" + m.group(1) + ";", "'");
         		break;
-        	case 8730:
+                case 8730:
         		text = text.replaceAll("&#" + m.group(1) + ";", "\\$\\\\sqrt{}\\$");
         		break;
         	default:
         		System.err.println("HTML escaped char not converted " + m.group(1) + ": " + Integer.toString(num));
         	}
         }
-
-	// Also match special characters with alphabetic codes
+	// Find non-covered special characters with alphabetic codes
         escapedPattern = Pattern.compile("&(\\w+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
-	  String match = m.group(1).toLowerCase();
-	  if (match.equals("mu"))
-	    text = text.replaceAll("&" + m.group(1) + ";", "\\$\\\\mu\\$");
-	  else if (match.equals("radic"))
-	    text = text.replaceAll("&" + m.group(1) + ";", "\\$\\\\sqrt{}\\$");
-	  else
 	    System.err.println("HTML escaped char not converted " + m.group(1));
 	}
 
