@@ -398,7 +398,7 @@ public class FileActions
                 e.printStackTrace();
                 throw new SaveException(ex.getMessage()+"\n"+
                         Globals.lang("Warning: could not complete file repair; your file may "
-                        +"have been corrupted. Error message: ")+e.getMessage());
+                        +"have been corrupted. Error message")+": "+e.getMessage());
             }
             throw new SaveException(ex.getMessage(), be);
     }

@@ -97,7 +97,7 @@ public class ManageJournalsPanel extends JPanel{
 
         CellConstraints cc = new CellConstraints();
 
-        /*JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef can switch journal names between "
+        /*JLabel description = new JLabel("<HTML>"+Glbals.lang("JabRef can switch journal names between "
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
             +"you may need to add your own definitions.")+"</HTML>");*/
         builder.addSeparator(Globals.lang("Built-in journal list"), cc.xyw(2,1,6));

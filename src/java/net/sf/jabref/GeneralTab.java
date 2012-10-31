@@ -226,8 +226,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("enforceLegalBibtexKey", enforceLegalKeys.isSelected());
         if (_prefs.getBoolean("memoryStickMode") && !memoryStick.isSelected()){
-            JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode" +
-            		" rename or remove the jabref.xml file in the same folder as JabRef."),
+            JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode"
+            		+ " rename or remove the jabref.xml file in the same folder as JabRef."),
             		Globals.lang("Memory Stick Mode"),
             		JOptionPane.INFORMATION_MESSAGE);
         }

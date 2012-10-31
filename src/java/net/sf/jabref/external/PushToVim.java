@@ -144,8 +144,8 @@ public class PushToVim implements PushToApplication {
                 panel.frame(),
                 "<HTML>"+
                 Globals.lang("Could not connect to Vim server. Make sure that "
-                +"Vim is running<BR>with correct server name."
-                +"</HTML>"),
+														 +"Vim is running<BR>with correct server name.")
+                +"</HTML>",
                 Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
         else if (couldNotRunClient)
             JOptionPane.showMessageDialog(

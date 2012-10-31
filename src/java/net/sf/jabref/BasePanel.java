@@ -1016,8 +1016,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                         if (keys.size() == bes.length)
                             // All entries had keys.
-                            output(Globals.lang((bes.length > 1) ? "Copied keys"
-                                                : "Copied key")+".");
+                            output(bes.length > 1 ? Globals.lang("Copied keys")
+                                                  : Globals.lang("Copied key")+".");
                         else
                             output(Globals.lang("Warning")+": "+(bes.length-keys.size())
                                    +" "+Globals.lang("out of")+" "+bes.length+" "+
