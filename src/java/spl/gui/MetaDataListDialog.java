@@ -192,7 +192,7 @@ public class MetaDataListDialog extends JDialog {
                     iconLabel.setVisible(false);
                     labelFetch.setText(LocalizationSupport.message("The_Mr._dLib_web_service_version_you_trying_to_access_is_outdated."));
                     blankButton.setVisible(showBlankButton);
-                    JOptionPane.showMessageDialog(thisDialog, LocalizationSupport.message("This_JabRef_version_is_trying_to_access_an_old_version_of_Mr._dLib's_webservice_that_is_not_working_any_more.\\nPlease_visit_http://jabref.sourceforge.net_or_http://www.mr-dlib.org_for_more_information_and_updates.\\n\\n\\n"), LocalizationSupport.message("Web_Service_Version_Outdated"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(thisDialog, LocalizationSupport.message("This_JabRef_version_is_trying_to_access_an_old_version_of_Mr._dLib's_webservice_that_is_not_working_any_more.\nPlease_visit_http://jabref.sourceforge.net_or_http://www.mr-dlib.org_for_more_information_and_updates."), LocalizationSupport.message("Web_Service_Version_Outdated"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 if (webserviceStatus == SplWebClient.WebServiceStatus.WEBSERVICE_DOWN) {
                     iconLabel.setVisible(false);
