@@ -814,7 +814,7 @@ public class BibtexParser {
 			//
 			// G\uFFFDr: $_*+.-\/?"^
 			if (!Character.isWhitespace((char) c)
-				&& (Character.isLetterOrDigit((char) c) || ((c != '#') && (c != '{') && (c != '}')
+				&& (Character.isLetterOrDigit((char) c) || (c == ':') || ((c != '#') && (c != '{') && (c != '}')
 					&& (c != '\uFFFD') && (c != '~') && (c != '\uFFFD') && (c != ',') && (c != '=')))) {
 				token.append((char) c);
 			} else {

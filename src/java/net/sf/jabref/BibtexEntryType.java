@@ -791,6 +791,44 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         };
 
     /**
+     * This type is used for IEEEtran.bst to control various 
+     * be repeated or not. Not a very elegant solution, but it works...
+     */
+    public static final BibtexEntryType IEEETRANBSTCTL =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "IEEEtranBSTCTL";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[] {
+                "ctluse_article_number", "ctluse_paper", "ctluse_forced_etal",
+                "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing",
+                "ctlalt_stretch_factor", "ctldash_repeated_names", "ctlname_format_string",
+                "ctlname_latex_cmd", "ctlname_url_prefix"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return null;
+            }
+
+            public String describeRequiredFields()
+            {
+                return "None";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
+            {
+		return true;
+           }
+        };
+
+    /**
      * This type is provided as an emergency choice if the user makes
      * customization changes that remove the type of an entry.
      */
@@ -888,6 +926,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             ALL_TYPES.put("periodical", PERIODICAL);
             ALL_TYPES.put("misc", MISC);
             ALL_TYPES.put("other", OTHER);
+            ALL_TYPES.put("ieeetranbstctl", IEEETRANBSTCTL);
         }
         else {
             ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
@@ -919,6 +958,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 	    ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
 	    ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
 	    ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
+            ALL_TYPES.put("ieeetranbstctl", BibLatexEntryTypes.IEEETRANBSTCTL);
         }
 
         // We need a record of the standard types, in case the user wants
