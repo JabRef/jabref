@@ -53,14 +53,18 @@ public class CookieHandlerImpl extends CookieHandler {
                 // New one will replace
                 for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
                     Cookie existingCookie = i.next();
-                    if ((cookie.getURI().equals(
-                            existingCookie.getURI())) &&
+                    if (/*(cookie.getURI().equals(
+                            existingCookie.getURI()))*/
+                        (cookie.domain.equals(existingCookie.domain))
+                        &&
                             (cookie.getName().equals(
                                     existingCookie.getName()))) {
                         i.remove();
                         break;
                     }
                 }
+                //System.out.println(cookie.getName()+" : "+cookie.domain+" : "+cookie.toString());
+
                 cache.add(cookie);
             }
         }
@@ -109,6 +113,7 @@ public class CookieHandlerImpl extends CookieHandler {
             List<String> list =
                     Collections.singletonList(cookies.toString());
             cookieMap.put("Cookie", list);
+
         }
         return Collections.unmodifiableMap(cookieMap);
     }
