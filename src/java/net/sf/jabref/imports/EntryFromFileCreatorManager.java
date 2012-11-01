@@ -89,33 +89,35 @@ public final class EntryFromFileCreatorManager {
 	 * @param files
 	 * @param database
 	 * @param entryType
-	 * @param changeListener
 	 * @return List of unexcpected import event messages including failures.
 	 */
 	public List<String> addEntrysFromFiles(List<File> files,
 			BibtexDatabase database, BibtexEntryType entryType,
 			boolean generateKeywordsFromPathToFile) {
-		return addEntrysFromFiles(files, database, entryType,
-				generateKeywordsFromPathToFile, null);
+        List<String> importGUIMessages = new LinkedList<String>();
+		addEntrysFromFiles(files, database, entryType,
+				generateKeywordsFromPathToFile, null, importGUIMessages);
+        return importGUIMessages;
 	}
 
 	/**
 	 * Tries to add a entry for each file in the List.
 	 * 
 	 * @param files
-	 * @param database
+     * @param database
 	 * @param entryType
 	 * @param generateKeywordsFromPathToFile
 	 * @param changeListener
-	 * @return Returns list of unexpected import event - Messages including
-	 *         failures
+     * @param importGUIMessages list of unexpected import event - Messages including
+     	 *         failures
+	 * @return Returns The number of entries added
 	 */
-	public List<String> addEntrysFromFiles(List<File> files,
+	public int addEntrysFromFiles(List<File> files,
 			BibtexDatabase database, BibtexEntryType entryType,
 			boolean generateKeywordsFromPathToFile,
-			ChangeListener changeListener) {
-		List<String> importGUIMessages = new LinkedList<String>();
-		
+			ChangeListener changeListener, List<String> importGUIMessages) {
+
+        int count = 0;
 		for (File f : files) {
 			EntryFromFileCreator creator = getEntryCreator(f);
 			if (creator != null) {
@@ -141,6 +143,8 @@ public final class EntryFromFileCreatorManager {
 					importGUIMessages.add("Problem importing " + f.getPath()
 							+ ": Insert into BibtexDatabase failed.");
 				}
+                else
+                    count++;
 			} else {
 				importGUIMessages.add("Problem importing " + f.getPath()
 						+ ": Unknown filetype.");
@@ -149,7 +153,7 @@ public final class EntryFromFileCreatorManager {
 			if (changeListener != null)
 				changeListener.stateChanged(new ChangeEvent(this));
 		}
-		return importGUIMessages;
+		return count;
 
 	}
 

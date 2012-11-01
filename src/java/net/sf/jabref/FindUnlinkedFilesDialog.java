@@ -23,12 +23,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -109,8 +104,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 	protected JButton buttonBrowse;
 	protected JButton buttonScan;
-	protected JButton buttonOk;
-	protected JButton buttonCancel;
+	protected JButton buttonApply;
+	protected JButton buttonClose;
 
 	/* Options for the TreeView */
 	protected JButton buttonOptionSelectAll;
@@ -171,6 +166,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		lastSelectedDirectory = loadLastSelectedDirectory();
 		
 		initialize();
+        buttonApply.setEnabled(false);
 	}
 	
 	/**
@@ -528,8 +524,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 		progressBarImporting.setVisible(true);
 		labelImportingInfo.setVisible(true);
-		buttonOk.setVisible(false);
-		buttonCancel.setVisible(false);
+		buttonApply.setVisible(false);
+		buttonClose.setVisible(false);
 		disOrEnableDialog(false);
 		
 		labelImportingInfo.setEnabled(true);
@@ -545,14 +541,16 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		threadState = new int[] {1};
 		new Thread(new Runnable() {
 			public void run() {
-				List<String> errors = creatorManager.addEntrysFromFiles(fileList, database, entryType, checkBoxWhyIsThereNoGetSelectedStupidSwing,  new ChangeListener() {
+                List<String> errors = new LinkedList<String>();
+				int count = creatorManager.addEntrysFromFiles(fileList, database, entryType,
+                        checkBoxWhyIsThereNoGetSelectedStupidSwing,  new ChangeListener() {
 					int counter = 0;
 					public void stateChanged(ChangeEvent e) {
 						progressBarImporting.setValue(++counter);
 						progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
 					}
-				});
-				importFinishedHandler(errors);
+				}, errors);
+				importFinishedHandler(count, errors);
 			}
 		}).start();
 		
@@ -562,7 +560,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * 
 	 * @param errors
 	 */
-	protected void importFinishedHandler(List<String> errors) {
+	protected void importFinishedHandler(int count, List<String> errors) {
 		
 		if (errors != null && errors.size() > 0) {
 			
@@ -582,11 +580,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		
 		progressBarImporting.setVisible(false);
 		labelImportingInfo.setVisible(false);
-		buttonOk.setVisible(true);
-		buttonCancel.setVisible(true);
-		
+		buttonApply.setVisible(true);
+		buttonClose.setVisible(true);
 		disOrEnableDialog(true);
+        buttonApply.setEnabled(false);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        frame.basePanel().markBaseChanged();
 	}
 	
 	/**
@@ -609,10 +608,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		progressBarSearching.setVisible(false);
 		labelSearchingDirectoryInfo.setVisible(false);
 		buttonScan.setVisible(true);
-		
 		actionSelectAll.actionPerformed(null);
 		
 		disOrEnableDialog(true);
+        buttonApply.setEnabled(true);
 	}
 
 	/**
@@ -648,13 +647,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			}
 		};
 		
-		buttonOk.addActionListener(actionListenerImportEntrys);
+		buttonApply.addActionListener(actionListenerImportEntrys);
 		
-		buttonCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		buttonClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
 	}
 
 	/**
@@ -737,14 +736,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		buttonScan = new JButton(Globals.lang("Scan directory"));
 		buttonScan.setMnemonic('S');
 		buttonScan.setToolTipText(Globals.lang("Searches the selected directory for unlinked files."));
-		buttonOk = new JButton(Globals.lang("Ok"));
-		buttonOk.setMnemonic('I');
-		buttonOk.setToolTipText(Globals.lang("Starts the import of bibtex entries."));
-		buttonCancel = new JButton(Globals.lang("Cancel"));
-		buttonCancel.setToolTipText(Globals.lang("Leave this dialog."));
-		buttonCancel.setMnemonic('C');
+		buttonApply = new JButton(Globals.lang("Apply"));
+		buttonApply.setMnemonic('I');
+		buttonApply.setToolTipText(Globals.lang("Starts the import of bibtex entries."));
+		buttonClose = new JButton(Globals.lang("Close"));
+		buttonClose.setToolTipText(Globals.lang("Leave this dialog."));
+		buttonClose.setMnemonic('C');
 
-		
 		
 		/* Options for the TreeView */
 		buttonOptionSelectAll = new JButton();
@@ -875,8 +873,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		
 	    ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
-        bb.addButton(buttonOk);
-        bb.addButton(buttonCancel);
+        bb.addButton(buttonApply);
+        bb.addButton(buttonClose);
         bb.addGlue();
 
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));        
