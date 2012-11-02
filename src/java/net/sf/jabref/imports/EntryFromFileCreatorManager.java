@@ -8,13 +8,12 @@ import java.util.List;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.UndoManager;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.undo.UndoableInsertEntry;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators. 
@@ -95,7 +94,7 @@ public final class EntryFromFileCreatorManager {
 			BibtexDatabase database, BibtexEntryType entryType,
 			boolean generateKeywordsFromPathToFile) {
         List<String> importGUIMessages = new LinkedList<String>();
-		addEntrysFromFiles(files, database, entryType,
+		addEntrysFromFiles(files, database, null, entryType,
 				generateKeywordsFromPathToFile, null, importGUIMessages);
         return importGUIMessages;
 	}
@@ -105,6 +104,7 @@ public final class EntryFromFileCreatorManager {
 	 * 
 	 * @param files
      * @param database
+     * @param panel
 	 * @param entryType
 	 * @param generateKeywordsFromPathToFile
 	 * @param changeListener
@@ -113,11 +113,12 @@ public final class EntryFromFileCreatorManager {
 	 * @return Returns The number of entries added
 	 */
 	public int addEntrysFromFiles(List<File> files,
-			BibtexDatabase database, BibtexEntryType entryType,
+			BibtexDatabase database, BasePanel panel, BibtexEntryType entryType,
 			boolean generateKeywordsFromPathToFile,
 			ChangeListener changeListener, List<String> importGUIMessages) {
 
         int count = 0;
+        CompoundEdit ce = new CompoundEdit();
 		for (File f : files) {
 			EntryFromFileCreator creator = getEntryCreator(f);
 			if (creator != null) {
@@ -143,8 +144,11 @@ public final class EntryFromFileCreatorManager {
 					importGUIMessages.add("Problem importing " + f.getPath()
 							+ ": Insert into BibtexDatabase failed.");
 				}
-                else
+                else {
                     count++;
+                    if (panel != null)
+                        ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                }
 			} else {
 				importGUIMessages.add("Problem importing " + f.getPath()
 						+ ": Unknown filetype.");
@@ -153,6 +157,13 @@ public final class EntryFromFileCreatorManager {
 			if (changeListener != null)
 				changeListener.stateChanged(new ChangeEvent(this));
 		}
+
+        System.out.println("count = "+count);
+        if ((count > 0) && (panel != null)) {
+            System.out.println("adding edit");
+            ce.end();
+            panel.undoManager.addEdit(ce);
+        }
 		return count;
 
 	}

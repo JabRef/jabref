@@ -61,6 +61,7 @@ import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
 import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
+import net.sf.jabref.undo.CountingUndoManager;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -542,7 +543,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		new Thread(new Runnable() {
 			public void run() {
                 List<String> errors = new LinkedList<String>();
-				int count = creatorManager.addEntrysFromFiles(fileList, database, entryType,
+                int count = creatorManager.addEntrysFromFiles(fileList, database, frame.basePanel(),
+                        entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing,  new ChangeListener() {
 					int counter = 0;
 					public void stateChanged(ChangeEvent e) {
@@ -583,8 +585,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		buttonApply.setVisible(true);
 		buttonClose.setVisible(true);
 		disOrEnableDialog(true);
-        buttonApply.setEnabled(false);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.basePanel().markBaseChanged();
 	}
 	
