@@ -264,6 +264,11 @@ public class PdfContentImporter extends ImportFormat {
 			//   the different lines are joined into one and thereby separated by " "
 			
 			proceedToNextNonEmptyLine();
+			if (i>=split.length) {
+				// PDF could not be parsed or is empty
+				// return empty list
+				return res;
+			}
 			curString = split[i];
 			i = i+1;
 			
