@@ -314,7 +314,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	}
 
     public void output(String s) {
-    //Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
         if (!suppressOutput)
             frame.output(s);
     }
@@ -607,10 +606,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           undoManager.addEdit(ce);
                           //entryTable.clearSelection();
                           //entryTable.revalidate();
-                          output(Globals.lang("Pasted")+" "+
-                                 (bes.length>1 ? bes.length+" "+
-                                  Globals.lang("entries") : "1 "+Globals.lang("entry"))
-                                 +".");
+                          output(Globals.lang("Pasted") + " " +
+                                  (bes.length > 1 ? bes.length + " " +
+                                          Globals.lang("entries") : "1 " + Globals.lang("entry"))
+                                  + ".");
                           markBaseChanged();
                         	  
                           if (Globals.prefs.getBoolean("autoOpenForm")) {
@@ -2733,6 +2732,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 markBaseChanged();
                 frame.output(name);
             } catch (CannotUndoException ex) {
+                ex.printStackTrace();
                 frame.output(Globals.lang("Nothing to undo")+".");
             }
             // After everything, enable/disable the undo/redo actions

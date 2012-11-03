@@ -3,41 +3,119 @@ package net.sf.jabref.gui;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
+import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
  */
-public class FetcherPreviewDialog extends JDialog {
+public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     protected EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
     protected JTable glTable;
+    protected JButton ok = new JButton(Globals.lang("Ok")),
+        cancel = new JButton(Globals.lang("Cancel"));
+    protected JButton selectAll = new JButton(Globals.lang("Select all"));
+    protected JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    protected boolean okPressed = false;
+    private JabRefFrame frame;
 
     public static void main(String[] args) {
-        FetcherPreviewDialog diag = new FetcherPreviewDialog();
+        FetcherPreviewDialog diag = new FetcherPreviewDialog(null);
         diag.addEntry("en", new JLabel("Dette er en prøve"));
         diag.addEntry("to", new JLabel("Dette er en prøve"));
 
         diag.setVisible(true);
     }
 
-    public FetcherPreviewDialog(/*JabRefFrame frame*/) {
-        super((JFrame)null, Globals.lang("Title"), true);
+    public FetcherPreviewDialog(JabRefFrame frame) {
+        super(frame, Globals.lang("Title"), true);
+        this.frame = frame;
 
-        //sortedList = new SortedList<TableEntry>(entries);
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                okPressed = true;
+                dispose();
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                okPressed = false;
+                dispose();
+            }
+        });
+        selectAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setSelectionAll(true);
+            }
+        });
+        deselectAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setSelectionAll(false);
+            }
+        });
+
         EventTableModel<TableEntry> tableModelGl = new EventTableModel<TableEntry>(entries,
                     new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
-        getContentPane().add(new JScrollPane(glTable), BorderLayout.CENTER);
+        glTable.setRowHeight(100);
+        glTable.getColumnModel().getColumn(0).setMaxWidth(30);
+        glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
+        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
+        glTable.setSelectionModel(selectionModel);
+        ButtonStackBuilder builder = new ButtonStackBuilder();
+        builder.addButton(selectAll);
+        builder.addButton(deselectAll);
+
+        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        bb.addGlue();
+        bb.addButton(ok);
+        bb.addButton(cancel);
+        bb.addGlue();
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+        JPanel centerPan = new JPanel();
+        centerPan.setLayout(new BorderLayout());
+        centerPan.add(new JScrollPane(glTable), BorderLayout.CENTER);
+        centerPan.add(builder.getPanel(), BorderLayout.WEST);
+
+        getContentPane().add(centerPan, BorderLayout.CENTER);
+        getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+
+        // Key bindings:
+        AbstractAction closeAction = new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        };
+        ActionMap am = centerPan.getActionMap();
+        InputMap im = centerPan.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", closeAction);
 
         pack();
+
+    }
+
+    public Map<String,Boolean> getSelection() {
+        LinkedHashMap<String, Boolean> selection = new LinkedHashMap<String,Boolean>();
+        for (TableEntry e : entries)
+            selection.put(e.id, e.isWanted());
+        return selection;
     }
 
         /* (non-Javadoc)
@@ -48,6 +126,14 @@ public class FetcherPreviewDialog extends JDialog {
         this.entries.getReadWriteLock().writeLock().lock();
         this.entries.add(entry);
         this.entries.getReadWriteLock().writeLock().unlock();
+        glTable.repaint();
+    }
+
+    public void setSelectionAll(boolean select) {
+        for (int i = 0; i < glTable.getRowCount(); i++) {
+            glTable.setValueAt(select, i, 0);
+        }
+        glTable.repaint();
     }
 
 
@@ -145,4 +231,21 @@ public class FetcherPreviewDialog extends JDialog {
 
     }
 
+    public boolean isOkPressed() {
+        return okPressed;
+    }
+
+
+    public void setStatus(String s) {
+        frame.setStatus(s);
+    }
+
+
+    public void showMessage(Object message, String title, int msgType) {
+        JOptionPane.showMessageDialog(this, message, title, msgType);
+    }
+
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
 }

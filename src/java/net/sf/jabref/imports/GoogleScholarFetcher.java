@@ -16,6 +16,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.NameListNormalizer;
 
@@ -29,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class GoogleScholarFetcher implements EntryFetcher {
+public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
     private boolean clearKeys = true; // Should we clear the keys so new ones can be generated?
@@ -42,7 +43,8 @@ public class GoogleScholarFetcher implements EntryFetcher {
             +"&amp;hl=en&amp;btnG=Search";
 
     final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\">[A-Za-z ]*BibTeX");
-
+    final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
+    final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
@@ -50,26 +52,20 @@ public class GoogleScholarFetcher implements EntryFetcher {
     protected boolean stopFetching = false;
 
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
+        return false;
+    }
+
+    public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview, OutputPrinter status) {
+
         stopFetching = false;
         try {
             if (!hasRunConfig) {
                 runConfig();
                 hasRunConfig = true;
             }
-            List<String> citations = getCitations(query);
-            int entriesAdded = 0;
-            inspector.setProgress(2, citations.size()+2);
-            int i=0;
-            for (String citation : citations) {
-                if (stopFetching)
-                    break;
-
-                BibtexEntry entry = downloadEntry(citation);
-                inspector.setProgress((++i)+2, citations.size()+2);
-                if (entry != null) {
-                    inspector.addEntry(entry);
-                    entriesAdded++;
-                }
+            Map<String, JLabel> citations = getCitations(query);
+            for (String link : citations.keySet()) {
+                preview.addEntry(link, citations.get(link));
             }
 
             return true;
@@ -79,6 +75,31 @@ public class GoogleScholarFetcher implements EntryFetcher {
             return false;
         }
     }
+
+    public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
+        int toDownload = 0, downloaded = 0;
+        for (String link : selection.keySet()) {
+            boolean isSelected = selection.get(link);
+            if (isSelected) toDownload++;
+        }
+        if (toDownload == 0) return;
+
+        for (String link : selection.keySet()) {
+            inspector.setProgress(downloaded, toDownload);
+            boolean isSelected = selection.get(link);
+            if (isSelected) {
+                downloaded++;
+                try {
+                    BibtexEntry entry = downloadEntry(link);
+                    inspector.addEntry(entry);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
 
     public String getTitle() {
         return "Google Scholar";
@@ -155,35 +176,57 @@ public class GoogleScholarFetcher implements EntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    protected List<String> getCitations(String query) throws IOException {
+    protected Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<String>();
+        LinkedHashMap<String, JLabel> res = new LinkedHashMap<String, JLabel>();
         try {
             urlQuery = SEARCH_URL.replace(QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage = null;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
+            while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
                     && (count < 2)) {
                 urlQuery = nextPage;
                 count++;
                 if (stopFetching)
                     break;
             }
-            return ids;
+            return res;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
+    protected String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
         URL url = new URL(urlQuery);
         URLDownload ud = new URLDownload(url);
         ud.download();
         String cont = ud.getStringContent();
         Matcher m = BIBTEX_LINK_PATTERN.matcher(cont);
+        int lastRegionStart = 0;
         while (m.find()) {
             String link = m.group(1).replaceAll("&amp;", "&");
-            ids.add(link);
+            JLabel preview;
+            System.out.println("regionStart: "+m.start());
+            String part = cont.substring(lastRegionStart, m.start());
+            Matcher titleS = TITLE_START_PATTERN.matcher(part);
+            Matcher titleE = TITLE_END_PATTERN.matcher(part);
+            boolean fS = titleS.find();
+            boolean fE = titleE.find();
+            System.out.println("fs = "+fS+", fE = "+fE);
+            System.out.println(titleS.end()+" : "+titleE.start());
+            if (fS && fE) {
+                if (titleS.end() < titleE.start()) {
+                    preview = new JLabel("<html>"+part.substring(titleS.end(),
+                            titleE.start())+"</html>");
+                }
+                else preview = new JLabel("<html>"+part+"</html>");
+            }
+            else
+                preview = new JLabel(link);
+
+            ids.put(link, preview);
+
+            lastRegionStart = m.end();
         }
 
         /*m = NEXT_PAGE_PATTERN.matcher(cont);

@@ -36,43 +36,43 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
     public UndoableInsertEntry(BibtexDatabase base, BibtexEntry entry,
 			       BasePanel panel) {
-	this.base = base;
-	this.entry = entry;
-	this.panel = panel;
+        this.base = base;
+        this.entry = entry;
+        this.panel = panel;
     }
 
     public String getUndoPresentationName() {
-	return "Undo: insert entry";
+	    return "Undo: insert entry";
     }
 
     public String getRedoPresentationName() {
-	return "Redo: insert entry";
+	    return "Redo: insert entry";
     }
 
     public void undo() {
-	super.undo();
+        super.undo();
 
-	// Revert the change.
-	try {
-	    base.removeEntry(entry.getId());
-	    // If the entry has an editor currently open, we must close it.
-	    panel.ensureNotShowing(entry);
-	} catch (Throwable ex) {
-          ex.printStackTrace();
-	}
+        // Revert the change.
+        try {
+            base.removeEntry(entry.getId());
+            // If the entry has an editor currently open, we must close it.
+            panel.ensureNotShowing(entry);
+        } catch (Throwable ex) {
+              ex.printStackTrace();
+        }
     }
 
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	try {
-          String id = Util.createNeutralId();
-	    entry.setId(id);
-	    base.insertEntry(entry);
-	} catch (Throwable ex) {
-          ex.printStackTrace();
-	}
+        // Redo the change.
+        try {
+              String id = Util.createNeutralId();
+            entry.setId(id);
+            base.insertEntry(entry);
+        } catch (Throwable ex) {
+              ex.printStackTrace();
+        }
     }
 
 

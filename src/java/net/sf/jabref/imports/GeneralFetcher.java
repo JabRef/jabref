@@ -31,6 +31,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.Util;
+import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
@@ -202,22 +203,66 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     public void actionPerformed(ActionEvent e) {
         if (tf.getText().trim().length() == 0)
             return;
-        final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
-                BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
-        dialog.addCallBack(activeFetcher);
-        Util.placeDialog(dialog, frame);
-        dialog.setVisible(true);
-        
-        new Thread(new Runnable(){
-            public void run(){
-                
-                if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)){
-                    dialog.entryListComplete();
-                } else {
-                    dialog.dispose();
+        // We have two categories of fetchers. One category can show previews first and ask the
+        // user which ones to download:
+        if (activeFetcher instanceof PreviewEntryFetcher) {
+            frame.output(Globals.lang("Searching..."));
+            frame.setProgressBarIndeterminate(true);
+            frame.setProgressBarVisible(true);
+            final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame);
+            final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher)activeFetcher;
+            new Thread(new Runnable(){
+                public void run(){
+                    final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            frame.setProgressBarVisible(false);
+                            frame.output("");
+                            if (!result)
+                                return;
+                            dialog.setLocationRelativeTo(frame);
+                            dialog.setVisible(true);
+                            if (dialog.isOkPressed()) {
+                                final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.basePanel(),
+                                        BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                                d2.addCallBack(activeFetcher);
+                                Util.placeDialog(d2, frame);
+                                d2.setVisible(true);
+                                new Thread(new Runnable() {
+                                    public void run() {
+                                        pFetcher.getEntries(dialog.getSelection(), d2);
+                                        d2.entryListComplete();
+                                    }
+                                }).start();
+
+                            }
+                        }
+                    });
+
+
                 }
-            }
-        }).start();
+            }).start();
+
+        }
+        // The other category downloads the entries first, then asks the user which ones to keep:
+        else {
+            final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
+                    BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+            dialog.addCallBack(activeFetcher);
+            Util.placeDialog(dialog, frame);
+            dialog.setVisible(true);
+
+            new Thread(new Runnable(){
+                public void run(){
+
+                    if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)){
+                        dialog.entryListComplete();
+                    } else {
+                        dialog.dispose();
+                    }
+                }
+            }).start();
+        }
     }
 
     class FetcherAction extends AbstractAction {

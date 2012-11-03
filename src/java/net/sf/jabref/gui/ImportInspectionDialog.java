@@ -1494,12 +1494,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     public void showMessage(Object message, String title, int msgType) {
-        System.out.println("ping");
         JOptionPane.showMessageDialog(this, message, title, msgType);
     }
 
     public void showMessage(String message) {
-        System.out.println("pingi");
         JOptionPane.showMessageDialog(this, message);
     }
 }

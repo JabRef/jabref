@@ -1571,7 +1571,6 @@ public JabRefPreferences prefs() {
   
 
  public void output(final String s) {
-
       SwingUtilities.invokeLater(new Runnable() {
           public void run() {
               statusLine.setText(s);
