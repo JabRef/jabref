@@ -80,6 +80,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addButton(selectAll);
         builder.addButton(deselectAll);
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         ButtonBarBuilder2 bb = new ButtonBarBuilder2();
         bb.addGlue();
@@ -140,7 +141,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     class TableEntry {
         private String id;
         private JLabel preview;
-        private boolean wanted = true;
+        private boolean wanted = false;
         public TableEntry(String id, JLabel preview) {
             this.id = id;
             this.preview = preview;
