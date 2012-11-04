@@ -43,25 +43,12 @@ public class CountingUndoManager extends UndoManager {
 	    super.undo();
 	    current--;
         panel.updateEntryEditorIfShowing();
-        //panel.updateViewToSelected();
-        /*SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                panel.updateViewToSelected();
-            }
-        });*/
-
     }
 
     public synchronized void redo() throws CannotUndoException {
 	    super.redo();
 	    current++;
         panel.updateEntryEditorIfShowing();
-        //panel.updateViewToSelected();
-        /*SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                panel.updateViewToSelected();
-            }
-        });*/
     }
 
     public synchronized void markUnchanged() {

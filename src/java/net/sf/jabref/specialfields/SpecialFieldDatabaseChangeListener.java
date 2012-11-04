@@ -14,7 +14,6 @@ public class SpecialFieldDatabaseChangeListener implements
 	
 	private static SpecialFieldDatabaseChangeListener INSTANCE = null;
 
-	@Override
 	public void databaseChanged(DatabaseChangeEvent e) {
 		if ((e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) &&
 		    SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -22,6 +21,7 @@ public class SpecialFieldDatabaseChangeListener implements
 			// NamedCompount code similar to SpecialFieldUpdateListener
 			NamedCompound nc = new NamedCompound(Globals.lang("Synchronized special fields based on keywords"));
 			SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
+            nc.end();
 			JabRef.jrf.basePanel().undoManager.addEdit(nc);
 		}
 	}
