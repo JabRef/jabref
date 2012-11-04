@@ -34,7 +34,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
     private boolean clearKeys = true; // Should we clear the keys so new ones can be generated?
-    protected static int MAX_ENTRIES_TO_LOAD = 20;
+    protected static int MAX_ENTRIES_TO_LOAD = 50;
     final static String QUERY_MARKER = "___QUERY___";
     final static String URL_START = "http://scholar.google.com";
     final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
@@ -205,25 +205,26 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         int lastRegionStart = 0;
         while (m.find()) {
             String link = m.group(1).replaceAll("&amp;", "&");
-            JLabel preview;
-            System.out.println("regionStart: "+m.start());
+            String pText = null;
+            //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = TITLE_START_PATTERN.matcher(part);
             Matcher titleE = TITLE_END_PATTERN.matcher(part);
             boolean fS = titleS.find();
             boolean fE = titleE.find();
-            System.out.println("fs = "+fS+", fE = "+fE);
-            System.out.println(titleS.end()+" : "+titleE.start());
+            //System.out.println("fs = "+fS+", fE = "+fE);
+            //System.out.println(titleS.end()+" : "+titleE.start());
             if (fS && fE) {
                 if (titleS.end() < titleE.start()) {
-                    preview = new JLabel("<html>"+part.substring(titleS.end(),
-                            titleE.start())+"</html>");
+                    pText = part.substring(titleS.end(), titleE.start());
                 }
-                else preview = new JLabel("<html>"+part+"</html>");
+                else pText = part;
             }
             else
-                preview = new JLabel(link);
+                pText = link;
 
+            pText = pText.replaceAll("\\[PDF\\]", "");
+            JLabel preview = new JLabel("<html>"+pText+"</html>");
             ids.put(link, preview);
 
             lastRegionStart = m.end();
