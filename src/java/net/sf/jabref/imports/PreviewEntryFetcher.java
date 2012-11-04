@@ -16,4 +16,10 @@ public interface PreviewEntryFetcher extends EntryFetcher {
 
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector);
 
+    /**
+     * The number of entries a user can select for download without getting a warning message.
+     * @return the warning limit
+     */
+    public int getWarningLimit();
+
 }

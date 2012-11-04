@@ -924,6 +924,7 @@ public JabRefPreferences prefs() {
     status.add(statusLine);
     con.weightx = 0;
     con.gridwidth = GridBagConstraints.REMAINDER;
+    con.insets = new Insets(2, 4, 2, 2);
     gbl.setConstraints(progressBar, con);
     status.add(progressBar);
     con.weightx = 1;

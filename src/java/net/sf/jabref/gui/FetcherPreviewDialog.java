@@ -33,23 +33,20 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     protected JButton deselectAll = new JButton(Globals.lang("Deselect all"));
     protected boolean okPressed = false;
     private JabRefFrame frame;
+    private int warningLimit;
 
-    public static void main(String[] args) {
-        FetcherPreviewDialog diag = new FetcherPreviewDialog(null);
-        diag.addEntry("en", new JLabel("Dette er en prøve"));
-        diag.addEntry("to", new JLabel("Dette er en prøve"));
 
-        diag.setVisible(true);
-    }
-
-    public FetcherPreviewDialog(JabRefFrame frame) {
+    public FetcherPreviewDialog(JabRefFrame frame, int warningLimit) {
         super(frame, Globals.lang("Title"), true);
         this.frame = frame;
+        this.warningLimit = warningLimit;
 
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                okPressed = true;
-                dispose();
+                if (verifySelection()) {
+                    okPressed = true;
+                    dispose();
+                }
             }
         });
         cancel.addActionListener(new ActionListener() {
@@ -73,7 +70,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                     new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         glTable.setRowHeight(100);
-        glTable.getColumnModel().getColumn(0).setMaxWidth(30);
+        glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
         EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
         glTable.setSelectionModel(selectionModel);
@@ -110,6 +107,28 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
         pack();
 
+    }
+
+    /**
+     * Check whether a large number of entries are selected, and if so, ask the user whether
+     * to go on.
+     * @return true if we should go on
+     */
+    public boolean verifySelection() {
+        int selected = 0;
+        for (TableEntry entry : entries) {
+            if (entry.isWanted())
+                selected++;
+        }
+        if (selected > warningLimit) {
+            int result = JOptionPane.showConfirmDialog(this,
+                    Globals.lang("You have selected more than %0 entries for download. Some web sites "
+                    +"might block you if you make too many rapid downloads. Do you want to continue?",
+                            String.valueOf(warningLimit)),
+                    Globals.lang("Confirm selection"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            return result == JOptionPane.YES_OPTION;
+        }
+        else return true;
     }
 
     public Map<String,Boolean> getSelection() {

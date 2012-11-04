@@ -209,8 +209,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             frame.output(Globals.lang("Searching..."));
             frame.setProgressBarIndeterminate(true);
             frame.setProgressBarVisible(true);
-            final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame);
             final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher)activeFetcher;
+            final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame, pFetcher.getWarningLimit());
             new Thread(new Runnable(){
                 public void run(){
                     final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);

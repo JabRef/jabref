@@ -51,6 +51,11 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     protected boolean stopFetching = false;
 
+
+    public int getWarningLimit() {
+        return 10;
+    }
+
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         return false;
     }
@@ -172,7 +177,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     /**
      *
      * @param query
-     *            The search term to query JStor for.
+     *            The search term to query Google Scholar for.
      * @return a list of IDs
      * @throws java.io.IOException
      */
@@ -201,6 +206,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         URLDownload ud = new URLDownload(url);
         ud.download();
         String cont = ud.getStringContent();
+        //save("query.html", cont);
         Matcher m = BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
         while (m.find()) {
