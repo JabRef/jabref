@@ -52,8 +52,7 @@
 	</extension>
 
     <!-- ACM Portal Fetcher disabled as the current implementation gets users banned -->
-    <!--
-	<extension id="ACMPortalFetcher" plugin-id="net.sf.jabref.core"
+    <extension id="ACMPortalFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
 			value="net.sf.jabref.imports.ACMPortalFetcher" />
@@ -61,8 +60,7 @@
 		<parameter id="description"
 			value="Fetch Entries from ACM Portal." />
 	</extension>
-	-->
-	
+
 	<extension id="CiteSeerFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
