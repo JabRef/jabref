@@ -122,16 +122,16 @@ public class CleanUpAction extends AbstractWorker {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.setDefaultDialogBorder();
         CellConstraints cc = new CellConstraints();
-        builder.add(cleanUpSuperscrips, cc.xyw(1,1,2));
-        builder.add(cleanUpDOI, cc.xyw(1,2,2));
-        builder.add(cleanUpMonth, cc.xyw(1,3,2));
-        builder.add(cleanUpPageNumbers, cc.xyw(1,4,2));
-        builder.add(cleanUpMakePathsRelative, cc.xyw(1,5,2));
-        builder.add(cleanUpRenamePDF, cc.xyw(1,6,2));
+        builder.add(cleanUpHTML, cc.xyw(1,1,2));
+        builder.add(cleanUpSuperscrips, cc.xyw(1,2,2));
+        builder.add(cleanUpDOI, cc.xyw(1,3,2));
+        builder.add(cleanUpMonth, cc.xyw(1,4,2));
+        builder.add(cleanUpPageNumbers, cc.xyw(1,5,2));
+        builder.add(cleanUpMakePathsRelative, cc.xyw(1,6,2));
+        builder.add(cleanUpRenamePDF, cc.xyw(1,7,2));
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern), cc.xyw(2,7,1));
-        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,8,1));
-        builder.add(cleanUpHTML, cc.xyw(1,9,2));
+        builder.add(new JLabel(currentPattern), cc.xyw(2,8,1));
+        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,9,1));
 	}
 	
 	private void retrieveSettings() {
