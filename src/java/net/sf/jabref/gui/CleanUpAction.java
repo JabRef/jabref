@@ -461,14 +461,15 @@ public class CleanUpAction extends AbstractWorker {
 			ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
 		}
 	}
+
 	/**
-	 * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
+	 * Converts HTML code to LaTeX code
 	 */
     private void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
-        final HTMLConverter htmlConverter = new HTMLConverter();
         String oldValue = entry.getField(field);
         if (oldValue == null) return;
+        final HTMLConverter htmlConverter = new HTMLConverter();
         String newValue = htmlConverter.format(oldValue);
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
