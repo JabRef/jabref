@@ -195,7 +195,6 @@ public class URLDownload {
                 ImportFormatReader.getReaderDefaultEncoding(_in);
         BufferedReader read = new BufferedReader(r);
 
-        byte[] buffer = new byte[512];
         String line;
         while ((line = read.readLine()) != null) {
             out.write(line);
