@@ -94,18 +94,21 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	con.insets = new Insets(4, 4, 4, 4);
 	int col = 0;
 
-	for (BibtexEntryType tp : BibtexEntryType.ALL_TYPES.values()){
-        TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
-	    b.addActionListener(this);
-	    // Check if we should finish the row.
-	    col++;
-	    if (col == COLNUM) {
-		col = 0;
-		con.gridwidth = GridBagConstraints.REMAINDER;
-	    } else
-		con.gridwidth = 1;
-	    gbl.setConstraints(b, con);
-	    pan.add(b);
+	for (BibtexEntryType tp : BibtexEntryType.ALL_TYPES.values()) {
+		if (tp.isVisibleAtNewEntryDialog()) {
+			TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
+			b.addActionListener(this);
+			// Check if we should finish the row.
+			col++;
+			if (col == COLNUM) {
+				col = 0;
+				con.gridwidth = GridBagConstraints.REMAINDER;
+			} else {
+				con.gridwidth = 1;
+			}
+			gbl.setConstraints(b, con);
+			pan.add(b);
+		}
 	}
 	pan.setBorder(BorderFactory.createTitledBorder
 		      (BorderFactory.createEtchedBorder(),

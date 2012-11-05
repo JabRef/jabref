@@ -2,6 +2,8 @@
     - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Svärd)
     - HTML import handles more characters. Cleanup can also do HTML cleanup. (Patch 3582375 by Oscar Gustafsson)
     - During file renaming: More illegal characters are removed (idea by Sarel Botha)
+    - Rudimentary support for IEEEtranBSTCTL added (patch 3582376 by Oscar Gustafsson)
+    - ":" is not filtered from the BibTeX keys any more (patch 3582376 by Oscar Gustafsson)
     - Changed internal look&feel setting (based on patch 3580605)
 2.9 beta
     - Replaced notification dialog after moving/renaming linked file by status message.

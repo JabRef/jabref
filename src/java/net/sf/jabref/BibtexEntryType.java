@@ -826,7 +826,11 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
 		return true;
            }
-        };
+
+            public boolean isVisibleAtNewEntryDialog() {
+            	return false;
+            }
+};
 
     /**
      * This type is provided as an emergency choice if the user makes
@@ -900,6 +904,10 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 	for (int i=0; i<opt.length; i++)
 	    if (opt[i].equals(field)) return true;
 	return false;
+    }
+    
+    public boolean isVisibleAtNewEntryDialog() {
+    	return true;
     }
 
     public static TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
