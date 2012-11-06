@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.imports;
 
-import java.awt.GridLayout;
+import java.awt.*;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -54,7 +54,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     
     private static final int perPage = 20;
     private static final int MAX_FETCH = perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
-    private static final int WAIT_TIME = 1000;
+    private static final int WAIT_TIME = 100;
     private int hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     
@@ -71,6 +71,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Pattern idPattern =
         Pattern.compile("citation.cfm\\?id=\\d*\\.?(\\d+)&.*");
+
+    // Patterns used to extract information for the preview:
+    private static final Pattern titlePattern = Pattern.compile("<A HREF=.*?\">([^<]*)</A>");
+    private static final Pattern monthYearPattern = Pattern.compile("([A-Za-z]+ [0-9]{4})");
+
     private FetcherPreviewDialog preview;
 
     public JPanel getOptionsPanel() {
@@ -102,7 +107,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
         String address = makeUrl(firstEntry);
-        List<String> addresses = new ArrayList<String>();
+        LinkedHashMap<String, JLabel> previews = new LinkedHashMap<String, JLabel>();
+
         try {
             URL url = new URL(address);
 
@@ -129,12 +135,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             hits = getNumberOfHits(page, "Results", maxHitsPattern);
 
             for (int i=0; i<hits; i++) {
-                parse(page, 0, firstEntry, addresses);
-                address = makeUrl(firstEntry);
+                parse(page, 0, firstEntry, previews);
+                //address = makeUrl(firstEntry);
                 firstEntry += perPage;
             }
-            for (String s : addresses) {
-                preview.addEntry(s, new JLabel(s));
+            for (String s : previews.keySet()) {
+                preview.addEntry(s, previews.get(s));
             }
 
 
@@ -173,83 +179,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
-        /*this.dialog = dialog;
-        this.status = status;
-        this.terms = query;
-        piv = 0;
-        shouldContinue = true;
-        parsed = 0;
-        unparseable = 0;
-        acmOrGuide = acmButton.isSelected();
-        fetchAbstract = absCheckBox.isSelected();
-        int firstEntry = 1;
-        String address = makeUrl(firstEntry);
-
-        try {
-            URL url = new URL(address);
-
-            //dialog.setVisible(true);
-            String page = getResults(url);
-
-            //System.out.println(address);
-            hits = getNumberOfHits(page, "Found", hitsPattern);
-			int index = page.indexOf("Found");
-			if (index >= 0) {
-            	page = page.substring(index + 5);
-				index = page.indexOf("Found");
-				if (index >= 0)
-            		page = page.substring(index);
-			}
-			//System.out.println(page);
-            //System.out.printf("Hit %d\n", hits);
-			
-            if (hits == 0) {
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        terms),
-                        Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-
-            int maxHits = getNumberOfHits(page, "Results", maxHitsPattern);
-            //System.out.printf("maxHit %d\n", maxHits);
-            //String page = getResultsFromFile(new File("/home/alver/div/temp50.txt"));
-
-            //System.out.println("Number of hits: "+hits);
-            //System.out.println("Maximum returned: "+maxHits);
-            if (hits > maxHits)
-                hits = maxHits;
-            
-            if (hits > MAX_FETCH) {
-                status.showMessage(Globals.lang("%0 entries found. To reduce server load, "
-                        +"only %1 will be downloaded. It will be very slow, in order to make ACM happy.",
-                                new String[] {String.valueOf(hits), String.valueOf(MAX_FETCH)}),
-                        Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
-                hits = MAX_FETCH;
-            }
-            
-            parse(dialog, page, 0, firstEntry);
-        	firstEntry += perPage;
-        	
-            while (shouldContinue && (firstEntry <= hits)) {
-                address = makeUrl(firstEntry);
-                //System.out.println("Fetch stating at " + firstEntry + " from: " + address);
-                page = getResults(new URL(address));
-                parse(dialog, page, 0, firstEntry);
-            	firstEntry += perPage;
-            }
-            
-            return true;
-            
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ConnectException e) {
-            status.showMessage(Globals.lang("Connection to ACM Portal failed"),
-                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
-        } catch (IOException e) {
-        	status.showMessage(Globals.lang(e.getMessage()),
-                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } */
         return false;
     }
 
@@ -269,12 +198,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private int piv = 0;
 
-    private void parse(String text, int startIndex, int firstEntryNumber, List<String> entries) {
+    private void parse(String text, int startIndex, int firstEntryNumber, Map<String,JLabel> entries) {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
         String entry;
-        while ((entry = getNextEntryURL(text, piv, entryNumber)) != null) {
-            entries.add(entry);
+        while (getNextEntryURL(text, piv, entryNumber, entries)) {
             entryNumber++;
         }
 
@@ -301,7 +229,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     }
 
-    private String getNextEntryURL(String allText, int startIndex, int entryNumber) {
+    private boolean getNextEntryURL(String allText, int startIndex, int entryNumber,
+                                   Map<String,JLabel> entries) {
         String toFind = new StringBuffer().append("<strong>")
                 .append(entryNumber).append("</strong><br>").toString();
         int index = allText.indexOf(toFind, startIndex);
@@ -314,17 +243,61 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 			Matcher fullCitation =
 				fullCitationPattern.matcher(text);
 			if (fullCitation.find()) {
-                return getEntryBibTeXURL(fullCitation.group(1), fetchAbstract);
+                String link = getEntryBibTeXURL(fullCitation.group(1), fetchAbstract);
+                String part;
+                int endOfRecord = text.indexOf("<div class=\"abstract2\">");
+                if (endOfRecord > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    part = text.substring(0, endOfRecord);
 
+                    try {
+                        save("part"+entryNumber+".html", part);
+                    } catch (IOException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+                    // Find authors:
+                    String authMarker = "<div class=\"authors\">";
+                    int authStart = text.indexOf(authMarker);
+                    if (authStart >= 0) {
+                        int authEnd = text.indexOf("</div>", authStart+authMarker.length());
+                        if (authEnd >= 0) {
+                            sb.append("<p>"+text.substring(authStart, authEnd)+"</p>");
+                        }
+
+                    }
+                    // Find title:
+                    Matcher titM = titlePattern.matcher(part);
+                    if (titM.find())
+                        sb.append("<p>"+titM.group(1)+"</p>");
+                    // Find month and year:
+                    Matcher mY = monthYearPattern.matcher(part);
+                    if (mY.find())
+                        sb.append("<p>"+mY.group(1)+"</p>");
+
+
+                    part = sb.toString();
+                    /*.replaceAll("</tr>", "<br>");
+                    part = part.replaceAll("</td>", "");
+                    part = part.replaceAll("<tr valign=\"[A-Za-z]*\">", "");
+                    part = part.replaceAll("<table style=\"padding: 5px; 5px; 5px; 5px;\" border=\"0\">", "");*/
+                }
+                else part = link;
+
+
+                JLabel preview = new JLabel("<html>"+part+"</html>");
+                preview.setPreferredSize(new Dimension(750, 100));
+                entries.put(link, preview);
+                return true;
 			} else {
 				System.out.printf("Citation Unmatched %d\n", entryNumber);
 				System.out.printf(text);
-                return null;
+                return false;
 			}
 
         }
 
-        return null;
+        return false;
     }
 
     private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) throws IOException {
@@ -368,99 +341,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     		}
         }
 
-    private BibtexEntry parseEntryBibTeX(String fullCitation, boolean abs) throws IOException {
-    	String bibAddr = "";
-    	String ID = "";
-    	try {
-    		// Get ID
-    		Matcher idMatcher = idPattern.matcher(fullCitation);
-    		if (idMatcher.find()) {
-    			ID = idMatcher.group(1);
-    			//System.out.println("To fetch: " + bibAddr);
-    		}
-    		else {
-    			System.out.println("Did not find ID in: " + fullCitation);
-    			return null;
-    		}
-    		
-    		// fetch bibtex record
-    		bibAddr = bibtexUrl + ID + bibtexUrlEnd;
-			URL bibtexUrl = new URL(startUrl + bibAddr);
-			BufferedReader in = new BufferedReader(new InputStreamReader(bibtexUrl.openStream()));
-			ParserResult result = BibtexParser.parse(in);
-			in.close();
-			Collection<BibtexEntry> item = result.getDatabase().getEntries();
-            if (item.size() == 0)
-                return null;
-			BibtexEntry entry = item.iterator().next();
-			Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
-			
-        	// get abstract
-        	if (abs) {
-        		URL url = new URL(startUrl + abstractUrl + ID);
-	        	String page = getResults(url);
-	        	entry.setField("abstract", convertHTMLChars(page).trim()); 	
-				Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
-        	}
-
-			return entry;
-			
-        } catch (NoSuchElementException e) {
-        	System.out.println("Bad Bibtex record read at: " + startUrl + bibAddr);
-        	System.out.println("link read was: " + fullCitation);
-            e.printStackTrace();
-            return null;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ConnectException e) {
-            e.printStackTrace();
-            return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return null;
-		}
-    }
-
-    private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber) {
-        String toFind = new StringBuffer().append("<strong>")
-                .append(entryNumber).append("</strong><br>").toString();
-        int index = allText.indexOf(toFind, startIndex);
-        int endIndex = allText.indexOf("</table>", index+1);
-        
-        //if (endIndex < 0)
-            endIndex = allText.length();
-
-        BibtexEntry entry = null;
-
-        if (index >= 0) {
-            piv = index+1;
-            String text = allText.substring(index, endIndex);
-            // Always try RIS import first
-			Matcher fullCitation =
-				fullCitationPattern.matcher(text);
-			if (fullCitation.find()) {
-				try {
-					entry = parseEntryBibTeX(fullCitation.group(1), fetchAbstract);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}  
-			} else {
-				System.out.printf("Citation Unmatched %d\n", entryNumber);
-				System.out.printf(text);
-			}
-            if (entry != null) { // fetch successful
-                return entry;
-            }
-        }
-        //System.out.println(allText);
-        //System.out.println(toFind);
-        //System.out.println("Parse Failed");
-        return null;
-    }
 
     /**
      * This method must convert HTML style char sequences to normal characters.
