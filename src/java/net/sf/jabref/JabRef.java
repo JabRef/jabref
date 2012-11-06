@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.theme.SkyBluer;
 import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
@@ -31,10 +33,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportFormats;
@@ -632,17 +631,26 @@ public class JabRef {
         return new ParserResult(result);
     }
     
-    private String getLookAndFeel() {
+    private void setLookAndFeel() {
         // * Look first into the Preferences
         // * Fallback to the System Look & Fell
-    	if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
-            return Globals.prefs.get("lookAndFeel");
-    	String systemLnF = UIManager.getSystemLookAndFeelClassName();
-        // At all cost, avoid ending up with the Metal look and feel:
-        if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
-            systemLnF = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+        try {
+            String systemLnF = UIManager.getSystemLookAndFeelClassName();
+            if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
+                systemLnF = Globals.prefs.get("lookAndFeel");
+
+            // At all cost, avoid ending up with the Metal look and feel:
+            if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+                Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
+                Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
+                UIManager.setLookAndFeel(lnf);
+            }
+            else {
+                UIManager.setLookAndFeel(systemLnF);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return systemLnF;
     }
 
 	public void openWindow(Vector<ParserResult> loaded) {
@@ -671,7 +679,7 @@ public class JabRef {
 
             // Set the Look & Feel for Swing.
             try {
-                UIManager.setLookAndFeel(getLookAndFeel());
+                setLookAndFeel();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
