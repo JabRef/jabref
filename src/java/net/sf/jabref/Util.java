@@ -559,7 +559,7 @@ public class Util {
 
 		if (fieldName.equals("url")) { // html
 			try {
-				link = sanitizeUrl(link);
+                link = sanitizeUrl(link);
                 ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
 				if (Globals.ON_MAC) {
 
@@ -927,10 +927,15 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         }
 
         // converts doi-only link to full http address
-        if (checkForPlainDOI(link)) {
+        // Morten Alver 6 Nov 2012: this extracts a nonfunctional DOI from some complete
+        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
+        // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
+        // To prevent mangling of working URLs I'm disabling this check if the link is already
+        // a full http link:
+        if (checkForPlainDOI(link) && !link.startsWith("http://")) {
             link = Globals.DOI_LOOKUP_PREFIX + getDOI(link);
         }
-        
+
 		link = link.replaceAll("\\+", "%2B");
 
 		try {

@@ -44,8 +44,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\">[A-Za-z ]*BibTeX");
     final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
+    final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
+    protected HashMap<String,String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -61,7 +63,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview, OutputPrinter status) {
-
+        entryLinks.clear();
         stopFetching = false;
         try {
             if (!hasRunConfig) {
@@ -90,6 +92,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         if (toDownload == 0) return;
 
         for (String link : selection.keySet()) {
+            if (stopFetching)
+                break;
             inspector.setProgress(downloaded, toDownload);
             boolean isSelected = selection.get(link);
             if (isSelected) {
@@ -233,6 +237,12 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             JLabel preview = new JLabel("<html>"+pText+"</html>");
             ids.put(link, preview);
 
+            // See if we can extract the link Google Scholar puts on the entry's title.
+            // That will be set as "url" for the entry if downloaded:
+            Matcher linkMatcher = LINK_PATTERN.matcher(pText);
+            if (linkMatcher.find())
+                entryLinks.put(link, linkMatcher.group(1));
+
             lastRegionStart = m.end();
         }
 
@@ -259,6 +269,13 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     BibtexEntry entry = entries.iterator().next();
                     if (clearKeys)
                         entry.setField(BibtexFields.KEY_FIELD, null);
+                    // If the entry's url field is not set, and we have stored an url for this
+                    // entry, set it:
+                    if (entry.getField("url") == null) {
+                        String storedUrl = entryLinks.get(link);
+                        if (storedUrl != null)
+                            entry.setField("url", storedUrl);
+                    }
                     return entry;
                 }
                 else if (entries.size() == 0) {
