@@ -54,7 +54,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     
     private static final int perPage = 20;
     private static final int MAX_FETCH = perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
-    private static final int WAIT_TIME = 100;
+    private static final int WAIT_TIME = 200;
     private int hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     
@@ -64,7 +64,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
     private static final Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
-    private static final Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
+    //private static final Pattern bibPattern = Pattern.compile(".*'(exportformats.cfm\\?id=\\d+&expformat=bibtex)'.*");
     
     private static final Pattern fullCitationPattern =
         Pattern.compile("<A HREF=\"(citation.cfm.*)\" class.*");
@@ -75,7 +75,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     // Patterns used to extract information for the preview:
     private static final Pattern titlePattern = Pattern.compile("<A HREF=.*?\">([^<]*)</A>");
     private static final Pattern monthYearPattern = Pattern.compile("([A-Za-z]+ [0-9]{4})");
-
+    private static final Pattern absPattern = Pattern.compile("<div .*?>(.*?)</div>");
     private FetcherPreviewDialog preview;
 
     public JPanel getOptionsPanel() {
@@ -115,8 +115,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             String page = getResults(url);
 
             hits = getNumberOfHits(page, "Found", hitsPattern);
-            System.out.println(hits);
-            System.out.println(address);
+
 			int index = page.indexOf("Found");
 			if (index >= 0) {
             	page = page.substring(index + 5);
@@ -162,6 +161,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
         for (String id : selection.keySet()) {
+            if (!shouldContinue)
+                break;
             boolean sel = selection.get(id);
             if (sel) {
                 try {
@@ -176,6 +177,10 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     public int getWarningLimit() {
         return 10;
+    }
+
+    public int getPreferredPreviewHeight() {
+        return 75;
     }
 
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
@@ -316,7 +321,10 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             	if (abs) {
             		url = new URL(startUrl + abstractUrl + ID);
     	        	String page = getResults(url);
-    	        	entry.setField("abstract", convertHTMLChars(page).trim());
+                    Matcher absM = absPattern.matcher(page);
+                    if (absM.find()) {
+                        entry.setField("abstract", absM.group(1).trim());
+                    }
     				Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
             	}
 
@@ -360,8 +368,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-        	System.out.println(page);
-            throw new IOException(Globals.lang("Could not parse number of hits"));
+        	throw new IOException(Globals.lang("Could not parse number of hits"));
         }
         String substring = page.substring(ind, Math.min(ind + 42, page.length()));
         Matcher m = pattern.matcher(substring);
@@ -451,8 +458,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 	//wanted entries, and clicked Ok. The callback object can update status
 	//line etc.
 	public void done(int entriesImported) {
-	    //System.out.println("Number of entries parsed: "+parsed);
-	    //System.out.println("Parsing failed for "+unparseable+" entries");
+
 	}
 	
 	// This method is called by the dialog when the user has cancelled or

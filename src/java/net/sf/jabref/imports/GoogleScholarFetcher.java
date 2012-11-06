@@ -58,6 +58,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         return 10;
     }
 
+    public int getPreferredPreviewHeight() {
+        return 100;
+    }
+
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         return false;
     }

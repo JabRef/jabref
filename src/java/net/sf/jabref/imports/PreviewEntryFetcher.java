@@ -22,4 +22,10 @@ public interface PreviewEntryFetcher extends EntryFetcher {
      */
     public int getWarningLimit();
 
+    /**
+     * The preferred table row height for the previews.
+     * @return the preferred height
+     */
+    public int getPreferredPreviewHeight();
+
 }

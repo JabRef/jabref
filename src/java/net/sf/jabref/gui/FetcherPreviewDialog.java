@@ -36,7 +36,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     private int warningLimit;
 
 
-    public FetcherPreviewDialog(JabRefFrame frame, int warningLimit) {
+    public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
         super(frame, Globals.lang("Title"), true);
         this.frame = frame;
         this.warningLimit = warningLimit;
@@ -69,7 +69,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         EventTableModel<TableEntry> tableModelGl = new EventTableModel<TableEntry>(entries,
                     new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
-        glTable.setRowHeight(100);
+        glTable.setRowHeight(tableRowHeight);
         glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
         EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
