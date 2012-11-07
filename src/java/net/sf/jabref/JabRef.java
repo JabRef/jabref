@@ -643,6 +643,7 @@ public class JabRef {
             if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
+                com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
                 UIManager.setLookAndFeel(lnf);
             }
             else {
