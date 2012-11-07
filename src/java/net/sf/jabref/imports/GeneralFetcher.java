@@ -18,6 +18,8 @@ package net.sf.jabref.imports;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.*;
@@ -70,10 +72,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         this.sidePaneManager = p0;
         this.frame = frame;
         fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
+        Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];
-        String[] choices = new String[fetchers.size()];
-        for (int i=0; i<fetchers.size(); i++) {
-            choices[i] = fetchers.get(i).getTitle();
+        String[] choices = new String[fetcherArray.length];
+        for (int i=0; i<fetcherArray.length; i++) {
+            choices[i] = fetcherArray[i].getTitle();
             //choices[i] = new JLabel(fetchers.get(i).getTitle(), new ImageIcon(fetchers.get(i).getIcon()),
             //        JLabel.HORIZONTAL);
             /*if (fetchers.get(i).getOptionsPanel() != null)
@@ -296,5 +299,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     public void componentOpening() {
         super.componentOpening();
         Globals.prefs.putBoolean("webSearchVisible", Boolean.TRUE);
+    }
+
+    class EntryFetcherComparator implements Comparator<EntryFetcher> {
+        public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {
+            return entryFetcher.getTitle().compareTo(entryFetcher1.getTitle());
+        }
     }
 }
