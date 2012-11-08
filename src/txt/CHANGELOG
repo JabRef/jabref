@@ -1,4 +1,5 @@
 [beta_2.9 branch]
+    - Improved import of equations in IEEE Xplore titles handling images and /spl / representations
     - Rewrote the HTML import in a more general way. Still characters need to be added.
     - IEEE Xplore abstract fetching should now be working again.
     - Added DOI to BibTex entry fetcher.

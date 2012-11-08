@@ -330,6 +330,24 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	if (entry == null)
     		return null;
     	
+        // clean up title
+        String title = (String)entry.getField("title");
+        // USe the alt-text and replace image links
+        title = title.replaceAll("[ ]?img src=.+alt=\"(.+)\">[ ]?", "\\$$1\\$");
+        // Try to sort out most of the /spl / conversions
+        // Deal with this specific nested type first
+        title = title.replaceAll("/sub /spl infin//","\\$_\\\\infty\\$");
+        title = title.replaceAll("/sup /spl infin//","\\$\\^\\\\infty\\$");
+        // Replace general expressions
+        title = title.replaceAll("/[sS]pl ([a-zA-Z]+)/", "\\$\\\\$1\\$");
+        // Deal with subscripts and superscripts
+        title = title.replaceAll("/sup ([0-9\\+\\.\\(\\)]+)/", "\\$\\^$1\\$");
+        title = title.replaceAll("/sub ([0-9\\+\\.\\(\\)]+)/", "\\$_$1\\$");
+        // Replace \infin with \infty
+        title = title.replaceAll("\\\\infin","\\\\infty");
+        // Write back
+        entry.setField("title", title);                        
+        
     	// clean up author
     	String author = (String)entry.getField("author");
     	if (author != null) {
