@@ -1,4 +1,5 @@
 [beta_2.9 branch]
+    - Rewrote the HTML import in a more general way. Still characters need to be added.
     - IEEE Xplore abstract fetching should now be working again.
     - Added DOI to BibTex entry fetcher.
     - Reintroduced Google Scholar and ACM portal fetcher with entry preview to reduce server load.
