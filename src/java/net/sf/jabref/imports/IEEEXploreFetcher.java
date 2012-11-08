@@ -601,9 +601,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
         
             if (includeAbstract) {
-            	index = allText.indexOf("<div class=\"abstract", piv);
-	            if (index >= 0) {
-	            	endIndex = allText.indexOf("</div>", index) + 6;
+		    index = allText.indexOf("id=\"abstract-1\"", piv);
+		    if (index >= 0) {
+		        endIndex = allText.indexOf("</div>", index) + 6;
 		            piv = endIndex;
 		            
 	            	text = allText.substring(index, endIndex);
