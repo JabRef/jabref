@@ -23,15 +23,12 @@ package net.sf.jabref;
  */
 public class OutputPrinterToNull implements OutputPrinter {
 
-	@Override
 	public void setStatus(String s) {
 	}
 
-	@Override
 	public void showMessage(Object message, String title, int msgType) {
 	}
 
-	@Override
 	public void showMessage(String string) {
 	}
 

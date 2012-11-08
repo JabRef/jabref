@@ -19,7 +19,7 @@ public class PdfFileFilter implements FileFilter {
     }
 
     public boolean accept(String path) {
-        if(path == null || path.isEmpty() || !path.contains(".")) return false;
+        if(path == null || path.length()==0 || !path.contains(".")) return false;
 
         return isMatchingFileFilter(path);
     }

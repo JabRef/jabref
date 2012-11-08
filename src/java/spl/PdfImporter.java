@@ -344,7 +344,7 @@ public class PdfImporter {
     }
 
     private boolean fieldExists(String string) {
-        return string != null && !string.isEmpty();
+        return string != null && string.length()>0;
     }
 
     private BibtexEntry createNewEntry() {

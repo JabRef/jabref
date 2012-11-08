@@ -374,7 +374,7 @@ public class SearchManager2 extends SidePaneComponent
     private void fireSearchlistenerEvent(String t){
     	// parse the Search string to words    	
     	ArrayList<String> words;
-    	if ((t == null) || (t.isEmpty())) {
+    	if ((t == null) || (t.length()==0)) {
     		words = null;
     	} else { 
     		words = getSearchwords(t);

@@ -28,7 +28,6 @@ public class SplDatabaseChangeListener implements DatabaseChangeListener {
         this.fileName = fileName;
     }
 
-    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         if(e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY){
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);

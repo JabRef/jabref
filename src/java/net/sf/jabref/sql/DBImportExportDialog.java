@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -41,8 +40,6 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-
-import org.w3c.dom.views.AbstractView;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -236,7 +233,6 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 	}
 	
 
-	@Override
 	public void mouseClicked(MouseEvent e) {
 		if ((e.getClickCount() == 2)
 				&& this.dialogType.equals(DialogType.EXPORTER)) {
@@ -244,42 +240,35 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 		}
 	}
 
-	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void keyReleased(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 

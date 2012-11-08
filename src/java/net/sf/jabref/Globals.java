@@ -1372,7 +1372,7 @@ public class Globals {
 	 * wi are escaped if no regex search is enabled
 	 */
 	public static Pattern getPatternForWords(ArrayList<String> words) {
-		if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty()))
+		if ((words == null) || (words.isEmpty()) || (words.get(0).length()==0))
 			return Pattern.compile("");
 		
 		boolean regExSearch = Globals.prefs.getBoolean("regExpSearch");

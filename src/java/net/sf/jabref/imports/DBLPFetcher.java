@@ -41,12 +41,10 @@ public class DBLPFetcher implements EntryFetcher {
 	private final DBLPHelper helper = new DBLPHelper();
 
 
-	@Override
 	public void stopFetching() {
 	    shouldContinue  = false;
 	}
 
-	@Override
 	public boolean processQuery(String query, ImportInspector inspector,
 			OutputPrinter status) {
 
@@ -136,27 +134,22 @@ public class DBLPFetcher implements EntryFetcher {
         return sb.toString();
 	}
 
-	@Override
 	public String getTitle() {
 		return "DBLP";
 	}
 
-	@Override
 	public String getKeyName() {
 		return "DBLP";
 	}
 
-	@Override
 	public URL getIcon() {
 	    return GUIGlobals.getIconUrl("www");
 	}
 
-	@Override
 	public String getHelpPage() {
 		return null;
 	}
 
-	@Override
 	public JPanel getOptionsPanel() {
 		return null;
 	}

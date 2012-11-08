@@ -78,7 +78,7 @@ public class Tools {
     }
 
     public static String getLink(String link, URL mindmapUrl){
-        if(link == null || link.isEmpty()){
+        if(link == null || link.length()==0){
             return null;
         }
         if(!Tools.isAbsolutePath(link)){

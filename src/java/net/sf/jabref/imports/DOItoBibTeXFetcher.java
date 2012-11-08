@@ -14,43 +14,32 @@
 */
 package net.sf.jabref.imports;
 
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Scanner;
-import javax.swing.JOptionPane;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.ImportInspector;
-import net.sf.jabref.Util;
 
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 	
 	private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
 
-	@Override
     public void stopFetching() {
 		// nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
 		String q;
 		try {
@@ -110,29 +99,24 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 	    return true;
     }
 
-	@Override
     public String getTitle() {
 	    return "DOI to BibTeX";
     }
 
-	@Override
     public String getKeyName() {
 	    return "DOItoBibTeX";
     }
 
-	@Override
     public URL getIcon() {
 		// no special icon for this fetcher available.
 		// Therefore, we return some kind of default icon
 	    return GUIGlobals.getIconUrl("www");
     }
 
-	@Override
     public String getHelpPage() {
 	    return "DOItoBibTeXHelp.html";
     }
 
-	@Override
     public JPanel getOptionsPanel() {
 		// no additional options available
 	    return null;

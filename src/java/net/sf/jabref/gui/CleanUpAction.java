@@ -16,11 +16,7 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
@@ -29,13 +25,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoableEdit;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
@@ -45,12 +34,15 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportSettingsTab;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.imports.HTMLConverter;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class CleanUpAction extends AbstractWorker {
 	private Logger logger = Logger.getLogger(CleanUpAction.class.getName());
@@ -108,7 +100,6 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpMakePathsRelative = new JCheckBox(Globals.lang("Make paths of linked files relative (if possible)"));
 		cleanUpRenamePDF = new JCheckBox(Globals.lang("Rename PDFs to given file name format pattern"));
 		cleanUpRenamePDF.addChangeListener(new ChangeListener() {
-			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
 			}
@@ -358,14 +349,6 @@ public class CleanUpAction extends AbstractWorker {
 		}
 	}
 	
-	private void doExportToKeywords(BibtexEntry entry, NamedCompound ce) {
-		
-	}
-	
-	private void doImportFromKeywords(BibtexEntry entry, NamedCompound ce) {
-		
-	}
-
 	private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
 		if (oldValue == null) return;

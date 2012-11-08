@@ -3076,7 +3076,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		value = value.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "");
 		value = value.replaceAll(REGEXP_PLAINDOI, "");
 		value = value.trim(); 
-		if (value.isEmpty()) value = null;
+		if (value.length()==0) value = null;
 		if (!origValue.equals(value)) {
 			ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
 			bes.setField(fieldName, value);

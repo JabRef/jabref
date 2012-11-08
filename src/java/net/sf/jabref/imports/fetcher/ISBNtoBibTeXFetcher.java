@@ -44,12 +44,10 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 	
 	private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s"; 
 
-	@Override
     public void stopFetching() {
 		// nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
 		String q;
 		try {
@@ -99,29 +97,24 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 	    return true;
     }
 
-	@Override
     public String getTitle() {
 	    return "ISBN to BibTeX";
     }
 
-	@Override
     public String getKeyName() {
 	    return "ISBNtoBibTeX";
     }
 
-	@Override
     public URL getIcon() {
 		// no special icon for this fetcher available.
 		// Therefore, we return some kind of default icon
 	    return GUIGlobals.getIconUrl("www");
     }
 
-	@Override
     public String getHelpPage() {
 	    return "ISBNtoBibTeXHelp.html";
     }
 
-	@Override
     public JPanel getOptionsPanel() {
 		// no additional options available
 	    return null;

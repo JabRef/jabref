@@ -415,7 +415,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		update();
 	}
 
-	@Override
 	public void searchText(ArrayList<String> words) {
 		if (Globals.prefs.getBoolean("highLightWords")) {
 			this.wordsToHighlight = words;

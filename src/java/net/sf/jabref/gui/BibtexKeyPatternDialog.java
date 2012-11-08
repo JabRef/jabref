@@ -98,7 +98,6 @@ public class BibtexKeyPatternDialog extends JDialog {
 		final JDialog dialog = this;
 		
         Action cancelAction = new AbstractAction() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
             }

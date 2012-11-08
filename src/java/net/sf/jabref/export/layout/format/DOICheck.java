@@ -35,7 +35,7 @@ public class DOICheck implements LayoutFormatter {
 			return null;
 		}
 		
-		if (fieldText.trim().isEmpty()) {
+		if (fieldText.trim().length()==0) {
 		    return "";
 		}
 		

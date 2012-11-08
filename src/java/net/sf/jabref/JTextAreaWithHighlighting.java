@@ -124,11 +124,11 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 		// myTa.set
 		h.removeAllHighlights();
 
-		if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
+		if (words == null || words.isEmpty() || words.get(0).length()==0) {
 			return;
 		}
 		String content = getText();
-		if (content.isEmpty())
+		if (content.length()==0)
 			return;
 
 		Matcher matcher = Globals.getPatternForWords(words).matcher(content);
