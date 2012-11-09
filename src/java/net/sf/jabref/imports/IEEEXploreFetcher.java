@@ -614,6 +614,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		}
             	}
             }
+            if (entry.getField("author") == null) {  // Fix for some documents without authors
+                entry.setField("author","");
+            }
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
             	entry.setType(BibtexEntryType.getStandardType("proceedings"));
             }
