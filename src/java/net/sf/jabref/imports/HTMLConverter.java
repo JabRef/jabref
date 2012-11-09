@@ -83,11 +83,11 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00BA ISOnum 
         {"187", "raquo", ""}, // right-pointing double angle quotation mark 
         //                                 = right pointing guillemet, U+00BB ISOnum 
-        {"188", "frac14", ""}, // vulgar fraction one quarter 
+        {"188", "frac14", "\\$\\sfrac\\{1\\}\\{4\\}\\$"}, // vulgar fraction one quarter 
         //                                 = fraction one quarter, U+00BC ISOnum 
-        {"189", "frac12", ""}, // vulgar fraction one half 
+        {"189", "frac12", "\\$\\sfrac\\{1\\}\\{2\\}\\$"}, // vulgar fraction one half 
         //                                 = fraction one half, U+00BD ISOnum 
-        {"190", "frac34", ""}, // vulgar fraction three quarters 
+        {"190", "frac34", "\\$\\sfrac\\{3\\}\\{4\\}\\$"}, // vulgar fraction three quarters 
         //                                 = fraction three quarters, U+00BE ISOnum 
         {"191", "iquest", ""}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
@@ -98,7 +98,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00C1 ISOlat1 
         {"194", "Acirc", ""}, // latin capital letter A with circumflex, 
         //                                 U+00C2 ISOlat1 
-        {"195", "Atilde", ""}, // latin capital letter A with tilde, 
+        {"195", "Atilde", "\\\\~\\{A\\}"}, // latin capital letter A with tilde, 
         //                                 U+00C3 ISOlat1 
         {"196", "Auml", "\\\"\\{A\\}"}, // latin capital letter A with diaeresis, 
         //                                 U+00C4 ISOlat1 
@@ -127,7 +127,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"207", "Iuml", "\\\"\\{I\\}"}, // latin capital letter I with diaeresis, 
         //                                 U+00CF ISOlat1 
         {"208", "ETH", ""}, // latin capital letter ETH, U+00D0 ISOlat1  
-        {"209", "Ntilde", ""}, // latin capital letter N with tilde, 
+        {"209", "Ntilde", "\\\\~\\{N\\}"}, // latin capital letter N with tilde, 
         //                                 U+00D1 ISOlat1 
         {"210", "Ograve", ""}, // latin capital letter O with grave, 
         //                                 U+00D2 ISOlat1 
@@ -135,7 +135,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00D3 ISOlat1 
         {"212", "Ocirc", ""}, // latin capital letter O with circumflex, 
         //                                 U+00D4 ISOlat1 
-        {"213", "Otilde", ""}, // latin capital letter O with tilde, 
+        {"213", "Otilde", "\\\\~\\{O\\}"}, // latin capital letter O with tilde, 
         //                                 U+00D5 ISOlat1 
         {"214", "Ouml", "\\\\\"\\{O\\}"}, // latin capital letter O with diaeresis, 
         //                                 U+00D6 ISOlat1 
@@ -164,9 +164,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E1 ISOlat1 
         {"226", "acirc", ""}, // latin small letter a with circumflex, 
         //                                 U+00E2 ISOlat1 
-        {"227", "atilde", ""}, // latin small letter a with tilde, 
+        {"227", "atilde", "\\\\~\\{a\\}"}, // latin small letter a with tilde, 
         //                                 U+00E3 ISOlat1 
-        {"228", "auml", ""}, // latin small letter a with diaeresis, 
+        {"228", "auml", "\\\\\"\\{a\\}"}, // latin small letter a with diaeresis, 
         //                                 U+00E4 ISOlat1 
         {"229", "aring", ""}, // latin small letter a with ring above 
         //                                 = latin small letter a ring,
@@ -181,7 +181,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E9 ISOlat1 
         {"234", "ecirc", ""}, // latin small letter e with circumflex, 
         //                                 U+00EA ISOlat1 
-        {"235", "euml", ""}, // latin small letter e with diaeresis, 
+        {"235", "euml", "\\\\\"\\{e\\}"}, // latin small letter e with diaeresis, 
         //                                 U+00EB ISOlat1 
         {"236", "igrave", ""}, // latin small letter i with grave, 
         //                                 U+00EC ISOlat1 
@@ -189,7 +189,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00ED ISOlat1 
         {"238", "icirc", ""}, // latin small letter i with circumflex, 
         //                                 U+00EE ISOlat1 
-        {"239", "iuml", ""}, // latin small letter i with diaeresis, 
+        {"239", "iuml", "\\\\\"\\{i\\}"}, // latin small letter i with diaeresis, 
         //                                 U+00EF ISOlat1 
         {"240", "eth", ""}, // latin small letter eth, U+00F0 ISOlat1  
         {"241", "ntilde", "\\\\~\\{n\\}"}, // latin small letter n with tilde, 
@@ -200,9 +200,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00F3 ISOlat1 
         {"244", "ocirc", ""}, // latin small letter o with circumflex, 
         //                                 U+00F4 ISOlat1 
-        {"245", "otilde", ""}, // latin small letter o with tilde, 
+        {"245", "otilde", "\\\\~\\{o\\}"}, // latin small letter o with tilde, 
         //                                 U+00F5 ISOlat1 
-        {"246", "ouml", ""}, // latin small letter o with diaeresis, 
+        {"246", "ouml", "\\\\\"\\{o\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
         {"247", "divide", ""}, // division sign, U+00F7 ISOnum  
         {"248", "oslash", ""}, // latin small letter o with stroke, 
@@ -214,13 +214,13 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00FA ISOlat1 
         {"251", "ucirc", ""}, // latin small letter u with circumflex, 
         //                                 U+00FB ISOlat1 
-        {"252", "uuml", ""}, // latin small letter u with diaeresis, 
+        {"252", "uuml", "\\\\\"\\{u\\}"}, // latin small letter u with diaeresis, 
         //                                 U+00FC ISOlat1 
         {"253", "yacute", "\\\\'\\{y\\}"}, // latin small letter y with acute, 
         //                                 U+00FD ISOlat1 
         {"254", "thorn", ""}, // latin small letter thorn, 
         //                                 U+00FE ISOlat1 
-        {"255", "yuml", ""}, // latin small letter y with diaeresis, 
+        {"255", "yuml", "\\\\\"\\{y\\}"}, // latin small letter y with diaeresis, 
         //                                 U+00FF ISOlat1 
         {"402", "fnof", ""}, // latin small f with hook = function 
         //                                   = florin, U+0192 ISOtech 
@@ -452,7 +452,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+0160 ISOlat2 
         {"353", "scaron", ""}, // latin small letter s with caron,
         //                                   U+0161 ISOlat2 
-        {"376", "Yuml", ""}, // latin capital letter Y with diaeresis,
+        {"376", "Yuml", "\\\\\"\\{Y\\}"}, // latin capital letter Y with diaeresis,
         //                                   U+0178 ISOlat2 
 
         /* Spacing Modifier Letters */
@@ -463,7 +463,7 @@ public class HTMLConverter implements LayoutFormatter {
         /* General Punctuation */
         {"8194", "ensp", "\\\\hspace\\{0.5em\\}"}, // en space, U+2002 ISOpub  
         {"8195", "emsp", "\\\\hspace\\{1em\\}"}, // em space, U+2003 ISOpub  
-        {"8201", "thinsp", ""}, // thin space, U+2009 ISOpub  
+        {"8201", "thinsp", "\\\\hspace\\{0.167em\\}"}, // thin space, U+2009 ISOpub  
         {"8204", "zwnj", ""}, // zero width non-joiner, 
         //                                   U+200C NEW RFC 2070 
         {"8205", "zwj", ""}, // zero width joiner, U+200D NEW RFC 2070  
