@@ -507,11 +507,11 @@ public class HTMLConverter implements LayoutFormatter {
 	public HTMLConverter() {
 		super();
                 for (int i=0;i<conversionList.length;i++) {
-                    if (conversionList[i][2].length() >= 0) {
-                        if (conversionList[i][1].length() >= 0) {
+                    if (conversionList[i][2].length() >= 1) {
+                        if (conversionList[i][1].length() >= 1) {
                             escapedSymbols.put("&" + conversionList[i][1] + ";" , conversionList[i][2]);
                         }
-                        if (conversionList[i][0].length() >= 0) {
+                        if (conversionList[i][0].length() >= 1) {
                             numSymbols.put(Integer.decode(conversionList[i][0]) , conversionList[i][2]);
                         }
                     }
