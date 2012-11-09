@@ -105,7 +105,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"197", "Aring", ""}, // latin capital letter A with ring above 
         //                                 = latin capital letter A ring,
         //                                 U+00C5 ISOlat1 
-        {"198", "AElig", ""}, // latin capital letter AE 
+        {"198", "AElig", "\\{\\\\AE\\}"}, // latin capital letter AE 
         //                                 = latin capital ligature AE,
         //                                 U+00C6 ISOlat1 
         {"199", "Ccedil", ""}, // latin capital letter C with cedilla, 
@@ -171,7 +171,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"229", "aring", ""}, // latin small letter a with ring above 
         //                                 = latin small letter a ring,
         //                                 U+00E5 ISOlat1 
-        {"230", "aelig", ""}, // latin small letter ae 
+        {"230", "aelig", "\\{\\\\ae\\}"}, // latin small letter ae 
         //                                 = latin small ligature ae, U+00E6 ISOlat1 
         {"231", "ccedil", ""}, // latin small letter c with cedilla, 
         //                                 U+00E7 ISOlat1 
@@ -444,9 +444,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"62", "gt", ">"}, // greater-than sign, U+003E ISOnum 
 
         /* Latin Extended-A */
-        {"338", "OElig", ""}, // latin capital ligature OE,
+        {"338", "OElig", "\\{\\\\OE\\}"}, // latin capital ligature OE,
         //                                   U+0152 ISOlat2 
-        {"339", "oelig", ""}, // latin small ligature oe, U+0153 ISOlat2 
+        {"339", "oelig", "\\{\\\\oe\\}"}, // latin small ligature oe, U+0153 ISOlat2 
         /* ligature is a misnomer, this is a separate character in some languages */
         {"352", "Scaron", ""}, // latin capital letter S with caron,
         //                                   U+0160 ISOlat2 
@@ -494,8 +494,14 @@ public class HTMLConverter implements LayoutFormatter {
             
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
-        {"305", "inodot", "\\\\i"},    // Small i without the dot
+        {"43", "", "\\+"}, // Plus
+        {"123", "", "\\{"}, // Left curly bracket
+        {"125", "", "\\}"}, // Right curly bracket
+        {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"769", "", "'"},    // Can be solved better as it is a combining accent
+        {"774", "", ""},    // FIX: Breve - Can be solved better as it is a combining accent
+        {"776", "", ""},    // FIX: Diaeresis - Can be solved better as it is a combining accent
+        {"780", "", ""},    // FIX: Caron - Can be solved better as it is a combining accent
         {"8208", "", "-"}    // Hyphen
     };
 
