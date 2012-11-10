@@ -22,13 +22,6 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Mar 26, 2006
- * Time: 8:05:08 PM
- * To change this template use File | Settings | File Templates.
- */
 public class HTMLConverter implements LayoutFormatter {
 
     /*   Portions © International Organization for Standardization 1986:
@@ -38,12 +31,15 @@ public class HTMLConverter implements LayoutFormatter {
     */
 
 
+	// most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
+	// The symbols can be looked at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
+	// http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
     private String[][] conversionList = new String[][]{
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
-        {"161", "iexcl", ""}, // inverted exclamation mark, U+00A1 ISOnum  
+        {"161", "iexcl", "\\\\textexclamdown"}, // inverted exclamation mark, U+00A1 ISOnum
         {"162", "cent", ""}, // cent sign, U+00A2 ISOnum  
-        {"163", "pound", ""}, // pound sign, U+00A3 ISOnum  
+        {"163", "pound", "\\\\pounds"}, // pound sign, U+00A3 ISOnum
         {"164", "curren", ""}, // currency sign, U+00A4 ISOnum  
         {"165", "yen", ""}, // yen sign = yuan sign, U+00A5 ISOnum  
         {"166", "brvbar", ""}, // broken bar = broken vertical bar, 
@@ -51,14 +47,14 @@ public class HTMLConverter implements LayoutFormatter {
         {"167", "sect", ""}, // section sign, U+00A7 ISOnum  
         {"168", "uml", ""}, // diaeresis = spacing diaeresis, 
         //                                 U+00A8 ISOdia 
-        {"169", "copy", ""}, // copyright sign, U+00A9 ISOnum  
-        {"170", "ordf", ""}, // feminine ordinal indicator, U+00AA ISOnum  
-        {"171", "laquo", ""}, // left-pointing double angle quotation mark 
+        {"169", "copy", "\\\\copyright"}, // copyright sign, U+00A9 ISOnum
+        {"170", "ordf", "\\\\textordfeminine"}, // feminine ordinal indicator, U+00AA ISOnum
+        {"171", "laquo", "\\\\guillemotleft"}, // left-pointing double angle quotation mark
         //                                 = left pointing guillemet, U+00AB ISOnum 
         {"172", "not", ""}, // not sign, U+00AC ISOnum  
         {"173", "shy", ""}, // soft hyphen = discretionary hyphen, 
         //                                 U+00AD ISOnum 
-        {"174", "reg", ""}, // registered sign = registered trade mark sign, 
+        {"174", "reg", "\\textregistered"}, // registered sign = registered trade mark sign,
         //                                 U+00AE ISOnum 
         {"175", "macr", ""}, // macron = spacing macron = overline 
         //                                 = APL overbar, U+00AF ISOdia 
@@ -77,11 +73,11 @@ public class HTMLConverter implements LayoutFormatter {
         {"183", "middot", ""}, // middle dot = Georgian comma 
         //                                 = Greek middle dot, U+00B7 ISOnum 
         {"184", "cedil", ""}, // cedilla = spacing cedilla, U+00B8 ISOdia  
-        {"185", "sup1", ""}, // superscript one = superscript digit one, 
+        {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
         //                                 U+00B9 ISOnum 
-        {"186", "ordm", ""}, // masculine ordinal indicator, 
+        {"186", "ordm", "\\\\textordmasculine"}, // masculine ordinal indicator,
         //                                 U+00BA ISOnum 
-        {"187", "raquo", ""}, // right-pointing double angle quotation mark 
+        {"187", "raquo", "\\\\guillemotright"}, // right-pointing double angle quotation mark
         //                                 = right pointing guillemet, U+00BB ISOnum 
         {"188", "frac14", "\\$\\sfrac\\{1\\}\\{4\\}\\$"}, // vulgar fraction one quarter 
         //                                 = fraction one quarter, U+00BC ISOnum 
@@ -91,7 +87,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 = fraction three quarters, U+00BE ISOnum 
         {"191", "iquest", ""}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
-        {"192", "Agrave", ""}, // latin capital letter A with grave 
+        {"192", "Agrave", "\\\\`\\{A\\}"}, // latin capital letter A with grave
         //                                 = latin capital letter A grave,
         //                                 U+00C0 ISOlat1 
         {"193", "Aacute", "\\\\'\\{A\\}"}, // latin capital letter A with acute, 
@@ -108,9 +104,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"198", "AElig", "\\{\\\\AE\\}"}, // latin capital letter AE 
         //                                 = latin capital ligature AE,
         //                                 U+00C6 ISOlat1 
-        {"199", "Ccedil", ""}, // latin capital letter C with cedilla, 
+        {"199", "Ccedil", "\\\\c\\{C\\}"}, // latin capital letter C with cedilla,
         //                                 U+00C7 ISOlat1 
-        {"200", "Egrave", ""}, // latin capital letter E with grave, 
+        {"200", "Egrave", "\\\\`\\{E\\}"}, // latin capital letter E with grave,
         //                                 U+00C8 ISOlat1 
         {"201", "Eacute", "\\\\'\\{E\\}"}, // latin capital letter E with acute, 
         //                                 U+00C9 ISOlat1 
@@ -118,7 +114,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00CA ISOlat1 
         {"203", "Euml", "\\\"\\{E\\}"}, // latin capital letter E with diaeresis, 
         //                                 U+00CB ISOlat1 
-        {"204", "Igrave", ""}, // latin capital letter I with grave, 
+        {"204", "Igrave", "\\\\`\\{I\\}"}, // latin capital letter I with grave,
         //                                 U+00CC ISOlat1 
         {"205", "Iacute", "\\\\'\\{I\\}"}, // latin capital letter I with acute, 
         //                                 U+00CD ISOlat1 
@@ -129,7 +125,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"208", "ETH", ""}, // latin capital letter ETH, U+00D0 ISOlat1  
         {"209", "Ntilde", "\\\\~\\{N\\}"}, // latin capital letter N with tilde, 
         //                                 U+00D1 ISOlat1 
-        {"210", "Ograve", ""}, // latin capital letter O with grave, 
+        {"210", "Ograve", "\\\\`\\{O\\}"}, // latin capital letter O with grave,
         //                                 U+00D2 ISOlat1 
         {"211", "Oacute", "\\\\'\\{O\\}"}, // latin capital letter O with acute, 
         //                                 U+00D3 ISOlat1 
@@ -143,7 +139,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"216", "Oslash", ""}, // latin capital letter O with stroke 
         //                                 = latin capital letter O slash,
         //                                 U+00D8 ISOlat1 
-        {"217", "Ugrave", ""}, // latin capital letter U with grave, 
+        {"217", "Ugrave", "\\\\`\\{U\\}"}, // latin capital letter U with grave,
         //                                 U+00D9 ISOlat1 
         {"218", "Uacute", "\\\\'\\{U\\}"}, // latin capital letter U with acute, 
         //                                 U+00DA ISOlat1 
@@ -155,9 +151,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00DD ISOlat1 
         {"222", "THORN", ""}, // latin capital letter THORN, 
         //                                 U+00DE ISOlat1 
-        {"223", "szlig", ""}, // latin small letter sharp s = ess-zed, 
+        {"223", "szlig", "\\\\ss\\{\\}"}, // latin small letter sharp s = ess-zed,
         //                                 U+00DF ISOlat1 
-        {"224", "agrave", ""}, // latin small letter a with grave 
+        {"224", "agrave", "\\\\`\\{a\\}"}, // latin small letter a with grave
         //                                 = latin small letter a grave,
         //                                 U+00E0 ISOlat1 
         {"225", "aacute", "\\\\'\\{a\\}"}, // latin small letter a with acute, 
@@ -173,9 +169,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E5 ISOlat1 
         {"230", "aelig", "\\{\\\\ae\\}"}, // latin small letter ae 
         //                                 = latin small ligature ae, U+00E6 ISOlat1 
-        {"231", "ccedil", ""}, // latin small letter c with cedilla, 
+        {"231", "ccedil", "\\\\c\\{c\\}"}, // latin small letter c with cedilla,
         //                                 U+00E7 ISOlat1 
-        {"232", "egrave", ""}, // latin small letter e with grave, 
+        {"232", "egrave", "\\\\`\\{e\\}"}, // latin small letter e with grave,
         //                                 U+00E8 ISOlat1 
         {"233", "eacute", "\\\\'\\{e\\}"}, // latin small letter e with acute, 
         //                                 U+00E9 ISOlat1 
@@ -183,7 +179,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00EA ISOlat1 
         {"235", "euml", "\\\\\"\\{e\\}"}, // latin small letter e with diaeresis, 
         //                                 U+00EB ISOlat1 
-        {"236", "igrave", ""}, // latin small letter i with grave, 
+        {"236", "igrave", "\\\\`\\{i\\}"}, // latin small letter i with grave,
         //                                 U+00EC ISOlat1 
         {"237", "iacute", "\\\\'\\{i\\}"}, // latin small letter i with acute, 
         //                                 U+00ED ISOlat1 
@@ -194,7 +190,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"240", "eth", ""}, // latin small letter eth, U+00F0 ISOlat1  
         {"241", "ntilde", "\\\\~\\{n\\}"}, // latin small letter n with tilde, 
         //                                 U+00F1 ISOlat1 
-        {"242", "ograve", ""}, // latin small letter o with grave, 
+        {"242", "ograve", "\\\\`\\{o\\}"}, // latin small letter o with grave,
         //                                 U+00F2 ISOlat1 
         {"243", "oacute", "\\\\'\\{o\\}"}, // latin small letter o with acute, 
         //                                 U+00F3 ISOlat1 
@@ -208,7 +204,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"248", "oslash", ""}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
-        {"249", "ugrave", ""}, // latin small letter u with grave, 
+        {"249", "ugrave", "\\\\`\\{u\\}"}, // latin small letter u with grave,
         //                                 U+00F9 ISOlat1 
         {"250", "uacute", "\\\\'\\{u\\}"}, // latin small letter u with acute, 
         //                                 U+00FA ISOlat1 
@@ -323,25 +319,25 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+2111 ISOamso 
         {"8476", "real", ""}, // blackletter capital R = real part symbol, 
         //                                    U+211C ISOamso 
-        {"8482", "trade", ""}, // trade mark sign, U+2122 ISOnum  
+        {"8482", "trade", "\\texttrademark"}, // trade mark sign, U+2122 ISOnum
         {"8501", "alefsym", ""}, // alef symbol = first transfinite cardinal, 
         //                                    U+2135 NEW 
         /*    alef symbol is NOT the same as hebrew letter alef,
          U+05D0 although the same glyph could be used to depict both characters */
         /* Arrows */
-        {"8592", "larr", ""}, // leftwards arrow, U+2190 ISOnum  
-        {"8593", "uarr", ""}, // upwards arrow, U+2191 ISOnum 
-        {"8594", "rarr", ""}, // rightwards arrow, U+2192 ISOnum  
-        {"8595", "darr", ""}, // downwards arrow, U+2193 ISOnum  
+        {"8592", "larr", "\\\\leftarrow"}, // leftwards arrow, U+2190 ISOnum
+        {"8593", "uarr", "\\\\uparrow"}, // upwards arrow, U+2191 ISOnum
+        {"8594", "rarr", "\\\\rightarrow"}, // rightwards arrow, U+2192 ISOnum
+        {"8595", "darr", "\\\\downarrow"}, // downwards arrow, U+2193 ISOnum
         {"8596", "harr", ""}, // left right arrow, U+2194 ISOamsa  
         {"8629", "crarr", ""}, // downwards arrow with corner leftwards 
         //                                    = carriage return, U+21B5 NEW 
-        {"8656", "lArr", ""}, // leftwards double arrow, U+21D0 ISOtech  
+        {"8656", "lArr", "\\\\Leftarrow"}, // leftwards double arrow, U+21D0 ISOtech
         /*  ISO 10646 does not say that lArr is the same as the 'is implied by' arrow
          but also does not have any other character for that function. So ? lArr can
          be used for 'is implied by' as ISOtech suggests */
-        {"8657", "uArr", ""}, // upwards double arrow, U+21D1 ISOamsa  
-        {"8658", "rArr", ""}, // rightwards double arrow, 
+        {"8657", "uArr", "\\\\Uparrow"}, // upwards double arrow, U+21D1 ISOamsa
+        {"8658", "rArr", "\\\\Rightarrow"}, // rightwards double arrow,
         //                                     U+21D2 ISOtech 
         /*   ISO 10646 does not say this is the 'implies' character but does not have 
          another character with this function so ?
@@ -352,17 +348,17 @@ public class HTMLConverter implements LayoutFormatter {
 
         /* Mathematical Operators */
         {"8704", "forall", "\\$\\\\forall\\$"}, // for all, U+2200 ISOtech  
-        {"8706", "part", ""}, // partial differential, U+2202 ISOtech   
-        {"8707", "exist", ""}, // there exists, U+2203 ISOtech  
-        {"8709", "empty", ""}, // empty set = null set = diameter, 
+        {"8706", "part", "\\$\\\\partial\\$"}, // partial differential, U+2202 ISOtech
+        {"8707", "exist", "\\$\\\\exists\\$"}, // there exists, U+2203 ISOtech
+        {"8709", "empty", "\\$\\\\emptyset\\$"}, // empty set = null set = diameter,
         //                                    U+2205 ISOamso 
         {"8711", "nabla", ""}, // nabla = backward difference, 
         //                                    U+2207 ISOtech 
-        {"8712", "isin", ""}, // element of, U+2208 ISOtech  
-        {"8713", "notin", ""}, // not an element of, U+2209 ISOtech  
-        {"8715", "ni", ""}, // contains as member, U+220B ISOtech  
+        {"8712", "isin", "\\$\\\\in\\$"}, // element of, U+2208 ISOtech
+        {"8713", "notin", "\\$\\\\notin\\$"}, // not an element of, U+2209 ISOtech
+        {"8715", "ni", "\\$\\\\ni\\$"}, // contains as member, U+220B ISOtech
         /* should there be a more memorable name than 'ni'? */
-        {"8719", "prod", "\\$\\\\prod\\$"}, // n-ary product = product sign, 
+        {"8719", "prod", "\\$\\\\prod\\$"}, // n-ary product = product sign,
         //                                    U+220F ISOamsb 
         /*    prod is NOT the same character as U+03A0 'greek capital letter pi' though
          the same glyph might be used for both  */
@@ -375,14 +371,14 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+221A ISOtech 
         {"8733", "prop", "\\$\\\\propto\\$"}, // proportional to, U+221D ISOtech  
         {"8734", "infin", "\\$\\\\infty\\$"}, // infinity, U+221E ISOtech  
-        {"8736", "ang", ""}, // angle, U+2220 ISOamso  
-        {"8743", "and", ""}, // logical and = wedge, U+2227 ISOtech  
-        {"8744", "or", ""}, // logical or = vee, U+2228 ISOtech  
-        {"8745", "cap", ""}, // intersection = cap, U+2229 ISOtech  
-        {"8746", "cup", ""}, // union = cup, U+222A ISOtech  
-        {"8747", "int", ""}, // integral, U+222B ISOtech  
-        {"8756", "there4", ""}, // therefore, U+2234 ISOtech  
-        {"8764", "sim", ""}, // tilde operator = varies with = similar to, 
+        {"8736", "ang", "\\$\\\\angle\\$"}, // angle, U+2220 ISOamso
+        {"8743", "and", "\\$\\\\land\\$"}, // logical and = wedge, U+2227 ISOtech
+        {"8744", "or", "\\$\\\\lor\\$"}, // logical or = vee, U+2228 ISOtech
+        {"8745", "cap", "\\$\\\\cap\\$"}, // intersection = cap, U+2229 ISOtech
+        {"8746", "cup", "\\$\\\\cup\\$"}, // union = cup, U+222A ISOtech
+        {"8747", "int", "\\$\\\\int\\$"}, // integral, U+222B ISOtech
+        {"8756", "there4", "\\$\\\\uptherefore\\$"}, // therefore, U+2234 ISOtech; only in LaTeX package MnSymbol
+        {"8764", "sim", "\\$\\\\sim\\$"}, // tilde operator = varies with = similar to,
         //                                    U+223C ISOtech 
         /*  tilde operator is NOT the same character as the tilde, U+007E,
          although the same glyph might be used to represent both   */
@@ -405,7 +401,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+2287 ISOtech 
         {"8853", "oplus", "\\$\\\\oplus\\$"}, // circled plus = direct sum, 
         //                                    U+2295 ISOamsb 
-        {"8855", "otimes", ""}, // circled times = vector product, 
+        {"8855", "otimes", "\\$\\\\otimes\\$"}, // circled times = vector product,
         //                                    U+2297 ISOamsb 
         {"8869", "perp", ""}, // up tack = orthogonal to = perpendicular, 
         //                                    U+22A5 ISOtech 
