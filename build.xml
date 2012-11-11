@@ -107,9 +107,9 @@
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
 		<include name="microba.jar" />
-		<include name="pdfbox-1.6.0.jar" />
-		<include name="jempbox-1.6.0.jar" />
-		<include name="fontbox-1.6.0.jar" />
+		<include name="pdfbox-1.7.1.jar" />
+		<include name="jempbox-1.7.1.jar" />
+		<include name="fontbox-1.7.1.jar" />
 		<include name="zoom-java.jar" />
     	<include name="mysql-connector-java-5.0.7-bin.jar" />
 		<include name="postgresql-9.1-902.jdbc4.jar" />
