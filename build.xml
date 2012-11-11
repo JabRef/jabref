@@ -9,13 +9,14 @@
              Jabref homepage:       http://jabref.sourceforge.net
              Jabref@SourceForge:    http://sourceforge.net/projects/jabref
              Jabref@FreeCode:       http://apps.freecode.com/projects/jabref
+             Jabref@Ohloh:          https://www.ohloh.net/p/jabref
              Jabref git repository: git://jabref.git.sourceforge.net/gitroot/jabref/jabref
 
              Further questions:
                help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
 
    Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK1.5 or higher
+                 2. JAVA_HOME environment variable contains the path to JDK1.6 or higher
                  3. ANT_HOME environment variable contains the path to ant's home directory
 
    Language: XML
@@ -198,13 +199,13 @@
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
 		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8"
-		   source="1.5" target="1.5">
+		   source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
 		</javac>
-		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="**/JabRefMain.java" />
 		</javac>
@@ -213,7 +214,7 @@
 	<!-- Compiles project including tests -->
 	<target name="compiletest">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" destdir="${build.classes}" source="1.5" target="1.5">
+		<javac debug="on" destdir="${build.classes}" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="tests/**" />
 			<classpath refid="classpathTest" />
@@ -224,7 +225,7 @@
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
 
-		<javac srcdir="${osx.dir}" debug="off" destdir="${build.classes}" target="1.5">
+		<javac srcdir="${osx.dir}" debug="off" destdir="${build.classes}" target="1.6">
 		</javac>
 	</target>
 
@@ -352,7 +353,7 @@ version=${jabref.version}</echo>
 	<!-- Creates javadocs -->
 	<target name="javadocs" depends="compile" description="Generates the javadocs">
 		<mkdir dir="${build.javadocs}" />
-		<javadoc sourcepath="${java.dir}" destdir="${build.javadocs}" author="true" version="true" windowtitle="JabRef API" link="http://java.sun.com/j2se/1.4.1/docs/api/">
+		<javadoc sourcepath="${java.dir}" destdir="${build.javadocs}" author="true" version="true" windowtitle="JabRef API" link="http://docs.oracle.com/javase/6/docs/api/">
 
 			<fileset dir="${java.dir}" defaultexcludes="yes">
 				<include name="**/*.java" />
@@ -372,7 +373,7 @@ version=${jabref.version}</echo>
 			</fileset>
 		</copy>
 
-		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://java.sun.com/j2se/1.4.1/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
+		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://docs.oracle.com/javase/6/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
 			<!-- 
                  create javadoc only selectively for classes that 
                  users extending JabRef are likely to use
