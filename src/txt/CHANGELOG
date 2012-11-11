@@ -14,6 +14,7 @@
     - ":" is not filtered from the BibTeX keys any more (patch 3582376 by Oscar Gustafsson)
     - Changed internal look&feel setting (based on patch 3580605)
     - Custom importers nested in jars should be supported now (bug 3582838)
+    - Downgrade of jgoodies and some code to be compatible with Java 1.5 again.
 2.9 beta
     - Replaced notification dialog after moving/renaming linked file by status message.
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
