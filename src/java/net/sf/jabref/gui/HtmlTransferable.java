@@ -44,10 +44,12 @@ public class HtmlTransferable implements Transferable {
         this.plainText = plainText;
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return FLAVORS.clone();
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         for (int i = 0; i < FLAVORS.length; i++) {
             if (flavor.equals(FLAVORS[i])) {
@@ -57,6 +59,7 @@ public class HtmlTransferable implements Transferable {
         return false;
     }
 
+    @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (flavor.equals(FLAVORS[STRING])) {
             return plainText;

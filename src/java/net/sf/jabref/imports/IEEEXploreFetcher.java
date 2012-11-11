@@ -387,7 +387,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	    		}
 	    	}
 	    	//date = date.trim();
-	    	//if (!date.length()==0) {
+	    	//if (!date.isEmpty()) {
 	    	entry.setField("month", date);
 	    	//}
     	}

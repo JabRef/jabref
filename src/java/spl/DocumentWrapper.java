@@ -42,7 +42,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasTitle(){
-        return (xmlDocument.getTitle() != null && xmlDocument.getTitle().getValue() != null && xmlDocument.getTitle().getValue().length()>0);
+        return (xmlDocument.getTitle() != null && xmlDocument.getTitle().getValue() != null && !xmlDocument.getTitle().getValue().isEmpty());
     }
 
     public String getAbstract(){
@@ -55,7 +55,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasAbstract(){
-        return (xmlDocument.getAbstract() != null && ((Abstract)xmlDocument.getAbstract()).getValue() != null && ((Abstract)xmlDocument.getAbstract()).getValue().length()>0);
+        return (xmlDocument.getAbstract() != null && ((Abstract)xmlDocument.getAbstract()).getValue() != null && !((Abstract)xmlDocument.getAbstract()).getValue().isEmpty());
     }
 
    public String getAuthors(String seperator){
@@ -108,7 +108,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasKeyWords(){
-        return (xmlDocument.getKeywords() != null && xmlDocument.getKeywords().getKeywords() != null && !xmlDocument.getKeywords().getKeywords().length()==0);
+        return (xmlDocument.getKeywords() != null && xmlDocument.getKeywords().getKeywords() != null && !xmlDocument.getKeywords().getKeywords().isEmpty());
     }
 */
 
@@ -122,7 +122,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasDoi(){
-        return (xmlDocument.getDoi() != null && this.getSimpleTypeValue(xmlDocument.getDoi()) != null && this.getSimpleTypeValue(xmlDocument.getDoi()).length()>0);
+        return (xmlDocument.getDoi() != null && this.getSimpleTypeValue(xmlDocument.getDoi()) != null && !this.getSimpleTypeValue(xmlDocument.getDoi()).isEmpty());
     }
 /*
     public String getPages(){
@@ -135,7 +135,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasPages(){
-        return (xmlDocument.getPages() != null && xmlDocument.getPages().getValue() != null && !xmlDocument.getPages().getValue().length()==0);
+        return (xmlDocument.getPages() != null && xmlDocument.getPages().getValue() != null && !xmlDocument.getPages().getValue().isEmpty());
     }
 
     public String getVolume(){
@@ -148,7 +148,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasVolume(){
-        return (xmlDocument.getVolume() != null && xmlDocument.getVolume().getValue() != null && !xmlDocument.getVolume().getValue().length()==0);
+        return (xmlDocument.getVolume() != null && xmlDocument.getVolume().getValue() != null && !xmlDocument.getVolume().getValue().isEmpty());
     }
 
     public String getNumber(){
@@ -161,7 +161,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasNumber(){
-        return (xmlDocument.getNumber() != null && xmlDocument.getNumber().getValue() != null && !xmlDocument.getNumber().getValue().length()==0);
+        return (xmlDocument.getNumber() != null && xmlDocument.getNumber().getValue() != null && !xmlDocument.getNumber().getValue().isEmpty());
     }
 */
     
@@ -175,7 +175,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasYear(){
-        return (this.getSimpleTypeValue(xmlDocument.getYear()) != null && this.getSimpleTypeValue(xmlDocument.getYear()).length()>0 && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
+        return (this.getSimpleTypeValue(xmlDocument.getYear()) != null && !this.getSimpleTypeValue(xmlDocument.getYear()).isEmpty() && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
     }
     
 /*
@@ -189,7 +189,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasMonth(){
-        return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getMonth() != null && !xmlDocument.getPublishdate().getMonth().length()==0);
+        return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getMonth() != null && !xmlDocument.getPublishdate().getMonth().isEmpty());
     }
 
     public String getDay(){
@@ -202,7 +202,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasDay(){
-        return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getDay() != null && !xmlDocument.getPublishdate().getDay().length()==0);
+        return (xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getDay() != null && !xmlDocument.getPublishdate().getDay().isEmpty());
     }
     
 	/*
@@ -216,7 +216,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasVenue(){
-        return (xmlDocument.getVenue() != null && xmlDocument.getVenue().getValue() != null && !xmlDocument.getVenue().getValue().length()==0);
+        return (xmlDocument.getVenue() != null && xmlDocument.getVenue().getValue() != null && !xmlDocument.getVenue().getValue().isEmpty());
     }*/
     
     private String getNameComplete(Author author){

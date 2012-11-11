@@ -27,9 +27,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -159,6 +161,7 @@ public class LabelPatternPanel  extends JPanel {
         con.insets = new Insets( 20,5,0,5 );
         gbl.setConstraints( btnDefaultAll, con );
         btnDefaultAll.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 // reset all fields
                 Iterator<String> i=textFields.keySet().iterator();
@@ -210,6 +213,7 @@ public class LabelPatternPanel  extends JPanel {
         gbl.setConstraints( but, con );
         but.setActionCommand(name);
         but.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JTextField tf = textFields.get(e.getActionCommand());
                 tf.setText("");
