@@ -38,13 +38,13 @@ public class HTMLConverter implements LayoutFormatter {
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
         {"161", "iexcl", "\\\\textexclamdown"}, // inverted exclamation mark, U+00A1 ISOnum
-        {"162", "cent", ""}, // cent sign, U+00A2 ISOnum  
+        {"162", "cent", "\\\\textcent"}, // cent sign, U+00A2 ISOnum  
         {"163", "pound", "\\\\pounds"}, // pound sign, U+00A3 ISOnum
         {"164", "curren", ""}, // currency sign, U+00A4 ISOnum  
-        {"165", "yen", ""}, // yen sign = yuan sign, U+00A5 ISOnum  
+        {"165", "yen", "\\\\textyen"}, // yen sign = yuan sign, U+00A5 ISOnum  
         {"166", "brvbar", ""}, // broken bar = broken vertical bar, 
         //                                 U+00A6 ISOnum 
-        {"167", "sect", ""}, // section sign, U+00A7 ISOnum  
+        {"167", "sect", "\\{\\\\S\\}"}, // section sign, U+00A7 ISOnum  
         {"168", "uml", ""}, // diaeresis = spacing diaeresis, 
         //                                 U+00A8 ISOdia 
         {"169", "copy", "\\\\copyright"}, // copyright sign, U+00A9 ISOnum
@@ -68,9 +68,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"180", "acute", ""}, // acute accent = spacing acute, 
         //                                 U+00B4 ISOdia 
         {"181", "micro", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
-        {"182", "para", ""}, // pilcrow sign = paragraph sign, 
+        {"182", "para", "\\{\\\\P\\}"}, // pilcrow sign = paragraph sign, 
         //                                 U+00B6 ISOnum 
-        {"183", "middot", ""}, // middle dot = Georgian comma 
+        {"183", "middot", "\\\\textperiodcenter"}, // middle dot = Georgian comma 
         //                                 = Greek middle dot, U+00B7 ISOnum 
         {"184", "cedil", ""}, // cedilla = spacing cedilla, U+00B8 ISOdia  
         {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
@@ -85,7 +85,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 = fraction one half, U+00BD ISOnum 
         {"190", "frac34", "\\$\\sfrac\\{3\\}\\{4\\}\\$"}, // vulgar fraction three quarters 
         //                                 = fraction three quarters, U+00BE ISOnum 
-        {"191", "iquest", ""}, // inverted question mark 
+        {"191", "iquest", "\\\\textquestiondown"}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
         {"192", "Agrave", "\\\\`\\{A\\}"}, // latin capital letter A with grave
         //                                 = latin capital letter A grave,
@@ -136,7 +136,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"214", "Ouml", "\\\\\"\\{O\\}"}, // latin capital letter O with diaeresis, 
         //                                 U+00D6 ISOlat1 
         {"215", "times", "\\$\\\\times\\$"}, // multiplication sign, U+00D7 ISOnum  
-        {"216", "Oslash", ""}, // latin capital letter O with stroke 
+        {"216", "Oslash", "\\{\\\\O\\{\\}\\}"}, // latin capital letter O with stroke 
         //                                 = latin capital letter O slash,
         //                                 U+00D8 ISOlat1 
         {"217", "Ugrave", "\\\\`\\{U\\}"}, // latin capital letter U with grave,
@@ -201,7 +201,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"246", "ouml", "\\\\\"\\{o\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
         {"247", "divide", ""}, // division sign, U+00F7 ISOnum  
-        {"248", "oslash", ""}, // latin small letter o with stroke, 
+        {"248", "oslash", "\\\\o\\{\\}"}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
         {"249", "ugrave", "\\\\`\\{u\\}"}, // latin small letter u with grave,
@@ -297,10 +297,10 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+03D1 NEW 
         {"978", "upsih", ""}, // greek upsilon with hook symbol, 
         //                                   U+03D2 NEW 
-        {"982", "piv", ""}, // greek pi symbol, U+03D6 ISOgrk3  
+        {"982", "piv", "\\$\\\\varphi\\$"}, // greek pi symbol, U+03D6 ISOgrk3  
 
         /* General Punctuation */
-        {"8226", "bull", ""}, // bullet = black small circle, 
+        {"8226", "bull", "\\$\\\\bullet\\$"}, // bullet = black small circle, 
         //                                    U+2022 ISOpub  
         /* bullet is NOT the same as bullet operator, U+2219 */
         {"8230", "hellip", ""}, // horizontal ellipsis = three dot leader, 
@@ -315,35 +315,35 @@ public class HTMLConverter implements LayoutFormatter {
         /* Letterlike Symbols */
         {"8472", "weierp", ""}, // script capital P = power set 
         //                                    = Weierstrass p, U+2118 ISOamso 
-        {"8465", "image", ""}, // blackletter capital I = imaginary part, 
+        {"8465", "image", "\\{\\$\\\\Im\\$\\}"}, // blackletter capital I = imaginary part, 
         //                                    U+2111 ISOamso 
-        {"8476", "real", ""}, // blackletter capital R = real part symbol, 
+        {"8476", "real", "\\{\\$\\\\Re\\$\\}"}, // blackletter capital R = real part symbol, 
         //                                    U+211C ISOamso 
-        {"8482", "trade", "\\texttrademark"}, // trade mark sign, U+2122 ISOnum
+        {"8482", "trade", "\\\\texttrademark"}, // trade mark sign, U+2122 ISOnum
         {"8501", "alefsym", ""}, // alef symbol = first transfinite cardinal, 
         //                                    U+2135 NEW 
         /*    alef symbol is NOT the same as hebrew letter alef,
          U+05D0 although the same glyph could be used to depict both characters */
         /* Arrows */
-        {"8592", "larr", "\\\\leftarrow"}, // leftwards arrow, U+2190 ISOnum
-        {"8593", "uarr", "\\\\uparrow"}, // upwards arrow, U+2191 ISOnum
-        {"8594", "rarr", "\\\\rightarrow"}, // rightwards arrow, U+2192 ISOnum
-        {"8595", "darr", "\\\\downarrow"}, // downwards arrow, U+2193 ISOnum
-        {"8596", "harr", ""}, // left right arrow, U+2194 ISOamsa  
+        {"8592", "larr", "\\$\\\\leftarrow\\$"}, // leftwards arrow, U+2190 ISOnum
+        {"8593", "uarr", "\\$\\\\uparrow\\$"}, // upwards arrow, U+2191 ISOnum
+        {"8594", "rarr", "\\$\\\\rightarrow\\$"}, // rightwards arrow, U+2192 ISOnum
+        {"8595", "darr", "\\$\\\\downarrow\\$"}, // downwards arrow, U+2193 ISOnum
+        {"8596", "harr", "\\$\\\\leftrightarrow\\$"}, // left right arrow, U+2194 ISOamsa  
         {"8629", "crarr", ""}, // downwards arrow with corner leftwards 
         //                                    = carriage return, U+21B5 NEW 
-        {"8656", "lArr", "\\\\Leftarrow"}, // leftwards double arrow, U+21D0 ISOtech
+        {"8656", "lArr", "\\{\\$\\\\Leftarrow\\$\\}"}, // leftwards double arrow, U+21D0 ISOtech
         /*  ISO 10646 does not say that lArr is the same as the 'is implied by' arrow
          but also does not have any other character for that function. So ? lArr can
          be used for 'is implied by' as ISOtech suggests */
-        {"8657", "uArr", "\\\\Uparrow"}, // upwards double arrow, U+21D1 ISOamsa
-        {"8658", "rArr", "\\\\Rightarrow"}, // rightwards double arrow,
+        {"8657", "uArr", "\\{\\$\\\\Uparrow\\$\\}"}, // upwards double arrow, U+21D1 ISOamsa
+        {"8658", "rArr", "\\{\\$\\\\Rightarrow\\$\\}"}, // rightwards double arrow,
         //                                     U+21D2 ISOtech 
         /*   ISO 10646 does not say this is the 'implies' character but does not have 
          another character with this function so ?
          rArr can be used for 'implies' as ISOtech suggests */
-        {"8659", "dArr", ""}, // downwards double arrow, U+21D3 ISOamsa  
-        {"8660", "hArr", ""}, // left right double arrow, 
+        {"8659", "dArr", "\\{\\$\\\\Downarrow\\$\\}"}, // downwards double arrow, U+21D3 ISOamsa  
+        {"8660", "hArr", "\\{\\$\\\\Leftrightarrow\\$\\}"}, // left right double arrow, 
         //                                     U+21D4 ISOamsa 
 
         /* Mathematical Operators */
@@ -352,7 +352,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"8707", "exist", "\\$\\\\exists\\$"}, // there exists, U+2203 ISOtech
         {"8709", "empty", "\\$\\\\emptyset\\$"}, // empty set = null set = diameter,
         //                                    U+2205 ISOamso 
-        {"8711", "nabla", ""}, // nabla = backward difference, 
+        {"8711", "nabla", "\\$\\\\nabla\\$"}, // nabla = backward difference, 
         //                                    U+2207 ISOtech 
         {"8712", "isin", "\\$\\\\in\\$"}, // element of, U+2208 ISOtech
         {"8713", "notin", "\\$\\\\notin\\$"}, // not an element of, U+2209 ISOtech
@@ -366,7 +366,7 @@ public class HTMLConverter implements LayoutFormatter {
         /*    sum is NOT the same character as U+03A3 'greek capital letter sigma'
          though the same glyph might be used for both */
         {"8722", "minus", "\\$-\\$"}, // minus sign, U+2212 ISOtech  
-        {"8727", "lowast", ""}, // asterisk operator, U+2217 ISOtech  
+        {"8727", "lowast", "\\$\\\\ast\\$"}, // asterisk operator, U+2217 ISOtech  
         {"8730", "radic", "\\$\\\\sqrt{}\\$"}, // square root = radical sign, 
         //                                    U+221A ISOtech 
         {"8733", "prop", "\\$\\\\propto\\$"}, // proportional to, U+221D ISOtech  
@@ -382,48 +382,48 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+223C ISOtech 
         /*  tilde operator is NOT the same character as the tilde, U+007E,
          although the same glyph might be used to represent both   */
-        {"8773", "cong", ""}, // approximately equal to, U+2245 ISOtech  
-        {"8776", "asymp", ""}, // almost equal to = asymptotic to, 
+        {"8773", "cong", "\\$\\\\cong\\$"}, // approximately equal to, U+2245 ISOtech  
+        {"8776", "asymp", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
         //                                    U+2248 ISOamsr 
-        {"8800", "ne", ""}, // not equal to, U+2260 ISOtech  
-        {"8801", "equiv", ""}, // identical to, U+2261 ISOtech  
+        {"8800", "ne", "\\$\\\\neq\\$"}, // not equal to, U+2260 ISOtech  
+        {"8801", "equiv", "\\$\\\\equiv\\$"}, // identical to, U+2261 ISOtech  
         {"8804", "le", "\\$\\\\leq\\$"}, // less-than or equal to, U+2264 ISOtech  
         {"8805", "ge", "\\$\\\\geq\\$"}, // greater-than or equal to, 
         //                                    U+2265 ISOtech 
-        {"8834", "sub", ""}, // subset of, U+2282 ISOtech  
-        {"8835", "sup", ""}, // superset of, U+2283 ISOtech  
+        {"8834", "sub", "\\$\\\\subset\\$"}, // subset of, U+2282 ISOtech  
+        {"8835", "sup", "\\$\\\\supset\\$"}, // superset of, U+2283 ISOtech  
         /*    note that nsup, 'not a superset of, U+2283' is not covered by the Symbol 
          font encoding and is not included. Should it be, for symmetry?
          It is in ISOamsn   */
         {"8836", "nsub", ""}, // not a subset of, U+2284 ISOamsn  
-        {"8838", "sube", ""}, // subset of or equal to, U+2286 ISOtech  
-        {"8839", "supe", ""}, // superset of or equal to, 
+        {"8838", "sube", "\\$\\\\subseteq\\$"}, // subset of or equal to, U+2286 ISOtech  
+        {"8839", "supe", "\\$\\\\supseteq\\$"}, // superset of or equal to, 
         //                                    U+2287 ISOtech 
         {"8853", "oplus", "\\$\\\\oplus\\$"}, // circled plus = direct sum, 
         //                                    U+2295 ISOamsb 
         {"8855", "otimes", "\\$\\\\otimes\\$"}, // circled times = vector product,
         //                                    U+2297 ISOamsb 
-        {"8869", "perp", ""}, // up tack = orthogonal to = perpendicular, 
+        {"8869", "perp", "\\$\\\\perp\\$"}, // up tack = orthogonal to = perpendicular, 
         //                                    U+22A5 ISOtech 
-        {"8901", "sdot", ""}, // dot operator, U+22C5 ISOamsb  
+        {"8901", "sdot", "\\$\\\\cdot\\$"}, // dot operator, U+22C5 ISOamsb  
         /* dot operator is NOT the same character as U+00B7 middle dot */
         /* Miscellaneous Technical */
-        {"8968", "lceil", ""}, // left ceiling = apl upstile, 
+        {"8968", "lceil", "\\$\\\\lceil\\$"}, // left ceiling = apl upstile, 
         //                                    U+2308 ISOamsc  
-        {"8969", "rceil", ""}, // right ceiling, U+2309 ISOamsc   
-        {"8970", "lfloor", ""}, // left floor = apl downstile, 
+        {"8969", "rceil", "\\$\\\\rceil\\$"}, // right ceiling, U+2309 ISOamsc   
+        {"8970", "lfloor", "\\$\\\\lfloor\\$"}, // left floor = apl downstile, 
         //                                    U+230A ISOamsc  
-        {"8971", "rfloor", ""}, // right floor, U+230B ISOamsc   
-        {"9001", "lang", ""}, // left-pointing angle bracket = bra, 
+        {"8971", "rfloor", "\\$\\\\rfloor\\$"}, // right floor, U+230B ISOamsc   
+        {"9001", "lang", "\\$\\\\langle\\$"}, // left-pointing angle bracket = bra, 
         //                                    U+2329 ISOtech 
         /*    lang is NOT the same character as U+003C 'less than' 
          or U+2039 'single left-pointing angle quotation mark' */
-        {"9002", "rang", ""}, // right-pointing angle bracket = ket, 
+        {"9002", "rang", "\\$\\\\rangle\\$"}, // right-pointing angle bracket = ket, 
         //                                    U+232A ISOtech 
         /*    rang is NOT the same character as U+003E 'greater than' 
          or U+203A 'single right-pointing angle quotation mark' */
         /* Geometric Shapes */
-        {"9674", "loz", ""}, // lozenge, U+25CA ISOpub  
+        {"9674", "loz", "\\$\\\\lozenge\\$"}, // lozenge, U+25CA ISOpub  
 
         /* Miscellaneous Symbols */
         {"9824", "spades", ""}, // black spade suit, U+2660 ISOpub  
@@ -433,11 +433,11 @@ public class HTMLConverter implements LayoutFormatter {
         {"9829", "hearts", ""}, // black heart suit = valentine, 
         //                                    U+2665 ISOpub 
         {"9830", "diams", ""}, // black diamond suit, U+2666 ISOpub  
-        {"34", "quot", "\""}, // quotation mark = APL quote,
+        {"34", "quot", "\\\""}, // quotation mark = APL quote,
         //                                   U+0022 ISOnum 
-        {"38", "amp", "&"}, // ampersand, U+0026 ISOnum 
-        {"60", "lt", "<"}, // less-than sign, U+003C ISOnum 
-        {"62", "gt", ">"}, // greater-than sign, U+003E ISOnum 
+        {"38", "amp", "\\\\&"}, // ampersand, U+0026 ISOnum 
+        {"60", "lt", "\\$<\\$"}, // less-than sign, U+003C ISOnum 
+        {"62", "gt", "\\$>\\$"}, // greater-than sign, U+003E ISOnum 
 
         /* Latin Extended-A */
         {"338", "OElig", "\\{\\\\OE\\}"}, // latin capital ligature OE,
@@ -452,9 +452,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+0178 ISOlat2 
 
         /* Spacing Modifier Letters */
-        {"710", "circ", ""}, // modifier letter circumflex accent,
+        {"710", "circ", "\\\\textasciicircum"}, // modifier letter circumflex accent,
         //                                   U+02C6 ISOpub 
-        {"732", "tilde", ""}, // small tilde, U+02DC ISOdia 
+        {"732", "tilde", "\\\\textasciitilde"}, // small tilde, U+02DC ISOdia 
 
         /* General Punctuation */
         {"8194", "ensp", "\\\\hspace\\{0.5em\\}"}, // en space, U+2002 ISOpub  
@@ -477,9 +477,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"8221", "rdquo", "''"}, // right double quotation mark, 
         //                                   U+201D ISOnum 
         {"8222", "bdquo", ""}, // double low-9 quotation mark, U+201E NEW  
-        {"8224", "dagger", ""}, // dagger, U+2020 ISOpub  
-        {"8225", "Dagger", ""}, // double dagger, U+2021 ISOpub  
-        {"8240", "permil", ""}, // per mille sign, U+2030 ISOtech  
+        {"8224", "dagger", "\\\\dag"}, // dagger, U+2020 ISOpub  
+        {"8225", "Dagger", "\\\\ddag"}, // double dagger, U+2021 ISOpub  
+        {"8240", "permil", "\\\\textperthousand"}, // per mille sign, U+2030 ISOtech  
         {"8249", "lsaquo", ""}, // single left-pointing angle quotation mark, 
         //                                   U+2039 ISO proposed 
         /* lsaquo is proposed but not yet ISO standardized */
@@ -491,8 +491,8 @@ public class HTMLConverter implements LayoutFormatter {
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
         {"43", "", "\\+"}, // Plus
-        {"123", "", "\\{"}, // Left curly bracket
-        {"125", "", "\\}"}, // Right curly bracket
+        {"123", "", "\\\\\\{"}, // Left curly bracket
+        {"125", "", "\\\\\\}"}, // Right curly bracket
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"769", "", "'"},    // Can be solved better as it is a combining accent
         {"774", "", ""},    // FIX: Breve - Can be solved better as it is a combining accent
