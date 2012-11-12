@@ -98,7 +98,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00C3 ISOlat1 
         {"196", "Auml", "\\\"\\{A\\}"}, // latin capital letter A with diaeresis, 
         //                                 U+00C4 ISOlat1 
-        {"197", "Aring", ""}, // latin capital letter A with ring above 
+        {"197", "Aring", "\\{\\\\AA\\}"}, // latin capital letter A with ring above 
         //                                 = latin capital letter A ring,
         //                                 U+00C5 ISOlat1 
         {"198", "AElig", "\\{\\\\AE\\}"}, // latin capital letter AE 
@@ -164,7 +164,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E3 ISOlat1 
         {"228", "auml", "\\\\\"\\{a\\}"}, // latin small letter a with diaeresis, 
         //                                 U+00E4 ISOlat1 
-        {"229", "aring", ""}, // latin small letter a with ring above 
+        {"229", "aring", "\\{\\\\aa\\}"}, // latin small letter a with ring above 
         //                                 = latin small letter a ring,
         //                                 U+00E5 ISOlat1 
         {"230", "aelig", "\\{\\\\ae\\}"}, // latin small letter ae 
@@ -493,6 +493,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"43", "", "\\+"}, // Plus
         {"123", "", "\\\\\\{"}, // Left curly bracket
         {"125", "", "\\\\\\}"}, // Right curly bracket
+        {"146", "", "'"}, // Private use two ???
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"769", "", "'"},    // Can be solved better as it is a combining accent
         {"774", "", ""},    // FIX: Breve - Can be solved better as it is a combining accent
