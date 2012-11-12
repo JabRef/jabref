@@ -3147,14 +3147,14 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	}
 	
 	/**
-	 * @param nc indicates the undo named compound. May be null
+	 * @param ce indicates the undo named compound. May be null
 	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
 		updateField(be, field, newValue, ce, false);
 	}
 
 	/**
-	 * @param nc indicates the undo named compound. May be null
+	 * @param ce indicates the undo named compound. May be null
 	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
 		String oldValue = be.getField(field);
