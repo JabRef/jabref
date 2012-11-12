@@ -34,7 +34,7 @@ import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileDialogs;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -137,7 +137,7 @@ public class PrefsDialog3 extends JDialog {
 		CancelAction cancelAction = new CancelAction();
 		cancel.addActionListener(cancelAction);
 		lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		ButtonBarBuilder2 bb = new ButtonBarBuilder2(lower);
+		ButtonBarBuilder bb = new ButtonBarBuilder(lower);
 		bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

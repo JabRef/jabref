@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
@@ -45,7 +45,7 @@ public class WaitForSaveOperation implements ActionListener {
         prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         diag = new JDialog(frame, Globals.lang("Please wait"), true);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(cancel);
         bb.addGlue();

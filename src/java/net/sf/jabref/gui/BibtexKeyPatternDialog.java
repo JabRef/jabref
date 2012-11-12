@@ -40,7 +40,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class BibtexKeyPatternDialog extends JDialog {
 	private MetaData metaData;
@@ -75,7 +75,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 		
 		JPanel lower = new JPanel();
 		lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		ButtonBarBuilder2 bb = new ButtonBarBuilder2(lower);
+		ButtonBarBuilder bb = new ButtonBarBuilder(lower);
 		bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

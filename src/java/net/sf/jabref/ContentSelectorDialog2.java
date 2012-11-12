@@ -26,7 +26,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class ContentSelectorDialog2 extends JDialog {
 
@@ -474,7 +474,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	wordEditPan.add(wordEditField);
 
 	// Add buttons:
-        ButtonBarBuilder2 bsb = new ButtonBarBuilder2(buttonPan);
+        ButtonBarBuilder bsb = new ButtonBarBuilder(buttonPan);
         bsb.addGlue();
         bsb.addButton(ok);
 	    bsb.addButton(apply);

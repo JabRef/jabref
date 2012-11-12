@@ -55,7 +55,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
@@ -872,7 +872,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		addComponent(gbl, getContentPane(), panelButtons, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, new Insets(10, 6, 10, 6),
 				0, 3, 1, 1, 0, 0, 0, 0);
 		
-	    ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+	    ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(buttonApply);
         bb.addButton(buttonClose);
