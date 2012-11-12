@@ -34,6 +34,7 @@ public class HTMLConverter implements LayoutFormatter {
 	// most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
 	// The symbols can be looked at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
 	// http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
+        // http://llg.cubic.org/docs/ent2latex.html is also useful
     private String[][] conversionList = new String[][]{
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
@@ -45,18 +46,18 @@ public class HTMLConverter implements LayoutFormatter {
         {"166", "brvbar", ""}, // broken bar = broken vertical bar, 
         //                                 U+00A6 ISOnum 
         {"167", "sect", "\\{\\\\S\\}"}, // section sign, U+00A7 ISOnum  
-        {"168", "uml", ""}, // diaeresis = spacing diaeresis, 
+        {"168", "uml", "\\\\\"\\{\\}"}, // diaeresis = spacing diaeresis, 
         //                                 U+00A8 ISOdia 
         {"169", "copy", "\\\\copyright"}, // copyright sign, U+00A9 ISOnum
         {"170", "ordf", "\\\\textordfeminine"}, // feminine ordinal indicator, U+00AA ISOnum
         {"171", "laquo", "\\\\guillemotleft"}, // left-pointing double angle quotation mark
         //                                 = left pointing guillemet, U+00AB ISOnum 
-        {"172", "not", ""}, // not sign, U+00AC ISOnum  
-        {"173", "shy", ""}, // soft hyphen = discretionary hyphen, 
+        {"172", "not", "\\$\\\\neg\\$"}, // not sign, U+00AC ISOnum  
+        {"173", "shy", "\\\\-"}, // soft hyphen = discretionary hyphen, 
         //                                 U+00AD ISOnum 
-        {"174", "reg", "\\textregistered"}, // registered sign = registered trade mark sign,
+        {"174", "reg", "\\\\textregistered"}, // registered sign = registered trade mark sign,
         //                                 U+00AE ISOnum 
-        {"175", "macr", ""}, // macron = spacing macron = overline 
+        {"175", "macr", "\\\\=\\{\\}"}, // macron = spacing macron = overline 
         //                                 = APL overbar, U+00AF ISOdia 
         {"176", "deg", "\\$\\\\deg\\$"}, // degree sign, U+00B0 ISOnum  
         {"177", "plusmn", "\\$\\\\pm\\$"}, // plus-minus sign = plus-or-minus sign, 
@@ -65,14 +66,14 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 = squared, U+00B2 ISOnum 
         {"179", "sup3", "\\$\\^3\\$"}, // superscript three = superscript digit three 
         //                                 = cubed, U+00B3 ISOnum 
-        {"180", "acute", ""}, // acute accent = spacing acute, 
+        {"180", "acute", "\\\\'\\{\\}"}, // acute accent = spacing acute, 
         //                                 U+00B4 ISOdia 
         {"181", "micro", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
         {"182", "para", "\\{\\\\P\\}"}, // pilcrow sign = paragraph sign, 
         //                                 U+00B6 ISOnum 
         {"183", "middot", "\\\\textperiodcenter"}, // middle dot = Georgian comma 
         //                                 = Greek middle dot, U+00B7 ISOnum 
-        {"184", "cedil", ""}, // cedilla = spacing cedilla, U+00B8 ISOdia  
+        {"184", "cedil", "\\\\c\\{\\}"}, // cedilla = spacing cedilla, U+00B8 ISOdia  
         {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
         //                                 U+00B9 ISOnum 
         {"186", "ordm", "\\\\textordmasculine"}, // masculine ordinal indicator,
@@ -92,7 +93,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00C0 ISOlat1 
         {"193", "Aacute", "\\\\'\\{A\\}"}, // latin capital letter A with acute, 
         //                                 U+00C1 ISOlat1 
-        {"194", "Acirc", ""}, // latin capital letter A with circumflex, 
+        {"194", "Acirc", "\\\\\\^\\{A\\}"}, // latin capital letter A with circumflex, 
         //                                 U+00C2 ISOlat1 
         {"195", "Atilde", "\\\\~\\{A\\}"}, // latin capital letter A with tilde, 
         //                                 U+00C3 ISOlat1 
@@ -110,26 +111,26 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00C8 ISOlat1 
         {"201", "Eacute", "\\\\'\\{E\\}"}, // latin capital letter E with acute, 
         //                                 U+00C9 ISOlat1 
-        {"202", "Ecirc", ""}, // latin capital letter E with circumflex, 
+        {"202", "Ecirc", "\\\\\\^\\{E\\}"}, // latin capital letter E with circumflex, 
         //                                 U+00CA ISOlat1 
-        {"203", "Euml", "\\\"\\{E\\}"}, // latin capital letter E with diaeresis, 
+        {"203", "Euml", "\\\\\"\\{E\\}"}, // latin capital letter E with diaeresis, 
         //                                 U+00CB ISOlat1 
         {"204", "Igrave", "\\\\`\\{I\\}"}, // latin capital letter I with grave,
         //                                 U+00CC ISOlat1 
         {"205", "Iacute", "\\\\'\\{I\\}"}, // latin capital letter I with acute, 
         //                                 U+00CD ISOlat1 
-        {"206", "Icirc", ""}, // latin capital letter I with circumflex, 
+        {"206", "Icirc", "\\\\\\^\\{I\\}"}, // latin capital letter I with circumflex, 
         //                                 U+00CE ISOlat1 
-        {"207", "Iuml", "\\\"\\{I\\}"}, // latin capital letter I with diaeresis, 
+        {"207", "Iuml", "\\\\\"\\{I\\}"}, // latin capital letter I with diaeresis, 
         //                                 U+00CF ISOlat1 
-        {"208", "ETH", ""}, // latin capital letter ETH, U+00D0 ISOlat1  
+        {"208", "ETH", "\\{\\\\DH\\}"}, // latin capital letter ETH, U+00D0 ISOlat1  
         {"209", "Ntilde", "\\\\~\\{N\\}"}, // latin capital letter N with tilde, 
         //                                 U+00D1 ISOlat1 
         {"210", "Ograve", "\\\\`\\{O\\}"}, // latin capital letter O with grave,
         //                                 U+00D2 ISOlat1 
         {"211", "Oacute", "\\\\'\\{O\\}"}, // latin capital letter O with acute, 
         //                                 U+00D3 ISOlat1 
-        {"212", "Ocirc", ""}, // latin capital letter O with circumflex, 
+        {"212", "Ocirc", "\\\\\\^\\{O\\}"}, // latin capital letter O with circumflex, 
         //                                 U+00D4 ISOlat1 
         {"213", "Otilde", "\\\\~\\{O\\}"}, // latin capital letter O with tilde, 
         //                                 U+00D5 ISOlat1 
@@ -143,13 +144,13 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00D9 ISOlat1 
         {"218", "Uacute", "\\\\'\\{U\\}"}, // latin capital letter U with acute, 
         //                                 U+00DA ISOlat1 
-        {"219", "Ucirc", ""}, // latin capital letter U with circumflex, 
+        {"219", "Ucirc", "\\\\\\^\\{U\\}"}, // latin capital letter U with circumflex, 
         //                                 U+00DB ISOlat1 
         {"220", "Uuml", "\\\\\"\\{U\\}"}, // latin capital letter U with diaeresis, 
         //                                 U+00DC ISOlat1 
         {"221", "Yacute", "\\\\'\\{Y\\}"}, // latin capital letter Y with acute, 
         //                                 U+00DD ISOlat1 
-        {"222", "THORN", ""}, // latin capital letter THORN, 
+        {"222", "THORN", "\\{\\\\TH\\}"}, // latin capital letter THORN, 
         //                                 U+00DE ISOlat1 
         {"223", "szlig", "\\\\ss\\{\\}"}, // latin small letter sharp s = ess-zed,
         //                                 U+00DF ISOlat1 
@@ -158,7 +159,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E0 ISOlat1 
         {"225", "aacute", "\\\\'\\{a\\}"}, // latin small letter a with acute, 
         //                                 U+00E1 ISOlat1 
-        {"226", "acirc", ""}, // latin small letter a with circumflex, 
+        {"226", "acirc", "\\\\\\^\\{a\\}"}, // latin small letter a with circumflex, 
         //                                 U+00E2 ISOlat1 
         {"227", "atilde", "\\\\~\\{a\\}"}, // latin small letter a with tilde, 
         //                                 U+00E3 ISOlat1 
@@ -175,7 +176,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E8 ISOlat1 
         {"233", "eacute", "\\\\'\\{e\\}"}, // latin small letter e with acute, 
         //                                 U+00E9 ISOlat1 
-        {"234", "ecirc", ""}, // latin small letter e with circumflex, 
+        {"234", "ecirc", "\\\\\\^\\{e\\}"}, // latin small letter e with circumflex, 
         //                                 U+00EA ISOlat1 
         {"235", "euml", "\\\\\"\\{e\\}"}, // latin small letter e with diaeresis, 
         //                                 U+00EB ISOlat1 
@@ -183,24 +184,24 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00EC ISOlat1 
         {"237", "iacute", "\\\\'\\{i\\}"}, // latin small letter i with acute, 
         //                                 U+00ED ISOlat1 
-        {"238", "icirc", ""}, // latin small letter i with circumflex, 
+        {"238", "icirc", "\\\\\\^\\{i\\}"}, // latin small letter i with circumflex, 
         //                                 U+00EE ISOlat1 
-        {"239", "iuml", "\\\\\"\\{i\\}"}, // latin small letter i with diaeresis, 
+        {"239", "iuml", "\\\\\"\\{\\\\i\\}"}, // latin small letter i with diaeresis, 
         //                                 U+00EF ISOlat1 
-        {"240", "eth", ""}, // latin small letter eth, U+00F0 ISOlat1  
+        {"240", "eth", "\\\\dh"}, // latin small letter eth, U+00F0 ISOlat1  
         {"241", "ntilde", "\\\\~\\{n\\}"}, // latin small letter n with tilde, 
         //                                 U+00F1 ISOlat1 
         {"242", "ograve", "\\\\`\\{o\\}"}, // latin small letter o with grave,
         //                                 U+00F2 ISOlat1 
         {"243", "oacute", "\\\\'\\{o\\}"}, // latin small letter o with acute, 
         //                                 U+00F3 ISOlat1 
-        {"244", "ocirc", ""}, // latin small letter o with circumflex, 
+        {"244", "ocirc", "\\\\\\^\\{o\\}"}, // latin small letter o with circumflex, 
         //                                 U+00F4 ISOlat1 
         {"245", "otilde", "\\\\~\\{o\\}"}, // latin small letter o with tilde, 
         //                                 U+00F5 ISOlat1 
         {"246", "ouml", "\\\\\"\\{o\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
-        {"247", "divide", ""}, // division sign, U+00F7 ISOnum  
+        {"247", "divide", "/"}, // division sign, U+00F7 ISOnum  
         {"248", "oslash", "\\\\o\\{\\}"}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
@@ -208,17 +209,17 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00F9 ISOlat1 
         {"250", "uacute", "\\\\'\\{u\\}"}, // latin small letter u with acute, 
         //                                 U+00FA ISOlat1 
-        {"251", "ucirc", ""}, // latin small letter u with circumflex, 
+        {"251", "ucirc", "\\\\\\^\\{u\\}"}, // latin small letter u with circumflex, 
         //                                 U+00FB ISOlat1 
         {"252", "uuml", "\\\\\"\\{u\\}"}, // latin small letter u with diaeresis, 
         //                                 U+00FC ISOlat1 
         {"253", "yacute", "\\\\'\\{y\\}"}, // latin small letter y with acute, 
         //                                 U+00FD ISOlat1 
-        {"254", "thorn", ""}, // latin small letter thorn, 
+        {"254", "thorn", "\\{\\\\th\\}"}, // latin small letter thorn, 
         //                                 U+00FE ISOlat1 
         {"255", "yuml", "\\\\\"\\{y\\}"}, // latin small letter y with diaeresis, 
         //                                 U+00FF ISOlat1 
-        {"402", "fnof", ""}, // latin small f with hook = function 
+        {"402", "fnof", "\\$f\\$"}, // latin small f with hook = function 
         //                                   = florin, U+0192 ISOtech 
 
         /* Greek */
@@ -281,7 +282,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"959", "omicron", "\\$\\\\omicron\\$"}, // greek small letter omicron, U+03BF NEW  
         {"960", "pi", "\\$\\\\phi\\$"}, // greek small letter pi, U+03C0 ISOgrk3  
         {"961", "rho", "\\$\\\\rho\\$"}, // greek small letter rho, U+03C1 ISOgrk3  
-        {"962", "sigmaf", ""}, // greek small letter final sigma, 
+        {"962", "sigmaf", "\\$\\\\varsigma\\$"}, // greek small letter final sigma, 
         //                                   U+03C2 ISOgrk3 
         {"963", "sigma", "\\$\\\\sigma\\$"}, // greek small letter sigma, 
         //                                   U+03C3 ISOgrk3 
@@ -293,7 +294,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"968", "psi", "\\$\\\\psi\\$"}, // greek small letter psi, U+03C8 ISOgrk3  
         {"969", "omega", "\\$\\\\omega\\$"}, // greek small letter omega, 
         //                                   U+03C9 ISOgrk3 
-        {"977", "thetasym", ""}, // greek small letter theta symbol, 
+        {"977", "thetasym", "\\$\\\\vartheta\\$"}, // greek small letter theta symbol, 
         //                                   U+03D1 NEW 
         {"978", "upsih", ""}, // greek upsilon with hook symbol, 
         //                                   U+03D2 NEW 
@@ -303,24 +304,24 @@ public class HTMLConverter implements LayoutFormatter {
         {"8226", "bull", "\\$\\\\bullet\\$"}, // bullet = black small circle, 
         //                                    U+2022 ISOpub  
         /* bullet is NOT the same as bullet operator, U+2219 */
-        {"8230", "hellip", ""}, // horizontal ellipsis = three dot leader, 
+        {"8230", "hellip", "\\{\\\\ldots\\}"}, // horizontal ellipsis = three dot leader, 
         //                                    U+2026 ISOpub  
-        {"8242", "prime", ""}, // prime = minutes = feet, U+2032 ISOtech  
-        {"8243", "Prime", ""}, // double prime = seconds = inches, 
+        {"8242", "prime", "\\$\\\\prime\\$"}, // prime = minutes = feet, U+2032 ISOtech  
+        {"8243", "Prime", "\\$\\{''\\}\\$"}, // double prime = seconds = inches, 
         //                                    U+2033 ISOtech 
-        {"8254", "oline", ""}, // overline = spacing overscore, 
+        {"8254", "oline", "\\\\=\\{\\}"}, // overline = spacing overscore, 
         //                                    U+203E NEW 
-        {"8260", "frasl", ""}, // fraction slash, U+2044 NEW  
+        {"8260", "frasl", "/"}, // fraction slash, U+2044 NEW  
 
         /* Letterlike Symbols */
-        {"8472", "weierp", ""}, // script capital P = power set 
+        {"8472", "weierp", "\\$\\\\wp\\$"}, // script capital P = power set 
         //                                    = Weierstrass p, U+2118 ISOamso 
         {"8465", "image", "\\{\\$\\\\Im\\$\\}"}, // blackletter capital I = imaginary part, 
         //                                    U+2111 ISOamso 
         {"8476", "real", "\\{\\$\\\\Re\\$\\}"}, // blackletter capital R = real part symbol, 
         //                                    U+211C ISOamso 
         {"8482", "trade", "\\\\texttrademark"}, // trade mark sign, U+2122 ISOnum
-        {"8501", "alefsym", ""}, // alef symbol = first transfinite cardinal, 
+        {"8501", "alefsym", "\\$\\\\aleph\\$"}, // alef symbol = first transfinite cardinal, 
         //                                    U+2135 NEW 
         /*    alef symbol is NOT the same as hebrew letter alef,
          U+05D0 although the same glyph could be used to depict both characters */
@@ -433,7 +434,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"9829", "hearts", ""}, // black heart suit = valentine, 
         //                                    U+2665 ISOpub 
         {"9830", "diams", ""}, // black diamond suit, U+2666 ISOpub  
-        {"34", "quot", "\\\""}, // quotation mark = APL quote,
+        {"34", "quot", "\""}, // quotation mark = APL quote,
         //                                   U+0022 ISOnum 
         {"38", "amp", "\\\\&"}, // ampersand, U+0026 ISOnum 
         {"60", "lt", "\\$<\\$"}, // less-than sign, U+003C ISOnum 
@@ -496,9 +497,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"146", "", "'"}, // Private use two ???
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"769", "", "'"},    // Can be solved better as it is a combining accent
-        {"774", "", ""},    // FIX: Breve - Can be solved better as it is a combining accent
-        {"776", "", ""},    // FIX: Diaeresis - Can be solved better as it is a combining accent
-        {"780", "", ""},    // FIX: Caron - Can be solved better as it is a combining accent
+        {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
+        {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
+        {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
         {"8208", "", "-"}    // Hyphen
     };
 
