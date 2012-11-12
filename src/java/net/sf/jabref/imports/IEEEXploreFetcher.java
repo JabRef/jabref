@@ -559,7 +559,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 					   	typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines")) {
 	                type = BibtexEntryType.getType("article");
 	                sourceField = "journal";
-	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications")) {
+	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
 	                type = BibtexEntryType.getType("inproceedings");
 	                sourceField = "booktitle";
 		        } else if (typeName.equalsIgnoreCase("IEEE Standards")) {
