@@ -1,13 +1,14 @@
 [beta_2.9 branch]
-    - Improved import of equations in IEEE Xplore titles handling images and /spl / representations
-    - Rewrote the HTML import in a more general way. Still characters need to be added.
+    - Fixed author and DOI import from IEEE Xplore 
+    - Improved import of equations in IEEE Xplore titles handling images, (sub) and /spl / representations
+    - Rewrote the HTML import in a more general way. A few characters need to be added.
     - IEEE Xplore abstract fetching should now be working again.
     - Added DOI to BibTex entry fetcher.
     - Reintroduced Google Scholar and ACM portal fetcher with entry preview to reduce server load.
     - Added alternate entry fetcher type where a preview can be displayed so the user can choose
       which entries to download. This can reduce server load significantly and prevent users from
       getting locked out of search services.
-    - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Svï¿½rd)
+    - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Svärd)
     - HTML import handles more characters. Cleanup can also do HTML cleanup. (Patch 3582375 by Oscar Gustafsson)
     - During file renaming: More illegal characters are removed (idea by Sarel Botha)
     - Rudimentary support for IEEEtranBSTCTL added (patch 3582376 by Oscar Gustafsson)

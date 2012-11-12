@@ -100,13 +100,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	super();
     	
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
-        fieldPatterns.put("author", "</h3>\\s+(.+)<br />");
+        fieldPatterns.put("author", "</h3>\\s*(.+)");
         fieldPatterns.put("volume", "Volume:\\s*(\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
         fieldPatterns.put("year", "Publication Year:\\s*(\\d{4})");
         fieldPatterns.put("pages", "Page\\(s\\):\\s*(\\d+)\\s*-\\s*(\\d*)");
-        fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
+        //fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
+        fieldPatterns.put("doi", "<a href=\"http://dx.doi.org/(.+)\" target");
     }
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -341,8 +342,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // Replace general expressions
         title = title.replaceAll("/[sS]pl ([a-zA-Z]+)/", "\\$\\\\$1\\$");
         // Deal with subscripts and superscripts
-        title = title.replaceAll("/sup ([0-9\\+\\.\\(\\)]+)/", "\\$\\^$1\\$");
-        title = title.replaceAll("/sub ([0-9\\+\\.\\(\\)]+)/", "\\$_$1\\$");
+        title = title.replaceAll("/sup (.+)/", "\\$\\^$1\\$");
+        title = title.replaceAll("/sub (.+)/", "\\$_$1\\$");
+        // Deal with the form (sub)k(/sub)
+        title = title.replaceAll("\\(sup\\)(.+)\\(/sup\\)", "\\$\\^$1\\$");
         // Replace \infin with \infty
         title = title.replaceAll("\\\\infin","\\\\infty");
         // Write back
@@ -572,7 +575,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
-            }
+            } 
             
             if (type == null) {
             	type = BibtexEntryType.getType("misc");
@@ -581,7 +584,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 unparseable++;
                 System.err.println(text);
             }
-        
+            
             entry = new BibtexEntry(Util.createNeutralId(), type);
             
             if (typeName.equalsIgnoreCase("IEEE Standards")) {
@@ -612,7 +615,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		if (field.equals("pages") && fieldMatcher.groupCount() == 2) {
             			entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
             		}
-            	}
+            	} 
             }
             if (entry.getField("author") == null) {  // Fix for some documents without authors
                 entry.setField("author","");

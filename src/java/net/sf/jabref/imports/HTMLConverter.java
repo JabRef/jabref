@@ -500,7 +500,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
         {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
         {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
-        {"8208", "", "-"}    // Hyphen
+        {"8208", "", "-"},    // Hyphen
+        {"8729", "", "\\$\\\\bullet\\$"}    // Bullet operator
     };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
