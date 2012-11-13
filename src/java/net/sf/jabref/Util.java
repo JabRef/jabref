@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -3059,7 +3060,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
    	 * Remove the http://... from DOI
    	 * 
    	 * @param doi - may not be null
-   	 * @return first DOI in the given String (without http://... prefix)
+   	 * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
    	 */
    	public static String getDOI(String doi) {
         Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
