@@ -500,8 +500,10 @@ public class HTMLConverter implements LayoutFormatter {
         {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
         {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
         {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
+        {"2013", "", ""},    // NKO letter FA
         {"8208", "", "-"},    // Hyphen
-        {"8729", "", "\\$\\\\bullet\\$"}    // Bullet operator
+        {"8729", "", "\\$\\\\bullet\\$"},    // Bullet operator
+        {"10877", "les", "\\$\\\\leqslant\\$"}    // Less than slanted equal -- requires amssymb 
     };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
