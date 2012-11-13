@@ -71,7 +71,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"181", "micro", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
         {"182", "para", "\\{\\\\P\\}"}, // pilcrow sign = paragraph sign, 
         //                                 U+00B6 ISOnum 
-        {"183", "middot", "\\\\textperiodcenter"}, // middle dot = Georgian comma 
+        {"183", "middot", "\\$\\\\cdot\\$"}, // middle dot = Georgian comma 
         //                                 = Greek middle dot, U+00B7 ISOnum 
         {"184", "cedil", "\\\\c\\{\\}"}, // cedilla = spacing cedilla, U+00B8 ISOdia  
         {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
@@ -492,6 +492,7 @@ public class HTMLConverter implements LayoutFormatter {
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
         {"43", "", "\\+"}, // Plus
+        {"95", "", "\\\\_"}, // Underscore
         {"123", "", "\\\\\\{"}, // Left curly bracket
         {"125", "", "\\\\\\}"}, // Right curly bracket
         {"146", "", "'"}, // Private use two ???
@@ -527,6 +528,9 @@ public class HTMLConverter implements LayoutFormatter {
         if (text == null)
             return null;
         StringBuffer sb = new StringBuffer();
+	// Deal with the form <sup>k</sup>
+	text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^$1\\$");
+
         for (int i=0; i<text.length(); i++) {
 
             int c = text.charAt(i);
@@ -543,14 +547,16 @@ public class HTMLConverter implements LayoutFormatter {
         	text = text.replaceAll(pattern, escapedSymbols.get(pattern));
         }
         
-        Pattern escapedPattern = Pattern.compile("&#([x]*\\p{XDigit}+);");
+        Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
         while (m.find()) {
-            int num = Integer.decode(m.group(1).replace("x", "#"));
+	    //	    System.err.println("Found pattern: " + m.group(1));
+	    //      System.err.println("Found pattern: " + m.group(2));
+            int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if(numSymbols.containsKey(num)) {
-                text = text.replaceAll("&#" + m.group(1) + ";", numSymbols.get(num));
+                text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";", numSymbols.get(num));
             } else {
-                System.err.println("HTML escaped char not converted " + m.group(1) + ": " + Integer.toString(num));
+                System.err.println("HTML escaped char not converted " + m.group(1) + m.group(2) + m.group(3) + ": " + Integer.toString(num));
             }
         }
 	// Find non-covered special characters with alphabetic codes
