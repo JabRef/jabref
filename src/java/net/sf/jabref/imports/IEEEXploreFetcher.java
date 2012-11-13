@@ -101,7 +101,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         fieldPatterns.put("author", "</h3>\\s*(.+)");
-        fieldPatterns.put("volume", "Volume:\\s*(\\d+)");
+        fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
         fieldPatterns.put("year", "Publication Year:\\s*(\\d{4})");
@@ -334,7 +334,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // clean up title
         String title = (String)entry.getField("title");
         // USe the alt-text and replace image links
-        title = title.replaceAll("[ ]?img src=.+alt=\"(.+)\">[ ]?", "\\$$1\\$");
+        title = title.replaceAll("[ ]?img src=.+alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
         // Try to sort out most of the /spl / conversions
         // Deal with this specific nested type first
         title = title.replaceAll("/sub /spl infin//","\\$_\\\\infty\\$");
@@ -342,10 +342,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // Replace general expressions
         title = title.replaceAll("/[sS]pl ([a-zA-Z]+)/", "\\$\\\\$1\\$");
         // Deal with subscripts and superscripts
-        title = title.replaceAll("/sup (.+)/", "\\$\\^$1\\$");
-        title = title.replaceAll("/sub (.+)/", "\\$_$1\\$");
-        // Deal with the form (sub)k(/sub)
-        title = title.replaceAll("\\(sup\\)(.+)\\(/sup\\)", "\\$\\^$1\\$");
+        title = title.replaceAll("/sup ([^/]+)/", "\\$\\^$1\\$");
+        title = title.replaceAll("/sub ([^/]+)/", "\\$_$1\\$");
+        // Deal with the form (sup)k(/sup)
+        title = title.replaceAll("\\(sup\\)([^/]+)\\(/sup\\)", "\\$\\^$1\\$");
         // Replace \infin with \infty
         title = title.replaceAll("\\\\infin","\\\\infty");
         // Write back
@@ -518,6 +518,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	        }
 			entry.setField(sourceField, fullName);
         }
+	
+
+
 		return entry;
     }
 
@@ -625,15 +628,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
         
             if (includeAbstract) {
-		    index = allText.indexOf("id=\"abstract-1\"", piv);
+		    index = text.indexOf("id=\"abstract");
 		    if (index >= 0) {
-		        endIndex = allText.indexOf("</div>", index) + 6;
-		            piv = endIndex;
+		        endIndex = text.indexOf("</div>", index) + 6;
 		            
-	            	text = allText.substring(index, endIndex);
+	            	text = text.substring(index, endIndex);
 	            	Matcher absMatcher = absPattern.matcher(text);
 	            	if (absMatcher.find()) {
-	            		entry.setField("abstract", absMatcher.group(1));
+			    	// Clean-up abstract
+			    String abstr=absMatcher.group(1);
+			    abstr = abstr.replaceAll("<span class='snippet'>([\\w]+)</span>","$1");
+				
+			    entry.setField("abstract", htmlConverter.format(abstr));
 	            	}
 	            }
             }
