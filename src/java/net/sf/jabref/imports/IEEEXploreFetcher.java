@@ -354,13 +354,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	// clean up author
     	String author = (String)entry.getField("author");
     	if (author != null) {
+	    if (author.indexOf("a href=") >= 0) {  // Author parsing failed because it was empty
+		entry.setField("author","");  // Maybe not needed anymore due to another change
+	    } else {
 	    	author = author.replaceAll("\\.", ". ");
 	    	author = author.replaceAll("  ", " ");
 	    	author = author.replaceAll("\\. -", ".-");
 	    	author = author.replaceAll("; ", " and ");
 	    	author = author.replaceAll("[,;]$", "");
 	    	entry.setField("author", author);
-    	}
+	    }
+	}
     	// clean up month
     	String month = (String)entry.getField("month");
     	if ((month != null) && (month.length() > 0)) {
@@ -620,7 +624,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		}
             	} 
             }
-            if (entry.getField("author") == null) {  // Fix for some documents without authors
+            if (entry.getField("author") == null || entry.getField("author").startsWith("a href")) {  // Fix for some documents without authors
                 entry.setField("author","");
             }
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
