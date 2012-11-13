@@ -16,7 +16,6 @@ package net.sf.jabref.imports;
 
 import java.io.IOException;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -71,9 +70,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
 
         URLConnection conn;
@@ -89,7 +85,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         
        String bibtexString;
         try {
-	        bibtexString = getResults(conn);
+	        bibtexString = Util.getResults(conn);
         } catch (FileNotFoundException e) {
                status.showMessage(Globals.lang("Unknown DOI: '%0'.",
                         query),
@@ -136,26 +132,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     public JPanel getOptionsPanel() {
 		// no additional options available
 	    return null;
-    }
-        
-     /**
-     * Download the URL and return contents as a String.
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    public String getResults(URLConnection source) throws IOException {
-        
-        InputStream in = source.getInputStream();
-        StringBuffer sb = new StringBuffer();
-        byte[] buffer = new byte[256];
-        while(true) {
-            int bytesRead = in.read(buffer);
-            if(bytesRead == -1) break;
-            for (int i=0; i<bytesRead; i++)
-                sb.append((char)buffer[i]);
-        }
-        return sb.toString();
     }
 
 

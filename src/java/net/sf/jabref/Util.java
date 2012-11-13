@@ -3182,5 +3182,25 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	    im.put(Globals.prefs.getKey("Close dialog"), "close");
 	    am.put("close", cancelAction);
     }
+
+	/**
+	 * Download the URL and return contents as a String.
+	 * @param source
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getResults(URLConnection source) throws IOException {
+	    
+	    InputStream in = source.getInputStream();
+	    StringBuffer sb = new StringBuffer();
+	    byte[] buffer = new byte[256];
+	    while(true) {
+	        int bytesRead = in.read(buffer);
+	        if(bytesRead == -1) break;
+	        for (int i=0; i<bytesRead; i++)
+	            sb.append((char)buffer[i]);
+	    }
+	    return sb.toString();
+	}
 }
 
