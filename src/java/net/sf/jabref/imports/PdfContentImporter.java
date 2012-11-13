@@ -37,6 +37,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.Util;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -51,6 +52,9 @@ import net.sf.jabref.OutputPrinter;
 public class PdfContentImporter extends ImportFormat {
 	
 	private static Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
+	
+	// we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
+	private static DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
 
 	/* global variables holding the state of the current parse run
 	 * needed to be able to generate methods such as "fillCurStringWithNonEmptyLines"
@@ -208,7 +212,7 @@ public class PdfContentImporter extends ImportFormat {
 	
 	@Override
 	public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-		ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
+		final ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
 		
 		PDDocument document = null;
 		try {
@@ -233,6 +237,33 @@ public class PdfContentImporter extends ImportFormat {
 			StringWriter writer = new StringWriter();
 			stripper.writeText(document, writer);
 			String textResult = writer.toString();
+			
+			String doi = Util.getDOI(textResult);
+			if (doi.length() < textResult.length()) {
+				// A DOI was found in the text
+				// We do NO parsing of the text, but use the DOI fetcher
+				
+				ImportInspector i = new ImportInspector() {
+					@Override
+					public void toFront() {
+					}
+					@Override
+					public void setProgress(int current, int max) {
+					}
+					@Override
+					public void addEntry(BibtexEntry entry) {
+						// add the entry to the result object
+						res.add(entry);
+					}
+				};
+				doiToBibTeXFetcher.processQuery(doi, i, status);
+				if (res.size() != 0) {
+					// if something has been found, return the result
+					return res;
+				} else {
+					// otherwise, we just parse the PDF
+				}
+			}
 
 			String author = null;
 			String editor = null;
