@@ -57,6 +57,9 @@ import net.sf.jabref.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
+    final CaseKeeperList caseKeeperList = new CaseKeeperList();
+    final CaseKeeper caseKeeper = new CaseKeeper();
+    
     ImportInspector dialog = null;
 	OutputPrinter status;
     final HTMLConverter htmlConverter = new HTMLConverter();
@@ -95,6 +98,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
+    
+    // Common words in IEEE Xplore that should always be 
     
     public IEEEXploreFetcher() {
     	super();
@@ -348,6 +353,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         title = title.replaceAll("\\(sup\\)([^/]+)\\(/sup\\)", "\\$\\^$1\\$");
         // Replace \infin with \infty
         title = title.replaceAll("\\\\infin","\\\\infty");
+        // Automatic case keeping
+        title = caseKeeper.format(title,caseKeeperList.wordListIEEEXplore);
         // Write back
         entry.setField("title", title);                        
         
