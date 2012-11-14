@@ -33,13 +33,8 @@ public class CaseKeeper implements LayoutFormatter {
         Arrays.sort(listOfWords, new LengthComparator());
         // For each word in the list
 	for (int i = 0; i < listOfWords.length; i++) {
-            // Add {} if the character before is a space, -, or } but not if it is followed by a }
-	    text = text.replaceAll("([ -\\}])" + listOfWords[i] + "([^}])","$1\\{" + listOfWords[i] + "\\}$2");
-            // Or if it is the first word and ends with a space or -
-            text = text.replaceAll("^" + listOfWords[i]+"([ -])","\\{" + listOfWords[i] + "\\}$1");	    
-            // Or if it is the last word and the character before is a space, -, or }
-            text = text.replaceAll("([ -\\}])" + listOfWords[i] +"$","$1\\{" + listOfWords[i] + "\\}");
-            
+            // Add {} if the character before is a space, -, /, or } or if it is at the start of the string but not if it is followed by a }
+	    text = text.replaceAll("(^|[- /}])" + listOfWords[i] + "($|[^}])","$1\\{" + listOfWords[i] + "\\}$2");
 	}
 	return text;
     }

@@ -161,7 +161,9 @@ public class CaseKeeperList {
         "MEMS",
         "Monte",
         "Carlo",
-        "DVFS"
+        "DVFS",
+        "RNS",
+        "LNS"
     };
     
    

@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.Globals;
 
 public class HTMLConverter implements LayoutFormatter {
 
@@ -545,9 +546,14 @@ public class HTMLConverter implements LayoutFormatter {
             return null;
         StringBuffer sb = new StringBuffer();
 	// Deal with the form <sup>k</sup>and <sub>k</sub>
-	text = text.replaceAll("<sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
-	text = text.replaceAll("<sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
-
+        if(Globals.prefs.getBoolean("useConvertToEquation")) {
+            text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
+            text = text.replaceAll("<sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
+        } else {
+            text = text.replaceAll("<sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+            text = text.replaceAll("<sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
+        }
+        
         for (int i=0; i<text.length(); i++) {
 
             int c = text.charAt(i);

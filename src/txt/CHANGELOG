@@ -1,7 +1,10 @@
 [beta_2.9 branch]
+    - Can control if the HTML converter should create subscripts and superscripts
+      as text or an equation via the preferences
     - Added initial support for adding curly brackets {} for certain
       key words to keep the character case independent of .bst, e.g., for
-      names and abbreviations  (use via "Cleanup entries")
+      names and abbreviations (use via "Cleanup entries") and can be controlled 
+      via preferences if it should be used at searches
     - Fixed author and DOI import from IEEE Xplore 
     - Improved import of equations in IEEE Xplore titles handling images, (sub) and /spl / representations
     - Rewrote the HTML import in a more general way. A few characters need to be added.

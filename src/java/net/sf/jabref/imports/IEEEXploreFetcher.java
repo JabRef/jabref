@@ -339,22 +339,30 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // clean up title
         String title = (String)entry.getField("title");
         // USe the alt-text and replace image links
-        title = title.replaceAll("[ ]?img src=.+alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
+        title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
         // Try to sort out most of the /spl / conversions
         // Deal with this specific nested type first
         title = title.replaceAll("/sub /spl infin//","\\$_\\\\infty\\$");
         title = title.replaceAll("/sup /spl infin//","\\$\\^\\\\infty\\$");
         // Replace general expressions
-        title = title.replaceAll("/[sS]pl ([a-zA-Z]+)/", "\\$\\\\$1\\$");
-        // Deal with subscripts and superscripts
-        title = title.replaceAll("/sup ([^/]+)/", "\\$\\^$1\\$");
-        title = title.replaceAll("/sub ([^/]+)/", "\\$_$1\\$");
+        title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
+        // Deal with subscripts and superscripts       
+        if(Globals.prefs.getBoolean("useConvertToEquation")) {
+            title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
+            title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
+        } else {
+            title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
+            title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
+        }
+
         // Deal with the form (sup)k(/sup)
         title = title.replaceAll("\\(sup\\)([^/]+)\\(/sup\\)", "\\$\\^$1\\$");
         // Replace \infin with \infty
         title = title.replaceAll("\\\\infin","\\\\infty");
         // Automatic case keeping
-        title = caseKeeper.format(title,caseKeeperList.wordListIEEEXplore);
+        if(Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+            title = caseKeeper.format(title,caseKeeperList.wordListIEEEXplore);
+        }
         // Write back
         entry.setField("title", title);                        
         
