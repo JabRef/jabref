@@ -16,6 +16,8 @@
 package net.sf.jabref.imports;
 
 import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
@@ -37,7 +39,25 @@ public class CaseKeeper implements LayoutFormatter {
 	"CMOS",
 	"D/A",
 	"A/D",
-	"I/Q"
+	"I/Q",
+        "Fourier",
+        "Winograd",
+        "IDCT",
+        "DCT",
+        "IEEE",
+        "SFDR",
+        "GSM",
+        "WCDMA",
+        "CDMA",
+        "LTE",
+        "EDGE",
+        "SNR",
+        "MIMO",
+        "kHz",
+        "MHz",
+        "GHz",
+        "Nyquist",
+        "ADSL"
     };
 
     public CaseKeeper() {
@@ -47,9 +67,29 @@ public class CaseKeeper implements LayoutFormatter {
     public String format(String text) {
 	if (text == null)
 	    return null;
+        Arrays.sort(wordList, new LengthComparator());
+        // For each word in the list
 	for (int i = 0; i < wordList.length; i++) {
-	    text = text.replaceAll("([ -\\}])" + wordList[i] + "(^\\})","$1\\{" + wordList[i] + "\\}$2");	    
+            // Add {} if the character before is a space, -, or } but not if it is followed by a }
+	    text = text.replaceAll("([ -\\}])" + wordList[i] + "([^}])","$1\\{" + wordList[i] + "\\}$2");
+            // Or if it is the first word and ends with a space or -
+            text = text.replaceAll("^" + wordList[i]+"([ -])","\\{" + wordList[i] + "\\}$1");	    
+            // Or if it is the last word and the character before is a space, -, or }
+            text = text.replaceAll("([ -\\}])" + wordList[i] +"$","$1\\{" + wordList[i] + "\\}");
+            
 	}
 	return text;
+    }
+    
+
+}
+
+class LengthComparator implements Comparator<String>{
+    @Override
+    public int compare(String o1, String o2) {  
+        if (o1.length() > o2.length()) {
+            return 1;
+        }
+        return 0;
     }
 }
