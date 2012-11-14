@@ -201,7 +201,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00F5 ISOlat1 
         {"246", "ouml", "\\\\\"\\{o\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
-        {"247", "divide", "/"}, // division sign, U+00F7 ISOnum  
+        {"247", "divide", "\\$\\\\div\\$"}, // division sign, U+00F7 ISOnum  
         {"248", "oslash", "\\\\o\\{\\}"}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
@@ -497,14 +497,26 @@ public class HTMLConverter implements LayoutFormatter {
         {"125", "", "\\\\\\}"}, // Right curly bracket
         {"146", "", "'"}, // Private use two ???
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
+        {"321", "", "\\{\\\\L\\}"},    // upper case l with stroke
+        {"322", "", "\\{\\\\l\\}"},    // lower case l with stroke
         {"769", "", "'"},    // Can be solved better as it is a combining accent
         {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
         {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
         {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
+        {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"2013", "", ""},    // NKO letter FA
-        {"8208", "", "-"},    // Hyphen
+        {"8208", "hyphen", "-"},    // Hyphen
+        {"8459", "Hscr", ""}, // script capital H 
+        {"8460", "", ""}, // black letter capital H 
+        {"8466", "Lscr", ""}, // script capital L
+        {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
+        {"8491", "", "\\{\\\\AA\\}"}, // Angstrom 
         {"8729", "", "\\$\\\\bullet\\$"},    // Bullet operator
-        {"10877", "les", "\\$\\\\leqslant\\$"}    // Less than slanted equal -- requires amssymb 
+        {"8776", "ap", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
+        {"8810", "", "\\$\\\\ll\\$"}, // Much less than 
+        {"8811", "", "\\$\\\\gg\\$"}, // Much greater than 
+        {"10877", "les", "\\$\\\\leqslant\\$"},    // Less than slanted equal -- requires amssymb 
+        {"10878", "ges", "\\$\\\\geqslant\\$"}    // Less than slanted equal -- requires amssymb 
     };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
@@ -530,8 +542,9 @@ public class HTMLConverter implements LayoutFormatter {
         if (text == null)
             return null;
         StringBuffer sb = new StringBuffer();
-	// Deal with the form <sup>k</sup>
-	text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^$1\\$");
+	// Deal with the form <sup>k</sup>and <sub>k</sub>
+	text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
+        text = text.replaceAll("<sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
 
         for (int i=0; i<text.length(); i++) {
 
