@@ -245,6 +245,7 @@ public class CleanUpAction extends AbstractWorker {
         	if (choiceCleanUpDOI) doCleanUpDOI(entry, ce);
         	if (choiceCleanUpMonth) doCleanUpMonth(entry, ce);
         	if (choiceCleanUpPageNumbers) doCleanUpPageNumbers(entry, ce);
+        	fixWrongFileEntries(entry, ce);
         	if (choiceMakePathsRelative) doMakePathsRelative(entry, ce);
         	if (choiceRenamePDF) doRenamePDFs(entry, ce);
 		if (choiceConvertHTML) doConvertHTML(entry, ce);
@@ -257,8 +258,6 @@ public class CleanUpAction extends AbstractWorker {
             }
     	}
     }
-    	
-
 
 	public void update() {
         if (cancelled) {
@@ -382,6 +381,34 @@ public class CleanUpAction extends AbstractWorker {
 		}
 	}
 	
+	private void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
+		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+		if (oldValue == null) return;
+		FileListTableModel flModel = new FileListTableModel();
+		flModel.setContent(oldValue);
+		if (flModel.getRowCount() == 0) {
+			return;
+		}
+		boolean changed = false;
+		for (int i = 0; i<flModel.getRowCount(); i++) {
+			FileListEntry flEntry = flModel.getEntry(i);
+			String link = flEntry.getLink();
+			String description = flEntry.getDescription();
+	    	if (link.equals("") && (!description.equals(""))) {
+	    		// link and description seem to be switched, quickly fix that
+	    		flEntry.setLink(flEntry.getDescription());
+	    		flEntry.setDescription("");
+	    		changed = true;
+	    	}
+		}
+		if (changed) {
+	        String newValue = flModel.getStringRepresentation();
+			assert(!oldValue.equals(newValue));
+			entry.setField(GUIGlobals.FILE_FIELD, newValue);
+			ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
+		}
+    }
+
 	private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
 		if (oldValue == null) return;
@@ -423,7 +450,7 @@ public class CleanUpAction extends AbstractWorker {
 			String realOldFilename = flModel.getEntry(i).getLink();
 			
 			if (cleanUpRenamePDFonlyRelativePaths.isSelected() && (new File(realOldFilename).isAbsolute()))
-				return;
+				continue;
 	
 			String newFilename = Util.getLinkedFileName(panel.database(), entry);
 			//String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
@@ -434,12 +461,16 @@ public class CleanUpAction extends AbstractWorker {
 			//get new Filename with path
 		    //Create new Path based on old Path and new filename
 		    File expandedOldFile = Util.expandFilename(realOldFilename, panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+		    if (expandedOldFile.getParent() == null) {
+		    	// something went wrong. Just skipt his entry
+		    	continue;
+		    }
 		    String newPath = expandedOldFile.getParent().concat(System.getProperty("file.separator")).concat(newFilename);
 		    
 		    if (new File(newPath).exists())
 		    	// we do not overwrite files
 		    	// TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-		    	return;
+		    	continue;
 		    
 			//do rename
 			boolean renameSuccesfull = Util.renameFile(expandedOldFile.toString(), newPath);
