@@ -581,7 +581,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	            typeName = typeMatcher.group(1);
 	            if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
 	            		typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
-					   	typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") || typeName.equalsIgnoreCase("TUP Journals &amp; Magazines")) {
+                                typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") || 
+                                typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
 	                type = BibtexEntryType.getType("article");
 	                sourceField = "journal";
 	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
@@ -593,7 +594,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
 		        	type = BibtexEntryType.getType("Electronic");
 		        	sourceField = "note";
-		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
+		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
