@@ -262,7 +262,7 @@ public class CleanUpAction extends AbstractWorker {
     		message = Globals.lang("One entry needed a clean up");
     		break;
     	default:
-    		message = Globals.lang("%0 entries needed a clean up");
+    		message = Globals.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
     		break;
     	}
         panel.output(message);
