@@ -1,7 +1,7 @@
 [beta_2.9 branch]
     - Added initial support for adding curly brackets {} for certain
-    key words to keep the character case independent of bst, e.g. for
-    names and abbreviations 
+      key words to keep the character case independent of .bst, e.g., for
+      names and abbreviations  (use via "Cleanup entries")
     - Fixed author and DOI import from IEEE Xplore 
     - Improved import of equations in IEEE Xplore titles handling images, (sub) and /spl / representations
     - Rewrote the HTML import in a more general way. A few characters need to be added.

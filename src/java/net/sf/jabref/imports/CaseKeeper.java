@@ -22,63 +22,34 @@ import java.util.Comparator;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class CaseKeeper implements LayoutFormatter {
-    private String[] wordList = new String[]{
-	"VLSI",
-	"FPGA",
-	"ASIC",
-	"ADC",
-	"DSP",
-	"DAC",
-	"RF",
-	"FFT",
-	"DFT",
-	"FIR",
-	"IIR",
-	"RAM",
-	"ROM",
-	"CMOS",
-	"D/A",
-	"A/D",
-	"I/Q",
-        "Fourier",
-        "Winograd",
-        "IDCT",
-        "DCT",
-        "IEEE",
-        "SFDR",
-        "GSM",
-        "WCDMA",
-        "CDMA",
-        "LTE",
-        "EDGE",
-        "SNR",
-        "MIMO",
-        "kHz",
-        "MHz",
-        "GHz",
-        "Nyquist",
-        "ADSL"
-    };
-
+    
     public CaseKeeper() {
 	super();
     }
+    
+    public String format(String text, String [] listOfWords) {
+	if (text == null)
+	    return null;
+        Arrays.sort(listOfWords, new LengthComparator());
+        // For each word in the list
+	for (int i = 0; i < listOfWords.length; i++) {
+            // Add {} if the character before is a space, -, or } but not if it is followed by a }
+	    text = text.replaceAll("([ -\\}])" + listOfWords[i] + "([^}])","$1\\{" + listOfWords[i] + "\\}$2");
+            // Or if it is the first word and ends with a space or -
+            text = text.replaceAll("^" + listOfWords[i]+"([ -])","\\{" + listOfWords[i] + "\\}$1");	    
+            // Or if it is the last word and the character before is a space, -, or }
+            text = text.replaceAll("([ -\\}])" + listOfWords[i] +"$","$1\\{" + listOfWords[i] + "\\}");
+            
+	}
+	return text;
+    }
+    
 
     public String format(String text) {
 	if (text == null)
 	    return null;
-        Arrays.sort(wordList, new LengthComparator());
-        // For each word in the list
-	for (int i = 0; i < wordList.length; i++) {
-            // Add {} if the character before is a space, -, or } but not if it is followed by a }
-	    text = text.replaceAll("([ -\\}])" + wordList[i] + "([^}])","$1\\{" + wordList[i] + "\\}$2");
-            // Or if it is the first word and ends with a space or -
-            text = text.replaceAll("^" + wordList[i]+"([ -])","\\{" + wordList[i] + "\\}$1");	    
-            // Or if it is the last word and the character before is a space, -, or }
-            text = text.replaceAll("([ -\\}])" + wordList[i] +"$","$1\\{" + wordList[i] + "\\}");
-            
-	}
-	return text;
+        final CaseKeeperList list = new CaseKeeperList();
+	return this.format(text,list.getAll());
     }
     
 
