@@ -335,9 +335,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
     bibtexKeyPattern = new BibtexKeyPatternAction(),
-    upgradeExternalLinks = new GeneralAction("upgradeLinks", "Upgrade external links",
-            Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD)),
-      errorConsole = Globals.errorConsole.getAction(this),
+    errorConsole = Globals.errorConsole.getAction(this),
     test = new GeneralAction("test", "Test"),
 
     dbConnect = new GeneralAction("dbConnect", "Connect to external SQL database",
@@ -1379,8 +1377,6 @@ public JabRefPreferences prefs() {
       checkAndFix.add(autoSetPdf);
       checkAndFix.add(autoSetPs);
       checkAndFix.add(integrityCheckAction);
-      //checkAndFix.addSeparator();
-      checkAndFix.add(upgradeExternalLinks);
       tools.add(checkAndFix);
 
       mb.add(tools);
