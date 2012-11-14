@@ -543,8 +543,8 @@ public class HTMLConverter implements LayoutFormatter {
             return null;
         StringBuffer sb = new StringBuffer();
 	// Deal with the form <sup>k</sup>and <sub>k</sub>
-	text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
-        text = text.replaceAll("<sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
+	text = text.replaceAll("<sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+	text = text.replaceAll("<sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
 
         for (int i=0; i<text.length(); i++) {
 
