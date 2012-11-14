@@ -35,16 +35,16 @@ public class HTMLConverter implements LayoutFormatter {
 	// most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
 	// The symbols can be looked at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
 	// http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
-        // http://llg.cubic.org/docs/ent2latex.html is also useful
+        // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
     private String[][] conversionList = new String[][]{
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
         {"161", "iexcl", "\\\\textexclamdown"}, // inverted exclamation mark, U+00A1 ISOnum
         {"162", "cent", "\\\\textcent"}, // cent sign, U+00A2 ISOnum  
         {"163", "pound", "\\\\pounds"}, // pound sign, U+00A3 ISOnum
-        {"164", "curren", ""}, // currency sign, U+00A4 ISOnum  
+        {"164", "curren", "\\\\textcurrency"}, // currency sign, U+00A4 ISOnum  
         {"165", "yen", "\\\\textyen"}, // yen sign = yuan sign, U+00A5 ISOnum  
-        {"166", "brvbar", ""}, // broken bar = broken vertical bar, 
+        {"166", "brvbar", "\\\\textbrokenbar"}, // broken bar = broken vertical bar, 
         //                                 U+00A6 ISOnum 
         {"167", "sect", "\\{\\\\S\\}"}, // section sign, U+00A7 ISOnum  
         {"168", "uml", "\\\\\"\\{\\}"}, // diaeresis = spacing diaeresis, 
@@ -297,7 +297,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+03C9 ISOgrk3 
         {"977", "thetasym", "\\$\\\\vartheta\\$"}, // greek small letter theta symbol, 
         //                                   U+03D1 NEW 
-        {"978", "upsih", ""}, // greek upsilon with hook symbol, 
+        {"978", "upsih", "\\{\\$\\\\Upsilon\\$\\}"}, // greek upsilon with hook symbol, 
         //                                   U+03D2 NEW 
         {"982", "piv", "\\$\\\\varphi\\$"}, // greek pi symbol, U+03D6 ISOgrk3  
 
@@ -397,7 +397,7 @@ public class HTMLConverter implements LayoutFormatter {
         /*    note that nsup, 'not a superset of, U+2283' is not covered by the Symbol 
          font encoding and is not included. Should it be, for symmetry?
          It is in ISOamsn   */
-        {"8836", "nsub", ""}, // not a subset of, U+2284 ISOamsn  
+        {"8836", "nsub", "\\$\\\\nsubset\\$"}, // not a subset of, U+2284 ISOamsn  
         {"8838", "sube", "\\$\\\\subseteq\\$"}, // subset of or equal to, U+2286 ISOtech  
         {"8839", "supe", "\\$\\\\supseteq\\$"}, // superset of or equal to, 
         //                                    U+2287 ISOtech 
@@ -446,9 +446,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+0152 ISOlat2 
         {"339", "oelig", "\\{\\\\oe\\}"}, // latin small ligature oe, U+0153 ISOlat2 
         /* ligature is a misnomer, this is a separate character in some languages */
-        {"352", "Scaron", ""}, // latin capital letter S with caron,
+        {"352", "Scaron", "\\\\v\\{S\\}"}, // latin capital letter S with caron,
         //                                   U+0160 ISOlat2 
-        {"353", "scaron", ""}, // latin small letter s with caron,
+        {"353", "scaron", "\\\\v\\{s\\}"}, // latin small letter s with caron,
         //                                   U+0161 ISOlat2 
         {"376", "Yuml", "\\\\\"\\{Y\\}"}, // latin capital letter Y with diaeresis,
         //                                   U+0178 ISOlat2 
@@ -469,53 +469,62 @@ public class HTMLConverter implements LayoutFormatter {
         {"8207", "rlm", ""}, // right-to-left mark, U+200F NEW RFC 2070  
         {"8211", "ndash", "--"}, // en dash, U+2013 ISOpub  
         {"8212", "mdash", "---"}, // em dash, U+2014 ISOpub  
-        {"8216", "lsquo", "`"}, // left single quotation mark, 
+        {"8216", "lsquo", "\\\\textquoteleft"}, // left single quotation mark, 
         //                                   U+2018 ISOnum 
-        {"8217", "rsquo", "'"}, // right single quotation mark, 
+        {"8217", "rsquo", "\\\\textquoteright"}, // right single quotation mark, 
         //                                   U+2019 ISOnum 
-        {"8218", "sbquo", ""}, // single low-9 quotation mark, U+201A NEW  
-        {"8220", "ldquo", "``"}, // left double quotation mark, 
+        {"8218", "sbquo", "\\\\quotesinglbase"}, // single low-9 quotation mark, U+201A NEW  
+        {"8220", "ldquo", "\\\\textquotedblleft"}, // left double quotation mark, 
         //                                   U+201C ISOnum 
-        {"8221", "rdquo", "''"}, // right double quotation mark, 
+        {"8221", "rdquo", "\\\\textquotedblright"}, // right double quotation mark, 
         //                                   U+201D ISOnum 
-        {"8222", "bdquo", ""}, // double low-9 quotation mark, U+201E NEW  
+        {"8222", "bdquo", "\\\\quotedblbase"}, // double low-9 quotation mark, U+201E NEW  
         {"8224", "dagger", "\\\\dag"}, // dagger, U+2020 ISOpub  
         {"8225", "Dagger", "\\\\ddag"}, // double dagger, U+2021 ISOpub  
         {"8240", "permil", "\\\\textperthousand"}, // per mille sign, U+2030 ISOtech  
-        {"8249", "lsaquo", ""}, // single left-pointing angle quotation mark, 
+        {"8249", "lsaquo", "\\\\guilsinglleft"}, // single left-pointing angle quotation mark, 
         //                                   U+2039 ISO proposed 
         /* lsaquo is proposed but not yet ISO standardized */
-        {"8250", "rsaquo", ""}, // single right-pointing angle quotation mark, 
+        {"8250", "rsaquo", "\\\\guilsinglright"}, // single right-pointing angle quotation mark, 
         //                                   U+203A ISO proposed 
         /* rsaquo is proposed but not yet ISO standardized */
         {"8364", "euro", ""}, // euro sign, U+20AC NEW 
             
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
-        {"43", "", "\\+"}, // Plus
-        {"95", "", "\\\\_"}, // Underscore
-        {"123", "", "\\\\\\{"}, // Left curly bracket
-        {"125", "", "\\\\\\}"}, // Right curly bracket
+        {"43", "plus", "\\+"}, // Plus
+        {"95", "lowbar", "\\\\_"}, // Underscore
+        {"123", "lbrace", "\\\\\\{"}, // Left curly bracket
+        {"125", "rbrace", "\\\\\\}"}, // Right curly bracket
         {"146", "", "'"}, // Private use two ???
+        {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
-        {"321", "", "\\{\\\\L\\}"},    // upper case l with stroke
-        {"322", "", "\\{\\\\l\\}"},    // lower case l with stroke
+        {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
+        {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
+        {"536", "", "\\\\cb\\{S\\}"},    // capital letter S with comma below, require combelow
+        {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
         {"769", "", "'"},    // Can be solved better as it is a combining accent
         {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
+        {"775", "", "\\\\\\.\\{\\}"},    // FIX: Dot above - Can be solved better as it is a combining accent
         {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
         {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
+        {"807", "", "\\\\c\\{\\}"},    // FIX: Cedilla - Can be solved better as it is a combining accent
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
+        {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
         {"2013", "", ""},    // NKO letter FA
         {"8208", "hyphen", "-"},    // Hyphen
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
         {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
-        {"8491", "", "\\{\\\\AA\\}"}, // Angstrom 
-        {"8729", "", "\\$\\\\bullet\\$"},    // Bullet operator
+        {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
+        {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
         {"8776", "ap", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
-        {"8810", "", "\\$\\\\ll\\$"}, // Much less than 
-        {"8811", "", "\\$\\\\gg\\$"}, // Much greater than 
+        {"8810", "ll", "\\$\\\\ll\\$"}, // Much less than 
+        {"8811", "gg", "\\$\\\\gg\\$"}, // Much greater than 
+        {"9426", "", "\\\\copyright"}, // circled small letter C
+        {"9653", "utri", "\\$\\\\triangle\\$"}, // White up-pointing small triangle -- \vartriangle probably
+                                                // better but requires amssymb
         {"10877", "les", "\\$\\\\leqslant\\$"},    // Less than slanted equal -- requires amssymb 
         {"10878", "ges", "\\$\\\\geqslant\\$"},    // Less than slanted equal -- requires amssymb 
         {"119978", "Oscr", "\\$\\\\mathcal\\{O\\}\\$"} // script capital O -- possibly use \mathscr
