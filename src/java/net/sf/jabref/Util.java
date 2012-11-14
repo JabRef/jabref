@@ -1921,9 +1921,20 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
+    	return upgradePdfPsToFile(database.getEntryMap().values(), fields);
+    }
+
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained
+     * in the field GUIGlobals.FILE_FIELD.
+     * @param entries The entries to modify.
+     * @param fields The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
         NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
         
-        for (BibtexEntry entry : database.getEntryMap().values()){
+        for (BibtexEntry entry : entries){
             FileListTableModel tableModel = new FileListTableModel();
             // If there are already links in the file field, keep those on top:
             String oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);

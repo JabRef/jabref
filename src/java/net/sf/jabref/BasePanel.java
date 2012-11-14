@@ -1593,7 +1593,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("autoSetPdf", new AutoSetExternalFileForEntries(this, "pdf"));
         actions.put("autoSetPs", new AutoSetExternalFileForEntries(this, "ps"));
         actions.put("autoSetFile", new SynchronizeFileField(this));
-        actions.put("upgradeLinks", new UpgradeExternalLinks(this));
 
         actions.put("back", new BaseAction() {
             public void action() throws Throwable {
