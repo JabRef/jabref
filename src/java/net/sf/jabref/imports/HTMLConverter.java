@@ -427,13 +427,13 @@ public class HTMLConverter implements LayoutFormatter {
         {"9674", "loz", "\\$\\\\lozenge\\$"}, // lozenge, U+25CA ISOpub  
 
         /* Miscellaneous Symbols */
-        {"9824", "spades", ""}, // black spade suit, U+2660 ISOpub  
+        {"9824", "spades", "\\$\\\\spadesuit\\$"}, // black spade suit, U+2660 ISOpub  
         /* black here seems to mean filled as opposed to hollow */
-        {"9827", "clubs", ""}, // black club suit = shamrock, 
+        {"9827", "clubs", "\\$\\\\clubsuit\\$"}, // black club suit = shamrock, 
         //                                    U+2663 ISOpub 
-        {"9829", "hearts", ""}, // black heart suit = valentine, 
+        {"9829", "hearts", "\\$\\\\heartsuit\\$"}, // black heart suit = valentine, 
         //                                    U+2665 ISOpub 
-        {"9830", "diams", ""}, // black diamond suit, U+2666 ISOpub  
+        {"9830", "diams", "\\$\\\\diamondsuit\\$"}, // black diamond suit, U+2666 ISOpub  
         {"34", "quot", "\""}, // quotation mark = APL quote,
         //                                   U+0022 ISOnum 
         {"38", "amp", "\\\\&"}, // ampersand, U+0026 ISOnum 
@@ -506,9 +506,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"2013", "", ""},    // NKO letter FA
         {"8208", "hyphen", "-"},    // Hyphen
-        {"8459", "Hscr", ""}, // script capital H 
-        {"8460", "", ""}, // black letter capital H 
-        {"8466", "Lscr", ""}, // script capital L
+        {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
+        {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
+        {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
         {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
         {"8491", "", "\\{\\\\AA\\}"}, // Angstrom 
         {"8729", "", "\\$\\\\bullet\\$"},    // Bullet operator
@@ -516,7 +516,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"8810", "", "\\$\\\\ll\\$"}, // Much less than 
         {"8811", "", "\\$\\\\gg\\$"}, // Much greater than 
         {"10877", "les", "\\$\\\\leqslant\\$"},    // Less than slanted equal -- requires amssymb 
-        {"10878", "ges", "\\$\\\\geqslant\\$"}    // Less than slanted equal -- requires amssymb 
+        {"10878", "ges", "\\$\\\\geqslant\\$"},    // Less than slanted equal -- requires amssymb 
+        {"119978", "Oscr", "\\$\\\\mathcal\\{O\\}\\$"} // script capital O -- possibly use \mathscr
+        
     };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
