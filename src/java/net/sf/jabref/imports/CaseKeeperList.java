@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -67,6 +67,7 @@ public class CaseKeeperList {
         "CATV",
         "CBR",
         "CDMA",
+        "CDR",
         "CIC",
         "CMOS",
         "CMRR",
@@ -78,6 +79,7 @@ public class CaseKeeperList {
         "CSD",
         "CSIT",
         "CSI",
+        "CSMA",
         "Carlo",
         "Cauer",
         "Chebyshev",
@@ -93,6 +95,7 @@ public class CaseKeeperList {
         "DEM",
         "DFE",
         "DFT",
+        "DLL",
 	"DMT",
         "DNL",
         "DOCSIS",
@@ -170,6 +173,7 @@ public class CaseKeeperList {
         "IDFT",
         "IEEE",
         "IFFT",
+        "IFIR",
         "IF",
         "IGBT",
         "IIR",
@@ -254,6 +258,7 @@ public class CaseKeeperList {
         "PCI",
         "PCM",
         "PC",
+        "PHY",
         "PID",
         "PLC",
         "PLL",
@@ -269,6 +274,7 @@ public class CaseKeeperList {
         "RAD",
         "RAM",
         "RCS",
+        "RFDAC",
         "RFE",
         "RFID",
         "RF",
