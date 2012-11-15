@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -488,14 +488,18 @@ public class HTMLConverter implements LayoutFormatter {
         {"8250", "rsaquo", "\\\\guilsinglright"}, // single right-pointing angle quotation mark, 
         //                                   U+203A ISO proposed 
         /* rsaquo is proposed but not yet ISO standardized */
-        {"8364", "euro", ""}, // euro sign, U+20AC NEW 
+        {"8364", "euro", "\\\\texteuro"}, // euro sign, U+20AC NEW 
             
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
+        {"39", "", "'"}, // Apostrophe
+        {"40", "", "("}, // Left bracket
+        {"41", "", ")"}, // Right bracket
         {"43", "plus", "\\+"}, // Plus
         {"95", "lowbar", "\\\\_"}, // Underscore
         {"123", "lbrace", "\\\\\\{"}, // Left curly bracket
         {"125", "rbrace", "\\\\\\}"}, // Right curly bracket
+     // {"141", "", ""}, // Reverse line feed
         {"146", "", "'"}, // Private use two ???
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
@@ -511,7 +515,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"807", "", "\\\\c\\{\\}"},    // FIX: Cedilla - Can be solved better as it is a combining accent
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
-        {"2013", "", ""},    // NKO letter FA
+     // {"2013", "", ""},    // NKO letter FA
         {"8208", "hyphen", "-"},    // Hyphen
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
