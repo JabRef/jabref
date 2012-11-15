@@ -109,7 +109,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
-        fieldPatterns.put("year", "Publication Year:\\s*(\\d{4})");
+        fieldPatterns.put("year", "(?:Copyright|Publication) Year:\\s*(\\d{4})");
         fieldPatterns.put("pages", "Page\\(s\\):\\s*(\\d+)\\s*-\\s*(\\d*)");
         //fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
         fieldPatterns.put("doi", "<a href=\"http://dx.doi.org/(.+)\" target");
@@ -338,33 +338,37 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	
         // clean up title
         String title = (String)entry.getField("title");
-        // USe the alt-text and replace image links
-        title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
-        // Try to sort out most of the /spl / conversions
-        // Deal with this specific nested type first
-        title = title.replaceAll("/sub /spl infin//","\\$_\\\\infty\\$");
-        title = title.replaceAll("/sup /spl infin//","\\$\\^\\\\infty\\$");
-        // Replace general expressions
-        title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
-        // Deal with subscripts and superscripts       
-        if(Globals.prefs.getBoolean("useConvertToEquation")) {
-            title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
-            title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
-        } else {
-            title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
-            title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
-        }
+        if (title != null) {
+            // USe the alt-text and replace image links
+            title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
+            // Try to sort out most of the /spl / conversions
+            // Deal with this specific nested type first
+            title = title.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
+            title = title.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
+            // Replace general expressions
+            title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
+            // Deal with subscripts and superscripts       
+            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+                title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
+                title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
+                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
+                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+            } else {
+                title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
+                title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
+                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
+                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+            }
 
-        // Deal with the form (sup)k(/sup)
-        title = title.replaceAll("\\(sup\\)([^/]+)\\(/sup\\)", "\\$\\^$1\\$");
-        // Replace \infin with \infty
-        title = title.replaceAll("\\\\infin","\\\\infty");
-        // Automatic case keeping
-        if(Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-            title = caseKeeper.format(title,caseKeeperList.wordListIEEEXplore);
+            // Replace \infin with \infty
+            title = title.replaceAll("\\\\infin", "\\\\infty");
+            // Automatic case keeping
+            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                title = caseKeeper.format(title, caseKeeperList.wordListIEEEXplore);
+            }
+            // Write back
+            entry.setField("title", title);
         }
-        // Write back
-        entry.setField("title", title);                        
         
     	// clean up author
     	String author = (String)entry.getField("author");
@@ -538,9 +542,33 @@ public class IEEEXploreFetcher implements EntryFetcher {
 			entry.setField(sourceField, fullName);
         }
 	
-
-
-		return entry;
+        // clean up abstract
+        String abstr = (String) entry.getField("abstract");
+        if (abstr != null) {
+            // Try to sort out most of the /spl / conversions
+            // Deal with this specific nested type first
+            abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
+            abstr = abstr.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
+            // Replace general expressions
+            abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
+            // Deal with subscripts and superscripts       
+            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
+                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
+                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
+                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+            } else {
+                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
+                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
+                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
+                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+            }
+            // Replace \infin with \infty
+            abstr = abstr.replaceAll("\\\\infin", "\\\\infty");
+            // Write back
+            entry.setField("abstract", abstr);
+        }
+	return entry;
     }
 
     private String parseNextEntryId(String allText, int startIndex) {
@@ -588,7 +616,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
 	                type = BibtexEntryType.getType("inproceedings");
 	                sourceField = "booktitle";
-		        } else if (typeName.equalsIgnoreCase("IEEE Standards")) {
+		        } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
 	                type = BibtexEntryType.getType("standard");
 	                sourceField = "number";
 		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
@@ -616,6 +644,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
             	entry.setField("publisher", "Wiley-IEEE Press");
+            } else if(typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
+                entry.setField("publisher", "MIT Press");
             }
             
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
