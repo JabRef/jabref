@@ -178,8 +178,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
         oldConvertToEquation = Globals.prefs.getBoolean("useConvertToEquation");
+        useConvertToEquation.setSelected(oldConvertToEquation);
         oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
-        
+        useCaseKeeperOnSearch.setSelected(oldCaseKeeperOnSearch);
     }
 
     public void storeSettings() {
