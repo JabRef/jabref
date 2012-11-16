@@ -29,7 +29,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialogs;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -110,7 +110,7 @@ public class ExternalFileTypeEntryEditor {
             builder.append(application);
             builder.append(browseBut);
         }
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

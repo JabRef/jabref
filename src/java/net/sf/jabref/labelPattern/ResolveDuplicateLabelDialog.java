@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.labelPattern;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
@@ -81,7 +81,7 @@ public class ResolveDuplicateLabelDialog {
         }
 
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

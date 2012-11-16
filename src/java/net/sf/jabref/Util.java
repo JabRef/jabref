@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -1920,9 +1921,20 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
+    	return upgradePdfPsToFile(database.getEntryMap().values(), fields);
+    }
+
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained
+     * in the field GUIGlobals.FILE_FIELD.
+     * @param entries The entries to modify.
+     * @param fields The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
         NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
         
-        for (BibtexEntry entry : database.getEntryMap().values()){
+        for (BibtexEntry entry : entries){
             FileListTableModel tableModel = new FileListTableModel();
             // If there are already links in the file field, keep those on top:
             String oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
@@ -3059,7 +3071,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
    	 * Remove the http://... from DOI
    	 * 
    	 * @param doi - may not be null
-   	 * @return first DOI in the given String (without http://... prefix)
+   	 * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
    	 */
    	public static String getDOI(String doi) {
         Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
@@ -3147,14 +3159,14 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	}
 	
 	/**
-	 * @param nc indicates the undo named compound. May be null
+	 * @param ce indicates the undo named compound. May be null
 	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
 		updateField(be, field, newValue, ce, false);
 	}
 
 	/**
-	 * @param nc indicates the undo named compound. May be null
+	 * @param ce indicates the undo named compound. May be null
 	 */
 	public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
 		String oldValue = be.getField(field);
@@ -3182,5 +3194,25 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	    im.put(Globals.prefs.getKey("Close dialog"), "close");
 	    am.put("close", cancelAction);
     }
+
+	/**
+	 * Download the URL and return contents as a String.
+	 * @param source
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getResults(URLConnection source) throws IOException {
+	    
+	    InputStream in = source.getInputStream();
+	    StringBuffer sb = new StringBuffer();
+	    byte[] buffer = new byte[256];
+	    while(true) {
+	        int bytesRead = in.read(buffer);
+	        if(bytesRead == -1) break;
+	        for (int i=0; i<bytesRead; i++)
+	            sb.append((char)buffer[i]);
+	    }
+	    return sb.toString();
+	}
 }
 

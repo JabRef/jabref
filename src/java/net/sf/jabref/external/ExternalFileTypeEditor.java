@@ -33,7 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 
 /**
@@ -156,7 +156,7 @@ public class ExternalFileTypeEditor extends JDialog {
         bs.addButton(toDefaults);
         upper.add(bs.getPanel(), BorderLayout.EAST);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

@@ -16,6 +16,8 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -37,6 +39,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.imports.HTMLConverter;
+import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
@@ -55,8 +58,10 @@ public class CleanUpAction extends AbstractWorker {
 		CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative",
 		CLEANUP_RENAMEPDF = "CleanUpRenamePDF",
 		CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths",
+		CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks",
 		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts",
-		CLEANUP_HTML = "CleanUpHTML";
+	        CLEANUP_HTML = "CleanUpHTML",
+		CLEANUP_CASE = "CleanUpCase";
 	
 	public static void putDefaults(HashMap<String, Object> defaults) {
 		defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
@@ -67,8 +72,10 @@ public class CleanUpAction extends AbstractWorker {
 		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
 		defaults.put(CLEANUP_RENAMEPDF, Boolean.TRUE);
 		defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
+		defaults.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, Boolean.FALSE);
 		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
                 defaults.put(CLEANUP_HTML, Boolean.TRUE);
+                defaults.put(CLEANUP_CASE, Boolean.TRUE);
 	}
 	
 	private JCheckBox cleanUpSuperscrips;
@@ -78,7 +85,9 @@ public class CleanUpAction extends AbstractWorker {
 	private JCheckBox cleanUpMakePathsRelative;
 	private JCheckBox cleanUpRenamePDF;
 	private JCheckBox cleanUpRenamePDFonlyRelativePaths;
+	private JCheckBox cleanUpUpgradeExternalLinks;
 	private JCheckBox cleanUpHTML;
+	private JCheckBox cleanUpCase;
 	private JPanel optionsPanel = new JPanel();
 	private BasePanel panel;
 	private JabRefFrame frame;
@@ -106,24 +115,28 @@ public class CleanUpAction extends AbstractWorker {
 			}
 		});
 		cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Globals.lang("Rename only PDFs having a relative path"));
+		cleanUpUpgradeExternalLinks = new JCheckBox(Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
 		cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
+		cleanUpCase = new JCheckBox(Globals.lang("Run filter on title keeping the case of selected words"));
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
-		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref");
+		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.setDefaultDialogBorder();
         CellConstraints cc = new CellConstraints();
         builder.add(cleanUpHTML, cc.xyw(1,1,2));
-        builder.add(cleanUpSuperscrips, cc.xyw(1,2,2));
-        builder.add(cleanUpDOI, cc.xyw(1,3,2));
-        builder.add(cleanUpMonth, cc.xyw(1,4,2));
-        builder.add(cleanUpPageNumbers, cc.xyw(1,5,2));
-        builder.add(cleanUpMakePathsRelative, cc.xyw(1,6,2));
-        builder.add(cleanUpRenamePDF, cc.xyw(1,7,2));
+        builder.add(cleanUpCase, cc.xyw(1,2,2));
+        builder.add(cleanUpSuperscrips, cc.xyw(1,3,2));
+        builder.add(cleanUpDOI, cc.xyw(1,4,2));
+        builder.add(cleanUpMonth, cc.xyw(1,5,2));
+        builder.add(cleanUpPageNumbers, cc.xyw(1,6,2));
+        builder.add(cleanUpUpgradeExternalLinks, cc.xyw(1, 7, 2));
+        builder.add(cleanUpMakePathsRelative, cc.xyw(1,8,2));
+        builder.add(cleanUpRenamePDF, cc.xyw(1,9,2));
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern), cc.xyw(2,8,1));
-        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,9,1));
+        builder.add(new JLabel(currentPattern), cc.xyw(2,10,1));
+        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,11,1));
 	}
 	
 	private void retrieveSettings() {
@@ -135,7 +148,9 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpRenamePDF.setSelected(Globals.prefs.getBoolean(CLEANUP_RENAMEPDF));
 		cleanUpRenamePDFonlyRelativePaths.setSelected(Globals.prefs.getBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS));
 		cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
+		cleanUpUpgradeExternalLinks.setSelected(Globals.prefs.getBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS));
                 cleanUpHTML.setSelected(Globals.prefs.getBoolean(CLEANUP_HTML));
+                cleanUpCase.setSelected(Globals.prefs.getBoolean(CLEANUP_CASE));
 	}
 	
 	private void storeSettings() {
@@ -146,7 +161,9 @@ public class CleanUpAction extends AbstractWorker {
 		Globals.prefs.putBoolean(CLEANUP_MAKEPATHSRELATIVE, cleanUpMakePathsRelative.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF, cleanUpRenamePDF.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, cleanUpRenamePDFonlyRelativePaths.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS, cleanUpUpgradeExternalLinks.isSelected());
                 Globals.prefs.putBoolean(CLEANUP_HTML, cleanUpHTML.isSelected());
+                Globals.prefs.putBoolean(CLEANUP_CASE, cleanUpCase.isSelected());
 	}
 
 	private int showCleanUpDialog() {
@@ -189,9 +206,11 @@ public class CleanUpAction extends AbstractWorker {
     		choiceCleanUpDOI = cleanUpDOI.isSelected(),
     		choiceCleanUpMonth = cleanUpMonth.isSelected(),
     		choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected(),
+    		choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected(),
     		choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected(),
 		choiceRenamePDF = cleanUpRenamePDF.isSelected(),
-                choiceConvertHTML = cleanUpHTML.isSelected();
+	        choiceConvertHTML = cleanUpHTML.isSelected(),
+                choiceConvertCase = cleanUpCase.isSelected();
     	
     	if (choiceRenamePDF && Globals.prefs.getBoolean(AKS_AUTO_NAMING_PDFS_AGAIN)) { 
 	        CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
@@ -206,6 +225,18 @@ public class CleanUpAction extends AbstractWorker {
 	        }
 	    }
     	
+    	// first upgrade the external links
+    	// we have to use it separately as the Utils function generates a separate Named Compound
+    	if (choiceCleanUpUpgradeExternalLinks) {
+    		NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), new String[] {"pdf", "ps"});
+    		if (ce.hasEdits()) {
+	    		panel.undoManager.addEdit(ce);
+	    		panel.markBaseChanged();
+	    		panel.updateEntryEditorIfShowing();
+	    		panel.output(Globals.lang("Upgraded links."));
+    		}
+    	}
+
     	for (BibtexEntry entry : panel.getSelectedEntries()) {
     		// undo granularity is on entry level
         	NamedCompound ce = new NamedCompound(Globals.lang("Cleanup entry"));
@@ -214,9 +245,11 @@ public class CleanUpAction extends AbstractWorker {
         	if (choiceCleanUpDOI) doCleanUpDOI(entry, ce);
         	if (choiceCleanUpMonth) doCleanUpMonth(entry, ce);
         	if (choiceCleanUpPageNumbers) doCleanUpPageNumbers(entry, ce);
+        	fixWrongFileEntries(entry, ce);
         	if (choiceMakePathsRelative) doMakePathsRelative(entry, ce);
         	if (choiceRenamePDF) doRenamePDFs(entry, ce);
 		if (choiceConvertHTML) doConvertHTML(entry, ce);
+		if (choiceConvertCase) doConvertCase(entry, ce);
         	
             ce.end();
             if (ce.hasEdits()) {
@@ -225,8 +258,6 @@ public class CleanUpAction extends AbstractWorker {
             }
     	}
     }
-    	
-
 
 	public void update() {
         if (cancelled) {
@@ -252,7 +283,7 @@ public class CleanUpAction extends AbstractWorker {
     		message = Globals.lang("One entry needed a clean up");
     		break;
     	default:
-    		message = Globals.lang("%0 entries needed a clean up");
+    		message = Globals.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
     		break;
     	}
         panel.output(message);
@@ -350,6 +381,34 @@ public class CleanUpAction extends AbstractWorker {
 		}
 	}
 	
+	private void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
+		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+		if (oldValue == null) return;
+		FileListTableModel flModel = new FileListTableModel();
+		flModel.setContent(oldValue);
+		if (flModel.getRowCount() == 0) {
+			return;
+		}
+		boolean changed = false;
+		for (int i = 0; i<flModel.getRowCount(); i++) {
+			FileListEntry flEntry = flModel.getEntry(i);
+			String link = flEntry.getLink();
+			String description = flEntry.getDescription();
+	    	if (link.equals("") && (!description.equals(""))) {
+	    		// link and description seem to be switched, quickly fix that
+	    		flEntry.setLink(flEntry.getDescription());
+	    		flEntry.setDescription("");
+	    		changed = true;
+	    	}
+		}
+		if (changed) {
+	        String newValue = flModel.getStringRepresentation();
+			assert(!oldValue.equals(newValue));
+			entry.setField(GUIGlobals.FILE_FIELD, newValue);
+			ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
+		}
+    }
+
 	private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
 		if (oldValue == null) return;
@@ -391,7 +450,7 @@ public class CleanUpAction extends AbstractWorker {
 			String realOldFilename = flModel.getEntry(i).getLink();
 			
 			if (cleanUpRenamePDFonlyRelativePaths.isSelected() && (new File(realOldFilename).isAbsolute()))
-				return;
+				continue;
 	
 			String newFilename = Util.getLinkedFileName(panel.database(), entry);
 			//String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
@@ -402,12 +461,16 @@ public class CleanUpAction extends AbstractWorker {
 			//get new Filename with path
 		    //Create new Path based on old Path and new filename
 		    File expandedOldFile = Util.expandFilename(realOldFilename, panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+		    if (expandedOldFile.getParent() == null) {
+		    	// something went wrong. Just skipt his entry
+		    	continue;
+		    }
 		    String newPath = expandedOldFile.getParent().concat(System.getProperty("file.separator")).concat(newFilename);
 		    
 		    if (new File(newPath).exists())
 		    	// we do not overwrite files
 		    	// TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-		    	return;
+		    	continue;
 		    
 			//do rename
 			boolean renameSuccesfull = Util.renameFile(expandedOldFile.toString(), newPath);
@@ -455,6 +518,21 @@ public class CleanUpAction extends AbstractWorker {
         if (oldValue == null) return;
         final HTMLConverter htmlConverter = new HTMLConverter();
         String newValue = htmlConverter.format(oldValue);
+        if (!oldValue.equals(newValue)) {
+            entry.setField(field, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+        }
+    }
+
+	/**
+	 * Adds curly brackets {} around keywords
+	 */
+    private void doConvertCase(BibtexEntry entry, NamedCompound ce) {
+        final String field = "title";
+        String oldValue = entry.getField(field);
+        if (oldValue == null) return;
+        final CaseKeeper caseKeeper = new CaseKeeper();
+        String newValue = caseKeeper.format(oldValue);
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));

@@ -57,6 +57,9 @@ import net.sf.jabref.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
+    final CaseKeeperList caseKeeperList = new CaseKeeperList();
+    final CaseKeeper caseKeeper = new CaseKeeper();
+    
     ImportInspector dialog = null;
 	OutputPrinter status;
     final HTMLConverter htmlConverter = new HTMLConverter();
@@ -96,17 +99,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
     
+    // Common words in IEEE Xplore that should always be 
+    
     public IEEEXploreFetcher() {
     	super();
     	
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
-        fieldPatterns.put("author", "</h3>\\s+(.+)<br />");
-        fieldPatterns.put("volume", "Volume:\\s*(\\d+)");
+        fieldPatterns.put("author", "</h3>\\s*(.+)");
+        fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
-        fieldPatterns.put("year", "Publication Year:\\s*(\\d{4})");
+        fieldPatterns.put("year", "(?:Copyright|Publication) Year:\\s*(\\d{4})");
         fieldPatterns.put("pages", "Page\\(s\\):\\s*(\\d+)\\s*-\\s*(\\d*)");
-        fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
+        //fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
+        fieldPatterns.put("doi", "<a href=\"http://dx.doi.org/(.+)\" target");
     }
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -158,6 +164,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
             if (page.indexOf("No results were found.") >= 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
+                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
+                        
+            if (page.indexOf("Error Page") >= 0) {
+                status.showMessage(Globals.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -332,32 +344,52 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	
         // clean up title
         String title = (String)entry.getField("title");
-        // USe the alt-text and replace image links
-        title = title.replaceAll("[ ]?img src=.+alt=\"(.+)\">[ ]?", "\\$$1\\$");
-        // Try to sort out most of the /spl / conversions
-        // Deal with this specific nested type first
-        title = title.replaceAll("/sub /spl infin//","\\$_\\\\infty\\$");
-        title = title.replaceAll("/sup /spl infin//","\\$\\^\\\\infty\\$");
-        // Replace general expressions
-        title = title.replaceAll("/[sS]pl ([a-zA-Z]+)/", "\\$\\\\$1\\$");
-        // Deal with subscripts and superscripts
-        title = title.replaceAll("/sup ([0-9\\+\\.\\(\\)]+)/", "\\$\\^$1\\$");
-        title = title.replaceAll("/sub ([0-9\\+\\.\\(\\)]+)/", "\\$_$1\\$");
-        // Replace \infin with \infty
-        title = title.replaceAll("\\\\infin","\\\\infty");
-        // Write back
-        entry.setField("title", title);                        
+        if (title != null) {
+            // USe the alt-text and replace image links
+            title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
+            // Try to sort out most of the /spl / conversions
+            // Deal with this specific nested type first
+            title = title.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
+            title = title.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
+            // Replace general expressions
+            title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
+            // Deal with subscripts and superscripts       
+            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+                title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
+                title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
+                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
+                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+            } else {
+                title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
+                title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
+                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
+                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+            }
+
+            // Replace \infin with \infty
+            title = title.replaceAll("\\\\infin", "\\\\infty");
+            // Automatic case keeping
+            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                title = caseKeeper.format(title, caseKeeperList.wordListIEEEXplore);
+            }
+            // Write back
+            entry.setField("title", title);
+        }
         
     	// clean up author
     	String author = (String)entry.getField("author");
     	if (author != null) {
+	    if (author.indexOf("a href=") >= 0) {  // Author parsing failed because it was empty
+		entry.setField("author","");  // Maybe not needed anymore due to another change
+	    } else {
 	    	author = author.replaceAll("\\.", ". ");
 	    	author = author.replaceAll("  ", " ");
 	    	author = author.replaceAll("\\. -", ".-");
 	    	author = author.replaceAll("; ", " and ");
 	    	author = author.replaceAll("[,;]$", "");
 	    	entry.setField("author", author);
-    	}
+	    }
+	}
     	// clean up month
     	String month = (String)entry.getField("month");
     	if ((month != null) && (month.length() > 0)) {
@@ -515,7 +547,34 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	        }
 			entry.setField(sourceField, fullName);
         }
-		return entry;
+	
+        // clean up abstract
+        String abstr = (String) entry.getField("abstract");
+        if (abstr != null) {
+            // Try to sort out most of the /spl / conversions
+            // Deal with this specific nested type first
+            abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
+            abstr = abstr.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
+            // Replace general expressions
+            abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
+            // Deal with subscripts and superscripts       
+            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
+                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
+                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
+                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+            } else {
+                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
+                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
+                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
+                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+            }
+            // Replace \infin with \infty
+            abstr = abstr.replaceAll("\\\\infin", "\\\\infty");
+            // Write back
+            entry.setField("abstract", abstr);
+        }
+	return entry;
     }
 
     private String parseNextEntryId(String allText, int startIndex) {
@@ -556,23 +615,24 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	            typeName = typeMatcher.group(1);
 	            if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
 	            		typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
-					   	typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines")) {
+                                typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") || 
+                                typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
 	                type = BibtexEntryType.getType("article");
 	                sourceField = "journal";
-	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications")) {
+	            } else if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
 	                type = BibtexEntryType.getType("inproceedings");
 	                sourceField = "booktitle";
-		        } else if (typeName.equalsIgnoreCase("IEEE Standards")) {
+		        } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
 	                type = BibtexEntryType.getType("standard");
 	                sourceField = "number";
 		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
 		        	type = BibtexEntryType.getType("Electronic");
 		        	sourceField = "note";
-		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
+		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
-            }
+            } 
             
             if (type == null) {
             	type = BibtexEntryType.getType("misc");
@@ -581,7 +641,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 unparseable++;
                 System.err.println(text);
             }
-        
+            
             entry = new BibtexEntry(Util.createNeutralId(), type);
             
             if (typeName.equalsIgnoreCase("IEEE Standards")) {
@@ -590,6 +650,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters")) {
             	entry.setField("publisher", "Wiley-IEEE Press");
+            } else if(typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
+                entry.setField("publisher", "MIT Press");
             }
             
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
@@ -612,9 +674,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		if (field.equals("pages") && fieldMatcher.groupCount() == 2) {
             			entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
             		}
-            	}
+            	} 
             }
-            if (entry.getField("author") == null) {  // Fix for some documents without authors
+            if (entry.getField("author") == null || entry.getField("author").startsWith("a href")) {  // Fix for some documents without authors
                 entry.setField("author","");
             }
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
@@ -622,15 +684,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
         
             if (includeAbstract) {
-		    index = allText.indexOf("id=\"abstract-1\"", piv);
+		    index = text.indexOf("id=\"abstract");
 		    if (index >= 0) {
-		        endIndex = allText.indexOf("</div>", index) + 6;
-		            piv = endIndex;
+		        endIndex = text.indexOf("</div>", index) + 6;
 		            
-	            	text = allText.substring(index, endIndex);
+	            	text = text.substring(index, endIndex);
 	            	Matcher absMatcher = absPattern.matcher(text);
 	            	if (absMatcher.find()) {
-	            		entry.setField("abstract", absMatcher.group(1));
+			    	// Clean-up abstract
+			    String abstr=absMatcher.group(1);
+			    abstr = abstr.replaceAll("<span class='snippet'>([\\w]+)</span>","$1");
+				
+			    entry.setField("abstract", htmlConverter.format(abstr));
 	            	}
 	            }
             }

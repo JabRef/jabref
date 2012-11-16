@@ -26,7 +26,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFilePanel;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -132,7 +132,7 @@ public class AttachFileDialog extends JDialog {
         builder.append(editor.getTextComponent());
         builder.append(browse);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addButton(download);
         bb.addButton(auto);
         builder.nextLine();
@@ -144,7 +144,7 @@ public class AttachFileDialog extends JDialog {
 
         main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        bb = new ButtonBarBuilder2();
+        bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);

@@ -67,7 +67,7 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
@@ -274,7 +274,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(stop);

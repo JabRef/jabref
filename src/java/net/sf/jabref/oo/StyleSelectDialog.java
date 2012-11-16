@@ -23,7 +23,7 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
@@ -277,7 +277,7 @@ public class StyleSelectDialog {
         };
         cancel.addActionListener(cancelListener);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
@@ -515,7 +515,7 @@ public class StyleSelectDialog {
             sp.setPreferredSize(new Dimension(700,500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
             JButton ok = new JButton(Globals.lang("Ok"));
-            ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+            ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(ok);
             bb.addGlue();

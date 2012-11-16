@@ -44,8 +44,15 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel p1 = new JPanel(),
         p2 = new JPanel();
     String oldLnf = "";
-    boolean oldUseDef, oldBiblMode=false;
+    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation, oldCaseKeeperOnSearch;
     int oldPort = -1;
+    
+    public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 
+    public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
+	
+    private JCheckBox useConvertToEquation;
+    private JCheckBox useCaseKeeperOnSearch;
+	
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
         _prefs = prefs;
@@ -67,8 +74,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             clName.setEnabled(((JCheckBox)e.getSource()).isSelected());
         }
         });
-
-
+    useConvertToEquation = new JCheckBox(Globals.lang("Prefer converting subscripts and superscripts to equations rather than text"));
+    useCaseKeeperOnSearch = new JCheckBox(Globals.lang("Add {} to specified title words on search to keep the correct case"));
+	
     FormLayout layout = new FormLayout
         ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
          "");
@@ -139,6 +147,15 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.append(new JPanel());
     builder.append(biblatexMode);
     
+    builder.nextLine();    
+    builder.appendSeparator(Globals.lang("Import conversions"));
+    builder.nextLine();
+    builder.append(new JPanel());
+    builder.append(useConvertToEquation);
+    builder.nextLine();
+    builder.append(pan);
+    builder.append(useCaseKeeperOnSearch);
+        
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setLayout(new BorderLayout());
@@ -160,6 +177,10 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
+        oldConvertToEquation = Globals.prefs.getBoolean("useConvertToEquation");
+        useConvertToEquation.setSelected(oldConvertToEquation);
+        oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
+        useCaseKeeperOnSearch.setSelected(oldCaseKeeperOnSearch);
     }
 
     public void storeSettings() {
@@ -215,6 +236,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             		.concat("You must restart JabRef for this change to come into effect."),
                     Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
+        
+        _prefs.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
+        _prefs.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
     }
 
     public boolean readyToClose() {

@@ -20,7 +20,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
@@ -66,7 +66,7 @@ public class CitationManager {
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
@@ -216,7 +216,7 @@ public class CitationManager {
             b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
             diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
-            ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+            ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(ok);
             bb.addButton(cancel);

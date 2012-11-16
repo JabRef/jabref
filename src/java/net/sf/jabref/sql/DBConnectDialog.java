@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -142,7 +142,7 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
         // add buttons are added in a similar way:
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2();
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(btnConnect);
         bb.addButton(btnCancel);

@@ -16,35 +16,27 @@ package net.sf.jabref.imports;
 
 import java.io.IOException;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.ImportInspector;
 import net.sf.jabref.Util;
 
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 	
-	private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
-
+    private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
+    final CaseKeeper caseKeeper = new CaseKeeper();
+    
 	@Override
     public void stopFetching() {
 		// nothing needed as the fetching is a single HTTP GET
@@ -71,9 +63,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
 
         URLConnection conn;
@@ -89,7 +78,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         
        String bibtexString;
         try {
-	        bibtexString = getResults(conn);
+	        bibtexString = Util.getResults(conn);
         } catch (FileNotFoundException e) {
                status.showMessage(Globals.lang("Unknown DOI: '%0'.",
                         query),
@@ -104,6 +93,15 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
        
         
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        
+        // Optionally add curly brackets around key words to keep the case
+        String title = (String)entry.getField("title");
+        if (title != null) {
+            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                title = caseKeeper.format(title);
+            }
+            entry.setField("title", title);
+        }
         // Do not use the provided key
         // entry.setField(BibtexFields.KEY_FIELD,null);
         inspector.addEntry(entry);
@@ -136,26 +134,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     public JPanel getOptionsPanel() {
 		// no additional options available
 	    return null;
-    }
-        
-     /**
-     * Download the URL and return contents as a String.
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    public String getResults(URLConnection source) throws IOException {
-        
-        InputStream in = source.getInputStream();
-        StringBuffer sb = new StringBuffer();
-        byte[] buffer = new byte[256];
-        while(true) {
-            int bytesRead = in.read(buffer);
-            if(bytesRead == -1) break;
-            for (int i=0; i<bytesRead; i++)
-                sb.append((char)buffer[i]);
-        }
-        return sb.toString();
     }
 
 

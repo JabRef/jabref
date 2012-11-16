@@ -73,7 +73,7 @@ import net.sf.jabref.imports.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class TextInputDialog
     extends JDialog implements ActionListener
@@ -363,7 +363,7 @@ public class TextInputDialog
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
     cancelButton.addActionListener( this ) ;
 
-    ButtonBarBuilder2 bb = new ButtonBarBuilder2(buttons);
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
     buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
     bb.addGlue();
     bb.addButton(okButton);

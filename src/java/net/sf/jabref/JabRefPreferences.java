@@ -494,6 +494,8 @@ public class JabRefPreferences {
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put("useIEEEAbrv", Boolean.TRUE);
+        defaults.put("useConvertToEquation", Boolean.FALSE);
+        defaults.put("useCaseKeeperOnSearch", Boolean.TRUE);
 
 	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
 	try {

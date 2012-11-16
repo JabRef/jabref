@@ -36,7 +36,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder2;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -181,7 +181,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.append(editors, 5);
         b.nextLine();
         
-        ButtonBarBuilder2 bb = new ButtonBarBuilder2(opt);
+        ButtonBarBuilder bb = new ButtonBarBuilder(opt);
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
