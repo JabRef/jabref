@@ -69,7 +69,7 @@ public class PostgreSQLExporter extends DBExporter {
 		}
 		rs.getStatement().close();
 		conn.close();
-		url += "/" + dbStrings.getDatabase();
+
 		conn = DriverManager.getConnection(url, dbstrings.getUsername(),
 				dbstrings.getPassword());
 		createPLPGSQLFunction(conn);
