@@ -257,7 +257,7 @@ public class SQLUtil {
 	/**
 	 * This routine returns the JDBC url corresponding to the DBStrings input.
 	 * 
-	 * @param dbstrings
+	 * @param dbStrings
 	 *            The DBStrings to use to make the connection
 	 * @return The JDBC url corresponding to the input DBStrings
 	 */

@@ -113,7 +113,7 @@
 		<include name="fontbox-1.7.1.jar" />
 		<include name="zoom-java.jar" />
     	<include name="mysql-connector-java-5.0.7-bin.jar" />
-		<include name="postgresql-9.1-902.jdbc4.jar" />
+		<include name="postgresql-9.2-1002.jdbc4.jar" />
         <!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />

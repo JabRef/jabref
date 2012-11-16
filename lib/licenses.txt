@@ -148,7 +148,7 @@ Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache 2.0
 
-Path:    postgresql-9.1-902.jdbc4.jar
+Path:    postgresql-9.*.jdbc4.jar
 Project: PostgreSQL JDBC Driver
 URL:     http://jdbc.postgresql.org/download.html
 License: BSD
