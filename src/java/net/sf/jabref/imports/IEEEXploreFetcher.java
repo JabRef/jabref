@@ -167,6 +167,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
+                        
+            if (page.indexOf("Error Page") >= 0) {
+                status.showMessage(Globals.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
+                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
             
             hits = getNumberOfHits(page, "display-status", hitsPattern);
 
