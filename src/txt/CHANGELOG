@@ -23,6 +23,7 @@
     - Custom importers nested in jars should be supported now (bug 3582838)
     - PDFContentImporter uses the DOI fetcher to fetch the BibTeX for the entry (if a DOI exists at the first page).
     - Moved migration of legacy PDF/PS fields from legacy tools to clean up dialog.
+    - MHT files can now also be linked by drag'n'drop without the need to configure "external file types".
 2.9 beta
     - Replaced notification dialog after moving/renaming linked file by status message.
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,

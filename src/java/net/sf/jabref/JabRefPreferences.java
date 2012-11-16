@@ -1136,6 +1136,7 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www"));
         list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture"));
         list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www"));
+        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www"));
         list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www"));
 
         // On all OSes there is a generic application available to handle file opening,
