@@ -37,5 +37,6 @@
 	<classpathentry kind="lib" path="lib/fontbox-1.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/jempbox-1.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox-1.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jayatana-1.2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

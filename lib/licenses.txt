@@ -113,6 +113,11 @@ Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LPGL 2.1
 
+Path:    jayatana-*.jar
+Project: java-swing-ayatana
+URL:     http://code.google.com/p/java-swing-ayatana/
+License: MIT
+
 Path:    jempbox-*.jar
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
