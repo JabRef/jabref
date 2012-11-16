@@ -36,6 +36,11 @@ public class HTMLConverter implements LayoutFormatter {
 	// The symbols can be looked at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
 	// http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
         // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
+    
+    
+    // An array of arrays of strings in the format:
+    // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
+    // Leaving a field empty is OK as it then will not be included
     private String[][] conversionList = new String[][]{
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
@@ -559,6 +564,8 @@ public class HTMLConverter implements LayoutFormatter {
             return null;
         StringBuffer sb = new StringBuffer();
 	// Deal with the form <sup>k</sup>and <sub>k</sub>
+        // If the result is in text or equation form can be controlled
+        // From the "Advanced settings" tab
         if(Globals.prefs.getBoolean("useConvertToEquation")) {
             text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
             text = text.replaceAll("<sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
@@ -567,6 +574,9 @@ public class HTMLConverter implements LayoutFormatter {
             text = text.replaceAll("<sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
         }
         
+        // TODO: maybe rewrite this based on regular expressions instead
+        // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to 
+        // remove tags for its image alt-tag to equation converter
         for (int i=0; i<text.length(); i++) {
 
             int c = text.charAt(i);
@@ -578,11 +588,14 @@ public class HTMLConverter implements LayoutFormatter {
 
         }
         text = sb.toString();
+        
+        // Handle text based HTML entities
         Set<String> patterns = escapedSymbols.keySet();
         for (String pattern: patterns) {
         	text = text.replaceAll(pattern, escapedSymbols.get(pattern));
         }
         
+        // Handle numerical HTML entities
         Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
         while (m.find()) {
@@ -592,14 +605,15 @@ public class HTMLConverter implements LayoutFormatter {
             if(numSymbols.containsKey(num)) {
                 text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";", numSymbols.get(num));
             } else {
-                System.err.println("HTML escaped char not converted " + m.group(1) + m.group(2) + m.group(3) + ": " + Integer.toString(num));
+                System.err.println("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
             }
         }
+        
 	// Find non-covered special characters with alphabetic codes
         escapedPattern = Pattern.compile("&(\\w+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
-	    System.err.println("HTML escaped char not converted " + m.group(1));
+	    System.err.println("HTML escaped char not converted: " + m.group(1));
 	}
 
         return text.trim();
