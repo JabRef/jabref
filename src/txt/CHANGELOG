@@ -10,6 +10,7 @@
     - Rewrote the HTML import in a more general way. A few characters need to be added.
     - IEEE Xplore abstract fetching should now be working again.
     - Added DOI to BibTex entry fetcher.
+    - Added ADS (The SAO/NASA Astrophysics Data System) fetcher by Ryo Igarashi (patch #120).
     - Reintroduced Google Scholar and ACM portal fetcher with entry preview to reduce server load.
     - Added alternate entry fetcher type where a preview can be displayed so the user can choose
       which entries to download. This can reduce server load significantly and prevent users from

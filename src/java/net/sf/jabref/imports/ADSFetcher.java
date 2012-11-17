@@ -71,7 +71,7 @@ public class ADSFetcher implements EntryFetcher {
     }
 
     public String getKeyName() {
-        return "Fetch ADS from DOI";
+        return "ADS from ADS-DOI";
     }
 
     public String getTitle() {
