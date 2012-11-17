@@ -27,6 +27,7 @@
     - MHT files can now also be linked by drag'n'drop without the need to configure "external file types".
     - Adds support for Ubunut's global menu and HUD integration by using java-swing-ayatana (feature #796).
     - Updates PostgreSQL support to PostgreSQL 9.2
+    - New Mac OS X icon (patch #61)
 2.9 beta
     - Replaced notification dialog after moving/renaming linked file by status message.
     - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
