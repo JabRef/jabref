@@ -1,9 +1,9 @@
 # owner		JabRef Team
 # license	GPL version 2
 # author	Uwe Stöhr
-# file version	2.0	date	20-11-2007
+# file version	1.0	date	18-01-2007
 
-; To compile this script NSIS 2.30 or newer are required
+; To compile this script NSIS 2.23 and newer are required
 ; http://nsis.sourceforge.net/
 
 
@@ -14,44 +14,31 @@ CRCCheck force
 ; Make the installer as small as possible.
 SetCompressor lzma
 
-; set execution level for Windows Vista
-RequestExecutionLevel user
 
 # general definitions
 ; you only need to change this section for new releases
-; you only need to change this section for new releases
-VIProductVersion "2.4.0.0" ; file version for the installer in the scheme "x.x.x.x"
-!ifndef VERSION
-	!define VERSION "2.4"
-!endif
+VIProductVersion "2.2.0.0" ; file version for the installer in the scheme "x.x.x.x"
+!define VERSION "2.2"
 Name "JabRef ${VERSION}"
 !define REGKEY "SOFTWARE\JabRef"
 !define COMPANY "JabRef Team"
 !define URL "http://jabref.sourceforge.net"
-!define PRODUCT_NAME "JabRef"
-!define PRODUCT_EXE "$INSTDIR\JabRef.exe"
-!define PRODUCT_EXE2 "JabRef.exe"
-!define PRODUCT_REGNAME "BibTeX.Document"
-!define PRODUCT_EXT ".bib"
+!define PRODUCT_EXE "JabRef.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
-
-
-; registry preparations
-!define SHCNE_ASSOCCHANGED 0x08000000
-!define SHCNF_IDLIST 0
+!define PRODUCT_LICENSE_FILE "dist\gpl.txt"
 
 
 # Variables
 Var StartmenuFolder
-Var CreateFileAssociations
 Var CreateDesktopIcon
 Var Answer
 Var UserName
+Var InstDestination
 
 
 # Included files
 !include "MUI.nsh"
+!include "fileassoc.nsh"
 !include "LogicLib.nsh"
 
 
@@ -116,7 +103,7 @@ Var UserName
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
-!define MUI_FINISHPAGE_RUN "${PRODUCT_EXE}"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXE}"
 !define MUI_FINISHPAGE_TEXT "$(FinishPageMessage)"
 !define MUI_FINISHPAGE_RUN_TEXT "$(FinishPageRun)"
 !insertmacro MUI_PAGE_FINISH
@@ -157,7 +144,7 @@ Section "!JabRef" SecCore
 SectionEnd
 
 Section "$(SecAssociateBibTitle)" SecAssociateBib
- StrCpy $CreateFileAssociations "true"
+ !insertmacro APP_ASSOCIATE "bib" "JabRef.BibTeX" "$(FileTypeTitle)" "$INSTDIR\${PRODUCT_EXE},0" "$(OpenIn)" "$INSTDIR\${PRODUCT_EXE} $\"%1$\""
 SectionEnd
 
 Section "$(SecDesktopTitle)" SecDesktop
@@ -177,46 +164,30 @@ Section "-Installation actions" SecInstallation
   SetOverwrite on
   File /r dist\*.*
   WriteRegStr SHCTX "${REGKEY}\Components" Main 1
-  
   ; register JabRef
   WriteRegStr SHCTX "${REGKEY}" Path $INSTDIR
   WriteUninstaller $INSTDIR\uninstall.exe
-  
   ; create shortcuts to startmenu
   SetOutPath "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\$StartmenuFolder"
-  CreateShortCut "$SMPROGRAMS\$StartmenuFolder\$(^Name).lnk" "${PRODUCT_EXE}" "" "$INSTDIR\JabRef.exe"
+  CreateShortCut "$SMPROGRAMS\$StartmenuFolder\$(^Name).lnk" "$INSTDIR\${PRODUCT_EXE}" "" "$INSTDIR\JabRef.exe"
   CreateShortCut "$SMPROGRAMS\$StartmenuFolder\Uninstall $(^Name).lnk" "$INSTDIR\uninstall.exe"
-  
   ; create desktop icon
   ${if} $CreateDesktopIcon == "true"
    SetOutPath "$INSTDIR"
-   CreateShortCut "$DESKTOP\$(^Name).lnk" "${PRODUCT_EXE}" "" "${PRODUCT_EXE}" ;$(^Name).lnk
+   CreateShortCut "$DESKTOP\$(^Name).lnk" "$INSTDIR\${PRODUCT_EXE}" "" "$INSTDIR\${PRODUCT_EXE}" ;$(^Name).lnk
   ${endif}
   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "StartMenu" "$SMPROGRAMS\$StartmenuFolder"
   ${if} $Answer == "yes" ; if user is admin
-  
    ; register information that appear in Windows' software listing
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${VERSION}"
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "Publisher" "${COMPANY}"
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${URL}"
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "DisplayIcon" "${PRODUCT_EXE}"
-   WriteRegStr SHCTX "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"   
-   WriteRegDWORD SHCTX "${PRODUCT_UNINST_KEY}" "NoModify" 0x00000001
-   WriteRegDWORD SHCTX "${PRODUCT_UNINST_KEY}" "NoRepair" 0x00000001
-  ${endif}
-  
-  # register the extension .bib
-  ${if} $CreateFileAssociations == "true"
-   # write informations about file type
-   WriteRegStr SHCTX "Software\Classes\${PRODUCT_REGNAME}" "" "${PRODUCT_NAME} Document"
-   WriteRegStr SHCTX "Software\Classes\${PRODUCT_REGNAME}\DefaultIcon" "" "${PRODUCT_EXE},0"
-   WriteRegStr SHCTX "Software\Classes\${PRODUCT_REGNAME}\Shell\open\command" "" '"${PRODUCT_EXE}" "%1"'
-   # write informations about file extensions
-   WriteRegStr SHCTX "Software\Classes\${PRODUCT_EXT}" "" "${PRODUCT_REGNAME}"
-   # refresh shell
-   System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${VERSION}"
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "${COMPANY}"
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${URL}"
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_EXE}"
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"   
+   WriteRegDWORD HKLM "${PRODUCT_UNINST_KEY}" "NoModify" 0x00000001
+   WriteRegDWORD HKLM "${PRODUCT_UNINST_KEY}" "NoRepair" 0x00000001
   ${endif}
 
 SectionEnd
@@ -231,24 +202,19 @@ Section "un.JabRef" un.SecUnProgramFiles
   ; delete start menu entry
   ReadRegStr $0 SHCTX "${PRODUCT_UNINST_KEY}" "StartMenu"
   RMDir /r "$0"
-  
   ; delete desktop icon
   Delete "$DESKTOP\$(^Name).lnk"
-  
-  # remove file extension 
-  ReadRegStr $R0 SHCTX "Software\Classes\${PRODUCT_EXT}" ""
-  ${if} $R0 == "${PRODUCT_REGNAME}"
-   DeleteRegKey SHCTX "Software\Classes\${PRODUCT_EXT}"
-   DeleteRegKey SHCTX "Software\Classes\${PRODUCT_REGNAME}"
-  ${endif}
-  
-  ; delete remaining registry entries
+  ; delete registry entries
   DeleteRegKey HKCU "${PRODUCT_UNINST_KEY}"
   DeleteRegKey SHCTX "${PRODUCT_UNINST_KEY}"
-  DeleteRegKey HKCR "Applications\${PRODUCT_EXE2}"
+  DeleteRegKey HKCR "Applications\${PRODUCT_EXE}"
+  DeleteRegValue HKCR ".bib" "JabRef.BibTeX_backup"
+  DeleteRegValue HKCU "Software\Classes\.bib" "JabRef.BibTeX_backup"
+  DeleteRegValue SHCTX "Software\Classes\.bib" "JabRef.BibTeX_backup"
   DeleteRegKey HKCU "${REGKEY}"
   DeleteRegKey SHCTX "${REGKEY}"
-  
+  ; remove file association with .bib-files
+  !insertmacro APP_UNASSOCIATE "bib" "JabRef.BibTeX"
   ; close uninstaller automatically
   SetAutoClose true
 
@@ -258,15 +224,6 @@ SectionEnd
 # Installer functions
 Function .onInit
 
-  StrCpy $StartmenuFolder ${PRODUCT_NAME}
-
- # check if the same Jabref version is already installed
-  ReadRegStr $0 SHCTX "${PRODUCT_UNINST_KEY}" "Publisher"
-  ${if} $0 != ""
-   MessageBox MB_OK|MB_ICONSTOP "$(StillInstalled)" /SD IDOK
-   Abort
-  ${endif}
-  
  InitPluginsDir
   ; If the user does *not* have administrator privileges, abort
   StrCpy $Answer ""
@@ -291,17 +248,11 @@ Function un.onInit
   ${if} $Answer == "yes"
    SetShellVarContext all
   ${else}
-   # check if the Jabref has been installed with admin permisions
-   ReadRegStr $0 HKLM "${PRODUCT_UNINST_KEY}" "Publisher"
-   ${if} $0 != ""
-    MessageBox MB_OK|MB_ICONSTOP "$(UnNotAdminLabel)" /SD IDOK
-    Abort
-   ${endif}
    SetShellVarContext current
   ${endif}
   
   ; ask if it should really be removed
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" /SD IDYES IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" IDYES +2
   Abort
 
 FunctionEnd
@@ -309,7 +260,7 @@ FunctionEnd
 Function un.onUninstSuccess
 
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(UnRemoveSuccessLabel)" /SD IDOK
+  MessageBox MB_ICONINFORMATION|MB_OK "$(UnRemoveSuccessLabel)"
 
 FunctionEnd
 
