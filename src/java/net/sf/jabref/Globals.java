@@ -28,9 +28,12 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Filter;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
@@ -190,9 +193,7 @@ public class Globals {
     public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
 
     // Instantiate logger:
-    // TODO: Doesn't work in Java 5:
-    // private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private static Logger logger = Logger.getLogger("global");
+    private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     /**
 	 * true if we have unix newlines
@@ -1392,5 +1393,39 @@ public class Globals {
 		
 		return pattern;
 	}
+
+	/**
+	 * With Java 7, one could directly set a format for the SimpleFormatter
+	 * (http://stackoverflow.com/a/10722260/873282) and use that in a StreamHandler.
+	 * As JabRef is compatible with Java6, we have to write our own Handler
+	 */
+	private static class StdoutConsoleHandler extends Handler {
+
+		@Override
+        public void close() throws SecurityException {
+        }
+
+		@Override
+        public void flush() {
+			System.out.flush();
+        }
+
+		@Override
+        public void publish(LogRecord record) {
+	        System.out.println(record.getMessage());
+	        System.out.flush();
+        }
+	}
+
+	public static void setupLogging() {
+	    Logger globalLogger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	    
+	    // disable console logging
+		globalLogger.setUseParentHandlers(false);
+	    
+	    // add new handler logging to System.out
+		StdoutConsoleHandler h = new StdoutConsoleHandler();
+		globalLogger.addHandler(h);
+    }
 
 }
