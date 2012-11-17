@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -39,6 +39,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.java.ayatana.ApplicationMenu;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
@@ -548,6 +550,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         });
+        
+        ApplicationMenu.tryInstall(this);
     }
 
     public void setWindowTitle() {

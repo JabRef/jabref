@@ -104,6 +104,7 @@
         <include name="jgoodies-common-1.4.0.jar" />
 		<include name="jgoodies-looks-2.5.2.jar" />
 		<include name="jgoodies-forms-1.6.0.jar" />
+		<include name="jayatana-1.2.4.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
 		<include name="microba.jar" />
@@ -112,7 +113,7 @@
 		<include name="fontbox-1.7.1.jar" />
 		<include name="zoom-java.jar" />
     	<include name="mysql-connector-java-5.0.7-bin.jar" />
-		<include name="postgresql-9.1-902.jdbc4.jar" />
+		<include name="postgresql-9.2-1002.jdbc4.jar" />
         <!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />

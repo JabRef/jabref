@@ -1,3 +1,6 @@
+[master branch]
+    - Adds support for java-swing-ayatana (feature #796)
+    - Updates PostgreSQL support to PostgreSQL 9.2
 [beta_2.9 branch]
     - Can control if the HTML converter should create subscripts and superscripts
       as text or an equation via the preferences

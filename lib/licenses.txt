@@ -113,6 +113,11 @@ Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LPGL 2.1
 
+Path:    jayatana-*.jar
+Project: java-swing-ayatana
+URL:     http://code.google.com/p/java-swing-ayatana/
+License: MIT
+
 Path:    jempbox-*.jar
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
@@ -143,7 +148,7 @@ Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache 2.0
 
-Path:    postgresql-9.1-902.jdbc4.jar
+Path:    postgresql-9.*.jdbc4.jar
 Project: PostgreSQL JDBC Driver
 URL:     http://jdbc.postgresql.org/download.html
 License: BSD
