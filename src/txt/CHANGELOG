@@ -1,4 +1,5 @@
 [beta_2.9 branch]
+    - Added DiVA fetcher
     - Can control if the HTML converter should create subscripts and superscripts
       as text or an equation via the preferences
     - Added initial support for adding curly brackets {} for certain
