@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -83,7 +83,7 @@ public class OAI2Fetcher implements EntryFetcher {
     private OutputPrinter status;
 
     /**
-     * some archives - like arxive.org - might expect of you to wait some time 
+     * some archives - like ArXiv.org - might expect of you to wait some time 
      */
     private boolean shouldWait() {
         return waitTime > 0;
@@ -175,8 +175,9 @@ public class OAI2Fetcher implements EntryFetcher {
         int dot = key.indexOf('.');
         int slash = key.indexOf('/');
         
-        if (dot > -1 && dot < slash)
+        if (dot > -1 && dot < slash) {
             key = key.substring(0, dot) + key.substring(slash, key.length());
+        }
     
         return key;
     }
@@ -193,7 +194,7 @@ public class OAI2Fetcher implements EntryFetcher {
      * 
      * @param key
      *            The OAI2 key to fetch from ArXiv.
-     * @return The imnported BibtexEntry or null if none.
+     * @return The imported BibtexEntry or null if none.
      */
     public BibtexEntry importOai2Entry(String key) {
         /**
@@ -300,18 +301,21 @@ public class OAI2Fetcher implements EntryFetcher {
                 status.setStatus(Globals.lang("Processing ") + key);
 
                 /* the cancel button has been hit */
-                if (!shouldContinue)
+                if (!shouldContinue) {
                     break;
+                }
                 
                 /* query the archive and load the results into the BibtexEntry */
                 BibtexEntry be = importOai2Entry(key);
 
-                if (shouldWait())
+                if (shouldWait()) {
                     lastCall = new Date();
+                }
                 
                 /* add the entry to the inspection dialog */
-                if (be != null)
+                if (be != null) {
                     dialog.addEntry(be);
+                }
 
                 /* update the dialogs progress bar */
                 dialog.setProgress(i + 1, keys.length);
@@ -319,7 +323,7 @@ public class OAI2Fetcher implements EntryFetcher {
             
             return true;
         } catch (Exception e) {
-            status.setStatus(Globals.lang("Error while fetching from OIA2")+ ": " + e.getMessage());
+            status.setStatus(Globals.lang("Error while fetching from OAI2")+ ": " + e.getMessage());
             e.printStackTrace();
         }
         return false;
