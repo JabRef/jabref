@@ -550,8 +550,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         });
-        
-        ApplicationMenu.tryInstall(this);
+
+        // The following sets up integration with Unity's global menu, but currently (Nov 18, 2012)
+        // this doesn't work with OpenJDK 6 (leads to crash), only with 7.
+        String javaVersion = System.getProperty("java.version", null);
+        if (javaVersion.compareTo("1.7") >= 0)
+            ApplicationMenu.tryInstall(this);
+
     }
 
     public void setWindowTitle() {
