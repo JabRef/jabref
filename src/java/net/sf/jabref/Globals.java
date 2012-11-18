@@ -1418,14 +1418,20 @@ public class Globals {
 	}
 
 	public static void setupLogging() {
-	    Logger globalLogger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+		// get the root logger. It is NOT GLOBAL_LOGGER_NAME
+	    Logger rootLogger = Logger.getLogger("");
 	    
-	    // disable console logging
-		globalLogger.setUseParentHandlers(false);
-	    
+	    // disable console logging by removing all handlers
+	    Handler[] handlers = rootLogger.getHandlers();
+	    for(Handler handler : handlers) {
+	        rootLogger.removeHandler(handler);
+	    }
+
 	    // add new handler logging to System.out
 		StdoutConsoleHandler h = new StdoutConsoleHandler();
-		globalLogger.addHandler(h);
+		rootLogger.addHandler(h);
+
+		rootLogger.addHandler(errorConsole);
     }
 
 }
