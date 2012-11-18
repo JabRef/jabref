@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -41,6 +42,7 @@ import net.sf.jabref.undo.NamedCompound;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
+    private static Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
 
     boolean showDialog;
     private JabRefFrame frame;
@@ -371,7 +373,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         	for (BibtexEntry entry: pr.getDatabase().getEntries()) {
         		SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
         	}
-        	Globals.logger(Globals.lang("Synchronized special fields based on keywords"));
+        	logger.fine(Globals.lang("Synchronized special fields based on keywords"));
         }
 
         if (!pr.getMetaData().isGroupTreeValid())
