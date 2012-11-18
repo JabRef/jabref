@@ -131,10 +131,10 @@ public class BibtexParser {
 	 */
 	public static BibtexEntry singleFromString(String bibtexString) {
 		Collection<BibtexEntry> c = fromString(bibtexString);
-		if (c == null){
+		if ((c == null) || (c.size() == 0)) {
 			return null;
 		}
-		return c.iterator().next();
+        return c.iterator().next();
 	}	
 	
 	/**
