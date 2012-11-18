@@ -16,7 +16,6 @@ package net.sf.jabref.imports.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,10 +26,8 @@ import java.util.Scanner;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.EntryFetcher;
@@ -95,8 +92,12 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         }
         
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        inspector.addEntry(entry);
+        if(entry != null) {
+            inspector.addEntry(entry);
 	    return true;
+        } else {
+            return false;
+        }
     }
 
 	@Override
