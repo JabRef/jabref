@@ -1429,11 +1429,10 @@ public JabRefPreferences prefs() {
       helpMenu.add(help);
       helpMenu.add(contents);
       helpMenu.addSeparator();
-//old about    helpMenu.add(about);
+      helpMenu.add(errorConsole);
+      helpMenu.addSeparator();
       helpMenu.add(about);
       mb.add(helpMenu);
-      helpMenu.addSeparator();
-      helpMenu.add(errorConsole);
   }
 
     public static JMenu subMenu(String name) {
