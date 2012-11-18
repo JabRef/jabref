@@ -25,7 +25,7 @@ Name "JabRef ${VERSION}"
 !define URL "http://jabref.sourceforge.net"
 !define PRODUCT_EXE "JabRef.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\gpl.txt"
+!define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
 
 
 # Variables
