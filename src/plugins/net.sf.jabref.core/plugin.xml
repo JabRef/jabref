@@ -70,6 +70,15 @@
 			value="Fetch Entries from Citeseer." />
 	</extension>
 
+        <extension id="DiVAtoBibTexFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.DiVAtoBibTeXFetcher" />
+		<parameter id="name" value="DiVA" />
+		<parameter id="description"
+			value="Fetch entries from DiVA." />
+	</extension>
+
         <extension id="DOItoBibTexFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
