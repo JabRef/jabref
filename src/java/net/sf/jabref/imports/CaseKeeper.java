@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.imports;
 
-import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -28,9 +27,10 @@ public class CaseKeeper implements LayoutFormatter {
     }
     
     public String format(String text, String [] listOfWords) {
-	if (text == null)
+	if (text == null) {
 	    return null;
-        Arrays.sort(listOfWords, new LengthComparator());  // Seems like the sorting is not working
+        }
+        Arrays.sort(listOfWords, new LengthComparator());  
         // For each word in the list
 	for (int i = 0; i < listOfWords.length; i++) {
             // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
@@ -41,8 +41,9 @@ public class CaseKeeper implements LayoutFormatter {
     
 
     public String format(String text) {
-	if (text == null)
+	if (text == null) {
 	    return null;
+        }
         final CaseKeeperList list = new CaseKeeperList();
 	return this.format(text,list.getAll());
     }
@@ -54,8 +55,10 @@ class LengthComparator implements Comparator<String>{
     @Override
     public int compare(String o1, String o2) {  
         if (o1.length() > o2.length()) {
-            return 1;
+            return -1;
+        } else if (o1.length() == o2.length()) {
+            return 0;
         }
-        return 0;
+        return 1;
     }
 }
