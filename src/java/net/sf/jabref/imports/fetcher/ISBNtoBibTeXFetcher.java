@@ -30,6 +30,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.ImportInspector;
 
@@ -40,7 +41,8 @@ import net.sf.jabref.imports.ImportInspector;
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
 	
 	private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s"; 
-
+        final CaseKeeper caseKeeper = new CaseKeeper();
+   
 	@Override
     public void stopFetching() {
 		// nothing needed as the fetching is a single HTTP GET
@@ -92,7 +94,16 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         }
         
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        if(entry != null) {
+        if(entry != null)  {
+            // Optionally add curly brackets around key words to keep the case
+            String title = (String)entry.getField("title");
+            if (title != null) {
+                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                    title = caseKeeper.format(title);
+                }
+                entry.setField("title", title);
+            }
+            
             inspector.addEntry(entry);
 	    return true;
         } else {
