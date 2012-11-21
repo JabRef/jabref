@@ -501,9 +501,18 @@ public class HTMLConverter implements LayoutFormatter {
         {"40", "", "("}, // Left bracket
         {"41", "", ")"}, // Right bracket
         {"43", "plus", "\\+"}, // Plus
+        {"44", "comma", ","}, // Comma
+        {"45", "hyphen", "-"}, // Hyphen
+        {"46", "period", "\\."}, // Period
+        {"47", "slash", "/"}, // Slash (solidus)
+        {"58", "colon", ":"}, // Colon
+        {"59", "semi", ";"}, // Semi colon
+        {"91", "lsqb", "\\["}, // Left square bracket
+        {"92", "bsol", "\\\\textbackslash"}, // Backslash
+        {"93", "rsqb", "\\]"}, // Right square bracket
         {"95", "lowbar", "\\\\_"}, // Underscore
-        {"123", "lbrace", "\\\\\\{"}, // Left curly bracket
-        {"125", "rbrace", "\\\\\\}"}, // Right curly bracket
+        {"123", "lbrace", "\\\\\\{"}, // Left curly bracket &lcub; ??
+        {"125", "rbrace", "\\\\\\}"}, // Right curly bracket &rcub; ??
      // {"141", "", ""}, // Reverse line feed
         {"146", "", "'"}, // Private use two ???
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
@@ -522,6 +531,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
      // {"2013", "", ""},    // NKO letter FA
         {"8208", "hyphen", "-"},    // Hyphen
+        {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
@@ -609,7 +619,10 @@ public class HTMLConverter implements LayoutFormatter {
             }
         }
         
-	// Find non-covered special characters with alphabetic codes
+        // Remove $$ in case of two adjacent conversions
+        text = text.replace("$$","");
+        
+       // Find non-covered special characters with alphabetic codes
         escapedPattern = Pattern.compile("&(\\w+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
