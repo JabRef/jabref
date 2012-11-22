@@ -61,7 +61,8 @@ public class CleanUpAction extends AbstractWorker {
 		CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks",
 		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts",
 	        CLEANUP_HTML = "CleanUpHTML",
-		CLEANUP_CASE = "CleanUpCase";
+		CLEANUP_CASE = "CleanUpCase",
+                CLEANUP_LATEX = "CleanUpLaTeX";
 	
 	public static void putDefaults(HashMap<String, Object> defaults) {
 		defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
@@ -76,6 +77,7 @@ public class CleanUpAction extends AbstractWorker {
 		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
                 defaults.put(CLEANUP_HTML, Boolean.TRUE);
                 defaults.put(CLEANUP_CASE, Boolean.TRUE);
+                defaults.put(CLEANUP_LATEX, Boolean.TRUE);
 	}
 	
 	private JCheckBox cleanUpSuperscrips;
@@ -88,6 +90,7 @@ public class CleanUpAction extends AbstractWorker {
 	private JCheckBox cleanUpUpgradeExternalLinks;
 	private JCheckBox cleanUpHTML;
 	private JCheckBox cleanUpCase;
+        private JCheckBox cleanUpLaTeX;
 	private JPanel optionsPanel = new JPanel();
 	private BasePanel panel;
 	private JabRefFrame frame;
@@ -118,25 +121,27 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpUpgradeExternalLinks = new JCheckBox(Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
 		cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
 		cleanUpCase = new JCheckBox(Globals.lang("Run filter on title keeping the case of selected words"));
+		cleanUpLaTeX = new JCheckBox(Globals.lang("Remove unneccessary $, {, and }")); // and move adjacent numbers into equations"));
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
-		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
+		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.setDefaultDialogBorder();
         CellConstraints cc = new CellConstraints();
         builder.add(cleanUpHTML, cc.xyw(1,1,2));
         builder.add(cleanUpCase, cc.xyw(1,2,2));
-        builder.add(cleanUpSuperscrips, cc.xyw(1,3,2));
-        builder.add(cleanUpDOI, cc.xyw(1,4,2));
-        builder.add(cleanUpMonth, cc.xyw(1,5,2));
-        builder.add(cleanUpPageNumbers, cc.xyw(1,6,2));
-        builder.add(cleanUpUpgradeExternalLinks, cc.xyw(1, 7, 2));
-        builder.add(cleanUpMakePathsRelative, cc.xyw(1,8,2));
-        builder.add(cleanUpRenamePDF, cc.xyw(1,9,2));
+        builder.add(cleanUpLaTeX, cc.xyw(1,3,2));
+        builder.add(cleanUpSuperscrips, cc.xyw(1,4,2));
+        builder.add(cleanUpDOI, cc.xyw(1,5,2));
+        builder.add(cleanUpMonth, cc.xyw(1,6,2));
+        builder.add(cleanUpPageNumbers, cc.xyw(1,7,2));
+        builder.add(cleanUpUpgradeExternalLinks, cc.xyw(1, 8, 2));
+        builder.add(cleanUpMakePathsRelative, cc.xyw(1,9,2));
+        builder.add(cleanUpRenamePDF, cc.xyw(1,10,2));
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern), cc.xyw(2,10,1));
-        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,11,1));
+        builder.add(new JLabel(currentPattern), cc.xyw(2,11,1));
+        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,12,1));
 	}
 	
 	private void retrieveSettings() {
@@ -151,6 +156,7 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpUpgradeExternalLinks.setSelected(Globals.prefs.getBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS));
                 cleanUpHTML.setSelected(Globals.prefs.getBoolean(CLEANUP_HTML));
                 cleanUpCase.setSelected(Globals.prefs.getBoolean(CLEANUP_CASE));
+                cleanUpLaTeX.setSelected(Globals.prefs.getBoolean(CLEANUP_LATEX));
 	}
 	
 	private void storeSettings() {
@@ -164,6 +170,7 @@ public class CleanUpAction extends AbstractWorker {
 		Globals.prefs.putBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS, cleanUpUpgradeExternalLinks.isSelected());
                 Globals.prefs.putBoolean(CLEANUP_HTML, cleanUpHTML.isSelected());
                 Globals.prefs.putBoolean(CLEANUP_CASE, cleanUpCase.isSelected());
+                Globals.prefs.putBoolean(CLEANUP_LATEX, cleanUpLaTeX.isSelected());
 	}
 
 	private int showCleanUpDialog() {
@@ -210,7 +217,8 @@ public class CleanUpAction extends AbstractWorker {
     		choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected(),
 		choiceRenamePDF = cleanUpRenamePDF.isSelected(),
 	        choiceConvertHTML = cleanUpHTML.isSelected(),
-                choiceConvertCase = cleanUpCase.isSelected();
+                choiceConvertCase = cleanUpCase.isSelected(),
+                choiceConvertLaTeX = cleanUpLaTeX.isSelected();
     	
     	if (choiceRenamePDF && Globals.prefs.getBoolean(AKS_AUTO_NAMING_PDFS_AGAIN)) { 
 	        CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
@@ -250,6 +258,7 @@ public class CleanUpAction extends AbstractWorker {
         	if (choiceRenamePDF) doRenamePDFs(entry, ce);
 		if (choiceConvertHTML) doConvertHTML(entry, ce);
 		if (choiceConvertCase) doConvertCase(entry, ce);
+        	if (choiceConvertLaTeX) doConvertLaTeX(entry, ce);
         	
             ce.end();
             if (ce.hasEdits()) {
@@ -352,17 +361,18 @@ public class CleanUpAction extends AbstractWorker {
 	private void doCleanUpMonth(BibtexEntry entry, NamedCompound ce) {
 		// implementation based on patch 3470076 by Mathias Walter
 		String oldValue = entry.getField("month");
-		if (oldValue == null) return;
+		if (oldValue == null) {
+                    return;
+                }
 		String newValue = oldValue;
 		try {
-    		int month = Integer.parseInt(newValue);
-    		newValue = new StringBuffer("#").append(Globals.MONTHS[month - 1]).append('#').toString();
-    	} catch (NumberFormatException e) {
-    		// adapt casing of newValue to follow entry in Globals_MONTH_STRINGS
-    		String casedString = newValue.substring(0, 1).toUpperCase().concat(newValue.substring(1).toLowerCase());
-        	if (Globals.MONTH_STRINGS.containsKey(newValue.toLowerCase()) ||
-        			Globals.MONTH_STRINGS.containsValue(casedString)) {
-        		newValue = new StringBuffer("#").append(newValue.substring(0, 3).toLowerCase()).append('#').toString();
+                    int month = Integer.parseInt(newValue);
+                    newValue = new StringBuffer("#").append(Globals.MONTHS[month - 1]).append('#').toString();
+                } catch (NumberFormatException e) {
+                    // Much more liberal matching covering most known abbreviations etc.
+                    String testString = newValue.substring(0, 3).toLowerCase();
+                    if (Globals.MONTH_STRINGS.containsKey(testString)) {
+                        newValue = new StringBuffer("#").append(testString).append('#').toString();
         	}
     	}
     	if (!oldValue.equals(newValue)) {
@@ -374,7 +384,7 @@ public class CleanUpAction extends AbstractWorker {
 	private void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
 		String oldValue = entry.getField("pages");		
 		if (oldValue == null) return;
-		String newValue = oldValue.replaceAll("(\\d+) *- *(\\d+)", "$1--$2");
+		String newValue = oldValue.replaceAll(" *(\\d+) *- *(\\d+) *", "$1--$2");
 		if (!oldValue.equals(newValue)) {
 			entry.setField("pages", newValue);
 			ce.addEdit(new UndoableFieldChange(entry, "pages", oldValue, newValue));
@@ -515,7 +525,9 @@ public class CleanUpAction extends AbstractWorker {
     private void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
-        if (oldValue == null) return;
+        if (oldValue == null) {
+            return;
+        }
         final HTMLConverter htmlConverter = new HTMLConverter();
         String newValue = htmlConverter.format(oldValue);
         if (!oldValue.equals(newValue)) {
@@ -530,9 +542,26 @@ public class CleanUpAction extends AbstractWorker {
     private void doConvertCase(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
-        if (oldValue == null) return;
+        if (oldValue == null) {
+            return;
+        }
         final CaseKeeper caseKeeper = new CaseKeeper();
         String newValue = caseKeeper.format(oldValue);
+        if (!oldValue.equals(newValue)) {
+            entry.setField(field, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+        }
+    }
+
+    private void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
+        final String field = "title";
+        String oldValue = entry.getField(field);
+        if (oldValue == null) {
+            return;
+        }
+        String newValue = oldValue;
+        // Remove redundant $, {, and }
+        newValue = newValue.replace("$$","").replaceAll("\\}([- /])?\\{","$1");
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));

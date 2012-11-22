@@ -1,3 +1,7 @@
+[beta_2.9 branch]
+    - Added cleanup action for removing redundant $, {, and }
+    - Fix for removing starting and ending spaces in the page number cleanup action
+    - Fix for a more liberal detection in the month cleanup action
 2.9 beta 2
     - Added DiVA fetcher
     - Can control if the HTML converter should create subscripts and superscripts
