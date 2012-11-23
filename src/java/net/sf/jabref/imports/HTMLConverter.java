@@ -515,12 +515,14 @@ public class HTMLConverter implements LayoutFormatter {
         {"125", "rbrace", "\\\\\\}"}, // Right curly bracket &rcub; ??
      // {"141", "", ""}, // Reverse line feed
         {"146", "", "'"}, // Private use two ???
+        {"150", "", "--"}, // En dash
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
         {"536", "", "\\\\cb\\{S\\}"},    // capital letter S with comma below, require combelow
         {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
+        {"768", "", "\\\\`\\{\\}"},    // FIX: Grave - Can be solved better as it is a combining accent
         {"769", "", "'"},    // Can be solved better as it is a combining accent
         {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
         {"775", "", "\\\\\\.\\{\\}"},    // FIX: Dot above - Can be solved better as it is a combining accent
@@ -529,18 +531,21 @@ public class HTMLConverter implements LayoutFormatter {
         {"807", "", "\\\\c\\{\\}"},    // FIX: Cedilla - Can be solved better as it is a combining accent
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
-     // {"2013", "", ""},    // NKO letter FA
+     // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
         {"8208", "hyphen", "-"},    // Hyphen
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
         {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
+        {"8469", "lscr", "\\$\\\\mathbb\\{N\\}\\$"}, // double struck capital N -- requires e.g. amsfonts
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
+        {"8771", "sime", "\\$\\\\simeq\\$"}, // almost equal to = asymptotic to, 
         {"8776", "ap", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
         {"8810", "ll", "\\$\\\\ll\\$"}, // Much less than 
         {"8811", "gg", "\\$\\\\gg\\$"}, // Much greater than 
+        {"8819", "gsim", "\\$\\\\gtrsim\\$"}, // Greater than or equivalent to
         {"9426", "", "\\\\copyright"}, // circled small letter C
         {"9653", "utri", "\\$\\\\triangle\\$"}, // White up-pointing small triangle -- \vartriangle probably
                                                 // better but requires amssymb
