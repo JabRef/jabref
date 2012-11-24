@@ -1,4 +1,6 @@
 [beta_2.9 branch]
+    - When generating subdatabase from AUX file, preamble and strings are now included from
+      the source database.
     - Added cleanup action for removing redundant $, {, and }
     - Fix for removing starting and ending spaces in the page number cleanup action
     - Fix for a more liberal detection in the month cleanup action
