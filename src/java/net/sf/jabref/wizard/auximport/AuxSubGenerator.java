@@ -58,12 +58,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.Util;
 
 public class AuxSubGenerator
 {
@@ -313,17 +315,6 @@ public class AuxSubGenerator
 
       }
     }
-
-      // If we have inserted any entries, make sure to copy the source database's preamble and
-      // strings:
-      if (auxDB.getEntryCount() > 0) {
-          auxDB.setPreamble(db.getPreamble());
-          Set<String> keys = db.getStringKeySet();
-          for (String key : keys) {
-              BibtexString string = db.getString(key);
-              auxDB.addString(string);
-          }
-      }
   }
 
     /**
