@@ -67,6 +67,8 @@ public class ExportFormats {
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
         putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
+        putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
+        putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
         putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
                 "endnote", ".txt"));
         putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
