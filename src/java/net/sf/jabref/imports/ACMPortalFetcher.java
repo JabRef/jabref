@@ -37,6 +37,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 	private ImportInspector dialog = null;
 	private OutputPrinter status;
     private final HTMLConverter htmlConverter = new HTMLConverter();
+    final CaseKeeper caseKeeper = new CaseKeeper();
     private String terms;
     
     private static final String startUrl = "http://portal.acm.org/";
@@ -118,10 +119,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
 			int index = page.indexOf("Found");
 			if (index >= 0) {
-            	page = page.substring(index + 5);
-				index = page.indexOf("Found");
-				if (index >= 0)
-            		page = page.substring(index);
+                            page = page.substring(index + 5);
+                            index = page.indexOf("Found");
+                            if (index >= 0) {
+                                page = page.substring(index);
+                            }
 			}
 
             if (hits == 0) {
@@ -161,13 +163,33 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
         for (String id : selection.keySet()) {
-            if (!shouldContinue)
+            if (!shouldContinue) {
                 break;
+            }
             boolean sel = selection.get(id);
             if (sel) {
                 try {
                     BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
-                    inspector.addEntry(entry);
+                    if (entry != null) {
+                        // Convert from HTML and optionally add curly brackets around key words to keep the case
+                        String title = (String) entry.getField("title");
+                        
+                        if (title != null) {
+                            title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
+                            title = convertHTMLChars(title);
+                            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                                title = caseKeeper.format(title);
+                            }
+                            entry.setField("title", title);
+                        }
+                        
+                        String abstr = (String) entry.getField("abstract");
+                        if (abstr != null) {
+                            abstr = convertHTMLChars(abstr);
+                            entry.setField("abstract",abstr);
+                        }
+                        inspector.addEntry(entry);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -190,13 +212,14 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private String makeUrl(int startIndex) {
         StringBuffer sb = new StringBuffer(startUrl).append(searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
-        sb.append("&start=" + String.valueOf(startIndex));
+        sb.append("&start=").append(String.valueOf(startIndex));
         sb.append(searchUrlPartII);
   
-        if (acmOrGuide)
+        if (acmOrGuide) {
         	sb.append("ACM");
-        else
+        } else {
         	sb.append("GUIDE");
+        }
         sb.append(endUrl);
         return sb.toString();
     }
@@ -267,18 +290,20 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     if (authStart >= 0) {
                         int authEnd = text.indexOf("</div>", authStart+authMarker.length());
                         if (authEnd >= 0) {
-                            sb.append("<p>"+text.substring(authStart, authEnd)+"</p>");
+                            sb.append("<p>").append(text.substring(authStart, authEnd)).append("</p>");
                         }
 
                     }
                     // Find title:
                     Matcher titM = titlePattern.matcher(part);
-                    if (titM.find())
-                        sb.append("<p>"+titM.group(1)+"</p>");
+                    if (titM.find()) {
+                        sb.append("<p>").append(titM.group(1)).append("</p>");
+                    }
                     // Find month and year:
                     Matcher mY = monthYearPattern.matcher(part);
-                    if (mY.find())
-                        sb.append("<p>"+mY.group(1)+"</p>");
+                    if (mY.find()) {
+                        sb.append("<p>").append(mY.group(1)).append("</p>");
+                    }
 
 
                     part = sb.toString();
@@ -286,8 +311,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     part = part.replaceAll("</td>", "");
                     part = part.replaceAll("<tr valign=\"[A-Za-z]*\">", "");
                     part = part.replaceAll("<table style=\"padding: 5px; 5px; 5px; 5px;\" border=\"0\">", "");*/
+                } else {
+                    part = link;
                 }
-                else part = link;
 
 
                 JLabel preview = new JLabel("<html>"+part+"</html>");
@@ -312,8 +338,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     			ParserResult result = BibtexParser.parse(in);
     			in.close();
     			Collection<BibtexEntry> item = result.getDatabase().getEntries();
-                if (item.size() == 0)
-                    return null;
+                if (item.isEmpty()) {
+                        return null;
+                    }
     			BibtexEntry entry = item.iterator().next();
     			Thread.sleep(WAIT_TIME);//wait between requests or you will be blocked by ACM
 
@@ -406,9 +433,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);
-            if(bytesRead == -1) break;
-            for (int i=0; i<bytesRead; i++)
+            if(bytesRead == -1) {
+                break;
+            }
+            for (int i=0; i<bytesRead; i++) {
                 sb.append((char)buffer[i]);
+            }
         }
         return sb.toString();
     }
@@ -425,9 +455,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);
-            if(bytesRead == -1) break;
-            for (int i=0; i<bytesRead; i++)
+            if(bytesRead == -1) {
+                break;
+            }
+            for (int i=0; i<bytesRead; i++) {
                 sb.append((char)buffer[i]);
+            }
         }
         return sb.toString();
     }

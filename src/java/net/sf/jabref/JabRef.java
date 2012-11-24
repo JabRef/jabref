@@ -101,6 +101,7 @@ public class JabRef {
         }
 
         Globals.startBackgroundTasks();
+        Globals.setupLogging();
 		Globals.prefs = prefs;
         String langStr = prefs.get("language");
         String[] parts = langStr.split("_");

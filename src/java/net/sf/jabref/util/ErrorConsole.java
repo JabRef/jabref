@@ -19,6 +19,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import javax.swing.*;
 
@@ -31,14 +35,23 @@ import net.sf.jabref.Globals;
  * useful in getting complete bug reports, especially from Windows users,
  * without asking users to run JabRef in a command window to catch the error info.
  *
+ * It also offers a separate tab for the log output.
+ *
  * User: alver
  * Date: Mar 1, 2006
  * Time: 11:13:03 PM
  */
-public class ErrorConsole {
+public class ErrorConsole  extends Handler {
 
     ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
     ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+    
+    ArrayList<String> logOutput = new ArrayList<String>();
+    String logOutputCache = "";
+    boolean logOutputCacheRefreshNeeded = true;
+    SimpleFormatter fmt = new SimpleFormatter();
+    private static final int MAXLOGLINES = 500;
+    
     private static ErrorConsole instance = null;
 
 
@@ -58,30 +71,48 @@ public class ErrorConsole {
         System.setOut(tee);
     }
 
-    public String getErrorMessages() {
+    private String getErrorMessages() {
         return errByteStream.toString();
     }
 
-    public String getOutput() {
+    private String getOutput() {
         return outByteStream.toString();
     }
-
+    
+    private String getLog() {
+    	if (logOutputCacheRefreshNeeded) {
+    		StringBuilder sb = new StringBuilder();
+    		for(String line: logOutput) {
+    			sb.append(line);
+    		}
+    		logOutputCache = sb.toString();
+    	}
+    	return logOutputCache;
+    }
+    
+    /**
+     * 
+     * @param tabbed the tabbed pane to add the tab to
+     * @param output the text to display in the tab
+     * @param ifEmpty Text to output if textbox is emtpy. may be null
+     */
+    private void addTextArea(JTabbedPane tabbed, String title, String output, String ifEmpty) {
+        JTextArea ta = new JTextArea(output);
+        ta.setEditable(false);
+        if ((ifEmpty!=null) && (ta.getText().length() == 0)) {
+            ta.setText(ifEmpty);
+        }
+        JScrollPane sp = new JScrollPane(ta);
+        tabbed.addTab(title, sp);
+    }
+    
     public void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
-        JTextArea ta = new JTextArea(getOutput());
-        ta.setEditable(false);
-        JScrollPane sp = new JScrollPane(ta);
-        tabbed.addTab(Globals.lang("Output"), sp);
-
-        ta = new JTextArea(getErrorMessages());
-        ta.setEditable(false);
-        if (ta.getText().length() == 0) {
-            ta.setText(Globals.lang("No exceptions have ocurred."));
-        }
-        sp = new JScrollPane(ta);
-
-        tabbed.addTab(Globals.lang("Exceptions"), sp);
-
+        
+        addTextArea(tabbed, Globals.lang("Output"), getOutput(), null);
+        addTextArea(tabbed, Globals.lang("Exceptions"), getErrorMessages(),
+        		Globals.lang("No exceptions have ocurred."));
+        addTextArea(tabbed, Globals.lang("Log"), getLog(), null);
 
         tabbed.setPreferredSize(new Dimension(500,500));
 
@@ -124,5 +155,34 @@ public class ErrorConsole {
             super.flush();
             out.flush();
         }
+    }
+    
+    /* * * methods for Logging (required by Handler) * * */
+
+	@Override
+    public void close() throws SecurityException {
+    }
+
+	@Override
+    public void flush() {
+    }
+
+	@Override
+    public void publish(LogRecord record) {
+		String msg = fmt.format(record);
+		logOutput.add(msg);
+		if (logOutput.size() < MAXLOGLINES) {
+			// if we did not yet reach MAXLOGLINES, we just append the string to the cache
+			logOutputCache = logOutputCache + msg;
+		} else {
+			// if we reached MAXLOGLINES, we switch to the "real" caching method and remove old lines 
+			logOutputCacheRefreshNeeded = true;
+			while (logOutput.size() > MAXLOGLINES) {
+				// if log is too large, remove first line
+				// we need a while loop as the formatter may output more than one line
+				logOutput.remove(0);
+			}
+		}
+		logOutputCacheRefreshNeeded = true;
     }
 }

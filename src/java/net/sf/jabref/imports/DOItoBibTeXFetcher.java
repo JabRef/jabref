@@ -94,18 +94,24 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
         
-        // Optionally add curly brackets around key words to keep the case
-        String title = (String)entry.getField("title");
-        if (title != null) {
-            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-                title = caseKeeper.format(title);
+        if(entry != null) {
+            // Optionally add curly brackets around key words to keep the case
+            String title = (String)entry.getField("title");
+            if (title != null) {
+                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                    title = caseKeeper.format(title);
+                }
+                entry.setField("title", title);
             }
-            entry.setField("title", title);
-        }
-        // Do not use the provided key
-        // entry.setField(BibtexFields.KEY_FIELD,null);
-        inspector.addEntry(entry);
+            
+            // Do not use the provided key
+            // entry.setField(BibtexFields.KEY_FIELD,null);
+            inspector.addEntry(entry);
 	    return true;
+        } else {
+            return false;
+        }
+        
     }
 
 	@Override

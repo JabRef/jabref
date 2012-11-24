@@ -70,6 +70,15 @@
 			value="Fetch Entries from Citeseer." />
 	</extension>
 
+        <extension id="DiVAtoBibTexFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.DiVAtoBibTeXFetcher" />
+		<parameter id="name" value="DiVA" />
+		<parameter id="description"
+			value="Fetch entries from DiVA." />
+	</extension>
+
         <extension id="DOItoBibTexFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">
 		<parameter id="entryFetcher"
@@ -86,6 +95,15 @@
 		<parameter id="name" value="OAI2 Entry Fetcher" />
 		<parameter id="description"
 			value="Fetch Entries from OAI2 Archives like ArXiv." />
+	</extension>
+
+	<extension id="ADSFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.ADSFetcher" />
+		<parameter id="name" value="ADS Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from ADS." />
 	</extension>
 
 	<extension id="SPIRESFetcher" plugin-id="net.sf.jabref.core"

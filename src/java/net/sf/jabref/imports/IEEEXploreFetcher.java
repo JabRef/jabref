@@ -113,6 +113,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         fieldPatterns.put("pages", "Page\\(s\\):\\s*(\\d+)\\s*-\\s*(\\d*)");
         //fieldPatterns.put("doi", "Digital Object Identifier:\\s*<a href=.*>(.+)</a>");
         fieldPatterns.put("doi", "<a href=\"http://dx.doi.org/(.+)\" target");
+        fieldPatterns.put("url", "<a href=\"(/stamp/stamp[^\"]+)");       
     }
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -573,6 +574,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("\\\\infin", "\\\\infty");
             // Write back
             entry.setField("abstract", abstr);
+        }
+        
+        // Clean up url
+        String url = (String) entry.getField("url");
+        if (url != null) {
+            entry.setField("url","http://ieeexplore.ieee.org"+url);
         }
 	return entry;
     }

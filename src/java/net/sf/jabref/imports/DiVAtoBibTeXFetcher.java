@@ -12,16 +12,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.sf.jabref.imports.fetcher;
+package net.sf.jabref.imports;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 import javax.swing.JPanel;
 
@@ -29,20 +29,15 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.CaseKeeper;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.ImportInspector;
+import net.sf.jabref.Util;
 
-/**
- * This class uses Manas Tungare's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
- * The online version of the converter is available at http://manas.tungare.name/software/isbn-to-bibtex/
- */
-public class ISBNtoBibTeXFetcher implements EntryFetcher {
+
+public class DiVAtoBibTeXFetcher implements EntryFetcher {
 	
-	private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s"; 
-        final CaseKeeper caseKeeper = new CaseKeeper();
-   
+    private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s"; 
+    private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s"; 
+    final CaseKeeper caseKeeper = new CaseKeeper();
+    
 	@Override
     public void stopFetching() {
 		// nothing needed as the fetching is a single HTTP GET
@@ -64,37 +59,40 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
         // Send the request
         URL url;
-        URLConnection conn;
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
 
-        InputStream source;
+        URLConnection conn;
         try {
-	        source = url.openStream();
+	        conn = url.openConnection();
         } catch (IOException e) {
 	        e.printStackTrace();
 	        return false;
         }
         
-        String bibtexString = new Scanner(source).useDelimiter("\\A").next();
-        if (bibtexString.startsWith("@comment")) {
-        	// an error occured
-        	// the error is nested in @comment{...}
-        	String errorMsg = bibtexString.substring("@comment{".length());
-        	errorMsg = errorMsg.substring(0, errorMsg.length()-1);
-        	status.showMessage(errorMsg); // showMessage does not work -> NPE
-        	return false;
-        }
+        // conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
         
+        
+       String bibtexString;
+        try {
+	        bibtexString = Util.getResults(conn);
+        } catch (FileNotFoundException e) {
+               status.showMessage(Globals.lang("Unknown DiVA entry: '%0'.",
+                        query),
+                        Globals.lang("Get BibTeX entry from DiVA"), JOptionPane.INFORMATION_MESSAGE);
+	        return false;
+        }
+        catch (IOException e) {
+	        e.printStackTrace();
+	        return false;
+        }
+
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        if(entry != null)  {
+        if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
             String title = (String)entry.getField("title");
             if (title != null) {
@@ -103,22 +101,24 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                 }
                 entry.setField("title", title);
             }
-            
+            // Do not use the provided key
+            // entry.setField(BibtexFields.KEY_FIELD,null);
             inspector.addEntry(entry);
-	    return true;
-        } else {
-            return false;
+
+            return true;
         }
+        else return false;
+
     }
 
 	@Override
     public String getTitle() {
-	    return "ISBN to BibTeX";
+	    return "DiVA";
     }
 
 	@Override
     public String getKeyName() {
-	    return "ISBNtoBibTeX";
+	    return "DiVAtoBibTeX";
     }
 
 	@Override
@@ -130,7 +130,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
 	@Override
     public String getHelpPage() {
-	    return "ISBNtoBibTeXHelp.html";
+	    return "DiVAtoBibTeXHelp.html";
     }
 
 	@Override
@@ -138,5 +138,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 		// no additional options available
 	    return null;
     }
+
 
 }

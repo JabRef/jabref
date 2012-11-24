@@ -55,10 +55,10 @@ public class JabRefMain {
 
         String javaVersion = System.getProperty("java.version", null);
 
-        if (javaVersion.compareTo("1.5") < 0) {
+        if (javaVersion.compareTo("1.6") < 0) {
             String javaVersionWarning = "\n" + 
-                "WARNING: You are running Java version 1.4 or lower (" + javaVersion + " to be exact).\n" +
-                "         JabRef needs at least a Java Runtime Environment 1.5 or higher.\n" +
+                "WARNING: You are running Java version 1.6 or lower (" + javaVersion + " to be exact).\n" +
+                "         JabRef needs at least a Java Runtime Environment 1.6 or higher.\n" +
                 "         JabRef should not start properly and output an error message\n" +
                 "         (probably java.lang.UnsupportedClassVersionError ... (Unsupported major.minor version 49.0)\n" +
                 "         See http://jabref.sf.net/faq.php for more information.\n";
@@ -162,12 +162,12 @@ public class JabRefMain {
             String errorMessage = 
                 exceptionToString(e) + "\n" +
                 "This means that your Java version (" + javaVersion + ") is not high enough to run JabRef.\n" +
-                		"Please update your Java Runtime Environment to a version 1.5 or higher.\n";
+                		"Please update your Java Runtime Environment to a version 1.6 or higher.\n";
             
             System.out.println(errorMessage);
             
             JEditorPane pane = new JEditorPane("text/html", 
-                "<html>You are using Java version " + javaVersion + ", but JabRef needs version 1.5 or higher." +
+                "<html>You are using Java version " + javaVersion + ", but JabRef needs version 1.6 or higher." +
                 "<p>Please update your Java Runtime Environment.</p>" +
                 "<p>For more information visit <b>http://jabref.sf.net/faq.php</b>.</p></html>");
             pane.setEditable(false);
