@@ -36,6 +36,7 @@ public class HTMLConverter implements LayoutFormatter {
 	// The symbols can be looked at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
 	// http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
         // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
+        // as well as http://www.w3.org/Math/characters/unicode.xml
     
     
     // An array of arrays of strings in the format:
@@ -294,6 +295,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+03C3 ISOgrk3 
         {"964", "tau", "\\$\\\\tau\\$"}, // greek small letter tau, U+03C4 ISOgrk3  
         {"965", "upsilon", "\\$\\\\upsilon\\$"}, // greek small letter upsilon, 
+        {"", "upsi", "\\$\\\\upsilon\\$"}, // alias 
         //                                   U+03C5 ISOgrk3 
         {"966", "phi", "\\$\\\\phi\\$"}, // greek small letter phi, U+03C6 ISOgrk3  
         {"967", "chi", "\\$\\\\chi\\$"}, // greek small letter chi, U+03C7 ISOgrk3  
@@ -517,21 +519,19 @@ public class HTMLConverter implements LayoutFormatter {
         {"146", "", "'"}, // Private use two ???
         {"150", "", "--"}, // En dash
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
+        {"265", "ccirc", "\\\\\\^\\{c\\}"}, // small C with circumflex
+        {"266", "Cdot", "\\\\\\.\\{C\\}"}, // capital C with dot above
+        {"267", "cdot", "\\\\\\.\\{c\\}"}, // small C with dot above
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
         {"536", "", "\\\\cb\\{S\\}"},    // capital letter S with comma below, require combelow
         {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
-        {"768", "", "\\\\`\\{\\}"},    // FIX: Grave - Can be solved better as it is a combining accent
-        {"769", "", "'"},    // Can be solved better as it is a combining accent
-        {"774", "", "\\\\u\\{\\}"},    // FIX: Breve - Can be solved better as it is a combining accent
-        {"775", "", "\\\\\\.\\{\\}"},    // FIX: Dot above - Can be solved better as it is a combining accent
-        {"776", "", "\\\\\"\\{\\}"},    // FIX: Diaeresis - Can be solved better as it is a combining accent
-        {"780", "", "\\\\v\\{\\}"},    // FIX: Caron - Can be solved better as it is a combining accent
-        {"807", "", "\\\\c\\{\\}"},    // FIX: Cedilla - Can be solved better as it is a combining accent
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
+        {"1082", "", "\\{\\\\cyrchar\\\\cyrk\\}"},    // Cyrillic small KA
      // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
+     // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
         {"8208", "hyphen", "-"},    // Hyphen
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
@@ -539,14 +539,19 @@ public class HTMLConverter implements LayoutFormatter {
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
         {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
         {"8469", "lscr", "\\$\\\\mathbb\\{N\\}\\$"}, // double struck capital N -- requires e.g. amsfonts
+        {"8486", "", "\\$\\{\\\\Omega\\}\\$"}, // Omega
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
         {"8771", "sime", "\\$\\\\simeq\\$"}, // almost equal to = asymptotic to, 
         {"8776", "ap", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
         {"8810", "ll", "\\$\\\\ll\\$"}, // Much less than 
         {"8811", "gg", "\\$\\\\gg\\$"}, // Much greater than 
+        {"", "Gt", "\\$\\\\gg\\$"}, // Much greater than 
         {"8819", "gsim", "\\$\\\\gtrsim\\$"}, // Greater than or equivalent to
+        {"8882", "vltri", "\\$\\\\triangleleft\\$"}, // Left triangle
+        {"8883", "vrtri", "\\$\\\\triangleright\\$"}, // Right triangle
         {"9426", "", "\\\\copyright"}, // circled small letter C
+        {"9633", "square", "\\$\\\\square\\$"}, // White square
         {"9653", "utri", "\\$\\\\triangle\\$"}, // White up-pointing small triangle -- \vartriangle probably
                                                 // better but requires amssymb
         {"10877", "les", "\\$\\\\leqslant\\$"},    // Less than slanted equal -- requires amssymb 
@@ -554,8 +559,23 @@ public class HTMLConverter implements LayoutFormatter {
         {"119978", "Oscr", "\\$\\\\mathcal\\{O\\}\\$"} // script capital O -- possibly use \mathscr
         
     };
+    
+        // List of combining accents
+        private String[][] accentList = new String[][] {
+        {"768", "`"},    // Grave 
+        {"769", "'"},    // 
+        {"771", "~"},    // Tilde
+        {"774", "u"},    // Breve
+        {"775", "."},    // Dot above
+        {"776", "\""},    // Diaeresis
+        {"778", "a"},    // Ring
+        {"780", "v"},    // Caron
+        {"807", "c"},    // Cedilla
+          
+        };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
+        private HashMap<Integer, String> escapedAccents = new HashMap<Integer, String>();
         private HashMap<Integer, String> numSymbols = new HashMap<Integer, String>();
         
         
@@ -571,6 +591,9 @@ public class HTMLConverter implements LayoutFormatter {
                             numSymbols.put(Integer.decode(conversionList[i][0]) , conversionList[i][2]);
                         }
                     }
+                }
+                for (int i=0;i<accentList.length;i++) {
+                    escapedAccents.put(Integer.decode(accentList[i][0]), accentList[i][1]);
                 }
 	}
         
@@ -611,16 +634,18 @@ public class HTMLConverter implements LayoutFormatter {
         }
         
         // Handle numerical HTML entities
-        Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
+        Pattern escapedPattern = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
         while (m.find()) {
 	    //	    System.err.println("Found pattern: " + m.group(1));
 	    //      System.err.println("Found pattern: " + m.group(2));
-            int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
+            int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if(numSymbols.containsKey(num)) {
-                text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";", numSymbols.get(num));
-            } else {
-                System.err.println("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
+                text = text.replaceAll("&#" + m.group(2) + m.group(3) + m.group(4) + ";", numSymbols.get(num));
+            } else if(escapedAccents.containsKey(num)) {
+                text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}");               
+                } else {
+                System.err.println("HTML escaped char not converted: " + m.group(2) + m.group(3) + m.group(4) + " = " + Integer.toString(num));
             }
         }
         

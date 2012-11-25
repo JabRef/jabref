@@ -1,4 +1,5 @@
 [beta_2.9 branch]
+    - Added support for converting HTML combining accents to LaTeX
     - When generating subdatabase from AUX file, preamble and strings are now included from
       the source database.
     - Added cleanup action for removing redundant $, {, and }
