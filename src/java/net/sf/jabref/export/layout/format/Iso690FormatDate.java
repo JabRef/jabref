@@ -3,7 +3,7 @@
  *
  * Creado el 10 de septiembre de 2009, 16:07
  *
- * Copyright 2009, Laura Hernández Gómez
+ * Copyright 2009, Laura HernÃ¡ndez GÃ³mez
  *
  * This file is part of Plugin ISO 690.
  *
@@ -42,14 +42,14 @@ public class Iso690FormatDate implements LayoutFormatter {
         StringBuilder sb = new StringBuilder();
         String[] date = s.split("de");
         //parte el string en los distintos campos de la fecha
-        if ( date.length == 1 ){ //sólo pone el año
+        if ( date.length == 1 ){ //sÃ³lo pone el aÃ±o
              sb.append(date[0].trim());
-        } else if (date.length == 2){//primer campo mes, segundo campo año
-            //cambiamos al formato año - mes
+        } else if (date.length == 2){//primer campo mes, segundo campo aÃ±o
+            //cambiamos al formato aÃ±o - mes
             sb.append(date[1].trim() + "-" + date[0].trim());
         } else if ( date.length == 3){
-            //primer campo día, segundo campo mes y tercer campo año
-            // cambiamos al formato año-mes-día
+            //primer campo dÃ­a, segundo campo mes y tercer campo aÃ±o
+            // cambiamos al formato aÃ±o-mes-dÃ­a
             sb.append(date[2].trim() + "-" + date[1].trim() + "-" + date[0].trim());
         }
         return sb.toString();//retorna el string creado con la fecha.

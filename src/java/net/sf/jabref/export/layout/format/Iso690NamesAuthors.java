@@ -3,7 +3,7 @@
  *
  * Creado el 02 de agosto de 2009, 16:07
  *
- * Copyright 2009, Laura Hern·ndez GÛmez
+ * Copyright 2009, Laura Hern√°ndez G√≥mez
  *
  * This file is part of Plugin ISO 690.
  *
@@ -46,17 +46,17 @@ public class Iso690NamesAuthors implements LayoutFormatter {
         
         //parte el string en los distintos autores
         for (int i=0; i<authors.length; i++){
-            //parte el string author en varios campos, seg˙n el separador ","
+            //parte el string author en varios campos, seg√∫n el separador ","
             String[] author = authors[i].split(",");
             
             // No separa apellidos y nombre con coma (,)
             if ( author.length < 2 ) { // Caso 1: Nombre Apellidos
-                //parte el string author en varios campos, seg˙n el separador " "
+                //parte el string author en varios campos, seg√∫n el separador " "
                 author = authors[i].split(" ");
                 //declaramos y damos un valor para evitar problemas
                 String name = "", surname = ""; 
                 
-                if ( author.length == 1 ){// Caso 1.0: SÛlo un campo
+                if ( author.length == 1 ){// Caso 1.0: S√≥lo un campo
                     sb.append(author[0].trim().toUpperCase());
                     
                 } else if ( author.length == 2 ){// Caso 1.1: Nombre Apellido
@@ -65,7 +65,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     //Segundo campo Apellido
                     surname = author[1].trim().toUpperCase();
                     
-                     //aÒadimos los campos modificados al string final
+                     //a√±adimos los campos modificados al string final
                     sb.append(surname); 
                     sb.append(", ");
                     sb.append(name);
@@ -76,7 +76,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                      //Segundo y tercer campo Apellido1 Apellido2
                      surname = author[1].trim().toUpperCase() + " " + author[2].trim().toUpperCase();
                       
-                     //aÒadimos los campos modificados al string final
+                     //a√±adimos los campos modificados al string final
                     sb.append(surname); 
                     sb.append(", ");
                     sb.append(name);
@@ -87,7 +87,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                      //tercer y cuarto campo Apellido1 Apellido2
                      surname = author[2].trim().toUpperCase() + " " + author[3].trim().toUpperCase();
                       
-                     //aÒadimos los campos modificados al string final
+                     //a√±adimos los campos modificados al string final
                     sb.append(surname); 
                     sb.append(", ");
                     sb.append(name);                    
@@ -98,7 +98,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                 String surname = author[0].trim().toUpperCase();
                 // campo 2 nombre
                 String name = author[1].trim(); 
-                //aÒadimos los campos modificados al string final
+                //a√±adimos los campos modificados al string final
                 sb.append(surname);
                 sb.append(", ");
                 sb.append(name);
