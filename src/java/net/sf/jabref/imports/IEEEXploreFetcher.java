@@ -578,7 +578,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // Clean up url
         String url = (String) entry.getField("url");
         if (url != null) {
-            entry.setField("url","http://ieeexplore.ieee.org"+url);
+            entry.setField("url","http://ieeexplore.ieee.org"+url.replace("tp=&",""));
         }
 	return entry;
     }
