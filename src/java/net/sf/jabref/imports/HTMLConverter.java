@@ -303,6 +303,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"969", "omega", "\\$\\\\omega\\$"}, // greek small letter omega, 
         //                                   U+03C9 ISOgrk3 
         {"977", "thetasym", "\\$\\\\vartheta\\$"}, // greek small letter theta symbol, 
+        {"", "thetav", "\\$\\\\vartheta\\$"}, // greek small letter theta symbol, 
+        {"", "vartheta", "\\$\\\\vartheta\\$"}, // greek small letter theta symbol, 
         //                                   U+03D1 NEW 
         {"978", "upsih", "\\{\\$\\\\Upsilon\\$\\}"}, // greek upsilon with hook symbol, 
         //                                   U+03D2 NEW 
@@ -512,24 +514,46 @@ public class HTMLConverter implements LayoutFormatter {
         {"91", "lsqb", "\\["}, // Left square bracket
         {"92", "bsol", "\\{\\\\textbackslash\\}"}, // Backslash
         {"93", "rsqb", "\\]"}, // Right square bracket
+        {"94", "Hat", "\\\\\\^\\{\\}"}, // Circumflex
         {"95", "lowbar", "\\\\_"}, // Underscore
-        {"123", "lbrace", "\\\\\\{"}, // Left curly bracket &lcub; ??
-        {"125", "rbrace", "\\\\\\}"}, // Right curly bracket &rcub; ??
+        {"96", "grave", "\\\\`\\{\\}"}, // Grave
+        {"123", "lbrace", "\\\\\\{"}, // Left curly bracket
+        {"", "lcub", "\\\\\\{"}, // Left curly bracket
+        {"124", "vert", "\\|"}, // Vertical bar
+        {"", "verbar", "\\|"}, // Vertical bar
+        {"", "VerticalLine", "\\|"}, // Vertical bar
+        {"125", "rbrace", "\\\\\\}"}, // Right curly bracket
+        {"", "rcub", "\\\\\\}"}, // Right curly bracket
+        {"138", "", "\\\\v\\{S\\}"}, // Line tabulation set   
      // {"141", "", ""}, // Reverse line feed
         {"145", "", "`"}, // Apostrophe
         {"146", "", "'"}, // Apostrophe
         {"147", "", "``"}, // Quotation mark
         {"148", "", "''"}, // Quotation mark
         {"150", "", "--"}, // En dash
+        {"154", "", "\\\\v\\{s\\}"}, // Single character introducer
+        {"262", "Cacute", "\\\\'\\{C\\}"}, // capital C with acute
+        {"263", "cacute", "\\\\'\\{c\\}"}, // small C with acute
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
         {"265", "ccirc", "\\\\\\^\\{c\\}"}, // small C with circumflex
         {"266", "Cdot", "\\\\\\.\\{C\\}"}, // capital C with dot above
         {"267", "cdot", "\\\\\\.\\{c\\}"}, // small C with dot above
+        {"268", "Ccaron", "\\\\v\\{C\\}"}, // capital C with caron
+        {"269", "ccaron", "\\\\v\\{c\\}"}, // small C with caron
+        {"298", "Imacr", "\\\\=\\{I\\}"}, // capital I with macron
+        {"299", "imacr", "\\\\=\\{\\\\i\\}"}, // small i with macron
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
+        {"", "imath", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
         {"536", "", "\\\\cb\\{S\\}"},    // capital letter S with comma below, require combelow
         {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
+        {"727", "caron", "\\\\v\\{\\}"}, // Caron
+        {"", "Hacek", "\\\\v\\{\\}"}, // Caron
+        {"728", "breve", "\\\\u\\{\\}"}, // Breve
+        {"", "Breve", "\\\\u\\{\\}"}, // Breve
+        {"729", "dot", "\\\\\\.\\{\\}"}, // Dot above
+        {"730", "ring", "\\\\r\\{\\}"}, // Ring above
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
         {"1055", "", "\\{\\\\cyrchar\\\\CYRP\\}"},    // Cyrillic capital Pe
@@ -540,12 +564,14 @@ public class HTMLConverter implements LayoutFormatter {
         {"8229", "nldr", "\\.\\."},    // Double dots - en leader
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
-        {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
+        {"8460", "Hfr", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
-        {"8467", "lscr", "\\{\\\\ell\\}"}, // script small l 
-        {"8469", "lscr", "\\$\\\\mathbb\\{N\\}\\$"}, // double struck capital N -- requires e.g. amsfonts
+        {"8467", "ell", "\\{\\\\ell\\}"}, // script small l 
+        {"8469", "naturals", "\\$\\\\mathbb\\{N\\}\\$"}, // double struck capital N -- requires e.g. amsfonts
         {"8486", "", "\\$\\{\\\\Omega\\}\\$"}, // Omega
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
+        {"8496", "Escr", "\\$\\\\mathcal\\{E\\}\\$"}, // script capital E 
+        {"8714", "", "\\$\\\\in\\$"},    // Small element in
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
         {"8758", "ratio", ":"},    // Colon/ratio
         {"8771", "sime", "\\$\\\\simeq\\$"}, // almost equal to = asymptotic to, 
@@ -652,19 +678,35 @@ public class HTMLConverter implements LayoutFormatter {
         }
         
         // Handle numerical HTML entities
-        Pattern escapedPattern = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
+        Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
+        while (m.find()) {
+	    //	    System.err.println("Found pattern: " + m.group(1));
+	    //      System.err.println("Found pattern: " + m.group(2));
+            int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
+            if(numSymbols.containsKey(num)) {
+                text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";", numSymbols.get(num));
+            } 
+        }
+
+        escapedPattern = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
+        m = escapedPattern.matcher(text);
         while (m.find()) {
 	    //	    System.err.println("Found pattern: " + m.group(1));
 	    //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if(numSymbols.containsKey(num)) {
                 text = text.replaceAll("&#" + m.group(2) + m.group(3) + m.group(4) + ";", numSymbols.get(num));
-            } else if(escapedAccents.containsKey(num)) {
-                text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}");               
-                } else {
-                System.err.println("HTML escaped char not converted: " + m.group(2) + m.group(3) + m.group(4) + " = " + Integer.toString(num));
-            }
+            } 
+        }
+
+        escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
+        m = escapedPattern.matcher(text);
+        while (m.find()) {
+	    //	    System.err.println("Found pattern: " + m.group(1));
+	    //      System.err.println("Found pattern: " + m.group(2));
+            int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
+            System.err.println("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
         }
         
         // Remove $$ in case of two adjacent conversions
