@@ -45,24 +45,24 @@ public class HTMLConverter implements LayoutFormatter {
     private String[][] conversionList = new String[][]{
         {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
         //                                 U+00A0 ISOnum 
-        {"161", "iexcl", "\\\\textexclamdown"}, // inverted exclamation mark, U+00A1 ISOnum
-        {"162", "cent", "\\\\textcent"}, // cent sign, U+00A2 ISOnum  
-        {"163", "pound", "\\\\pounds"}, // pound sign, U+00A3 ISOnum
-        {"164", "curren", "\\\\textcurrency"}, // currency sign, U+00A4 ISOnum  
-        {"165", "yen", "\\\\textyen"}, // yen sign = yuan sign, U+00A5 ISOnum  
-        {"166", "brvbar", "\\\\textbrokenbar"}, // broken bar = broken vertical bar, 
+        {"161", "iexcl", "\\{\\\\textexclamdown\\}"}, // inverted exclamation mark, U+00A1 ISOnum
+        {"162", "cent", "\\{\\\\textcent\\}"}, // cent sign, U+00A2 ISOnum  
+        {"163", "pound", "\\{\\\\pounds\\}"}, // pound sign, U+00A3 ISOnum
+        {"164", "curren", "\\{\\\\textcurrency\\}"}, // currency sign, U+00A4 ISOnum  
+        {"165", "yen", "\\{\\\\textyen\\}"}, // yen sign = yuan sign, U+00A5 ISOnum  
+        {"166", "brvbar", "\\{\\\\textbrokenbar\\}"}, // broken bar = broken vertical bar, 
         //                                 U+00A6 ISOnum 
         {"167", "sect", "\\{\\\\S\\}"}, // section sign, U+00A7 ISOnum  
         {"168", "uml", "\\\\\"\\{\\}"}, // diaeresis = spacing diaeresis, 
         //                                 U+00A8 ISOdia 
-        {"169", "copy", "\\\\copyright"}, // copyright sign, U+00A9 ISOnum
-        {"170", "ordf", "\\\\textordfeminine"}, // feminine ordinal indicator, U+00AA ISOnum
-        {"171", "laquo", "\\\\guillemotleft"}, // left-pointing double angle quotation mark
+        {"169", "copy", "\\{\\\\copyright\\}"}, // copyright sign, U+00A9 ISOnum
+        {"170", "ordf", "\\{\\\\textordfeminine\\}"}, // feminine ordinal indicator, U+00AA ISOnum
+        {"171", "laquo", "\\{\\\\guillemotleft\\}"}, // left-pointing double angle quotation mark
         //                                 = left pointing guillemet, U+00AB ISOnum 
         {"172", "not", "\\$\\\\neg\\$"}, // not sign, U+00AC ISOnum  
         {"173", "shy", "\\\\-"}, // soft hyphen = discretionary hyphen, 
         //                                 U+00AD ISOnum 
-        {"174", "reg", "\\\\textregistered"}, // registered sign = registered trade mark sign,
+        {"174", "reg", "\\{\\\\textregistered\\}"}, // registered sign = registered trade mark sign,
         //                                 U+00AE ISOnum 
         {"175", "macr", "\\\\=\\{\\}"}, // macron = spacing macron = overline 
         //                                 = APL overbar, U+00AF ISOdia 
@@ -83,9 +83,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"184", "cedil", "\\\\c\\{\\}"}, // cedilla = spacing cedilla, U+00B8 ISOdia  
         {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
         //                                 U+00B9 ISOnum 
-        {"186", "ordm", "\\\\textordmasculine"}, // masculine ordinal indicator,
+        {"186", "ordm", "\\{\\\\textordmasculine\\}"}, // masculine ordinal indicator,
         //                                 U+00BA ISOnum 
-        {"187", "raquo", "\\\\guillemotright"}, // right-pointing double angle quotation mark
+        {"187", "raquo", "\\{\\\\guillemotright\\}"}, // right-pointing double angle quotation mark
         //                                 = right pointing guillemet, U+00BB ISOnum 
         {"188", "frac14", "\\$\\sfrac\\{1\\}\\{4\\}\\$"}, // vulgar fraction one quarter 
         //                                 = fraction one quarter, U+00BC ISOnum 
@@ -93,7 +93,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 = fraction one half, U+00BD ISOnum 
         {"190", "frac34", "\\$\\sfrac\\{3\\}\\{4\\}\\$"}, // vulgar fraction three quarters 
         //                                 = fraction three quarters, U+00BE ISOnum 
-        {"191", "iquest", "\\\\textquestiondown"}, // inverted question mark 
+        {"191", "iquest", "\\{\\\\textquestiondown\\}"}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
         {"192", "Agrave", "\\\\`\\{A\\}"}, // latin capital letter A with grave
         //                                 = latin capital letter A grave,
@@ -195,7 +195,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00EE ISOlat1 
         {"239", "iuml", "\\\\\"\\{\\\\i\\}"}, // latin small letter i with diaeresis, 
         //                                 U+00EF ISOlat1 
-        {"240", "eth", "\\\\dh"}, // latin small letter eth, U+00F0 ISOlat1  
+        {"240", "eth", "\\{\\\\dh\\}"}, // latin small letter eth, U+00F0 ISOlat1  
         {"241", "ntilde", "\\\\~\\{n\\}"}, // latin small letter n with tilde, 
         //                                 U+00F1 ISOlat1 
         {"242", "ograve", "\\\\`\\{o\\}"}, // latin small letter o with grave,
@@ -328,7 +328,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+2111 ISOamso 
         {"8476", "real", "\\{\\$\\\\Re\\$\\}"}, // blackletter capital R = real part symbol, 
         //                                    U+211C ISOamso 
-        {"8482", "trade", "\\\\texttrademark"}, // trade mark sign, U+2122 ISOnum
+        {"8482", "trade", "\\{\\\\texttrademark\\}"}, // trade mark sign, U+2122 ISOnum
         {"8501", "alefsym", "\\$\\\\aleph\\$"}, // alef symbol = first transfinite cardinal, 
         //                                    U+2135 NEW 
         /*    alef symbol is NOT the same as hebrew letter alef,
@@ -461,9 +461,9 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+0178 ISOlat2 
 
         /* Spacing Modifier Letters */
-        {"710", "circ", "\\\\textasciicircum"}, // modifier letter circumflex accent,
+        {"710", "circ", "\\{\\\\textasciicircum\\}"}, // modifier letter circumflex accent,
         //                                   U+02C6 ISOpub 
-        {"732", "tilde", "\\\\textasciitilde"}, // small tilde, U+02DC ISOdia 
+        {"732", "tilde", "\\{\\\\textasciitilde\\}"}, // small tilde, U+02DC ISOdia 
 
         /* General Punctuation */
         {"8194", "ensp", "\\\\hspace\\{0.5em\\}"}, // en space, U+2002 ISOpub  
@@ -476,26 +476,26 @@ public class HTMLConverter implements LayoutFormatter {
         {"8207", "rlm", ""}, // right-to-left mark, U+200F NEW RFC 2070  
         {"8211", "ndash", "--"}, // en dash, U+2013 ISOpub  
         {"8212", "mdash", "---"}, // em dash, U+2014 ISOpub  
-        {"8216", "lsquo", "\\\\textquoteleft"}, // left single quotation mark, 
+        {"8216", "lsquo", "\\{\\\\textquoteleft\\}"}, // left single quotation mark, 
         //                                   U+2018 ISOnum 
-        {"8217", "rsquo", "\\\\textquoteright"}, // right single quotation mark, 
+        {"8217", "rsquo", "\\{\\\\textquoteright\\}"}, // right single quotation mark, 
         //                                   U+2019 ISOnum 
-        {"8218", "sbquo", "\\\\quotesinglbase"}, // single low-9 quotation mark, U+201A NEW  
-        {"8220", "ldquo", "\\\\textquotedblleft"}, // left double quotation mark, 
+        {"8218", "sbquo", "\\{\\\\quotesinglbase\\}"}, // single low-9 quotation mark, U+201A NEW  
+        {"8220", "ldquo", "\\{\\\\textquotedblleft\\}"}, // left double quotation mark, 
         //                                   U+201C ISOnum 
-        {"8221", "rdquo", "\\\\textquotedblright"}, // right double quotation mark, 
+        {"8221", "rdquo", "\\{\\\\textquotedblright\\}"}, // right double quotation mark, 
         //                                   U+201D ISOnum 
-        {"8222", "bdquo", "\\\\quotedblbase"}, // double low-9 quotation mark, U+201E NEW  
-        {"8224", "dagger", "\\\\dag"}, // dagger, U+2020 ISOpub  
-        {"8225", "Dagger", "\\\\ddag"}, // double dagger, U+2021 ISOpub  
-        {"8240", "permil", "\\\\textperthousand"}, // per mille sign, U+2030 ISOtech  
-        {"8249", "lsaquo", "\\\\guilsinglleft"}, // single left-pointing angle quotation mark, 
+        {"8222", "bdquo", "\\{\\\\quotedblbase\\}"}, // double low-9 quotation mark, U+201E NEW  
+        {"8224", "dagger", "\\{\\\\dag\\}"}, // dagger, U+2020 ISOpub  
+        {"8225", "Dagger", "\\{\\\\ddag\\}"}, // double dagger, U+2021 ISOpub  
+        {"8240", "permil", "\\{\\\\textperthousand\\}"}, // per mille sign, U+2030 ISOtech  
+        {"8249", "lsaquo", "\\{\\\\guilsinglleft\\}"}, // single left-pointing angle quotation mark, 
         //                                   U+2039 ISO proposed 
         /* lsaquo is proposed but not yet ISO standardized */
-        {"8250", "rsaquo", "\\\\guilsinglright"}, // single right-pointing angle quotation mark, 
+        {"8250", "rsaquo", "\\{\\\\guilsinglright\\}"}, // single right-pointing angle quotation mark, 
         //                                   U+203A ISO proposed 
         /* rsaquo is proposed but not yet ISO standardized */
-        {"8364", "euro", "\\\\texteuro"}, // euro sign, U+20AC NEW 
+        {"8364", "euro", "\\{\\\\texteuro\\}"}, // euro sign, U+20AC NEW 
             
         /* Manually added */
         {"37", "percnt", "\\\\%"}, // Percent
@@ -510,13 +510,16 @@ public class HTMLConverter implements LayoutFormatter {
         {"58", "colon", ":"}, // Colon
         {"59", "semi", ";"}, // Semi colon
         {"91", "lsqb", "\\["}, // Left square bracket
-        {"92", "bsol", "\\\\textbackslash"}, // Backslash
+        {"92", "bsol", "\\{\\\\textbackslash\\}"}, // Backslash
         {"93", "rsqb", "\\]"}, // Right square bracket
         {"95", "lowbar", "\\\\_"}, // Underscore
         {"123", "lbrace", "\\\\\\{"}, // Left curly bracket &lcub; ??
         {"125", "rbrace", "\\\\\\}"}, // Right curly bracket &rcub; ??
      // {"141", "", ""}, // Reverse line feed
-        {"146", "", "'"}, // Private use two ???
+        {"145", "", "`"}, // Apostrophe
+        {"146", "", "'"}, // Apostrophe
+        {"147", "", "``"}, // Quotation mark
+        {"148", "", "''"}, // Quotation mark
         {"150", "", "--"}, // En dash
         {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
         {"265", "ccirc", "\\\\\\^\\{c\\}"}, // small C with circumflex
@@ -529,10 +532,12 @@ public class HTMLConverter implements LayoutFormatter {
         {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
-        {"1082", "", "\\{\\\\cyrchar\\\\cyrk\\}"},    // Cyrillic small KA
+        {"1055", "", "\\{\\\\cyrchar\\\\CYRP\\}"},    // Cyrillic capital Pe
+        {"1082", "", "\\{\\\\cyrchar\\\\cyrk\\}"},    // Cyrillic small Ka
      // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
      // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
         {"8208", "hyphen", "-"},    // Hyphen
+        {"8229", "nldr", "\\.\\."},    // Double dots - en leader
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
@@ -542,15 +547,19 @@ public class HTMLConverter implements LayoutFormatter {
         {"8486", "", "\\$\\{\\\\Omega\\}\\$"}, // Omega
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
+        {"8758", "ratio", ":"},    // Colon/ratio
         {"8771", "sime", "\\$\\\\simeq\\$"}, // almost equal to = asymptotic to, 
         {"8776", "ap", "\\$\\\\approx\\$"}, // almost equal to = asymptotic to, 
         {"8810", "ll", "\\$\\\\ll\\$"}, // Much less than 
+        {"", "Lt", "\\$\\\\ll\\$"}, // Much less than 
         {"8811", "gg", "\\$\\\\gg\\$"}, // Much greater than 
         {"", "Gt", "\\$\\\\gg\\$"}, // Much greater than 
         {"8819", "gsim", "\\$\\\\gtrsim\\$"}, // Greater than or equivalent to
         {"8882", "vltri", "\\$\\\\triangleleft\\$"}, // Left triangle
         {"8883", "vrtri", "\\$\\\\triangleright\\$"}, // Right triangle
-        {"9426", "", "\\\\copyright"}, // circled small letter C
+        {"8896", "xwedge", "\\$\\\\bigwedge\\$"}, // Big wedge
+        {"8897", "xvee", "\\$\\\\bigvee\\$"}, // Big vee
+        {"9426", "", "\\{\\\\copyright\\}"}, // circled small letter C
         {"9633", "square", "\\$\\\\square\\$"}, // White square
         {"9653", "utri", "\\$\\\\triangle\\$"}, // White up-pointing small triangle -- \vartriangle probably
                                                 // better but requires amssymb
@@ -563,13 +572,22 @@ public class HTMLConverter implements LayoutFormatter {
         // List of combining accents
         private String[][] accentList = new String[][] {
         {"768", "`"},    // Grave 
-        {"769", "'"},    // 
+        {"769", "'"},    // Acute
+        {"770", "\\^"},  // Circumflex
         {"771", "~"},    // Tilde
+        {"772", "="},    // Macron
+        {"773", "="},     // Overline - not completely correct
         {"774", "u"},    // Breve
-        {"775", "."},    // Dot above
-        {"776", "\""},    // Diaeresis
-        {"778", "a"},    // Ring
+        {"775", "\\."},  // Dot above
+        {"776", "\""},   // Diaeresis
+        {"777", "h"},    // Hook above
+        {"778", "a"},    // Ring  r??
+        {"779", "H"},    // Double acute
         {"780", "v"},    // Caron
+        {"781", "\\|"},  // Vertical line above
+        // {"782", ""},     // Double vertical line above
+        {"783", "G"},    // Double grave
+        {"803", "d"},    // Dot below
         {"807", "c"},    // Cedilla
           
         };
