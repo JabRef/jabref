@@ -30,7 +30,6 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -635,7 +634,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
 		        	type = BibtexEntryType.getType("Electronic");
 		        	sourceField = "note";
-		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
+		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
+                                typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
@@ -659,6 +659,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             	entry.setField("publisher", "Wiley-IEEE Press");
             } else if(typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
                 entry.setField("publisher", "MIT Press");
+            } else if(typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks") {
+                entry.setField("publisher", "IEEE USA");
             }
             
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
@@ -683,7 +685,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		}
             	} 
             }
-            if (entry.getField("author") == null || entry.getField("author").startsWith("a href")) {  // Fix for some documents without authors
+            if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
+                    entry.getField("author").startsWith("Topic(s)")) {  // Fix for some documents without authors
                 entry.setField("author","");
             }
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
