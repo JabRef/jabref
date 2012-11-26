@@ -659,7 +659,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             	entry.setField("publisher", "Wiley-IEEE Press");
             } else if(typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
                 entry.setField("publisher", "MIT Press");
-            } else if(typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks") {
+            } else if(typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
                 entry.setField("publisher", "IEEE USA");
             }
             
