@@ -71,10 +71,7 @@ import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEditor;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.VerticalLabelUI;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.JournalAbbreviations;
@@ -153,7 +150,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     JLabel lab;
 
-    TypeLabel typeLabel;
+    TypeButton typeButton;
 
     JabRefFrame frame;
 
@@ -335,16 +332,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         JButton closeBut = new JButton(closeAction);
         closeBut.setText(null);
         closeBut.setBorder(null);
+        closeBut.setMargin(new Insets(8,0,8,0));
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        typeLabel = new TypeLabel(entry.getType().getName());
-        leftPan.add(typeLabel, BorderLayout.CENTER);
+        leftPan.add(new TypeLabel(entry.getType().getName()), BorderLayout.CENTER);
+        typeButton = new TypeButton(entry.getType().getName());
 
-        //tlb.add(typeL);
-
-        tlb.addSeparator();
-        
+        tlb.add(typeButton);
         tlb.add(generateKeyAction);
         tlb.add(autoLink);
 
@@ -995,43 +990,44 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         movingToDifferentEntry = true;
     }
 
-    private class TypeLabel extends JLabel {
-        public TypeLabel(String type) {
-            super(type+" ");
-            setUI(new VerticalLabelUI(false));
-            setForeground(GUIGlobals.entryEditorLabelColor);
-            setHorizontalAlignment(RIGHT);
-            setFont(GUIGlobals.typeNameFont);
-            addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    boolean ctrlClick = prefs.getBoolean("ctrlClick");
+    private class TypeButton extends JButton {
+        public TypeButton(String type) {
+            super(GUIGlobals.getImage("edit"));
+            setToolTipText(Globals.lang("Change entry type"));
+            addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JPopupMenu typeMenu = new JPopupMenu();
+                    for (String s: BibtexEntryType.ALL_TYPES.keySet())
+                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
 
-                    if ((e.getButton() == MouseEvent.BUTTON3)
-                        || (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-                        JPopupMenu typeMenu = new JPopupMenu();
-
-                        // typeMenu.addSeparator();
-                        for (String s: BibtexEntryType.ALL_TYPES.keySet())
-                            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
-
-                        typeMenu.show(ths, e.getX(), e.getY());
-                    }
+                    typeMenu.show(ths, 0, 0);
                 }
             });
         }
 
-        public void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g;
-            //g2.setColor(GUIGlobals.entryEditorLabelColor);
-            //g2.setFont(GUIGlobals.typeNameFont);
-            //FontMetrics fm = g2.getFontMetrics();
-            //int width = fm.stringWidth(label);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            super.paintComponent(g2);
-            //g2.rotate(-Math.PI / 2, 0, 0);
-            //g2.drawString(label, -width - 7, 28);
-        }
     }
+
+    private class TypeLabel extends JLabel {
+            public TypeLabel(String type) {
+                super(type);
+                setUI(new VerticalLabelUI(false));
+                setForeground(GUIGlobals.entryEditorLabelColor);
+                setHorizontalAlignment(RIGHT);
+                setFont(GUIGlobals.typeNameFont);
+            }
+
+            public void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                //g2.setColor(GUIGlobals.entryEditorLabelColor);
+                //g2.setFont(GUIGlobals.typeNameFont);
+                //FontMetrics fm = g2.getFontMetrics();
+                //int width = fm.stringWidth(label);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                super.paintComponent(g2);
+                //g2.rotate(-Math.PI / 2, 0, 0);
+                //g2.drawString(label, -width - 7, 28);
+            }
+        }
 
     class FieldListener extends FocusAdapter {
         /*

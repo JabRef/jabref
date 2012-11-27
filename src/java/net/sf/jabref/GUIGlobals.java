@@ -380,7 +380,7 @@ public class GUIGlobals {
 	 * on Un*x is unavailable.
 	 */
 	public static void init() {
-		typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
+		typeNameFont = new Font("dialog", Font.ITALIC+Font.BOLD, 18);
 		fieldNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 14);
 		JLabel lab;
 		lab = new JLabel(getImage("pdfSmall"));

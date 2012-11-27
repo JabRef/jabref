@@ -1,6 +1,8 @@
 [master branch]
+    - Added button to change entry type. Removed this functionality from the type label, and
+      reduced the font size.
     - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
-      (patch 123 by Laura Hernández Gómez)
+      (patch 123 by Laura Hernï¿½ndez Gï¿½mez)
 [beta_2.9 branch]
     - When generating subdatabase from AUX file, preamble and strings are now included from
       the source database.
