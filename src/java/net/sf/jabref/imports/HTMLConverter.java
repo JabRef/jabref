@@ -53,7 +53,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"166", "brvbar", "\\{\\\\textbrokenbar\\}"}, // broken bar = broken vertical bar, 
         //                                 U+00A6 ISOnum 
         {"167", "sect", "\\{\\\\S\\}"}, // section sign, U+00A7 ISOnum  
-        {"168", "uml", "\\\\\"\\{\\}"}, // diaeresis = spacing diaeresis, 
+        {"168", "uml", "\\{\\\\\"\\{\\}\\}"}, // diaeresis = spacing diaeresis, 
         //                                 U+00A8 ISOdia 
         {"169", "copy", "\\{\\\\copyright\\}"}, // copyright sign, U+00A9 ISOnum
         {"170", "ordf", "\\{\\\\textordfeminine\\}"}, // feminine ordinal indicator, U+00AA ISOnum
@@ -64,23 +64,23 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00AD ISOnum 
         {"174", "reg", "\\{\\\\textregistered\\}"}, // registered sign = registered trade mark sign,
         //                                 U+00AE ISOnum 
-        {"175", "macr", "\\\\=\\{\\}"}, // macron = spacing macron = overline 
+        {"175", "macr", "\\{\\\\=\\{\\}\\}"}, // macron = spacing macron = overline 
         //                                 = APL overbar, U+00AF ISOdia 
         {"176", "deg", "\\$\\\\deg\\$"}, // degree sign, U+00B0 ISOnum  
         {"177", "plusmn", "\\$\\\\pm\\$"}, // plus-minus sign = plus-or-minus sign, 
         //                                 U+00B1 ISOnum 
-        {"178", "sup2", "\\$\\^2\\$"}, // superscript two = superscript digit two 
+        {"178", "sup2", "\\\\textsuperscript\\{2\\}"}, // superscript two = superscript digit two 
         //                                 = squared, U+00B2 ISOnum 
-        {"179", "sup3", "\\$\\^3\\$"}, // superscript three = superscript digit three 
+        {"179", "sup3", "\\\\textsuperscript\\{3\\}"}, // superscript three = superscript digit three 
         //                                 = cubed, U+00B3 ISOnum 
-        {"180", "acute", "\\\\'\\{\\}"}, // acute accent = spacing acute, 
+        {"180", "acute", "\\{\\\\'\\{\\}\\}"}, // acute accent = spacing acute, 
         //                                 U+00B4 ISOdia 
         {"181", "micro", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
         {"182", "para", "\\{\\\\P\\}"}, // pilcrow sign = paragraph sign, 
         //                                 U+00B6 ISOnum 
         {"183", "middot", "\\$\\\\cdot\\$"}, // middle dot = Georgian comma 
         //                                 = Greek middle dot, U+00B7 ISOnum 
-        {"184", "cedil", "\\\\c\\{\\}"}, // cedilla = spacing cedilla, U+00B8 ISOdia  
+        {"184", "cedil", "\\{\\\\c\\{\\}\\}"}, // cedilla = spacing cedilla, U+00B8 ISOdia  
         {"185", "sup1", "\\\\textsuperscript\\{1\\}"}, // superscript one = superscript digit one,
         //                                 U+00B9 ISOnum 
         {"186", "ordm", "\\{\\\\textordmasculine\\}"}, // masculine ordinal indicator,
@@ -95,16 +95,16 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 = fraction three quarters, U+00BE ISOnum 
         {"191", "iquest", "\\{\\\\textquestiondown\\}"}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
-        {"192", "Agrave", "\\\\`\\{A\\}"}, // latin capital letter A with grave
+        {"192", "Agrave", "\\{\\\\`\\{A\\}\\}"}, // latin capital letter A with grave
         //                                 = latin capital letter A grave,
         //                                 U+00C0 ISOlat1 
-        {"193", "Aacute", "\\\\'\\{A\\}"}, // latin capital letter A with acute, 
+        {"193", "Aacute", "\\{\\\\'\\{A\\}\\}"}, // latin capital letter A with acute, 
         //                                 U+00C1 ISOlat1 
-        {"194", "Acirc", "\\\\\\^\\{A\\}"}, // latin capital letter A with circumflex, 
+        {"194", "Acirc", "\\{\\\\\\^\\{A\\}\\}"}, // latin capital letter A with circumflex, 
         //                                 U+00C2 ISOlat1 
-        {"195", "Atilde", "\\\\~\\{A\\}"}, // latin capital letter A with tilde, 
+        {"195", "Atilde", "\\{\\\\~\\{A\\}\\}"}, // latin capital letter A with tilde, 
         //                                 U+00C3 ISOlat1 
-        {"196", "Auml", "\\\"\\{A\\}"}, // latin capital letter A with diaeresis, 
+        {"196", "Auml", "\\{\\\\\"\\{A\\}\\}"}, // latin capital letter A with diaeresis, 
         //                                 U+00C4 ISOlat1 
         {"197", "Aring", "\\{\\\\AA\\}"}, // latin capital letter A with ring above 
         //                                 = latin capital letter A ring,
@@ -112,119 +112,119 @@ public class HTMLConverter implements LayoutFormatter {
         {"198", "AElig", "\\{\\\\AE\\}"}, // latin capital letter AE 
         //                                 = latin capital ligature AE,
         //                                 U+00C6 ISOlat1 
-        {"199", "Ccedil", "\\\\c\\{C\\}"}, // latin capital letter C with cedilla,
+        {"199", "Ccedil", "\\{\\\\c\\{C\\}\\}"}, // latin capital letter C with cedilla,
         //                                 U+00C7 ISOlat1 
-        {"200", "Egrave", "\\\\`\\{E\\}"}, // latin capital letter E with grave,
+        {"200", "Egrave", "\\{\\\\`\\{E\\}\\}"}, // latin capital letter E with grave,
         //                                 U+00C8 ISOlat1 
-        {"201", "Eacute", "\\\\'\\{E\\}"}, // latin capital letter E with acute, 
+        {"201", "Eacute", "\\{\\\\'\\{E\\}\\}"}, // latin capital letter E with acute, 
         //                                 U+00C9 ISOlat1 
-        {"202", "Ecirc", "\\\\\\^\\{E\\}"}, // latin capital letter E with circumflex, 
+        {"202", "Ecirc", "\\{\\\\\\^\\{E\\}\\}"}, // latin capital letter E with circumflex, 
         //                                 U+00CA ISOlat1 
-        {"203", "Euml", "\\\\\"\\{E\\}"}, // latin capital letter E with diaeresis, 
+        {"203", "Euml", "\\{\\\\\"\\{E\\}\\}"}, // latin capital letter E with diaeresis, 
         //                                 U+00CB ISOlat1 
-        {"204", "Igrave", "\\\\`\\{I\\}"}, // latin capital letter I with grave,
+        {"204", "Igrave", "\\{\\\\`\\{I\\}\\}"}, // latin capital letter I with grave,
         //                                 U+00CC ISOlat1 
-        {"205", "Iacute", "\\\\'\\{I\\}"}, // latin capital letter I with acute, 
+        {"205", "Iacute", "\\{\\\\'\\{I\\}\\}"}, // latin capital letter I with acute, 
         //                                 U+00CD ISOlat1 
-        {"206", "Icirc", "\\\\\\^\\{I\\}"}, // latin capital letter I with circumflex, 
+        {"206", "Icirc", "\\{\\\\\\^\\{I\\}\\}"}, // latin capital letter I with circumflex, 
         //                                 U+00CE ISOlat1 
-        {"207", "Iuml", "\\\\\"\\{I\\}"}, // latin capital letter I with diaeresis, 
+        {"207", "Iuml", "\\{\\\\\"\\{I\\}\\}"}, // latin capital letter I with diaeresis, 
         //                                 U+00CF ISOlat1 
         {"208", "ETH", "\\{\\\\DH\\}"}, // latin capital letter ETH, U+00D0 ISOlat1  
-        {"209", "Ntilde", "\\\\~\\{N\\}"}, // latin capital letter N with tilde, 
+        {"209", "Ntilde", "\\{\\\\~\\{N\\}\\}"}, // latin capital letter N with tilde, 
         //                                 U+00D1 ISOlat1 
-        {"210", "Ograve", "\\\\`\\{O\\}"}, // latin capital letter O with grave,
+        {"210", "Ograve", "\\{\\\\`\\{O\\}\\}"}, // latin capital letter O with grave,
         //                                 U+00D2 ISOlat1 
-        {"211", "Oacute", "\\\\'\\{O\\}"}, // latin capital letter O with acute, 
+        {"211", "Oacute", "\\{\\\\'\\{O\\}\\}"}, // latin capital letter O with acute, 
         //                                 U+00D3 ISOlat1 
-        {"212", "Ocirc", "\\\\\\^\\{O\\}"}, // latin capital letter O with circumflex, 
+        {"212", "Ocirc", "\\{\\\\\\^\\{O\\}\\}"}, // latin capital letter O with circumflex, 
         //                                 U+00D4 ISOlat1 
-        {"213", "Otilde", "\\\\~\\{O\\}"}, // latin capital letter O with tilde, 
+        {"213", "Otilde", "\\{\\\\~\\{O\\}\\}"}, // latin capital letter O with tilde, 
         //                                 U+00D5 ISOlat1 
-        {"214", "Ouml", "\\\\\"\\{O\\}"}, // latin capital letter O with diaeresis, 
+        {"214", "Ouml", "\\{\\\\\"\\{O\\}\\}"}, // latin capital letter O with diaeresis, 
         //                                 U+00D6 ISOlat1 
         {"215", "times", "\\$\\\\times\\$"}, // multiplication sign, U+00D7 ISOnum  
         {"216", "Oslash", "\\{\\\\O\\{\\}\\}"}, // latin capital letter O with stroke 
         //                                 = latin capital letter O slash,
         //                                 U+00D8 ISOlat1 
-        {"217", "Ugrave", "\\\\`\\{U\\}"}, // latin capital letter U with grave,
+        {"217", "Ugrave", "\\{\\\\`\\{U\\}\\}"}, // latin capital letter U with grave,
         //                                 U+00D9 ISOlat1 
-        {"218", "Uacute", "\\\\'\\{U\\}"}, // latin capital letter U with acute, 
+        {"218", "Uacute", "\\{\\\\'\\{U\\}\\}"}, // latin capital letter U with acute, 
         //                                 U+00DA ISOlat1 
-        {"219", "Ucirc", "\\\\\\^\\{U\\}"}, // latin capital letter U with circumflex, 
+        {"219", "Ucirc", "\\{\\\\\\^\\{U\\}\\}"}, // latin capital letter U with circumflex, 
         //                                 U+00DB ISOlat1 
-        {"220", "Uuml", "\\\\\"\\{U\\}"}, // latin capital letter U with diaeresis, 
+        {"220", "Uuml", "\\{\\\\\"\\{U\\}\\}"}, // latin capital letter U with diaeresis, 
         //                                 U+00DC ISOlat1 
-        {"221", "Yacute", "\\\\'\\{Y\\}"}, // latin capital letter Y with acute, 
+        {"221", "Yacute", "\\{\\\\'\\{Y\\}\\}"}, // latin capital letter Y with acute, 
         //                                 U+00DD ISOlat1 
         {"222", "THORN", "\\{\\\\TH\\}"}, // latin capital letter THORN, 
         //                                 U+00DE ISOlat1 
-        {"223", "szlig", "\\\\ss\\{\\}"}, // latin small letter sharp s = ess-zed,
+        {"223", "szlig", "\\{\\\\ss\\}"}, // latin small letter sharp s = ess-zed,
         //                                 U+00DF ISOlat1 
-        {"224", "agrave", "\\\\`\\{a\\}"}, // latin small letter a with grave
+        {"224", "agrave", "\\{\\\\`\\{a\\}\\}"}, // latin small letter a with grave
         //                                 = latin small letter a grave,
         //                                 U+00E0 ISOlat1 
-        {"225", "aacute", "\\\\'\\{a\\}"}, // latin small letter a with acute, 
+        {"225", "aacute", "\\{\\\\'\\{a\\}\\}"}, // latin small letter a with acute, 
         //                                 U+00E1 ISOlat1 
-        {"226", "acirc", "\\\\\\^\\{a\\}"}, // latin small letter a with circumflex, 
+        {"226", "acirc", "\\{\\\\\\^\\{a\\}\\}"}, // latin small letter a with circumflex, 
         //                                 U+00E2 ISOlat1 
-        {"227", "atilde", "\\\\~\\{a\\}"}, // latin small letter a with tilde, 
+        {"227", "atilde", "\\{\\\\~\\{a\\}\\}"}, // latin small letter a with tilde, 
         //                                 U+00E3 ISOlat1 
-        {"228", "auml", "\\\\\"\\{a\\}"}, // latin small letter a with diaeresis, 
+        {"228", "auml", "\\{\\\\\"\\{a\\}\\}"}, // latin small letter a with diaeresis, 
         //                                 U+00E4 ISOlat1 
         {"229", "aring", "\\{\\\\aa\\}"}, // latin small letter a with ring above 
         //                                 = latin small letter a ring,
         //                                 U+00E5 ISOlat1 
         {"230", "aelig", "\\{\\\\ae\\}"}, // latin small letter ae 
         //                                 = latin small ligature ae, U+00E6 ISOlat1 
-        {"231", "ccedil", "\\\\c\\{c\\}"}, // latin small letter c with cedilla,
+        {"231", "ccedil", "\\{\\\\c\\{c\\}\\}"}, // latin small letter c with cedilla,
         //                                 U+00E7 ISOlat1 
-        {"232", "egrave", "\\\\`\\{e\\}"}, // latin small letter e with grave,
+        {"232", "egrave", "\\{\\\\`\\{e\\}\\}"}, // latin small letter e with grave,
         //                                 U+00E8 ISOlat1 
-        {"233", "eacute", "\\\\'\\{e\\}"}, // latin small letter e with acute, 
+        {"233", "eacute", "\\{\\\\'\\{e\\}\\}"}, // latin small letter e with acute, 
         //                                 U+00E9 ISOlat1 
-        {"234", "ecirc", "\\\\\\^\\{e\\}"}, // latin small letter e with circumflex, 
+        {"234", "ecirc", "\\{\\\\\\^\\{e\\}\\}"}, // latin small letter e with circumflex, 
         //                                 U+00EA ISOlat1 
-        {"235", "euml", "\\\\\"\\{e\\}"}, // latin small letter e with diaeresis, 
+        {"235", "euml", "\\{\\\\\"\\{e\\}\\}"}, // latin small letter e with diaeresis, 
         //                                 U+00EB ISOlat1 
-        {"236", "igrave", "\\\\`\\{i\\}"}, // latin small letter i with grave,
+        {"236", "igrave", "\\{\\\\`\\{\\\\i\\}\\}"}, // latin small letter i with grave,
         //                                 U+00EC ISOlat1 
-        {"237", "iacute", "\\\\'\\{i\\}"}, // latin small letter i with acute, 
+        {"237", "iacute", "\\{\\\\'\\{\\\\i\\}\\}"}, // latin small letter i with acute, 
         //                                 U+00ED ISOlat1 
-        {"238", "icirc", "\\\\\\^\\{i\\}"}, // latin small letter i with circumflex, 
+        {"238", "icirc", "\\{\\\\\\^\\{\\\\i\\}\\}"}, // latin small letter i with circumflex, 
         //                                 U+00EE ISOlat1 
-        {"239", "iuml", "\\\\\"\\{\\\\i\\}"}, // latin small letter i with diaeresis, 
+        {"239", "iuml", "\\{\\\\\"\\{\\\\i\\}\\}"}, // latin small letter i with diaeresis, 
         //                                 U+00EF ISOlat1 
         {"240", "eth", "\\{\\\\dh\\}"}, // latin small letter eth, U+00F0 ISOlat1  
-        {"241", "ntilde", "\\\\~\\{n\\}"}, // latin small letter n with tilde, 
+        {"241", "ntilde", "\\{\\\\~\\{n\\}\\}"}, // latin small letter n with tilde, 
         //                                 U+00F1 ISOlat1 
-        {"242", "ograve", "\\\\`\\{o\\}"}, // latin small letter o with grave,
+        {"242", "ograve", "\\{\\\\`\\{o\\}\\}"}, // latin small letter o with grave,
         //                                 U+00F2 ISOlat1 
-        {"243", "oacute", "\\\\'\\{o\\}"}, // latin small letter o with acute, 
+        {"243", "oacute", "\\{\\\\'\\{o\\}\\}"}, // latin small letter o with acute, 
         //                                 U+00F3 ISOlat1 
-        {"244", "ocirc", "\\\\\\^\\{o\\}"}, // latin small letter o with circumflex, 
+        {"244", "ocirc", "\\{\\\\\\^\\{o\\}\\}"}, // latin small letter o with circumflex, 
         //                                 U+00F4 ISOlat1 
-        {"245", "otilde", "\\\\~\\{o\\}"}, // latin small letter o with tilde, 
+        {"245", "otilde", "\\{\\\\~\\{o\\}\\}"}, // latin small letter o with tilde, 
         //                                 U+00F5 ISOlat1 
-        {"246", "ouml", "\\\\\"\\{o\\}"}, // latin small letter o with diaeresis, 
+        {"246", "ouml", "\\{\\\\\"\\{o\\}\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
         {"247", "divide", "\\$\\\\div\\$"}, // division sign, U+00F7 ISOnum  
-        {"248", "oslash", "\\\\o\\{\\}"}, // latin small letter o with stroke, 
+        {"248", "oslash", "\\{\\\\o\\{\\}\\}"}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
-        {"249", "ugrave", "\\\\`\\{u\\}"}, // latin small letter u with grave,
+        {"249", "ugrave", "\\{\\\\`\\{u\\}\\}"}, // latin small letter u with grave,
         //                                 U+00F9 ISOlat1 
-        {"250", "uacute", "\\\\'\\{u\\}"}, // latin small letter u with acute, 
+        {"250", "uacute", "\\{\\\\'\\{u\\}\\}"}, // latin small letter u with acute, 
         //                                 U+00FA ISOlat1 
-        {"251", "ucirc", "\\\\\\^\\{u\\}"}, // latin small letter u with circumflex, 
+        {"251", "ucirc", "\\{\\\\\\^\\{u\\}\\}"}, // latin small letter u with circumflex, 
         //                                 U+00FB ISOlat1 
-        {"252", "uuml", "\\\\\"\\{u\\}"}, // latin small letter u with diaeresis, 
+        {"252", "uuml", "\\{\\\\\"\\{u\\}\\}"}, // latin small letter u with diaeresis, 
         //                                 U+00FC ISOlat1 
-        {"253", "yacute", "\\\\'\\{y\\}"}, // latin small letter y with acute, 
+        {"253", "yacute", "\\{\\\\'\\{y\\}\\}"}, // latin small letter y with acute, 
         //                                 U+00FD ISOlat1 
         {"254", "thorn", "\\{\\\\th\\}"}, // latin small letter thorn, 
         //                                 U+00FE ISOlat1 
-        {"255", "yuml", "\\\\\"\\{y\\}"}, // latin small letter y with diaeresis, 
+        {"255", "yuml", "\\{\\\\\"\\{y\\}\\}"}, // latin small letter y with diaeresis, 
         //                                 U+00FF ISOlat1 
         {"402", "fnof", "\\$f\\$"}, // latin small f with hook = function 
         //                                   = florin, U+0192 ISOtech 
@@ -319,7 +319,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"8242", "prime", "\\$\\\\prime\\$"}, // prime = minutes = feet, U+2032 ISOtech  
         {"8243", "Prime", "\\$\\{''\\}\\$"}, // double prime = seconds = inches, 
         //                                    U+2033 ISOtech 
-        {"8254", "oline", "\\\\=\\{\\}"}, // overline = spacing overscore, 
+        {"8254", "oline", "\\{\\\\=\\{\\}\\}"}, // overline = spacing overscore, 
         //                                    U+203E NEW 
         {"8260", "frasl", "/"}, // fraction slash, U+2044 NEW  
 
@@ -455,11 +455,11 @@ public class HTMLConverter implements LayoutFormatter {
         //                                   U+0152 ISOlat2 
         {"339", "oelig", "\\{\\\\oe\\}"}, // latin small ligature oe, U+0153 ISOlat2 
         /* ligature is a misnomer, this is a separate character in some languages */
-        {"352", "Scaron", "\\\\v\\{S\\}"}, // latin capital letter S with caron,
+        {"352", "Scaron", "\\{\\\\v\\{S\\}\\}"}, // latin capital letter S with caron,
         //                                   U+0160 ISOlat2 
-        {"353", "scaron", "\\\\v\\{s\\}"}, // latin small letter s with caron,
+        {"353", "scaron", "\\{\\\\v\\{s\\}\\}"}, // latin small letter s with caron,
         //                                   U+0161 ISOlat2 
-        {"376", "Yuml", "\\\\\"\\{Y\\}"}, // latin capital letter Y with diaeresis,
+        {"376", "Yuml", "\\{\\\\\"\\{Y\\}\\}"}, // latin capital letter Y with diaeresis,
         //                                   U+0178 ISOlat2 
 
         /* Spacing Modifier Letters */
@@ -514,9 +514,9 @@ public class HTMLConverter implements LayoutFormatter {
         {"91", "lsqb", "\\["}, // Left square bracket
         {"92", "bsol", "\\{\\\\textbackslash\\}"}, // Backslash
         {"93", "rsqb", "\\]"}, // Right square bracket
-        {"94", "Hat", "\\\\\\^\\{\\}"}, // Circumflex
+        {"94", "Hat", "\\{\\\\\\^\\{\\}\\}"}, // Circumflex
         {"95", "lowbar", "\\\\_"}, // Underscore
-        {"96", "grave", "\\\\`\\{\\}"}, // Grave
+        {"96", "grave", "\\{\\\\`\\{\\}\\}"}, // Grave
         {"123", "lbrace", "\\\\\\{"}, // Left curly bracket
         {"", "lcub", "\\\\\\{"}, // Left curly bracket
         {"124", "vert", "\\|"}, // Vertical bar
@@ -524,36 +524,36 @@ public class HTMLConverter implements LayoutFormatter {
         {"", "VerticalLine", "\\|"}, // Vertical bar
         {"125", "rbrace", "\\\\\\}"}, // Right curly bracket
         {"", "rcub", "\\\\\\}"}, // Right curly bracket
-        {"138", "", "\\\\v\\{S\\}"}, // Line tabulation set   
+        {"138", "", "\\{\\\\v\\{S\\}\\}"}, // Line tabulation set   
      // {"141", "", ""}, // Reverse line feed
         {"145", "", "`"}, // Apostrophe
         {"146", "", "'"}, // Apostrophe
         {"147", "", "``"}, // Quotation mark
         {"148", "", "''"}, // Quotation mark
         {"150", "", "--"}, // En dash
-        {"154", "", "\\\\v\\{s\\}"}, // Single character introducer
-        {"262", "Cacute", "\\\\'\\{C\\}"}, // capital C with acute
-        {"263", "cacute", "\\\\'\\{c\\}"}, // small C with acute
-        {"264", "Ccirc", "\\\\\\^\\{C\\}"}, // capital C with circumflex
-        {"265", "ccirc", "\\\\\\^\\{c\\}"}, // small C with circumflex
-        {"266", "Cdot", "\\\\\\.\\{C\\}"}, // capital C with dot above
-        {"267", "cdot", "\\\\\\.\\{c\\}"}, // small C with dot above
-        {"268", "Ccaron", "\\\\v\\{C\\}"}, // capital C with caron
-        {"269", "ccaron", "\\\\v\\{c\\}"}, // small C with caron
-        {"298", "Imacr", "\\\\=\\{I\\}"}, // capital I with macron
-        {"299", "imacr", "\\\\=\\{\\\\i\\}"}, // small i with macron
+        {"154", "", "\\{\\\\v\\{s\\}\\}"}, // Single character introducer
+        {"262", "Cacute", "\\{\\\\'\\{C\\}\\}"}, // capital C with acute
+        {"263", "cacute", "\\{\\\\'\\{c\\}\\}"}, // small C with acute
+        {"264", "Ccirc", "\\{\\\\\\^\\{C\\}\\}"}, // capital C with circumflex
+        {"265", "ccirc", "\\{\\\\\\^\\{c\\}\\}"}, // small C with circumflex
+        {"266", "Cdot", "\\{\\\\\\.\\{C\\}\\}"}, // capital C with dot above
+        {"267", "cdot", "\\{\\\\\\.\\{c\\}\\}"}, // small C with dot above
+        {"268", "Ccaron", "\\{\\\\v\\{C\\}\\}"}, // capital C with caron
+        {"269", "ccaron", "\\{\\\\v\\{c\\}\\}"}, // small C with caron
+        {"298", "Imacr", "\\{\\\\=\\{I\\}\\}"}, // capital I with macron
+        {"299", "imacr", "\\{\\\\=\\{\\\\i\\}\\}"}, // small i with macron
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"", "imath", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
-        {"536", "", "\\\\cb\\{S\\}"},    // capital letter S with comma below, require combelow
-        {"537", "", "\\\\cb\\{s\\}"},    // small letter S with comma below, require combelow
-        {"727", "caron", "\\\\v\\{\\}"}, // Caron
-        {"", "Hacek", "\\\\v\\{\\}"}, // Caron
-        {"728", "breve", "\\\\u\\{\\}"}, // Breve
-        {"", "Breve", "\\\\u\\{\\}"}, // Breve
-        {"729", "dot", "\\\\\\.\\{\\}"}, // Dot above
-        {"730", "ring", "\\\\r\\{\\}"}, // Ring above
+        {"536", "", "\\{\\\\cb\\{S\\}\\}"},    // capital letter S with comma below, require combelow
+        {"537", "", "\\{\\\\cb\\{s\\}\\}"},    // small letter S with comma below, require combelow
+        {"727", "caron", "\\{\\\\v\\{\\}\\}"}, // Caron
+        {"", "Hacek", "\\{\\\\v\\{\\}\\}"}, // Caron
+        {"728", "breve", "\\{\\\\u\\{\\}\\}"}, // Breve
+        {"", "Breve", "\\{\\\\u\\{\\}\\}"}, // Breve
+        {"729", "dot", "\\{\\\\\\.\\{\\}\\}"}, // Dot above
+        {"730", "ring", "\\{\\\\r\\{\\}\\}"}, // Ring above
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
         {"1055", "", "\\{\\\\cyrchar\\\\CYRP\\}"},    // Cyrillic capital Pe
@@ -607,7 +607,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"775", "\\."},  // Dot above
         {"776", "\""},   // Diaeresis
         {"777", "h"},    // Hook above
-        {"778", "a"},    // Ring  r??
+        {"778", "r"},    // Ring 
         {"779", "H"},    // Double acute
         {"780", "v"},    // Caron
         {"781", "\\|"},  // Vertical line above
@@ -695,8 +695,8 @@ public class HTMLConverter implements LayoutFormatter {
 	    //	    System.err.println("Found pattern: " + m.group(1));
 	    //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
-            if(numSymbols.containsKey(num)) {
-                text = text.replaceAll("&#" + m.group(2) + m.group(3) + m.group(4) + ";", numSymbols.get(num));
+            if(escapedAccents.containsKey(num)) {
+                text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}\\}");
             } 
         }
 
