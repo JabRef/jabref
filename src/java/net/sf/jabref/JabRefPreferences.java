@@ -323,6 +323,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
         defaults.put("pdfColumn", Boolean.FALSE);
         defaults.put("urlColumn", Boolean.TRUE);
+        defaults.put("preferUrlDoi", Boolean.FALSE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("arxivColumn", Boolean.FALSE);
         

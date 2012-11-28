@@ -1,4 +1,5 @@
 [master branch]
+    - Added a setting to choose either a DOI link or a URL to be standard (feature 710)
     - Added button to change entry type. Removed this functionality from the type label, and
       reduced the font size.
     - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
