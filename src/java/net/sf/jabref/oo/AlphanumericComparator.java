@@ -29,7 +29,8 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
 
     FieldComparator authComp = new FieldComparator("author"),
         editorComp = new FieldComparator("editor"),
-        yearComp = new FieldComparator("year");
+        yearComp = new FieldComparator("year"),
+        titleComp = new FieldComparator("title");
 
     public AlphanumericComparator() {
 
@@ -48,8 +49,17 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
         comp = yearComp.compare(o1, o2);
         if (comp != 0)
             return comp;
+        // Title as next criterion:
+        comp = titleComp.compare(o1, o2);
+        if (comp != 0)
+            return comp;
         // Bibtex key as next criterion:
-        String k1 = o1.getCiteKey(), k2 = o2.getCiteKey();
+        return compare(o1.getCiteKey(), o2.getCiteKey());
+
+
+    }
+
+    private int compare(String k1, String k2) {
         if (k1 != null) {
             if (k2 != null)
                 return k1.compareTo(k2);
@@ -59,6 +69,5 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
         else if (k2 != null)
             return -1;
         else return 0;
-
     }
 }
