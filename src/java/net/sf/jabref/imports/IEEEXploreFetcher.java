@@ -384,10 +384,13 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		entry.setField("author","");  // Maybe not needed anymore due to another change
 	    } else {
 	    	author = author.replaceAll("\\.", ". ");
+	    	author = author.replaceAll("([^;]+),([^;]+),([^;]+)","$1,$3,$2"); // Change order in case of Jr. etc
 	    	author = author.replaceAll("  ", " ");
 	    	author = author.replaceAll("\\. -", ".-");
-	    	author = author.replaceAll("; ", " and ");
-	    	author = author.replaceAll("[,;]$", "");
+                author = author.replaceAll("; ", " and ");
+	    	author = author.replaceAll(" ,", ",");
+	    	author = author.replaceAll("  ", " ");
+	    	author = author.replaceAll("[ ,;]+$", "");
 	    	entry.setField("author", author);
 	    }
 	}
