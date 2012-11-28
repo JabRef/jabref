@@ -1,4 +1,6 @@
 [beta_2.9 branch]
+    - Fixed bug: in OO/LO reference lists, entries may fall out when multiple entries with same
+      author and year are cited.
     - Added support for converting HTML combining accents to LaTeX
     - When generating subdatabase from AUX file, preamble and strings are now included from
       the source database.

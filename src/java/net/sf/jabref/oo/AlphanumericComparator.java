@@ -40,12 +40,25 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
         int comp = authComp.compare(o1, o2);
         if (comp != 0)
             return comp;
-        // TODO: Is it a good idea to try editor if author fields are equal?
+        // Editor as second criterion:
         comp = editorComp.compare(o1, o2);
         if (comp != 0)
             return comp;
         // Year as next criterion:
-        return yearComp.compare(o1, o2);
+        comp = yearComp.compare(o1, o2);
+        if (comp != 0)
+            return comp;
+        // Bibtex key as next criterion:
+        String k1 = o1.getCiteKey(), k2 = o2.getCiteKey();
+        if (k1 != null) {
+            if (k2 != null)
+                return k1.compareTo(k2);
+            else
+                return 1;
+        }
+        else if (k2 != null)
+            return -1;
+        else return 0;
 
     }
 }
