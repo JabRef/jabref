@@ -87,11 +87,11 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00BA ISOnum 
         {"187", "raquo", "\\{\\\\guillemotright\\}"}, // right-pointing double angle quotation mark
         //                                 = right pointing guillemet, U+00BB ISOnum 
-        {"188", "frac14", "\\$\\sfrac\\{1\\}\\{4\\}\\$"}, // vulgar fraction one quarter 
+        {"188", "frac14", "\\$\\\\sfrac\\{1\\}\\{4\\}\\$"}, // vulgar fraction one quarter 
         //                                 = fraction one quarter, U+00BC ISOnum 
-        {"189", "frac12", "\\$\\sfrac\\{1\\}\\{2\\}\\$"}, // vulgar fraction one half 
+        {"189", "frac12", "\\$\\\\sfrac\\{1\\}\\{2\\}\\$"}, // vulgar fraction one half 
         //                                 = fraction one half, U+00BD ISOnum 
-        {"190", "frac34", "\\$\\sfrac\\{3\\}\\{4\\}\\$"}, // vulgar fraction three quarters 
+        {"190", "frac34", "\\$\\\\sfrac\\{3\\}\\{4\\}\\$"}, // vulgar fraction three quarters 
         //                                 = fraction three quarters, U+00BE ISOnum 
         {"191", "iquest", "\\{\\\\textquestiondown\\}"}, // inverted question mark 
         //                                 = turned question mark, U+00BF ISOnum 
