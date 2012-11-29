@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import java.net.ConnectException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -67,6 +69,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
     private JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
     
+    private CookieManager cm = new CookieManager();
+    
     private static final int MAX_FETCH = 100;
     private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
     private int piv = 0;
@@ -102,7 +106,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     
     public IEEEXploreFetcher() {
     	super();
-    	
+    	// CookieHandler.setDefault(cm);
+        
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         fieldPatterns.put("author", "</h3>\\s*(.+)");
         fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
