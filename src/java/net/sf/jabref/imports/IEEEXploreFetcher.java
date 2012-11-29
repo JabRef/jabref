@@ -106,7 +106,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     
     public IEEEXploreFetcher() {
     	super();
-    	// CookieHandler.setDefault(cm);
+    	CookieHandler.setDefault(cm);
         
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         fieldPatterns.put("author", "</h3>\\s*(.+)");
