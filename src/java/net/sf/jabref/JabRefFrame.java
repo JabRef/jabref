@@ -351,6 +351,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     Cleanup = new GeneralAction("Cleanup", "Cleanup entries", 
 					Globals.lang("Cleanup entries"), 
 					GUIGlobals.getIconUrl("cleanupentries") ),
+          
+    mergeEntries = new GeneralAction("mergeEntries", "Merge entries", 
+					Globals.lang("Merge entries"),
+                                        GUIGlobals.getIconUrl("mergeentries")),
 					
     dbImport = new DbImportAction(this).getAction(),
     //downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
@@ -1363,6 +1367,7 @@ public JabRefPreferences prefs() {
       
       tools.add(makeKeyAction);
       tools.add(Cleanup);
+      tools.add(mergeEntries);
       //tools.add(downloadFullText);
       tools.add(newSubDatabaseAction);
       tools.add(writeXmpAction);
@@ -1496,7 +1501,8 @@ public JabRefPreferences prefs() {
     tlb.addAction(editStrings);
     tlb.addAction(makeKeyAction);
     tlb.addAction(Cleanup);
-
+    tlb.addAction(mergeEntries);
+    
     tlb.addSeparator();
     tlb.addAction(mark);
     tlb.addAction(unmark);

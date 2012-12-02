@@ -917,6 +917,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         
      // The action for cleaning up entry.
         actions.put("Cleanup", cleanUpAction);
+        
+        actions.put("mergeEntries", new BaseAction() {
+            public void action() {
+                MergeEntriesDialog med = new MergeEntriesDialog(BasePanel.this);
+                
+            }
+        });
 
         actions.put("search", new BaseAction() {
                 public void action() {
