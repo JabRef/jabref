@@ -1875,7 +1875,7 @@ public JabRefPreferences prefs() {
         Util.placeDialog(dialog, JabRefFrame.this);
         dialog.setVisible(true) ;
 
-        if (dialog.okPressed())
+        if (dialog.generatePressed())
         {
           BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database
