@@ -520,7 +520,8 @@ public class SearchManager2 extends SidePaneComponent
         worker.getWorker().run();
         worker.getCallBack().update();
         escape.setEnabled(true);
-        
+
+        frame.basePanel().mainTable.setSelected(0);
     }
     }
 

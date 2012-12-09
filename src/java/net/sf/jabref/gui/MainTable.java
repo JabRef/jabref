@@ -462,6 +462,15 @@ public class MainTable extends JTable {
         return selectionModel.getSelected();
     }
 
+    /**
+     * Selects the given row
+     *
+     * @param row the row to select
+     */
+    public void setSelected(int row) {
+    	selectionModel.setSelectionInterval(row, row);
+    }
+
     public int findEntry(BibtexEntry entry) {
         //System.out.println(sortedForGrouping.indexOf(entry));
         return sortedForGrouping.indexOf(entry);

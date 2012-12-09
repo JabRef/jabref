@@ -5,6 +5,7 @@
       reduced the font size.
     - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
       (patch 123 by Laura Hern�ndez G�mez)
+    - After a search has been done, the first entry of the entry table is selected (feature 656).
 [beta_2.9 branch]
     - When generating subdatabase from AUX file, preamble and strings are now included from
       the source database.
