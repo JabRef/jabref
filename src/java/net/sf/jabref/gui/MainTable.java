@@ -471,6 +471,14 @@ public class MainTable extends JTable {
     	selectionModel.setSelectionInterval(row, row);
     }
 
+    /**
+     * Adds the given row to the selection
+     * @param row the row to add to the selection
+     */
+    public void addSelection(int row)  {
+    	this.selectionModel.addSelectionInterval(row, row);
+    }
+
     public int findEntry(BibtexEntry entry) {
         //System.out.println(sortedForGrouping.indexOf(entry));
         return sortedForGrouping.indexOf(entry);

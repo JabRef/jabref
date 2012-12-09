@@ -42,6 +42,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -71,11 +72,13 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -84,6 +87,7 @@ public class FromAuxDialog
         extends JDialog {
     private JPanel statusPanel = new JPanel();
     private JPanel buttons = new JPanel();
+    private JButton selectInDBButton = new JButton();
     private JButton generateButton = new JButton();
     private JButton cancelButton = new JButton();
     private JButton parseButton = new JButton();
@@ -123,6 +127,14 @@ public class FromAuxDialog
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
+        selectInDBButton.setText(Globals.lang("Select"));
+        selectInDBButton.setEnabled(false);
+        selectInDBButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				FromAuxDialog.this.select_actionPerformed();
+			}
+		});
         generateButton.setText(Globals.lang("Generate"));
         generateButton.setEnabled(false);
         generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));
@@ -141,6 +153,7 @@ public class FromAuxDialog
         bb.addGlue();
         bb.addButton(parseButton);
         bb.addRelatedGap();
+        bb.addButton(selectInDBButton);
         bb.addButton(generateButton);
         bb.addButton(cancelButton);
         bb.addGlue();
@@ -230,6 +243,21 @@ public class FromAuxDialog
         dispose();
     }
 
+    private void select_actionPerformed() {
+    	BibtexDatabase db = getGenerateDB();
+    	MainTable mainTable = JabRef.jrf.basePanel().mainTable;
+    	BibtexDatabase database = JabRef.jrf.basePanel().getDatabase();
+    	mainTable.clearSelection();
+    	for (BibtexEntry newEntry: db.getEntries()) {
+    		// the entries are not the same objects as in the original database
+    		// therefore, we have to search for the entries in the original database
+    		// to be able to find them in the maintable
+    		BibtexEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
+    		int row = mainTable.findEntry(origEntry);
+    		mainTable.addSelection(row);
+    	}
+    }
+
     void parse_actionPerformed(ActionEvent e) {
         parseButton.setEnabled(false);
         BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
@@ -262,6 +290,7 @@ public class FromAuxDialog
                             nested);
                 }
 
+                selectInDBButton.setEnabled(true);
                 generateButton.setEnabled(true);
             }
         }
