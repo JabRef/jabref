@@ -1,7 +1,8 @@
 /* CSS for JabRef */
+@charset ‘UTF-8′;
 
 body { 
-	font-family: Arial, sans-serif; 
+	font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック', Arial, sans-serif; 
 	font-size: 12pt;
 	color: #393939;
 	margin: 0px;

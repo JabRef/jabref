@@ -1,44 +1,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 
 <body>
-<h1>Groups</h1>
+<h1>グループ</h1>
 
-    <p>Groups allow to structure a BibTeX database in a
-    tree-like way that is similar to organizing files on disk in
-    directories and subdirectories. The two main differences are:</p>
+    <p>グループを用いると、ディスク上のファイルをディレクトリやサブディレクトリを使って整理するように、BibTeXデータベースをツリー状に構造化することができます。ファイルツリーと違うところは、大きく2つあります。</p>
 
     <ul>
-        <li>While a file is always located in exactly one
-        directory, an entry may be contained in more than one
-        group.</li>
+        <li>ファイルは、常に唯一のディレクトリ内に属しますが、項目は二つ以上のグループに属することができます。</li>
 
-        <li>Groups may use certain criteria to dynamically define
-        their content. New entries that match these criteria are
-        automatically contained in these groups. This feature is
-        not available in common file systems, but in several Email
-        clients (e.g. Thunderbird and Opera).</li>
-    </ul>Selecting a group shows the entries contained in that
-    group. Selecting multiple groups shows the entries contained in
-    any group (union) or those contained in all groups
-    (intersection), depending on the current settings. All this is
-    explained in detail below.
+        <li>グループは、特定の基準を設けて内容を動的に制御することができます。これらの基準に一致する新規項目は、自動的にグループに加えられます。このような機能は、通常のファイルシステムにはありませんが、電子メールクライアントの中には、同様の機能を持つものがあります(ThunderbirdやOperaなど)。</li>
+    </ul>
 
-    <p>Group definitions are database-specific; they are saved as a
-    <tt>@COMMENT</tt> block in the <tt>.bib</tt>-file and are
-    shared among all users. (Future versions of JabRef might
-    support user-dependent groups.)</p>
+    <p>グループを選択すると、当該グループに属する項目が表示されます。複数のグループを選択すると、現在の設定の状態によって、どれかのグループに属する項目が表示されるか(和集合)、すべてのグループに属する項目が表示されます(積集合)。これらはすべて下記に詳細に説明します。</p>
 
-    <h2>Interface</h2>
+    <p>グループの定義はデータベース毎に為されます。これは、<tt>.bib</tt>ファイル内の<tt>@COMMENT</tt>ブロックに保存され、全ユーザーに共有されます(将来のJabRefではユーザー毎のグループがサポートされるかもしれません)。</p>
 
-    <p>The groups interface is shown in the side
-    pane on the left of the screen. It can be toggled on or off by
-    pressing <tt>CTRL-SHIFT-G</tt> or by the groups button in the
-    toolbar. The interface has several buttons, but most functions
-    are accessed via a context ("right-click") menu. Drag and Drop
-    is also supported.</p>
+    <h2>制御盤</h2>
+
+    <p>グループ制御盤は、画面左側のサイド・ペーンに表示されます。<tt>CTRL-SHIFT-G</tt>を押すか、ツールバーのグループボタンを押すことで入切することができます。制御盤にはいくつかのボタンがありますが、ほとんどの機能はコンテクストメニュー(「右クリック」)でもアクセスできます。ドラッグ&amp;ドロップもサポートされています。</p>
 
     <table cellspacing="0"
            cellpadding="5"
@@ -47,190 +30,78 @@
 		   summary="Examples">
         <tr>
             <td>
-                <h2>Some quick examples</h2>
+                <h2>いくつかの簡単な例</h2>
 
-                <p>You might want to...</p>
+                <p>わたしは...</p>
 
-                <h3>...just create a group and assign some entries
-                to it</h3>
+                <h3>...グループを作成して、いくつかの項目を割り当てたいのです</h3>
 
-                <p>Ensure that the groups interface is
-                visible. Press the <b>New Group</b> button, enter a
-                name for the group, then press OK, leaving all
-                values at their defaults. Now select the entries to
-                be assigned to the group and use Drag and Drop to
-                the group, or the option <b>Add to group</b> in the
-                context menu. Finally select the group to see its
-                content (which should be the entries you just
-                assigned).</p>
+                <p>グループ制御盤が表示されていることを確認します。<b>新規グループ</b>ボタンを押し、新しいグループの名称を入力、他の値はすべて既定値にしたままで<b>OK</b>ボタンを押します。そのグループに所属させたい項目群を選択して、そのグループへドラッグ&amp;ドロップするか、コンテクストメニュー中の<b>グループに追加</b>オプションを選択します。最後に、そのグループを選択して、内容を表示させます(いま所属させた項目が表示されるはずです)。</p>
 
-                <h3>...use the <tt>keywords</tt> field to group the
-                entries</h3>
+                <h3>...<tt>keywords</tt>フィールドを使用して項目をグループ分けしたいのです</h3>
 
-                <p>Ensure that the groups interface is
-                visible. Press the <b>New Group</b> button, enter a
-                name for the group, and select the option to
-                dynamically group entries by searching a field for
-                a keyword. Enter the keyword to search for, then
-                click OK. Finally select the group to see its
-                content (which should be all entries whose
-                <tt>keywords</tt> field contains the keyword you
-                specified).</p>
+                <p>グループ制御盤が表示されていることを確認します。<b>新規グループ</b>ボタンを押し、新しいグループの名称を入力、オプションを「フィールド中のキーワードを検索して動的にグループ化」に設定します。検索するキーワードを入力して<b>OK</b>ボタンを押します。最後に、そのグループを選択して、内容を表示させます(<tt>keywords</tt>フィールドに指定したキーワードが入っている項目すべてが表示されるはずです)。</p>
 
-                <h3>...use a free-form search expression to define
-                a group</h3>
+                <h3>...自由型検索表現を使ってグループを定義したいのです</h3>
 
-                <p>Ensure that the groups interface is
-                visible. Press the <b>New Group</b> button, enter a
-                name for the group, and select the option to
-                dynamically group entries by a free-form search
-                expression. Enter <tt>author=smith</tt> as a search
-                expression (replace <tt>smith</tt> with a name that
-                actually occurs in your database) and click
-                <b>OK</b>. Finally select the group to see its
-                content (which should be all entries whose
-                <tt>author</tt> field contains the name you
-                specified).</p>
+                <p>グループ制御盤が表示されていることを確認します。<b>新規グループ</b>ボタンを押し、新しいグループの名称を入力、オプションを「自由型検索表現で動的にグループ化」に設定します。「検索表現」に<tt>author=smith</tt>のように入力し(<tt>smith</tt>はデータベース中の実際の名前に置き換えてください)、<b>OK</b>ボタンを押します。最後に、そのグループを選択して、内容を表示させます(<tt>author</tt>フィールドに指定した名前が入っている項目すべてが表示されるはずです)。</p>
 
-                <h3>...combine multiple groups</h3>
+                <h3>...複数のグループを連結したいのです</h3>
 
-                <p>Create two
-                different groups (e.g. as described above). Click
-                the <b>Settings</b> button and make sure that
-                <b>Union</b> is selected. Now select both groups.
-                You should see all entries contained in any of the
-                two groups. Click <b>Settings</b> again and select
-                <b>Intersection</b>. Now you should see only those
-                entries contained in both groups (which might be
-                none at all, or exactly the same entries as before
-                in case both groups contain the same entries).</p>
+                <p>上述の方法などを使って、2つのグループを作成します。<b>設定</b>ボタンを押して、<b>論理和</b>が選択されていることを確認します。それから2つのグループを選択します。2つのグループのうちどちらかに属している項目がすべて表示されます。<b>設定</b>をもう一度押し、<b>論理積</b>を選択します。すると、両方のグループの属している項目のみが表示されます(全く表示されないかもしれませんし、両方のグループが同じ項目を含んでいる場合には全く同じ項目が表示されます)。</p>
 
-                <h3>...identify overlapping groups</h3>
+                <h3>...重複のあるグループを識別したいのです</h3>
 
-                <p>JabRef allows you to easily identify groups that overlap
-                with the currently selected groups (i.e. that
-                contain at least one entry that is also contained
-                in the currently selected groups). Click
-                <b>Settings</b> and activate the option to
-                highlight overlapping groups. Then select a group
-                that overlaps with other groups. The other groups
-                should be highlighted.</p>
+                <p>JabRefでは、現在選択しているグループと重複部分があるグループ(すなわち、そのうち少なくとも1つの項目が現在選択しているグループにも含まれているもの)を簡単に見つけることができます。<b>設定</b>を押して、「重複のあるグループを着色」オプションを有効にします。そして、他のグループと重複しているグループを選択すると、他のグループの方が着色されます。</p>
             </td>
         </tr>
     </table>
 
-    <h2>Types of groups</h2>
+    <h2>グループの型</h2>
 
-    <p>In JabRef there are four different types of groups:</p>
+    <p>JabRefには、以下の4つのグループ型があります。</p>
 
     <ol>
-        <li>The group <b>All Entries</b>, which -- as the name
-        suggests -- contains all entries, is always present and
-        cannot be edited or removed.</li>
+        <li><b>全項目</b>グループは、名称が示すとおり、全ての項目を含んでいて、常に存在し、編集したり削除したりすることはできません。</li>
 
-        <li><b>Static groups</b> behave like directories on disk
-        and contain only those entries that you explicitly assign
-        to them.</li>
+        <li><b>静的グループ</b>は、ディスク上のディレクトリと同様の働きを示し、明示的に割り当てた項目のみを含みます。</li>
 
-        <li><b>Dynamic groups based on keyword search</b> contain
-        entries in which a certain BibTeX field (e.g.
-        <tt>keywords</tt>) contains a certain keyword (e.g.
-        <tt>electrical</tt>). This method does not require manual
-        assignment of entries, but uses information that is already
-        present in the database. If all entries in your database
-        have suitable keywords in their <tt>keywords</tt> field,
-        using this type of group might be the best choice.</li>
+        <li><b>キーワード検索に基づく動的グループ</b>には、特定のBibTeXフィールド(例えば<tt>keywords</tt>)に特定のキーワード(例えば<tt>electrical</tt>)が含まれる項目が含まれます。この方法では、項目を手動で割り当てる必要はなく、データベースに既存の情報を使用します。もしデータベース中の全ての項目が、<tt>keywords</tt>フィールドに適切なキーワードが収録されているならば、このグループ型を用いるのがもっとも良い方法でしょう。</li>
 
-        <li><b>Dynamic groups based on free-form search
-        expressions</b> contain entries that match a specified
-        search expression, using the same syntax as the
-        <a href="SearchHelp.html">search panel</a> on the side
-        pane. This <a href="SearchHelp.html#advanced">syntax</a>
-        supports logical operators (<tt>AND</tt>, <tt>OR</tt>,
-        <tt>NOT</tt>) and allows to specify one or more BibTeX
-        fields to search, facilitating more flexible group
-        definitions than a keyword search (e.g. <tt>author=smith
-        and title=electrical</tt>).</li>
-    </ol>Every group that you create is of one of the last three
-    types. The group editing dialog, which is invoked by
-    double-clicking on a group, shows a short description of the
-    selected/edited group in plain English.
+        <li><b>自由型検索表現に基づく動的グループ</b>には、指定した検索表現に一致する項目が含まれます。検索表現は、サイド・ペーンの<a href="SearchHelp.html">検索パネル</a>と同一の文法を用います。この<a href="SearchHelp.html#advanced">文法</a>は、論理演算子(<tt>AND</tt>・<tt>OR</tt>・<tt>NOT</tt>)をサポートし、検索対象として1つ以上のBibTeXフィールドを指定することができるので、キーワード検索よりも柔軟なグループ定義を行うことができます(例：<tt>author=smith and title=electrical</tt>)。</li>
+    </ol>
+    <p>作成したグループは、上記の後ろ3つの型のいずれかになります。グループをダブルクリックして現れるグループ編集ダイアログでは、選択もしくは編集したグループの定義の説明が、簡便な言葉で表示されます。</p>
 
-    <h2>Groups structure, creating and removing groups</h2>
 
-    <p>Just like directories, groups are structured like a tree, with the
-    group <b>All Entries</b> at the root. By right-clicking on a
-    group you can add a new group to the tree, either at the same
-    level as the selected group or as a subgroup of it. The <b>New
-    Group</b> button lets you create a new subgroup of the group
-    <b>All Entries</b>, regardless of the currently selected
-    group(s). The context menu also allows to remove groups and/or
-    subgroups, to sort subgroups alphabetically, or to move groups
-    to a different location in the tree. The latter can also be
-    done by Drag and Drop, with the restriction that Drag and Drop
-    does not support changing the order of a group's subgroups.</p>
+    <h2>グループの構造およびグループの作成と削除</h2>
 
-    <p>Undo and redo is supported for all edits.</p>
+    <p>ディレクトリと同様に、グループはツリー状に体系化することができます。この時、<b>全項目</b>グループがルート(ツリーの起点)になります。グループを右クリックすれば、選択したグループと同じ階層かそれよりも下層に、新しいグループを追加することができます。<b>新規グループ</b>ボタンを押せば、現在選択されているグループの状態に関わらず、<b>全項目</b>グループ配下に、新しい下層グループを加えることができます。コンテキストメニューを使えば、グループや下層グループを削除したり、下層グループをアルファベット順に整序したり、グループをツリー内の別の場所に移動したりすることができます。後者は、ドラッグ&amp;ドロップでも行えるようになっていますが、グループ内の下層グループの順序を変更することはサポートされません。</p>
 
-    <h3>Static groups</h3>
+    <p>取り消しと再実行は、編集全てにおいてサポートされています。</p>
 
-    <p>Static groups are populated only by
-    explicit manual assignment of entries. After creating a static
-    group you select the entries to be assigned to it, and use
-    either Drag and Drop or the main table's context menu to
-    perform the assignment. To remove entries from a static group,
-    select them and use the main table's context menu. There are no
-    options to be configured.</p>
+    <h3>静的グループ</h3>
 
-    <p>This method of grouping requires that all entries have a
-    unique BibTeX key. In case of missing or duplicate BibTeX keys,
-    the assignment of the affected entries cannot be correctly
-    restored in future sessions.</p>
+    <p>静的グループは、項目を明示的に割り当てることによってのみ、作成することができます。静的グループを作成した後、それに割り当てる項目を選択し、ドラッグ&amp;ドロップか主要表のコンテクストメニューを用いて割り当てを行ってください。静的グループから項目を削除するには、項目を選択して、主要表のコンテクストメニューを使ってください。設定できるオプションはありません。</p>
 
-    <h3>Dynamic groups</h3>
+    <p>このグループ化法は、全項目が一意的なBibTeX鍵を持っていることを前提としています。BibTeX鍵の欠損や重複がある場合は、それらの項目を割り当てても、後のセッションで正しく呼び出されません。</p>
 
-    <p>The content of a dynamic group is
-    defined by a logical condition. Only entries that meet this
-    condition are contained in the group. This method uses the
-    information stored in the database itself, and updates
-    dynamically whenever the database changes.</p>
+    <h3>動的グループ</h3>
 
-    <p>Two types of conditions can be used:</p>
+    <p>動的グループの中身は、論理条件によって定義されます。この条件に合致する項目のみがグループに含まれることになります。この方法は、データベース自身に含まれる情報を用い、データベースが変更されると、常に動的に更新されます。</p>
+
+    <p>下記の2つの条件型を使用することができます。</p>
 
     <dl>
-        <dt><b>Searching a field for a keyword</b></dt>
+        <dt><b>フィールド中のキーワードを検索</b></dt>
 
-        <dd>This method groups entries in which a specified BibTeX
-        field (e.g. <tt>keywords</tt>) contains a specified search
-        term (e.g. <tt>electrical</tt>). Obviously, for this to
-        work, the grouping field must be present in every entry,
-        and its content must be accurate. The above example would
-        group all entries referring to something electrical. Using
-        the field <tt>author</tt> allows to group entries by a
-        certain author, etc. The search can either be done as a
-        plain-text or a regular expression search. In the former
-        case, JabRef allows to manually assign/remove entries
-        to/from the group by simply appending/removing the search
-        term to/from the content of the grouping field. This makes
-        sense only for the <tt>keywords</tt> field or for
-        self-defined fields, but obviously not for fields like
-        <tt>author</tt> or <tt>year</tt>.</dd>
+        <dd>この方法は、特定のBibTeXフィールド(例えば<tt>keywords</tt>)に、特定の検索語(例えば<tt>electrical</tt>)が含まれる項目をグループ化します。当然ながら、この方法が機能するためには、すべての項目にグループ化用フィールドが存在しているとともに、その内容が正確でなくてはなりません。上記の用例を用いると、electricalに関係する全ての項目をグループ化することになります。あるいは、<tt>author</tt>フィールドを使用すると、著者毎にグループ化することができます。検索は、平文でも正規表現でも行うことができます。前者の場合は、グループ化用フィールドの内容に、手動で検索語を追加したり削除したりするだけで、項目を追加したり削除したりすることができます。この方法は、<tt>keywords</tt>フィールドや他の自己定義フィールドでは意味を成しますが、<tt>author</tt>や<tt>year</tt>のようなフィールドでは、明らかに意味を成しません。</dd>
 
-        <dt><b>Using a free-form search expression</b></dt>
+        <dt><b>自由型検索表現を使用</b></dt>
 
-        <dd>This is similar to the above, but rather than search a
-        single field for a single search term, the
-        <a href="SearchHelp.html#advanced">search expression
-        syntax</a> can be used, which supports logical operators
-        (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) and allows to
-        search multiple BibTeX fields. For example, the search
-        expression <tt>keywords=regression and not
-        keywords=linear</tt> groups entries concerned with
-        non-linear regression.</dd>
-    </dl>In the groups view, dynamic groups are shown in
-    <i>italics</i> by default. This can be turned off in the
-    preferences (Options -&gt; Preferences -&gt; Groups, box "Show
-    dynamic groups in italics").
+        <dd>これは上記と同様ですが、単独フィールドを単独検索語で検索するのではなく、<a href="SearchHelp.html#advanced">検索表現文法</a>を使用することができます。これは、論理演算子(<tt>AND</tt>・<tt>OR</tt>・<tt>NOT</tt>)をサポートし、複数のBibTeXフィールドを検索することができます。例えば、<tt>keywords=regression and not keywords=linear</tt>という検索表現は、非線形回帰に関係した項目をグループ化します。</dd>
+    </dl>
+
+    <p>グループ表示において、動的グループは、既定値で<i>イタリック体</i>で表示されます。この表示は、設定(オプション→設定→グループ→「動的グループをイタリック体で表示」チェックボックス)で、止めることができます。</p>
 
     <h3>Hierarchical context</h3>
 
