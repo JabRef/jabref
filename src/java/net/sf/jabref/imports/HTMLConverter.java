@@ -341,8 +341,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"8594", "rarr", "\\$\\\\rightarrow\\$"}, // rightwards arrow, U+2192 ISOnum
         {"8595", "darr", "\\$\\\\downarrow\\$"}, // downwards arrow, U+2193 ISOnum
         {"8596", "harr", "\\$\\\\leftrightarrow\\$"}, // left right arrow, U+2194 ISOamsa  
-        {"8629", "crarr", ""}, // downwards arrow with corner leftwards 
-        //                                    = carriage return, U+21B5 NEW 
+        {"8629", "crarr", "\\$\\\\dlsh\\$"}, // downwards arrow with corner leftwards 
+        //                                    = carriage return, U+21B5 NEW - require mathabx
         {"8656", "lArr", "\\{\\$\\\\Leftarrow\\$\\}"}, // leftwards double arrow, U+21D0 ISOtech
         /*  ISO 10646 does not say that lArr is the same as the 'is implied by' arrow
          but also does not have any other character for that function. So ? lArr can
@@ -532,8 +532,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"148", "", "''"}, // Quotation mark
         {"150", "", "--"}, // En dash
         {"154", "", "\\{\\\\v\\{s\\}\\}"}, // Single character introducer
-        {"260", "", "\\{\\\\k\\{A\\}\\}"}, // capital A with ogonek
-        {"261", "", "\\{\\\\k\\{a\\}\\}"}, // small a with ogonek
+        {"260", "Aogon", "\\{\\\\k\\{A\\}\\}"}, // capital A with ogonek
+        {"261", "aogon", "\\{\\\\k\\{a\\}\\}"}, // small a with ogonek
         {"262", "Cacute", "\\{\\\\'\\{C\\}\\}"}, // capital C with acute
         {"263", "cacute", "\\{\\\\'\\{c\\}\\}"}, // small C with acute
         {"264", "Ccirc", "\\{\\\\\\^\\{C\\}\\}"}, // capital C with circumflex
@@ -542,21 +542,23 @@ public class HTMLConverter implements LayoutFormatter {
         {"267", "cdot", "\\{\\\\\\.\\{c\\}\\}"}, // small C with dot above
         {"268", "Ccaron", "\\{\\\\v\\{C\\}\\}"}, // capital C with caron
         {"269", "ccaron", "\\{\\\\v\\{c\\}\\}"}, // small C with caron
-        {"280", "", "\\{\\\\k\\{E\\}\\}"}, // capital E with ogonek
-        {"281", "", "\\{\\\\k\\{e\\}\\}"}, // small e with ogonek
+        {"272", "Dstrok", "\\{\\\\DJ\\}"}, // capital D with stroke
+        {"273", "dstrok", "\\{\\\\dj\\}"}, // small d with stroke
+        {"280", "Eogon", "\\{\\\\k\\{E\\}\\}"}, // capital E with ogonek
+        {"281", "eogon", "\\{\\\\k\\{e\\}\\}"}, // small e with ogonek
         {"298", "Imacr", "\\{\\\\=\\{I\\}\\}"}, // capital I with macron
         {"299", "imacr", "\\{\\\\=\\{\\\\i\\}\\}"}, // small i with macron
-        {"302", "", "\\{\\\\k\\{I\\}\\}"}, // capital I with ogonek
-        {"303", "", "\\{\\\\k\\{i\\}\\}"}, // small i with ogonek
-        {"304", "", "\\{\\\\.\\{I\\}\\}"},    // capital I with dot above
+        {"302", "Iogon", "\\{\\\\k\\{I\\}\\}"}, // capital I with ogonek
+        {"303", "iogon", "\\{\\\\k\\{i\\}\\}"}, // small i with ogonek
+        {"304", "Idot", "\\{\\\\.\\{I\\}\\}"},    // capital I with dot above
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"", "imath", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
-        {"370", "", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
-        {"371", "", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
-        {"490", "", "\\{\\\\k\\{O\\}\\}"},    // capital letter O with ogonek
-        {"491", "", "\\{\\\\k\\{o\\}\\}"},    // small letter o with ogonek
+        {"370", "Uogon", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
+        {"371", "uogon", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
+        {"490", "Oogon", "\\{\\\\k\\{O\\}\\}"},    // capital letter O with ogonek
+        {"491", "oogon", "\\{\\\\k\\{o\\}\\}"},    // small letter o with ogonek
         {"492", "", "\\{\\\\k\\{\\\\=\\{O\\}\\}\\}"},    // capital letter O with ogonek and macron
         {"493", "", "\\{\\\\k\\{\\\\=\\{o\\}\\}\\}"},    // small letter o with ogonek and macron
         {"536", "", "\\{\\\\cb\\{S\\}\\}"},    // capital letter S with comma below, require combelow
@@ -569,13 +571,19 @@ public class HTMLConverter implements LayoutFormatter {
         {"", "Breve", "\\{\\\\u\\{\\}\\}"}, // Breve
         {"729", "dot", "\\{\\\\\\.\\{\\}\\}"}, // Dot above
         {"730", "ring", "\\{\\\\r\\{\\}\\}"}, // Ring above
-        {"731", "", "\\{\\\\k\\{\\}\\}"}, // Ogonek
+        {"731", "ogon", "\\{\\\\k\\{\\}\\}"}, // Ogonek
+        {"733", "dblac", "\\{\\\\H\\{\\}\\}"}, // Double acute
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
         {"1055", "", "\\{\\\\cyrchar\\\\CYRP\\}"},    // Cyrillic capital Pe
         {"1082", "", "\\{\\\\cyrchar\\\\cyrk\\}"},    // Cyrillic small Ka
      // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
      // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
+        {"8192", "", "\\\\hspace\\{0.5em\\}"}, // en quad
+        {"8193", "", "\\\\hspace\\{1em\\}"}, // em quad
+        {"8196", "", "\\\\hspace\\{0.333em\\}"}, // Three-Per-Em Space 
+        {"8197", "", "\\\\hspace\\{0.25em\\}"}, // Four-Per-Em Space 
+        {"8198", "", "\\\\hspace\\{0.167em\\}"}, // Six-Per-Em Space
         {"8208", "hyphen", "-"},    // Hyphen
         {"8229", "nldr", "\\.\\."},    // Double dots - en leader
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
@@ -587,6 +595,19 @@ public class HTMLConverter implements LayoutFormatter {
         {"8486", "", "\\$\\{\\\\Omega\\}\\$"}, // Omega
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
         {"8496", "Escr", "\\$\\\\mathcal\\{E\\}\\$"}, // script capital E 
+        {"8531", "frac13", "\\$\\\\sfrac\\{1\\}\\{3\\}\\$"},    // Vulgar fraction one third
+        {"8532", "frac23", "\\$\\\\sfrac\\{2\\}\\{3\\}\\$"},    // Vulgar fraction two thirds
+        {"8533", "frac15", "\\$\\\\sfrac\\{1\\}\\{5\\}\\$"},    // Vulgar fraction one fifth
+        {"8534", "frac25", "\\$\\\\sfrac\\{2\\}\\{5\\}\\$"},    // Vulgar fraction two fifths
+        {"8535", "frac35", "\\$\\\\sfrac\\{3\\}\\{5\\}\\$"},    // Vulgar fraction three fifths
+        {"8536", "frac45", "\\$\\\\sfrac\\{4\\}\\{5\\}\\$"},    // Vulgar fraction four fifths
+        {"8537", "frac16", "\\$\\\\sfrac\\{1\\}\\{6\\}\\$"},    // Vulgar fraction one sixth
+        {"8538", "frac56", "\\$\\\\sfrac\\{5\\}\\{6\\}\\$"},    // Vulgar fraction five sixths
+        {"8539", "frac18", "\\$\\\\sfrac\\{1\\}\\{8\\}\\$"},    // Vulgar fraction one eighth
+        {"8540", "frac38", "\\$\\\\sfrac\\{3\\}\\{8\\}\\$"},    // Vulgar fraction three eighths
+        {"8541", "frac58", "\\$\\\\sfrac\\{5\\}\\{8\\}\\$"},    // Vulgar fraction five eighths
+        {"8542", "frac78", "\\$\\\\sfrac\\{7\\}\\{8\\}\\$"},    // Vulgar fraction seven eighths
+        {"8710", "", "\\$\\\\triangle\\$"},    // Increment - could use a more appropriate symbol
         {"8714", "", "\\$\\\\in\\$"},    // Small element in
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
         {"8758", "ratio", ":"},    // Colon/ratio
