@@ -121,7 +121,7 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpUpgradeExternalLinks = new JCheckBox(Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
 		cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
 		cleanUpCase = new JCheckBox(Globals.lang("Run filter on title keeping the case of selected words"));
-		cleanUpLaTeX = new JCheckBox(Globals.lang("Remove unneccessary $, {, and }")); // and move adjacent numbers into equations"));
+		cleanUpLaTeX = new JCheckBox(Globals.lang("Remove unneccessary $, {, and } and move adjacent numbers into equations"));
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
@@ -562,6 +562,25 @@ public class CleanUpAction extends AbstractWorker {
         String newValue = oldValue;
         // Remove redundant $, {, and }
         newValue = newValue.replace("$$","").replaceAll("\\}([- /])?\\{","$1");
+        
+        // Move numbers, +, -, /, and brackets into equations
+        // System.err.println(newValue);
+        newValue = newValue.replaceAll("(([^$]|\\\\\\$)*)\\$","$1@@"); // Replace $, but not \$ with @@
+        // System.err.println(newValue);
+        newValue = newValue.replaceAll("([^@]*)@@([^@]*)@@", "$1\\$$2@@"); // Replace every other @@ with $
+        // System.err.println(newValue);
+        //newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
+        // System.err.println(newValue);
+        newValue = newValue.replaceAll("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$","\\$$1"); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation
+        // System.err.println(newValue);
+        newValue = newValue.replaceAll("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)"," $1@@"); // Move numbers right of @@ into the equation
+        // System.err.println(newValue);
+        newValue = newValue.replace("@@","$"); // Replace all @@ with $
+        // System.err.println(newValue);
+        newValue = newValue.replace("  "," "); // Clean up
+        newValue = newValue.replace("$$","$");
+        newValue = newValue.replace(" )$",")$");
+        
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
