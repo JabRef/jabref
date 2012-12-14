@@ -144,7 +144,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"214", "Ouml", "\\{\\\\\"\\{O\\}\\}"}, // latin capital letter O with diaeresis, 
         //                                 U+00D6 ISOlat1 
         {"215", "times", "\\$\\\\times\\$"}, // multiplication sign, U+00D7 ISOnum  
-        {"216", "Oslash", "\\{\\\\O\\{\\}\\}"}, // latin capital letter O with stroke 
+        {"216", "Oslash", "\\{\\\\O\\}"}, // latin capital letter O with stroke 
         //                                 = latin capital letter O slash,
         //                                 U+00D8 ISOlat1 
         {"217", "Ugrave", "\\{\\\\`\\{U\\}\\}"}, // latin capital letter U with grave,
@@ -209,7 +209,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"246", "ouml", "\\{\\\\\"\\{o\\}\\}"}, // latin small letter o with diaeresis, 
         //                                 U+00F6 ISOlat1 
         {"247", "divide", "\\$\\\\div\\$"}, // division sign, U+00F7 ISOnum  
-        {"248", "oslash", "\\{\\\\o\\{\\}\\}"}, // latin small letter o with stroke, 
+        {"248", "oslash", "\\{\\\\o\\}"}, // latin small letter o with stroke, 
         //                                 = latin small letter o slash,
         //                                 U+00F8 ISOlat1 
         {"249", "ugrave", "\\{\\\\`\\{u\\}\\}"}, // latin small letter u with grave,
@@ -532,6 +532,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"148", "", "''"}, // Quotation mark
         {"150", "", "--"}, // En dash
         {"154", "", "\\{\\\\v\\{s\\}\\}"}, // Single character introducer
+        {"260", "", "\\{\\\\k\\{A\\}\\}"}, // capital A with ogonek
+        {"261", "", "\\{\\\\k\\{a\\}\\}"}, // small a with ogonek
         {"262", "Cacute", "\\{\\\\'\\{C\\}\\}"}, // capital C with acute
         {"263", "cacute", "\\{\\\\'\\{c\\}\\}"}, // small C with acute
         {"264", "Ccirc", "\\{\\\\\\^\\{C\\}\\}"}, // capital C with circumflex
@@ -540,20 +542,34 @@ public class HTMLConverter implements LayoutFormatter {
         {"267", "cdot", "\\{\\\\\\.\\{c\\}\\}"}, // small C with dot above
         {"268", "Ccaron", "\\{\\\\v\\{C\\}\\}"}, // capital C with caron
         {"269", "ccaron", "\\{\\\\v\\{c\\}\\}"}, // small C with caron
+        {"280", "", "\\{\\\\k\\{E\\}\\}"}, // capital E with ogonek
+        {"281", "", "\\{\\\\k\\{e\\}\\}"}, // small e with ogonek
         {"298", "Imacr", "\\{\\\\=\\{I\\}\\}"}, // capital I with macron
         {"299", "imacr", "\\{\\\\=\\{\\\\i\\}\\}"}, // small i with macron
+        {"302", "", "\\{\\\\k\\{I\\}\\}"}, // capital I with ogonek
+        {"303", "", "\\{\\\\k\\{i\\}\\}"}, // small i with ogonek
+        {"304", "", "\\{\\\\.\\{I\\}\\}"},    // capital I with dot above
         {"305", "inodot", "\\{\\\\i\\}"},    // Small i without the dot
         {"", "imath", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
+        {"370", "", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
+        {"371", "", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
+        {"490", "", "\\{\\\\k\\{O\\}\\}"},    // capital letter O with ogonek
+        {"491", "", "\\{\\\\k\\{o\\}\\}"},    // small letter o with ogonek
+        {"492", "", "\\{\\\\k\\{\\\\=\\{O\\}\\}\\}"},    // capital letter O with ogonek and macron
+        {"493", "", "\\{\\\\k\\{\\\\=\\{o\\}\\}\\}"},    // small letter o with ogonek and macron
         {"536", "", "\\{\\\\cb\\{S\\}\\}"},    // capital letter S with comma below, require combelow
         {"537", "", "\\{\\\\cb\\{s\\}\\}"},    // small letter S with comma below, require combelow
+        {"538", "", "\\{\\\\cb\\{T\\}\\}"},    // capital letter T with comma below, require combelow
+        {"539", "", "\\{\\\\cb\\{t\\}\\}"},    // small letter T with comma below, require combelow
         {"727", "caron", "\\{\\\\v\\{\\}\\}"}, // Caron
         {"", "Hacek", "\\{\\\\v\\{\\}\\}"}, // Caron
         {"728", "breve", "\\{\\\\u\\{\\}\\}"}, // Breve
         {"", "Breve", "\\{\\\\u\\{\\}\\}"}, // Breve
         {"729", "dot", "\\{\\\\\\.\\{\\}\\}"}, // Dot above
         {"730", "ring", "\\{\\\\r\\{\\}\\}"}, // Ring above
+        {"731", "", "\\{\\\\k\\{\\}\\}"}, // Ogonek
         {"949", "epsi", "\\$\\\\epsilon\\$"},    // Epsilon - double check
         {"1013", "epsiv", "\\$\\\\varepsilonup\\$"},    // lunate epsilon, requires txfonts
         {"1055", "", "\\{\\\\cyrchar\\\\CYRP\\}"},    // Cyrillic capital Pe
@@ -611,11 +627,74 @@ public class HTMLConverter implements LayoutFormatter {
         {"779", "H"},    // Double acute
         {"780", "v"},    // Caron
         {"781", "\\|"},  // Vertical line above
-        // {"782", ""},     // Double vertical line above
+        {"782", "U"},     // Double vertical line above
         {"783", "G"},    // Double grave
+        {"784", "textdotbreve"},    // Candrabindu
+        {"785", "t"},    // Inverted breve
+//        {"786", ""},    // Turned comma above
+//        {"787", ""},    // Comma above
+//        {"788", ""},    // Reversed comma above
+//        {"789", ""},    // Comma above right
+        {"790", "textsubgrave"},    // Grave accent below -requires tipa
+        {"791", "textsubacute"},    // Acute accent below - requires tipa
+        {"792", "textadvancing"},    // Left tack below - requires tipa
+        {"793", "textretracting"},    // Right tack below - requires tipa
+//        {"794", ""},    // Left angle above
+//        {"795", ""},    // Horn
+        {"796", "textsublhalfring"},    // Left half ring below - requires tipa
+        {"797", "textraising"},    // Up tack below - requires tipa
+        {"798", "textlowering"},    // Down tack below - requires tipa
+        {"799", "textsubplus"},    // Plus sign below - requires tipa
+//        {"800", ""},    // Minus sign below
+//        {"801", ""},    // Palatalized hook below
+//        {"802", ""},    // Retroflex hook below
         {"803", "d"},    // Dot below
+        {"804", "textsubumlaut"},    // Diaeresis below - requires tipa
+        {"805", "textsubring"},    // Ring below - requires tipa
+        {"806", "cb"},    // Comma below - requires combelow
         {"807", "c"},    // Cedilla
-          
+        {"808", "k"},    // Ogonek
+        {"809", "textsyllabic"},    // Vertical line below - requires tipa
+        {"810", "textsubbridge"},    // Bridge below - requires tipa
+        {"811", "textsubw"},    // Inverted double arch below - requires tipa
+        {"812", "textsubwedge"},    // Caron below
+        {"813", "textsubcircum"},    // Circumflex accent below - requires tipa
+//        {"814", ""},    // Breve below
+        {"815", "textsubarch"},    // Inverted breve below - requires tipa
+        {"816", "textsubtilde"},    // Tilde below - requires tipa
+        {"817", "b"},    // Macron below - not completely correct
+        {"818", "b"},    // Underline
+        {"819", "subdoublebar"},    // Double low line -- requires extraipa
+        {"820", "textsuperimposetilde"},    // Tilde overlay - requires tipa
+//        {"821", ""},    // Short stroke overlay
+//        {"822", ""},    // Long stroke overlay
+//        {"823", ""},    // Short solidus overlay
+//        {"824", ""},    // Long solidus overlay
+        {"825", "textsubrhalfring"},    // Right half ring below - requires tipa
+        {"826", "textinvsubbridge"},    // inverted bridge below - requires tipa
+        {"827", "textsubsquare"},    // Square below - requires tipa
+        {"828", "textseagull"},    // Seagull below - requires tipa
+        {"829", "textovercross"},    // X above - requires tipa
+//        {"830", ""},    // Vertical tilde
+//        {"831", ""},    // Double overline
+//        {"832", ""},    // Grave tone mark
+//        {"833", ""},    // Acute tone mark
+//        {"834", ""},    // Greek perispomeni
+//        {"835", ""},    // Greek koronis
+//        {"836", ""},    // Greek dialytika tonos
+//        {"837", ""},    // Greek ypogegrammeni
+        {"838", "overbridge"},    // Bridge above - requires extraipa
+        {"839", "subdoublebar"},    // Equals sign below - requires extraipa
+        {"840", "subdoublevert"},    // Double vertical line below - requires extraipa
+        {"841", "subcorner"},    // Left angle below - requires extraipa
+        {"842", "crtilde"},    // Not tilde above - requires extraipa
+        {"843", "dottedtilde"},    // Homothetic above - requires extraipa
+        {"844", "doubletilde"},    // Almost equal to above - requires extraipa
+        {"845", "spreadlips"},    // Left right arrow below - requires extraipa
+        {"846", "whistle"},    // Upwards arrow below - requires extraipa
+//        {"864", ""},    // Double tilde
+//        {"865", ""},    // Double inverted breve
+        {"866", "sliding"},    // Double rightwards arrow below - requires extraipa
         };
 
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
@@ -696,7 +775,13 @@ public class HTMLConverter implements LayoutFormatter {
 	    //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if(escapedAccents.containsKey(num)) {
-                text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}\\}");
+                if(m.group(1).equals("i")) {
+                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{\\\\i\\}\\}");
+                } else if(m.group(1).equals("j")){
+                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{\\\\j\\}\\}");
+                } else {
+                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\" + escapedAccents.get(num) + "\\{" + m.group(1) + "\\}\\}");
+                }
             } 
         }
 
