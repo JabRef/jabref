@@ -44,14 +44,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel p1 = new JPanel(),
         p2 = new JPanel();
     String oldLnf = "";
-    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation, oldCaseKeeperOnSearch;
+    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation, oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
     int oldPort = -1;
     
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 
     public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
 	
-    private JCheckBox useConvertToEquation;
-    private JCheckBox useCaseKeeperOnSearch;
+    private JCheckBox useConvertToEquation, useCaseKeeperOnSearch, useUnitFormatterOnSearch;
 	
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
@@ -76,6 +75,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         });
     useConvertToEquation = new JCheckBox(Globals.lang("Prefer converting subscripts and superscripts to equations rather than text"));
     useCaseKeeperOnSearch = new JCheckBox(Globals.lang("Add {} to specified title words on search to keep the correct case"));
+    useUnitFormatterOnSearch = new JCheckBox(Globals.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 	
     FormLayout layout = new FormLayout
         ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
@@ -155,6 +155,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.nextLine();
     builder.append(pan);
     builder.append(useCaseKeeperOnSearch);
+    builder.nextLine();
+    builder.append(pan);
+    builder.append(useUnitFormatterOnSearch);
         
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -181,6 +184,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useConvertToEquation.setSelected(oldConvertToEquation);
         oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
         useCaseKeeperOnSearch.setSelected(oldCaseKeeperOnSearch);
+        oldUnitFormatterOnSearch = Globals.prefs.getBoolean("useUnitFormatterOnSearch");
+        useUnitFormatterOnSearch.setSelected(oldUnitFormatterOnSearch);
     }
 
     public void storeSettings() {
@@ -239,6 +244,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         
         _prefs.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
         _prefs.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
+        _prefs.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
     }
 
     public boolean readyToClose() {

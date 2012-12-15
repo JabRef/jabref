@@ -497,6 +497,7 @@ public class JabRefPreferences {
         defaults.put("useIEEEAbrv", Boolean.TRUE);
         defaults.put("useConvertToEquation", Boolean.FALSE);
         defaults.put("useCaseKeeperOnSearch", Boolean.TRUE);
+        defaults.put("useUnitFormatterOnSearch", Boolean.TRUE);
 
 	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
 	try {

@@ -38,6 +38,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 	private OutputPrinter status;
     private final HTMLConverter htmlConverter = new HTMLConverter();
     final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
     private String terms;
     
     private static final String startUrl = "http://portal.acm.org/";
@@ -177,6 +178,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         if (title != null) {
                             title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
                             title = convertHTMLChars(title);
+                                        
+                            // Unit formatting
+                            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                                title = unitFormatter.format(title);
+                            }
+            
+                            // Case keeping
                             if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                                 title = caseKeeper.format(title);
                             }

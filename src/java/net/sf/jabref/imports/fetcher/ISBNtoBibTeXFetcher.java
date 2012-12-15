@@ -33,6 +33,7 @@ import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.ImportInspector;
+import net.sf.jabref.imports.UnitFormatter;
 
 /**
  * This class uses Manas Tungare's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
@@ -42,6 +43,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 	
 	private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s"; 
         final CaseKeeper caseKeeper = new CaseKeeper();
+        final UnitFormatter unitFormatter = new UnitFormatter();
    
 	@Override
     public void stopFetching() {
@@ -97,7 +99,13 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         if(entry != null)  {
             // Optionally add curly brackets around key words to keep the case
             String title = (String)entry.getField("title");
-            if (title != null) {
+            if (title != null) {           
+                // Unit formatting
+                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                    title = unitFormatter.format(title);
+                }
+            
+                // Case keeping
                 if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                     title = caseKeeper.format(title);
                 }

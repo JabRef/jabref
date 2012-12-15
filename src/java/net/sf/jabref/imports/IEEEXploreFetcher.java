@@ -59,6 +59,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     final CaseKeeperList caseKeeperList = new CaseKeeperList();
     final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
     
     ImportInspector dialog = null;
 	OutputPrinter status;
@@ -369,6 +370,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             // Replace \infin with \infty
             title = title.replaceAll("\\\\infin", "\\\\infty");
+            
+            // Unit formatting
+            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                title = unitFormatter.format(title);
+            }
+            
             // Automatic case keeping
             if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                 title = caseKeeper.format(title, caseKeeperList.wordListIEEEXplore);

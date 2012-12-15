@@ -36,6 +36,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 	
     private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
     final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
     
 	@Override
     public void stopFetching() {
@@ -98,6 +99,13 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             // Optionally add curly brackets around key words to keep the case
             String title = (String)entry.getField("title");
             if (title != null) {
+                            
+                // Unit formatting
+                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                    title = unitFormatter.format(title);
+                }
+            
+                // Case keeping
                 if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                     title = caseKeeper.format(title);
                 }
