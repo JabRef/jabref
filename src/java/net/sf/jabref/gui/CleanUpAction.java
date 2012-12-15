@@ -561,7 +561,7 @@ public class CleanUpAction extends AbstractWorker {
         }
         String newValue = oldValue;
         // Remove redundant $, {, and }
-        newValue = newValue.replace("$$","").replaceAll("(\\{.*[^\\\\][\\w]*)\\}([- /]?)\\{","$1$2").replaceAll("([^\\\\])\\{\\}", "$1");
+        newValue = newValue.replace("$$","").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{","$1");
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
