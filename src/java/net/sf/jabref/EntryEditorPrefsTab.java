@@ -22,6 +22,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
+
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -31,7 +33,7 @@ import com.jgoodies.forms.layout.FormLayout;
 public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, showSource,
-        defSource, disableOnMultiple, autoComplete;
+        defSource, emacsMode, disableOnMultiple, autoComplete;
     private JRadioButton autoCompBoth, autoCompFF, autoCompLF, 
     	autoCompFirstNameMode_Full, autoCompFirstNameMode_Abbr, autoCompFirstNameMode_Both;
     boolean oldAutoCompFF, oldAutoCompLF,
@@ -62,6 +64,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"));
         defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"));
         showSource = new JCheckBox(Globals.lang("Show BibTeX source panel"));
+        emacsMode = new JCheckBox(Globals.lang("Use Emacs keybindings"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
         
@@ -105,13 +108,14 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         );
 
         FormLayout layout = new FormLayout
-                ("8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                (// columns
+                 "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                  // rows  1 to 10
                  "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
                  // rows 11 to 20
-                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, pref, pref, pref, " +
-                 // rows 21 to 26
-                 "6dlu, pref, pref, pref, pref");
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, pref, " +
+                 // rows 21 to 27
+                 "pref, pref, 6dlu, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1, 1, 5));
@@ -119,9 +123,10 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(disableOnMultiple, cc.xy(2, 5));
         builder.add(showSource, cc.xy(2, 7));
         builder.add(defSource, cc.xy(2, 9));
+        builder.add(emacsMode, cc.xy(2, 11));
         
-        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 11, 5));
-        builder.add(autoComplete, cc.xy(2, 13));
+        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 13, 5));
+        builder.add(autoComplete, cc.xy(2, 15));
         
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields")+":");
@@ -130,17 +135,17 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         JLabel label2 = new JLabel(Globals.lang("Autocomplete after following number of characters")+":");
         builder3.append(label2);
         builder3.append(shortestToComplete);
-        builder.add(builder3.getPanel(), cc.xyw(2, 15, 3));
+        builder.add(builder3.getPanel(), cc.xyw(2, 17, 3));
 
-        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 17, 4));
-        builder.add(autoCompFF, cc.xy(2,18));
-        builder.add(autoCompLF, cc.xy(2,19));
-        builder.add(autoCompBoth, cc.xy(2,20));
+        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 19, 4));
+        builder.add(autoCompFF, cc.xy(2,20));
+        builder.add(autoCompLF, cc.xy(2,21));
+        builder.add(autoCompBoth, cc.xy(2,22));
         
-        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 22, 4));
-        builder.add(autoCompFirstNameMode_Abbr, cc.xy(2,23));
-        builder.add(autoCompFirstNameMode_Full, cc.xy(2,24));
-        builder.add(autoCompFirstNameMode_Both, cc.xy(2,25));
+        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 24, 4));
+        builder.add(autoCompFirstNameMode_Abbr, cc.xy(2,25));
+        builder.add(autoCompFirstNameMode_Full, cc.xy(2,26));
+        builder.add(autoCompFirstNameMode_Both, cc.xy(2,27));
         
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -151,6 +156,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
         defSource.setSelected(_prefs.getBoolean("defaultShowSource"));
         showSource.setSelected(_prefs.getBoolean("showSource"));
+        emacsMode.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
         disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
         autoComplete.setSelected(_prefs.getBoolean("autoComplete"));
         autoCompFields.setText(_prefs.get("autoCompleteFields"));
@@ -184,6 +190,16 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         _prefs.putBoolean("autoOpenForm", autoOpenForm.isSelected());
         _prefs.putBoolean("defaultShowSource", defSource.isSelected());
+        if (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected()) {
+        	// user has changed settings of EMACS mode
+        	// immediately apply the change
+        	if (emacsMode.isSelected()) {
+        		EmacsKeyBindings.load();
+        	} else {
+        		EmacsKeyBindings.unload();
+        	}
+            _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, emacsMode.isSelected());
+        }
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
         boolean oldAutoComplete = _prefs.getBoolean("autoComplete");

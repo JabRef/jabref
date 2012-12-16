@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,15 +18,17 @@ package net.sf.jabref;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Keymap;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -109,8 +111,28 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                     }
                 });
 
-        // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
+        // Bind the redo action to ctrl-Y
+        boolean bind = true;
+        KeyStroke redoKey = Globals.prefs.getKey("Redo");
+        if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
+        	// If emacs is enabled, check if we have a conflict at keys
+        	// If yes, do not bind
+        	// Typically, we have: CTRL+y is "yank" in emacs and REDO in 'normal' settings
+        	// The Emacs key bindings are stored in the keymap, not in the input map.
+        	Keymap keymap2 = getKeymap();
+        	KeyStroke[] keys = keymap2.getBoundKeyStrokes();
+        	int i = 0;
+        	while ((i<keys.length) && (!keys[i].equals(redoKey))) {
+        		i++;
+        	}
+        	if (i<keys.length) {
+        		// conflict found -> do not bind
+        		bind = false;
+        	}
+        }
+        if (bind) {
+        	getInputMap().put(redoKey, "Redo");
+        }
     }
 
     /**

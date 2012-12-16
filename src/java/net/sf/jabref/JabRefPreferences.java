@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -69,6 +69,8 @@ public class JabRefPreferences {
         PDF_PREVIEW = "pdfPreview",
 
         SHOWONELETTERHEADINGFORICONCOLUMNS = "showOneLetterHeadingForIconColumns",
+
+        EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings",
 
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
@@ -248,6 +250,7 @@ public class JabRefPreferences {
         defaults.put("highLightWords", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
+        defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"

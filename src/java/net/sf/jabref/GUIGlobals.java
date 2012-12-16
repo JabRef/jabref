@@ -28,6 +28,8 @@ import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
+
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
@@ -426,6 +428,10 @@ public class GUIGlobals {
         tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
         
         //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
+        	EmacsKeyBindings.load();
+        }
 	}
 
 }
