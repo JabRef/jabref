@@ -97,14 +97,6 @@ public class EmacsKeyBindings
 
     public static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS = {
 		new JTextComponent.
-			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-											  InputEvent.ALT_MASK),
-					   DefaultEditorKit.copyAction),
-		new JTextComponent.
-			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-											  InputEvent.CTRL_MASK),
-					   DefaultEditorKit.cutAction),
-		new JTextComponent.
 			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 											  InputEvent.CTRL_MASK),
 					   DefaultEditorKit.endLineAction),
@@ -400,33 +392,7 @@ public class EmacsKeyBindings
 		public void actionPerformed(ActionEvent e)
 		{
 			JTextComponent jtc = getTextComponent(e);
-			if (jtc != null) {
-				int caretPosition = jtc.getCaretPosition();
-				String text = jtc.getSelectedText();
-				if (text != null) {
-					// user has manually marked a text without using CTRL+W
-					// we obey that selection and copy it.
-				} else if (SetMarkCommandAction.isMarked(jtc)) {
-					int beginPos = caretPosition;
-					int endPos = SetMarkCommandAction.getCaretPosition();
-					if (beginPos > endPos) {
-						int tmp = endPos;
-						endPos = beginPos;
-						beginPos = tmp;
-					}
-					jtc.setSelectionStart(beginPos);
-					jtc.setSelectionEnd(endPos);
-					SetMarkCommandAction.reset();
-				}
-				text = jtc.getSelectedText();
-				if (text != null) {
-					jtc.copy();
-					KillRing.getInstance().add(text);
-					// clear the selection
-					jtc.setSelectionStart(caretPosition);
-					jtc.setSelectionEnd(caretPosition);
-				}
-			}
+			EmacsKeyBindings.doCopyOrCut(jtc, true);
 		}
     }
 
@@ -444,29 +410,47 @@ public class EmacsKeyBindings
 		public void actionPerformed(ActionEvent e)
 		{
 			JTextComponent jtc = getTextComponent(e);
-			if (jtc != null && SetMarkCommandAction.isMarked(jtc)) {
-				int start, end;
-				if (SetMarkCommandAction.getCaretPosition() < jtc.getCaretPosition()) {
-					start = SetMarkCommandAction.getCaretPosition();
-					end = jtc.getCaretPosition();
-				}
-				else {
-					start = jtc.getCaretPosition();
-					end = SetMarkCommandAction.getCaretPosition();
-				}
-				if (start != end) {
-					jtc.select(start, end);
-					SetMarkCommandAction.reset();
-					KillRing.getInstance().add(jtc.getSelectedText());
-					jtc.cut();
-				}
-				else {
-					jtc.getToolkit().beep();
-				}
-			}
+			EmacsKeyBindings.doCopyOrCut(jtc, false);
 		}
     }
 
+    private static void doCopyOrCut(JTextComponent jtc, boolean copy) {
+		if (jtc != null) {
+			int caretPosition = jtc.getCaretPosition();
+			String text = jtc.getSelectedText();
+			if (text != null) {
+				// user has manually marked a text without using CTRL+W
+				// we obey that selection and copy it.
+			} else if (SetMarkCommandAction.isMarked(jtc)) {
+				int beginPos = caretPosition;
+				int endPos = SetMarkCommandAction.getCaretPosition();
+				if (beginPos > endPos) {
+					int tmp = endPos;
+					endPos = beginPos;
+					beginPos = tmp;
+				}
+				jtc.select(beginPos, endPos);
+				SetMarkCommandAction.reset();
+			}
+			text = jtc.getSelectedText();
+			if (text != null) {
+				if (copy) {
+					jtc.copy();
+					// clear the selection
+					jtc.select(caretPosition, caretPosition);
+				} else {
+					int newCaretPos = jtc.getSelectionStart();
+					jtc.cut();
+					// put the cursor to the beginning of the text to cut
+					jtc.setCaretPosition(newCaretPos);
+				}
+				KillRing.getInstance().add(text);
+			} else {
+				jtc.getToolkit().beep();
+			}
+		}
+    }
+    
     /**
      * This actin kills text up to the end of the current line and stores it in 
      * the killring.
