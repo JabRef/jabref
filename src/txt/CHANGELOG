@@ -1,4 +1,5 @@
 [master branch]
+    - Added a formatter for units which keeps the case and adds non-breaking separators
     - Added a Merge entries functionality
     - Added a setting to choose either a DOI link or a URL to be standard (feature 710)
     - Added button to change entry type. Removed this functionality from the type label, and

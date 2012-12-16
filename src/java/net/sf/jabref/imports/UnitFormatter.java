@@ -16,7 +16,6 @@
 package net.sf.jabref.imports;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
@@ -46,12 +45,14 @@ public class UnitFormatter implements LayoutFormatter {
         "W",  // Watt
         "Wb", // Weber
         "Wh",  // Watt hours
+        "bar", // bar
         "b",  // bit
         "cd", // candela
         "dB",  // decibel
         "dBm", // decibel
         "dBc",  //decibel
         "eV",  // electron volts
+        "inch", // inch
         "kat", // katal
         "lm",  // lumen
         "lx",  // lux
@@ -119,9 +120,9 @@ public class UnitFormatter implements LayoutFormatter {
         // For each word in the list
 	for (int i = 0; i < listOfWords.length; i++) {
             // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
-	    text = text.replaceAll("([0-9,\\.]+)("+listOfWords[i]+")","$1\\{$2\\}"); // Only add brackets to keep case
-            text = text.replaceAll("([0-9,\\.]+)-("+listOfWords[i]+")","$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
-            text = text.replaceAll("([0-9,\\.]+) ("+listOfWords[i]+")","$1~\\{$2\\}"); // Replace space with a hard space
+	    text = text.replaceAll("([0-9])("+listOfWords[i]+")","$1\\{$2\\}"); // Only add brackets to keep case
+            text = text.replaceAll("([0-9])-("+listOfWords[i]+")","$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
+            text = text.replaceAll("([0-9]) ("+listOfWords[i]+")","$1~\\{$2\\}"); // Replace space with a hard space
             
 	}
         
