@@ -529,7 +529,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         //DefaultFormBuilder builder = new DefaultFormBuilder
         //        (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));
-        source.setEditable(true); // prefs.getBoolean("enableSourceEditing"));
+        source.setEditable(true);
         source.setLineWrap(true);
         source.setTabSize(GUIGlobals.INDENT);
         source.addFocusListener(new FieldEditorFocusListener());

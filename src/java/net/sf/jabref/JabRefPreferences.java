@@ -232,7 +232,6 @@ public class JabRefPreferences {
         defaults.put("defaultShowSource", Boolean.FALSE);
         defaults.put("showSource", Boolean.TRUE);
         defaults.put("defaultAutoSort", Boolean.FALSE);
-        defaults.put("enableSourceEditing", Boolean.TRUE);
         defaults.put("caseSensitiveSearch", Boolean.FALSE);
         defaults.put("searchReq", Boolean.TRUE);
         defaults.put("searchOpt", Boolean.TRUE);
