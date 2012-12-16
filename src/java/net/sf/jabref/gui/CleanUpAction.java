@@ -585,9 +585,9 @@ public class CleanUpAction extends AbstractWorker {
             return;
         }
         String newValue = oldValue;
+
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted
         newValue = newValue.replace("$$","").replaceAll("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{","$1");
-        
         // Move numbers, +, -, /, and brackets into equations
         // System.err.println(newValue);
         newValue = newValue.replaceAll("(([^$]|\\\\\\$)*)\\$","$1@@"); // Replace $, but not \$ with @@
@@ -605,7 +605,7 @@ public class CleanUpAction extends AbstractWorker {
         newValue = newValue.replace("  "," "); // Clean up
         newValue = newValue.replace("$$","");
         newValue = newValue.replace(" )$",")$");
-        
+
         if (!oldValue.equals(newValue)) {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));

@@ -196,11 +196,14 @@
 
     <p>After the key pattern has
     been applied to produce a key, you can choose to have the key
-    generator search for occurences of a specific regular
+    generator search for occurrences of a specific regular
     expression, and replace it with a string. The regular
     expression and replacement string are entered in the text
     fields below the list of key patterns. If the replacement
     string is empty, matches of the regular expression will simply
-    be removed from the generated key.</p>
+    be removed from the generated key. For instance,
+    <code>\p{Punct}</code> or <code>[:/%]</code> can be replaced
+    by nothing to remove unwanted characters from the key.
+    This may be useful when naming PDFs according to BibTeX keys.</p>
 </body>
 </html>

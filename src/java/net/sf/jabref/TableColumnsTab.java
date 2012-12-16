@@ -326,7 +326,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
 		// has to be called as last to correctly enable/disable the other settings
 		oldSpecialFieldsEnabled = _prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED);
-		specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled);
+		specialFieldsEnabled.setSelected(!oldSpecialFieldsEnabled);
+		specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 		
         /*** end: special fields ***/
 		

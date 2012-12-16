@@ -7,7 +7,10 @@
       (patch 123 by Laura Hern�ndez G�mez)
     - After a search has been done, the first entry of the entry table is selected (feature 656).
     - Entries contained in an .aux file can now be selected (feature 644).
-[beta_2.9 branch]
+2.9
+    - Fixed bug: in OO/LO reference lists, entries may fall out when multiple entries with same
+      author and year are cited.
+    - Added support for converting HTML combining accents to LaTeX
     - When generating subdatabase from AUX file, preamble and strings are now included from
       the source database.
     - Added cleanup action for removing redundant $, {, and }

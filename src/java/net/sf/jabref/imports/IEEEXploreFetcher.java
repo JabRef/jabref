@@ -27,10 +27,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import java.net.ConnectException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,6 +70,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
     private JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
     
+    private CookieManager cm = new CookieManager();
+    
     private static final int MAX_FETCH = 100;
     private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
     private int piv = 0;
@@ -104,7 +107,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     
     public IEEEXploreFetcher() {
     	super();
-    	
+    	CookieHandler.setDefault(cm);
+        
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         fieldPatterns.put("author", "</h3>\\s*(.+)");
         fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
@@ -589,7 +593,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // Clean up url
         String url = (String) entry.getField("url");
         if (url != null) {
-            entry.setField("url","http://ieeexplore.ieee.org"+url);
+            entry.setField("url","http://ieeexplore.ieee.org"+url.replace("tp=&",""));
         }
 	return entry;
     }
@@ -645,7 +649,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
 		        	type = BibtexEntryType.getType("Electronic");
 		        	sourceField = "note";
-		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
+		        } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
+                                typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
 		        	type = BibtexEntryType.getType("inCollection");
 		        	sourceField = "booktitle";
 		        }
@@ -669,6 +674,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             	entry.setField("publisher", "Wiley-IEEE Press");
             } else if(typeName.equalsIgnoreCase("MIT Press eBook Chapters")) {
                 entry.setField("publisher", "MIT Press");
+            } else if(typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                entry.setField("publisher", "IEEE USA");
             }
             
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
@@ -693,7 +700,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		}
             	} 
             }
-            if (entry.getField("author") == null || entry.getField("author").startsWith("a href")) {  // Fix for some documents without authors
+            if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
+                    entry.getField("author").startsWith("Topic(s)")) {  // Fix for some documents without authors
                 entry.setField("author","");
             }
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
