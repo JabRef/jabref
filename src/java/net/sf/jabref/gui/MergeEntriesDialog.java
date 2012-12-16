@@ -93,9 +93,8 @@ public class MergeEntriesDialog extends JDialog {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(frame, Globals.lang("Must choose exactly two entries to merge."),
+            JOptionPane.showMessageDialog(frame, Globals.lang("You have to choose exactly two entries to merge."),
                     Globals.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
-
             this.dispose();
             return;
         }
@@ -106,10 +105,6 @@ public class MergeEntriesDialog extends JDialog {
 
         // Create undo-compound
         ce = new NamedCompound(Globals.lang("Merge entries"));
-
-        
-       
-       
 
         joint = new TreeSet<String>(one.getAllFields());
         joint.addAll(two.getAllFields());
@@ -297,7 +292,7 @@ public class MergeEntriesDialog extends JDialog {
         try {
             mergedEntry.write(sw, new LatexFieldFormatter(), false);
         } catch (IOException ex) {
-            System.err.println(Globals.lang("Error in entry: " + ex.getMessage()));
+            System.err.println(Globals.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
@@ -426,7 +421,7 @@ public class MergeEntriesDialog extends JDialog {
         try {
             mergedEntry.write(sw, new LatexFieldFormatter(), false);
         } catch (IOException ex) {
-            System.err.println(Globals.lang("Error in entry: " + ex.getMessage()));
+            System.err.println(Globals.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);

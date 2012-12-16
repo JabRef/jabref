@@ -64,7 +64,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"));
         defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"));
         showSource = new JCheckBox(Globals.lang("Show BibTeX source panel"));
-        emacsMode = new JCheckBox(Globals.lang("Use Emacs keybindings"));
+        emacsMode = new JCheckBox(Globals.lang("Use Emacs key bindings"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
         
