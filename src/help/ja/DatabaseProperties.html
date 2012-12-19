@@ -1,49 +1,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
 </head>
 
 <body>
-    <h1>Database properties window</h1>
+    <h1>データベース特性ウィンドウ</h1>
 
-<p><em>Opened from the main window by selecting <b>File -> Database properties</b></em></p>
+<p><em>メインウィンドウから<b>ファイル→データベース特性</b>を選べば開きます。</em></p>
 
-The database properties window lets you set certain database-specific settings.
+データベース特性ウィンドウでは、データベースに関連した設定を行うことができます。
 
-<h2>Database encoding</h2>
+<h2>データベースのエンコーディング</h2>
 
-<p>This setting determines which character encoding JabRef will use when writing this database
-to disk. Changing this setting will override the setting made in Preferences dialog for this
-database. JabRef specifies the encoding near the top of the bib file, in order to be able
-to use the correct encoding next time you open the file.</p>
+<p>この設定は、データベースをディスクに書き込む際、JabRefがどの文字エンコーディングを使うべきかを指定します。この設定を変更すると、このデータベースに関しては、この設定が、「JabRefの設定」ダイアログで行った設定よりも優先して用いられます。JabRefはエンコーディングをbibファイルの冒頭部に書き込み、次回このファイルを開いたときに正しいエンコーディングで開くことができるようにします。</p>
 
-<h2>Override default file directories</h2>
+<h2>ファイルディレクトリ既定値の上書き</h2>
 
-<p>These settings are used to specify which directory will be used to search for general file links
-(specified in the <em>file</em> field), and for legacy PDF/PS links (the <em>pdf</em> and <em>ps</em>
-fields were used in JabRef versions prior to 2.3, but should in current versions be replaced by
-general file links).</p>
+<p>これらの設定は、一般ファイルリンク(<em>file</em>フィールドで指定)と旧来のPDF/PSリンク(この<em>pdf</em>および<em>ps</em>フィールドは、JabRef第2.3版以前で用いられていましたが、現行版では一般ファイルリンクを用いなくてはなりません)を検索する際、どのディレクトリを対象とするか指定するのに用いられます。</p>
 
-<p>Relative directories can be specified. This means that the location of the files will be interpreted
-relative to the location of the bib file. Simply setting a directory to "." (without quotes) means
-that the files should reside in the same directory as the bib file.</p>
+<p>相対ディレクトリを指定することは可能です。この場合、ファイルの場所は、bibファイルのある場所からの相対パスとして解釈されます。ディレクトリを「.」に指定すると(除括弧)、ファイルがbibファイルと同じディレクトリにあることを意味します。</p>
 
-<p>These settings override the general file directories specified in the Preferences dialog. If
-no values are set, the general directories will be used.</p>
+<p>これらの設定は、「JabRefの設定」ダイアログで指定した一般ファイルディレクトリよりも優先して扱われます。ここで値を指定しない場合は、「JabRefの設定」ダイアログの値が用いられます。</p>
 
-<h2>Database protection</h2>
+<h2>データベース保護</h2>
 
-<p>This setting lets you enforce reviewing of external changes before the database can be saved. Without
-the protection enabled, users have the option to save even if other users have made changes to the file,
-without reviewing the changes - although they will be warned about the changes. When the protection is
-enabled, users will only be able to save after any external changes have been reviewed and merged (however,
-the user can disable individual changes in the course of reviewing them).</p>
+<p>この設定は、データベースを保存する前に、外部から加えられた変更を常に審査するように強制します。データベース保護を有効にしないと、他のユーザーがファイルに変更を加えていた場合に、変更が為されているという警告は発せられますが、変更内容を審査せずに保存することができてしまいます。データベース保護を有効にすると、外部から加えられた変更を審査し、マージした上でないと保存することができません(ただし審査過程で、ユーザーが各々の変更をなかったことにすることは可能です)。</p>
 
-<p><b>Note:</b> this is not a security feature, merely a way to prevent users from overwriting other users'
-changes inadvertently. This feature does not protect your database against malicious users.</p>
-
-
-
+<p><b>【註】</b>本機能は、セキュリティ機能を提供するものではなく、他のユーザーが加えた変更を意図せずに上書きしてしまうのを避ける機会を提供するだけです。本機能は、悪意を持ったユーザーからあなたのデータベースを守るわけではありません。</p>
 
 </body>
 </html>

@@ -1,17 +1,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
 </head>
 
 <body>
 
-    <h1>Customizing the BibTeX key generator</h1>
+    <h1>BibTeX<ruby><rb>鍵</rb><rp>(</rp><rt>キー</rt><rp>)</rp></ruby>生成子の個人用設定</h1>
 
-    <p>In the 'Key pattern' tab in Preferences, one can set the fields
-    used in auto generation of BibTex labels. The pattern can be
-    set for each of the standard entry types.</p>
+    <p>JabRef設定の「BibTeXキーの生成」タブでは、BibTeXラベルの自動生成に使用されるフィールドを設定することができます。パターンは、標準的な項目型それぞれに対して設定することができます。</p>
 
-    <h2>Key patterns</h2>
+    <h2>キーパターン</h2>
 
     <p>The pattern can contain any text you wish,
     in addition to field markers that indicate that a specific
@@ -196,11 +195,14 @@
 
     <p>After the key pattern has
     been applied to produce a key, you can choose to have the key
-    generator search for occurences of a specific regular
+    generator search for occurrences of a specific regular
     expression, and replace it with a string. The regular
     expression and replacement string are entered in the text
     fields below the list of key patterns. If the replacement
     string is empty, matches of the regular expression will simply
-    be removed from the generated key.</p>
+    be removed from the generated key. For instance,
+    <code>\p{Punct}</code> or <code>[:/%]</code> can be replaced
+    by nothing to remove unwanted characters from the key.
+    This may be useful when naming PDFs according to BibTeX keys.</p>
 </body>
 </html>
