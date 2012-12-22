@@ -13,8 +13,8 @@ What is here?
   * dist
     * Should contain everything that is supposed to be shipped to the user.
   * launcher.nsi - Will create the exe-wrapper.
+  * fileassoc.nsh - Helper script to set file-associations. Source: http://nsis.sourceforge.net/FileAssoc
   * setup.nsi - Will create the installer.
-  * fileassoc.nsh - Helper script to set file-associations
 
 Requirements + Current Status
 

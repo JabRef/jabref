@@ -81,15 +81,14 @@
 
 	<property name="osxbin.dir" value="osx" />
 
-	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
-	<property name="nsis.executable.linux" value="makensis"/>
-
-	<!-- Load user dependent properties -->
+	<!-- Load user dependent properties. Has to happen before setting the properties here -->
 	<!-- For instance to redefine the NSIS-compiler write 
-		nsis.executable="d:\prog\dev\NSIS\makensis.exe"
+		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
 	  -->
 	<property file="user.properties" />
 
+	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
+	<property name="nsis.executable.linux" value="makensis"/>
 	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
 	<condition property="is.windows">
 	  <and>
