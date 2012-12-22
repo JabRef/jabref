@@ -292,7 +292,7 @@
 		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="false" errorproperty="">
 			<arg value="log" />
 			<arg value="-1" />
-			<arg value="--pretty=format:%ad - %H" />
+			<arg value="--pretty=format:%cd - %H" />
 			<arg value="--date=iso" />
 		</exec>
 		<script language="javascript"><![CDATA[
