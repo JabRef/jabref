@@ -36,6 +36,7 @@
 
 	<!-- some version information -->
 	<property name="jabref.version" value="2.9.1" />
+	<property name="jabref.version.full" value="2.9.1.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2012" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
@@ -89,6 +90,8 @@
 
 	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
 	<property name="nsis.executable.linux" value="makensis"/>
+	<property name="launch4j.dir" location="/opt/launch4j" />
+
 	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
 	<condition property="is.windows">
 	  <and>
@@ -495,8 +498,20 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<!-- "Create Exe-Wrapper" -->
-		<exec dir="." executable="${nsis.executable}" failonerror="true">
-		  <arg line="'/DJARFILE=${build.jar}' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+
+		<!-- first of all, update version information -->
+		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
+		<replace file="jabref-launch4j.tmp">
+			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
+			<replacefilter token="./" value="${basedir}/" />
+		</replace>
+
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
 
 		<!-- Finally create Windows-Installer -->
@@ -529,8 +544,20 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<!-- "Create Exe-Wrapper" -->
-		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
-		  <arg line="'-DJARFILE=${build.jar}' '-DVERSION=${jabref.version}' '-DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+
+		<!-- first of all, update version information -->
+		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
+		<replace file="jabref-launch4j.tmp">
+			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
+			<replacefilter token="./" value="${basedir}/" />
+		</replace>
+
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
 
 		<!-- Finally create Windows-Installer -->

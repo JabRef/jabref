@@ -1,3 +1,5 @@
+[2.9.1]
+    - Replaced Java launcher by launch4j
 2.9
     - Fixed bug: in OO/LO reference lists, entries may fall out when multiple entries with same
       author and year are cited.

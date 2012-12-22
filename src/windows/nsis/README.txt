@@ -4,15 +4,16 @@ JabRef Installer Documentation
 
 How to build the installer:
 
-  * Create a build.properties file in root-directory and set the
-    nsis.executable variable to point to makensis.exe
+  * Create a user.properties file in root-directory
+    * Set the nsis.executable variable to point to makensis.exe
+    * Set the launch4.jar variable to point to launch4j.jar
   * Run the win.installer.build target from the ant-file in root-directory.
 
 What is here?
 
   * dist
     * Should contain everything that is supposed to be shipped to the user.
-  * launcher.nsi - Will create the exe-wrapper.
+  * jabref-launch4j.xml - used by launch4j to create the exe-wrapper.
   * fileassoc.nsh - Helper script to set file-associations. Source: http://nsis.sourceforge.net/FileAssoc
   * setup.nsi - Will create the installer.
 
