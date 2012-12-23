@@ -1960,7 +1960,6 @@ public JabRefPreferences prefs() {
          */
         if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
             (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
-
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -2548,14 +2547,17 @@ class SaveSessionAction
     }
 
     public void showIfMinimizedToSysTray() {
-        if (sysTray != null)
-            sysTray.setTrayIconVisible(false);
-        setVisible(true);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                toFront();
+        // TODO: does not work correctly when a dialog is shown
+        // Workaround: put into invokeLater queue before a dialog is added to that queue
+        if (!this.isVisible()) {
+            // isVisible() is false if minimized to systray
+            if (sysTray != null) {
+                sysTray.setTrayIconVisible(false);
             }
-        });
+            setVisible(true);
+            this.isActive();
+            toFront();
+        }
     }
 
     /*private class ForegroundLabel extends JLabel {
