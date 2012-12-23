@@ -13,10 +13,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.help;
 
-import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,10 +23,9 @@ import java.util.Stack;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.TextAction;
-import javax.swing.text.html.HTMLEditorKit;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +43,7 @@ public class HelpContent extends JTextPane {
 	public HelpContent(JabRefPreferences prefs_) {
 		super();
 		pane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pane.setDoubleBuffered(true);
 		prefs = prefs_;
 		history = new Stack<URL>();
@@ -168,62 +165,4 @@ public class HelpContent extends JTextPane {
 		super.paintComponent(g2);
 	}*/
 
-	public class MyNextVisualPositionAction extends TextAction {
-		private Action textActn;
-
-		private int direction;
-
-		private MyNextVisualPositionAction(Action textActn, int direction) {
-			super((String) textActn.getValue(Action.NAME));
-			this.textActn = textActn;
-			this.direction = direction;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			JTextComponent c = getTextComponent(e);
-
-			if (c.getParent() instanceof JViewport) {
-				JViewport viewport = (JViewport) c.getParent();
-				Point p = viewport.getViewPosition();
-
-				if (this.direction == SwingConstants.NORTH) {
-					c.setCaretPosition(c.viewToModel(p));
-				} else {
-					p.y += viewport.getExtentSize().height;
-					c.setCaretPosition(c.viewToModel(p));
-				}
-			}
-
-			textActn.actionPerformed(e);
-		}
-	}
-
-	public class MyEditorKit extends HTMLEditorKit {
-		private Action[] myActions;
-
-		public Action[] getActions() {
-			if (myActions == null) {
-				Action[] actions = super.getActions();
-				Action[] newActions = new Action[2];
-
-				for (int i = 0; i < actions.length; i++) {
-					Action actn = actions[i];
-
-					String name = (String) actn.getValue(Action.NAME);
-
-					if (name.equals(DefaultEditorKit.upAction)) {
-						newActions[0] = new MyNextVisualPositionAction(actions[i],
-							SwingConstants.NORTH);
-					} else if (name.equals(DefaultEditorKit.downAction)) {
-						newActions[1] = new MyNextVisualPositionAction(actions[i],
-							SwingConstants.SOUTH);
-					}
-				}
-
-				myActions = TextAction.augmentList(actions, newActions);
-			}
-
-			return myActions;
-		}
-	}
 }

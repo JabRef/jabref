@@ -41,6 +41,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

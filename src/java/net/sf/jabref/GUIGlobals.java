@@ -63,11 +63,12 @@ public class GUIGlobals {
 		"This file was created with JabRef";
 
 	// Size of help window.
-	static Dimension
+	public static final Dimension
 	helpSize = new Dimension(700, 600),
 	aboutSize = new Dimension(600, 265),
 	searchPaneSize = new Dimension(430, 70),
 	searchFieldSize = new Dimension(215, 25);
+	public static Double zoomLevel = new Double(1.0);
 
 	// Divider size for BaseFrame split pane. 0 means non-resizable.
 	public static final int

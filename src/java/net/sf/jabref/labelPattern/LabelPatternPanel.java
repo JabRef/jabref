@@ -38,9 +38,9 @@ import javax.swing.JTextField;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
-import net.sf.jabref.HelpDialog;
 import net.sf.jabref.Util;
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.help.HelpDialog;
 
 public class LabelPatternPanel  extends JPanel {
     

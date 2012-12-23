@@ -22,6 +22,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.PushToApplication;
+import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.plugin.SidePanePlugin;
 
 import javax.swing.*;

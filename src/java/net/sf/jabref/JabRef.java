@@ -665,13 +665,21 @@ public class JabRef {
             int fontSize = Globals.prefs.getInt("menuFontSize");
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
+            Double zoomLevel = null;
             while (keys.hasMoreElements()) {
                 Object key = keys.nextElement();
                 if ((key instanceof String) && (((String) key).endsWith(".font"))) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
+                    if (zoomLevel == null) {
+                        // zoomLevel not yet set, calculate it based on the first found font
+                        zoomLevel = new Double(fontSize) / new Double(font.getSize());
+                    }
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
+            }
+            if (zoomLevel != null) {
+                GUIGlobals.zoomLevel = zoomLevel;
             }
         }
     }

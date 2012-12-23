@@ -73,6 +73,7 @@ import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
+import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;

@@ -69,7 +69,6 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.ErrorMessageDisplay;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -77,6 +76,7 @@ import net.sf.jabref.SearchRule;
 import net.sf.jabref.SearchRuleSet;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
+import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements

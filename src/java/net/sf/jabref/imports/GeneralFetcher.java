@@ -28,13 +28,13 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.Util;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.help.HelpAction;
 
 /**
  * <p>Title: </p>

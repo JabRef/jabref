@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.help;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -21,6 +21,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 
 /**
  * 
@@ -46,7 +52,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 	public HelpDialog(JabRefFrame bf) {
 		super(bf, Globals.lang("JabRef help"), false);
 		frame = bf;
-		content = new HelpContent(bf.prefs);
+		content = new HelpContent(bf.prefs());
 		content.addHyperlinkListener(this);
 		setSize(GUIGlobals.helpSize);
 
@@ -60,19 +66,19 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 		// Make ESC close dialog, and set shortkeys for back and forward.
 		InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		ActionMap am = tlb.getActionMap();
-		im.put(bf.prefs.getKey("Close dialog"), "close");
+		im.put(bf.prefs().getKey("Close dialog"), "close");
 		am.put("close", new CloseAction());
-		im.put(bf.prefs.getKey("Back, help dialog"), "left");
+		im.put(bf.prefs().getKey("Back, help dialog"), "left");
 		am.put("left", back);
-		im.put(bf.prefs.getKey("Forward, help dialog"), "right");
+		im.put(bf.prefs().getKey("Forward, help dialog"), "right");
 		am.put("right", forward);
 
 		// Set shortkeys for back and forward specifically for the EditorPane.
 		im = content.getInputMap(JComponent.WHEN_FOCUSED);
 		am = content.getActionMap();
-		im.put(bf.prefs.getKey("Back, help dialog"), "left");
+		im.put(bf.prefs().getKey("Back, help dialog"), "left");
 		am.put("left", back);
-		im.put(bf.prefs.getKey("Forward, help dialog"), "right");
+		im.put(bf.prefs().getKey("Forward, help dialog"), "right");
 		am.put("right", forward);
 
 		getContentPane().add(tlb, BorderLayout.NORTH);
