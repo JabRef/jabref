@@ -76,6 +76,7 @@ import net.sf.jabref.gui.FileListEditor;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.VerticalLabelUI;
 import net.sf.jabref.gui.date.DatePickerButton;
+import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;

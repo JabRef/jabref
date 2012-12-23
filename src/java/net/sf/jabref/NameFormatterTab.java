@@ -28,6 +28,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import net.sf.jabref.export.layout.format.plugin.NameFormat;
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

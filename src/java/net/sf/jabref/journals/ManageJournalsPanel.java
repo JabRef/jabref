@@ -31,9 +31,9 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.net.URLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

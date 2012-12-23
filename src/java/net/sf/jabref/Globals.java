@@ -37,6 +37,7 @@ import java.util.logging.StreamHandler;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
+import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.util.ErrorConsole;

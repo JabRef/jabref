@@ -47,6 +47,8 @@ import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.GeneralFetcher;
 import net.sf.jabref.imports.ImportCustomizationDialog;

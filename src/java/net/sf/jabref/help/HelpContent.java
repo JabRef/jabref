@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.help;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -29,6 +29,10 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import javax.swing.text.html.HTMLEditorKit;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -21,6 +21,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.remote.RemoteListener;
 

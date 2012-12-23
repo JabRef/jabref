@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.help;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -22,6 +22,10 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MnemonicAwareAction;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help

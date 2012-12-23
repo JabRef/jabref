@@ -26,6 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.external.*;
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
