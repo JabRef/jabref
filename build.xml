@@ -489,7 +489,7 @@ version=${jabref.version}</echo>
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
-		<zip basedir="${build.lib}" destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip" includes="JabRef.app/*" level="9" />
+		<zip basedir="${build.lib}" destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip" includes="JabRef.app/" level="9" />
 	</target>
 
 
@@ -569,7 +569,7 @@ version=${jabref.version}</echo>
 	</target>
 
 	<target name="win.installer.step3">
-		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
+		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${build.lib}/JabRef-${jabref.version}-setup.exe" />
 		<delete dir="${win.installer.dir}/dist" />
 	</target>
 
@@ -633,4 +633,28 @@ version=${jabref.version}</echo>
 
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
+	<target name="zipsrc">
+		<!-- clone current repo into tmp dir. Reason: we want to have a clean src.zip, but do not want to execute "git clean -xdf" to allow developers having some temporary files (and user.properties) -->
+		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
+		<mkdir dir="${temp.dir}"/>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull">
+			<arg value="clone" />
+			<arg value="${basedir}/.." />
+			<arg value="${temp.dir}" />
+		</exec>
+		<!-- <property name="temp.dir" value="C:\Users\Oliver\AppData\Local\Temp\jabrefsrc628715364" /> -->
+
+		<!-- we want to have jabref-${jabref.version} as main directory -->
+		<property name="distsrc" value="${temp.dir}/distsrc/" />
+		<mkdir dir="${distsrc}" />
+		<move file="${temp.dir}/jabref" tofile="${distsrc}/jabref-${jabref.version}" />
+
+		<zip destfile="${build.lib}/JabRef-${jabref.version}-src.zip" basedir="${distsrc}" level="9" />
+		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${distsrc}" excludes=".git/" compression="bzip2" />
+
+		<delete dir="${temp.dir}" failonerror="no"/>
+	</target>
+
+	<!-- creates all distribution files in ${build.lib} -->
+	<target name="release" depends="clean, win.installer, osxjar, zipsrc" />
 </project>
