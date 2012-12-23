@@ -557,7 +557,7 @@ version=${jabref.version}</echo>
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
 
-		<rename src="${win.installer.dir}/JabRefSetup.exe" dest="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
+		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
 
 		<delete dir="${win.installer.dir}/dist" />
 
