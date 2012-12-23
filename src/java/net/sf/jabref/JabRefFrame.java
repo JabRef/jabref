@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -70,8 +69,6 @@ import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldAction;
-import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
@@ -570,7 +567,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             setTitle(GUIGlobals.frameTitle);
             return;
         }
-        String star = bp.baseChanged ? "*" : "";
+        String star = bp.isBaseChanged() ? "*" : "";
         if (bp.getFile() != null) {
             setTitle(GUIGlobals.frameTitle+" - "+bp.getFile().getPath()+star);
         } else {
@@ -703,7 +700,7 @@ public JabRefPreferences prefs() {
     Vector<String> filenames = new Vector<String>();
     if (tabbedPane.getTabCount() > 0) {
       for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-        if (baseAt(i).baseChanged) {
+        if (baseAt(i).isBaseChanged()) {
           tabbedPane.setSelectedIndex(i);
           int answer = JOptionPane.showConfirmDialog
               (JabRefFrame.this, Globals.lang
@@ -1701,8 +1698,20 @@ public JabRefPreferences prefs() {
 
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
-                       bp);
+        String title;
+        if (file == null ) {
+            title = Globals.lang(GUIGlobals.untitledTitle);
+            if (!bp.database().getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                // This also happens internally at basepanel to ensure consistency
+                title = title + "*";
+            }
+        } else {
+            title = file.getName();
+        }
+        tabbedPane.add(title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
@@ -1790,7 +1799,7 @@ public JabRefPreferences prefs() {
                 return; // nbatada nov 7
             }
 
-            if (basePanel().baseChanged) {
+            if (basePanel().isBaseChanged()) {
                 int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Globals
                     .lang("Database has changed. Do you want to save " + "before closing?"),
                     Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
@@ -1957,7 +1966,6 @@ public JabRefPreferences prefs() {
          */
         if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
             (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
-
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -2545,14 +2553,17 @@ class SaveSessionAction
     }
 
     public void showIfMinimizedToSysTray() {
-        if (sysTray != null)
-            sysTray.setTrayIconVisible(false);
-        setVisible(true);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                toFront();
+        // TODO: does not work correctly when a dialog is shown
+        // Workaround: put into invokeLater queue before a dialog is added to that queue
+        if (!this.isVisible()) {
+            // isVisible() is false if minimized to systray
+            if (sysTray != null) {
+                sysTray.setTrayIconVisible(false);
             }
-        });
+            setVisible(true);
+            this.isActive();
+            toFront();
+        }
     }
 
     /*private class ForegroundLabel extends JLabel {

@@ -86,6 +86,16 @@ public class RemoteListener extends Thread {
                     String[] args = sb.toString().split("\n");
                     Vector<ParserResult> loaded = jabref.processArguments(args, false);
 
+                    // put "bringToFront" in the queue
+                    // it has to happen before the call to import as the import might open a dialog
+                    // --> Globals.prefs.getBoolean("useImportInspectionDialog")
+                    // this dialog has to be shown AFTER JabRef has been brought to front
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            jabref.jrf.showIfMinimizedToSysTray();
+                        }
+                    });
+
                     for (int i=0; i<loaded.size(); i++) {
                         ParserResult pr = loaded.elementAt(i);
                         if (!pr.toOpenTab()) {
@@ -105,12 +115,6 @@ public class RemoteListener extends Thread {
                     in.close();
                     out.close();
                     newSocket.close();
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            jabref.jrf.showIfMinimizedToSysTray();
-                        }
-                    });
                 } catch (SocketTimeoutException ex) {
                     //System.out.println("timeout");
                     in.close();

@@ -396,40 +396,48 @@ public class ImportFormatReader {
 	 */
 	public Pair<String, ParserResult> importUnknownFormat(String filename) {
 
-		Pair<String, ParserResult> result = null;
-		
 		// we don't use a provided OutputPrinter (such as the JabRef frame),
 		// as we don't want to see any outputs from failed importers:
 		// we expect failures and do not want to report them to the user
 		OutputPrinterToNull nullOutput = new OutputPrinterToNull();
-		
-		// Cycle through all importers:
-		int bestResult = 0;
 
-        for (ImportFormat imFo : getImportFormats()) {
+		// stores ref to best result, gets updated at the next loop
+		List<BibtexEntry> bestResult = null;
+		int bestResultCount = 0;
+		String bestFormatName = null;
+
+		// Cycle through all importers:
+		for (ImportFormat imFo : getImportFormats()) {
 
             try {
 
                 List<BibtexEntry> entries = importFromFile(imFo, filename, nullOutput);
 
-                if (entries != null)
+                int entryCount;
+                if (entries == null) {
+                    entryCount = 0;
+                } else {
                     purgeEmptyEntries(entries);
+                    entryCount = entries.size();
+                }
 
-                int entryCount = ((entries != null) ? entries.size() : 0);
-
-                if (entryCount > bestResult) {
-                    bestResult = entryCount;
-
-                    result = new Pair<String, ParserResult>(imFo.getFormatName(),
-                    new ParserResult(entries));
+                if (entryCount > bestResultCount) {
+                    bestResult = entries;
+                    bestResultCount = bestResult.size();
+                    bestFormatName = imFo.getFormatName();
                 }
             } catch (IOException ex) {
                 // The import didn't succeed. Go on.
             }
         }
-		
-		if (result != null)
-			return result;
+
+        if (bestResult != null) {
+            // we found something
+            ParserResult parserResult = new ParserResult(bestResult);
+            Pair<String, ParserResult> result =
+                    new Pair<String, ParserResult>(bestFormatName, parserResult);
+            return result;
+        }
 
       // Finally, if all else fails, see if it is a BibTeX file:
       try {

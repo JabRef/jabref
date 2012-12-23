@@ -18,7 +18,7 @@ SetCompressor lzma
 # general definitions
 ; you only need to change this section for new releases
 VIProductVersion "2.2.0.0" ; file version for the installer in the scheme "x.x.x.x"
-!define VERSION "2.2"
+#!define VERSION "2.2" #Already set by command line parameter
 Name "JabRef ${VERSION}"
 !define REGKEY "SOFTWARE\JabRef"
 !define COMPANY "JabRef Team"
@@ -37,8 +37,11 @@ Var InstDestination
 
 
 # Included files
+#from nullsoft distribution
 !include "MUI.nsh"
+#taken from http://nsis.sourceforge.net/FileAssoc
 !include "fileassoc.nsh"
+#from nullsoft distribution
 !include "LogicLib.nsh"
 
 
@@ -115,10 +118,14 @@ Var InstDestination
 
 # Installer languages
 !insertmacro MUI_LANGUAGE "English" # first language is the default language
+!insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "Italian"
 
 !include "installer_languages\english.nsh"
+!include "installer_languages\french.nsh"
 !include "installer_languages\german.nsh"
+!include "installer_languages\italian.nsh"
 
 
 # Installer attributes

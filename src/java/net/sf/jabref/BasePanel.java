@@ -27,7 +27,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -43,13 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Pattern;
-
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -73,14 +68,12 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.*;
-import net.sf.jabref.groups.AddToGroupAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
-import net.sf.jabref.imports.INSPIREFetcher;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -94,7 +87,6 @@ import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
@@ -104,7 +96,6 @@ import net.sf.jabref.sql.exporter.DBExporter;
 import net.sf.jabref.undo.CountingUndoManager;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableChangeType;
-import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -166,7 +157,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
 
-    boolean baseChanged = false, nonUndoableChange = false;
+    private boolean baseChanged = false;
+    private boolean nonUndoableChange = false;
     // Used to track whether the base has changed since last save.
 
     //EntryTableModel tableModel = null;
@@ -252,6 +244,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void init(JabRefFrame frame, BibtexDatabase db, File file,
                       MetaData metaData, String encoding) {
+        assert(frame != null);
+        assert(db != null);
+        //file may be null
+        assert(encoding != null);
+        assert(metaData != null);
+
         this.encoding = encoding;
         this.metaData = metaData;
         // System.out.println(encoding);
@@ -265,13 +263,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         metaData.setFile(file);
 
-        // Register so we get notifications about outside changes to the file.
-        if (file != null)
+        if (file == null) {
+            if (!database.getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
+        } else {
+            // Register so we get notifications about outside changes to the file.
             try {
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
+                System.err.println(ex);
             }
+        }
         
     }
 

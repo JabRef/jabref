@@ -28,12 +28,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportFormats;
@@ -633,12 +635,15 @@ public class JabRef {
     }
     
     private void setLookAndFeel() {
-        // * Look first into the Preferences
-        // * Fallback to the System Look & Fell
         try {
-            String systemLnF = UIManager.getSystemLookAndFeelClassName();
-            if (!Globals.prefs.getBoolean("useDefaultLookAndFeel"))
+            String systemLnF;
+            // * Look first into the Preferences
+            // * Fallback to the System Look & Fell
+            if (Globals.prefs.getBoolean("useDefaultLookAndFeel")) {
+                systemLnF = UIManager.getSystemLookAndFeelClassName();
+            } else {
                 systemLnF = Globals.prefs.get("lookAndFeel");
+            }
 
             // At all cost, avoid ending up with the Metal look and feel:
             if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
@@ -652,6 +657,22 @@ public class JabRef {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
+        boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
+        if (overrideDefaultFonts) {
+            int fontSize = Globals.prefs.getInt("menuFontSize");
+            UIDefaults defaults = UIManager.getDefaults();
+            Enumeration<Object> keys = defaults.keys();
+            while (keys.hasMoreElements()) {
+                Object key = keys.nextElement();
+                if ((key instanceof String) && (((String) key).endsWith(".font"))) {
+                    FontUIResource font = (FontUIResource) UIManager.get(key);
+                    font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
+                    defaults.put(key, font);
+                }
+            }
         }
     }
 
@@ -740,8 +761,11 @@ public class JabRef {
                         i.remove();
                     }
                     else if (!pr.isPostponedAutosaveFound()) {
-                        jrf.addTab(pr.getDatabase(), pr.getFile(),
-                                pr.getMetaData(), pr.getEncoding(), first);
+                        MetaData metaData = pr.getMetaData();
+                        if (metaData == null) metaData = new MetaData();
+                        String encoding = pr.getEncoding();
+                        if (encoding == null) encoding = Globals.prefs.get("defaultEncoding");
+                        jrf.addTab(pr.getDatabase(), pr.getFile(), metaData, encoding, first);
                         first = false;
                     }
                     else {

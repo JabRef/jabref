@@ -36,6 +36,7 @@
 
 	<!-- some version information -->
 	<property name="jabref.version" value="2.10dev" />
+	<property name="jabref.version.full" value="2.10.0.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2012" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
@@ -81,14 +82,15 @@
 
 	<property name="osxbin.dir" value="osx" />
 
-	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
-	<property name="nsis.executable.linux" value="makensis"/>
-
-	<!-- Load user dependent properties -->
+	<!-- Load user dependent properties. Has to happen before setting the properties here -->
 	<!-- For instance to redefine the NSIS-compiler write 
-		nsis.executable="d:\prog\dev\NSIS\makensis.exe"
+		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
 	  -->
 	<property file="user.properties" />
+
+	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
+	<property name="nsis.executable.linux" value="makensis"/>
+	<property name="launch4j.dir" location="/opt/launch4j" />
 
 	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
 	<condition property="is.windows">
@@ -290,7 +292,7 @@
 		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="false" errorproperty="">
 			<arg value="log" />
 			<arg value="-1" />
-			<arg value="--pretty=format:%ad - %H" />
+			<arg value="--pretty=format:%cd - %H" />
 			<arg value="--date=iso" />
 		</exec>
 		<script language="javascript"><![CDATA[
@@ -493,7 +495,7 @@ version=${jabref.version}</echo>
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 	<!-- Build Windows Installer                                                    -->
 	<!--                                                                            -->
-	<!-- Don't forget to set nsis.executable property                               -->
+	<!-- Don't forget to set nsis.executable and launch4j.dir properties            -->
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
@@ -524,14 +526,38 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<!-- "Create Exe-Wrapper" -->
-		<exec dir="." executable="${nsis.executable}" failonerror="true">
-		  <arg line="'/DJARFILE=${build.jar}' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+
+		<!-- first of all, update version information -->
+		<script language="javascript"><![CDATA[
+			// create new property with a maximum length of 50 characters
+			var txtFileVersion = project.getProperty("jabref.version");
+			if (txtFileVersion.length()>50) {
+				txtFileVersion = txtFileVersion.substring(0,50);
+			}
+			project.setProperty("txtFileVersion", txtFileVersion);
+		]]></script>
+		<delete file="jabref-launch4j.tmp" />
+		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
+		<replace file="jabref-launch4j.tmp">
+			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="3.3.3" value="${txtFileVersion}" />
+			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
+			<replacefilter token="./" value="${basedir}/" />
+		</replace>
+
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
 
 		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
+
+		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
 
 		<delete dir="${win.installer.dir}/dist" />
 
@@ -558,8 +584,20 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<!-- "Create Exe-Wrapper" -->
-		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
-		  <arg line="'-DJARFILE=${build.jar}' '-DVERSION=${jabref.version}' '-DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+
+		<!-- first of all, update version information -->
+		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
+		<replace file="jabref-launch4j.tmp">
+			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
+			<replacefilter token="./" value="${basedir}/" />
+		</replace>
+
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
 
 		<!-- Finally create Windows-Installer -->

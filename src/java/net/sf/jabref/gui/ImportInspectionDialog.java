@@ -93,10 +93,6 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  * receiving this call).
  * 
  * @author alver
- * @author $Author$
- * @version $Revision$ ($Date: 2007-11-14 01:25:31 +0100 (Mi, 14 Nov
- *          2007) $)
- * 
  */
 public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
 
