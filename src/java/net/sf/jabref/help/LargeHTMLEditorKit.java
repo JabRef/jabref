@@ -19,6 +19,8 @@ import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 
+import net.sf.jabref.GUIGlobals;
+
 /**
  * An extended {@link HTMLEditorKit} that allow faster
  * rendering of large html files and allow zooming of content.
@@ -86,11 +88,11 @@ public class LargeHTMLEditorKit extends HTMLEditorKit {
 
             public double getZoomFactor() {
                 Double scale = (Double) getDocument().getProperty("ZOOM_FACTOR");
-                if (scale != null) {
+                if (scale == null) {
+                    return GUIGlobals.zoomLevel;
+                } else {
                     return scale.doubleValue();
                 }
-
-                return 1;
             }
 
             @Override

@@ -66,6 +66,7 @@ public class GUIGlobals {
 	aboutSize = new Dimension(600, 265),
 	searchPaneSize = new Dimension(430, 70),
 	searchFieldSize = new Dimension(215, 25);
+	public static Double zoomLevel = new Double(1.0);
 
 	// Divider size for BaseFrame split pane. 0 means non-resizable.
 	public static final int

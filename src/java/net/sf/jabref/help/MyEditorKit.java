@@ -9,10 +9,9 @@ import javax.swing.SwingConstants;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
-import javax.swing.text.html.HTMLEditorKit;
 
 @SuppressWarnings("serial")
-public class MyEditorKit extends HTMLEditorKit {
+public class MyEditorKit extends LargeHTMLEditorKit {
 
     public class MyNextVisualPositionAction extends TextAction {
         private Action textActn;
