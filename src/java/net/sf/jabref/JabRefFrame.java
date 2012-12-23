@@ -610,7 +610,32 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             sidePaneManager.show("search");
     }
 
-
+    // The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    public void openAction(String filePath) {
+    	File file = new File(filePath);
+    	
+        // Check if the file is already open.
+    	for (int i=0; i<this.getTabbedPane().getTabCount(); i++) {
+    		BasePanel bp = this.baseAt(i);
+    		if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+    			//The file is already opened, so just raising its tab.
+    			this.getTabbedPane().setSelectedComponent(bp);
+    			return;
+    		}
+    	}
+        
+    	if (file.exists()) {
+    		// Run the actual open in a thread to prevent the program
+    		// locking until the file is loaded.
+    		final File theFile = new File(filePath);
+    		(new Thread() {
+    			public void run() {
+    				open.openIt(theFile, true);
+    			}
+    		}).start();
+    	}
+    } 
+    
 AboutAction aboutAction = new AboutAction();
   class AboutAction
       extends AbstractAction {
@@ -815,28 +840,30 @@ public JabRefPreferences prefs() {
   private void macOSXRegistration() {
     if (Globals.osName.equals(Globals.MAC)) {
       try {
-        Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
-
-        Class<?>[] defArgs = {
-            JabRefFrame.class};
-        Method registerMethod = osxAdapter.getDeclaredMethod(
-            "registerMacOSXApplication", defArgs);
-        if (registerMethod != null) {
-          Object[] args = {
-              this};
-          registerMethod.invoke(osxAdapter, args);
-        }
-        // This is slightly gross.  to reflectively access methods with boolean args,
-        // use "boolean.class", then pass a Boolean object in as the arg, which apparently
-
-        defArgs[0] = boolean.class;
-        Method prefsEnableMethod = osxAdapter.getDeclaredMethod("enablePrefs",
-            defArgs);
-        if (prefsEnableMethod != null) {
-          Object args[] = {
-              Boolean.TRUE};
-          prefsEnableMethod.invoke(osxAdapter, args);
-        }
+    	  Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
+		  
+		  Class<?>[] defArgs = {Object.class, Method.class};
+		  Class<?> thisClass = JabRefFrame.class;
+		  Method registerMethod = osxAdapter.getDeclaredMethod("setAboutHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("about", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setPreferencesHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("preferences", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setQuitHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("quit", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", new Class[] { String.class })};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
       }
       catch (NoClassDefFoundError e) {
         // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
