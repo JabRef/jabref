@@ -23,11 +23,11 @@
   </jre>
   <versionInfo>
     <fileVersion>2.2.2.2</fileVersion>
-    <txtFileVersion>1.1.1</txtFileVersion>
+    <txtFileVersion>3.3.3</txtFileVersion>
     <fileDescription>JabRef</fileDescription>
     <copyright>JabRef developers</copyright>
     <productVersion>2.2.2.2</productVersion>
-    <txtProductVersion>1.1.1</txtProductVersion>
+    <txtProductVersion>3.3.3</txtProductVersion>
     <productName>JabRef</productName>
     <companyName></companyName>
     <internalName>JabRef</internalName>

@@ -495,7 +495,7 @@ version=${jabref.version}</echo>
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 	<!-- Build Windows Installer                                                    -->
 	<!--                                                                            -->
-	<!-- Don't forget to set nsis.executable property                               -->
+	<!-- Don't forget to set nsis.executable and launch4j.dir properties            -->
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
@@ -528,9 +528,19 @@ version=${jabref.version}</echo>
 		<!-- "Create Exe-Wrapper" -->
 
 		<!-- first of all, update version information -->
+		<script language="javascript"><![CDATA[
+			// create new property with a maximum length of 50 characters
+			var txtFileVersion = project.getProperty("jabref.version");
+			if (txtFileVersion.length()>50) {
+				txtFileVersion = txtFileVersion.substring(0,50);
+			}
+			project.setProperty("txtFileVersion", txtFileVersion);
+		]]></script>
+		<delete file="jabref-launch4j.tmp" />
 		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
 		<replace file="jabref-launch4j.tmp">
 			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="3.3.3" value="${txtFileVersion}" />
 			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
 			<replacefilter token="./" value="${basedir}/" />
 		</replace>
@@ -546,6 +556,8 @@ version=${jabref.version}</echo>
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
+
+		<rename src="${win.installer.dir}/JabRefSetup.exe" dest="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
 
 		<delete dir="${win.installer.dir}/dist" />
 
