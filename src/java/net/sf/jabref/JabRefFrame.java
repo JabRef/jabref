@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -70,8 +69,6 @@ import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldAction;
-import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
