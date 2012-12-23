@@ -566,7 +566,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             setTitle(GUIGlobals.frameTitle);
             return;
         }
-        String star = bp.baseChanged ? "*" : "";
+        String star = bp.isBaseChanged() ? "*" : "";
         if (bp.getFile() != null) {
             setTitle(GUIGlobals.frameTitle+" - "+bp.getFile().getPath()+star);
         } else {
@@ -699,7 +699,7 @@ public JabRefPreferences prefs() {
     Vector<String> filenames = new Vector<String>();
     if (tabbedPane.getTabCount() > 0) {
       for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-        if (baseAt(i).baseChanged) {
+        if (baseAt(i).isBaseChanged()) {
           tabbedPane.setSelectedIndex(i);
           int answer = JOptionPane.showConfirmDialog
               (JabRefFrame.this, Globals.lang
@@ -1784,7 +1784,7 @@ public JabRefPreferences prefs() {
                 return; // nbatada nov 7
             }
 
-            if (basePanel().baseChanged) {
+            if (basePanel().isBaseChanged()) {
                 int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Globals
                     .lang("Database has changed. Do you want to save " + "before closing?"),
                     Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);

@@ -157,7 +157,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
 
-    boolean baseChanged = false, nonUndoableChange = false;
+    private boolean baseChanged = false;
+    private boolean nonUndoableChange = false;
     // Used to track whether the base has changed since last save.
 
     //EntryTableModel tableModel = null;
@@ -243,6 +244,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void init(JabRefFrame frame, BibtexDatabase db, File file,
                       MetaData metaData, String encoding) {
+        assert(frame != null);
+        assert(db != null);
+        //file may be null
+        assert(encoding != null);
+        assert(metaData != null);
+
         this.encoding = encoding;
         this.metaData = metaData;
         // System.out.println(encoding);

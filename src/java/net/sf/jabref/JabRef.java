@@ -761,8 +761,11 @@ public class JabRef {
                         i.remove();
                     }
                     else if (!pr.isPostponedAutosaveFound()) {
-                        jrf.addTab(pr.getDatabase(), pr.getFile(),
-                                pr.getMetaData(), pr.getEncoding(), first);
+                        MetaData metaData = pr.getMetaData();
+                        if (metaData == null) metaData = new MetaData();
+                        String encoding = pr.getEncoding();
+                        if (encoding == null) encoding = Globals.prefs.get("defaultEncoding");
+                        jrf.addTab(pr.getDatabase(), pr.getFile(), metaData, encoding, first);
                         first = false;
                     }
                     else {
