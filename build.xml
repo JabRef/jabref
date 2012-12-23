@@ -475,10 +475,10 @@ version=${jabref.version}</echo>
 		<jarbundler dir="${build.lib}"
                     name="JabRef"
                     mainclass="net.sf.jabref.JabRef"
-                    jars="${build.lib}/${build.jar}"
+                    jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
-                    jvmversion="1.5+"
+                    jvmversion="1.6+"
                     stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">
             <documenttype name="BibTeX file" extensions="bib" role="Editor"
