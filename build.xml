@@ -503,10 +503,11 @@ version=${jabref.version}</echo>
 		<delete file="${win.installer.dir}/JabRefSetup.exe" />
 	</target>
 
-	<target name="win.installer" description="Copy files in place to be used by the installer" depends="jars">
-
+	<target name="win.installer.win.pre" description="Precondition for win.installer on Windows">
 		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
+	</target>
 
+	<target name="win.installer.step1">
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
 
@@ -551,60 +552,30 @@ version=${jabref.version}</echo>
 			dir="${launch4j.dir}">
 			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
-
-		<!-- Finally create Windows-Installer -->
-		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
-		</exec>
-
-		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
-
-		<delete dir="${win.installer.dir}/dist" />
-
 	</target>
 
-	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars">
-
-		<!-- Gather everything that will go into the installer in dist -->
-		<mkdir dir="${win.installer.dir}/dist" />
-
-		<copy file="${build.lib}/${build.jar}" todir="${win.installer.dir}/dist" />
-
-		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}" />
-
-		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}" />
-
-		<copy todir="${win.installer.dir}/dist">
-			<fileset dir="${txt.dir}">
-				<include name="gpl2.txt" />
-				<include name="gpl3.txt" />
-				<include name="lesser.txt" />
-				<include name="README" />
-			</fileset>
-		</copy>
-
-		<!-- "Create Exe-Wrapper" -->
-
-		<!-- first of all, update version information -->
-		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
-		<replace file="jabref-launch4j.tmp">
-			<replacefilter token="1.1.1" value="${jabref.version}" />
-			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
-			<replacefilter token="./" value="${basedir}/" />
-		</replace>
-
-		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
-		<exec
-			executable="${launch4j.dir}/launch4jc.exe"
-			dir="${launch4j.dir}">
-			<arg value="${basedir}/jabref-launch4j.tmp"/>
-		</exec>
-
+	<target name="win.installer.step2.linux" description="Create Windows-Installer on Linux">
 		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
 			<arg line="'-DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
+	</target>
 
+	<target name="win.installer.step2.win" description="Create Windows-Installer on Windows">
+		<exec dir="." executable="${nsis.executable}" failonerror="true">
+			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
+		</exec>
+	</target>
+
+	<target name="win.installer.step3">
+		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${win.installer.dir}/JabRef-${jabref.version}-setup.exe" />
+		<delete dir="${win.installer.dir}/dist" />
+	</target>
+
+	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.win.pre, jars, win.installer.step1, win.installer.step2.win, win.installer.step3">
+	</target>
+
+	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
 		<delete dir="${win.installer.dir}/dist" />
 
 	</target>
@@ -615,8 +586,6 @@ version=${jabref.version}</echo>
 			<classpath refid="classpathTest" />
 		</java>
 	</target>
-
-
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets
