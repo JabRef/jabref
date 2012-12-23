@@ -16,6 +16,7 @@
 package net.sf.jabref.groups;
 
 import java.awt.Cursor;
+import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
@@ -74,6 +75,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
 	private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
 
 	public GroupsTree(GroupSelector groupSelector) {
+	    // Adjust hight according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
+	    FontMetrics metrics = getFontMetrics(getFont());
+	    setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+
 		this.groupSelector = groupSelector;
 		DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
 				.createDefaultDragGestureRecognizer(this,
