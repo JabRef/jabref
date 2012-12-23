@@ -655,6 +655,7 @@ version=${jabref.version}</echo>
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
-	<!-- creates all distribution files in ${build.lib} -->
-	<target name="release" depends="clean, win.installer, osxjar, zipsrc" />
+	<target name="devsnapshot" depends="clean, addgitinfo, win.installer, osxjar" description="creates development snapshot binaries" />
+
+	<target name="release" depends="clean, win.installer, osxjar, zipsrc" description="creates all distribution files in ${build.lib}" />
 </project>
