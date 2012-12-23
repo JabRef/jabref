@@ -471,7 +471,7 @@ version=${jabref.version}</echo>
 	</target>
 
 
-	<target name="osxjar">
+	<target name="osxjar" depends="jars">
 		<jarbundler dir="${build.lib}"
                     name="JabRef"
                     mainclass="net.sf.jabref.JabRef"
@@ -489,6 +489,7 @@ version=${jabref.version}</echo>
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
+		<zip basedir="${build.lib}" destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip" includes="JabRef.app/*" level="9" />
 	</target>
 
 
