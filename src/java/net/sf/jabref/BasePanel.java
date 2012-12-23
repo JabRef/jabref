@@ -263,13 +263,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         metaData.setFile(file);
 
-        // Register so we get notifications about outside changes to the file.
-        if (file != null)
+        if (file == null) {
+            if (!database.getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
+        } else {
+            // Register so we get notifications about outside changes to the file.
             try {
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
+                System.err.println(ex);
             }
+        }
         
     }
 

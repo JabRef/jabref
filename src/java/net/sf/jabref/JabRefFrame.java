@@ -1692,8 +1692,20 @@ public JabRefPreferences prefs() {
 
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
-        tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
-                       bp);
+        String title;
+        if (file == null ) {
+            title = Globals.lang(GUIGlobals.untitledTitle);
+            if (!bp.database().getEntries().isEmpty()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                // This also happens internally at basepanel to ensure consistency
+                title = title + "*";
+            }
+        } else {
+            title = file.getName();
+        }
+        tabbedPane.add(title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
