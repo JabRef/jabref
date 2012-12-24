@@ -382,7 +382,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             // Automatic case keeping
             if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-                title = caseKeeper.format(title, caseKeeperList.wordListIEEEXplore);
+                title = caseKeeper.format(title);
             }
             // Write back
             entry.setField("title", title);
