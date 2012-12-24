@@ -500,10 +500,11 @@ public class HTMLConverter implements LayoutFormatter {
         {"8364", "euro", "\\{\\\\texteuro\\}"}, // euro sign, U+20AC NEW 
             
         /* Manually added */
+        {"24", "dollar", "\\\\$"}, // Percent
         {"37", "percnt", "\\\\%"}, // Percent
-        {"39", "", "'"}, // Apostrophe
-        {"40", "", "("}, // Left bracket
-        {"41", "", ")"}, // Right bracket
+        {"39", "apos", "'"}, // Apostrophe
+        {"40", "lpar", "("}, // Left bracket
+        {"41", "rpar", ")"}, // Right bracket
         {"43", "plus", "\\+"}, // Plus
         {"44", "comma", ","}, // Comma
         {"45", "hyphen", "-"}, // Hyphen
@@ -511,6 +512,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"47", "slash", "/"}, // Slash (solidus)
         {"58", "colon", ":"}, // Colon
         {"59", "semi", ";"}, // Semi colon
+        {"61", "equals", "="}, // Equals to
         {"91", "lsqb", "\\["}, // Left square bracket
         {"92", "bsol", "\\{\\\\textbackslash\\}"}, // Backslash
         {"93", "rsqb", "\\]"}, // Right square bracket
@@ -557,6 +559,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
         {"370", "Uogon", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
         {"371", "uogon", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
+        {"381", "Zcaron", "\\{\\\\v\\{Z\\}\\}"}, // capital Z with caron
+        {"382", "zcaron", "\\{\\\\v\\{z\\}\\}"}, // small z with caron
         {"490", "Oogon", "\\{\\\\k\\{O\\}\\}"},    // capital letter O with ogonek
         {"491", "oogon", "\\{\\\\k\\{o\\}\\}"},    // small letter o with ogonek
         {"492", "", "\\{\\\\k\\{\\\\=\\{O\\}\\}\\}"},    // capital letter O with ogonek and macron
@@ -609,6 +613,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"8542", "frac78", "\\$\\\\sfrac\\{7\\}\\{8\\}\\$"},    // Vulgar fraction seven eighths
         {"8710", "", "\\$\\\\triangle\\$"},    // Increment - could use a more appropriate symbol
         {"8714", "", "\\$\\\\in\\$"},    // Small element in
+        {"8723", "mp", "\\$\\\\mp\\$"},    // Minus-plus
         {"8729", "bullet", "\\$\\\\bullet\\$"},    // Bullet operator
         {"8758", "ratio", ":"},    // Colon/ratio
         {"8771", "sime", "\\$\\\\simeq\\$"}, // almost equal to = asymptotic to, 
@@ -617,18 +622,24 @@ public class HTMLConverter implements LayoutFormatter {
         {"", "Lt", "\\$\\\\ll\\$"}, // Much less than 
         {"8811", "gg", "\\$\\\\gg\\$"}, // Much greater than 
         {"", "Gt", "\\$\\\\gg\\$"}, // Much greater than 
+        {"8818", "lsim", "\\$\\\\lesssim\\$"}, // Less than or equivalent to
         {"8819", "gsim", "\\$\\\\gtrsim\\$"}, // Greater than or equivalent to
+        {"8862", "boxplus", "\\$\\\\boxplus\\$"}, // Boxed plus -- requires amssymb 
+        {"8863", "boxminus", "\\$\\\\boxminus\\$"}, // Boxed minus -- requires amssymb 
+        {"8864", "boxtimes", "\\$\\\\boxtimes\\$"}, // Boxed times -- requires amssymb 
         {"8882", "vltri", "\\$\\\\triangleleft\\$"}, // Left triangle
         {"8883", "vrtri", "\\$\\\\triangleright\\$"}, // Right triangle
         {"8896", "xwedge", "\\$\\\\bigwedge\\$"}, // Big wedge
         {"8897", "xvee", "\\$\\\\bigvee\\$"}, // Big vee
-        {"9426", "", "\\{\\\\copyright\\}"}, // circled small letter C
+        {"9426", "circledc", "\\{\\\\copyright\\}"}, // circled small letter C
         {"9633", "square", "\\$\\\\square\\$"}, // White square
+        {"9651", "xutri", "\\$\\\\bigtriangleup\\$"}, // White up-pointing big triangle 
         {"9653", "utri", "\\$\\\\triangle\\$"}, // White up-pointing small triangle -- \vartriangle probably
                                                 // better but requires amssymb
         {"10877", "les", "\\$\\\\leqslant\\$"},    // Less than slanted equal -- requires amssymb 
         {"10878", "ges", "\\$\\\\geqslant\\$"},    // Less than slanted equal -- requires amssymb 
-        {"119978", "Oscr", "\\$\\\\mathcal\\{O\\}\\$"} // script capital O -- possibly use \mathscr
+        {"119978", "Oscr", "\\$\\\\mathcal\\{O\\}\\$"}, // script capital O -- possibly use \mathscr
+        {"119984", "Uscr", "\\$\\\\mathcal\\{U\\}\\$"} // script capital U -- possibly use \mathscr
         
     };
     
@@ -774,7 +785,7 @@ public class HTMLConverter implements LayoutFormatter {
         // Handle text based HTML entities
         Set<String> patterns = escapedSymbols.keySet();
         for (String pattern: patterns) {
-        	text = text.replaceAll(pattern, escapedSymbols.get(pattern));
+        	text = text.replace(pattern, escapedSymbols.get(pattern));
         }
         
         // Handle numerical HTML entities
