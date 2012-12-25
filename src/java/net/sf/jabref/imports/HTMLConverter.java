@@ -732,6 +732,7 @@ public class HTMLConverter implements LayoutFormatter {
         private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
         private HashMap<Integer, String> escapedAccents = new HashMap<Integer, String>();
         private HashMap<Integer, String> numSymbols = new HashMap<Integer, String>();
+        private HashMap<Character, String> unicodeSymbols = new HashMap<Character, String>();
         
         
 	
@@ -744,6 +745,11 @@ public class HTMLConverter implements LayoutFormatter {
                         }
                         if (conversionList[i][0].length() >= 1) {
                             numSymbols.put(Integer.decode(conversionList[i][0]) , conversionList[i][2]);
+                            if(Integer.decode(conversionList[i][0]).intValue()>128) {
+                                Character c = new Character((char) Integer.decode(conversionList[i][0]).intValue());
+                                unicodeSymbols.put(c, conversionList[i][2]);
+                                // System.err.println(Integer.decode(conversionList[i][0]).toString() + ": " + c.toString() + ": "+ conversionList[i][2]);
+                            }
                         }
                     }
                 }
@@ -751,6 +757,17 @@ public class HTMLConverter implements LayoutFormatter {
                     escapedAccents.put(Integer.decode(accentList[i][0]), accentList[i][1]);
                 }
 	}
+        
+    public String formatUnicode(String text) {
+        if (text == null)
+            return null;    
+        Set<Character> chars = unicodeSymbols.keySet();
+        for (Character character: chars) {
+                // System.err.println(new Integer((int) character).toString() + ": " + character.toString() + ": " + unicodeSymbols.get(character));
+        	text = text.replaceAll(character.toString(), unicodeSymbols.get(character));
+        }
+        return text;
+    };
         
     public String format(String text) {
         if (text == null)
@@ -785,7 +802,7 @@ public class HTMLConverter implements LayoutFormatter {
         // Handle text based HTML entities
         Set<String> patterns = escapedSymbols.keySet();
         for (String pattern: patterns) {
-        	text = text.replace(pattern, escapedSymbols.get(pattern));
+        	text = text.replaceAll(pattern, escapedSymbols.get(pattern));
         }
         
         // Handle numerical HTML entities

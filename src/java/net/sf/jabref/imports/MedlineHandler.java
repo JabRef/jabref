@@ -27,6 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class MedlineHandler extends DefaultHandler
 {
+    static HTMLConverter htmlConverter = new HTMLConverter();
     ArrayList<BibtexEntry> bibitems= new ArrayList<BibtexEntry>();
     boolean inTitle=false,			inYear = false,
 		inJournal = false,			inMonth = false,
@@ -169,10 +170,12 @@ public class MedlineHandler extends DefaultHandler
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
 			if (!author.equals("")) { 
-			    b.setField("author",ImportFormatReader.expandAuthorInitials(author));
+			    b.setField("author",htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+			    // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
 			    author = "";
 			}
-			if (!title.equals("")) b.setField("title",title);
+			if (!title.equals("")) b.setField("title",htmlConverter.formatUnicode(title));
+			// if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
 			if (!journal.equals("")) b.setField("journal",journal);
 			if (!year.equals("")) b.setField("year",year);
                         // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
