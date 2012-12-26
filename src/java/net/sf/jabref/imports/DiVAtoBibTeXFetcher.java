@@ -38,6 +38,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s"; 
     final CaseKeeper caseKeeper = new CaseKeeper();
     final UnitFormatter unitFormatter = new UnitFormatter();
+    final HTMLConverter htmlConverter = new HTMLConverter();
     
 	@Override
     public void stopFetching() {
@@ -80,7 +81,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         
        String bibtexString;
         try {
-	        bibtexString = Util.getResults(conn);
+	        bibtexString = Util.getResultsWithEncoding(conn,"UTF-8");
         } catch (FileNotFoundException e) {
                status.showMessage(Globals.lang("Unknown DiVA entry: '%0'.",
                         query),
@@ -107,6 +108,12 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
+            }
+            
+            String institution = (String) entry.getField("institution");
+            if (institution!=null) {
+                institution = htmlConverter.formatUnicode(institution);
+                entry.setField("institution",institution);
             }
             // Do not use the provided key
             // entry.setField(BibtexFields.KEY_FIELD,null);
