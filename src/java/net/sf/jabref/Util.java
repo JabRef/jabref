@@ -3203,14 +3203,31 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 */
 	public static String getResults(URLConnection source) throws IOException {
 	    
-	    InputStream in = source.getInputStream();
+
+	    return getResultsWithEncoding(source, null);
+	}
+
+	/**
+	 * Download the URL using specified encoding and return contents as a String.
+	 * @param source
+         * encoding
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getResultsWithEncoding(URLConnection source, String encoding) throws IOException {
+	    
+	    InputStreamReader in;
+            if(encoding != null) {
+                in = new InputStreamReader(source.getInputStream(), encoding);
+            } else {
+                in = new InputStreamReader(source.getInputStream());
+            }
+            
 	    StringBuffer sb = new StringBuffer();
-	    byte[] buffer = new byte[256];
 	    while(true) {
-	        int bytesRead = in.read(buffer);
-	        if(bytesRead == -1) break;
-	        for (int i=0; i<bytesRead; i++)
-	            sb.append((char)buffer[i]);
+	        int byteRead = in.read();
+	        if(byteRead == -1) break;
+                sb.append((char)byteRead);
 	    }
 	    return sb.toString();
 	}
