@@ -6,184 +6,95 @@
 
 <body>
 
-    <h1>BibTeX<ruby><rb>鍵</rb><rp>(</rp><rt>キー</rt><rp>)</rp></ruby>生成子の個人用設定</h1>
+    <h1>BibTeXキー生成機構の個人用設定</h1>
 
     <p>JabRef設定の「BibTeXキーの生成」タブでは、BibTeXラベルの自動生成に使用されるフィールドを設定することができます。パターンは、標準的な項目型それぞれに対して設定することができます。</p>
 
     <h2>キーパターン</h2>
 
-    <p>The pattern can contain any text you wish,
-    in addition to field markers that indicate that a specific
-    field of the entry should be inserted at that position of the
-    key. A field marker generally consists of the field name
-    enclosed in square braces, e.g. <b>[volume]</b>. If the field
-    is undefined in an entry at the time of key generation, no text
-    will be inserted by the field marker.</p>
+    <p>パターンには、特定の項目フィールドをキー内のその場所に入れることを示すフィールドマーカーの他、好きな文字列を含めることができます。フィールドマーカーは、<b>[volume]</b>のように、通常、フィールド名を角括弧で囲ったものです。キーを生成するときに、項目内でフィールドが定義されていなければ、フィールドマーカーには何も挿入されません。</p>
 
-    <p>Several special field markers are offered, which extract
-    only a specific part of a field. These are listed below. Feel
-    free to suggest new special field markers.</p>
+    <p>フィールド中の特定部分を抜き出す特殊フィールドマーカーがいくつか用意されています。これらを下記に列挙します。追加したい特殊フィールドマーカーがありましたら、ぜひお知らせください。</p>
 
-    <p>Special field markers:</p>
+    <p>特殊フィールドマーカー</p>
 
     <ul>
-        <li><b>[<code>auth</code>]</b>: The last name of the first
-        author<br /></li>
+        <li><b>[<code>auth</code>]</b>: 第1著者の姓<br /></li>
 
-        <li><b>[<code>authors</code>]</b>: The last name of all
-        authors<br /></li>
+        <li><b>[<code>authors</code>]</b>: 全著者の姓<br /></li>
 
-        <li><b>[<code>authorLast</code>]</b>: The last name of the last
-        author<br /></li>
+        <li><b>[<code>authorLast</code>]</b>: 末尾著者の姓<br /></li>
 
-        <li><b>[<code>authorsN</code>]</b>: The last name of up to
-        N authors. If there are more authors, "EtAl" is
-        appended.<br /></li>
+        <li><b>[<code>authorsN</code>]</b>: N人めの著者までの姓。それよりも多い著者がいる場合は、その後に"EtAl"を付けます。<br /></li>
         
-        <li><b>[<code>authorsAlpha</code>]</b>: Corresponds to the BibTeX
-        style "alpha". One author: First three letters of the last name.
-        Two to four authors: First letters of last names concatenated.
-        More than four authors: First letters of last names of first three
-        authors concatenated. "+" at the end. <br /></li>  
+        <li><b>[<code>authorsAlpha</code>]</b>: BibTeXスタイル「alpha」に対応します。著者1名の時：姓の最初の3文字。著者2〜4名：姓の最初の文字を繋げたもの。著者5名以上：最初の著者3名の最初の文字を繋げ、最後に「+」を付けたもの。<br /></li>  
 
-        <li><b>[<code>authIniN</code>]</b>: The beginning of each
-        author's last name, using no more than N
-        characters.<br /></li>
+        <li><b>[<code>authIniN</code>]</b>: 各著者の姓の頭部最大N文字。<br /></li>
 
-        <li><b>[<code>authorIni</code>]</b>: The first 5 characters
-        of the first author's last name, and the last name initials
-        of the remaining authors.<br /></li>
+        <li><b>[<code>authorIni</code>]</b>: 第1著者の姓の最初5文字と、残りの著者の姓の頭文字。<br /></li>
 
-        <li><b>[<code>authN</code>]</b>: The first N characters of
-        the first author's last name<br /></li>
+        <li><b>[<code>authN</code>]</b>: 第1著者の姓の頭部N文字。<br /></li>
 
-        <li><b>[<code>authN_M</code>]</b>: The first N characters
-        of the Mth author's last name<br /></li>
+        <li><b>[<code>authN_M</code>]</b>: M番目の著者の姓の頭部N文字。<br /></li>
 
-        <li><b>[<code>auth.auth.ea</code>]</b>: The last name of
-        the first two authors, and ".ea" if there are more than
-        two.<br /></li>
+        <li><b>[<code>auth.auth.ea</code>]</b>: 最初の著者2名の姓と、3名以上著者がいる時には「.ea」を追加。<br /></li>
 
-        <li><b>[<code>auth.etal</code>]</b>: The last name of the
-        first author, and the last name of the second author if
-        there are two authors or ".etal" if there are more than
-        two.<br /></li>
+        <li><b>[<code>auth.etal</code>]</b>: 第1著者の姓の後に、著者が2名の時は第2著者の姓、著者が3名以上の時は「.etal」。<br /></li>
 
-        <li><b>[<code>authshort</code>]</b>: The last name if one
-        author is given; the first character of up to three
-        authors' last names if more than one author is given. A
-        plus character is added, if there are more than three
-        authors.<br /></li>
-    </ul><b>Note:</b> If there is no author (as in the case of an
-    edited book), then all of the above
-    <b><code>[auth...]</code></b> markers will use the editor(s)
-    (if any) as a fallback. Thus, the editor(s) of a book with no
-    author will be treated as the author(s) for label-generation
-    purposes. If you do not want this behaviour, i.e. you require a
-    marker which expands to nothing if there is no author, use
-    <b><code>pureauth</code></b> instead of
-    <b><code>auth</code></b> in the above codes. For example,
-    <b><code>[pureauth]</code></b>, or
-    <b><code>[pureauthors3]</code></b>.
+        <li><b>[<code>authshort</code>]</b>: 著者1名の時はその姓、著者2名以上の時は、3名までの著者の姓の最初の文字。4名以上の著者がいる時には、その後に+文字。<br /></li>
 
-    <ul>
-        <li><b>[<code>edtr</code>]</b>: The last name of the first
-        editor<br /></li>
-
-        <li><b>[<code>edtrIniN</code>]</b>: The beginning of each
-        editor's last name, using no more than N
-        characters<br /></li>
-
-        <li><b>[<code>editors</code>]</b>: The last name of all
-        editors<br /></li>
-
-        <li><b>[<code>editorLast</code>]</b>: The last name of the last
-        editor<br /></li>
-
-        <li><b>[<code>editorIni</code>]</b>: The first 5 characters
-        of the first editor's last name, and the last name initials
-        of the remaining editors.<br /></li>
-
-        <li><b>[<code>edtrN</code>]</b>: The first N characters of
-        the first editor's last name<br /></li>
-
-        <li><b>[<code>edtrN_M</code>]</b>: The first N characters
-        of the Mth editor's last name<br /></li>
-
-        <li><b>[<code>edtr.edtr.ea</code>]</b>: The last name of
-        the first two editors, and ".ea" if there are more than
-        two.<br /></li>
-
-        <li><b>[<code>edtrshort</code>]</b>: The last name if one
-        editor is given; the first character of up to three
-        editors' last names if more than one editor is given. A
-        plus character is added, if there are more than three
-        editors.<br /></li>
-
-        <li><b>[<code>firstpage</code>]</b>: The number of the
-        first page of the publication (Caution: this will return 
-        the lowest number found in the pages field, since bibtex 
-        allows <code>7,41,73--97</code> or <code>43+</code>.)<br /></li>
-
-        <li><b>[<code>keywordN</code>]</b>: Keyword number N from
-        the "keywords" field, assuming keywords are separated by
-        commas or semicolons.<br /></li>
-
-        <li><b>[<code>lastpage</code>]</b>: The number of the last
-        page of the publication (See the remark on 
-        <code>firstpage</code>)<br /></li>
-
-        <li><b>[<code>shorttitle</code>]</b>: The first 3 words of
-        the title<br /></li>
-
-        <li><b>[<code>shortyear</code>]</b>: The last 2 digits of
-        the publication year<br /></li>
-
-        <li><b>[<code>veryshorttitle</code>]</b>: The first word of
-        the title, discounting 'the', 'a', 'an'.<br /></li>
     </ul>
 
-    <p>A field name (or one of the above pseudo-field names) may
-    optionally be followed by one or more modifiers. Modifiers are
-    applied in the order they are specified.</p>
+    <p><b>《註》</b>(編集書籍など)著者がいない場合には、上記の<b><code>[auth...]</code></b>マーカーはすべて、編者を(ある場合には)代わりに使用します。したがって、著者のいない書籍の編者は、ラベル生成用には著者として取り扱われます。この挙動を望まない、即ち著者がいない場合は何も出力しないマーカーが必要な場合には、上記のコードにおいて<b><code>auth</code></b>の代わりに<b><code>pureauth</code></b>を使用してください。例：<b><code>[pureauth]</code></b>や<b><code>[pureauthors3]</code></b>など。</p>
 
     <ul>
-        <li><b>:abbr</b>: Abbreviates the text produced by the
-        field name or spcial field marker. Only the first character
-        and subsequent characters following white space will be
-        included. For example, <b>[journal:abbr]</b> would from the
-        journal name "Journal of Fish Biology" produce
-        "JoFB".<br /></li>
+        <li><b>[<code>edtr</code>]</b>: 第1編者の姓<br /></li>
 
-        <li><b>:lower</b>: Forces the text inserted by the field
-        marker to be in lowercase. For example, <b>[auth:lower]</b>
-        expands the last name of the first author in
-        lowercase.<br /></li>
+        <li><b>[<code>edtrIniN</code>]</b>: 各編者の姓の頭部N文字以内<br /></li>
 
-        <li><b>:upper</b>: Forces the text inserted by the field
-        marker to be in uppercase. For example, <b>[auth:upper]</b>
-        expands the last name of the first author in
-        uppercase.<br /></li>
+        <li><b>[<code>editors</code>]</b>: 全編者の姓<br /></li>
 
-        <li><b>:(x)</b>: Replace x by any string. The string between
-        the parentheses will be inserted if the field marker preceding this
-        modifier resolves to an empty value. For instance, the marker
-        <b>[volume:(unknown)]</b> will return the entry's volume if set, and the
-        string <b>unknown</b> if the entry's <code>volume</code> field is not set.
+        <li><b>[<code>editorLast</code>]</b>: 最後の編者の姓<br /></li>
+
+        <li><b>[<code>editorIni</code>]</b>: 第1編者の姓の頭部5文字と、残りの編者の姓の頭文字<br /></li>
+
+        <li><b>[<code>edtrN</code>]</b>: 第1編者の頭部N文字<br /></li>
+
+        <li><b>[<code>edtrN_M</code>]</b>: 第M編者の頭部N文字<br /></li>
+
+        <li><b>[<code>edtr.edtr.ea</code>]</b>: 最初の2編者の姓と、3名以上の場合は「.ea」を追加。<br /></li>
+
+        <li><b>[<code>edtrshort</code>]</b>: 編者1名の時はその姓、編者2名以上の時は、3名までの編者の姓の最初の文字。4名以上の編者がいる時には、その後に+文字。<br /></li>
+
+        <li><b>[<code>firstpage</code>]</b>: 発行物の最初のページ番号(注意：bibtexは<code>7,41,73--97</code>あるいは<code>43+</code>という表記をするので、pagesフィールド中の最小のページ番号を返します)<br /></li>
+
+        <li><b>[<code>keywordN</code>]</b>: "keywords"フィールドのN番目のキーワード。キーワードがコンマかセミコロンで区切られていると仮定します。<br /></li>
+
+        <li><b>[<code>lastpage</code>]</b>: 発行物の最後のページ(<code>firstpage</code>の註を参照)<br /></li>
+
+        <li><b>[<code>shorttitle</code>]</b>: タイトルの最初の3単語<br /></li>
+
+        <li><b>[<code>shortyear</code>]</b>: 出版年の下2桁<br /></li>
+
+        <li><b>[<code>veryshorttitle</code>]</b>: タイトルの最初の単語。「the」「a」「an」を除く。<br /></li>
+    </ul>
+
+    <p>フィールド名(もしくは上記の準フィールド名)には、1つ以上の修正辞を後ろに付けることができます。修正辞は記述順に適用されます。</p>
+
+    <ul>
+        <li><b>:abbr</b>: フィールド名や特殊フィールドマーカーで生成された文字列を短縮形にします。最初の文字と、その後は空白の次の文字のみを使います。例えば、<b>[journal:abbr]</b>は、ジャーナル名"Journal of Fish Biology"を"JoFB"と出力します。<br /></li>
+
+        <li><b>:lower</b>: フィールドマーカーが挿入した文字列を強制的に小文字にします。例えば、<b>[auth:lower]</b>は、第1著者の姓を小文字で出力します。<br /></li>
+
+        <li><b>:upper</b>: フィールドマーカーが挿入した文字列を強制的に大文字にします。例えば、<b>[auth:upper]</b>は、第1著者の姓を大文字で出力します。<br /></li>
+
+        <li><b>:(x)</b>: xには任意の文字列を入れてください。この修正辞の前のフィールドマーカーの値が空の時、括弧の間の文字列を挿入します。例えば、<b>[volume:(unknown)]</b>というマーカーは、項目の<code>volume</code>フィールドが設定されていれば、それを返し、設定されていなければ、<b>unknown</b>を返します。
         </li>
     </ul>
 
-    <p>If you haven't defined a key pattern for a certain entry
-    type, the <b>Default key pattern</b> will be used. You can
-    change the default pattern - its setting is above the list of
-    entry types in the <b>Key pattern</b> section of the
-    <b>Preferences</b> dialog.</p>
+    <p>ある項目型に対してキーパターンを定義していない場合には、<b>既定キーパターン</b>が使われます。既定パターンは変更することができ、<b>設定</b>ダイアログの<b>キーパターン</b>セクションの項目型一覧の上で設定します。</p>
 
-    <p>The default key pattern is [auth][year], and this could
-    produce keys like e.g. <code>Yared1998</code> If the key is not
-    unique in the current database, it is made unique by adding one
-    of the letters a-z until a unique key is found. Thus, the
-    labels might look like:</p>
+    <p>既定キーパターンは[auth][year]となっており、これは<code>Yared1998</code>のようなキーを生成します。現在のデータベース中でキーが一意でない場合には、キーが一意になるようにa-zのうち1文字を付け加えます。したがって、ラベルは以下のような形になります。</p>
 
     <p style="margin-left: 28pt">
         <code>Yared1998</code><br />
@@ -191,18 +102,9 @@
         <code>Yared1998b</code>
     </p>
 
-    <h2>Regular expression replace</h2>
+    <h2>正規表現での置換</h2>
 
-    <p>After the key pattern has
-    been applied to produce a key, you can choose to have the key
-    generator search for occurrences of a specific regular
-    expression, and replace it with a string. The regular
-    expression and replacement string are entered in the text
-    fields below the list of key patterns. If the replacement
-    string is empty, matches of the regular expression will simply
-    be removed from the generated key. For instance,
-    <code>\p{Punct}</code> or <code>[:/%]</code> can be replaced
-    by nothing to remove unwanted characters from the key.
-    This may be useful when naming PDFs according to BibTeX keys.</p>
+    <p>キーパターンを適用してキーを生成した後、キー生成機構に特定の正規表現を検索させ、それを文字列で置換することができます。正規表現文字列と置換文字列は、キーパターン一覧の下にあるテキストフィールドに入力します。置換文字列が空の場合、正規表現に一致した文字列は、生成されたキーから削除されます。例えば、置換対象に<code>\p{Punct}</code>あるいは<code>[:/%]</code>を入れ、置換文字列を空にした場合、キーから不必要な文字を取り除くことができます。これは、BibTeXキーにしたがってPDFの名前を付ける時便利です。</p>
+
 </body>
 </html>
