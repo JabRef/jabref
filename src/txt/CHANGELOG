@@ -1,6 +1,7 @@
 [2.9.1]
     - Menu font size can now be changed again. Help contents are also enlarged accordingly. Fixes bug 1122.
     - Importing of entries works again. Fixes bug 1121.
+    - Import inspection dialog is now modal.
     - Replaced Java launcher by launch4j. Fixes bugs 1100, 1103.
 2.9
     - Fixed bug: in OO/LO reference lists, entries may fall out when multiple entries with same
