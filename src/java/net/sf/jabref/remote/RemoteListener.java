@@ -23,12 +23,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.imports.ParserResult;
@@ -92,26 +88,15 @@ public class RemoteListener extends Thread {
                     // this dialog has to be shown AFTER JabRef has been brought to front
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            jabref.jrf.showIfMinimizedToSysTray();
+                            JabRef.jrf.showIfMinimizedToSysTray();
                         }
                     });
 
                     for (int i=0; i<loaded.size(); i++) {
                         ParserResult pr = loaded.elementAt(i);
-                        if (!pr.toOpenTab()) {
-                            jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
-                        } else {
-                            // Add the entries to the open tab.
-                            BasePanel panel = jabref.jrf.basePanel();
-                            if (panel == null) {
-                                // There is no open tab to add to, so we create a new tab:
-                                jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
-                            } else {
-                                List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
-                                jabref.jrf.addImportedEntries(panel, entries, "", false);
-                            }
-                        }
+                        JabRef.jrf.addParserResult(pr, (i==0));
                     }
+
                     in.close();
                     out.close();
                     newSocket.close();

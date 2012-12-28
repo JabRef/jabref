@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +57,7 @@ import net.sf.jabref.imports.ImportFormat;
 import net.sf.jabref.imports.ImportFormats;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.label.ArticleLabelRule;
 import net.sf.jabref.label.BookLabelRule;
@@ -1453,6 +1455,21 @@ public JabRefPreferences prefs() {
         return res;
     }
 
+    public void addParserResult(ParserResult pr, boolean raisePanel) {
+        if (pr.toOpenTab()) {
+            // Add the entries to the open tab.
+            BasePanel panel = basePanel();
+            if (panel == null) {
+                // There is no open tab to add to, so we create a new tab:
+                addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+            } else {
+                List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
+                addImportedEntries(panel, entries, "", false);
+            }
+        } else {
+            addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+        }
+    }
 
     public void addPluginMenuItem(JMenuItem item) {
         if (!addedToPluginMenu) {
@@ -1686,8 +1703,12 @@ public JabRefPreferences prefs() {
   }
 
 
-    public BasePanel addTab(BibtexDatabase db, File file, MetaData meta, String encoding, boolean raisePanel) {
-        BasePanel bp = new BasePanel(JabRefFrame.this, db, file, meta, encoding);
+    public BasePanel addTab(BibtexDatabase db, File file, MetaData metaData, String encoding, boolean raisePanel) {
+        // ensure that non-null parameters are really non-null
+        if (metaData == null) metaData = new MetaData();
+        if (encoding == null) encoding = Globals.prefs.get("defaultEncoding");
+
+        BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);
         addTab(bp, file, raisePanel);
         return bp;
     }
@@ -2607,4 +2628,5 @@ class SaveSessionAction
   public SearchManager2 getSearchManager() {
 		return searchManager;
 	}
+
 }
