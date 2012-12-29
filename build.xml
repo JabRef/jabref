@@ -283,13 +283,13 @@
 
 	</target>
 
-	<!-- updates version information if git is available,
+	<!-- updates version information with git information.
 	     should be used in development builds only
 
 	     Use "ant addgitinfo jars" to generate a jar with version information in the filename
 	-->
 	<target name="addgitinfo" description="Adds git version information in ${jabref.version} and ${build.jar}">
-		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="false" errorproperty="">
+		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="true" errorproperty="">
 			<arg value="log" />
 			<arg value="-1" />
 			<arg value="--pretty=format:%cd - %H" />
