@@ -760,28 +760,35 @@ public class JabRef {
 	        boolean first = true;
             List<File> postponed = new ArrayList<File>();
             List<ParserResult> failed = new ArrayList<ParserResult>();
+            List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
             if (loaded.size() > 0) {
                 for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();){
                     ParserResult pr = i.next();
                     if (pr.isInvalid()) {
-
                         failed.add(pr);
                         i.remove();
                     }
                     else if (!pr.isPostponedAutosaveFound()) {
-                        MetaData metaData = pr.getMetaData();
-                        if (metaData == null) metaData = new MetaData();
-                        String encoding = pr.getEncoding();
-                        if (encoding == null) encoding = Globals.prefs.get("defaultEncoding");
-                        jrf.addTab(pr.getDatabase(), pr.getFile(), metaData, encoding, first);
-                        first = false;
+                        if (pr.toOpenTab()) {
+                            // things to be appended to an opened tab should be done after opening all tabs
+                            // add them to the list
+                            toOpenTab.add(pr);
+                        } else {
+                            jrf.addParserResult(pr, first);
+                            first = false;
+                        }
                     }
                     else {
                         i.remove();
                         postponed.add(pr.getFile());
-
                     }
                 }
+            }
+
+            // finally add things to the currently opened tab
+            for (ParserResult pr: toOpenTab) {
+                jrf.addParserResult(pr, first);
+                first = false;
             }
 
             if (loadSess.isInvoked())
@@ -850,8 +857,11 @@ public class JabRef {
             // any post open actions need to be done. For instance, checking
             // if we found new entry types that can be imported, or checking
             // if the database contents should be modified due to new features
-            // in this version of JabRef:
-            for (int i = 0; i < loaded.size(); i++) {
+            // in this version of JabRef.
+            // Note that we have to check whether i does not go over baseCount().
+            // This is because importToOpen might have been used, which adds to
+            // loaded, but not to baseCount()
+            for (int i = 0; (i < loaded.size()) && (i < jrf.baseCount()); i++) {
                 ParserResult pr = loaded.elementAt(i);
                 BasePanel panel = jrf.baseAt(i);
                 OpenDatabaseAction.performPostOpenActions(panel, pr, true);
