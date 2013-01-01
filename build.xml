@@ -37,7 +37,7 @@
 	<!-- some version information -->
 	<property name="jabref.version" value="2.10dev" />
 	<property name="jabref.version.full" value="2.10.0.0" /> <!-- a version number with 4 places. Required by launch4j -->
-	<property name="jabref.year" value="2012" />
+	<property name="jabref.year" value="2013" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
 	<!-- used by replace task -->
@@ -283,13 +283,13 @@
 
 	</target>
 
-	<!-- updates version information if git is available,
+	<!-- updates version information with git information.
 	     should be used in development builds only
 
 	     Use "ant addgitinfo jars" to generate a jar with version information in the filename
 	-->
 	<target name="addgitinfo" description="Adds git version information in ${jabref.version} and ${build.jar}">
-		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="false" errorproperty="">
+		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="true" errorproperty="">
 			<arg value="log" />
 			<arg value="-1" />
 			<arg value="--pretty=format:%cd - %H" />
