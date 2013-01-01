@@ -35,9 +35,9 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.9.1dev" />
-	<property name="jabref.version.full" value="2.9.1.0" /> <!-- a version number with 4 places. Required by launch4j -->
-	<property name="jabref.year" value="2012" />
+	<property name="jabref.version" value="2.9.1" />
+	<property name="jabref.version.full" value="2.9.1.1" /> <!-- a version number with 4 places. Required by launch4j -->
+	<property name="jabref.year" value="2013" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
 	<!-- used by replace task -->
