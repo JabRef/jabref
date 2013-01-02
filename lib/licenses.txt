@@ -138,6 +138,11 @@ Project: JGoodies Looks
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
+Path:    microba.jar
+Project: Microba
+URL:     http://microba.sourceforge.net/
+License: BSD
+
 Path:    mysql-connector-java-5.0.7-bin.jar
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
