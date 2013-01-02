@@ -1043,7 +1043,7 @@ public class AuthorList {
 		 */
 		private boolean properBrackets(String s) {
 			// nested construct is there, check for "proper" nesting
-			int i = 1;
+			int i = 0;
 			int level = 0;
 			loop: do {
 				char c = s.charAt(i);
