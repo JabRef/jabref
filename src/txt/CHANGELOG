@@ -1,5 +1,5 @@
 [2.9.2]
-    - Fixed handling of one-letter author entries
+    - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
 2.9.1
     - Command line option --importToOpen now also adds to an open tab when JabRef is launched.
     - Importing of entries works again. Fixes bug 1121.
