@@ -1805,9 +1805,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 //Add the new entry to the group(s) selected in the Group Panel
                 addToSelectedGroup(be);
 
-                // Set Self-Created entries to have a high quality
-                be.setField("quality", "1");
-                
                 return be;
             } catch (KeyCollisionException ex) {
                 Util.pr(ex.getMessage());
