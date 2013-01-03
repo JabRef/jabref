@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -54,6 +56,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sf.jabref.DatabaseChangeEvent.ChangeType;
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
@@ -110,6 +113,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
+    private static Logger logger = Logger.getLogger(BasePanel.class.getName());
 
     public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
     
@@ -263,6 +267,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         metaData.setFile(file);
 
+        // ensure that at each addition of a new entry, the entry is added to the groups interface
+        db.addDatabaseChangeListener(new GroupTreeUpdater());
+
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -276,7 +283,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
-                System.err.println(ex);
+                logger.warning(ex.toString());
             }
         }
         
@@ -602,7 +609,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               be.setId(Util.createNeutralId());
                               database.insertEntry(be);
                               
-                              addToSelectedGroup(be); 
                               ce.addEdit(new UndoableInsertEntry
                                          (database, be, BasePanel.this));
                             } catch (KeyCollisionException ex) {
@@ -1781,7 +1787,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 database.insertEntry(be);
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
-                list.add(be);                
+                list.add(be);
                 Util.setAutomaticFields(list, true, true, false);
 
                 // Create an UndoableInsertEntry object.
@@ -1809,9 +1815,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));              
 
-                //Add the new entry to the group(s) selected in the Group Panel
-                addToSelectedGroup(be);
-
                 return be;
             } catch (KeyCollisionException ex) {
                 Util.pr(ex.getMessage());
@@ -1821,14 +1824,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * This method is called to add a new entry to a group (or a set of groups)
+     * This listener is used to add a new entry to a group (or a set of groups)
      * in case the Group View is selected and one or more groups are marked
-     * @param bibEntry The new entry.
-     */    
-	private void addToSelectedGroup(final BibtexEntry bibEntry) {
-		if (Globals.prefs.getBoolean("autoAssignGroup")){
-			if (frame.groupToggle.isSelected()){
-				BibtexEntry[] entries = {bibEntry};
+     */
+    private class GroupTreeUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ( (e.getType() == ChangeType.ADDED_ENTRY)
+                 && (Globals.prefs.getBoolean("autoAssignGroup"))
+                 && (frame.groupToggle.isSelected())) {
+				BibtexEntry[] entries = {e.getEntry()};
 				TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
 				if (selection != null) {
 					// it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1836,11 +1840,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 						((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
 					}
 				}
-				this.updateEntryEditorIfShowing();
-				this.getGroupSelector().valueChanged(null);
-			}
-		}
-	}
+				//BasePanel.this.updateEntryEditorIfShowing(); // doesn't seem to be necessary
+				SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        BasePanel.this.getGroupSelector().valueChanged(null);
+                    }
+                });
+            }
+        }
+    }
 
     /**
      * This method is called from JabRefFrame when the user wants to

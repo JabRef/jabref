@@ -145,9 +145,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
 
-  // References to the toggle buttons in the toolbar:
-  public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,
-      highlightAll;
+  /* References to the toggle buttons in the toolbar */
+  // the groups interface
+  public JToggleButton groupToggle;
+  public JToggleButton searchToggle, previewToggle, highlightAny, highlightAll;
+
   OpenDatabaseAction
       open = new OpenDatabaseAction(this, true);
   AbstractAction

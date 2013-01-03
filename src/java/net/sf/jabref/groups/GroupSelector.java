@@ -80,6 +80,9 @@ import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.undo.NamedCompound;
 
+/**
+ * The whole UI component holding the groups tree and the buttons
+ */
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
     private static Logger logger = Logger.getLogger(GroupSelector.class.getName());
