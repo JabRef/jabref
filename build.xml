@@ -478,7 +478,7 @@ version=${jabref.version}</echo>
                     jars="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
-                    jvmversion="1.5+"
+                    jvmversion="1.6+"
                     stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">
             <documenttype name="BibTeX file" extensions="bib" role="Editor"
