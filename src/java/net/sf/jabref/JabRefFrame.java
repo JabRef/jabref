@@ -1991,6 +1991,10 @@ public JabRefPreferences prefs() {
                         openInNew);
                     diag.addEntries(entries);
                     diag.entryListComplete();
+                    // On the one hand, the following statement could help at issues when JabRef is minimized to the systray
+                    // On the other hand, users might dislake modality and this is not required to let the GUI work.
+                    // Therefore, it is disabled.
+                    // diag.setModal(true);
                     Util.placeDialog(diag, JabRefFrame.this);
                     diag.setVisible(true);
                     diag.toFront();
