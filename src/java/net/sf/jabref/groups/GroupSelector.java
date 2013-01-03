@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -81,6 +82,7 @@ import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
+    private static Logger logger = Logger.getLogger(GroupSelector.class.getName());
 
     JButton newButton = new JButton(GUIGlobals.getImage("new")),
             helpButton = new JButton(
@@ -254,8 +256,8 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
                 Globals.prefs.putInt("groupsVisibleRows", i);
-                Globals.logger(Double.toString(GroupSelector.this.getHeight()));
-                Globals.logger(Double.toString(GroupSelector.this.getPreferredSize().getHeight()));
+                logger.fine(Double.toString(GroupSelector.this.getHeight()));
+                logger.fine(Double.toString(GroupSelector.this.getPreferredSize().getHeight()));
                 
             }
         });
@@ -638,11 +640,11 @@ public class GroupSelector extends SidePaneComponent implements
         for (BibtexEntry entry : entries) {
             // Sort according to current state of the entries
             if (group.contains(entry)) {
-                Globals.logger("remove " + entry.toString());
+                logger.fine("remove " + entry.toString());
                 toRemove.add(entry);
             }
             else {
-                Globals.logger("add " + entry.toString());
+                logger.fine("add " + entry.toString());
                 toAdd.add(entry);
             }
         }
@@ -683,8 +685,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void annotationEvent(GroupTreeNode node) {
-        Globals.logger("annotationEvent");
-        Globals.logger(node.toString());
+        logger.fine("annotationEvent");
+        logger.fine(node.toString());
         if (editModeIndicator) {
             updateGroupContent(node);
             panel.markBaseChanged();
