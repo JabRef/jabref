@@ -1005,7 +1005,7 @@ public class AuthorList {
 		
 		/**
 		 * Creates the Author object. If any part of the name is absent, <CODE>null</CODE>
-		 * must be passes; otherwise other methods may return erroneous results.
+		 * must be passed; otherwise other methods may return erroneous results.
 		 * 
 		 * @param first
 		 *            the first name of the author (may consist of several
@@ -1043,9 +1043,9 @@ public class AuthorList {
 		 */
 		private boolean properBrackets(String s) {
 			// nested construct is there, check for "proper" nesting
-			int i = 1;
+			int i = 0;
 			int level = 0;
-			loop: do {
+			loop: while (i<s.length()) {
 				char c = s.charAt(i);
 				switch (c) {
 				case '{':
@@ -1060,7 +1060,7 @@ public class AuthorList {
 					break;
 				}
 				i++;
-			} while (i<s.length()-1);
+			};
 			return (level == 0);
 		}
 		

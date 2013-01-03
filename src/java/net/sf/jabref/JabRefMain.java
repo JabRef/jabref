@@ -91,7 +91,7 @@ public class JabRefMain {
                 "  * ...FAQ at http://jabref.sf.net/faq.php and our...\n" +
                 "  * ...user mailing-list at http://sf.net/mailarchive/forum.php?forum_name=jabref-users\n\n" + 
                 "If you do not find a solution there, please let us know about the problem by writing a bug report.\n" +
-                "You can find our bug tracker at http://sourceforge.net/tracker/?atid=600306&group_id=92314\n\n" +
+                "You can find our bug tracker at http://sourceforge.net/p/jabref/bugs/\n\n" +
                 "  * If the bug has already been reported there, please add your comments to the existing bug.\n" +
                 "  * If the bug has not been reported yet, then we need the complete error message given above\n" +
                 "    and a description of what you did before the error occured.\n\n" +
@@ -112,7 +112,7 @@ public class JabRefMain {
                 "<ul><li>...FAQ at <b>http://jabref.sf.net/faq.php</b> and our..." +
                 "<li>...user mailing-list at <b>http://sf.net/mailarchive/forum.php?forum_name=jabref-users</b></ul>" + 
                 "If you do not find a solution there, please let us know about the problem by writing a bug report.<br>" +
-                "You can find our bug tracker at <b>http://sourceforge.net/tracker/?atid=600306&group_id=92314</b>.<br>"  +
+                "You can find our bug tracker at <a href=\"http://sourceforge.net/p/jabref/bugs/\"><b>http://sourceforge.net/p/jabref/bugs/</b></a>.<br>"  +
                 "<ul><li>If the bug has already been reported there, please add your comments to the existing bug.<br>" +
                 "<li>If the bug has not been reported yet, then we need the complete error message given above<br>" +
                 "and a description of what you did before the error occured.</ul>" +

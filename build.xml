@@ -633,29 +633,58 @@ version=${jabref.version}</echo>
 
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
-	<target name="zipsrc">
+	<target name="compresssrc">
 		<!-- clone current repo into tmp dir. Reason: we want to have a clean src.zip, but do not want to execute "git clean -xdf" to allow developers having some temporary files (and user.properties) -->
-		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
 		<mkdir dir="${temp.dir}"/>
 		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull">
 			<arg value="clone" />
 			<arg value="${basedir}/.." />
 			<arg value="${temp.dir}" />
 		</exec>
-		<!-- <property name="temp.dir" value="C:\Users\Oliver\AppData\Local\Temp\jabrefsrc628715364" /> -->
+
+		<!-- ensure correct line endings -->
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="config" />
+			<arg value="core.autocrlf" />
+			<arg value="${git.core.autocrlf}" />
+		</exec>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="rm" />
+			<arg value="--cached" />
+			<arg value="-r" />
+			<arg value="." />
+		</exec>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="reset" />
+			<arg value="--hard" />
+		</exec>
 
 		<!-- we want to have jabref-${jabref.version} as main directory -->
-		<property name="distsrc" value="${temp.dir}/distsrc/" />
 		<mkdir dir="${distsrc}" />
 		<move file="${temp.dir}/jabref" tofile="${distsrc}/jabref-${jabref.version}" />
+	</target>
 
+	<target name="zipsrc">
+		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
+		<property name="distsrc" value="${temp.dir}/distsrc/" />
+		<antcall target="compresssrc">
+			<param name="git.core.autocrlf" value="true" />
+		</antcall>
 		<zip destfile="${build.lib}/JabRef-${jabref.version}-src.zip" basedir="${distsrc}" level="9" />
-		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${distsrc}" excludes=".git/" compression="bzip2" />
+		<delete dir="${temp.dir}" failonerror="no"/>
+	</target>
 
+	<target name="bzip2src">
+		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
+		<property name="distsrc" value="${temp.dir}/distsrc/" />
+		<antcall target="compresssrc">
+			<param name="git.core.autocrlf" value="false" />
+		</antcall>
+		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${distsrc}" excludes=".git/" compression="bzip2" />
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
 	<target name="devsnapshot" depends="clean, addgitinfo, win.installer, osxjar" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, win.installer, osxjar, zipsrc" description="creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, win.installer, osxjar, bzip2src, zipsrc" description="creates all distribution files in ${build.lib}" />
 </project>

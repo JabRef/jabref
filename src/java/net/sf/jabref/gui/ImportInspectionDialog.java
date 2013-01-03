@@ -216,7 +216,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview0"));
-        this.setModal(true);
 
         duplLabel.setToolTipText(Globals
             .lang("Possible duplicate of existing entry. Click to resolve."));
@@ -718,7 +717,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         if (entry.getField(BibtexFields.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the
                             // group.
-                            // The best course of ation is probably to ask the
+                            // The best course of action is probably to ask the
                             // user if a key should be generated
                             // immediately.
                             int answer = JOptionPane
@@ -733,7 +732,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                 groupingCanceled = true;
                         }
 
-                        // If the key was list, or has been list now, go ahead:
+                        // If the key existed, or exists now, go ahead:
                         if (entry.getField(BibtexFields.KEY_FIELD) != null) {
                             for (Iterator<GroupTreeNode> i2 = groups.iterator(); i2.hasNext();) {
                                 GroupTreeNode node = i2.next();

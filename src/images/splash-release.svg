@@ -234,7 +234,7 @@
    id="rect3080" />
       </flowRegion><flowPara
          id="flowPara1339">This program is distributed under the terms of the General Public License.</flowPara><flowPara
-         id="flowPara1341">Copyright (2003-2012) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
+         id="flowPara1341">Copyright (2003-2013) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
        inkscape:export-filename="/home/alver/jabref/jabref/src/images/splash.png"
@@ -278,7 +278,7 @@
     <text
        xml:space="preserve"
        style="font-size:57.12125397px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#727888;stroke-width:1.80000007;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Nimbus Sans L"
-       x="446.94968"
+       x="442.59207"
        y="426.25284"
        id="text2911"
        sodipodi:linespacing="100%"
@@ -288,8 +288,8 @@
        inkscape:export-ydpi="75"><tspan
          sodipodi:role="line"
          id="tspan2913"
-         x="446.94968"
+         x="442.59207"
          y="426.25284"
-         style="font-size:119.00261688px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#727888;stroke-width:1.80000007;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Bitstream Vera Sans">2.9.1</tspan></text>
+         style="font-size:119.00261688px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#727888;stroke-width:1.80000007;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Bitstream Vera Sans">2.9.2</tspan></text>
   </g>
 </svg>
