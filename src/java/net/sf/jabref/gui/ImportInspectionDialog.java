@@ -754,9 +754,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     try {
                         entry.setId(Util.createNeutralId());
                         panel.database().insertEntry(entry);
-                        // Let the autocompleters, if any, harvest words from
-                        // the entry:
-                        Util.updateCompletersForEntry(panel.getAutoCompleters(), entry);
                         ce.addEdit(new UndoableInsertEntry(panel.database(), entry, panel));
                     } catch (KeyCollisionException e) {
                         e.printStackTrace();

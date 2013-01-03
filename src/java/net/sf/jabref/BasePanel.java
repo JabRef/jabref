@@ -70,10 +70,26 @@ import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.external.*;
+import net.sf.jabref.external.AttachFileAction;
+import net.sf.jabref.external.AutoSetExternalFileForEntries;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.FindFullTextAction;
+import net.sf.jabref.external.RegExpFileSearch;
+import net.sf.jabref.external.SynchronizeFileField;
+import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.CleanUpAction;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GlazedEntrySorter;
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.gui.MergeEntriesDialog;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -83,17 +99,17 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.sql.DBConnectDialog;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.sql.exporter.DBExporter;
 import net.sf.jabref.undo.CountingUndoManager;
@@ -142,6 +158,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
+
+    // Hashtable indexing the only search auto completer
+    // required for the SearchAutoCompleterUpdater
+    HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
 
     HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
@@ -1852,6 +1872,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
+     * Ensures that the search auto completer is up to date when entries are changed
+     * AKA Let the auto completer, if any, harvest words from the entry
+     */
+    private class SearchAutoCompleterUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
+                Util.updateCompletersForEntry(BasePanel.this.searchAutoCompleterHM, e.getEntry());
+            }
+        }
+    }
+
+    /**
+     * Ensures that auto completers are up to date when entries are changed
+     * AKA Let the auto completer, if any, harvest words from the entry
+     */
+    private class AutoCompletersUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
+                Util.updateCompletersForEntry(BasePanel.this.getAutoCompleters(), e.getEntry());
+            }
+        }
+    }
+
+    /**
      * This method is called from JabRefFrame when the user wants to
      * create a new entry.
      * @param bibEntry The new entry.
@@ -2056,11 +2100,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         add(splitPane, BorderLayout.CENTER);
 
         // Set up name autocompleter for search:
+        //if (!Globals.prefs.getBoolean("searchAutoComplete")) {
         instantiateSearchAutoCompleter();
+        this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean("autoComplete")) {
             instantiateAutoCompleters();
+            // ensure that the autocompleters are in sync with entries
+            this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         }
 
         splitPane.revalidate();
@@ -2081,13 +2129,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void instantiateSearchAutoCompleter() {
-        //if (!Globals.prefs.getBoolean("searchAutoComplete"))
-        //    return;
         searchCompleter = new NameFieldAutoCompleter(new String[] {"author", "editor"}, true);
-        HashMap<String, AbstractAutoCompleter> hm = new HashMap<String, AbstractAutoCompleter>();
-        hm.put("x", searchCompleter);
+        searchAutoCompleterHM.put("x", searchCompleter);
         for (BibtexEntry entry : database.getEntries()){
-            Util.updateCompletersForEntry(hm, entry);
+            Util.updateCompletersForEntry(searchAutoCompleterHM, entry);
         }
         searchCompleteListener = new AutoCompleteListener(searchCompleter);
         searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
