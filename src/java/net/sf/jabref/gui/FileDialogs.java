@@ -210,7 +210,9 @@ public class FileDialogs {
         fc.setVisible(true); // fc.show(); -> deprecated since 1.5
 
         if (fc.getFile() != null) {
-            Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
+            if (updateWorkingDirectory) {
+                Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
+            }
             return fc.getDirectory() + fc.getFile();
         } else {
             return null;
