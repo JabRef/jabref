@@ -37,7 +37,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     public WriteXMPEntryEditorAction(BasePanel panel, EntryEditor editor) {
         this.panel = panel;
         this.editor = editor;
-        putValue(NAME, Globals.lang("Write XMP"));
+        putValue(NAME, Globals.lang("Write XMP")); // normally, this call should be without "Globals.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Globals.lang()
         putValue(SMALL_ICON, GUIGlobals.getImage("pdfSmall"));
         putValue(SHORT_DESCRIPTION, Globals.lang("Write BibtexEntry as XMP-metadata to PDF."));
     }
