@@ -1169,8 +1169,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
-                panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-                    oldValue, newValue));
+                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.database, entry.getId(), oldValue, newValue);
+                if (Util.updateTimeStampIsSet()) {
+                    NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableKeyChange);
+                    panel.undoManager.addEdit(ce);
+                } else {
+                    panel.undoManager.addEdit(undoableKeyChange);
+                }
 
                 if ((newValue != null) && (newValue.length() > 0))
                     // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
@@ -1239,13 +1244,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         if (aComp != null)
                             aComp.addBibtexEntry(entry);
 
-                        // Add an UndoableFieldChange to the baseframe's
-                        // undoManager.
-                        panel.undoManager.addEdit(new UndoableFieldChange(entry, fe.getFieldName(),
-                            oldValue, toSet));
+                        // Add an UndoableFieldChange to the baseframe's undoManager.
+                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fe.getFieldName(), oldValue, toSet);
+                        if (Util.updateTimeStampIsSet()) {
+                            NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableFieldChange);
+                            panel.undoManager.addEdit(ce);
+                        } else {
+                            panel.undoManager.addEdit(undoableFieldChange);
+                        }
                         updateSource();
                         panel.markBaseChanged();
-
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
                             .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);

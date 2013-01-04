@@ -42,7 +42,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     defSort, ctrlClick, useOwner, overwriteOwner,
     keyDuplicateWarningDialog, keyEmptyWarningDialog, enforceLegalKeys,
     confirmDelete, allowEditing, memoryStick, useImportInspector,
-    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp,
+    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, updateTimeStamp, overwriteTimeStamp,
     markImportedEntries, unmarkAllEntriesBeforeImporting;
 
     private JTextField defOwnerField, timeStampFormat, timeStampField;
@@ -66,6 +66,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
         useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
         useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
             +Globals.lang("Date format")+ ":");
+        useTimeStamp.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent arg0) {
+                updateTimeStamp.setEnabled(useTimeStamp.isSelected());
+            }
+        });
+        updateTimeStamp = new JCheckBox(Globals.lang("Update timestamp on modification"));
         overwriteOwner = new JCheckBox(Globals.lang("Overwrite"));
         overwriteTimeStamp = new JCheckBox(Globals.lang("Overwrite"));
         overwriteOwner.setToolTipText(Globals.lang("If a pasted or imported entry already has "
@@ -156,6 +163,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(hlp);
         builder.nextLine();
 
+        builder.append(new JPanel());
+        builder.append(updateTimeStamp, 2);
+        builder.nextLine();
+
         builder.append(markImportedEntries, 13);
         builder.nextLine();
         builder.append(unmarkAllEntriesBeforeImporting, 13);
@@ -183,6 +194,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         overwriteOwner.setSelected(_prefs.getBoolean("overwriteOwner"));
         useTimeStamp.setSelected(_prefs.getBoolean("useTimeStamp"));
         overwriteTimeStamp.setSelected(_prefs.getBoolean("overwriteTimeStamp"));
+        updateTimeStamp.setSelected(_prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        updateTimeStamp.setEnabled(useTimeStamp.isSelected());
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
         enforceLegalKeys.setSelected(_prefs.getBoolean("enforceLegalBibtexKey"));
@@ -224,6 +237,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("overwriteOwner", overwriteOwner.isSelected());
         _prefs.putBoolean("useTimeStamp", useTimeStamp.isSelected());
         _prefs.putBoolean("overwriteTimeStamp", overwriteTimeStamp.isSelected());
+        _prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("enforceLegalBibtexKey", enforceLegalKeys.isSelected());

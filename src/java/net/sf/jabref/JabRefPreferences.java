@@ -77,7 +77,9 @@ public class JabRefPreferences {
         // here are the possible values for _MODE:
         AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both",
         AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly",
-        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
+        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly",
+
+        UPDATE_TIMESTAMP = "updateTimestamp";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -412,6 +414,7 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
+        defaults.put(UPDATE_TIMESTAMP, Boolean.TRUE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);

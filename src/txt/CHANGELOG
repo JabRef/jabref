@@ -14,6 +14,7 @@
     - After a search has been done, the first entry of the entry table is selected (feature 656).
     - Entries contained in an .aux file can now be selected (feature 644).
     - New entries are now always be added to a group. Fixes bug 1093.
+    - Timestamp is now automatically updated on a change of an entry (feature 799)
 [2.9.2]
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.

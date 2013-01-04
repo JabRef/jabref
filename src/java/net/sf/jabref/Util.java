@@ -50,7 +50,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -71,6 +70,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
@@ -3231,5 +3231,24 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	    }
 	    return sb.toString();
 	}
+
+    public static boolean updateTimeStampIsSet() {
+        return (Globals.prefs.getBoolean("useTimeStamp") &&
+                Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+    }
+
+    /**
+     * Updates the timestamp of the given entry,
+     * nests the given undaoableEdit in a named compound,
+     * and returns that named compound
+     */
+    public static NamedCompound doUpdateTimeStamp(BibtexEntry entry, AbstractUndoableEdit undoableEdit) {
+        NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
+        ce.addEdit(undoableEdit);
+        String timeStampField = Globals.prefs.get("timeStampField");
+        String timestamp = Util.easyDateFormat();
+        Util.updateField(entry, timeStampField, timestamp, ce);
+        return ce;
+    }
 }
 
