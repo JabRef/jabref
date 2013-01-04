@@ -1833,7 +1833,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 markBaseChanged(); // The database just changed.
-                new FocusRequester(getEntryEditor(be));              
+                new FocusRequester(getEntryEditor(be));
 
                 return be;
             } catch (KeyCollisionException ex) {
