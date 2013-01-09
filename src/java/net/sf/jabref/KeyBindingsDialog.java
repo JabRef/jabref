@@ -20,6 +20,8 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.*;
@@ -28,21 +30,40 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-//
-class KeyBindingsDialog
-    extends JDialog {
-  KeystrokeTable table;
-  KeystrokeTableModel tableModel;
+/**
+ * Dialog to customize key bindings
+ */
+@SuppressWarnings("serial")
+class KeyBindingsDialog extends JDialog {
+    private KeystrokeTable table;
+  private KeystrokeTableModel tableModel;
   //JList list = new JList();
-  JTextField keyTF = new JTextField();
-  JButton ok, cancel, grabB, defB;
-  HashMap<String, String> bindHM, defBinds;
-  boolean clickedSave = false;
-  int selectedRow = -1;
+
+  // displays the key binding of the currently selected entry
+  // currently not displayed as it does not get updated
+  private JTextField keyTF = new JTextField();
+
+  private JButton ok, cancel, grabB, defB;
+  
+  // stores the user-selected key bindings
+  private final HashMap<String, String> bindHM;
+
+  // stores default key bindings
+  private HashMap<String, String> defBinds;
+
+  private boolean clickedSave = false;
+
+  /**
+   * Checked by the caller whether user has confirmed the change
+   * @return true if the user wants the keybindings to be stored
+   */
   boolean getAction() {
     return clickedSave;
   }
 
+  /**
+   * Used by the caller to retrieve the keybindings
+   */
   HashMap<String, String> getNewKeyBindings() {
     return bindHM;
   }
@@ -54,6 +75,7 @@ class KeyBindingsDialog
     setModal(true); //this needs to be modal so that client knows when ok or cancel was clicked
     getContentPane().setLayout(new BorderLayout());
     bindHM = name2binding;
+    setupTable();
     setList();
     //JScrollPane listScroller = new JScrollPane(list);
     JScrollPane listScroller = new JScrollPane(table);
@@ -66,12 +88,6 @@ class KeyBindingsDialog
     grabB = new JButton(Globals.lang("Grab"));
     defB = new JButton(Globals.lang("Default"));
     grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
-    /*grabB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        selectedRow = (table.getSelectedRows())[0];
-        Util.pr(""+selectedRow);
-      }
-    });*/
     buttonBox.add(grabB);
     buttonBox.add(defB);
     buttonBox.add(ok);
@@ -82,6 +98,8 @@ class KeyBindingsDialog
     setButtons();
     keyTF.setEditable(false);
 
+    Util.bindCloseDialogKeyToCancelAction(getRootPane(), cancel.getAction());
+
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
         clickedSave = false;
@@ -90,7 +108,17 @@ class KeyBindingsDialog
     });
   }
 
-  void setTop() {
+  private void setupTable() {
+      table = new KeystrokeTable();
+      //table.setCellSelectionEnabled(false);
+      table.setRowSelectionAllowed(true);
+      table.setColumnSelectionAllowed(false);
+      table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      table.setAutoCreateRowSorter(true);
+      // TODO: setup so that clicking on list will display the current binding
+  }
+
+  private void setTop() {
     Box topBox = new Box(BoxLayout.X_AXIS);
 
     topBox.add(new JLabel(Globals.lang("Binding") + ":", JLabel.RIGHT));
@@ -99,21 +127,16 @@ class KeyBindingsDialog
 
   }
 
-  //##################################################
-  // respond to grabKey and display the key binding
-  //##################################################
-  public class JBM_CustomKeyBindingsListener
+  /**
+   * respond to grabKey and display the key binding
+   */
+  private class JBM_CustomKeyBindingsListener
       extends KeyAdapter {
     public void keyPressed(KeyEvent evt) {
       // first check if anything is selected if not the return
       int selRow = table.getSelectedRow();
       if (selRow < 0)
         return;
-      //Util.pr("dei"+selectedRow+" "+table.getSelectedRow());
-      //Object[] selected = list.getSelectedValues();
-      //if (selected.length == 0) {
-      //  return;
-      //}
 
       String code = KeyEvent.getKeyText(evt.getKeyCode());
       String mod = KeyEvent.getKeyModifiersText(evt.getModifiers());
@@ -121,8 +144,8 @@ class KeyBindingsDialog
 
       if (mod.equals("")) {
         int kc = evt.getKeyCode();
-        if ( (kc < KeyEvent.VK_F1) && (kc > KeyEvent.VK_F12) &&
-            (kc != KeyEvent.VK_ESCAPE) && (kc != KeyEvent.VK_DELETE)) {
+        if (!(((kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12)) ||
+              (kc == KeyEvent.VK_ESCAPE) || (kc == KeyEvent.VK_DELETE))) {
           return; // need a modifier except for function keys
         }
       }
@@ -163,10 +186,10 @@ class KeyBindingsDialog
     }
   }
 
-  //##################################################
-  // put the corresponding key binding into keyTF
-  //##################################################
-  class MyListSelectionListener
+  /**
+   * put the corresponding key binding into keyTF
+   */
+  private class MyListSelectionListener
       implements ListSelectionListener {
     // This method is called each time the user changes the set of selected items
     public void valueChanged(ListSelectionEvent evt) {
@@ -189,9 +212,10 @@ class KeyBindingsDialog
 
   
 
-  //setup so that clicking on list will display the current binding
-  void setList() {
-
+  /**
+   * Puts the content of bindHM into the table
+   */
+  private void setList() {
     Iterator<String> it = bindHM.keySet().iterator();
     String[][] tableData = new String[bindHM.size()][3];
     int i=0;
@@ -208,26 +232,25 @@ class KeyBindingsDialog
      sorted.put(tableData[i][0], tableData[i]);
 
     tableModel = new KeystrokeTableModel(sorted);
-    table = new KeystrokeTable(tableModel);
-    //table.setCellSelectionEnabled(false);
-    table.setRowSelectionAllowed(true);
-    table.setColumnSelectionAllowed(false);
-    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-    //list.setModel(listModel);
+    table.setModel(tableModel);
+    
+    // has to be done each time as the columnModel is dependend on the tableModel
     TableColumnModel cm = table.getColumnModel();
     cm.getColumn(0).setPreferredWidth(GUIGlobals.KEYBIND_COL_0);
     cm.getColumn(1).setPreferredWidth(GUIGlobals.KEYBIND_COL_1);
-    table.setRowSelectionInterval(0, 0); //select the first entry
+//    table.setRowSelectionInterval(0, 0); //select the first entry
+
   }
 
-  class KeystrokeTable extends JTable {
-    public KeystrokeTable(KeystrokeTableModel model) { super(model); }
+  @SuppressWarnings("serial")
+  private class KeystrokeTable extends JTable {
+    public KeystrokeTable() { super(); }
      public boolean isCellEditable(int row, int col) { return false; }
      public String getOriginalName(int row) { return ((KeystrokeTableModel)getModel()).data[row][2]; }
    }
 
-    class KeystrokeTableModel extends AbstractTableModel {
+  @SuppressWarnings("serial")
+  private class KeystrokeTableModel extends AbstractTableModel {
       String[][] data;
       //String[] trData;
       public KeystrokeTableModel(TreeMap<String, String[]> sorted) {
@@ -263,35 +286,59 @@ class KeyBindingsDialog
     }
 
   // listners
-  void setButtons() {
+  private void setButtons() {
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         // save all the key bindings
         dispose();
         clickedSave = true;
-        // message: key bindings will take into effect next time you start JBM
+        // also displays message: key bindings will take into effect next time you start JBM
       }
     });
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         dispose();
         clickedSave = false;
-        //System.exit(-1);//get rid of this
       }
     });
     defB.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        /*Object[] selected = list.getSelectedValues();
+        int[] selected = table.getSelectedRows();
         if (selected.length == 0) {
-          return;
+            int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Globals.lang("All key bindings will be reset to their defaults.")+" "+Globals.lang("Continue?"), Globals.lang("Resetting all key bindings"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null,
+                    new String[]{Globals.lang("Ok"), Globals.lang("Cancel")},
+                    Globals.lang("Ok"));
+            if (answer == JOptionPane.YES_OPTION) {
+                bindHM.clear();
+                Set<Entry<String, String>> entrySet = defBinds.entrySet();
+                for (Entry<String, String> entry: entrySet) {
+                    bindHM.put(entry.getKey(), entry.getValue());
+                }
+                setList();
+            }
+        } else {
+            for (int i=0; i<selected.length; i++) {
+                int row = selected[i];
+                String name = (String) table.getValueAt(row, 0);
+                String newKey = setToDefault(name);
+                keyTF.setText(newKey);
+                table.setValueAt(newKey, row, 1);
+                table.repaint();
+            }
         }
-        keyTF.setText(setToDefault( (String) list.getSelectedValue()));*/
       }
     });
 
   }
 
-  String setToDefault(String name) {
+  /**
+   * Resets a single accelerator key
+   * @param name the action name
+   * @return the default accelerator key
+   */
+  private String setToDefault(String name) {
     String defKey = defBinds.get(name);
     bindHM.put(name, defKey);
     return defKey;

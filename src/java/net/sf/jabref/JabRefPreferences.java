@@ -913,7 +913,7 @@ public class JabRefPreferences {
 
         // First read the bindings, and their names.
         String[] bindNames = getStringArray("bindNames"),
-            bindings = getStringArray("bindings");
+                 bindings  = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
         if ((bindNames == null) || (bindings == null)
@@ -1034,8 +1034,17 @@ public class JabRefPreferences {
     }
 
     private String getNextUnit(Reader data) throws IOException {
-        int c;
-        boolean escape = false, done = false;
+        // character last read
+        // -1 if end of stream
+        // initialization necessary, because of Java compiler
+        int c = -1;
+
+        // last character was escape symbol
+        boolean escape = false;
+
+        // true if a ";" is found
+        boolean done = false;
+
         StringBuffer res = new StringBuffer();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
@@ -1057,10 +1066,14 @@ public class JabRefPreferences {
                 escape = false;
             }
         }
-        if (res.length() > 0)
+        if (res.length() > 0) {
             return res.toString();
-        else
+        } else if (c ==-1) {
+            // end of stream
             return null;
+        } else {
+            return "";
+        }
     }
 
     private String makeEscape(String s) {

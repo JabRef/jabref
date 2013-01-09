@@ -1466,7 +1466,7 @@ public JabRefPreferences prefs() {
       mb.add(pluginMenu);
 
 
-      //options.add(selectKeys);
+      options.add(selectKeys);
       mb.add(options);
 
       helpMenu.add(help);
@@ -1799,7 +1799,7 @@ public JabRefPreferences prefs() {
       KeyBindingsDialog d = new KeyBindingsDialog
           ( new HashMap<String, String>(prefs.getKeyBindings()),
            prefs.getDefaultKeys());
-      d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       d.pack(); //setSize(300,500);
       Util.placeDialog(d, JabRefFrame.this);
       d.setVisible(true);
