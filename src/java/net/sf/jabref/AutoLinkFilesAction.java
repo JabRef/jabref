@@ -17,6 +17,7 @@ public class AutoLinkFilesAction extends AbstractAction {
     public AutoLinkFilesAction() {
         putValue(SMALL_ICON, GUIGlobals.getImage("autoGroup"));
         putValue(NAME, Globals.lang("Automatically set file links"));
+        putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
     }
 
     public void actionPerformed(ActionEvent event) {
