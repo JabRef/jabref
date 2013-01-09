@@ -17,12 +17,47 @@ package net.sf.jabref;
 
 public class BibtexString {
 
+    public enum Type {
+        AUTHOR("a"),
+        INSTITUTION("i"),
+        PUBLISHER("p"),
+        OTHER("");
+
+        private String prefix;
+
+        Type(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public static final Type get(String name) {
+            if (!(name.charAt(1) + "").toUpperCase().equals(
+                    (name.charAt(1) + "")))
+                return OTHER;
+
+            for(Type t : Type.values()) {
+                if (t.prefix.equals(name.charAt(0) + "")
+                        && name.length() > 0)
+                    return t;
+            }
+            return OTHER;
+        }
+    }
+
     String _name, _content, _id;
+    Type _type;
 
     public BibtexString(String id, String name, String content) {
 	_id = id;
 	_name = name;
 	_content = content;
+	_type = Type.get(name);
+    }
+
+    public BibtexString(String id, String name, String content, Type type) {
+	_id = id;
+	_name = name;
+	_content = content;
+	_type = type;
     }
 
     public String getId() {
@@ -39,6 +74,7 @@ public class BibtexString {
 
     public void setName(String name) {
 	_name = name;
+	_type = Type.get(name.charAt(0)+"");
     }
 
     public String getContent() {
@@ -53,4 +89,7 @@ public class BibtexString {
       return new BibtexString(_id, _name, _content);
     }
 
+    public Type getType() {
+        return _type;
+    }
 }

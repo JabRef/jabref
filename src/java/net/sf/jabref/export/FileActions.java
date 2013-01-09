@@ -56,7 +56,7 @@ public class FileActions
 {
 
     private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
-
+    private static BibtexString.Type previousStringType;
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
     if (preamble != null) {
@@ -74,6 +74,7 @@ public class FileActions
      * @throws IOException If anthing goes wrong in writing.
      */
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
+        previousStringType = BibtexString.Type.AUTHOR;
         List<BibtexString> strings = new ArrayList<BibtexString>();
         for (String s : database.getStringKeySet()) {
             strings.add(database.getString(s));
@@ -81,18 +82,24 @@ public class FileActions
         Collections.sort(strings, new BibtexStringComparator(true));
         // First, make a Map of all entries:
         HashMap<String, BibtexString> remaining = new HashMap<String, BibtexString>();
+        int maxKeyLength = 0;
         for (Iterator<BibtexString> i=strings.iterator(); i.hasNext();) {
             BibtexString string = i.next();
             remaining.put(string.getName(), string);
+            maxKeyLength = Math.max(maxKeyLength, string.getName().length());
         }
-        for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
-            BibtexString bs = i.next();
-            if (remaining.containsKey(bs.getName()))
-                writeString(fw, bs, remaining);
+
+        for(BibtexString.Type t : BibtexString.Type.values()) {
+            for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
+                BibtexString bs = i.next();
+                if (remaining.containsKey(bs.getName()) && bs.getType() == t)
+                    writeString(fw, bs, remaining, maxKeyLength);
+            }
         }
+        fw.write(Globals.NEWLINE);
     }
 
-    private static void writeString(Writer fw, BibtexString bs, HashMap<String, BibtexString> remaining) throws IOException {
+    private static void writeString(Writer fw, BibtexString bs, HashMap<String, BibtexString> remaining, int maxKeyLength) throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bs.getName());
 
@@ -108,10 +115,19 @@ public class FileActions
             Object referred = remaining.get(foundLabel.substring(1, foundLabel.length()-1));
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (referred != null)
-                writeString(fw, (BibtexString)referred, remaining);
+                writeString(fw, (BibtexString)referred, remaining, maxKeyLength);
         }
 
-        fw.write("@STRING{" + bs.getName() + " = ");
+        if (previousStringType != bs.getType()) {
+            fw.write(Globals.NEWLINE);
+            previousStringType = bs.getType();
+        }
+
+        String suffix = "";
+        for(int i = maxKeyLength - bs.getName().length(); i > 0; i--) 
+            suffix += " ";
+
+        fw.write("@String { " + bs.getName() + suffix + " = ");
         if (!bs.getContent().equals("")) {
             try {
                 String formatted = (new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING);
@@ -126,7 +142,7 @@ public class FileActions
         else
             fw.write("{}");
 
-        fw.write("}" + Globals.NEWLINE + Globals.NEWLINE);
+        fw.write(" }" + Globals.NEWLINE);// + Globals.NEWLINE);
     }
 
     /**

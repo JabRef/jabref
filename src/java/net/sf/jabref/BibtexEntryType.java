@@ -79,7 +79,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "number", "month", "part", "eid", "note"
+                    "volume", "number", "pages", "month", "note", //- "volume", "pages", "part", "eid"
                 };
             }
 
@@ -87,7 +87,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "author", "title", "journal", "year", "volume", "pages"
+                    "author", "title", "journal", "year" //+ "volume", "pages"
                 };
             }
 
@@ -117,7 +117,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "author", "howpublished", "lastchecked", "address", "month", "year", "note"
+                    "author", "howpublished", "address", "month", "year", "note" //+ "lastchecked"
                 };
             }
 
@@ -149,15 +149,15 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Inbook";
+                return "InBook";
             }
 
             public String[] getOptionalFields()
             {
                 return new String[]
                 {
-                    "volume", "number", "pages", "series", "type", "address", "edition",
-		    "month", "note"
+                    "volume", "number", "series", "type", "address", "edition",
+		    "month", "note" //+ "pages"
                 };
             }
 
@@ -206,8 +206,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "volume", "number", "pages", "series", "address", "edition", "month",
-                    "note"
+                    "volume", "number", "series", "address", "edition", "month",
+                    "note" //+ pages
                 };
             }
 
@@ -249,7 +249,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Incollection";
+                return "InCollection";
             }
 
             public String[] getOptionalFields()
@@ -329,7 +329,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Inproceedings";
+                return "InProceedings";
             }
 
             public String[] getOptionalFields()
@@ -447,7 +447,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Techreport";
+                return "TechReport";
             }
 
             public String[] getOptionalFields()
@@ -487,7 +487,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Mastersthesis";
+                return "MastersThesis";
             }
 
             public String[] getOptionalFields()
@@ -526,7 +526,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         {
             public String getName()
             {
-                return "Phdthesis";
+                return "PhdThesis";
             }
 
             public String[] getOptionalFields()
