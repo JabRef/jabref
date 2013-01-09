@@ -414,7 +414,7 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
-        defaults.put(UPDATE_TIMESTAMP, Boolean.TRUE);
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
