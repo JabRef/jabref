@@ -11,6 +11,7 @@
       reduced the font size.
     - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
       (patch 123 by Laura Hern�ndez G�mez)
+    - Added menu option "Automatically set file links for selected entries".
     - After a search has been done, the first entry of the entry table is selected (feature 656).
     - Entries contained in an .aux file can now be selected (feature 644).
     - New entries are now always be added to a group. Fixes bug 1093.

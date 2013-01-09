@@ -19,7 +19,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
-import net.sf.jabref.gui.FileListEditor;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
@@ -99,8 +98,6 @@ public class SynchronizeFileField extends AbstractWorker {
         //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
         //FieldTextField editor = new FieldTextField(fieldName, "", false);
 
-        // Find the default directory for this field type:
-        String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         Set<BibtexEntry> changedEntries = new HashSet<BibtexEntry>();
 
         // First we try to autoset fields
@@ -110,13 +107,8 @@ public class SynchronizeFileField extends AbstractWorker {
                 entries.add(sel[i]);
             }
 
-            // We need to specify which directories to search in:
-            ArrayList<File> dirs = new ArrayList<File>();
-            for (int i=0; i<dirsS.length; i++)
-                dirs.add(new File(dirsS[i]));
-
             // Start the autosetting process:                
-            Thread t = FileListEditor.autoSetLinks(entries, ce, changedEntries, dirs);
+            Thread t = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
             // Wait for the autosetting to finish:
             try {
                 t.join();
@@ -158,6 +150,13 @@ public class SynchronizeFileField extends AbstractWorker {
                 if ((old != null) && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old);
+
+                    // We need to specify which directories to search in for Util.expandFilename:
+                    String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+                    ArrayList<File> dirs = new ArrayList<File>();
+                    for (int k=0; k<dirsS.length; k++)
+                        dirs.add(new File(dirsS[k]));
+
                     for (int j=0; j<tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
@@ -269,14 +268,13 @@ public class SynchronizeFileField extends AbstractWorker {
             }
         }
 
-        entriesChangedCount = changedEntries.size();
 	//for (BibtexEntry entr : changedEntries)
 	//    System.out.println(entr.getCiteKey());
-        if (entriesChangedCount > 0) {
+        if (!changedEntries.isEmpty()) {
             // Add the undo edit:
             ce.end();
             panel.undoManager.addEdit(ce);
-            
+            panel.markBaseChanged();
         }
     }
 

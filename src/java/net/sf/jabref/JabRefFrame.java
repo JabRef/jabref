@@ -379,7 +379,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   			FindUnlinkedFilesDialog.ACTION_ICON,
   			prefs.getKey(FindUnlinkedFilesDialog.ACTION_COMMAND)
   	);
-    
+
+	AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
+
     PushToApplicationButton pushExternalButton;
 
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
@@ -1413,6 +1415,7 @@ public JabRefPreferences prefs() {
       tools.add(openUrl);
       //tools.add(openSpires);
       tools.add(findUnlinkedFiles);
+      tools.add(autoLinkFile);
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);

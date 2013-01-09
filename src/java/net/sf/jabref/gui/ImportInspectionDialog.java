@@ -1227,7 +1227,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            FileListEditor.autoSetLinks(entry, model, metaData, new ActionListener() {
+            Util.autoSetLinks(entry, model, metaData, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
                     if (e.getID() > 0) {
