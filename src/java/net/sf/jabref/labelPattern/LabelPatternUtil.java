@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.AuthorList.Author;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 /**
@@ -45,6 +48,189 @@ public class LabelPatternUtil {
 
     public static void updateDefaultPattern() {
         DEFAULT_LABELPATTERN = split(JabRefPreferences.getInstance().get("defaultLabelPattern"));
+    }
+
+    private static String normalize(String content) {
+        List<String> tokens = new ArrayList<String>();
+        int b = 0;
+        String and = "";
+        String token = "";
+        for (int p=0; p<content.length(); p++) {
+            if (b == 0) {
+                if (and.equals("") && content.charAt(p) == 'a'
+                        || and.equals("a") && content.charAt(p) == 'n'
+                        || and.equals("an") && content.charAt(p) == 'd') {
+                    and += content.charAt(p);
+                } else if (and.equals("and") && content.charAt(p) == ' ') {
+                    and = "";
+                    tokens.add(token.trim());
+                    token = "";
+                } else {
+                    if (content.charAt(p) == '{') b++;
+                    if (content.charAt(p) == '}') b--;
+                    token += and;
+                    and = "";
+                    token += content.charAt(p);
+                }
+            } else {
+                token += content.charAt(p);
+            }
+        }
+        tokens.add(token);
+        StringBuilder normalized = new StringBuilder("");
+
+        for (int i=0; i<tokens.size(); i++) {
+            if (i>0)
+                normalized.append(" and ");
+
+            normalized.append(isInsitution(tokens.get(i))
+                    ? generateInstitutionKey(tokens.get(i))
+                            : removeDiacritics(tokens.get(i)));
+        }
+        return normalized.toString();
+    }
+
+    private static String removeDiacritics(String content) {
+        if (content == null) return null;
+
+        // Replace umaut with '?e'
+        content = content.replaceAll("\\{\\\\\"([a-zA-Z])\\}","$1e");
+        content = content.replaceAll("\\\\\"\\{([a-zA-Z])\\}","$1e");
+        content = content.replaceAll("\\\\\"([a-zA-Z])","$1e");
+        // Remove diacritics
+        content = content.replaceAll("\\{\\\\.([a-zA-Z])\\}","$1");
+        content = content.replaceAll("\\\\.\\{([a-zA-Z])\\}","$1");
+        content = content.replaceAll("\\\\.([a-zA-Z])","$1");
+        return content;
+    }
+
+    private static String unifyUmlaut(String content) {
+        if (content == null) return null;
+        return content.replaceAll(
+                "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
+                "{\\\"$1}").replaceAll(
+                        "\\{?(\\\\[^\\-a-zA-Z])([a-zA-Z])\\}?",
+                        "{$1$2}");
+    }
+
+    private static boolean isInsitution(String content) {
+        Author a = AuthorList.getAuthorList(content).getAuthor(0);
+        return content.charAt(0) == '{'
+                && content.charAt(content.length()-1) == '}';
+    }
+
+    private static String generateInstitutionKey(String content) {
+        if (content == null) return null;
+        content = unifyUmlaut(content);
+        List<String> ignore = Arrays.asList(new String[]{ "press", "the" });
+        content = content.replaceAll("^\\{", "").replaceAll("\\}$", "");
+        Pattern regex = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
+        Matcher matcher = regex.matcher(content);
+        if (matcher.matches())
+            return matcher.group(1);
+
+        content = removeDiacritics(content);
+        String[] parts = content.split(",");
+
+        // Key parts
+        String university = null;
+        String department = null;
+        String school     = null;
+        String rest       = null;
+
+        for(int index=0; index<parts.length; index++) {
+            List<String> part = new ArrayList<String>();
+
+            // Cleanup: remove unnecessary words.
+            for(String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
+                if ( !k.equals("") // remove empty
+                        && !ignore.contains(k.toLowerCase()) // remove ignored words
+                        && k.charAt(k.length()-1) != '.' // remove ltd., co., ...
+                        && (k.charAt(0)+"").matches("[A-Z]") // remove of, di, ...
+                        || k.length()>=3 && k.toLowerCase().substring(0, 2).equals("uni")) {
+                    part.add(k);
+                }
+            }
+
+            boolean isUniversity = false; // university
+            boolean isTechnology = false; // technology institute
+            boolean isDepartment = false; // departments
+            boolean isSchool     = false; // schools
+
+            // Deciding about a part type...
+            for (String k : part) {
+                if (k.length()>=5 && k.toLowerCase().substring(0, 5).equals("univ"))
+                    isUniversity = true;
+                if (k.length()>=6 && k.toLowerCase().substring(0, 6).equals("techn"))
+                    isTechnology = true;
+                if (k.toLowerCase().equals("school"))
+                    isSchool = true;
+                if (k.length()>=7 && k.toLowerCase().substring(0, 7).matches("d[ei]part")
+                        || k.length()>=4 && k.toLowerCase().substring(0, 4).equals("lab"))
+                    isDepartment = true;
+            }
+            if (isTechnology) isUniversity = false; // technology institute isn't university :-)
+
+            // University part looks like: Uni[NameOfTheUniversity]
+            //
+            // If university is detected than the previous part is suggested
+            // as department
+            if (isUniversity) {
+                university = "Uni";
+                for (String k : part) {
+                    if (k.length()>=5 && !k.toLowerCase().substring(0, 5).equals("univ"))
+                        university += k;
+                }
+                if (index > 0 && department == null)
+                    department = parts[index-1];
+
+            // School is an abbreviation of all the words beginning with a
+            // capital letter excluding: department, school and faculty words.
+            //
+            // Explicitly defined department part is build the same way as
+            // school
+            } else if (isSchool || isDepartment) {
+                if (isSchool)
+                    school = "";
+                if (isDepartment)
+                    department = "";
+
+                for (String k : part) {
+                    if (k.length()>=7 && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
+                            && !k.toLowerCase().equals("school")
+                            && !k.toLowerCase().equals("faculty")
+                            && !k.replaceAll("[^A-Z]", "").equals("")) {
+                        if (isSchool)
+                            school += k.replaceAll("[^A-Z]", "");
+                        if (isDepartment)
+                            department += k.replaceAll("[^A-Z]", "");
+                    }
+                }
+            // A part not matching university, department nor school.
+            } else if (rest == null) {
+                rest = "";
+                // Less than 3 parts -> concatenate those
+                if (part.size() < 3) {
+                    for (String k : part)
+                        rest += k;
+                // More than 3 parts -> use 1st letter abbreviation
+                } else {
+                    for (String k : part) {
+                        k = k.replaceAll("[^A-Z]", "");
+                        if (!k.equals(""))
+                            rest += k;
+                    }
+                }
+            }
+        }
+
+        // Putting parts together.
+        String result = (university==null ? rest : university)
+                + (school == null ? "" : school)
+                + ((department == null
+                    || (school != null && department.equals(school))) ?
+                            "" : department);
+        return result;
     }
 
     /**
@@ -298,6 +484,8 @@ public class LabelPatternUtil {
                  * substitution of editor.
                  */
                 String authString = _entry.getField("author");
+                if (authString != null)
+                    authString = normalize(_db.resolveForStrings(authString));
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
@@ -306,6 +494,9 @@ public class LabelPatternUtil {
                 } else {
                     if (authString == null || authString.equals("")) {
                         authString = _entry.getField("editor");
+                        if (authString != null)
+                            authString = normalize(
+                                    _db.resolveForStrings(authString));
                     }
                 }
 
@@ -332,7 +523,10 @@ public class LabelPatternUtil {
                     String s = authAuthEa(authString);
                     return s == null ? "" : s;
                 } else if (val.equals("auth.etal")) {
-                    String s = authEtal(authString);
+                    String s = authEtal(authString, ".", ".etal");
+                    return s == null ? "" : s;
+                } else if (val.equals("authEtAl")) {
+                    String s = authEtal(authString, "", "EtAl");
                     return s == null ? "" : s;
                 } else if (val.equals("authshort")) {
                     String s = authshort(authString);
@@ -762,7 +956,8 @@ public class LabelPatternUtil {
      * Newton.etal
      * Newton.Maxwell
      */
-    private static String authEtal(String authorField) {
+    private static String authEtal(String authorField, String delim,
+            String append) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuffer author = new StringBuffer();
 
@@ -772,9 +967,9 @@ public class LabelPatternUtil {
         }
         author.append((tokens[0].split(","))[0]);
         if (tokens.length == 2)
-            author.append(".").append((tokens[1].split(","))[0]);
+            author.append(delim).append((tokens[1].split(","))[0]);
         else if (tokens.length > 2)
-            author.append(".etal");
+            author.append(append);
 
         return author.toString();
     }
