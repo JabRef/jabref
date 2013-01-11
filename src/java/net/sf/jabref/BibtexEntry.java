@@ -432,7 +432,7 @@ public class BibtexEntry
     private boolean writeField(String name, Writer out,
                             FieldFormatter ff, boolean isNotFirst, boolean isNextGroup) throws IOException {
         String o = getField(name);
-        //if (o != null) {
+        if (o != null || Globals.prefs.getBoolean("includeEmptyFields")) {
             if (isNotFirst)
                 out.write(","+Globals.NEWLINE);
             if (isNextGroup)
@@ -446,8 +446,8 @@ public class BibtexEntry
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
             }
             return true;
-        //} else
-        //    return false;
+        } else
+            return false;
     }
 
     /**

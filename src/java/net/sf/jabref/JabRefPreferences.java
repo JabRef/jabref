@@ -454,6 +454,7 @@ public class JabRefPreferences {
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
         defaults.put("biblatexMode", Boolean.FALSE);
         defaults.put("valueDelimiters", 0);
+        defaults.put("includeEmptyFields", Boolean.FALSE);
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
         defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));

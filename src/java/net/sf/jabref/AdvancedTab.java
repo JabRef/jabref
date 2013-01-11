@@ -39,7 +39,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         lnf = new JPanel();
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
-            useIEEEAbrv, biblatexMode;
+            useIEEEAbrv, biblatexMode, includeEmptyFields;
     JComboBox<String> valueDelimiter;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
@@ -47,7 +47,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel p1 = new JPanel(),
         p2 = new JPanel();
     String oldLnf = "";
-    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation, oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
+    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation,
+            oldCaseKeeperOnSearch, oldUnitFormatterOnSearch,
+            includeEmptyFieldsValue;
     int oldPort = -1, valueDelimiterSelected;
     
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 
@@ -71,6 +73,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     valueDelimiter = new JComboBox<String>(new String[]{
             Globals.lang("Quotes: \", \""),
             Globals.lang("Curly Brackets: {, }") });
+    includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -163,6 +166,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.nextLine();
     builder.append(new JPanel());
     builder.append(builder2.getPanel());
+    builder.nextLine();
+    builder.append(new JPanel());
+    builder.append(includeEmptyFields);
 
     builder.nextLine();    
     builder.appendSeparator(Globals.lang("Import conversions"));
@@ -199,6 +205,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         biblatexMode.setSelected(oldBiblMode);
         valueDelimiterSelected = Globals.prefs.getInt("valueDelimiters");
         valueDelimiter.setSelectedIndex(valueDelimiterSelected);
+        includeEmptyFieldsValue = Globals.prefs.getBoolean("includeEmptyFields");
+        includeEmptyFields.setSelected(includeEmptyFieldsValue);
         oldConvertToEquation = Globals.prefs.getBoolean("useConvertToEquation");
         useConvertToEquation.setSelected(oldConvertToEquation);
         oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
@@ -262,6 +270,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         }
         
         _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
+        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
         _prefs.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
         _prefs.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
         _prefs.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
