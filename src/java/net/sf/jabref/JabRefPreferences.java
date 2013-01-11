@@ -85,6 +85,9 @@ public class JabRefPreferences {
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
+    private static final char[][] VALUE_DELIMITERS =
+            new char[][]{ {'"', '"'}, {'{', '}'} };
+
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
     Preferences prefs;
@@ -450,6 +453,7 @@ public class JabRefPreferences {
         defaults.put("deletePlugins", "");
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
         defaults.put("biblatexMode", Boolean.FALSE);
+        defaults.put("valueDelimiters", 0);
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
         defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));
@@ -559,6 +563,15 @@ public class JabRefPreferences {
                 nonWrappableFields.add(fields[i].trim());
         }
 
+    }
+
+    public char getValueDelimiters(int index) {
+        return getValueDelimiters()[index];
+    }
+
+    public char[] getValueDelimiters() {
+        return VALUE_DELIMITERS[getInt(
+                "valueDelimiters")];
     }
 
     /**
