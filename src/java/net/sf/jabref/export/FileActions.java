@@ -480,7 +480,9 @@ public class FileActions
 
             boolean inStandardOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInStandardOrder") :
                 Globals.prefs.getBoolean("exportInStandardOrder");
-            if (!inStandardOrder) {
+            boolean inTitleOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInTitleOrder") :
+                Globals.prefs.getBoolean("exportInTitleOrder");
+            if (!inStandardOrder && !inTitleOrder) {
                 // The setting is to save according to the current table order.
                 pri = Globals.prefs.get("priSort");
                 sec = Globals.prefs.get("secSort");
@@ -489,7 +491,14 @@ public class FileActions
                 priD = Globals.prefs.getBoolean("priDescending");
                 secD = Globals.prefs.getBoolean("secDescending");
                 terD = Globals.prefs.getBoolean("terDescending");
-
+            } else if (!inStandardOrder && inTitleOrder) {
+                // The setting is to save in standard order: author, editor, year
+                pri = "title";
+                sec = "author";
+                ter = "editor";
+                priD = false;
+                secD = false;
+                terD = false;
             } else {
                 // The setting is to save in standard order: author, editor, year
                 pri = "author";
