@@ -52,15 +52,22 @@ public class BibtexEntry
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;
 
+    /** Display name map for entry field names. */
     private static final Map<String, String> tagDisplayNameMap = new HashMap<String, String>();
+    /** The maximum length of a field name to properly make the alignment of the
+     *  equal sign. */
     private static final int maxFieldLength;
     static{
+        // The field name display map.
         tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
         tagDisplayNameMap.put("howpublished", "HowPublished");
         tagDisplayNameMap.put("lastchecked", "LastChecked");
         tagDisplayNameMap.put("isbn", "ISBN");
         tagDisplayNameMap.put("issn", "ISSN");
 
+        // Looking for the longest field name.
+        // XXX JK: Look for all used field names not only defined once, since
+        //         there may be some unofficial field name used.
         int max = 0;
         for (BibtexEntryType t : BibtexEntryType.ALL_TYPES.values()) {
             if (t.getRequiredFields() != null) {
@@ -77,14 +84,27 @@ public class BibtexEntry
         maxFieldLength = max;
     }
 
-	private static final String getTagDisplayName(final String tag) {
+    /**
+     * Get display version of a entry field.
+     *
+     * BibTeX is case-insensitive therefore there is no difference between:
+     * howpublished, HOWPUBLISHED, HowPublished, etc. Since the camel case
+     * version is the most easy to read this should be the one written in the
+     * *.bib file. Since there is no way how do detect multi-word strings by
+     * default the first character will be made uppercase. In other characters
+     * case needs to be changed the {@link #tagDisplayNameMap} will be used. 
+     *
+     * @param field The name of the field.
+     * @return The display version of the field name.
+     */
+	private static final String getFieldDisplayName(final String field) {
 		String suffix = "";
-		for (int i = maxFieldLength - tag.length(); i > 0; i--)
+		for (int i = maxFieldLength - field.length(); i > 0; i--)
 			suffix += " ";
 
-		if (tagDisplayNameMap.containsKey(tag.toLowerCase()))
-			return tagDisplayNameMap.get(tag.toLowerCase()) + suffix;
-		return (tag.charAt(0)+"").toUpperCase() + tag.substring(1) + suffix;
+		if (tagDisplayNameMap.containsKey(field.toLowerCase()))
+			return tagDisplayNameMap.get(field.toLowerCase()) + suffix;
+		return (field.charAt(0)+"").toUpperCase() + field.substring(1) + suffix;
 	}
 
     public BibtexEntry(){
@@ -376,7 +396,7 @@ public class BibtexEntry
         written.put("title", null);
         String[] s = getRequiredFields();
         if (s != null) {
-            Arrays.sort(s);
+            Arrays.sort(s); // Sorting in alphabetic order.
             for (int i=0; i<s.length; i++) {
                 if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten, false);
@@ -389,7 +409,7 @@ public class BibtexEntry
         boolean first = true, previous = true;
         previous = false;
         if (s != null) {
-            Arrays.sort(s);
+            Arrays.sort(s); // Sorting in alphabetic order.
             for (int i=0; i<s.length; i++) {
                 if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
                     //writeField(s[i], out, ff);
@@ -437,7 +457,7 @@ public class BibtexEntry
                 out.write(","+Globals.NEWLINE);
             if (isNextGroup)
                 out.write(Globals.NEWLINE);
-            out.write("  "+ getTagDisplayName(name) + " = ");
+            out.write("  "+ getFieldDisplayName(name) + " = ");
 
             try {
                 out.write(ff.format(o, name));

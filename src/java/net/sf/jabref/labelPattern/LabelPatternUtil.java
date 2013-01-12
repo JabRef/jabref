@@ -90,6 +90,15 @@ public class LabelPatternUtil {
         return normalized.toString();
     }
 
+    /**
+     * Will remove diacritics from the content.
+     *
+     * Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.
+     * Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.
+     *
+     * @param content The content.
+     * @return The content without diacritics.
+     */
     private static String removeDiacritics(String content) {
         if (content == null) return null;
 
@@ -104,19 +113,45 @@ public class LabelPatternUtil {
         return content;
     }
 
-    private static String unifyUmlaut(String content) {
+    /**
+     * Unifies umlauts.
+     *
+     * Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}
+     * Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol
+     *
+     * @param content The content.
+     * @return The content with unified diacritics.
+     */
+    private static String unifyDiacritics(String content) {
         if (content == null) return null;
         return content.replaceAll(
                 "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
                 "{\\\"$1}").replaceAll(
-                        "\\{?(\\\\[^\\-a-zA-Z])([a-zA-Z])\\}?",
+                        "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
                         "{$1$2}");
     }
 
-    private static boolean isInsitution(String content) {
-        Author a = AuthorList.getAuthorList(content).getAuthor(0);
-        return content.charAt(0) == '{'
-                && content.charAt(content.length()-1) == '}';
+    /**
+     * Check if a value is institution.
+     *
+     * This is usable for distinguishing between persons and institutions in
+     * the author or editor fields.
+     *
+     * A person:
+     *   - "John Doe"
+     *   - "Doe, John"
+     *
+     * An institution:
+     *   - "{The Big Company or Institution Inc.}"
+     *   - "{The Big Company or Institution Inc. (BCI)}"
+     *
+     * @param author Author or editor.
+     * @return True if the author or editor is an institution.
+     */
+    private static boolean isInsitution(String author) {
+        Author a = AuthorList.getAuthorList(author).getAuthor(0);
+        return author.charAt(0) == '{'
+                && author.charAt(author.length()-1) == '}';
     }
 
     /**
@@ -192,7 +227,7 @@ public class LabelPatternUtil {
 	 */
     private static String generateInstitutionKey(String content) {
         if (content == null) return null;
-        content = unifyUmlaut(content);
+        content = unifyDiacritics(content);
         List<String> ignore = Arrays.asList(new String[]{ "press", "the" });
         content = content.replaceAll("^\\{", "").replaceAll("\\}$", "");
         Pattern regex = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
@@ -367,9 +402,9 @@ public class LabelPatternUtil {
     /**
      * Generates a BibTeX label according to the pattern for a given entry type, and
      * returns the <code>Bibtexentry</code> with the unique label.
-     * 
+     *
      * The given database is used to avoid duplicate keys.
-     * 
+     *
      * @param database a <code>BibtexDatabase</code>
      * @param _entry a <code>BibtexEntry</code>
      * @return modified Bibtexentry
@@ -1020,12 +1055,17 @@ public class LabelPatternUtil {
     }
 
     /**
-     * auth.etal format:
+     * auth.etal, authEtAl, ... format:
      * Isaac Newton and James Maxwell and Albert Einstein (1960)
      * Isaac Newton and James Maxwell (1960)
-     *  give:
+     *
+     *  auth.etal give (delim=".", append=".etal"):
      * Newton.etal
      * Newton.Maxwell
+     *
+     *  authEtAl give (delim="", append="EtAl"):
+     * NewtonEtAl
+     * NewtonMaxwell
      */
     private static String authEtal(String authorField, String delim,
             String append) {
