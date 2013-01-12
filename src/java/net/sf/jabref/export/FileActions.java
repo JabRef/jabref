@@ -284,6 +284,58 @@ public class FileActions
 
 	}
 
+    private static class SaveSettings {
+        public final String pri, sec, ter;
+        public final boolean priD, secD, terD;
+        
+        public SaveSettings(boolean isSaveOperation) {
+            boolean inStandardOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInStandardOrder") :
+                Globals.prefs.getBoolean("exportInStandardOrder");
+            boolean inTitleOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInTitleOrder") :
+                Globals.prefs.getBoolean("exportInTitleOrder");
+            if (!inStandardOrder && !inTitleOrder) {
+                // The setting is to save according to the current table order.
+                pri = Globals.prefs.get("priSort");
+                sec = Globals.prefs.get("secSort");
+                // sorted as they appear on the screen.
+                ter = Globals.prefs.get("terSort");
+                priD = Globals.prefs.getBoolean("priDescending");
+                secD = Globals.prefs.getBoolean("secDescending");
+                terD = Globals.prefs.getBoolean("terDescending");
+            } else if (!inStandardOrder && inTitleOrder) {
+                // The setting is to not save in standard order, but in title order: title, author, editor
+                pri = "title";
+                sec = "author";
+                ter = "editor";
+                priD = false;
+                secD = false;
+                terD = false;
+            } else {
+                // The setting is to save in standard order: author, editor, year
+                pri = "author";
+                sec = "editor";
+                ter = "year";
+                priD = false;
+                secD = false;
+                terD = true;
+            }
+        }
+    }
+    
+    private static List<Comparator<BibtexEntry>> getSaveComparators(boolean isSaveOperation) {
+        SaveSettings saveSettings = new SaveSettings(isSaveOperation);
+
+        List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
+        if (isSaveOperation)
+            comparators.add(new CrossRefEntryComparator());
+        comparators.add(new FieldComparator(saveSettings.pri, saveSettings.priD));
+        comparators.add(new FieldComparator(saveSettings.sec, saveSettings.secD));
+        comparators.add(new FieldComparator(saveSettings.ter, saveSettings.terD));
+        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
+        
+        return comparators;
+    }
+    
     /**
 	 * Saves the database to file, including only the entries included in the
 	 * supplied input array bes.
@@ -332,34 +384,9 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-        String pri, sec, ter;
 
-        boolean priD, secD, terD;
-        if (!prefs.getBoolean("saveInStandardOrder")) {
-        // The setting is to save according to the current table order.
-        pri = prefs.get("priSort");
-        sec = prefs.get("secSort");
-        // sorted as they appear on the screen.
-        ter = prefs.get("terSort");
-        priD = prefs.getBoolean("priDescending");
-        secD = prefs.getBoolean("secDescending");
-        terD = prefs.getBoolean("terDescending");
-        } else {
-        // The setting is to save in standard order: author, editor, year
-        pri = "author";
-        sec = "editor";
-        ter = "year";
-        priD = false;
-        secD = false;
-        terD = true;
-        }
+        List<Comparator<BibtexEntry>> comparators = getSaveComparators(true);
 
-        List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
-        comparators.add(new CrossRefEntryComparator());
-        comparators.add(new FieldComparator(pri, priD));
-        comparators.add(new FieldComparator(sec, secD));
-        comparators.add(new FieldComparator(ter, terD));
-        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList entryList = new BasicEventList();
         SortedList sorter = new SortedList(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
@@ -462,64 +489,21 @@ public class FileActions
     */
     @SuppressWarnings("unchecked")
 	public static List<BibtexEntry> getSortedEntries(BibtexDatabase database, Set<String> keySet, boolean isSaveOperation) {
-        FieldComparatorStack<BibtexEntry> comparatorStack = null;
-
         boolean inOriginalOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInOriginalOrder") :
             Globals.prefs.getBoolean("exportInOriginalOrder");
+        List<Comparator<BibtexEntry>> comparators;
         if (inOriginalOrder) {
             // Sort entries based on their creation order, utilizing the fact
             // that IDs used for entries are increasing, sortable numbers.
-            List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
+            comparators = new ArrayList<Comparator<BibtexEntry>>();
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
-            comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
-
         } else {
-            String pri, sec, ter;
-            boolean priD, secD, terD = false;
-
-            boolean inStandardOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInStandardOrder") :
-                Globals.prefs.getBoolean("exportInStandardOrder");
-            boolean inTitleOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInTitleOrder") :
-                Globals.prefs.getBoolean("exportInTitleOrder");
-            if (!inStandardOrder && !inTitleOrder) {
-                // The setting is to save according to the current table order.
-                pri = Globals.prefs.get("priSort");
-                sec = Globals.prefs.get("secSort");
-                // sorted as they appear on the screen.
-                ter = Globals.prefs.get("terSort");
-                priD = Globals.prefs.getBoolean("priDescending");
-                secD = Globals.prefs.getBoolean("secDescending");
-                terD = Globals.prefs.getBoolean("terDescending");
-            } else if (!inStandardOrder && inTitleOrder) {
-                // The setting is to save in standard order: author, editor, year
-                pri = "title";
-                sec = "author";
-                ter = "editor";
-                priD = false;
-                secD = false;
-                terD = false;
-            } else {
-                // The setting is to save in standard order: author, editor, year
-                pri = "author";
-                sec = "editor";
-                ter = "year";
-                priD = false;
-                secD = false;
-                terD = true;
-            }
-            
-            List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
-            if (isSaveOperation)
-                comparators.add(new CrossRefEntryComparator());
-            comparators.add(new FieldComparator(pri, priD));
-            comparators.add(new FieldComparator(sec, secD));
-            comparators.add(new FieldComparator(ter, terD));
-            comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
-
-            comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
+            comparators = getSaveComparators(isSaveOperation);
         }
+        
         // Use glazed lists to get a sorted view of the entries:
+        FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
         BasicEventList entryList = new BasicEventList();
         SortedList sorter = new SortedList(entryList, comparatorStack);
 
@@ -536,7 +520,8 @@ public class FileActions
         return sorter;
     }
 
-    /** Returns true iff the entry has a nonzero value in its field.
+    /** 
+     * @return true iff the entry has a nonzero value in its field.
      */
     private static boolean nonZeroField(BibtexEntry be, String field)
     {

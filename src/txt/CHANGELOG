@@ -25,6 +25,7 @@
       * Fields are ordered by name. Except the fields author, institution, publisher, which are written first.
       * The second word in of the BibTeX type is capitalized. E.g., Inproceedings got InProceedings
     - Author field is now resolved using @String data.
+    - Saving a part of the database now also first writes entries with a crossref field.
 [2.9.2]
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
