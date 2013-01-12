@@ -39,8 +39,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         lnf = new JPanel();
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
-            useIEEEAbrv, biblatexMode, includeEmptyFields;
-    JComboBox<String> valueDelimiter;
+            useIEEEAbrv, biblatexMode;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -48,9 +47,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         p2 = new JPanel();
     String oldLnf = "";
     boolean oldUseDef, oldBiblMode=false, oldConvertToEquation,
-            oldCaseKeeperOnSearch, oldUnitFormatterOnSearch,
-            includeEmptyFieldsValue;
-    int oldPort = -1, valueDelimiterSelected;
+            oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
+    int oldPort = -1;
     
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 
     public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
@@ -70,10 +68,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
-    valueDelimiter = new JComboBox<String>(new String[]{
-            Globals.lang("Quotes: \", \""),
-            Globals.lang("Curly Brackets: {, }") });
-    includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -156,20 +150,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     builder.append(new JPanel());
     builder.append(biblatexMode);
     
-    builder.nextLine();
-    builder.appendSeparator(Globals.lang("Export options"));
-    FormLayout layout2 = new FormLayout(
-			"left:pref, 8dlu, fill:pref", "");
-    DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-	builder2.append(new JLabel(Globals.lang("Value delimiter") + ":"));
-    builder2.append(valueDelimiter);
-    builder.nextLine();
-    builder.append(new JPanel());
-    builder.append(builder2.getPanel());
-    builder.nextLine();
-    builder.append(new JPanel());
-    builder.append(includeEmptyFields);
-
     builder.nextLine();    
     builder.appendSeparator(Globals.lang("Import conversions"));
     builder.nextLine();
@@ -203,10 +183,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
-        valueDelimiterSelected = Globals.prefs.getInt("valueDelimiters");
-        valueDelimiter.setSelectedIndex(valueDelimiterSelected);
-        includeEmptyFieldsValue = Globals.prefs.getBoolean("includeEmptyFields");
-        includeEmptyFields.setSelected(includeEmptyFieldsValue);
         oldConvertToEquation = Globals.prefs.getBoolean("useConvertToEquation");
         useConvertToEquation.setSelected(oldConvertToEquation);
         oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
@@ -269,8 +245,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                     Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
         
-        _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
-        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
         _prefs.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
         _prefs.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
         _prefs.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());

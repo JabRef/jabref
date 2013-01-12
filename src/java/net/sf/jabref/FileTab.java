@@ -35,7 +35,9 @@ public class FileTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     JabRefFrame _frame;
 
-    private JCheckBox backup, openLast, autoDoubleBraces, autoSave, promptBeforeUsingAutoSave;
+    private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
+            promptBeforeUsingAutoSave, includeEmptyFields;
+    private JComboBox<String> valueDelimiter;
     private JRadioButton
         saveOriginalOrder, saveAuthorOrder, saveTableOrder, saveTitleOrder,
         exportOriginalOrder, exportAuthorOrder, exportTableOrder, exportTitleOrder,
@@ -65,6 +67,10 @@ public class FileTab extends JPanel implements PrefsTab {
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
+        valueDelimiter = new JComboBox<String>(new String[]{
+                Globals.lang("Quotes") + ": \", \"",
+                Globals.lang("Curly Brackets") + ": {, }" });
+        includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAuthorOrder);
         bg.add(saveOriginalOrder);
@@ -149,6 +155,19 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(saveTitleOrder, 1);
         builder.append(exportTitleOrder, 1);
         builder.nextLine();
+        builder.appendSeparator(Globals.lang("Export options"));
+        FormLayout layout2 = new FormLayout(
+                "left:pref, 8dlu, fill:pref", "");
+        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
+        builder2.append(new JLabel(Globals.lang("Value delimiter") + ":"));
+        builder2.append(valueDelimiter);
+        builder.nextLine();
+        builder.append(builder2.getPanel());
+        builder.append(new JPanel());
+        builder.nextLine();
+        builder.append(includeEmptyFields);
+        builder.append(new JPanel());
+        builder.nextLine();
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -188,6 +207,8 @@ public class FileTab extends JPanel implements PrefsTab {
         promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean("promptBeforeUsingAutosave"));
         autoSaveInterval.setValue(_prefs.getInt("autoSaveInterval"));
         origAutoSaveSetting = autoSave.isSelected();
+        valueDelimiter.setSelectedIndex(_prefs.getInt("valueDelimiters"));
+        includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
     }
 
     public void storeSettings() {
@@ -205,6 +226,8 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("autoSave", autoSave.isSelected());
         _prefs.putBoolean("promptBeforeUsingAutosave", promptBeforeUsingAutoSave.isSelected());
         _prefs.putInt("autoSaveInterval", (Integer)autoSaveInterval.getValue());
+        _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
+        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
         doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
         boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
