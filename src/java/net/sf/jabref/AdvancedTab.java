@@ -161,7 +161,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     FormLayout layout2 = new FormLayout(
 			"left:pref, 8dlu, fill:pref", "");
     DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-    builder2.append(new JLabel(Globals.lang("Value delimiter:")));
+	builder2.append(new JLabel(Globals.lang("Value delimiter") + ":"));
     builder2.append(valueDelimiter);
     builder.nextLine();
     builder.append(new JPanel());

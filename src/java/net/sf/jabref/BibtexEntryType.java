@@ -33,6 +33,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Locale;
 
+/**
+ * Provides a list of known entry types
+ *
+ * The list of optional and required fields is derived from http://en.wikipedia.org/wiki/BibTeX#Entry_types
+ */
 public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 {
 

@@ -15,10 +15,13 @@
 */
 package net.sf.jabref;
 
+/**
+ * This class models a BibTex String ("@String")
+ */
 public class BibtexString {
 
     public enum Type {
-        AUTHOR("a"),
+		AUTHOR("a"),
         INSTITUTION("i"),
         PUBLISHER("p"),
         OTHER("");
@@ -30,13 +33,14 @@ public class BibtexString {
         }
 
         public static final Type get(String name) {
+        	if (name.length() == 0) {
+        		return OTHER;
+        	}
             if (!(name.charAt(1) + "").toUpperCase().equals(
                     (name.charAt(1) + "")))
                 return OTHER;
-
             for(Type t : Type.values()) {
-                if (t.prefix.equals(name.charAt(0) + "")
-                        && name.length() > 0)
+                if (t.prefix.equals(name.charAt(0) + ""))
                     return t;
             }
             return OTHER;
@@ -74,7 +78,7 @@ public class BibtexString {
 
     public void setName(String name) {
 	_name = name;
-	_type = Type.get(name.charAt(0)+"");
+	_type = Type.get(name);
     }
 
     public String getContent() {
