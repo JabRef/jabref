@@ -1,4 +1,4 @@
-[2.9.2]
+2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
 2.9.1
