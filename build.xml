@@ -693,5 +693,6 @@ version=${jabref.version}</echo>
 	</target>
 
 	<!-- creates all distribution files in ${build.lib} -->
-	<target name="release" depends="clean, win.installer, osxjar, bzip2src, zipsrc" />
+	<target name="release" depends="clean, win.installer, non_osx, osxjar, bzip2src, zipsrc" />
+	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, bzip2src, zipsrc" />
 </project>
