@@ -1,134 +1,85 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
 </head>
 
 <body>
 
-    <h1>Command line options</h1>
+    <h1>コマンドライン オプション</h1>
 
-    <p>Although JabRef is primarily a GUI
-    based application, it offers several command line options that
-    may be useful, and can even perform file conversion operations
-    without opening the graphical interface.</p>
+<p>JabRefは、第一にGUIベースのアプリケーションですが、便利なコマンドライン オプションもいくつか提供しており、グラフィカル インタフェースを開くこと無しにファイル変換操作を行うこともできます。</p>
 
-    <p>You can always specify one or more BibTeX files to load by
-    simply listing their filenames. Take care to specify all
-    options before your list of file names. You must make sure the
-    first file name is not misunderstood as being an argument for
-    an option - this simply means that if a boolean option like
-    <code>-n</code> or <code>-l</code> immediately precedes a file
-    name, add the word "true" as an argument. For instance, the
-    command line:</p>
+    <p>ファイル名を列挙するだけで、一つ以上のBibTeXファイルを読み込むように指定することができます。オプションを指定する場合には、すべてこのファイル名の列挙よりも前で行ってください。最初のファイル名は、オプションの引数と誤解されないようにしなくてはいけませんので、<code>-n</code>や<code>-l</code>のような二値オプションがファイル名の直前に来る場合には、引数として「true」を指定してください。例えば、</p>
 
     <p><code>jabref -o filetoexport.xml,docbook -n true
     original.bib</code></p>
 
-    <p>will correctly load the file <code>original.bib</code>,
-    export it in docbook format to <code>filetoexport.xml</code>,
-    and suppress the GUI. The word <em>true</em> prevents the file
-    name from being interpreted as an argument to the -n
-    option.</p>
+    <p>というコマンドラインは、<code>original.bib</code>ファイルを正しく読み込み、docbook形式で<code>filetoexport.xml</code>に書き出し、GUIは抑制します。ここでは、<em>true</em>という単語があることで、ファイル名が<code>-n</code>オプションの引数と解釈されるのを防いでいます。</p>
 
-    <h2>Help: -h</h2>
+    <h2>ヘルプ: -h</h2>
 
-    <p>This option causes JabRef to display a summary
-    of the command line options, and quit immediately.</p>
+<p>このオプションを与えると、JabRefはコマンドライン オプションの概略を表示して、直ちに終了します。</p>
 
-    <h2>No-GUI mode: -n</h2>
+    <h2>GUI無しモード: -n</h2>
 
-    <p>This option suppresses both the JabRef
-    window and the splash window normally shown at startup. It
-    causes the program to quit immediately once the command line
-    options have been processed.</p>
+    <p>このオプションを与えると、起動時に通常表示されるスプラッシュ ウィンドウとJabRefウィンドウが表示されなくなります。これは、コマンドラインオプションを実行すると、直ちにプログラムを終了します。</p>
 
-    <p>This option is useful for performing file conversion
-    operations from the command line or a script.</p>
+    <p>このオプションは、コマンドラインやスクリプトからファイル変換操作を行う際に便利です。</p>
 
-    <h2>Load session: -l</h2>
+    <h2>セッションの読込: -l</h2>
 
-    <p>This option causes JabRef to load the
-    saved session, if any, before opening the main window.</p>
+    <p>このオプションを与えると、JabRefは、保存されたセッションがある場合には其れを読み込み、それから基本ウィンドウを開きます。</p>
 
-    <h2>Import file: -i filename[,format]</h2>
+    <h2>ファイルの読込: -i ファイル名[,形式]</h2>
 
-    <p>This option causes
-    JabRef to import or load the specified file. If only a filename
-    is specified, or the filename is followed by a comma and a *
-    character, JabRef will attempt to detect the file format
-    automatically. This should work for all BibTeX files and files
-    in any import format supported by JabRef. If the filename is
-    followed by a comma and the name of an import format, the given
-    import filter will be used. Use the <code>-h</code> option to
-    get a list of availiable import formats.</p>
+    <p>このオプションを与えると、JabRefは指定したファイルを読み込むか開くかします。ファイル名だけが指定された場合やファイル名の後にコンマか*文字を付けた場合には、JabRefはファイル形式の自動検出を試みます。これは、BibTeXファイルとJabRefがサポートしているすべての読込形式に対して機能します。ファイル名の後にコンマと読込形式名を続けると、その読込フィルタが使用されます。使用できる読込形式については、<code>-h</code>オプションを使うと一覧を得ることができます。</p>
 
-    <p>If an output option is also specified, an import will always
-    be processed before it, and the imported or loaded file will be
-    given to the export filter. If the GUI is not suppressed using
-    the <code>-n</code> option, any imported or loaded file will
-    show up in the main window.</p>
+    <p>出力オプションが指定されると、読込は出力よりも前に処理されるので、読み込んだり開いたりしたファイルは書出フィルタに渡されます。<code>-n</code>オプションを使ってGUIを抑制しなかった場合には、読み込んだり開いたりしたファイルは、基本ウィンドウに表示されます。</p>
 
-    <p>The -i option can be specified only once, and for one file
-    only.</p>
+    <p><code>-i</code>オプションは、一度だけかつ一つのファイルについてのみ指定することができます。</p>
 
-    <h2>Export file: -o filename[,format]</h2>
+    <h2>ファイルの書出: -o ファイル名[,形式]</h2>
 
-    <p>This option causes
-    JabRef to save or export a file imported or loaded by the same
-    command line. If a file is imported using the <code>-i</code>
-    option, that database will be exported. Otherwise, the
-    <em>last</em> file specified (and successfully loaded) without
-    the <code>-i</code> option will be exported.</p>
+    <p>このオプションを与えると、JabRefは同一コマンドライン中で読み込んだり開いたりしたファイルを、保存したり書き出したりします。ファイルが<code>-i</code>を使って読み込まれた場合には、そのデータベースが書き出されます。<code>-i</code>オプションを使わない場合には、指定した(かつ成功裏に開かれた)<b>最後の</b>ファイルが書き出されます。</p>
 
-    <p>If only a filename is specified, it will be saved in BibTeX
-    format. If the filename is followed by a comma and an export
-    format, the given export filter will be used. A custom export
-    filter can be used in this way, and will be preferred if the
-    export name matches both a custom and a standard export
-    filter.</p>
+    <p>ファイル名だけを指定すると、BibTeX形式で保存されます。ファイル名の後にコンマと書出形式を続けると、その書出フィルタが使用されます。この方法で自作書出フィルタも使用することができ、自作書出フィルタと標準書出フィルタの書出名が同一の時には、前者が優先されます。</p>
 
-    <p>Use the <code>-h</code> option to get a list of availiable
-    export formats.</p>
+    <p>使用できる書出形式については、<code>-h</code>オプションを使うと一覧を得ることができます。</p>
 
-    <p>If the <code>-n</code> option has not been invoked, any
-    export operation will be performed before the JabRef window is
-    opened, and the imported database will show up in the
-    window.</p>
+    <p><code>-n</code>オプションを使用しなかった場合には、書き出し操作はすべてJabRefウィンドウが開く前に実行され、読み込まれたデータベースがウィンドウに表示されます。</p>
 
-    <p>The -o option can be specified only once, and for one file
-    only.</p>
+    <p><code>-o</code>オプションは、一度だけかつ一つのファイルについてのみ指定することができます。</p>
 
-    <h2>Export preferences: -x filename</h2>
+    <h2>設定の書出: -x ファイル名</h2>
 
-    <p>Using this option, you
-    can have JabRef export all user preferences to an XML file.
-    After exporting, JabRef will start normally.</p>
+    <p>このオプションを使うと、ユーザー設定全部をXMLファイルに書き出すようJabRefに指定することができます。書き出した後、JabRefは通常通り起動します。</p>
 
-    <h2>Import preferences: -p filename</h2>
+    <h2>設定の読込: -p ファイル名</h2>
 
-    <p>This option causes
-    JabRef to import user preferences exported using the
-    <code>-x</code> option. After importing, JabRef will start
-    normally.</p>
-
-    <h2>Export only used items: -a
-    filename[.aux],newBibFile[.bib]</h2>
-
-    <p>Sometimes it is helpful, to
-    have a bibtex file that contains only the used bibtex entries.
-    A list of these used entries is located in an aux file. Jabref
-    can parse this file to generate a new bibtex file, which
-    contains only the known and used entries. That will mean, if an
-    entry is not defined in the standard bibtex file, it cannot be
-    located in the new file.</p>
+    <p>このオプションを与えると、JabRefは<code>-x</code>オプションを使って書き出した設定を読み込みます。読み込んだ後、JabRefは通常通り起動します。</p>
     
-    <h2>Fetch from Web: --fetch==name of fetcher:query string</h2>
+    <h2>一致項目の書出: -m [フィールド=]検索語,書出ファイル[,書出形式]</h2>
+    <p>これは、与えられた検索語に一致するデータベース項目をすべて新しいファイルに保存します。書出ファイル形式は選択することができますが、既定形式は(tablerefsabsbibが提供するabstractおよびbibtex付き)HTML表です。</p>
+
+    <p>呼び出し方法l: <code>JabRef.jar -m [フィールド=]検索語,出力ファイル[,書出形式] -n true 入力ファイル</code></p>
+    <p>検索機能についての詳細は、説明書の「詳細検索」の項をご覧ください。特定の年の項目を検索できるだけでなく、起源を区切って項目を検索することも可能です。</p>
+    <p>空白を含む検索語は引用符で囲む必要があることに留意してください。</p>
+	<p>用例</p>
+	<ul>
+		<li> <code>Year=2005</code> </li>
+		<li> <code>title|keywords=Optimization</code> </li>
+		<li> <code>(author=bock or title|keywords="computer methods")and not(author=sager)</code> </li>
+		<li> <code>Year=1989-2005</code> </li>
+	</ul>
+
+    <h2>使用されている項目のみの書出: -a
+    ファイル名[.aux],新規bibファイル[.bib]</h2>
+
+    <p>ときどき、使用されているBibTeX項目のみを集めたBibTeXファイルを作ると便利なことがあります。これら使用されている項目の一覧はauxファイルに含まれています。JabRefはこのファイルを解析して、既知の使用されている項目のみを含んだBibTeXファイルを新しく生成することができます。言い換えれば、このauxファイルに項目が定義されていない場合、生成したファイルにも含まれません。</p>
     
-    <p>The fetchers in the Web menu can also be run from the command 
-    line. Use the --fetch option and then pass both the name of a fetcher 
-    (for instance ieee, medline or jstor) and your search term or paper id and 
-    the given fetcher will be run. Note that some fetcher will still display 
-    GUI if they need feedback from you. To get a list of available fetchers run
-    --fetch without parameters.</p>
+    <h2>ウェブからの取得: --fetch==取得法:問い合わせ文字列</h2>
+    
+    <p>ウェブ検索メニュー中の各取得法は、コマンドラインからも指定することができます。--fetchオプションを使って、取得方法(ieee、medline、jstorなど)と、検索語もしくは論文IDのいずれかを渡すと、その方法で取得が行われます。ユーザーからのフィードバックが必要な場合には、GUIを表示する取得法もありますので、注意してください。利用できる取得法を列挙させるには、パラメーターを与えずに--fetchを実行してください。</p>
 </body>
 </html>
