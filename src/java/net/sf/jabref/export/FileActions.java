@@ -284,16 +284,36 @@ public class FileActions
 
 	}
 
+    private enum SaveOrder {
+    	Standard, Original, Title, TableSort
+    }
+    
     private static class SaveSettings {
         public final String pri, sec, ter;
         public final boolean priD, secD, terD;
         
         public SaveSettings(boolean isSaveOperation) {
-            boolean inStandardOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInStandardOrder") :
-                Globals.prefs.getBoolean("exportInStandardOrder");
-            boolean inTitleOrder = isSaveOperation ? Globals.prefs.getBoolean("saveInTitleOrder") :
-                Globals.prefs.getBoolean("exportInTitleOrder");
-            if (!inStandardOrder && !inTitleOrder) {
+        	/* four options:
+        	 * 1. ordered by author/editor/year (saveInStandardOrder)
+        	 * 2. original order (saveInOriginalOrder) -- not hit here as SaveSettings is not called in that case
+        	 * 3. current table sort order (*everything else*)
+        	 * 4. ordered by title (saveInTitleOrder)
+        	 */
+        	SaveOrder saveOrder;
+        	String prefix = isSaveOperation ? "save" :  "export";
+        	if (Globals.prefs.getBoolean(prefix + "InStandardOrder")) {
+        		saveOrder = SaveOrder.Standard;
+        	} else if (Globals.prefs.getBoolean(prefix + "InTitleOrder")) {
+        		saveOrder = SaveOrder.Title;
+//        	} else if (Globals.prefs.getBoolean(prefix + "InOriginalOrder")) {
+        		// this case is never hit as SaveSettings() is never called if InOriginalOrder is true
+//        		saveOrder = SaveOrder.Original;
+        	} else {
+        		saveOrder = SaveOrder.TableSort;
+        	}
+
+        	switch (saveOrder) {
+        	case TableSort:
                 // The setting is to save according to the current table order.
                 pri = Globals.prefs.get("priSort");
                 sec = Globals.prefs.get("secSort");
@@ -302,23 +322,26 @@ public class FileActions
                 priD = Globals.prefs.getBoolean("priDescending");
                 secD = Globals.prefs.getBoolean("secDescending");
                 terD = Globals.prefs.getBoolean("terDescending");
-            } else if (!inStandardOrder && inTitleOrder) {
-                // The setting is to not save in standard order, but in title order: title, author, editor
-                pri = "title";
+                break;
+        	case Title:
+        		// The setting is to not save in standard order, but in title order: title, author, editor
+        		pri = "title";
                 sec = "author";
                 ter = "editor";
                 priD = false;
                 secD = false;
                 terD = false;
-            } else {
-                // The setting is to save in standard order: author, editor, year
+                break;
+        	case Standard:
+        	default: // required to get rid of Java compile errors
                 pri = "author";
                 sec = "editor";
                 ter = "year";
                 priD = false;
                 secD = false;
                 terD = true;
-            }
+        		break;
+        	}
         }
     }
     

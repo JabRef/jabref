@@ -155,11 +155,11 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(saveTitleOrder, 1);
         builder.append(exportTitleOrder, 1);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Export options"));
+        builder.appendSeparator(Globals.lang("Field saving options"));
         FormLayout layout2 = new FormLayout(
                 "left:pref, 8dlu, fill:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        builder2.append(new JLabel(Globals.lang("Value delimiter") + ":"));
+    	builder2.append(new JLabel(Globals.lang("Field value delimiter. E.g., \"author={x}\" or \"author='x'\"") + ":"));
         builder2.append(valueDelimiter);
         builder.nextLine();
         builder.append(builder2.getPanel());
