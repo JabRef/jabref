@@ -15,7 +15,7 @@
         <li>グループは、特定の基準を設けて内容を動的に制御することができます。これらの基準に一致する新規項目は、自動的にグループに加えられます。このような機能は、通常のファイルシステムにはありませんが、電子メールクライアントの中には、同様の機能を持つものがあります(ThunderbirdやOperaなど)。</li>
     </ul>
 
-    <p>グループを選択すると、当該グループに属する項目が表示されます。複数のグループを選択すると、現在の設定の状態によって、どれかのグループに属する項目が表示されるか(和集合)、すべてのグループに属する項目が表示されます(積集合)。これらはすべて下記に詳細に説明します。</p>
+    <p>グループを選択すると、当該グループに属する項目が表示されます。複数のグループを選択すると、現在の設定の状態によって、どれかのグループに属する項目が表示されるか(論理和)、すべてのグループに属する項目が表示されます(論理積)。これらはすべて下記に詳細に説明します。</p>
 
     <p>グループの定義はデータベース毎に為されます。これは、<tt>.bib</tt>ファイル内の<tt>@COMMENT</tt>ブロックに保存され、全ユーザーに共有されます(将来のJabRefではユーザー毎のグループがサポートされるかもしれません)。</p>
 
@@ -103,107 +103,46 @@
 
     <p>グループ表示において、動的グループは、既定値で<i>イタリック体</i>で表示されます。この表示は、設定(オプション→設定→グループ→「動的グループをイタリック体で表示」チェックボックス)で、止めることができます。</p>
 
-    <h3>Hierarchical context</h3>
+    <h3>階層コンテクスト</h3>
 
-    <p>By default, a group is
-    <b>independent</b> of its position in the groups tree: When
-    selected, only the group's contents are shown. However,
-    especially when using dynamic groups, it is often useful to
-    define a subgroup that <b>refines its supergroup</b>, i.e.,
-    when selected, entries contained in both groups are displayed.
-    For example, create a supergroup containing entries with the
-    keyword <tt>distribution</tt> and a subgroup containing entries
-    with the keyword <tt>gauss</tt> that refines this supergroup.
-    Selecting the subgroup now displays entries that match both
-    conditions, i.e. are concerned with Gaussian distributions. By
-    adding another refining subgroup for <tt>laplace</tt> to the
-    original supergroup, the grouping can easily be extended. In
-    the groups tree, refining groups have a special icon (this can
-    be turned off in the preferences).</p>
+    <p>既定値では、グループは、グループツリー中で他の階層から<b>独立</b>したものと解され、該当するグループの内容のみが表示されます。しかしながら、特に動的グループを使用している際には、<b>上層グループを絞り込む</b>形の下層グループを定義することが便利なことがあり、この場合、下層グループとその上層グループの両方に属する項目が表示されます。例えば、<tt>distribution</tt>というキーワードを持つ項目を集めた上層グループと、この上層グループを絞り込む<tt>gauss</tt>というキーワードを持つ項目を集めた下層グループを作成したとしましょう。この下層グループを選択すると、両方の条件を満たす項目、すなわちガウス分布に関連した項目が表示されます。さらに、この上層グループを<tt>laplace</tt>で絞り込む下層グループを追加すると、元のグループ化を簡単に拡張することができます。グループツリー中では、絞り込みグループは、専用アイコンで表されます(この表示は設定で切ることができます)。</p>
 
-    <p>The logical complement to a refining group is a group that
-    <b>includes its subgroups</b>, i.e. when selected, not only the
-    group's own entries, but also its subgroups' entries are shown.
-    In the groups tree, this type of group has a special icon (this
-    can be turned off in the preferences).</p>
+    <p>絞り込みグループの逆は、<b>下層グループを取り込む</b>形のグループで、グループ自身の項目だけでなく、その下層グループの項目も表示されるものです。グループツリー中で、この型のグループは、専用アイコンで表されます(この表示は設定で切ることができます)。</p>
 
-    <h2>Viewing a group's entries, combining multiple
-    groups</h2>
+    <h2>グループ項目の表示と複数グループの結合</h2>
 
-    <p>Selecting a group shows the entries contained in
-    that group by highlighting them and, depending on the settings
-    (accessible by clicking the <b>Settings</b> button), moving
-    them to the top of the list and/or selecting them. These
-    options are identical to those available for the regular
-    search.</p>
+    <p>グループを選択すると、当該グループに含まれる項目を着色して、設定次第では(<b>設定</b>ボタンをクリックすれば変更できます)、それらを一覧の最上部に移動したり選択したり(あるいは両方)します。これらのオプションは、通常検索で使用されるものと同一です。</p>
 
-    <p>When multiple groups are selected, either the union or the
-    intersection of their content is shown, depending on the
-    current settings. This allows to quickly combine multiple
-    conditions, e.g. if you have a static group <tt>Extremely
-    Important</tt> to which you assign all extremely important
-    entries, you can view the extremely important entries in any
-    other group by selecting both groups (this requires to have
-    <b>Intersection</b> selected in the settings).</p>
+    <p>複数のグループを選択すると、設定に依存して、それらの中身の和集合(結び)もしくは積集合(交わり)が表示されます。これを用いると、複数の条件を簡単に結びつけることができます。例えば、非常に重要な項目すべてに割り当てた<tt>最重要</tt>という静的グループがある時、他のどのグループにおいても、そのグループと<tt>最重要</tt>グループ両方を選択することで、そのグループ内の最重要項目を表示することができます(この時、設定で<b>論理積</b>が選択されている必要があります)。</p>
 
-    <h2>Groups and searching</h2>
+    <h2>グループと検索</h2>
 
-    <p>When viewing the contents of the
-    selected group(s), a search can be performed within these
-    contents using the regular search facility.</p>
+    <p>選択したグループの内容が表示されている時には、通常検索機能を使って、これらの内容内部での検索を行うことができます。</p>
 
-    <h2>Highlighting overlapping groups</h2>
+    <h2>重複のあるグループを着色表示</h2>
 
-    <p>The <b>Settings</b>
-    button offers an option to highlight overlapping groups. If
-    this is activated, upon selection of one or more groups, all
-    groups that contain at least one of the entries contained in
-    the currently selected group(s) are highlighted. This quickly
-    identifies overlap between the groups' contents. You might, for
-    example, create a group <tt>To Read</tt> that contains all
-    entries which you plan to read. Now, whenever you select any
-    group, the group <tt>To Read</tt> is highlighted if the
-    selected group contains entries that you plan to read.</p>
+    <p><b>設定</b>ボタンを押すと、重複のあるグループを着色表示するオプションがあります。一つ以上のグループを選択した上で、これを有効にすると、現在選択されているグループに含まれている項目を少なくとも一つ含むグループは、すべて着色表示されます。これを使うと、グループ間の項目に重複があるかどうかを簡単に確かめることができます。例えば、これから読もうと思っている項目をすべて含む<tt>読む予定</tt>というグループを作成したとします。すると、どのグループを選択したとしても、そのグループに読む予定の項目があるときには、<tt>読む予定</tt>グループが着色表示されるようになります。</p>
 
-    <h2>Advanced features</h2>
+    <h2>選択したグループに新規項目を割り当てる</h2>
+   
+    <p><b>設定</b>ボタンでは、新規項目を選択したグループに自動的に割り当てるオプションも提供します。一つ以上のグループを選択した上で、これを有効にすると、作成した新規項目はすべて、選択したグループに割り当てられるようになります。これは、メニューボタンから作成した項目に対しても、クリップボードから貼り付けた項目に対しても動作します。本オプションは、「オプション→設定→グループ」メニューからでも有効化ないし無効化することができます。</p>
 
-    <p>After mastering the grouping concepts
-    described above, the following advanced features might come in
-    handy.</p>
+    <h2>熟練者向け機能</h2>
 
-    <h3>Automatically creating dynamic groups</h3>
+    <p>前述のグループ化の概念をマスターしたならば、下記の熟練者向け機能が便利であることに気づかれるかもしれません。</p>
 
-    <p>By clicking the
-    <b>Automatically create groups for database</b> button, you can
-    quickly create a set of groups appropriate for your database.
-    This feature will gather all words found in a specific field of
-    your choice, and create a group for each word. This is useful
-    for instance if your database contains suitable keywords for
-    all entries. By autogenerating groups based on the
-    <tt>keywords</tt> field, you should have a basic set of groups
-    at no cost.</p>
+    <h3>動的グループを自動生成</h3>
 
-    <p>You can also specify characters to ignore, for instance
-    commas used between keywords. These will be treated as
-    separators between words, and not part of them. This step is
-    important for combined keywords such as <tt>laplace
-    distribution</tt> to be recognized as a single semantic unit.
-    (You cannot use this option to remove complete words. Instead,
-    delete the unwanted groups manually after they were created
-    automatically.)</p>
+    <p><b>データベースのグループを自動生成</b>ボタンをクリックすると、使用中のデータベースに適切なグループの組を簡単に作ることができます。この機能は、ユーザーが選んだ特定のフィールド中に収められているすべての単語を収集して、単語毎にグループを生成します。これは、例えば、使用中のデータベースの全項目に適切なキーワードが収められている場合に便利です。<tt>keywords</tt>フィールドに基づいてグループを自動生成すれば、グループの基本となる組を、手間をかけることなく手に入れることができます。</p>
 
-    <h3>Refreshing the groups view</h3>
+    <p>また、例えばキーワードを区切るコンマなど、特定の文字を無視するよう指定することもできます。コンマは単語間の区切りとして扱われ、単語の一部としては解されません。このステップは、<tt>laplace distribution</tt>のような複合キーワードが、単一の意味論的単位として認識されるために重要です(このオプションを完全な単語を削除するために使うことはできません。代わりに、グループを自動的に生成させた後に、要らないグループを手動で削除してください)。</p>
 
-    <p>The <b>Refresh</b> button
-    updates the entry table to reflect the current groups
-    selection. This is usually done automatically, but in rare
-    occasions (e.g. after a group-related undo/redo) a manual
-    refresh is required.</p>
+    <h3>グループの表示を更新</h3>
 
-    <h3>Mixing refining groups with including groups</h3>
+    <p><b>更新</b>ボタンは、現在選択しているグループを、項目表に反映させて更新するためのものです。これは通常自動的に行われますが、稀に手動更新が必要になることがあります(例えば、グループに関連した取り消しや再実行)。</p>
 
-    <p>If a refining group is a subgroup of a group that includes its
-    subgroups -- the refining group's siblings --, these siblings
-    are ignored when the refining group is selected.</p>
+    <h3>絞り込みグループと取り込みグループの両立</h3>
+
+    <p>絞り込みグループが、下層グループ(絞り込みグループと同階層の兄弟)を取り込むグループの下層グループになっている場合、これらの同階層兄弟は、絞り込みグループを選択したときには無視されます。</p>
 </body>
 </html>
