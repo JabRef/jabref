@@ -777,11 +777,11 @@ public class HTMLConverter implements LayoutFormatter {
         // If the result is in text or equation form can be controlled
         // From the "Advanced settings" tab
         if(Globals.prefs.getBoolean("useConvertToEquation")) {
-            text = text.replaceAll("<sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
-            text = text.replaceAll("<sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
+            text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
+            text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
         } else {
-            text = text.replaceAll("<sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
-            text = text.replaceAll("<sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
+            text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+            text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
         }
         
         // TODO: maybe rewrite this based on regular expressions instead
