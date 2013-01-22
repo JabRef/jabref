@@ -43,6 +43,7 @@ public class RightClickMenu extends JPopupMenu
             rankingMenu = new JMenu(),
             priorityMenu = new JMenu(),
             typeMenu = new JMenu(Globals.lang("Change entry type"));
+    JMenuItem groupAdd, groupRemove;
     JCheckBoxMenuItem
             floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
             Globals.prefs.getBoolean("floatMarkedEntries"));
@@ -251,6 +252,40 @@ public class RightClickMenu extends JPopupMenu
         
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
+        groupAdd = new JMenuItem(new AbstractAction(Globals.lang("Add to group"))
+        {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand("addToGroup");
+
+                    //BibtexEntry[] bes = panel.getSelectedEntries();
+                    //JMenu groupMenu = buildGroupMenu(bes, true, false);
+
+
+                } catch (Throwable ex) {}
+            }
+        });
+        add(groupAdd);
+        groupRemove = new JMenuItem(new AbstractAction(Globals.lang("Remove from group"))
+        {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand("removeFromGroup");
+                } catch (Throwable ex) {}
+            }
+        });
+        add(groupRemove);
+
+        add(new AbstractAction(Globals.lang("Remove from group"))
+        {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand("removeFromGroup");
+                } catch (Throwable ex) {}
+            }
+        });
+
+
         floatMarked.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Globals.prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
@@ -290,37 +325,55 @@ public class RightClickMenu extends JPopupMenu
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         BibtexEntry[] bes = panel.getSelectedEntries();
         panel.storeCurrentEdit();
+        GroupTreeNode groups = panel.metaData().getGroups();
+        if (groups == null) {
+            groupAdd.setEnabled(false);
+            groupRemove.setEnabled(false);
+        } else {
+            groupAdd.setEnabled(true);
+            groupRemove.setEnabled(true);
+        }
+
+        addSeparator();
+        floatMarked.setSelected(Globals.prefs.getBoolean("floatMarkedEntries"));
+        add(floatMarked);
+    }
+
+    private JMenu buildGroupMenu(BibtexEntry[] bes, boolean add, boolean move) {
+        if (bes == null)
+            return null;
+        JMenu groupMenu = new JMenu();
         GroupTreeNode groups = metaData.getGroups();
         if (groups == null) {
             groupAddMenu.setEnabled(false);
             groupMoveMenu.setEnabled(false);
             groupRemoveMenu.setEnabled(false);
-            return;
+            return null;
         }
 
-        groupAddMenu.setEnabled(true);
+        /*groupAddMenu.setEnabled(true);
         groupMoveMenu.setEnabled(true);
         groupRemoveMenu.setEnabled(true);
         groupAddMenu.removeAll();
         groupMoveMenu.removeAll();
         groupRemoveMenu.removeAll();
 
-        if (bes == null)
-            return;
         add(groupAddMenu);
         add(groupMoveMenu);
         add(groupRemoveMenu);
 
         groupAddMenu.setEnabled(false);
         groupMoveMenu.setEnabled(false);
-        groupRemoveMenu.setEnabled(false);
-        insertNodes(groupAddMenu,metaData.getGroups(),bes,true,false);
-        insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
-        insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);
+        groupRemoveMenu.setEnabled(false);*/
 
-        addSeparator();
-        floatMarked.setSelected(Globals.prefs.getBoolean("floatMarkedEntries"));
-        add(floatMarked);
+        /*insertNodes(groupAddMenu,metaData.getGroups(),bes,true,false);
+        insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
+        insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);*/
+
+        insertNodes(groupMenu,metaData.getGroups(),bes,add, move);
+
+        return groupMenu;
+
     }
 
     /**

@@ -80,16 +80,7 @@ import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.CleanUpAction;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.GlazedEntrySorter;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.gui.MainTableSelectionListener;
-import net.sf.jabref.gui.MergeEntriesDialog;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -1646,6 +1637,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put("resolveDuplicateKeys", new SearchFixDuplicateLabels(this));
+
+        actions.put("addToGroup", new GroupAddRemoveDialog(this, true));
+        actions.put("removeFromGroup", new GroupAddRemoveDialog(this, false));
 
         //actions.put("downloadFullText", new FindFullTextAction(this));
     }
