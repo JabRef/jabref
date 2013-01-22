@@ -218,8 +218,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             for (int i = 0; i < fld.length; i++) {
                 if (fld[i].equals(GUIGlobals.TYPE_HEADER))
                     o = be.getType().getName();
-                else
+                else {
                     o = be.getField(fld[i]);
+                    if (getColumnName(col).equals("Author") && o != null) {
+                        o = panel.database().resolveForStrings((String) o);
+                    }
+                }
                 if (o != null) {
                     j = i;
                     break;

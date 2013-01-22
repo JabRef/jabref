@@ -35,10 +35,12 @@ public class FileTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     JabRefFrame _frame;
 
-    private JCheckBox backup, openLast, autoDoubleBraces, autoSave, promptBeforeUsingAutoSave;
+    private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
+            promptBeforeUsingAutoSave, includeEmptyFields;
+    private JComboBox<String> valueDelimiter;
     private JRadioButton
-        saveOriginalOrder, saveAuthorOrder, saveTableOrder,
-        exportOriginalOrder, exportAuthorOrder, exportTableOrder,
+        saveOriginalOrder, saveAuthorOrder, saveTableOrder, saveTitleOrder,
+        exportOriginalOrder, exportAuthorOrder, exportTableOrder, exportTitleOrder,
         resolveStringsStandard, resolveStringsAll;
     private JTextField bracesAroundCapitalsFields, nonWrappableFields,
             doNotResolveStringsFor;
@@ -60,17 +62,25 @@ public class FileTab extends JPanel implements PrefsTab {
         exportOriginalOrder = new JRadioButton(Globals.lang("Export entries in their original order"));
         saveTableOrder = new JRadioButton(Globals.lang("Save in current table sort order"));
         exportTableOrder = new JRadioButton(Globals.lang("Export in current table sort order"));
+        saveTitleOrder = new JRadioButton(Globals.lang("Save entries ordered by title"));
+        exportTitleOrder = new JRadioButton(Globals.lang("Export entries ordered by title"));
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
+        valueDelimiter = new JComboBox<String>(new String[]{
+                Globals.lang("Quotes") + ": \", \"",
+                Globals.lang("Curly Brackets") + ": {, }" });
+        includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAuthorOrder);
         bg.add(saveOriginalOrder);
         bg.add(saveTableOrder);
+        bg.add(saveTitleOrder);
         bg = new ButtonGroup();
         bg.add(exportAuthorOrder);
         bg.add(exportOriginalOrder);
         bg.add(exportTableOrder);
+        bg.add(exportTitleOrder);
         resolveStringsAll = new JRadioButton(Globals.lang("Resolve strings for all fields except")+":");
         resolveStringsStandard = new JRadioButton(Globals.lang("Resolve strings for standard BibTeX fields only"));
         bg = new ButtonGroup();
@@ -142,6 +152,22 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(saveOriginalOrder, 1);
         builder.append(exportOriginalOrder, 1);
         builder.nextLine();
+        builder.append(saveTitleOrder, 1);
+        builder.append(exportTitleOrder, 1);
+        builder.nextLine();
+        builder.appendSeparator(Globals.lang("Field saving options"));
+        FormLayout layout2 = new FormLayout(
+                "left:pref, 8dlu, fill:pref", "");
+        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
+    	builder2.append(new JLabel(Globals.lang("Field value delimiter. E.g., \"author={x}\" or \"author='x'\"") + ":"));
+        builder2.append(valueDelimiter);
+        builder.nextLine();
+        builder.append(builder2.getPanel());
+        builder.append(new JPanel());
+        builder.nextLine();
+        builder.append(includeEmptyFields);
+        builder.append(new JPanel());
+        builder.nextLine();
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -156,12 +182,16 @@ public class FileTab extends JPanel implements PrefsTab {
             saveAuthorOrder.setSelected(true);
         else if (_prefs.getBoolean("saveInOriginalOrder"))
             saveOriginalOrder.setSelected(true);
+        else if (_prefs.getBoolean("saveInTitleOrder"))
+            saveTitleOrder.setSelected(true);
         else
             saveTableOrder.setSelected(true);
         if (_prefs.getBoolean("exportInStandardOrder"))
             exportAuthorOrder.setSelected(true);
         else if (_prefs.getBoolean("exportInOriginalOrder"))
             exportOriginalOrder.setSelected(true);
+        else if (_prefs.getBoolean("exportInTitleOrder"))
+            exportTitleOrder.setSelected(true);
         else
             exportTableOrder.setSelected(true);
 
@@ -177,6 +207,8 @@ public class FileTab extends JPanel implements PrefsTab {
         promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean("promptBeforeUsingAutosave"));
         autoSaveInterval.setValue(_prefs.getInt("autoSaveInterval"));
         origAutoSaveSetting = autoSave.isSelected();
+        valueDelimiter.setSelectedIndex(_prefs.getInt("valueDelimiters"));
+        includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
     }
 
     public void storeSettings() {
@@ -184,14 +216,18 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("openLastEdited", openLast.isSelected());
         _prefs.putBoolean("saveInStandardOrder", saveAuthorOrder.isSelected());
         _prefs.putBoolean("saveInOriginalOrder", saveOriginalOrder.isSelected());
+        _prefs.putBoolean("saveInTitleOrder", saveTitleOrder.isSelected());
         _prefs.putBoolean("exportInStandardOrder", exportAuthorOrder.isSelected());
         _prefs.putBoolean("exportInOriginalOrder", exportOriginalOrder.isSelected());
+        _prefs.putBoolean("exportInTitleOrder", exportTitleOrder.isSelected());
         _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
         _prefs.putBoolean("resolveStringsAllFields", resolveStringsAll.isSelected());
         _prefs.put("doNotResolveStringsFor", doNotResolveStringsFor.getText().trim());
         _prefs.putBoolean("autoSave", autoSave.isSelected());
         _prefs.putBoolean("promptBeforeUsingAutosave", promptBeforeUsingAutoSave.isSelected());
         _prefs.putInt("autoSaveInterval", (Integer)autoSaveInterval.getValue());
+        _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
+        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
         doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
         boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {

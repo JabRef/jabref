@@ -35,6 +35,8 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     public String format(String text, String fieldName)
             throws IllegalArgumentException {
+        if (text == null) return Globals.prefs.getValueDelimiters(0)
+                + "" + Globals.prefs.getValueDelimiters(1);
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
             text = Util.putBracesAroundCapitals(text);
@@ -75,17 +77,18 @@ public class LatexFieldFormatter implements FieldFormatter {
             if (!ok)
                 throw new IllegalArgumentException("Curly braces { and } must be balanced.");
 
-            sb = new StringBuffer("{");
+            sb = new StringBuffer(
+                    Globals.prefs.getValueDelimiters(0) + "");
             // No formatting at all for these fields, to allow custom formatting?
             //if (Globals.prefs.getBoolean("preserveFieldFormatting"))
             //  sb.append(text);
             //else
-            if (!Globals.prefs.isNonWrappableField(fieldName))
-                sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
-            else
+            //if (!Globals.prefs.isNonWrappableField(fieldName))
+            //    sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
+            //else
                 sb.append(text);
 
-            sb.append('}');
+            sb.append(Globals.prefs.getValueDelimiters(1));
 
             return sb.toString();
         }
@@ -143,9 +146,9 @@ public class LatexFieldFormatter implements FieldFormatter {
             //if (tell++ > 10) System.exit(0);
         }
 
-        if (!Globals.prefs.isNonWrappableField(fieldName))
-            return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);
-        else
+        //if (!Globals.prefs.isNonWrappableField(fieldName))
+        //    return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);
+        //else
             return sb.toString();
 
 
@@ -156,7 +159,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
-        sb.append('{');
+        sb.append(Globals.prefs.getValueDelimiters(0));
         boolean escape = false, inCommandName = false, inCommand = false,
                 inCommandOption = false;
         int nestedEnvironments = 0;
@@ -221,7 +224,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 sb.append(c);
             escape = (c == '\\');
         }
-        sb.append('}');
+        sb.append(Globals.prefs.getValueDelimiters(1));
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,

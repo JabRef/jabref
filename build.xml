@@ -489,7 +489,13 @@ version=${jabref.version}</echo>
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
-		<zip basedir="${build.lib}" destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip" includes="JabRef.app/" level="9" />
+		<zip basedir="${build.lib}"
+			destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip"
+			excludes="JabRef.app/Contents/MacOS/JavaApplicationStub"
+			includes="JabRef.app/"
+			level="9">
+			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
+		</zip>
 	</target>
 
 
@@ -547,22 +553,30 @@ version=${jabref.version}</echo>
 			<replacefilter token="./" value="${basedir}/" />
 		</replace>
 
+	</target>
+
+	<target name="win.installer.step2.linux" description="Create Windows launcher and Windows installer on Linux">
 		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
 		<exec
-			executable="${launch4j.dir}/launch4jc.exe"
+			executable="${launch4j.dir}/launch4j"
 			dir="${launch4j.dir}">
 			<arg value="${basedir}/jabref-launch4j.tmp"/>
 		</exec>
-	</target>
 
-	<target name="win.installer.step2.linux" description="Create Windows-Installer on Linux">
 		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
 			<arg line="'-DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
 	</target>
 
-	<target name="win.installer.step2.win" description="Create Windows-Installer on Windows">
+	<target name="win.installer.step2.win" description="Create Windows launcher and Windows installer on Windows">
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
+		</exec>
+
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
@@ -684,7 +698,8 @@ version=${jabref.version}</echo>
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
-	<target name="devsnapshot" depends="clean, addgitinfo, win.installer, osxjar" description="creates development snapshot binaries" />
+	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, osxjar" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, win.installer, osxjar, bzip2src, zipsrc" description="creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, win.installer, non_osx, osxjar, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>

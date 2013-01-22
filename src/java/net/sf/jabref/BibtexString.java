@@ -15,14 +15,87 @@
 */
 package net.sf.jabref;
 
+/**
+ * This class models a BibTex String ("@String")
+ */
 public class BibtexString {
 
+    /**
+     * Type of a \@String.
+     *
+     * Differentiate a \@String based on its usage:
+     *
+     * - {@link #AUTHOR}: prefix "a", for author and editor fields.
+     * - {@link #INSTITUTION}: prefix "i", for institution and organization
+     *                         field
+     * - {@link #PUBLISHER}: prefix "p", for publisher fields
+     * - {@link #OTHER}: no prefix, for any field
+     *
+     * Examples:
+     *
+     * \@String { aKahle    = "Kahle, Brewster " } -> author
+     * \@String { aStallman = "Stallman, Richard" } -> author
+     * \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
+     * \@String { pMIT      = "{Massachusetts Institute of Technology ({MIT}) press}" } -> publisher
+     * \@String { anct      = "Anecdote" } -> other
+     * \@String { eg        = "for example" } -> other
+     * \@String { et        = " and " } -> other
+     * \@String { lBigMac   = "Big Mac" } -> other
+     *
+     * Usage:
+     *
+     * \@Misc {
+     *   title       = "The GNU Project"
+     *   author      = aStallman # et # aKahle
+     *   institution = iMIT
+     *   publisher   = pMIT
+     *   note        = "Just " # eg
+     * }
+     *
+     * @author Jan Kubovy <jan@kubovy.eu>
+     */
+    public enum Type {
+		AUTHOR("a"),
+        INSTITUTION("i"),
+        PUBLISHER("p"),
+        OTHER("");
+
+        private String prefix;
+
+        Type(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public static final Type get(String name) {
+        	if (name.length() == 0) {
+        		return OTHER;
+        	}
+            if (!(name.charAt(1) + "").toUpperCase().equals(
+                    (name.charAt(1) + "")))
+                return OTHER;
+            for(Type t : Type.values()) {
+                if (t.prefix.equals(name.charAt(0) + ""))
+                    return t;
+            }
+            return OTHER;
+        }
+    }
+
     String _name, _content, _id;
+    Type _type;
 
     public BibtexString(String id, String name, String content) {
 	_id = id;
 	_name = name;
 	_content = content;
+	_type = Type.get(name);
+    }
+
+    public BibtexString(String id, String name, String content, Type type) {
+	_id = id;
+	_name = name;
+	_content = content;
+	_type = type;
     }
 
     public String getId() {
@@ -39,6 +112,7 @@ public class BibtexString {
 
     public void setName(String name) {
 	_name = name;
+	_type = Type.get(name);
     }
 
     public String getContent() {
@@ -53,4 +127,7 @@ public class BibtexString {
       return new BibtexString(_id, _name, _content);
     }
 
+    public Type getType() {
+        return _type;
+    }
 }

@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -341,13 +340,8 @@ public class FileListEntryEditor {
                 Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                ArrayList<File> dirs = new ArrayList<File>();
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-                for (int i=0; i<dirsS.length; i++)
-                    dirs.add(new File(dirsS[i]));
-                if (dirs.size() > 0) {
-                    newFile = FileListEditor.relativizePath(newFile, dirs);
-                }
+                newFile = Util.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());
                 comp.requestFocus();

@@ -46,7 +46,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel p1 = new JPanel(),
         p2 = new JPanel();
     String oldLnf = "";
-    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation, oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
+    boolean oldUseDef, oldBiblMode=false, oldConvertToEquation,
+            oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
     int oldPort = -1;
     
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 

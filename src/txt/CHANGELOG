@@ -12,11 +12,22 @@
       reduced the font size.
     - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
       (patch 123 by Laura Hern�ndez G�mez)
+    - Added menu option "Automatically set file links for selected entries".
+    - Added new BibTeX label pattern authEtAl
+    - Adapted the required and optional fields of entry types according to
+      http://en.wikipedia.org/wiki/BibTeX#Entry_types
     - After a search has been done, the first entry of the entry table is selected (feature 656).
     - Entries contained in an .aux file can now be selected (feature 644).
     - New entries are now always be added to a group. Fixes bug 1093.
     - Timestamp is now automatically updated on a change of an entry (feature 799)
-[2.9.2]
+    - Re-enabled customization of shortcut keys
+    - Changed serialization of the BibTeX entry:
+      * First, the required, then the optional and then all other fields are written
+      * Fields are ordered by name. Except the fields author, institution, publisher, which are written first.
+      * The second word in of the BibTeX type is capitalized. E.g., Inproceedings got InProceedings
+    - Author field is now resolved using @String data.
+    - Saving a part of the database now also first writes entries with a crossref field.
+2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
 2.9.1

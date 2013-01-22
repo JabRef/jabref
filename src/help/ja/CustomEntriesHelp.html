@@ -1,83 +1,44 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
 </head>
 
 <body>
 
-    <h1>項目型のカスタマイズ</h1>
+    <h1>項目型の自作</h1>
 
-    <p>To customize entry types, select the menu <strong>Options
-    --&gt; Customize entry types</strong>.</p>
+    <p>項目型を自作するには、<strong>オプション→項目型を自作</strong>メニューを選択してください。</p>
 
-    <p>When customizing an entry type, you both define how its
-    entry editor should look, and what it takes for JabRef to
-    consider an entry complete. You can both make changes to the
-    existing entry types, and define new ones.</p>
+    <p>項目型を自作する際、その項目エディタの外観を定義するとともに、JabRefが項目入力を完了したと見なす基準を定義しなくてはなりません。変更は、既存の項目型に対して加えることもできますし、新規のものを定義することもできます。</p>
 
-    <p>Note that no modifications you make in this dialog will be
-    stored until you click <b>Apply</b> or <b>OK</b>. If you click
-    <b>Cancel</b> or simply close the dialog, unapplied changes
-    will be lost.</p>
+    <p>このダイアログで加えた変更は、<b>適用</b>か<b>OK</b>を押すまで保存されないことに注意してください。<b>取消</b>もしくはダイアログを閉じた場合には、適用済みでない変更は失われます。</p>
 
-    <h2>Using the entry customization dialog</h2>
+    <h2>項目型自作ダイアログを使う</h2>
 
-    <p>The entry
-    customization dialog is divided in three main panels. The
-    leftmost panel is where you can select an entry type for
-    modification, and add new ones. The middle panel is used for
-    setting up the required fields of the selected entry type, and
-    the right panel for setting up the optional fields.</p>
+    <p>項目型自作ダイアログは3つの主要パネルに分かたれています。左パネルは、修正する項目型を選んだり新しい項目型を付け加えたりする場所です。中央パネルは、選択した項目型の必須フィールドを設定するのに用いられ、右パネルは非必須フィールドを設定するのに使用されます。</p>
 
-    <h3>Adding and removing entry types</h3>
+    <h3>項目型の追加と削除</h3>
 
-    <p>The currently available entry types are listed in the left
-    panel. Whenever you select an entry type, the other panels will
-    update to show what fields are required and optional for this
-    entry type.</p>
+    <p>現在使用することのできる項目型は、左パネルに羅列されます。項目型を選ぶと、他の2つのパネルが更新されて、この項目型に対してどれが必須でどれが非必須のフィールドかが表示されます。</p>
 
-    <p>To add a new entry type, you must enter a name for it in the
-    text field below the type list, and click <b>Add</b>. The new
-    entry type will be added to the list, and selected for
-    modification.</p>
+    <p>新規項目型を追加するには、項目型一覧下のテキストフィールドに名称を入力して、<b>追加</b>ボタンを押す必要があります。すると、新規項目型が一覧に追加されて選択状態になり、修正ができるようになります。</p>
 
-    <p>To remove a custom entry type, select it and click
-    <b>Remove</b>. This operation will only be available for custom
-    entry types that are not merely modifications of standard
-    types. It is not possible to remove a standard entry type.</p>
+    <p>自作した項目型を削除するには、その項目型を選択して、<b>削除</b>ボタンを押してください。この操作は、標準項目型に手を加えただけのものではない自作項目型に対してのみ行うことができます。標準項目型を削除することはできません。</p>
 
-    <p>To return a modified standard type to its default setup,
-    select it and click <b>Default</b>. This operation will only be
-    available for customized entry types that modify a standard
-    type.</p>
+    <p>変更を加えた標準型を既定の設定に戻すには、その型を選択して<b>既定値</b>を押します。この操作は、標準型に変更を加えた自作項目型に対してのみ行うことができます。</p>
 
-    <h2>Editing entry types</h2>
+    <h2>項目型を編集する</h2>
 
-    <p>When an entry type is selected, the
-    current required and optional fields will be listed in the
-    center and right panels of the dialog. The process of editing
-    the lists are identical for the required and optional fields.</p>
+    <p>項目型を選択すると、その必須フィールドと非必須フィールドが、ダイアログの中央パネルと右パネルに列挙されます。一覧の編集方法は、必須フィールド・非必須フィールドともに共通です。</p>
 
-    <p>To add a new field, edit the text field below the list, or
-    select a field name from the dropdown menu, then click
-    <b>Add</b>. The chosen field name will be added at the end of
-    the list.</p>
+    <p>新規フィールドを追加するには、一覧下のテキストフィールドを編集するか、ドロップダウンメニューからフィールド名を選択し、<b>追加</b>を押してください。選択したフィールド名が、一覧末尾に追加されます。</p>
 
-    <p>To remove one or more fields, select them in the list, and
-    click <b>Remove</b>.</p>
+    <p>フィールドを一つないしそれ以上削除するには、対象となるものを一覧から選択して、<b>削除</b>を押します。</p>
 
-    <p>To change the order of the fields, choose one field name,
-    and click the arrow buttons to move it up or down in the
-    list.</p>
+    <p>フィールド順を変更するには、フィールド名を一つ選択して、矢印ボタンを押し、そのフィールド名を一覧内で上下させてください。</p>
 
-    <h3>Either/or fields</h3>
-    <p>Certain entry types have an either-or condition in their
-    required fields. For instance, a <em>book</em> entry is complete
-    with either the <em>author</em> or the <em>editor</em> field, or
-    both. To indicate such a condition in a custom entry type, you should
-    add a field named as the set of alternative fields separated by slashes,
-    for instance <em>author/editor</em> indicates the condition mentioned above for
-    the <em>book</em> entry type.</p>
+    <h3>論理和(OR)フィールド</h3>
+    <p>項目型の中には、必須フィールドに論理和(OR)条件を持つものがあります。例えば、<em>book</em>項目は、<em>author</em>か<em>editor</em>フィールドの一方もしくは双方が満たされれば、完成します。自作項目型でそのような条件を課すには、代替条件下にあるフィールド群をスラッシュで区切ったフィールド名を追加します。例えば、<em>author/editor</em>は、上述の<em>book</em>項目型が持つ条件と同じ条件を指定することになります。</p>
 </body>
 </html>

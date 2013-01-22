@@ -18,7 +18,10 @@ package net.sf.jabref;
 import net.sf.jabref.gui.MainTableFormat;
 
 import java.text.Collator;
+import java.text.ParseException;
+import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Locale;
 
 /**
  * 
@@ -42,7 +45,13 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     private static Collator collator;
 
     static {
-        collator = Collator.getInstance();
+        try {
+            collator = new RuleBasedCollator(
+                        ((RuleBasedCollator) Collator.getInstance()).getRules()
+                                .replaceAll("<'\u005f'", "<' '<'\u005f'"));
+        } catch (ParseException e) {
+            collator = Collator.getInstance();
+        }
     }
 
 	private String[] field;

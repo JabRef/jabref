@@ -85,6 +85,9 @@ public class JabRefPreferences {
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
+    private static final char[][] VALUE_DELIMITERS =
+            new char[][]{ {'"', '"'}, {'{', '}'} };
+
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
     Preferences prefs;
@@ -245,8 +248,10 @@ public class JabRefPreferences {
         defaults.put("searchAutoComplete", Boolean.TRUE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
         defaults.put("saveInOriginalOrder", Boolean.FALSE);
+        defaults.put("saveInTitleOrder", Boolean.FALSE);
         defaults.put("exportInStandardOrder", Boolean.TRUE);
         defaults.put("exportInOriginalOrder", Boolean.FALSE);
+        defaults.put("exportInTitleOrder", Boolean.FALSE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("highLightWords", Boolean.TRUE);
@@ -414,7 +419,7 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
-        defaults.put(UPDATE_TIMESTAMP, Boolean.TRUE);
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
@@ -450,6 +455,8 @@ public class JabRefPreferences {
         defaults.put("deletePlugins", "");
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
         defaults.put("biblatexMode", Boolean.FALSE);
+        defaults.put("valueDelimiters", 0);
+        defaults.put("includeEmptyFields", Boolean.FALSE);
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
         defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));
@@ -559,6 +566,15 @@ public class JabRefPreferences {
                 nonWrappableFields.add(fields[i].trim());
         }
 
+    }
+
+    public char getValueDelimiters(int index) {
+        return getValueDelimiters()[index];
+    }
+
+    public char[] getValueDelimiters() {
+        return VALUE_DELIMITERS[getInt(
+                "valueDelimiters")];
     }
 
     /**
@@ -913,7 +929,7 @@ public class JabRefPreferences {
 
         // First read the bindings, and their names.
         String[] bindNames = getStringArray("bindNames"),
-            bindings = getStringArray("bindings");
+                 bindings  = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
         if ((bindNames == null) || (bindings == null)
@@ -1034,8 +1050,17 @@ public class JabRefPreferences {
     }
 
     private String getNextUnit(Reader data) throws IOException {
-        int c;
-        boolean escape = false, done = false;
+        // character last read
+        // -1 if end of stream
+        // initialization necessary, because of Java compiler
+        int c = -1;
+
+        // last character was escape symbol
+        boolean escape = false;
+
+        // true if a ";" is found
+        boolean done = false;
+
         StringBuffer res = new StringBuffer();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
@@ -1057,10 +1082,14 @@ public class JabRefPreferences {
                 escape = false;
             }
         }
-        if (res.length() > 0)
+        if (res.length() > 0) {
             return res.toString();
-        else
+        } else if (c ==-1) {
+            // end of stream
             return null;
+        } else {
+            return "";
+        }
     }
 
     private String makeEscape(String s) {
