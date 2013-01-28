@@ -116,9 +116,9 @@ public class SimpleUrlDragDrop implements DropTargetListener {
             return;
         }catch (UnsupportedFlavorException nfe){
             // if not an URL
-            JOptionPane.showMessageDialog((Component) editor, Globals
-                    .lang("Operation not supported"), Globals
-                    .lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog((Component) editor, 
+                    Globals.lang("Operation not supported"),
+                    Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             logger.log(Level.WARNING, "Transfer exception", nfe);
         }catch (IOException ioex){
             logger.log(Level.WARNING, "!should not happen!", ioex);

@@ -53,8 +53,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
-			GUIGlobals.getImage("helpSmall")), reset = new JButton(Globals
-			.lang("Reset"));
+			GUIGlobals.getImage("helpSmall")), reset = new JButton(
+                                Globals.lang("Reset"));
     JComboBox fetcherChoice;
     CardLayout optionsCards = new CardLayout();
     JPanel optionsPanel = new JPanel(optionsCards);

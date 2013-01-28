@@ -53,8 +53,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize = new JTextField(5);
 
 
-        colorCodes = new JCheckBox(Globals.lang
-                   ("Color codes for required and optional fields"));
+        colorCodes = new JCheckBox(
+                   Globals.lang("Color codes for required and optional fields"));
         /*antialias = new JCheckBox(Globals.lang
                   ("Use antialiasing font"));*/
         overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));

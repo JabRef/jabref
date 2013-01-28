@@ -209,8 +209,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     public static String getDescriptionForPreview() {
-        return Globals
-                .lang("This group contains entries based on manual assignment. "
+        return Globals.lang("This group contains entries based on manual assignment. "
                         + "Entries can be assigned to this group by selecting them "
                         + "then using either drag and drop or the context menu. "
                         + "Entries can be removed from this group by selecting them "

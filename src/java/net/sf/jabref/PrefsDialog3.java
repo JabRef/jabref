@@ -162,14 +162,14 @@ public class PrefsDialog3 extends JDialog {
 				File file = new File(filename);
 				if (!file.exists()
 					|| (JOptionPane.showConfirmDialog(PrefsDialog3.this, "'" + file.getName()
-						+ "' " + Globals.lang("exists. Overwrite file?"), Globals
-						.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+						+ "' " + Globals.lang("exists. Overwrite file?"),
+                                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
 					try {
 						prefs.exportPreferences(filename);
 					} catch (IOException ex) {
-						JOptionPane.showMessageDialog(PrefsDialog3.this, Globals
-							.lang("Could not export preferences")
+						JOptionPane.showMessageDialog(PrefsDialog3.this,
+                                                        Globals.lang("Could not export preferences")
 							+ ": " + ex.getMessage(), Globals.lang("Export preferences"),
 							JOptionPane.ERROR_MESSAGE);
 						// ex.printStackTrace();
@@ -194,8 +194,8 @@ public class PrefsDialog3 extends JDialog {
 					frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {
-					JOptionPane.showMessageDialog(PrefsDialog3.this, Globals
-						.lang("Could not import preferences")
+					JOptionPane.showMessageDialog(PrefsDialog3.this,
+                                                Globals.lang("Could not import preferences")
 						+ ": " + ex.getMessage(), Globals.lang("Import preferences"),
 						JOptionPane.ERROR_MESSAGE);
 					// ex.printStackTrace();

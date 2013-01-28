@@ -97,8 +97,7 @@ public class DatabaseSearch extends Thread {
 		final int outputHits = hits;
 		SwingUtilities.invokeLater(new Thread() {
 			public void run() {
-				panel.output(Globals
-                    .lang("Searched database. Global number of hits")
+				panel.output(Globals.lang("Searched database. Global number of hits")
                     + ": " + outputHits);
 			}
 		});

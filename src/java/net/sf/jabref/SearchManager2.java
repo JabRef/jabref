@@ -704,9 +704,8 @@ public class SearchManager2 extends SidePaneComponent
 
 
             if (incSearchPos >= panel.getDatabase().getEntryCount()) {
-            panel.output("'"+text+"' : "+Globals.lang
-
-                     ("Incremental search failed. Repeat to search from top.")+".");
+            panel.output("'"+text+"' : "+
+                    Globals.lang("Incremental search failed. Repeat to search from top.")+".");
             incSearchPos = -1;
             return;
             }
@@ -720,8 +719,8 @@ public class SearchManager2 extends SidePaneComponent
                 if (incSearchPos < panel.getDatabase().getEntryCount())
                     be = panel.mainTable.getEntryAt(incSearchPos);
             else {
-                panel.output("'"+text+"' : "+Globals.lang
-                     ("Incremental search failed. Repeat to search from top."));
+                panel.output("'"+text+"' : "+
+                     Globals.lang("Incremental search failed. Repeat to search from top."));
                 incSearchPos = -1;
                 return;
             }
@@ -729,9 +728,8 @@ public class SearchManager2 extends SidePaneComponent
             if (incSearchPos >= 0) {
 
             panel.selectSingleEntry(incSearchPos);
-            panel.output("'"+text+"' "+Globals.lang
-
-                     ("found")+".");
+            panel.output("'"+text+"' "+
+                     Globals.lang("found")+".");
 
             }
         }

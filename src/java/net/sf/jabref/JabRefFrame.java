@@ -124,8 +124,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
-        .lang("Status")
+    JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(
+        Globals.lang("Status")
         + ":", SwingConstants.LEFT);
     JProgressBar progressBar = new JProgressBar();
 
@@ -1855,8 +1855,8 @@ public JabRefPreferences prefs() {
             }
 
             if (basePanel().isBaseChanged()) {
-                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Globals
-                    .lang("Database has changed. Do you want to save " + "before closing?"),
+                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
+                    Globals.lang("Database has changed. Do you want to save " + "before closing?"),
                     Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
                 if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
                     close = false; // The user has cancelled.

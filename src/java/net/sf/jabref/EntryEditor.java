@@ -1264,8 +1264,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         updateSource();
                         panel.markBaseChanged();
                     } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
-                            .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(),
+                                Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                         fe.setInvalidBackgroundColor();
                     }
                 } else {

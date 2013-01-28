@@ -127,8 +127,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     protected JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
 
-    protected JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
-        .lang("Cancel")), generate = new JButton(Globals.lang("Generate now"));
+    protected JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(
+            Globals.lang("Cancel")), generate = new JButton(Globals.lang("Generate now"));
 
     protected EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
 
@@ -217,8 +217,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.newDatabase = newDatabase;
         preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview0"));
 
-        duplLabel.setToolTipText(Globals
-            .lang("Possible duplicate of existing entry. Click to resolve."));
+        duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
 
         sortedList = new SortedList<BibtexEntry>(entries);
         EventTableModel<BibtexEntry> tableModelGl = new EventTableModel<BibtexEntry>(sortedList,
@@ -644,8 +643,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
-                            Globals
-                                .lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
+                            Globals.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
                             Globals.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
                             cbm, Globals.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
@@ -723,8 +721,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             int answer = JOptionPane
                                 .showConfirmDialog(
                                     ImportInspectionDialog.this,
-                                    Globals
-                                        .lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                    Globals.lang("Cannot add entries to group without generating keys. Generate keys now?"),
                                     Globals.lang("Add to group"), JOptionPane.YES_NO_OPTION);
                             if (answer == JOptionPane.YES_OPTION) {
                                 generateKeys(false);
@@ -1135,8 +1132,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (selectionModel.getSelected().size() != 1)
                 return;
             BibtexEntry entry = selectionModel.getSelected().get(0);
-            String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Globals
-                .lang("Enter URL"), entry.getField("url"));
+            String result = JOptionPane.showInputDialog(ImportInspectionDialog.this,
+                    Globals.lang("Enter URL"), entry.getField("url"));
             entries.getReadWriteLock().writeLock().lock();
             if (result != null) {
                 if (result.equals("")) {
@@ -1166,9 +1163,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             entry = selectionModel.getSelected().get(0);
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
-                int answer = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("This entry has no BibTeX key. Generate key now?"), Globals
-                    .lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
+                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
@@ -1210,9 +1207,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             final BibtexEntry entry = selectionModel.getSelected().get(0);
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
-                int answer = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("This entry has no BibTeX key. Generate key now?"), Globals
-                    .lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
+                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();

@@ -402,14 +402,12 @@ public class DroppedFileHandler {
 		};
 
 		if (multipleEntries) {
-			linkInPlace.setText(Globals
-					.lang("Leave files in their current directory."));
+			linkInPlace.setText(Globals.lang("Leave files in their current directory."));
 			copyRadioButton.setText(Globals.lang("Copy files to file directory."));
 
 			moveRadioButton.setText(Globals.lang("Move files to file directory."));
 		} else {
-			linkInPlace.setText(Globals
-					.lang("Leave file in its current directory."));
+			linkInPlace.setText(Globals.lang("Leave file in its current directory."));
 			copyRadioButton.setText(Globals.lang("Copy file to file directory."));
 			moveRadioButton.setText(Globals.lang("Move file to file directory."));
 		}

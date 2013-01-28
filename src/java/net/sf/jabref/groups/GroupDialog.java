@@ -58,12 +58,12 @@ class GroupDialog extends JDialog {
         private static final int TEXTFIELD_LENGTH = 30;
         // for all types
         private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
-        private JRadioButton m_explicitRadioButton = new JRadioButton(Globals
-                        .lang("Statically group entries by manual assignment"));
+        private JRadioButton m_explicitRadioButton = new JRadioButton(
+                        Globals.lang("Statically group entries by manual assignment"));
         private JRadioButton m_keywordsRadioButton = new JRadioButton(
                         Globals.lang("Dynamically group entries by searching a field for a keyword"));
-        private JRadioButton m_searchRadioButton = new JRadioButton(Globals
-                        .lang("Dynamically group entries by a free-form search expression"));
+        private JRadioButton m_searchRadioButton = new JRadioButton(
+                        Globals.lang("Dynamically group entries by a free-form search expression"));
         private JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
                         Globals.lang("Independent group: When selected, view only this group's entries"));
         private JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
@@ -74,16 +74,16 @@ class GroupDialog extends JDialog {
         private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
         private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
                         false);
-        private JCheckBox m_kgCaseSensitive = new JCheckBox(Globals
-                        .lang("Case sensitive"));
-        private JCheckBox m_kgRegExp = new JCheckBox(Globals
-                        .lang("Regular Expression"));
+        private JCheckBox m_kgCaseSensitive = new JCheckBox(
+                        Globals.lang("Case sensitive"));
+        private JCheckBox m_kgRegExp = new JCheckBox(
+                        Globals.lang("Regular Expression"));
         // for SearchGroup
         private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
-        private JCheckBox m_sgCaseSensitive = new JCheckBox(Globals
-                        .lang("Case sensitive"));
-        private JCheckBox m_sgRegExp = new JCheckBox(Globals
-                        .lang("Regular Expression"));
+        private JCheckBox m_sgCaseSensitive = new JCheckBox(
+                        Globals.lang("Case sensitive"));
+        private JCheckBox m_sgRegExp = new JCheckBox(
+                        Globals.lang("Regular Expression"));
         // for all types
         private JButton m_ok = new JButton(Globals.lang("Ok"));
         private JButton m_cancel = new JButton(Globals.lang("Cancel"));
@@ -408,8 +408,8 @@ class GroupDialog extends JDialog {
                         s2 = m_kgSearchTerm.getText().trim();
                         okEnabled = okEnabled && s2.length() > 0;
                         if (!okEnabled) {
-                                setDescription(Globals
-                                                .lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
+                                setDescription(
+                                            Globals.lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
                         } else {
                                 if (m_kgRegExp.isSelected()) {
                                         try {
@@ -432,8 +432,8 @@ class GroupDialog extends JDialog {
                         s1 = m_sgSearchExpression.getText().trim();
                         okEnabled = okEnabled & s1.length() > 0;
                         if (!okEnabled) {
-                                setDescription(Globals
-                                                .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
+                                setDescription(
+                                                Globals.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
                                                                 + "<tt>smith</tt><p>"
                                                                 + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>"
                                                                 + "<tt>author%esmith and title%eelectrical</tt>"));
@@ -467,8 +467,8 @@ class GroupDialog extends JDialog {
          */
         private void addPreviousEntries() {
                 // JZTODO lyrics...
-                int i = JOptionPane.showConfirmDialog(m_basePanel.frame(), Globals
-                                .lang("Assign the original group's entries to this group?"),
+                int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
+                                Globals.lang("Assign the original group's entries to this group?"),
                                 Globals.lang("Change of Grouping Method"),
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (i == JOptionPane.NO_OPTION)

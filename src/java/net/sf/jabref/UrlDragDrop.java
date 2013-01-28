@@ -140,14 +140,14 @@ public class UrlDragDrop implements DropTargetListener {
         try{
             URL url = (URL) tsf.getTransferData(dtURL);
             JOptionChoice res = (JOptionChoice) JOptionPane
-                    .showInputDialog(editor, "", Globals
-                            .lang("Select action"),
+                    .showInputDialog(editor, "",
+                            Globals.lang("Select action"),
                             JOptionPane.QUESTION_MESSAGE, null,
                             new JOptionChoice[] {
-                                    new JOptionChoice(Globals
-                                            .lang("Insert URL"), 0),
-                                    new JOptionChoice(Globals
-                                            .lang("Download file"), 1) },
+                                    new JOptionChoice(
+                                            Globals.lang("Insert URL"), 0),
+                                    new JOptionChoice(
+                                            Globals.lang("Download file"), 1) },
                             new JOptionChoice(Globals.lang("Insert URL"), 0));
             switch (res.getId()) {
             //insert URL
@@ -174,9 +174,9 @@ public class UrlDragDrop implements DropTargetListener {
                 }catch (IOException ioex){
                     logger.log(Level.SEVERE, "Error while downloading file",
                             ioex);
-                    JOptionPane.showMessageDialog(editor, Globals
-                            .lang("File download"), Globals
-                            .lang("Error while downloading file:"
+                    JOptionPane.showMessageDialog(editor, 
+                            Globals.lang("File download"),
+                            Globals.lang("Error while downloading file:"
                                     + ioex.getMessage()),
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -196,9 +196,9 @@ public class UrlDragDrop implements DropTargetListener {
                     .getTransferData(DataFlavor.javaFileListFlavor);
             if (filelist.size() > 1){
                 JOptionPane
-                        .showMessageDialog(editor, Globals
-                                .lang("Only one item is supported"), Globals
-                                .lang("Drag and Drop Error"),
+                        .showMessageDialog(editor,
+                                Globals.lang("Only one item is supported"),
+                                Globals.lang("Drag and Drop Error"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -207,9 +207,9 @@ public class UrlDragDrop implements DropTargetListener {
             editor.updateField(feditor);
 
         }catch (UnsupportedFlavorException nfe){
-            JOptionPane.showMessageDialog(editor, Globals
-                    .lang("Operation not supported"), Globals
-                    .lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(editor,
+                    Globals.lang("Operation not supported"),
+                    Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             logger.log(Level.WARNING, "Transfer exception", nfe);
         }catch (IOException ioex){
             logger.log(Level.WARNING, "Transfer exception", ioex);
