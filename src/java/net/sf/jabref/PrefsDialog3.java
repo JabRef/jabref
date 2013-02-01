@@ -77,6 +77,7 @@ public class PrefsDialog3 extends JDialog {
 		// ----------------------------------------------------------------
 		ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
 		tabs.add(new GeneralTab(frame, prefs));
+		tabs.add(new NetworkTab(frame, prefs));
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));

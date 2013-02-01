@@ -88,10 +88,6 @@ public class JabRef {
 
 		singleton = this;
 
-		// The following two lines signal that the system proxy settings should
-		// be used:
-		System.setProperty("java.net.useSystemProxies", "true");
-		System.getProperties().put("proxySet", "true");
 
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 
@@ -101,6 +97,20 @@ public class JabRef {
             PluginInstaller.deletePluginsOnStartup(toDelete);
             prefs.put("deletePlugins", "");
         }
+
+		if (prefs.get("proxyHostname") != null) {
+			System.getProperties().put("http.proxyHost", prefs.get("proxyHostname"));
+			System.getProperties().put("http.proxyPort", prefs.get("proxyPort"));
+			if (prefs.get("proxyUsername") != null) {
+				System.getProperties().put("http.proxyUser", prefs.get("proxyUsername"));
+				System.getProperties().put("http.proxyPassword", prefs.get("proxyPassword"));
+			}
+		} else {
+			// The following two lines signal that the system proxy settings
+			// should be used:
+			System.setProperty("java.net.useSystemProxies", "true");
+			System.getProperties().put("proxySet", "true");
+		}
 
         Globals.startBackgroundTasks();
         Globals.setupLogging();

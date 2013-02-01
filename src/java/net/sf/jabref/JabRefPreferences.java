@@ -189,6 +189,9 @@ public class JabRefPreferences {
         	defaults.put(EMACS_23, false);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
+		defaults.put("useProxy", Boolean.FALSE);
+        defaults.put("proxyHostname", "my proxy host");
+        defaults.put("proxyPort", "my proxy port");
         defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
