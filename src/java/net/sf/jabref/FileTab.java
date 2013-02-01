@@ -36,7 +36,7 @@ public class FileTab extends JPanel implements PrefsTab {
     JabRefFrame _frame;
 
     private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
-            promptBeforeUsingAutoSave, includeEmptyFields;
+            promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
     private JComboBox<String> valueDelimiter;
     private JRadioButton
         saveOriginalOrder, saveAuthorOrder, saveTableOrder, saveTitleOrder,
@@ -71,6 +71,8 @@ public class FileTab extends JPanel implements PrefsTab {
                 Globals.lang("Quotes") + ": \", \"",
                 Globals.lang("Curly Brackets") + ": {, }" });
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
+        camelCase = new JCheckBox(Globals.lang("Start field contents in same column"));
+        sameColumn = new JCheckBox(Globals.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAuthorOrder);
         bg.add(saveOriginalOrder);
@@ -156,6 +158,10 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(exportTitleOrder, 1);
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Field saving options"));
+        builder.nextLine();
+        builder.append(camelCase);
+        builder.nextLine();
+        builder.append(sameColumn);
         FormLayout layout2 = new FormLayout(
                 "left:pref, 8dlu, fill:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
@@ -209,6 +215,8 @@ public class FileTab extends JPanel implements PrefsTab {
         origAutoSaveSetting = autoSave.isSelected();
         valueDelimiter.setSelectedIndex(_prefs.getInt("valueDelimiters"));
         includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
+        camelCase.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
+        sameColumn.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
     }
 
     public void storeSettings() {
@@ -228,6 +236,8 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putInt("autoSaveInterval", (Integer)autoSaveInterval.getValue());
         _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
         _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
+        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
+        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
         doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
         boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {

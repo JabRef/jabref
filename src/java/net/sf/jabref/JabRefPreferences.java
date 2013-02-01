@@ -79,6 +79,9 @@ public class JabRefPreferences {
         AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly",
         AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly",
 
+        WRITEFIELD_ADDSPACES = "writeFieldAddSpaces",
+        WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase",
+
         UPDATE_TIMESTAMP = "updateTimestamp";
 
     // This String is used in the encoded list in prefs of external file type
@@ -421,6 +424,10 @@ public class JabRefPreferences {
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
+
+        // behavior of JabRef before 2.10: both: false
+        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
+        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", new Integer(6050));

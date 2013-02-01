@@ -99,12 +99,22 @@ public class BibtexEntry
      */
 	private static final String getFieldDisplayName(final String field) {
 		String suffix = "";
-		for (int i = maxFieldLength - field.length(); i > 0; i--)
-			suffix += " ";
+		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
+			for (int i = maxFieldLength - field.length(); i > 0; i--)
+				suffix += " ";
+		}
 
-		if (tagDisplayNameMap.containsKey(field.toLowerCase()))
-			return tagDisplayNameMap.get(field.toLowerCase()) + suffix;
-		return (field.charAt(0)+"").toUpperCase() + field.substring(1) + suffix;
+		String res;
+		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
+			if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
+				res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
+			} else {
+				res = (field.charAt(0)+"").toUpperCase() + field.substring(1) + suffix;
+			}
+		} else {
+			res = field + suffix;
+		}
+		return res;
 	}
 
     public BibtexEntry(){
@@ -392,6 +402,7 @@ public class BibtexEntry
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
+        // Thereby, write the title field first.
         hasWritten = hasWritten | writeField("title", out, ff, hasWritten, false);
         written.put("title", null);
         String[] s = getRequiredFields();
