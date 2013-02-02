@@ -10,10 +10,12 @@
     - Added a setting to choose either a DOI link or a URL to be standard (feature 710)
     - Added button to change entry type. Removed this functionality from the type label, and
       reduced the font size.
-    - Adds Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
+    - Added Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
       (patch 123 by Laura Hern�ndez G�mez)
     - Added menu option "Automatically set file links for selected entries".
     - Added new BibTeX label pattern authEtAl
+    - Added new BibTeX label pattern authForeIne, authorLastForeIni, edtrForeIni, and editorLastForeIni
+      (patch 199)
     - Adapted the required and optional fields of entry types according to
       http://en.wikipedia.org/wiki/BibTeX#Entry_types
     - After a search has been done, the first entry of the entry table is selected (feature 656).
