@@ -98,9 +98,12 @@ public class JabRef {
             prefs.put("deletePlugins", "");
         }
 
-		if (prefs.get("proxyHostname") != null) {
+        if (prefs.getBoolean("useProxy")) {
+        	// NetworkTab.java ensures that proxyHostname and proxyPort are not null
 			System.getProperties().put("http.proxyHost", prefs.get("proxyHostname"));
 			System.getProperties().put("http.proxyPort", prefs.get("proxyPort"));
+
+			// currently, the following cannot be configured
 			if (prefs.get("proxyUsername") != null) {
 				System.getProperties().put("http.proxyUser", prefs.get("proxyUsername"));
 				System.getProperties().put("http.proxyPassword", prefs.get("proxyPassword"));

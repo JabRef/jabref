@@ -29,6 +29,7 @@
       * Configurable: Use camel case for field names (e.g., "HowPublished" instead of "howpublished"). Enabled by default.
     - Saving a part of the database now also writes entries with a crossref field first.
     - Author field is now resolved using @String data.
+    - A custom proxy can be specified (patch 198 by Michael).
 2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
