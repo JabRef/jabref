@@ -609,6 +609,8 @@ public class LabelPatternUtil {
                 // have to check all the time.
                 if (val.equals("auth")) {
                     return firstAuthor(authString);
+                } else if (val.equals("authForeIni")) {
+                	return firstAuthorForenameInitials(authString);
                 } else if (val.equals("authors")) {
                     return allAuthors(authString);
                 } else if (val.equals("authorsAlpha")) {
@@ -617,6 +619,8 @@ public class LabelPatternUtil {
                 // Last author's last name
                 else if (val.equals("authorLast")) {
                     return lastAuthor(authString);
+                } else if (val.equals("authorLastForeIni")) {
+                	return lastAuthorForenameInitials(authString);
                 } else if (val.equals("authorIni")) {
                     String s = oneAuthorPlusIni(authString);
                     return s == null ? "" : s;
@@ -666,11 +670,15 @@ public class LabelPatternUtil {
                 // don't have to check all the time.
                 if (val.equals("edtr")) {
                     return firstAuthor(_entry.getField("editor").toString());
+                } else if (val.equals("edtrForeIni")) {
+                	return firstAuthorForenameInitials(_entry.getField("editor").toString());
                 } else if (val.equals("editors")) {
                     return allAuthors(_entry.getField("editor").toString());
                 // Last author's last name
                 } else if (val.equals("editorLast")) {
                     return lastAuthor(_entry.getField("editor").toString());
+                } else if (val.equals("editorLastForeIni")) {
+                	return lastAuthorForenameInitials(_entry.getField("editor").toString());
                 } else if (val.equals("editorIni")) {
                     String s = oneAuthorPlusIni(_entry.getField("editor")
                         .toString());
@@ -871,6 +879,25 @@ public class LabelPatternUtil {
         return s != null ? s : "";
 
     }
+    
+    /**
+     * Gets the first name initals of the first author/editor
+     * 
+     * @param authorField
+     *            a <code>String</code>
+     * @return the first name initial of an author/editor or "" if no author was found
+     *    This method is guaranteed to never return null.
+     * 
+     * @throws NullPointerException
+     *             if authorField == null
+     */
+    public static String firstAuthorForenameInitials(String authorField) {
+        AuthorList al = AuthorList.getAuthorList(authorField);
+        if (al.size() == 0)
+            return "";
+        String s = al.getAuthor(0).getFirstAbbr();
+        return s != null ? s.substring(0,1) : "";
+    }
 
     /**
      * Gets the von part and the last name of the first author/editor
@@ -912,6 +939,25 @@ public class LabelPatternUtil {
 
         }
         else return "";
+    }
+
+    /**
+     * Gets the forename initals of the last author/editor
+     * 
+     * @param authorField
+     *            a <code>String</code>
+     * @return the forename initial of an author/editor or "" if no author was found
+     *    This method is guaranteed to never return null.
+     * 
+     * @throws NullPointerException
+     *             if authorField == null
+     */
+    public static String lastAuthorForenameInitials(String authorField) {
+        AuthorList al = AuthorList.getAuthorList(authorField);
+        if (al.size() == 0)
+            return "";
+        String s = al.getAuthor(al.size()-1).getFirstAbbr();
+        return s != null ? s.substring(0,1) : "";
     }
 
     /**
