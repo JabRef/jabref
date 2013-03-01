@@ -198,7 +198,7 @@ public class ExternalFilePanel extends JPanel {
 					
 				} catch (TransformerException e) {
 					JOptionPane.showMessageDialog(editor.getParent(), 
-            Globals.lang("Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), 
+            Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()), 
             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
 					  Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
 						finalFile.getAbsolutePath()));

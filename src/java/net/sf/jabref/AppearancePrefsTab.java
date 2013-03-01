@@ -85,19 +85,18 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Table and entry editor colors"));
         builder.append(colorPanel);
-        /*builder.appendSeparator(Globals.lang("Custom icon theme"));
-        builder.append(useCustomIconTheme);
-        builder.nextLine();
-        JPanel p2 = new JPanel();
-        lab = new JLabel(Globals.lang("Custom icon theme file")+":");
-        p2.add(lab);
-        p2.add(customIconThemeFile);
-        BrowseAction browse = new BrowseAction(null, customIconThemeFile, false);
-        JButton browseBut = new JButton(Globals.lang("Browse"));
-        browseBut.addActionListener(browse);
-        p2.add(browseBut);
-        builder.append(p2);
-          */
+        //builder.appendSeparator(Globals.lang("Custom icon theme"));
+        //builder.append(useCustomIconTheme);
+        //builder.nextLine();
+        //JPanel p2 = new JPanel();
+        //lab = new JLabel(Globals.lang("Custom icon theme file")+":");
+        //p2.add(lab);
+        //p2.add(customIconThemeFile);
+        //BrowseAction browse = new BrowseAction(null, customIconThemeFile, false);
+        //JButton browseBut = new JButton(Globals.lang("Browse"));
+        //browseBut.addActionListener(browse);
+        //p2.add(browseBut);
+        //builder.append(p2);
 
     JPanel upper = new JPanel(),
         sort = new JPanel(),

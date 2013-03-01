@@ -245,7 +245,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 */
 	protected void initializeActions() {
 		
-		actionSelectAll = new AbstractAction(Globals.lang("Select All")) {
+		actionSelectAll = new AbstractAction(Globals.lang("Select all")) {
 			private static final long serialVersionUID = 9153126361571985383L;
 			public void actionPerformed(ActionEvent e) {
 				CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -255,7 +255,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			}
 		};
 		
-		actionUnselectAll = new AbstractAction(Globals.lang("Unselect All")) {
+		actionUnselectAll = new AbstractAction(Globals.lang("Unselect all")) {
 			private static final long serialVersionUID = -9012913268030356450L;
 			public void actionPerformed(ActionEvent e) {
 				CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -265,7 +265,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			}
 		};
 		
-		actionExpandTree = new AbstractAction(Globals.lang("Expand All")) {
+		actionExpandTree = new AbstractAction(Globals.lang("Expand all")) {
 			private static final long serialVersionUID = -4794088095435302433L;
 			public void actionPerformed(ActionEvent e) {
 				CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -273,7 +273,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			}
 		};
 		
-		actionCollapseTree = new AbstractAction(Globals.lang("Collapse All")) {
+		actionCollapseTree = new AbstractAction(Globals.lang("Collapse all")) {
 			private static final long serialVersionUID = 6007246730370326456L;
 			public void actionPerformed(ActionEvent e) {
 				CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();

@@ -265,7 +265,7 @@ public class FontSelectorDialog extends JDialog {
                 buttons.setBorder(new EmptyBorder(12,0,0,0));
                 buttons.add(Box.createGlue());
 
-                ok = new JButton(Globals.lang("OK"));
+                ok = new JButton(Globals.lang("Ok"));
                 ok.addActionListener(new ActionHandler());
                 getRootPane().setDefaultButton(ok);
                 buttons.add(ok);

@@ -62,7 +62,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     private JPopupMenu menu = new JPopupMenu();
 
     private JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
-    private JMenuItem rename = new JMenuItem(Globals.lang("Move/rename file"));
+    private JMenuItem rename = new JMenuItem(Globals.lang("Move/Rename file"));
     private JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,

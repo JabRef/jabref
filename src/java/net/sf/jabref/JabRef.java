@@ -635,7 +635,7 @@ public class JabRef {
         }
 
         System.out.println(Globals.lang("Running Query '%0' with fetcher '%1'.", query, engine) +
-            " " + Globals.lang("Please wait!"));
+            " " + Globals.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
         if (result == null || result.size() == 0) {
