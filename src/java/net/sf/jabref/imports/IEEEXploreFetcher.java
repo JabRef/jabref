@@ -110,7 +110,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	CookieHandler.setDefault(cm);
         
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
-        fieldPatterns.put("author", "</h3>\\s*(.+)");
+        //fieldPatterns.put("author", "</h3>\\s*(.+)");
+        fieldPatterns.put("author", "(?s)</h3>\\s*(.+)</br>");
         fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
@@ -394,6 +395,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	    if (author.indexOf("a href=") >= 0) {  // Author parsing failed because it was empty
 		entry.setField("author","");  // Maybe not needed anymore due to another change
 	    } else {
+	    	author = author.replaceAll("\\s+", " ");
 	    	author = author.replaceAll("\\.", ". ");
 	    	author = author.replaceAll("([^;]+),([^;]+),([^;]+)","$1,$3,$2"); // Change order in case of Jr. etc
 	    	author = author.replaceAll("  ", " ");

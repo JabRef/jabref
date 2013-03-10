@@ -856,7 +856,8 @@ public class HTMLConverter implements LayoutFormatter {
         return text.trim();
     }
 
-    private final int MAX_TAG_LENGTH = 30;
+    private final int MAX_TAG_LENGTH = 100;
+    /*private final int MAX_TAG_LENGTH = 30;*/
     /*private final int MAX_CHAR_LENGTH = 10;
 
     private int readHtmlChar(String text, StringBuffer sb, int position) {
