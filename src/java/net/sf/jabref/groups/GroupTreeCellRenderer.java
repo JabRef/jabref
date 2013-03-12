@@ -33,7 +33,7 @@ import net.sf.jabref.Util;
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its
  * toString() method.
- * 
+ *
  * @author jzieren
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -59,7 +59,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             selected = true; // show as selected
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
-        // this is sometimes called from deep within somewhere, with a dummy 
+        // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
         if (!(value instanceof GroupTreeNode))
             return c;
@@ -150,7 +150,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /**
      * For use when dragging: The sepcified cell is always rendered as selected.
-     * 
+     *
      * @param cell
      *            The cell over which the user is currently dragging.
      */
@@ -175,7 +175,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * Highlights the specified cells (by drawing a border around it), 
+     * Highlights the specified cells (by drawing a border around it),
      * or disables highlight if highlightBorderCell == null.
      */
     void setHighlightBorderCell(Object highlightBorderCell) {

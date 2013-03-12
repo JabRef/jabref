@@ -24,7 +24,7 @@ import net.sf.jabref.util.QuotedStringTokenizer;
 
 /**
  * @author jzieren
- * 
+ *
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "ExplicitGroup:";
@@ -233,7 +233,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         }
         return sb.toString();
     }
-    
+
     /**
      * Update the group to handle the situation where the group
      * is applied to a different BibtexDatabase than it was created for.
