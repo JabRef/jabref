@@ -38,6 +38,7 @@
       as the latter conflicts with "Synchronize files" (by Adrian Daerr)
     - WriteXMPAction now uses database to resolve strings even for selected entries (by Adrian Daerr)
     - Extend XMP privacy filtering to Dublin Core Schema (by Adrian Daerr)
+    - IEEE search should include author field again (patch 201 by Christopher S. Lester, fixes bug 1137)
 2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
