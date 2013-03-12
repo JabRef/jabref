@@ -34,6 +34,10 @@
     - Saving a part of the database now also writes entries with a crossref field first.
     - Author field is now resolved using @String data.
     - A custom proxy can be specified (patch 198 by Michael).
+    - Default key binding for Write XMP is now "CTRL+F7" instead of "CTRL+F4"
+      as the latter conflicts with "Synchronize files" (by Adrian Daerr)
+    - WriteXMPAction now uses database to resolve strings even for selected entries (by Adrian Daerr)
+    - Extend XMP privacy filtering to Dublin Core Schema (by Adrian Daerr)
 2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
