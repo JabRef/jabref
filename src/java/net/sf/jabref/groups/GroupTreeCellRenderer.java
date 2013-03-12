@@ -102,6 +102,16 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (italics)
             sb.append("<i>");
         sb.append(Util.quoteForHTML(name));
+    	if (group instanceof ExplicitGroup) {
+    	    sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
+    	} else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+    		int hits = 0;
+    		for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()){
+    		    if (group.contains(entry))
+    			hits++;
+    		}
+    		sb.append(" [").append(hits).append("]");
+    	}
         if (italics)
             sb.append("</i>");
         if (underline)

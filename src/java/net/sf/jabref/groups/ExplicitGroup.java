@@ -266,4 +266,9 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public String getTypeId() {
         return ID;
     }
+
+	public int getNumEntries() {
+		return m_entries.size();
+	}
+
 }
