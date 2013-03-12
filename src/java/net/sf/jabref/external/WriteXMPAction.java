@@ -62,12 +62,12 @@ public class WriteXMPAction extends AbstractWorker {
 
 	public void init() {
 
+		database = panel.getDatabase();
 		// Get entries and check if it makes sense to perform this operation
 		entries = panel.getSelectedEntries();
 
 		if (entries.length == 0) {
 
-			database = panel.getDatabase();
 			entries = database.getEntries().toArray(new BibtexEntry[]{});
 
 			if (entries.length == 0) {
