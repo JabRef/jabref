@@ -31,6 +31,7 @@
       * The second word in of the BibTeX type is capitalized. E.g., Inproceedings got InProceedings
       * Configurable: Start field contents in same column. Enabled by default.
       * Configurable: Use camel case for field names (e.g., "HowPublished" instead of "howpublished"). Enabled by default.
+      * If no field name is given, then "UNKNOWN" is used. For instance, " = {X}" gets " UNKNOWN = {X}".
     - Saving a part of the database now also writes entries with a crossref field first.
     - Author field is now resolved using @String data.
     - A custom proxy can be specified (patch 198 by Michael).

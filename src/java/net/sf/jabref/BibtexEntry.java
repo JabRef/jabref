@@ -64,6 +64,7 @@ public class BibtexEntry
         tagDisplayNameMap.put("lastchecked", "LastChecked");
         tagDisplayNameMap.put("isbn", "ISBN");
         tagDisplayNameMap.put("issn", "ISSN");
+        tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
 
         // Looking for the longest field name.
         // XXX JK: Look for all used field names not only defined once, since
@@ -97,8 +98,13 @@ public class BibtexEntry
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-	private static final String getFieldDisplayName(final String field) {
-		String suffix = "";
+	private static final String getFieldDisplayName(String field) {
+        if (field.length() == 0) {
+            // hard coded "UNKNOWN" is assigned to a field without any name
+            field = "UNKNOWN";
+        }
+
+        String suffix = "";
 		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
 			for (int i = maxFieldLength - field.length(); i > 0; i--)
 				suffix += " ";
