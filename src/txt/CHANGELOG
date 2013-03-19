@@ -5,7 +5,8 @@
     - Added Unicode to LaTeX conversion for Medline imports (feature 721)
     - Added Unicode to LaTeX conversion cleanup action (feature 721)
     - Added countries, weekdays and months to the case keeper
-    - Added support for Emacs key bindings at the entry editor
+    - Added support for Emacs key bindings at the entry editor.
+      To avoid collisions of common key bindings, Page up and page down (C-v) are not supported as C-v is "paste" in Windows key bindings. 
     - Added a formatter for units which keeps the case and adds non-breaking separators
     - Added a Merge entries functionality
     - Added a setting to choose either a DOI link or a URL to be standard (feature 710)

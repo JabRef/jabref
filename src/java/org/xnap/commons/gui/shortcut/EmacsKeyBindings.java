@@ -57,6 +57,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
 import javax.swing.text.Utilities;
+
+import net.sf.jabref.JabRefPreferences;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,15 +98,11 @@ public class EmacsKeyBindings
 
     public static final String upcaseWordAction = "emacs-upcase-word";
 
-    public static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS = {
+    public static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS_BASE = {
 		new JTextComponent.
 			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E,
 											  InputEvent.CTRL_MASK),
 					   DefaultEditorKit.endLineAction),
-		new JTextComponent.
-			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
-											  InputEvent.CTRL_MASK),
-					   DefaultEditorKit.beginLineAction),
 		new JTextComponent.
 			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_D,
 											  InputEvent.CTRL_MASK),
@@ -201,6 +200,10 @@ public class EmacsKeyBindings
 											  InputEvent.ALT_MASK),
 					   EmacsKeyBindings.upcaseWordAction),
     };
+
+    public static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_A = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+            InputEvent.CTRL_MASK),
+            DefaultEditorKit.beginLineAction);
 
     private static final TextAction[] EMACS_ACTIONS = {
 		new KillWordAction(killWordAction),
@@ -308,7 +311,16 @@ public class EmacsKeyBindings
 			
 			Keymap k = JTCS[i].getKeymap();
 
-			JTCS[i].loadKeymap(k, EMACS_KEY_BINDINGS, actions);
+			JTextComponent.KeyBinding[] keybindings;
+			if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA)) {
+			    int size = EMACS_KEY_BINDINGS_BASE.length + 1;
+			    keybindings = new JTextComponent.KeyBinding[size];
+	            System.arraycopy(EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EMACS_KEY_BINDINGS_BASE.length);
+	            keybindings[EMACS_KEY_BINDINGS_BASE.length] = EMACS_KEY_BINDING_C_A;
+			} else {
+			    keybindings = EMACS_KEY_BINDINGS_BASE;
+			}
+			JTCS[i].loadKeymap(k, keybindings, actions);
 		}
     }
 
