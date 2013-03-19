@@ -465,7 +465,9 @@ public class JabRefPreferences {
         defaults.put("deletePlugins", "");
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
         defaults.put("biblatexMode", Boolean.FALSE);
-        defaults.put("valueDelimiters", 0);
+        // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
+        // Currently, JabRef does not escape them
+        defaults.put("valueDelimiters", 1);
         defaults.put("includeEmptyFields", Boolean.FALSE);
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
