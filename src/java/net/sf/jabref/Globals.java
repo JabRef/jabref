@@ -175,6 +175,8 @@ public class Globals {
 
     public static AutoSaveManager autoSaveManager = null;
 
+    // In the main program, this field is initialized in JabRef.java
+    // Each test case initializes this field if required
 	public static JabRefPreferences prefs = null;
 
 	public static HelpDialog helpDiag = null;
