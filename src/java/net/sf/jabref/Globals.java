@@ -183,7 +183,7 @@ public class Globals {
 
 	public static final String osName = System.getProperty("os.name", "def");
 
-	public static final boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows");
+	public static final boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows"), ON_LINUX = osName.startsWith("Linux");
 
 	public static final String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
 	

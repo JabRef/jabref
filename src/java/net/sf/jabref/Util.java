@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -3434,6 +3435,44 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         entries.add(entry);
         
         return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+    }
+    
+    public static void openFolder(String link) throws IOException {
+        if(Globals.ON_WIN){
+            openFolderOnWindows(link);
+        }else if(Globals.ON_LINUX){
+            openFolderOnLinux(link);
+        }else{
+            openFolderGeneric(link);
+        }
+    }
+
+    private static void openFolderOnLinux(String link) throws IOException {
+        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
+        
+        String cmd = "";
+        
+        if(desktopSession.contains("gnome")){
+            cmd = "nautilus " + link;
+        }else if(desktopSession.contains("kde")){
+            cmd = "dolphin --select " + link;
+        }else{
+            cmd = "xdg-open " + link.substring(0, link.lastIndexOf(File.separator));
+        }
+        
+        Runtime.getRuntime().exec(cmd);
+    }
+
+    private static void openFolderGeneric(String link) throws IOException {
+        Desktop.getDesktop().open(new File(link.substring(0, link.lastIndexOf(File.separator))));
+    }
+
+    private static void openFolderOnWindows(String link) throws IOException {
+        link = link.replace("&", "\"&\"");
+
+        String cmd = "explorer.exe /select,\"" + link + "\"";
+
+        Runtime.getRuntime().exec(cmd);
     }
 }
 

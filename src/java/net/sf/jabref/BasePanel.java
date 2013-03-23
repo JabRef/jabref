@@ -65,6 +65,7 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.export.ExportToClipboardAction;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.OpenFolder;
 import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
@@ -1106,6 +1107,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 
+          actions.put("openFolder", new OpenFolder(frame));
 
         actions.put("openFile", new BaseAction() {
             public void action() {

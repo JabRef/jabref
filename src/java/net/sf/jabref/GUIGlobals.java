@@ -174,6 +174,8 @@ public class GUIGlobals {
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
     public static final String FILE_FIELD = "file";
+    
+    public static final String FOLDER_FIELD = "folder";
 
     public static final double
 	SMALL_W = 0.30,
@@ -404,6 +406,9 @@ public class GUIGlobals {
 		lab = new JLabel(getImage("psSmall"));
 		lab.setToolTipText(Globals.lang("Open")+" PS");
 		tableIcons.put("ps", lab);
+		lab = new JLabel(getImage("psSmall"));
+        lab.setToolTipText(Globals.lang("Open folder"));
+        tableIcons.put(GUIGlobals.FOLDER_FIELD, lab);
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
         tableIcons.put(GUIGlobals.FILE_FIELD, lab);

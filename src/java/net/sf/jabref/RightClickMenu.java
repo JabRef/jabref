@@ -187,6 +187,14 @@ public class RightClickMenu extends JPopupMenu
 	        addSeparator();
         }
         
+        add(new AbstractAction(Globals.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand("openFolder");
+                } catch (Throwable ex) {}
+            }
+        });
+        
         add(new AbstractAction(Globals.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
             public void actionPerformed(ActionEvent e) {
                 try {

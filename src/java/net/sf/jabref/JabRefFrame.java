@@ -291,18 +291,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
+      openFolder = new GeneralAction("openFolder", "Open folder",
+                                        Globals.lang("Open folder"),
+                                        prefs.getKey("Open folder")),
       openFile = new GeneralAction("openExternalFile", "Open file",
-                                   Globals.lang("Open file"),
-                                   prefs.getKey("Open file")),
+                                   		Globals.lang("Open file"),
+                                   		prefs.getKey("Open file")),
       openPdf = new GeneralAction("openFile", "Open PDF or PS",
-                                   Globals.lang("Open PDF or PS"),
-                                   prefs.getKey("Open PDF or PS")),
+                                   		Globals.lang("Open PDF or PS"),
+                                   		prefs.getKey("Open PDF or PS")),
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
-                                  Globals.lang("Open URL or DOI"),
-                                  prefs.getKey("Open URL or DOI")),
+                                  		Globals.lang("Open URL or DOI"),
+                                  		prefs.getKey("Open URL or DOI")),
       openSpires = new GeneralAction("openSpires", "Open SPIRES entry",
-                                          Globals.lang("Open SPIRES entry"),
-                                          prefs.getKey("Open SPIRES entry")),
+                                        Globals.lang("Open SPIRES entry"),
+                                        prefs.getKey("Open SPIRES entry")),
       /*
 	   * It looks like this wasn't being implemented for spires anyway so we
 	   * comment it out for now.
@@ -1410,6 +1413,7 @@ public JabRefPreferences prefs() {
       tools.addSeparator();
       tools.add(manageSelectors);
       tools.addSeparator();
+      tools.add(openFolder);
       tools.add(openFile);
       tools.add(openPdf);
       tools.add(openUrl);
@@ -1611,6 +1615,7 @@ public JabRefPreferences prefs() {
       //tlb.addAction(winEdtPushAction);
       tlb.add(pushExternalButton.getComponent());
 
+      tlb.addAction(openFolder);
       tlb.addAction(openFile);
     //tlb.addAction(openPdf);
     //tlb.addAction(openUrl);
@@ -1657,7 +1662,7 @@ public JabRefPreferences prefs() {
             incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
-                openPdf, openUrl, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
