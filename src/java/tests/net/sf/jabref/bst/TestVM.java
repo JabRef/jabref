@@ -451,7 +451,7 @@ public class TestVM extends TestCase {
 		vm.run(v);
 
 		assertEquals(4, vm.getStack().size());
-		assertEquals("Inproceedings", vm.getStack().pop());
+		assertEquals("InProceedings", vm.getStack().pop());
 		assertEquals("Misc", vm.getStack().pop());
 		assertEquals("Book", vm.getStack().pop());
 		assertEquals("Article", vm.getStack().pop());
