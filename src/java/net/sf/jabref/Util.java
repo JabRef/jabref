@@ -130,7 +130,7 @@ public class Util {
     public static int MARK_COLOR_LEVELS = 6,
             MAX_MARKING_LEVEL = MARK_COLOR_LEVELS-1,
             IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
-    public static Pattern markNumberPattern = Pattern.compile(Globals.prefs.MARKING_WITH_NUMBER_PATTERN);
+    public static Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
 
     static {
@@ -300,7 +300,7 @@ public class Util {
 	public static String checkLegalKey(String key) {
 		if (key == null)
 			return null;
-        if (!Globals.prefs.getBoolean("enforceLegalBibtexKey")) {
+        if (!JabRefPreferences.getInstance().getBoolean("enforceLegalBibtexKey")) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:

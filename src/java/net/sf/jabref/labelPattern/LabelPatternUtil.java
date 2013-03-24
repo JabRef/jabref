@@ -49,6 +49,15 @@ public class LabelPatternUtil {
     public static void updateDefaultPattern() {
         DEFAULT_LABELPATTERN = split(JabRefPreferences.getInstance().get("defaultLabelPattern"));
     }
+    
+    /**
+     * Required fro LabelPatternUtilTest
+     * 
+     * @param db the DB to use as global database
+     */
+    public static void setDataBase(BibtexDatabase db) {
+    	_db = db;
+    }
 
     private static String normalize(String content) {
         List<String> tokens = new ArrayList<String>();
@@ -832,10 +841,14 @@ public class LabelPatternUtil {
 
     /**
      * Tests whether a given label is unique.
+     * 
+     * This method is private as it is currently used nowhere.
+     * The issue with this method is that it uses the global variable "_db", which might be undefined when calling the method.
+     *
      * @param label a <code>String</code>
      * @return <code>true</code> if and only if the <code>label</code> is unique
      */
-    public static boolean isLabelUnique(String label) {
+    private static boolean isLabelUnique(String label) {
         boolean _isUnique = true;
         BibtexEntry _entry;
         int _dbSize = _db.getEntryCount();
@@ -1308,7 +1321,7 @@ public class LabelPatternUtil {
             return String.valueOf(result);
     }
 
-    /**
+    	/**
          * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
          * as well as escaped colons and parentheses.
          * @param arg The argument string.

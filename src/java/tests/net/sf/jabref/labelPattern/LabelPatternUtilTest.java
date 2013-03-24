@@ -1,12 +1,16 @@
 package tests.net.sf.jabref.labelPattern;
 
 import junit.framework.TestCase;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 public class LabelPatternUtilTest extends TestCase {
 
+    public void setUp() {
+    	LabelPatternUtil.setDataBase(new BibtexDatabase());
+    }
 
     /**
      * Test for https://sourceforge.net/forum/message.php?msg_id=4498555
