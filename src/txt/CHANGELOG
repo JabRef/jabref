@@ -1,0 +1,1180 @@
+2.9.2
+    - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
+    - Fetchers work again: Import inspection dialog is not modal any more.
+2.9.1
+    - Command line option --importToOpen now also adds to an open tab when JabRef is launched.
+    - Importing of entries works again. Fixes bug 1121.
+    - Import inspection dialog is now modal.
+    - Replaced Java launcher by launch4j. Fixes bugs 1100, 1103, 1123.
+    - Menu font size can now be changed again. Help contents are also enlarged accordingly. Fixes bug 1122.
+2.9
+    - Fixed bug: in OO/LO reference lists, entries may fall out when multiple entries with same
+      author and year are cited.
+    - Added support for converting HTML combining accents to LaTeX
+    - When generating subdatabase from AUX file, preamble and strings are now included from
+      the source database.
+    - Added cleanup action for removing redundant $, {, and }
+    - Fix for removing starting and ending spaces in the page number cleanup action
+    - Fix for a more liberal detection in the month cleanup action
+2.9 beta 2
+    - Added DiVA fetcher
+    - Can control if the HTML converter should create subscripts and superscripts
+      as text or an equation via the preferences
+    - Added initial support for adding curly brackets {} for certain
+      key words to keep the character case independent of .bst, e.g., for
+      names and abbreviations (use via "Cleanup entries") and can be controlled 
+      via preferences if it should be used at searches
+    - Fixed author and DOI import from IEEE Xplore 
+    - Improved import of equations in IEEE Xplore titles handling images, (sub) and /spl / representations
+    - Rewrote the HTML import in a more general way. A few characters need to be added.
+    - IEEE Xplore abstract fetching should now be working again.
+    - Added DOI to BibTex entry fetcher.
+    - Added ADS (The SAO/NASA Astrophysics Data System) fetcher by Ryo Igarashi (patch #120).
+    - Reintroduced Google Scholar and ACM portal fetcher with entry preview to reduce server load.
+    - Added alternate entry fetcher type where a preview can be displayed so the user can choose
+      which entries to download. This can reduce server load significantly and prevent users from
+      getting locked out of search services.
+    - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Sv�rd)
+    - HTML import handles more characters. Cleanup can also do HTML cleanup. (Patch 3582375 by Oscar Gustafsson)
+    - During file renaming: More illegal characters are removed (idea by Sarel Botha)
+    - Rudimentary support for IEEEtranBSTCTL added (patch 3582376 by Oscar Gustafsson)
+    - ":" is not filtered from the BibTeX keys any more (patch 3582376 by Oscar Gustafsson)
+    - Changed internal look&feel setting (based on patch 3580605)
+    - Custom importers nested in jars should be supported now (bug 3582838)
+    - PDFContentImporter uses the DOI fetcher to fetch the BibTeX for the entry (if a DOI exists at the first page).
+    - Moved migration of legacy PDF/PS fields from legacy tools to clean up dialog.
+    - MHT files can now also be linked by drag'n'drop without the need to configure "external file types".
+    - Adds support for Ubunut's global menu and HUD integration by using java-swing-ayatana (feature #796).
+    - Updates PostgreSQL support to PostgreSQL 9.2
+    - New Mac OS X icon (patch #61)
+2.9 beta
+    - Replaced notification dialog after moving/renaming linked file by status message.
+    - Replaced dialog warnings about empty/duplicate key in entry editor by status line messages,
+      to prevent lockup if Save button is pressed directly.
+    - Replaced window icon with 48x48 image.
+    - [experimental] Added local undo/redo handling for entry editor text fields.
+    - Added special field functionality for ranking, marking as relevant,
+      marking as quality assured, and prioritizing. Can be enabled by "Entry table columns".
+      Based on the work by Igor Chernyavsky, Florian Straßer, and Marius Kleiner.
+    - Added PDF preview functionality to the preview panel. Configurable via "Entry preview" settings.
+    - Group edit dialog now closes when Escape is pressed.
+    - Fixed MS bib import, month was lost on import.
+    - Generate key action in entry editor now honors key overwrite settings.
+    - Fixed bug when importing XMP data from PDF, file will now be linked from the new entry.
+    - Fixed bug in layout processing - quoted formatter argments are now handled correctly.
+    - Fixed bug 3545394: null and curly brackets in custom export filter.
+    - Added "Manage keywords" popup menu to manage common keywords of selected entries.
+    - Added support for pushing citations to TeXstudio (requires TeXstudio >=2.4)
+    - Text-based citations can now be imported using FreeCite by Brown University
+      (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
+    - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".
+      Based on patch 3122104. 
+    - Added command line argument -d/-prdef for resetting preferences to default values. Can
+      reset a comma-separated list of preference values, or all values.
+    - Added small right-click popup menu at each tab
+    - A PDF can also be dropped to the preview panel to trigger linking it
+    - Drag'n'drop of text from the preview panel to other applications is now working
+    - Added highlighting in preview area for search text (based on patch 3121914 by
+      Maximilian Lengsfeld).
+    - New context menu option "Switch preview layout" in the preview panel. 
+    - BibTeX key generator patterns can now be stored in per database (implements feature 3495993)
+    - Braces around author names are now dropped internally. They remain in the .bib though
+      Effects (incomplete list): Authors in the main window are shown without braces,
+      autocompletion does not show these braces
+    - Autocompletion: ";" is now also a delimiter allowing "keyword1; keyword2" in the keyword fields
+    - Autocompletion: the amount of characters to trigger autocompletion may now be configured
+      (default is 2)
+    - Autocompletion: in case lower case letters are used, the search is case-insenstive,
+      otherwise the search is case sensitive.
+    - Autocompletion: new preference to choose how to deal with first names 
+      (always full/always abbreviated/both full and abbreviated)
+    - Added functionality "clean up entries" 
+      - Includes clean up DOI functionality by Florian Straßer and Marius Kleiner
+        (move of DOIs from ee, note, and url field is supported)
+      - Option to rename PDF of entry according to configured PDF-naming-scheme
+        (by Florian Straßer and Marius Kleiner)
+      - make file paths relative
+      - clean up month (functionality based on patch 3470076 by Mathias Walter)
+      - clean up pages
+      - fix superscripts
+    - New "ISBN to BibTeX" fetcher. Uses the online "ISBN to BibTeX Converter" service by Manas Tungare.
+    - Added support for drag'n'drop of tabs by Florian Straßer and Marius Kleiner.
+    - PDF import dialog now always stores settings: checkbox removed
+    - float search now also jumps to first entry if entry editor is opened
+    - usability improvements of "content selectors"
+2.8.1
+    - New DBLP fetcher. Patch 3462232 by Sascha Hunold.
+    - Disabled ACM portal fetcher to avoid users of getting banned.
+    - Fixed bug in PostgreSQL export/import.
+    - Improved handling of file fields written in the style exported from Zotero.
+2.8
+    - Applied Oscar Gustafsson's fix for IEEEXplore fetcher.
+    - Added capability to remove databases from SQL database.
+    - Fixed customization of entries in Biblatex mode.
+2.8 beta 2
+    - Improvements to SQL export and import. Fixed bug where subsequent exports to same
+      database would fail. Can now save multiple bib bases to a single SQL database.
+    - "abbr" modifier in BibTeX key generator now skips parentheses.
+    - Minor change to FirstPage formatter. Now splits at spaces as well as hyphens,
+      and returns original field content if only one page number is found.
+    - When using the preferences import command line option, preferences are now imported
+      before load/import/export operations are handled.
+    - Applied Nicolas Pavillon's patch for proper keystroke handling on Mac OS X.
+    - Applied Ivanilton Polato's patch for handling multi-line fields in CSV export.
+    - Fixed bug: "Send as Email" did not handle absolute paths correctly.
+    - Fixed bug 3472991: Search: "Highlight Words" inconsistent
+    - Fixed bug 2933201: Exporting InProceedings to Word 2007
+    - Fixed bug 3146059: Error in translating author field to MS Office
+    - Fixed bug: entering field names containing capital letters in table columns tab
+      in Preferences makes the columns empty.
+2.8 beta
+    - Fixed issues with ACM portal fetcher using Benjamin Langmann's patch, plus an
+      additional minor fix.
+    - A large list of journal abbreviations is now loaded by default.
+    - Added global option to allow file links relative to the bib file location, in addition
+      to the global or database- or user-specific file directory.
+    - Fixed bug 3434674: Reviewing changes overwrites groups.
+    - Integrated the plugin for interaction with OpenOffice/LibreOffice as a standard part
+      of JabRef.
+    - Added keyboard shortcuts Ctrl-Up and Ctrl-Down to move file links up and down in a list
+      of external links in the entry editor.
+    - Applied "bjoerntm"'s patch for making the loading of group information less sensitive
+      to white space, in order to prevent trouble loading files written by other tools.
+    - Added optional autocompletion of author/editor last names in search field.
+    - Changed entry fetcher system so all fetchers are accessed from a single side pane
+      component with a selector.
+    - Added INSPIRE fetcher by Sheer El-Showk.
+    - Improved error handling when importing in specific format.
+    - Prevented crash when calling invalid import format on startup.
+    - Improved duplicate detection.
+    - Added markers \filename and \filepath for ".begin.layout" and ".end.layout" files
+      in order to output the name or full path of the bib file of the exported database.
+    - Fixed possible array index exception in LastPage formatter.
+    - Improved author/editor normalization in entry editor.
+    - Added metadata extraction from text when PDFs are dragged into JabRef.
+    - The filename pattern for renaming a file when dropping a PDF can now be
+      configured at "Options"/"Preferences"/"Import"/"File name format pattern".
+    - The defaults of the ImportDialog shown when PDFs are dragged into JabRef
+      can now be configured at "Options"/"Preferences"/"Import". It is possible to
+      override showing the ImportDialog.
+    - An entry can be sent by a right click on an entry and select "Send as Email"
+      (patch 3306271).
+    - Added option to "copy BibTeX key and title" (patch 3370471).
+    - The command for pushing to emacs can be configured now. New command for Emacs 23.
+      New default for Windows: emacsclient.
+    - Added export support for DIN1505 style (based on patch 1874662).
+    - Added support for PostgreSQL import/export (patch 3368760 by Fred Stevens).
+    - Added formatter "JournalAbbreviator" (patch 3013311 by Meigel).
+    - RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
+      (patch 2905383 by Russell Almond).
+    - Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).
+    - ToggleButton added to GroupSelector to ease adding/removing references to/from groups
+      (based on patch 3313564 updated by Andreas Schlicker).
+    - Export filter "tablerefsandbib" updated to contain links to files and notes 
+      (patch 2787096 by Thomas Arildsen).
+    - "of" added to the list of skip words (patch 2781830).
+    - Added cli-function for exporting entries filtered by a search term 
+      (patch 1817093 by Silberer, Zirn)
+    - Added highlighting in textarea for search text (patch 3117881 by Ben).
+      Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
+      "Clear" also clears the highlighting.
+    - Switched from PDFBox 0.7.3 to PDFBox 1.6.0.
+2.7.2
+    - Fixed bug that prevented search functions from working under Java 7.
+2.7.1
+    - Fixed problem with search function under Java 7.
+    - Made Database properties dialog modal to prevent database from being closed
+      while properties window is open.
+    - Fixed error handling in custom import dialog when invalid jar files or class
+      files are specified.
+    - Added OR operator for conditional export formatting.
+    - DocBook export format switched to 4.4 (based on patch 3313898).
+    - Fixed bug that made the key generator combination [shorttitle:abbr] return
+      only a single letter.
+    - "of" added to the list of skip words (patch 2781830).
+    - Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).
+    - RTFExport: Replaces ligatures `` and '' with RTF control sequences {\ldblquote} and {\rdblquote}.
+      (patch 2905383 by Russell Almond).
+    - Fixed bug that made menu items for marking in specific colors invisible
+      under Windows 7.
+    - In case a new entry is added, this entry is highlighted and the editor is opened
+      if configured in the settings (patch 3370466). The UI behavior of adding an entry
+      at "new entry from plain text" is now similar to "new entry".
+    - Fixed bug in focus handling that affected some actions.
+    - Running JabRef under the Oracle JVM will no longer give a warning.
+2.7
+    - Medline importer now wraps multipart last names in braces.
+    - RIS importer now handles multiple title fields by concatenation.
+    - Disallowed "comment" as entry type name, since this conflicts with the BibTeX format.
+    - Fixed handling of suffix name parts (Jr, etc.) in Medline importer.
+    - Added optional second numeric argument to Authors formatter, which determines
+      how many authors are shown if the maximum number is exceeded.
+    - Added content selector for "review" field in entry editor.
+    - Improved detection of file type when adding new link. Can now recognize double
+      extensions such as ".ps.gz".
+    - Improved autocompletion of author names. Added options to complete either in
+      'Firstname Lastname' or 'Lastname, Firstname' formats, or in both.
+    - Fixed bug in import function if no suitable import filter is found.
+2.7 beta 2
+    - Added support for MrdLib lookup or metadata extraction when PDFs are dragged into
+      JabRef.
+    - Added option under "External programs" for disabling the automatic opening of the
+      Browse dialog when creating a new file link.
+    - Fixed shortcut key collision. Shortcut for Import to new database is now Ctrl-Alt-I.
+    - The "Open URL or DOI" action now uses URL links in the "file" field as fallback if
+      no links are found in the "url" or "doi" fields.
+    - Restricted remote listener port numbers to interval 1025-65535.
+    - Added Japanese translation by Koji Yokota.
+    - Added scrollbar to entry editor when it is too high to fit in its panel. Patch
+      by Matthias Erll 
+    - Made it possible to copy entries from the search dialog.    
+    - Added proper error message when trying to search with invalid regular expression.
+    - Added error dialog on startup if custom look and feel cannot be loaded.
+    - Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files.
+    - Removed potential NullPointerException in SearchExpressionTreeParser.
+2.7 beta
+    - Some improvements to MS Office export filter.
+    - Introduced three choices for ensuring unique generated keys. The default one (marking
+      with a, b, etc.), a modified one (marking with b, c, etc.) and always adding a letter
+      (a, b, etc.).
+    - Font and background colors are now customizable in the entry editor (Options ->
+      Preferences -> Appearance).
+    - Window title now includes the full path to the current file.
+    - Entries can now be marked in a series of different colors. Automarking of imported
+      entries is now done in separate color without affecting other marked entries.
+    - Added new feature (Tools -> Scan database... -> Resolve duplicate BibTeX keys) to
+      search for duplicate keys and offer to generate new keys to resolve the duplicates.
+      Instead of being listed in a warning dialog after opening a bib file, duplicate keys
+      now trigger a dialog asking whether the user wants to resolve the duplicates.
+    - Added check that ensures that application doesn't quit while a large save operation
+      is still in progress. Shows wait message with cancel button.
+    - Added apostrophe (') as illegal character in BibTeX keys.
+    - BibTeX strings that refer each other are now sorted correctly when saving bib file.
+    - Fixed bug in merging external changes - file would still be reported as modified
+      externally after merging changes.
+    - Fixed bug in Move/rename file link feature that could cause the wrong link to be
+      stored for certain directory structures.
+    - Fixed bug: curly braces can now be used in arguments to formatters. 
+    - Fixed lockup bug when generating key for entries with crossref fields.
+    - BibTeX strings are now resolved before attempting to (un)abbreviate journal names.
+    - Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
+      a hyphen a word boundary, and remove punctuation characters (keep only numbers and
+      letters).
+    - deprecate various export formatters with new Authors formatter, which provides flexible 
+      formatting options.
+2.6
+    - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
+    - Active preview (1 or 2) is now remembered.
+    - Applied patch by Igor L. Chernyavsky. to prevent loss of entry selection after
+      generating key.
+    - Changed OpenDocument Spreadsheet export so the mimetype file is written correctly
+      at the start of the zip file.
+    - Fixed bug when importing preferences: custom export filters would not be updated
+      after import.
+    - Changed help page loading procedure so help pages can be loaded for plugin entry
+      fetchers.
+    - Made it possible to define customized entry types with either-or conditions on
+      required fields, e.g. using a pseudo-field called "author/editor" will indicate
+      that the entry requires either the "author" or the "editor" field set.
+    - Fixed bug: entries of a customized type could be indicated as complete even if
+      BibTeX key was not set.
+    - Changed deletion process for some temporary files to avoid leftover files.
+2.6b3
+    - Added ScienceDirect entry fetcher that utilizes the BibSonomy scraper.
+    - Changed non-native file dialog setting so files cannot be renamed. This prevents
+      accidentally entering rename mode when trying to enter directory. Can be enabled
+      again in Options -> Preferences -> Advanced.
+    - Added new JStor fetcher that utilizes the BibSonomy scraper to obtain BibTeX data.
+    - Fixed bug in CookieHandlerImpl.
+    - Fixed bug; when dragging a file into JabRef and asking to move it to the file
+      directory, warning will now be given if the destination file already exists. Patch
+      by Alastair Mailer.
+    - When dragging a file into JabRef and asking to copy or move it to the file directory,
+      it is now possible to rename to an arbitrary name. Patch by Alastair Mailer.
+    - Added "review" field to BibTeXML export.
+    - Added Reset button to entry fetchers. Patch by Dennis Hartrampf and Ines Moosdorf.
+    - Changed Microsoft Office XML export so "number" rather than "issue" is exported
+      as <b:Issue>, which conforms with import format. 
+    - Added confirmation dialog that allows saving without backup in cases when
+      backup creation fails.
+    - Fixed bug 2938562: using the move/rename feature on a file link could give an
+      absolute link even if the file was put below the main file directory. 
+    - Fixed bug 2931293: error generating key with [authorsAlpha] for short names.
+    - When checking for external modifications, file size is now checked in addition
+      to the time stamp.
+    - Fixed handling of maximised state when shutting down and starting up JabRef.
+      Patch by Igor L. Chernyavsky.
+    - Fixed bug that prevented correct handling of DOS short file names. Patch
+      by Igor L. Chernyavsky.
+    - Added support for KOI8_R character set.
+    - Removed DocumentPrinter class, using standard API functions instead. Patch by
+      Tony Mancill.
+    - Removed HightlightFilter class, using standard API functions instead. Patch by
+      Tony Mancill.
+    - Changed keyboard shortcut for IEEXplorer search to Alt-F8.
+    - Disabled JStor search, which doesn't work due to API changes.
+    - External file type manager now removes "." prefix in file type extension if the user
+      has typed it that way.
+    - Preview panel now defaults to preview layout 1 instead of 2. Switched default layouts.
+    - Added IfPlural formatter by Russell Almond. The formatter outputs its first argument
+      if the input field contains " and " and the second one otherwise.
+    - Applied patch by Philipp Cordes and Björn Kahlert for improved handling of names by
+      autocompleter. The patch also reorganizes the autocompleter classes.
+    - Table will now scroll to keep the currently edited entry visible if an edit leads to
+      the entry getting sorted to a different position.
+    - Reworked author and editor handling in Docbook export. Added Docbook XML header.
+    - Database will no longer be marked as changed after accepting external changes, unless one or
+      more changes were not accepted before merging, and unless database was already marked as
+      changed.
+    - Fixed bug: undesired autocompletion when saving file.
+    - Fixed bug: entry editor doesn't appear when new entry is added while a filtering search or
+      group selection is active.
+    - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
+      messed up after the metadata comment in a bib file.
+    - Search dialog now automatically previews first hit, and hides preview if there are no hits. 
+2.6b2
+    - Added export formatter "Default" which takes a single argument. Outputs the string to format
+      unchanged if it is non-empty, otherwise outputs the argument.
+    - Added option under Options -> Preferences -> General for disabling the strict enforcing of
+      correct BibTeX keys. Disabling this makes it possible to use e.g. umlaut characters in keys.
+    - Modified launcher script for Windows installer to give higher heap size limit.
+    - Improved autocompletion. All fields with autocompletion which have content selectors will now
+      autocomplete on content selector values. For the "journal" field, the autocompleter will now
+      additionally use entries from the current journal abbreviations list, and will also complete
+      on the entire field up to the cursor rather than just looking at the last word only.
+    - Added support for postformatter in Layout. The postformatter will be run after
+      the formatters called from a layout.
+    - Improved group autogeneration. Added option to generate groups based on author or editor
+      last names. Autogenerated groups are now alphabetized.
+    - Modified Endnote export filter so "--" gets converted to "-" in the "pages" field.
+    - Changed keyword groups so they will match on whole words only. E.g. a keyword group for the
+      keyword "can" will no longer match the keyword "scanner".
+    - Improved entry type determination and author parsing for some varieties of CSA files.
+    - Minor change to Harvard RTF export. Added space after "ed.", and added editor to output for
+      inbook entries.
+    - Set limit to the number of displayed characters in group names in groups tree in order to
+      avoid group panel width problems.
+    - Changed file link handling so all remote links classified as URL can be opened through
+      the browser. Setting a different file type manually makes JabRef call a remote link using
+      the handler application instead.
+    - Modified Endnote/refer import filter to strip "doi:" from the %R field.
+    - Modified HTML conversion so single newline is displayed in the preview (and HTML exports) as
+      <br>, while multiple newlines are displayed as <p>.
+    - Fixed bug: switching entry editor between entries of different type may result in switching
+      of entry editor tabs.
+    - Fixed bug: adding external file link leads to relative path from root directory if file
+      directory is set to an empty string.
+    - Fixed error message when a # in a BibTeX string prevents saving. No longer states that the
+      problem is in an entry, but specifies that it is in a string.
+    - Fixed bug: ODS export doesn't resolve BibTeX strings.
+    - Fixed bug: content selector for "editor" field uses "," instead of " and " as delimiter.
+    - Fixed bug: editing source doesn't allow change of entry type.
+    - RTFChars formatter now converts --- to \emdash and -- to \endash.
+
+2.6b
+    - Added pages information to several entry types in Endnote export.
+    - Modified LastPage formatter so it returns the number when only the number of pages is given.
+    - Modified search algorithms so LaTeX commands are removed before search. For instance, this
+      means that the value "test \textit{case}" now matches the search string "test case".
+    - Changed default table font family to "SansSerif".
+    - Can now create lock file while writing a bib file. The lock file is checked before
+      saving, and before scanning an externally changed file, in order to avoid reading an
+      unfinished file.
+    - Added support for dragging a file link from the file column to another application.
+    - Added toolbar button and shortcut (Alt-F) in entry editor for autosetting file links.
+    - Improved ISI import filter so DOI information is included.
+    - Fixed bug: metadata changes would not be detected as external changes to a database.
+    - Fixed bug: when accepting external changes and not saving before new changes are
+      detected, the previously accepted changes would also be listed.
+    - Fixed bug in Scifinder import where an empty Inventor field could overwrite the
+      author field.
+    - Fixed bug in autocompleter. Current suggested completion would be added to the field
+      if the user closed the entry editor or mouse clicked on another field.
+    - Fixed problem with exporting to some MySql versions. Patch by François Dorin. 
+    - Fixed bug in handling of LaTeX character sequences - now sequences with = as command
+      character (e.g. "\={A}") are recognized.
+    - Fixed bug: gray out / hide setting in groups panel is overridden on startup
+      by search mode selection. Added separate prefs key for the groups setting.
+      Fix suggested by Igor L. Chernyavsky.
+    - Fixed bug: cookie manager installed by Download button in file field editor throws
+      an exception when trying to fetch from Medline.
+    - Fixed bug: temporary files don't get deleted on shutdown.
+    - Disabled table column reordering in import inspection window, since a user reported
+      problems when using this.
+    - Changed years from 2008 to 2009 in splash image.
+2.5
+    - Modified export layout procedure so missing formatters can be reported in the error
+      output. Export now succeeds with warnings added where formatters are missing.
+    - Conditional blocks (\begin{field}...\end{field}) in layout files can now be given a
+      semicolon-separated list of fields as argument. All fields must then be set for output
+      to be given.
+    - Changed RIS import so multiple abstract fields in an entry are concatenated.
+    - Added quoting of some special characters in SQL export, based on Kyle Crabtree's patch.
+    - Fixed bug in MS Office 2007 XML export - editor names missing.
+    - Fixed bug in plugin manager that prevented the "Download plugin" button from working.
+    - Fixed bug in plugin manager routine that checks for installed versions of a plugin.
+    - Fixed bug in startup that could show warnings multiple times when loading
+      from autosave files.
+2.5b2
+    - Plugin manager now handles plugin versions correctly based on the version number in their
+      plugin.xml file.
+    - Added formatter "Number" that outputs a sequence number for the current entry in the current
+      export operation. This formatter can be used to produce a numbered list of entries.
+    - Added autosave feature.
+    - Fixed bug in file link handling in BibTeXML export.
+    - Improved handling of patents in Scifinder import.
+2.5b
+    - Added Simplified Chinese translation.
+    - Added simple plugin manager.
+    - Added ~/.jabref/plugins as user-specific plugin directory.
+    - Added \r marker to WrapFileLinks formatter that outputs file links without expanding
+      relative links.
+    - Added [authorsAlpha] key marker that formats authors according to the "alpha" BibTeX style.
+      Patch submitted by Oliver Kopp.
+    - Table sort order set by clicking and Ctrl-clicking table columns is now immediately set
+      as default sort order in preferences.
+    - Changed LyX pipe setting so it works whether ".in" is included or omitted.
+    - Modified ISI importer so the words "of", "and" and "the" will not be capitalized in the title,
+      journal or publisher fields.
+    - When adding new local file link, browse dialog now appears immediately when opening file link
+      editor, saving one mouse click.
+    - Added "Remove all broken links" option in the resolver dialog for broken links when
+      synchronizing file links.
+    - Added rename option to Set/clear field dialog, to move contents from one field to another.
+    - Added Back and Forward actions, for switching between recently edited BibTeX entries.
+    - Added option under "Entry table" to designate fields as numeric for sorting purposes.
+    - Added possibility for custom export filters to define their own name formatters.
+      This is done by adding a file named "<filtername>.formatters". This file defines
+      one formatter on each line, with each line containing the name of the formatter and
+      the formatter definition, separated by a colon (:).
+    - Added menu items for increasing/decreasing table font size, with shortcut keys Ctrl-plus and
+      Ctrl-minus.
+    - Added options to automatically mark entries imported into an existing database, and to unmark
+      previously marked entries when importing.
+    - Added ":(x)" modifier to key generator, specifying that the arbitrary string x
+      should be used as a fallback value if the value returned by the field marker is empty.
+    - Added ":upper" modifier to key generator, to force uppercase for a field marker.
+    - Added buttons in External programs tab in Preferences for modifying settings for
+      "Push to"-features, and removed obsolete fields.
+    - Added support for DOI field in Endnote importer.
+    - Added support for language and publication status fields in Medline import (publication status
+      stored in "medline-pst" field).
+    - Enabled cookie handling for downloading full-text articles.
+    - Improved handling of invalid BibTeX keys containing white space. Parser will now try to
+      piece together the key and avoid disturbing the continued parsing. Patch submitted by
+      Stephan Lau.
+    - Cosmetic change to the entry type label to the left in the entry editor.
+    - Changed name handling so a single-entry name without a capital initial letter, such as
+      "unknown", will be treated as a solitary last name rather than a von particle.
+    - Changed table selection coloring so entries that are grayed out or marked can be
+      distinguished from normal entries when selected.
+    - Changed handling of "affiliation" in Medline import - now makes sure to escape
+      # characters before storing.
+    - Modified ACM portal fetcher due to web site changes.
+    - Improvements to IEEEXplore fetcher - better handling of month and page fields.
+    - Changed behaviour of source panel when an entry contains imbalanced # characters -
+      the panel can now show the entry in its invalid form, allowing the user to fix the problem.
+    - Improved handling of PDF files without XMP metadata - other metadata will now be retained.
+      Patch submitted by Felix Langner.
+    - Fixed bug in parsing file field - double spaces in file names would be reduced to single
+      spaces, breaking the file link. Fix submitted by Uwe Kuehn.
+    - Fixed NullPointerException when downloading external file and file directory is undefined.
+    - Fixed bug in HTMLConverter.
+    - Fixed NullPointerException in key generator for incomplete names.
+    - Fixed bug in removing custom export filters.
+    - Fixed bug 2225371: restart is no longer required after adding a new custom export filter. 
+    - Fixed bug in "Move/rename file" feature in file field editor with regard to undefined
+      file directory.
+    - Fixed bug in Ris importer.
+    - Fixed NullPointerException in Endnote importer.
+2.4.2
+    - Added missing layout formatters FirstPage and LastPage.
+    - Fixed a bug regarding ParamLayoutFormatter loaded from plugin.
+    - Fixed crash during initalization of journal abbreviation list.
+    - Added option to have JabRef search for external file when "Open file" function is chosen
+      for an entry without any linked files. This is similar to what was always done in
+      JabRef 2.3.1 and earlier. 
+    - Improved regular expression file search, so the regular expression can contain field
+      markers as used for BibTeX key generation in addition to just regular fields. It is
+      no longer possible to call arbitrary layout formatters, but the modifiers "upper",
+      "lower" and "abbr" (for case conversion and abbreviation) can be used.
+    - Ris importer now imports PB as "school" instead of "publisher" for THES entries.
+    - Fixed bug 2157664: Current edit is now treated as an undoable edit in itself.
+2.4.1
+    - Fixed bug: layout formatter arguments were not set when using a ParamLayoutFormatter
+      loaded from plugin.
+    - Fixed bug: when abbreviating first names, for authors with first names connected
+      with "-", only the first letter is shown.
+    - Enhanced ExportFormatTemplate plugins with an optional property "encoding" which
+      overrides the default encoding with the given one.
+    - Fixed menu colors under Windows Vista.
+    - Fixed bug 2137771: Missing file extension when downloading.
+    - Fixed bug 2105329: Ensure that newly added entry is visible in table.
+    - Fixed bug 1908222: Preference "Fit table horizontally on screen" doesn't work
+    - Fixed bug 2119059: Handling of the A1 tag in the RIS format.
+    - Added missing help file for ACM digital library fetcher.
+    - Added option for whether to use IEEE LaTeX journal abbreviation list.
+    - Added tooltip to menu items in push-to-application popup menu.
+2.4
+    - Added mappings for some special characters that need to be sanitized when generating
+      BibTeX keys.
+    - Added ACM Digital Library fetcher by Aaron Chen.
+    - Added new entry types (conference, patent, standard, electronic).
+    - Improvements to IEEEXplore fetcher.
+    - Added explanatory text to indicate that "ps" and "pdf" files are legacy features.
+    - Fixed unexpected behaviour of "Open PDF or PS" menu item - now looks in "file" field,
+      and does not launch search for external files.
+    - Fixed bug 1827568: 'Save database' might not store current edit in entry editor.
+    - Fixed bug 2027944: updating custom export definitions requires restart.
+2.4b2
+    - Opening external files on Linux now uses "xdg-open" as application if no other is specified
+      for the file type. xdg-open should be available to call the appropriate application according
+      to the user's settings on all freedesktop compliant Linux distributions.
+    - Download external file now attempts to determine file type based on MIME type, using
+      file extension as fallback.
+    - Changed the way names are handled under autocompletion. Last and first names are
+      now indexed separately.
+    - A table column can now be set up with fallback fields used if the main field is
+      empty. Fallback fields are set in Options -> Preferences -> Main table columns by
+      setting a column to "field1/field2/...". The fields will be checked in succession
+      until a non-empty value has been found or al fields have been checked. For instance,
+      specifying "author/editor" will result in a column displaying the author field where,
+      set, and the editor field for entries with an empty author field.
+    - Added special handling of autocompletion for the "crossref" field - now indexes
+      words from the BibTeX key field instead of the "crossref" field. Added crossref
+      to the default fields using autocompletion.
+    - Added menu item and shortcut (ctrl shift E) to shift focus to the entry table.
+    - Main window now remembers maximisation state from last time.
+    - Improved SQL export feature so the complete information about groups, strings and preamble
+      is included. Added SQL import feature supporting the same database schema.
+    - Added new implementation of regular expression file search that can handler multiple files
+      and file types. Added regexp search as a third option for autolink feature.
+    - Added support for BibO RDF format, contributed by Egon Willighagen.
+    - Fixed bug in autocompletion; continuing writing the suggested word after cycling
+      through alternatives would give wrong result in editor.
+    - Fixed bug where selection would jump back if an entry of different type was selected
+      by mouse click while editing a field of the current entry.
+    - Fixed missing name formatting in search dialog. Now uses same formatting as main table.
+2.4b
+    - Added Export to SQL database feature. Supports MySQL.
+    - Added "protection" flag in Database properties. When this flag is set, JabRef will
+      refuse to save the database when the file has been externally modified, until the
+      changes have been reviewed and partly or completely accepted.
+    - Fixed bug where the external update notification in the side pane would remain
+      even if the referred database was closed.
+    - Added two new search modes - display search results in a dialog, and global search.
+    - Support for fetching from the command line using --fetch (contributed by 
+      Jan F. Boldt and David Kaltschmidt).
+    - Support for fetching from Spires (contributed by Fedor Bezrukov).
+    - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 
+      Doege, Sebastian de Hoog and Christoph Jacob)
+    - Added context menu for file list editor with options to move/rename linked file
+      as well as to automatically move the file to file directory and optionally rename
+      after BibTeX key.
+	- JabRef can now be extended by plugins (using the Java Plugin Framework 
+	  JPF as the underlying technology). Currently extension points exist for:
+		- ImportFormat
+		- ExportFormat based on Templates
+		- ExportFormat based on IExportFormat (contributed by Kariem Hussein)
+		- LayoutFormatter
+		- EntryFetcher
+		- PushToApplication
+	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to
+	  generate helper classes for making JPF easier. Current version used: 0.4
+	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
+	- Print warnings if insufficient Java version is used or if JRE is not from Sun.
+	- Memory Stick Mode: JabRef automatically loads configuration settings from 
+	  jabref.xml and also writes them there if enabled.
+	- Improved handling of crossrefs. Fields are now resolved in preview and export.
+	- Updated dependencies, now using: JempBox-0.2
+	- Improved handling of ArXiv URIs.
+	- Changed default preference value: now using import inspection dialog also
+	  when just a single entry is imported.
+	- Parsing of field lists for non-wrappable fields and fields for which to automatically
+	  add braces around capitals now ignores whitespace between entries.
+	- [ 1620792 ] Fixed: JabRef randomly hangs during Medline fetch
+	- [ 1738920 ] Fixed: Windows Position in Multi-Monitor environment
+	- [ 1795355 ] Fixed: LatexFieldFormatter omits "{" on beginning of optional field
+	- [ 1297576 ] New feature: Printing of entry preview (use right-click menu)
+	- [ 1717849 ] Fixed: Bug in aux import (contributed by Kai Eckert)
+    - [ 1749613 ] Fixed: About translation
+    - [ 1709449 ] Fixed: Clicking a DOI from context menu fails
+    - [ 1869331 ] Fixed: Uninstall after silent install removes Windows start menu
+    - [ 1723219 ] Fixed: Strange message (LyX) while installing
+2.3
+    - Added handling of unknown file types when synchronizing the file field.
+    - Changed the way customized external file types are stored. Types are now stored in a
+      way analogous to a diff from the default types. This allows default types added in later
+      versions to appear immediately, even if the user has customized the list.
+    - Moved file preferences from General tab to new File tab.
+    - Reduced horizontal size of preferences dialog.
+    - Fixed handling of quotes when using the "abbr" modifier for key generator (Debian bug
+      #448917).
+    - Download file procedure now strips query string in order to find correct file extension
+      (Debian bug #448027).    
+2.3b3
+    - Export formats that output the character encoding now use common names for encodings
+      instead of Java-specific names.
+    - Added "Open" button in external link dialog box to test or use the link.
+    - Added formatter WrapFileLinks which iterates over file links, producing a formatted
+      string for each containing any desired information about the file link.
+    - Applied Fedor Bezrukov patch (setting User-Agent in URLDownload to solve ArXiv problem).
+    - Applied Aaron Chen's patch for fixing bugs in IEEExplore fetcher.
+    - Applied Edward Valeev's patch for handling article numbers replacing pages in Refer/Endnote
+      import.
+    - Added toolbar button to entry editor for writing XMP-metadata.
+    - Added paste and drag & drop support to file list editor.
+    - Added "authorLast" and "editorLast" markers for using last author's last name in BibTeX keys.
+    - Added support for file field in Write XMP action.
+    - Numeric fields (year, volume, number, pmid, citeseercitationcount) are now sorted as numbers
+      when possible.
+    - Improvements to the Ovid import filter.
+    - Modified AuthorLastFirstAbbreviator and AuthorAbbreviator to accept names in both last-first
+      and first-first format, but always return in last-first format. These two formatters are
+      identical.
+    - [ 1648789 ] Fixed: Problem on writing XMP when option to leave out some fields was active.
+    - [ 1561990 ] Fixed: Exporting to WinEdt - apostrophe.
+    - Fixed bug in entry editor: source panel edits were not properly stored when clicking a
+      different entry in the main table.
+    - Fixed problem with "Synchronize file links" not honouring database specific file directory.
+    - Fixed problem with file type selection in external file link editor not being up-to-date.
+    - Fixed problem with wrong enable/disable behaviour of Clear search button when switching
+      between tabs.
+    - Fixed argument parsing in AbstractParamLayoutFormatter so \t and \n can be used for
+      tabs and newlines.
+2.3b2
+	- Added % at start of signature text in BibTeX output. Parser now reads both
+	  old and new style.
+    - When user chooses to save to an existing file, and answers that the file should not be
+      overwritten, a new file dialog now appears instead of the operation cancelling.
+    - Removed antialias setting for main table, because it interferes with proper rendering
+      on LCDs when running under JRE 6. Removed non-optional antialias settings for entry
+      editor for the same reason.
+    - Changed external link handling so remote (http) links can be sent to the external
+      application. Applications like Evince and Gimp can open remote links.
+    - Replaced Simle HTML export filter with improved version by Mark Schenk.
+    - Introduced ParamLayoutFormatter interface for layout formatters that can take an
+      argument by the following syntax: \format[MyFormatter(argument)]{\field}
+      Implementing classes contain a setArgument(String) method that receives the argument
+      (if any) before the format() method is called.
+    - Timestamp and owner fields are now set also when appending a bib file, and new options
+      have been introduced to control whether imported/appended/pasted entries should have
+      these fields overwritten if already set.
+    - Added operations for adding file links in import inspection window, and made file
+      and URL icons in the table clickable.
+    - Removed PDF and PS columns and operations in import inspection window (replaced by
+      operations on the "file" field).
+    - File field column in main table now shows file type icon instead of generic icon.
+    - Modified Endnote export to take "file" field into account, and to resolve full
+      paths to PDF files.
+    - Added "Auto" button to automatically set "owner" field to the default username.
+    - Added \encoding tag for begin/end layouts in export filters to print the name of the
+      character encoding used for the export. The tag is not available in entry layouts.
+    - Added \% as a supported LaTeX command, producing '%'.
+    - Fixed bug in HTMLChars: commands like {\aa} and {\o} were not processed properly, even
+      though defined in Globals.HTMLCHARS.
+    - Fixed bug that made it possible to accidentally close database without saving, when error
+      occurs during the save operation.
+2.3b
+	- Added MIS Quarterly export format.
+	- Added support for COPAC file format.
+	- Added RemoveTilde LayoutFormatter to deal with Bibtex non-breakable spaces.
+	- Added autocompletion feature for author/editors and other fields.
+	- Added feature to save all open databases.
+	- Added support for pushing citations to Vim when Vim server is enabled.
+	- Added missing option for specifying the path to LEd.exe.
+	- Added -s/--nosplash command line option for disabling the splash screen.
+	- Added new field marker [auth.etal] for key generation.
+	- Added support in XMP metadata handling for bibtex string resolution.
+	- When opening databases, already open files are now skipped.
+	- Option to use native instead of Swing file dialogs is now available on all OSes.
+	- Synchronize external links now searches entire database, not selected entries.
+	- Medline import now adds <Affiliation> information into the "institution" field.
+	- Improved handling of external links. The 'file' field can now specify a list
+	  of external links, and arbitrary file types are supported. Old-style PDF and
+	  PS links can be moved automatically into the 'file' field.
+	- Fixed minor bug in importing preferences. General fields for entry editors are
+	  now updated without restarting JabRef.
+	- Fixed bug in RIS and Refer/Endnote imports. Entries with editors but no authors
+	  are now imported properly.
+	- Fixed missing export formatter AuthorFirstFirstCommas.
+	- Fixed minor bug in Harvard export with missing space between year and title.
+	- Fixed bug that caused lockup when connection to IEEExplore fails.
+	- Fixed wrong dependency in OAI2/ArXiv Fetcher.
+	- Fixed problem with foreign characters in OAI2/ArXiv Fetcher.
+	- Fixed problem with key generation in OAI2/ArXiv Fetcher.
+	- Fixed bug in duplicate search that made misc entries never get
+	  detected as duplicates.
+	- Fixed bug in XMP reimport from DublinCore related to month strings.
+2.2  	- Added progress bar to indicate progress when synchronizing PS/PDF links.
+        - Option to autogenerate key for imported entries now also affects entries imported
+          without using the import inspection window.
+        - Modified quick jump behaviour so sequences of letters can be found. Timeout or
+          ESC resets the search.
+        - Width of side pane is now remembered.
+        - Improved XMP support:
+          - JabRef now reads and write DublinCore and Legacy Document Properties
+            Caution needs to be used though since, JabRef does overwrite existing values.
+          - XMP privacy filter can be used to prevent sensitive fields to be exported.
+        - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
+        - Fixed bug that made explicit groups appear empty after updating group tree from external
+          change.
+        - New windows installer thanks to Uwe St�hr.
+        - [ 1641247 ] Fixed: No update of preview after generating bibtex key
+        - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
+        - [ 1598777 ] Fixed: Month sorting
+        - [ 1570570 ] New Feature: Deselect all duplicates on import
+        - [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
+        - [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
+        - [ 1608391 ] Fixed: Medline Search Editbox size gets to big
+2.2b2   - Redesigned export functions to simplify GUI and provide "Export selected
+          entries" functionality. Export filter is now chosen using the file type
+          dropdown menu in the file dialog.
+        - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
+        - Added warning dialog when exporting failed.
+        - Added fix for exporting special chars in RTF like ���...
+        - Added NameFormat LayoutFormatter based on Bibtex method name.format$
+        - Added Fetch from ArXiv.org to Web Search
+          [ 1587342 ] Quering ArXiv (and any OAI2 Repository)
+        - [ 1594123 ] Fixed: Failure to import big numbers in Bibtex
+        - [ 1594169 ] Fixed: Entry editor navigation between panels faulty
+        - [ 1588028 ] Fixed: Export HTML table has relative DOI URL
+        - [ 1601651 ] Fixed: PDF subdirectory - missing first character
+2.2b    - Added Mark Schenk's advanced HTML export filter.
+        - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
+        - Removed unnecessary output text when scanning for external file changes.
+        - Changed layout of entry editor to solve problem with collapsing text fields.
+        - Added first version of support for XMP-metadata in PDFs.
+          - "Import into..."
+          - Integrate with copy/move/link.
+          - Added option to write all/selected PDFs in database
+        - Added tooltips to database tabs showing the file's full path.
+        - Added function for setting or clearing specific fields in selected or
+          all entries.
+        - Setting a relative PDF/PS path in Database Properties now makes JabRef
+          look for the directory relative to the bib file's location.
+        - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
+        - Added LayoutFormatters that print the Oxford comma.
+        - Added missing space between abbreviated author first names:
+          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
+        - Added LayoutFormatter for HTML paragraphs.
+        - Changing Database Properties now causes the database to be marked as changed.
+        - Improved simple search. Words are now treated as separate search terms,
+          and phrases can be indicated with "double quotes".
+        - When a letter key is pressed in the table, the first entry starting with the
+          same letter (in the current sort column) is selected.
+        - Bib files dragged into JabRef now appear in the Recent files menu.
+        - Fixed bug in import dialog.
+        - Better support for ISI files in general (should basically be better than INSPEC) including IEEE parsing.
+        - Added regular expression search for auto-linking. Search is now more flexible by default.
+        - Search operation also now search relative to the JabRef directory.
+        - General improvements in Inspec ISI handling.
+        - New LayoutFormatter: AuthorOrgSci - first author is in "last, first"
+          all others in "first last". First names are abbreviated.
+        - New LayoutFormatter: NoSpaceBetweenAbbreviations - spaces between multiple
+          abbreviated first names are removed.
+        - Improved PDF link resolver to produce proper URIs.                                                 s
+        - [ 1503956 ] Fixed: Help text instead of Help icon.
+        - [ 1542552 ] Fixed: Wrong author import from ISI file.
+        - [ 1534537 ] Fixed: resize groups interface
+        - [ 1465610 ] Fixed: (Double-)Names containing hyphen (-) not handled correctly
+        - [ 1436014 ] Fixed: No comma added to separate keywords
+		- [ 1548875 ] Fixed: download pdf produces unsupported filename
+		- [ 1545601 ] Fixed: downloading pdf corrupts pdf field text
+        - [ 1285977 ] Fixed: Impossible to properly sort a numeric field
+	    - [ 1535044 ] Fixed: Month sorting
+        - [ 1540646 ] Fixed: Default sort order: bibtexkey
+        - [ 1553552 ] Fixed: Not properly detecting changes to flag as changed
+2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
+          opened normally, other files imported, and WWW links downloaded and imported.
+        - The -v command line option now makes the application only print version number
+          and quit immediately.
+        - Duplicates within a set of imported entries are now found and shown in the
+          import inspection window.
+        - Mac users can now choose between native and Swing file chooser under
+          Preferences -> Advanced.
+        - Fixed missing duplicate warning when importing without import inspection window.
+        - Fixed error in ISI import which allowed empty fields to be set, causing errors
+          when saving and reloading entries.
+        - Fixed missing time and owner stamps when importing entries (only in 2.1b/2.1b2).
+        - Fixed erroneous updates in entry editor if user switches to a different entry
+          while downloading PDF/PS file.
+        - Fixed bug (only in 2.1b2) in calling file open/save dialog on Mac OS X.
+        - Fixed bug that made duplicate resolver dialog pop under import inspection dialog.
+        - Fixed bug in windows-installer which prevented running JabRef from the
+          command-line with arguments.
+        - Added windows-installer-option to associate JabRef with .bib files.
+2.1b2   - Added option to toggle floating of marked entries to the top of the table.
+        - Added option to open, append and import multiple BibTeX files.
+        - Improved support for LaTeX special characters in HTML and RTF representations.
+        - Improved generation of subdatabase from AUX file. Crossreferenced entries are
+          now included automatically.
+        - Fixed bug that made entry selection get lost when an edit modifies the entry's
+          position in the main table.
+        - Fixed bug in BibTeXML export (entry type name missing in tag).
+        - Fixed name handling in (non-compliant) Endnote files giving all author names
+          on the same line.
+        - Fixed problem with keyword handling in Medline import.
+        - Fixed (harmless) NullPointerException when medline fetch is cancelled.
+        - Fixed bug in parser that made {"} illegal in fields quoted with ".
+2.1b    - Known issue: font sizes cannot be changed, but should follow OS settings on
+          Windows and Mac.
+        - Known issue: some HTML may be handled inappropriately when downloading from
+          IEEEXplore.
+        - Changed Paste function so timestamp and owner fields are updated.
+        - Added "Other" item to the "New entry ..." menu.
+        - Changed sorting order so marked entries are displayed at the top of the table.
+        - Added IEEEXplore search and download feature.
+        - Added option to store entries in their original order. Unsorted table view now
+          shows entries in their original order.
+        - Added option to autogenerate keys for entries with missing keys before each save.
+        - Improved handling of external URLs to prevent problems with special characters.
+        - Medline and Endnote imports no longer automatically add curly braces around capital
+          letters in title.
+        - Float search now scrolls table to the top.
+        - Fixed lockup problem in preview with uneven number of # characters in fields.
+        - Fixed problem with default content selector fields reappearing after removal.
+        - Fixed problem with unsupported character encodings being selectable and causing
+          unreported save errors.
+        - Fixed bug that blocked last line in table columns setup from being removed.
+        - Fixed missing export formats from command line.
+        - Fixed bug that made Review tab impossible to remove from entry editor.
+        - Fixed bug in Medline XML import that assigned wrong PMID for some entries.
+        - Fixed bug in custom export that collapsed sequences of two or more backslashes
+          into a single backslash in output.
+        - Fixed bug (misspelled formatter name) in Harvard RTF export.
+2.0.1:	- Fixed bug that made a hidden entry editor under some circumstances store a
+	      field value to the wrong entry.
+	    - Fixed synchronization bug that made the opening of a new database sometimes fail.
+	    - Fixed bug in setting external journal lists when no personal list is set.
+2.0:    - Changed sorting selection interface for main table for more intuitive
+          operation.
+        - Made import operation update "working directory".
+        - Removed hard-coded author/editor name rearrangement in OpenOffice and
+          OpenDocument exports.
+        - Fixed hangup when parsing RIS files from Nature.
+        - Fixed NullPointerException when generating database from AUX file on Mac OS X.
+        - Fixed bug in routine for adding braces around capital letters.
+        - Fixed bug in switching preview layouts.
+        - Fixed bug in link handling in entry preview.
+2.0b2:  - Changed field order in OpenDocument export to comply with bibliography requirement.
+        - Added support for inserting citations into Emacs using gnuserv/gnuclient.
+        - Added option to set a regular expression replace operation on generated bibtex keys.
+        - Added support for custom importers inside a jar file.
+        - Fixed bug in opening URLs containing '&' on Windows.
+2.0b:   - Added a system for registering custom import formats in the form of Java classes.
+        - Added export option for OpenDocument spreadsheet.
+        - Added new options for name formatting in main table.
+        - Added REPEC-NEP import filter.
+        - Added option for non-field parameters for export formatters. If the parameters does not start with the
+          backslash character, it will be passed unchanged to the formatter in place of any field value.
+        - Added export formatter CurrentDate, which returns the current date, and takes a format string as
+          parameter.
+        - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
+        - Added new Appearance tab to preferences dialog to gather appearance related options.
+        - Added toggling of abbreviated and full journal names. The list of journals is realized as
+           an external file, but editable from a Manage Journal Abbreviations panel. Secondary lists can also
+           be linked, but not edited. There is a download option to quickly get a list available on the internet,
+           and we will provide one or more lists for download from the SourceForge web server.
+        - Added functionality for new JabRef instances to detect a running instance, and send
+          command line parameters to the running instance for processing.
+        - Added handling of HTML links in preview panel.
+        - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
+          Gives options to save, cancel or try a different encoding.
+        - The encoding used when opening a database is now remembered, and used when database is stored.
+        - Added review field for research comments, paper reviews, etc.
+        - Added option to disable wrapping for certain fields. Wrapping of pdf, ps, doi and url is disabled by
+          default.
+        - Antialiasing option now affects entry editor text fields as well as table text.
+        - Changed to monospaced font in source editor field.
+        - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
+          when loading. Added option to put braces around capital letters of a chosen set of fields.
+        - Improved Ovid import.
+        - Fixed problem with ordering of BibTeX strings that are referred to by other strings.
+        - Fixed problem with loading 16-bit encoded bib files with 8-bit encoding as default, and vice versa.
+        - Fixed multiplying authors bug when author/editor field appears both in Required and Optional tabs.
+        - Fixed startup freeze when trying to load certain malformed bib files.
+        - Fixed bug related to multi-line fields in RIS import.
+        - Fixed bug related to looking up a fully qualified DOI
+        - Included review field to preview panel 1, which shows the abstract
+        - Fixed bug where booktitle field was not displayed in preview
+          for conference proceedings, similar to journal field
+        - By default preserve capitalization on the following fields: title;journal;booktitle;review;abstract
+1.8.1:  - Added automatic timestamp with configurable format for entries.
+        - Added new key generator modifier ":abbr" to abbreviate field contents.
+        - Added Help button in Preferences -> Entry preview
+        - Added Big5, Big5_HKSCS and GBK encodings for Chinese.
+        - Improved marking feature. Username is now used for marking, so different users can mark
+          entries separately without interference.
+        - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
+          for presentation and sorting purposes. Key generation now should always use the genuine last
+          name, and not produce keys like "de2001".
+        - Removed duplicate warning from inspection dialog for non-selected entries.
+        - Fixed setting of sheet name in OpenOffice.org Calc export.
+        - Fixed bug that prevented PDF/PS opening by F4 from automatically finding files in
+          subdirectories below the main PDF/PS dir.
+        - Fixed BibTeX parser bug that made it choke on short comment strings.
+        - Fixed bug that made regexp search fail for fields containing newline characters.
+        - Fixed platform-dependent handling of newline characters.
+        - Fixed bug that prevented command line import with explicit format.
+        - Fixed bug that made it impossible to disable table antialiasing.
+        - Fixed AuthorAndsCommaReplacer.
+1.8:    - Search panel now starts visible if it was visible at last shutdown.
+        - Added option to disable import inspection window when only one entry is being imported.
+        - Fixed parser bug that caused problems for bib files containing extra characters after the
+          last entry.
+        - Fixed missing month in JStor import.
+	    - Fixed some bugs in "new from plain-text" wizard
+1.8b2:  - Changed handling of external updates so the notification is suppressed when there are
+          no actual changes.
+        - Changed autodetecting import so BibTeX files are handled more similarly to other formats.
+        - Enabled sorting by icon columns.
+        - Added option to remove BibTeX source panel from entry editor.
+        - Added command line option to not load any files at startup. Will override any autoloading
+          or other command line options that normally load or import files.
+        - Added handling of duplicates to import inspection window.
+        - Made entry preview be updated whenever the selection is expanded by one row, to make
+          it more useful while selecting a set of entries.
+        - Changed BibTeX field parsing to avoid inserting line breaks at wrong places.
+        - Improved handling of page numbers in Medline import.
+        - Fixed import of file links when importing SixPack files.
+        - Fixed bug that prevented closing of search interface when no databases are open.
+        - Fixed OpenOffice Calc export to be compatible with OpenOffice.org 2.0 beta.
+        - Fixed bugs in Refer/Endnote import filter.
+        - Fixed bug that caused changes to be lost in some cases when the same field is present
+          in multiple entry editor tabs.
+        - Fixed bug that prevented command line autodetecting import from working with BibTeX files.
+        - Fixed minor bug in routine for removing double braces.
+1.8b:   - Added option to store bib file with double braces.
+        - Follow @input tags in aux files to indicate nested aux files for
+          generating subdatabases.
+        - Improved wrapping and formatting of bib files, to preserve paragraph separator (empty line).
+        - Added test buttons for customization of preview layouts.
+        - Added inspection dialog for previewing and generating keys for imported entries,
+          and deciding which ones to keep and discard. The dialog allows inspection during long import
+          processes such as Medline search.
+        - Restructured layout to use a common side pane with all tabs.
+        - Added import filter for Cambridge Scientific Abstracts (CSA) format.
+        - Added PS directory with similar options as PDF.
+	    - Added [authshort] and [edtrshort] key field markers. Patch submitted by
+	      Kolja Brix.
+        - Made the program remember preview enable setting.
+        - Improved handling of illegal regular expressions in search.
+        - Removed options to search only Required, Optional and/or General fields,
+          in order to simplify search interface.
+        - Changed keys for Next and Previous tab to CTRL-PGDN and CTRL-PGUP to match shortcuts in a
+          certain popular web browser.
+        - Minor change to Preferences -> Table columns to enable insertion of column in position 2.
+        - Fixed parser bug that caused problems for files with >10000 entries.
+        - Fixed bug in entry editor that caused the source edit panel to remove marking from entries.
+        - Fixed export bug that made "\begin" tags fail if encountered immediately after an "\end" tag.
+        - Fixed export bug that made whitespace disappear after empty field values.
+        - Fixed ISI import bug that handled SO fields with line breaks wrong.
+        - Fixed bug occuring when choosing not to import duplicate imported entry.
+        - Fixed problem with detecting popup trigger on Mac OSX with one button mouse.
+        - Fixed erroneous relative paths for PDF files when PDF directory is not set.
+        - Fixed entry preview to resolve string references.
+1.7.1   - Removed unnecessary stack traces when opening external viewer.
+        - Fixed bug that made Ctrl-E destroy current edit in entry editor.
+        - Fixed problem when copying modified BibTeX key gave old value.
+        - Fixed missing 'booktitle' import in CONF entries in RIS import.
+        - Fixed bug that made group tree disappear for certain keyword expressions.
+        - Fixed bug that made standard BibTeX fields be saved without line wrapping.
+1.7     - When fetching from Medline or CiteSeer, fetched entry is now opened in editor.
+        - Added French translations of help files.
+        - Added color highlighting of focused text field in entry editor.
+        - Added option in context menu of entry editor for changing capitalization
+              of field contents.
+            - Added name conversion "Smith, RA" -> "Smith, R. A." to Medline import.
+            - Fixed bug that left some search settings items disabled when they shouldn't be.
+        - Fixed bug that caused requirement for restart to register change in default
+          key pattern.
+        - Fixed bug that caused crash some times after adding/removing field content selectors.
+        - Fixed bug in recognizing custom entry types when reading bib files.
+        - Fixed bug that allowed a deleted entry to stay visible in the entry editor.
+1.7b2:  - Made side pane resizable.
+        - Replaced entry customization dialog with improved interface.
+        - Added standard entry type "conference", similar to "inproceedings".
+        - Added default key pattern to avoid the need to set similar patterns manually.
+        - Added line wrapping to metadata in saved .bib file to avoid long lines.
+        - Added "bibtexkey" as implicit fourth sort criterion, to minimize problem with almost
+          similar entries swapping places.
+        - Added OpenOffice.org Calc export filter that exports spreadsheet compatible with the
+          OpenOffice.org bibliography feature.
+        - Added a couple of previously unsupported publication types in SciFinder.
+        - Added extra shortcuts CTRL-+ and CTRL-- for switching tabs in entry editor, since
+          original shortcuts CTRL[-SHIFT]-TAB is used by some window managers.
+        - Updated Endnote export filter.
+        - Fixed focus and key binding problems for switching tabs/entries in entry editor
+        - Fixed bug that prevented required fields tab from appearing for entries with only bibtex key
+          as required field.
+        - Fixed bug that prevented the user from changing the default encoding.
+        - Fixed bugs in RIS import.
+        - Fixed bug 1112050; freeze when reading certain author fields with mismatched braces.
+1.7b:	- Changed routine for rearranging author names (Lastname, Firstname) so bracketed
+            expressions are treated as units.
+        - Grouping controls now allow group hierarchies, and now allow explicit and search
+          expression groups as well as keyword groups.
+        - Added full customization of general fields tabs
+        - Added option to preserve formatting for non-BibTeX fields.
+        - Added integrity check for database.
+        - Added export filters EndNote and Harvard RTF.
+        - Added automatic import format chooser for import (same as wildcard import below).
+        - Added wildcard (*) option for command-line import, to try to automatically
+          determine the correct format.
+        - Improved layout of Preferences dialog.
+        - Improved several import filters.
+        - Added authIniN/edtrIniN key formatters.
+        - Marked entries now float to the top when no searching or grouping reordering is active.
+        - Fixed problem with opening file dialog on Win NT - AWT dialog is now opened if
+          Swing dialog fails.
+1.6:    - Improved handling of entry selection in various ways. E.g. selected entry is now scrolled
+          into view when opening entry editor and entry is kept selected when importing CiteSeer
+          fields.
+        - Fixed update bug between autogenerated bibtex key and source panel.
+        - Fixed missing . at the end of last author name in RIS import.
+        - Fixed NullPointerException on certain special characters when exporting to BibTeXML.
+        - Fixed bug that sometimes prevented the unmarking of entries.
+        - Fixed problem with formatting one-name authors.
+1.6b:	- Added mnemonic keys to menus and menu items.
+        - Added MODS and tab-separated file export
+        - Added facility for detecting and handling external changes to open bib files.
+        - Added scan option for exact duplicates with automatic removal.
+        - Bibtex strings are now sorted automatically.
+        - Bibtex strings are now resolved when exporting database.
+        - Fixed problem with field content selector getting too wide. Limited width.
+        - Fixed PDF/PS view routine to remove problems with filenames
+          containing spaces.
+        - Fixed bug that interfered with Fetch Medline by ID, and fixed
+          parsing problem with certain Medline entries.
+        - Fixed bug that interfered with Push to WinEdt.
+        - Fixed HTML output so \c{c} is handled correctly.
+        - command line option for generating a sub-database from LaTex aux file
+          entries
+        - simple copy/paste menu in entry editor
+        - experimental: text-input-area with underlying infotext in plaintext import dialog
+1.55:	- Made method for opening PDF files robust with regard to file separators (/ and \),
+          so bib files can easier be used across platforms.
+        - Improved Medline fetcher. Can now fetch entries based on a search expression.
+        - Added features for fetching fields and referring publications from the CiteSeer
+          database.
+        - Added option to always save database ordered by author/editor/year, and made this
+          the default setting.
+        - When a single entry is selected, right-click menu now shows a checkbox menu for group
+          memberships instead of the regular "Add to" and "Remove from" menus.
+        - Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+        - Added dialog box for conveniently setting the fields of an entry from a
+          plain text description.
+        - Added formatter "ResolvePDF" to create correct PDF/PS links in HTML export when
+          relative file names are used.
+        - Added Abstract panel in entry editor.
+        - Added alternate preview with abstract, and made both previews configurable.
+        - Added the option to create a subset of a database based on an .aux file.
+        - Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
+        - Added check for spaces in custom entry type names.
+        - Added several new key pattern markers.
+        - Added toolbar buttons for Mark/Unmark to improve discoverability.
+        - Fixed bug that made export filters ignore the chosen character encoding.
+        - Fixed bug that interfered with author name formatting.
+        - Fixed various bugs in import filters.
+        - Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.
+        - Fixed bug that made the next entry be opened instead of the current, when pressing
+          Enter in table.
+        - Fixed bug that made it possible to leave a source edit when the source didn't validate
+          properly. Also made it impossible to change table selection until source validates.
+1.5:	- Enabled selection of default encoding, and started storing encoding information in
+          saved .bib files, which is used when reopening.
+        - Added Highlight and select options to the group interface, and made it possible
+            to change the number of visible lines in the list.
+              - Added option to allow or disallow direct table editing.
+        - Added optional confirmation dialog for deleting entries.
+              - Added optional warning dialog for duplicate BibTeX keys.
+        - Added warnings to bibtex parser, and prevented failure to load files with
+          duplicate string definitions.
+              - Added JStor import filter.
+        - Changed the look and feel to JGoodies Forms on non-Macintosh platforms.
+        - Optimized performance in several areas.
+        - Numerous usability improvements.
+        - Fixed RIS import bug caused by short lines.
+              - Fixed bug in SciFinder import.
+              - Fixed bug that made entire field get cleared when removing from group.
+1.4:	- Added advanced search feature.
+        - Added facility for using custom export formats.
+        - Added command line options for importing/exporting files, importing/exporting
+          user preferences, loading session and for suppressing the GUI (using RitOpt for
+          parsing options).
+        - Added automatic stripping of \url{} when opening url.
+        - Improved export filters.
+        - Fixed focus bug which sometimes interfered with cut/copy/paste.
+1.3.1:	- Bugfix.
+1.3:	- Added entry preview.
+        - Added detection of duplicate entries.
+              - Added possibility to mark entries persistently.
+        - Added import filter for Sixpack and Biblioscape Tag files.
+              - Added option to use a standard directory for PDFs. PDFs placed in or below this directory
+          and named after an entry's BibTeX key can be automatically found.
+            - Added optional columns showing clickable icons for pdf/ps and url/doi links.
+        - Added menu and toolbar actions for open pdf/ps and url/doi.
+        - Added web lookup of DOI.
+        - Added several new special field markers to the key autogenerator.
+              - Added BibTeXML and simple HTML export.
+              - Changed browsing of entries. Entry editor now shows the selected entry.
+              - Improved HTML export for several entry types.
+              - Improved compatibility with Mac OS X.
+        - Made it possible to set custom secondary and tertiary sort fields.
+        - Made the entry number column width customizable.
+              - Fixed bug that caused database to always be marked as changed after viewing source.
+               - Fixed bug in selector word removal.
+               - Fixed	bug that made the file chooser unable to interpret Mac OS X aliases.
+1.2:	- Replaced the icon set.
+        - Added support for French language.
+        - Added customization of key generation.
+        - Improved HTML export.
+        - Added Replace string feature.
+            - Made a couple of adaptations for Mac OS X users.
+        - Added option in Table Preferences to set current column widths as default.
+            - Added import filter for BibTeXML.
+        - Fixed bug that allowed non-lowercase grouping field, leading to problems.
+        - Fixed bug that made selector words added in the dialog to be lowercased.
+        - Fixed bug relating to translated help files.
+1.19:	- Entry editor is now opened for an entry that causes an error when saving.
+        - Added options to display names in harmonised format in the main table.
+        - Added Docbook and (experimental) HTML export.
+        - Enabled 'doi' and 'pii' fields for Medline import.
+        - Enabled antialiasing fonts.
+        - Added the Kunststoff look&feel to give a more pleasant user interface.
+        - Added font selector for the main table.
+        - Improved table column customization.
+        - Added word selector feature for selected fields (keywords, journal).
+        - Added support for German and Norwegian language.
+        - Generalized copy cite key features for multiple entries.
+        - Added quick load/save session feature.
+        - Fixed issue/number bug in ISI import.
+        - Added "Open pdf/ps" item in right-click menu.
+        - Fixed bug causing external viewer to only work in General fields.
+        - Added functionality for using Browse buttons for file-related fields
+          (ps, pdf, etc.).
+        - Added Browse buttons to External programs tab in Preferences.
+        - Fixed bug related to Save database and Source field which caused changes
+          to disappear.
+1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration
+          from generating non-unique keys.
+        - Added command line option to load file on startup.
+        - Fixed problem with autogeneration creating invalid keys.
+        - Improved Refer/Endnote import.
+        - Added feature for importing entries and/or strings and/or group
+          definitions from another BibTeX database.
+        - Added menu choices to import into open database.
+              - Added toolbar button for closing current database.
+              - Fixed shortcut key for "Store field" in entry editor, and fixed
+                problem that made shortcut for "Save database" unavailable from
+          entry editor.
+        - Added option to fetch Medline entries automatically by
+          ID, based on a patch submitted by Mike Smoot.
+        - Fixed bug in RIS import.
+        - Added options to copy key and copy "\cite{key}" to right-click menu.
+        - Fixed bug that caused some General fields not to get displayed.
+        - Enabled customization of General fields.
+        - Enabled customization of existing entry types, and definition of
+          new types.
+1.0:	First release.

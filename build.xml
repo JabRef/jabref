@@ -1,0 +1,704 @@
+<?xml version="1.0"?>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   Filename: build.xml
+   Purpose:  Ant build file for Jabref.
+
+             Ant-Download: http://jakarta.apache.org/ant
+             Ant-Manual:   http://jakarta.apache.org/ant/manual/index.html
+
+             Jabref homepage:       http://jabref.sourceforge.net
+             Jabref@SourceForge:    http://sourceforge.net/projects/jabref
+             Jabref@FreeCode:       http://apps.freecode.com/projects/jabref
+             Jabref@Ohloh:          https://www.ohloh.net/p/jabref
+             Jabref git repository: git://jabref.git.sourceforge.net/gitroot/jabref/jabref
+
+             Further questions:
+               help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
+
+   Precondition: 1. Ant should be installed.
+                 2. JAVA_HOME environment variable contains the path to JDK1.6 or higher
+                 3. ANT_HOME environment variable contains the path to ant's home directory
+
+   Language: XML
+   Compiler: Ant
+   Authors:  Joerg K. Wegner, wegnerj@informatik.uni-tuebingen.de
+             Morten O. Alver
+
+   modified: see at git checkout and "gitk build.xml"
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+<project name="JabRef" default="jars" basedir=".">
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        PROPERTY SETUP
+     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<!-- some version information -->
+	<property name="jabref.version" value="2.9.2" />
+	<property name="jabref.version.full" value="2.9.2.0" /> <!-- a version number with 4 places. Required by launch4j -->
+	<property name="jabref.year" value="2013" />
+	<property name="jabref.placeholder.version" value="@version@" />
+	<property name="jabref.placeholder.year" value="@year@" />
+	<!-- used by replace task -->
+
+	<!-- Set the properties for intermediate directory -->
+	<property name="build.jar" value="JabRef-${jabref.version}.jar" />
+	<property name="build.dir" value="build" />
+	<property name="build.classes" value="${build.dir}/classes" />
+	<property name="build.tmp" value="${build.dir}/tmp" />
+	<property name="build.osx" value="${build.dir}/classes/osxadapter" />
+	<property name="build.lib" value="${build.dir}/lib" />
+	<property name="build.win" value="${build.dir}/windows" />
+	<property name="build.images" value="${build.dir}/images" />
+	<property name="build.fonts" value="${build.dir}/images/font" />
+	<property name="build.resource" value="${build.dir}/resource" />
+	<property name="build.help" value="${build.dir}/help" />
+	<property name="build.javadocs" value="${build.dir}/docs/API" />
+	<property name="build.extensions" value="${build.dir}/extensions" />
+	<property name="build.extension-javadocs" value="${build.extensions}/API" />
+	<property name="build.extension-layout" value="${build.extensions}/layout" />
+	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
+	<property name="build.tests" value="${build.dir}/tests" />
+
+	<!-- Set the properties for source directories -->
+	<property name="src.dir" value="src" />
+	<property name="src.tests" value="src/java/tests" />
+	<property name="plugin.dir" value="src/plugins/" />
+	<property name="txt.dir" value="src/txt" />
+	<property name="java.dir" value="${src.dir}/java" />
+	<property name="osx.dir" value="${src.dir}/osx" />
+	<property name="win.installer.dir" value="${src.dir}/windows/nsis" />
+	<property name="resource.dir" value="${src.dir}/resource" />
+	<property name="bin.dir" value="${src.dir}/scripts" />
+	<property name="images.dir" value="${src.dir}/images" />
+	<property name="fonts.dir" value="${src.dir}/images/font" />
+	<property name="help.dir" value="${src.dir}/help" />
+	<property name="extensions.dir" value="${src.dir}/extensions" />
+	<property name="layout.dir" value="${src.dir}/resource/layout" />
+	<property name="lib.dir" value="lib" />
+	<property name="buildlib.dir" value="buildlib" />
+	<property name="tests.dir" value="${src.dir}/tests" />
+
+	<property name="osxbin.dir" value="osx" />
+
+	<!-- Load user dependent properties. Has to happen before setting the properties here -->
+	<!-- For instance to redefine the NSIS-compiler write 
+		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
+	  -->
+	<property file="user.properties" />
+
+	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
+	<property name="nsis.executable.linux" value="makensis"/>
+	<property name="launch4j.dir" location="/opt/launch4j" />
+
+	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
+	<condition property="is.windows">
+	  <and>
+	    <isset property="nsis.executable" />
+	    <os family="windows" />
+	  </and>
+	</condition>
+
+	<fileset id="jarsFileset" dir="${lib.dir}">
+		<include name="antlr.jar" />
+		<include name="antlr-3.4-complete.jar" />
+        <include name="jgoodies-common-1.4.0.jar" />
+		<include name="jgoodies-looks-2.5.2.jar" />
+		<include name="jgoodies-forms-1.6.0.jar" />
+		<include name="jayatana-1.2.4.jar" />
+		<include name="spin.jar" />
+		<include name="glazedlists-1.8.0_java15.jar" />
+		<include name="microba.jar" />
+		<include name="pdfbox-1.7.1.jar" />
+		<include name="jempbox-1.7.1.jar" />
+		<include name="fontbox-1.7.1.jar" />
+		<include name="zoom-java.jar" />
+    	<include name="mysql-connector-java-5.0.7-bin.jar" />
+		<include name="postgresql-9.2-1002.jdbc4.jar" />
+        <!-- Plugin runtime dependencies -->
+		<include name="plugin/JPFCodeGenerator-rt.jar" />
+		<include name="plugin/jpf.jar" />
+		<include name="plugin/jpf-boot.jar" />
+		<include name="plugin/commons-logging.jar" />
+	</fileset>
+
+    <!-- Openoffice connection dependencies. Compile-time only -->
+    <fileset id="ooFileset" dir="${lib.dir}">
+        <include name="oo/unoil.jar" />
+        <include name="oo/ridl.jar" />
+        <include name="oo/juh.jar" />
+        <include name="oo/jurt.jar" />
+    </fileset>
+
+    <!-- Done by MrDlib -->
+    <fileset id="splJars" dir="${lib.dir}">
+        <include name="spl/**/*.jar" />
+        <include name="spl/*.jar" />
+    </fileset>
+	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
+	        <exclude name="services/**/*" />	        
+	</fileset>
+    <!-- Done by MrDlib -->
+
+	<!-- Build classpath -->
+	<path id="classpath">
+		<pathelement path="${build.classes}" />
+		<pathelement path="${build.dir}" />
+        <!-- Done by MrDlib -->
+        <pathelement path="${lib.dir}/spl" />
+        <fileset refid="splJars" />
+        <!-- Done by MrDlib -->
+		<fileset refid="jarsFileset" />
+        <fileset refid="ooFileset" />
+	</path>
+
+	<!-- Classpath for running the code generator -->
+	<path id="codegenerator">
+		<pathelement location="${lib.dir}/plugin/JPFCodeGenerator.jar" />
+		<pathelement location="${lib.dir}/plugin/jpf.jar" />
+		<pathelement location="${lib.dir}/plugin/jpf-boot.jar" />
+		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
+	</path>
+
+	<!-- Classpath for tests -->
+	<path id="classpathTest">
+		<path refid="classpath" />
+		<pathelement location="${buildlib.dir}/junit.jar" />
+	</path>
+
+	<target name="run" depends="build">
+		<java classname="net.sf.jabref.JabRefMain" fork="true">
+			<classpath refid="classpath" />
+		</java>
+	</target>
+
+	<!-- Runs project -->
+	<target name="runFromJar">
+		<java dir="${build.lib}" classname="net.sf.jabref.JabRefMain" fork="true">
+			<classpath>
+				<pathelement location="${build.lib}/${build.jar}" />
+			</classpath>
+		</java>
+	</target>
+
+	<!-- Only rerun the code generator if plug-in xml or jars are newer than generated java file. -->
+	<uptodate property="needsNoRegenerate" targetfile="${java.dir}/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java">
+		<srcfiles dir=".">
+			<include name="${plugin.dir}/**/plugin.xml" />
+			<include name="${lib.dir}/plugin/*.jar" />
+		</srcfiles>
+	</uptodate>
+
+	<!-- Run the JPF Code Generator -->
+	<target name="generate" unless="needsNoRegenerate">
+		<java classname="net.sf.jabref.plugin.util.CodeGenerator" fork="true">
+			<arg value="${plugin.dir}" />
+			<classpath refid="codegenerator" />
+		</java>
+	</target>
+
+	<!-- Compiles project excluding tests -->
+	<target name="compile" depends="generate">
+		<mkdir dir="${build.classes}" />
+		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8"
+		   source="1.6" target="1.6">
+			<src path="${java.dir}" />
+			<exclude name="tests/**" />
+			<exclude name="**/JabRefMain.java" />
+			<classpath refid="classpath" />
+		</javac>
+		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.6" target="1.6">
+			<src path="${java.dir}" />
+			<include name="**/JabRefMain.java" />
+		</javac>
+	</target>
+
+	<!-- Compiles project including tests -->
+	<target name="compiletest">
+		<mkdir dir="${build.classes}" />
+		<javac debug="on" destdir="${build.classes}" source="1.6" target="1.6">
+			<src path="${java.dir}" />
+			<include name="tests/**" />
+			<classpath refid="classpathTest" />
+		</javac>
+	</target>
+
+	<!-- Builds the OSXAdapter -->
+	<target name="osx">
+		<mkdir dir="${build.classes}" />
+
+		<javac srcdir="${osx.dir}" debug="off" destdir="${build.classes}" target="1.6">
+		</javac>
+	</target>
+
+	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
+	<target name="non_osx">
+		<mkdir dir="${build.osx}" />
+		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.osx}" />
+	</target>
+
+	<!-- Jars up project -->
+	<target name="jars" depends="build, unjarlib">
+		<mkdir dir="${build.lib}" />
+        
+		<mkdir dir="${build.tmp}" />
+		<jar destfile="${build.lib}/${build.jar}" > 
+        <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
+
+			<fileset dir="${build.classes}" />
+			<fileset dir="${build.tmp}" />
+			<fileset dir="${build.dir}">
+				<include name="images/**" />
+				<include name="help/**" />
+				<include name="resource/**" />
+			</fileset>
+
+			<!-- Add Plugins -->
+			<fileset dir="${src.dir}">
+				<include name="plugins/**" />
+			</fileset>
+             <!-- Done by MrDlib -->
+            <fileset dir ="${java.dir}">
+                <include name="spl/localization/spljabref.properties"/>
+                <include name="spl/gui/ajax-loader.gif"/>
+                <include name="spl/gui/mrdlib header.png"/>
+            </fileset>
+            <!-- Done by MrDlib -->
+			<fileset dir="${lib.dir}">
+				<include name="EndNote.zip" />
+			</fileset>
+			<fileset dir="${txt.dir}">
+				<include name="gpl2.txt" />
+				<include name="gpl3.txt" />
+				<include name="lesser.txt" />
+				<include name="jgoodies.txt" />
+				<include name="README" />
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="net.sf.jabref.JabRefMain" />
+                <attribute name="Class-Path" value="." />
+			</manifest>
+		</jar>
+
+	</target>
+
+	<!-- updates version information with git information.
+	     should be used in development builds only
+
+	     Use "ant addgitinfo jars" to generate a jar with version information in the filename
+	-->
+	<target name="addgitinfo" description="Adds git version information in ${jabref.version} and ${build.jar}">
+		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="true" errorproperty="">
+			<arg value="log" />
+			<arg value="-1" />
+			<arg value="--pretty=format:%cd - %H" />
+			<arg value="--date=iso" />
+		</exec>
+		<script language="javascript"><![CDATA[
+			var gitVersion = project.getProperty("git.version");
+			if ((gitVersion != undefined) && (gitVersion.length() > 0)) {
+				// convert "2012-12-16 15:44:07 +0100 - a249a226" to "2012-12-16 15.44.07 - a249a226"
+				gitVersion = gitVersion.substr(0,13) + "." + gitVersion.substr(14,2) + "." + gitVersion.substr(17, 2) + gitVersion.substr(25);
+
+				// we have to update the properties using JavaScript as properties are normally immutable
+				// Properties can be updated using JavaScript and not with the <property>-Task
+				var jabrefVersion = project.getProperty("jabref.version");
+				jabrefVersion = jabrefVersion + " - " + gitVersion;
+				project.setProperty("jabref.version", jabrefVersion);
+				project.setProperty("build.jar", "JabRef-" + jabrefVersion + ".jar");
+			}
+		]]></script>
+	</target>
+
+	<!-- copy all necessary files and insert version informations -->
+	<target name="build" depends="compile, buildinfos" description="Build project">
+
+		<mkdir dir="${build.resource}" />
+
+		<copy todir="${build.resource}">
+			<fileset dir="${resource.dir}">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.images}" />
+		<copy todir="${build.images}">
+			<fileset dir="${images.dir}">
+				<include name="**" />
+			</fileset>
+		</copy>
+
+		<mkdir dir="${build.help}" />
+		<copy todir="${build.help}">
+			<fileset dir="${help.dir}" />
+		</copy>
+
+		<!-- Insert version informations -->
+		<replace dir="${build.help}">
+		    <replacefilter
+			    token="${jabref.placeholder.version}" 
+				value="${jabref.version}" />
+		    <replacefilter
+			    token="${jabref.placeholder.year}" 
+				value="${jabref.year}" />
+			<include name="**/About.html" />
+		</replace>
+		<replace dir="${build.openoffice.meta}" token="${jabref.placeholder.version}" value="${jabref.version}">
+			<include name="meta.xml" />
+		</replace>
+
+	</target>
+
+	<!-- Prepare for testing -->
+	<target name="buildtest" depends="build, compiletest" description="Build project for testing">
+
+		<mkdir dir="${build.tests}" />
+		<copy todir="${build.tests}">
+			<fileset dir="${tests.dir}">
+				<include name="**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- generate and save some build infos !!! necessary for dynamic build infos !!! -->
+	<!-- todo : replace it by the replace task :-),
+          src/resource/build.properties = template
+          build/resource/build.properties = real info file
+	-->
+	<target name="buildinfos">
+		<tstamp />
+		<!-- get date -->
+		<buildnumber />
+		<!-- generate new build number -> build.number -->
+		<echo message="build number = ${build.number}" />
+		<!-- write the file, please do not edit this lines -->
+		<echo file="${resource.dir}/build.properties">builddate=${TODAY}
+build=${build.number}
+version=${jabref.version}</echo>
+	</target>
+
+
+	<!-- Creates all docs -->
+	<target name="docs" depends="javadocs" description="Generates all the documentation" />
+
+	<!-- Creates javadocs -->
+	<target name="javadocs" depends="compile" description="Generates the javadocs">
+		<mkdir dir="${build.javadocs}" />
+		<javadoc sourcepath="${java.dir}" destdir="${build.javadocs}" author="true" version="true" windowtitle="JabRef API" link="http://docs.oracle.com/javase/6/docs/api/">
+
+			<fileset dir="${java.dir}" defaultexcludes="yes">
+				<include name="**/*.java" />
+			</fileset>
+
+			<classpath refid="classpath" />
+		</javadoc>
+	</target>
+
+	<!-- Creates javadocs for the extensions -->
+	<target name="extension-javadocs" depends="build" description="Generates the javadocs for the extensions archive">
+		<mkdir dir="${build.extension-javadocs}" />
+		<copy todir="${build.extension-javadocs}">
+			<fileset dir="${help.dir}" defaultexcludes="yes">
+				<include name="CustomExports.html" />
+				<include name="CustomImports.html" />
+			</fileset>
+		</copy>
+
+		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://docs.oracle.com/javase/6/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
+			<!-- 
+                 create javadoc only selectively for classes that 
+                 users extending JabRef are likely to use
+              -->
+			<fileset dir="${java.dir}" defaultexcludes="yes">
+				<include name="net/sf/jabref/imports/ImportFormat.java" />
+				<include name="net/sf/jabref/imports/ImportFormatReader.java" />
+				<include name="net/sf/jabref/BibtexEntry.java" />
+				<include name="net/sf/jabref/BibtexEntryType.java" />
+				<include name="net/sf/jabref/AuthorList.java" />
+				<include name="net/sf/jabref/AuthorList.java" />
+				<include name="net/sf/jabref/export/layout/LayoutFormatter.java" />
+			</fileset>
+
+			<classpath refid="classpath" />
+		</javadoc>
+	</target>
+
+	<!-- Creates javadocs for the extensions -->
+	<target name="extensions" depends="extension-javadocs" description="Generates the extensions archive">
+		<!-- copy examples -->
+		<copy todir="${build.extensions}">
+			<fileset dir="${java.dir}">
+				<include name="net/sf/jabref/export/layout/format/CurrentDate.java" />
+				<include name="net/sf/jabref/export/layout/format/ToLowerCase.java" />
+				<include name="net/sf/jabref/export/layout/format/HTMLChars.java" />
+				<include name="net/sf/jabref/imports/*Importer.java" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.extension-layout}" />
+		<copy todir="${build.extension-layout}">
+			<fileset dir="${layout.dir}" />
+		</copy>
+		<copy todir="${build.extensions}">
+			<fileset dir="${extensions.dir}" />
+			<filterset>
+				<filter token="version" value="${jabref.version}" />
+			</filterset>
+		</copy>
+		<!-- create extensions-zip file -->
+		<zip destfile="${build.dir}/jabref-extensions.zip">
+			<zipfileset dir="${build.extensions}" prefix="jabref-extensions" />
+		</zip>
+	</target>
+
+	<target name="clean" depends="win.installer.clean" description="Clean project">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- Unpacks jar needed jar files from lib directory into temp directory. -->
+	<target name="unjarlib" description="Unpacks jars from library">
+		<mkdir dir="${build.tmp}" />
+		<unjar dest="${build.tmp}">
+			<fileset refid="jarsFileset" />
+			<fileset refid="splJars" />
+		</unjar>
+		<!-- done by MrDlib -->
+		<delete includeEmptyDirs="true">
+			<fileset refid="deletableMeta-InfFiles" />
+		</delete>
+		<!-- done by MrDlib -->
+		<!-- rename the microba license file -->
+		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
+	</target>
+
+
+	<target name="osxjar" depends="jars">
+		<jarbundler dir="${build.lib}"
+                    name="JabRef"
+                    mainclass="net.sf.jabref.JabRef"
+                    jars="${build.lib}/${build.jar}"
+                    icon="${images.dir}/JabRef-Logo.icns"
+                    version="${jabref.version}"
+                    jvmversion="1.6+"
+                    stubfile="${osxbin.dir}/JavaApplicationStub"
+                    signature="JABr">
+            <documenttype name="BibTeX file" extensions="bib" role="Editor"
+                          iconFile="${images.dir}/JabRef-Logo.icns"/>
+        </jarbundler>
+        <!-- After running jarbundler we need to hack the Info.plist file: -->
+        <replace file="${build.lib}/JabRef.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
+            value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
+   &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
+   &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
+		<zip basedir="${build.lib}"
+			destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip"
+			excludes="JabRef.app/Contents/MacOS/JavaApplicationStub"
+			includes="JabRef.app/"
+			level="9">
+			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
+		</zip>
+	</target>
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Build Windows Installer                                                    -->
+	<!--                                                                            -->
+	<!-- Don't forget to set nsis.executable and launch4j.dir properties            -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
+		<delete failonerror="false" dir="${win.installer.dir}/dist" />
+		<delete file="${win.installer.dir}/JabRefSetup.exe" />
+	</target>
+
+	<target name="win.installer.win.pre" description="Precondition for win.installer on Windows">
+		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
+	</target>
+
+	<target name="win.installer.step1">
+		<!-- Gather everything that will go into the installer in dist -->
+		<mkdir dir="${win.installer.dir}/dist" />
+
+		<copy file="${build.lib}/${build.jar}" todir="${win.installer.dir}/dist" />
+
+		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}" />
+
+		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}" />
+
+		<copy todir="${win.installer.dir}/dist">
+			<fileset dir="${txt.dir}">
+				<include name="gpl2.txt" />
+				<include name="gpl3.txt" />
+				<include name="lesser.txt" />
+				<include name="README" />
+			</fileset>
+		</copy>
+
+		<!-- "Create Exe-Wrapper" -->
+
+		<!-- first of all, update version information -->
+		<script language="javascript"><![CDATA[
+			// create new property with a maximum length of 50 characters
+			var txtFileVersion = project.getProperty("jabref.version");
+			if (txtFileVersion.length()>50) {
+				txtFileVersion = txtFileVersion.substring(0,50);
+			}
+			project.setProperty("txtFileVersion", txtFileVersion);
+		]]></script>
+		<delete file="jabref-launch4j.tmp" />
+		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
+		<replace file="jabref-launch4j.tmp">
+			<replacefilter token="1.1.1" value="${jabref.version}" />
+			<replacefilter token="3.3.3" value="${txtFileVersion}" />
+			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
+			<replacefilter token="./" value="${basedir}/" />
+		</replace>
+
+	</target>
+
+	<target name="win.installer.step2.linux" description="Create Windows launcher and Windows installer on Linux">
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4j"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
+		</exec>
+
+		<!-- Finally create Windows-Installer -->
+		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
+			<arg line="'-DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
+		</exec>
+	</target>
+
+	<target name="win.installer.step2.win" description="Create Windows launcher and Windows installer on Windows">
+		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
+		<exec
+			executable="${launch4j.dir}/launch4jc.exe"
+			dir="${launch4j.dir}">
+			<arg value="${basedir}/jabref-launch4j.tmp"/>
+		</exec>
+
+		<exec dir="." executable="${nsis.executable}" failonerror="true">
+			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
+		</exec>
+	</target>
+
+	<target name="win.installer.step3">
+		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${build.lib}/JabRef-${jabref.version}-setup.exe" />
+		<delete dir="${win.installer.dir}/dist" />
+	</target>
+
+	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.win.pre, jars, win.installer.step1, win.installer.step2.win, win.installer.step3">
+	</target>
+
+	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
+		<delete dir="${win.installer.dir}/dist" />
+
+	</target>
+
+	<target name="test" depends="buildtest" description="Runs all unit tests">
+		<java fork="yes" classname="junit.textui.TestRunner" failonerror="true">
+			<arg value="tests.net.sf.jabref.AllTests" />
+			<classpath refid="classpathTest" />
+		</java>
+	</target>
+
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
+	   Auxiliary targets
+	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<target name="profile" depends="jars" description="Profile JabRef">
+		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+
+		<nbprofiledirect>
+			<classpath refid="classpath" />
+		</nbprofiledirect>
+
+		<property environment="env" />
+		<java fork="true" classname="net.sf.jabref.JabRef" dir="${build.dir}" jvm="${profiler.info.jvm}">
+			<jvmarg value="${profiler.info.jvmargs.agent}" />
+			<jvmarg line="${profiler.info.jvmargs}" />
+			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
+			<classpath refid="classpath" />
+		</java>
+	</target>
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        What's about the software design ?!;-)
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
+		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
+			<classpath>
+				<pathelement path="${classpath}" />
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="${buildlib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</taskdef>
+		<jalopy fileformat="unix" convention="${src.dir}/java/jalopy.format.convention.xml" history="file" historymethod="adler32" loglevel="error" threads="2" classpathref="classpath" backup="bak">
+			<fileset dir="${src.dir}">
+				<include name="java/net/sf/jabref/**/*.java" />
+			</fileset>
+		</jalopy>
+	</target>
+
+	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
+
+	<target name="compresssrc">
+		<!-- clone current repo into tmp dir. Reason: we want to have a clean src.zip, but do not want to execute "git clean -xdf" to allow developers having some temporary files (and user.properties) -->
+		<mkdir dir="${temp.dir}"/>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull">
+			<arg value="clone" />
+			<arg value="${basedir}/.." />
+			<arg value="${temp.dir}" />
+		</exec>
+
+		<!-- ensure correct line endings -->
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="config" />
+			<arg value="core.autocrlf" />
+			<arg value="${git.core.autocrlf}" />
+		</exec>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="rm" />
+			<arg value="--cached" />
+			<arg value="-r" />
+			<arg value="." />
+		</exec>
+		<exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="${temp.dir}">
+			<arg value="reset" />
+			<arg value="--hard" />
+		</exec>
+
+		<!-- we want to have jabref-${jabref.version} as main directory -->
+		<mkdir dir="${distsrc}" />
+		<move file="${temp.dir}/jabref" tofile="${distsrc}/jabref-${jabref.version}" />
+	</target>
+
+	<target name="zipsrc">
+		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
+		<property name="distsrc" value="${temp.dir}/distsrc/" />
+		<antcall target="compresssrc">
+			<param name="git.core.autocrlf" value="true" />
+		</antcall>
+		<zip destfile="${build.lib}/JabRef-${jabref.version}-src.zip" basedir="${distsrc}" level="9" />
+		<delete dir="${temp.dir}" failonerror="no"/>
+	</target>
+
+	<target name="bzip2src">
+		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc"/>
+		<property name="distsrc" value="${temp.dir}/distsrc/" />
+		<antcall target="compresssrc">
+			<param name="git.core.autocrlf" value="false" />
+		</antcall>
+		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${distsrc}" excludes=".git/" compression="bzip2" />
+		<delete dir="${temp.dir}" failonerror="no"/>
+	</target>
+
+	<!-- creates all distribution files in ${build.lib} -->
+	<target name="release" depends="clean, win.installer, non_osx, osxjar, bzip2src, zipsrc" />
+	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, bzip2src, zipsrc" />
+</project>

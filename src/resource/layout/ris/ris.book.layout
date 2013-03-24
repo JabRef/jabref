@@ -1,0 +1,22 @@
+TY  - BOOK
+\begin{author}\format[FormatChars,RisAuthors(AU)]{\author}\end{author}
+\begin{editor}\format[FormatChars,RisAuthors(A2)]{\editor}\end{editor}
+\begin{title}T1  - \format[FormatChars]{\title}\end{title}
+\begin{publisher}PB  - \format[FormatChars]{\publisher}\end{publisher}
+\begin{address}AD  - \format[FormatChars]{\address}\end{address}
+\begin{year}Y1  - \format[FormatChars]{\year}\end{year}\begin{month}/\format[FormatChars,RisMonth]{\month}\end{month}
+\begin{volume}VL  - \format[FormatChars]{\volume}\end{volume}
+\begin{number}IS  - \format[FormatChars]{\number}\end{number}
+\begin{pages}SP  - \format[FormatChars,FirstPage]{\pages}
+EP  - \format[FormatChars,LastPage]{\pages}\end{pages}
+\begin{url}UR  - \url\end{url}
+\begin{doi}M3  - http://dx.doi.org/\doi\end{doi}
+\begin{keywords}\format[FormatChars,RisKeywords]{\keywords}\end{keywords}
+\begin{file}L1  - \format[FileLink(pdf)]{\file}\end{file}
+\begin{issn}U1  - \format[FormatChars]{\issn}\end{issn}
+\begin{comment}N1  - \format[FormatChars]{\comment}\end{comment}
+\begin{notes}N1  - \format[FormatChars]{\notes}\end{notes}
+\begin{owner}N1  - Owner: \format[FormatChars]{\owner}\end{owner}
+\begin{timestamp}N1  - Added to JabRef: \format[FormatChars]{\timestamp}\end{timestamp}
+\begin{abstract}N2  - \format[FormatChars]{\abstract}\end{abstract}
+ER  -

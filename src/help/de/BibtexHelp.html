@@ -1,0 +1,305 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>&Uuml;ber <em>BibTeX</em></h1>
+
+    <p>JabRef hilft Ihnen bei der
+    Arbeit mit Ihren <em>BibTeX</em>-Dateien, aber es m&uuml;ssen
+    dennoch Regeln beachtet werden, wenn Sie Ihre Eintr&auml;ge
+    bearbeiten. Nur so kann sichergestellt werden, dass
+    <em>BibTeX</em> Ihre Datei richtig verarbeiten kann.</p>
+
+    <h2><em>BibTeX</em> Felder</h2>
+
+    <p>Es gibt viele unterschiedliche
+    Felder in <em>BibTeX</em> und einige zus&auml;tzliche Felder,
+    die Sie in JabRef einsetzen k&ouml;nnen.</p>
+
+    <p>Grunds&auml;tzlich k&ouml;nnen Sie LaTeX-Befehle in Feldern,
+    die Text beinhalten, einsetzen. <em>BibTeX</em> wird Ihr
+    Literaturverzeichnis automatisch formatieren und je nach
+    <em>BibTeX</em> style (Stildatei .bst) Gro&szlig;buchstaben
+    verkleinern. Um sicherzustellen, dass einzelne Buchstaben
+    gro&szlig; bleiben, m&uuml;ssen Sie sie in Klammern
+    einschlie&szlig;en, wie im Wort {B}elgien. <em>(Anm. d.
+    &Uuml;bers.: Die meisten deutschen BibTeX-Stile behalten
+    die Gro&szlig;buchstaben ohnehin bei.)</em></p>
+
+    <p>Hinweise zu einigen Feldtypen:</p>
+
+    <ul>
+        <li>
+        <strong style="font-style: italic;">Bibtexkey<br /></strong>Eine
+        eindeutige Bezeichnung, um sich in LaTeX-Dokumenten auf den
+        Eintrag beziehen zu k&ouml;nnen. Beachten Sie, dass der
+        Bibtexkey genau mit dem Verweis im LaTeX-Dokument
+        &uuml;bereinstimmen muss (auch die
+        Gro&szlig;-/Kleinschreibung).<br />
+        </li>
+
+        <li><strong>address<br /></strong> Der Ort des
+        <em>Verlags</em> oder einer anderen Institution.</li>
+
+        <li><strong>annote<br /></strong> Eine Anmerkung. Dieses
+        Feld wird von den Standard-Bibliographiestilen nicht
+        verwendet, kann aber bei einigen Stilen benutzt werden, um
+        eine kommentierte Literaturliste zu erstellen.</li>
+
+        <li>
+            <strong>author<br /></strong> Dieses Feld sollte alle
+            Autoren Ihres Eintrags enthalten. Die Namen werden
+            durch das Wort <tt>and</tt> getrennt, auch wenn es mehr
+            als zwei Autoren gibt. Jeder Name kann in zwei
+            gleichwertigen Formen notiert werden:
+
+            <ul>
+                <li>Donald E. Knuth <em>oder</em> Knuth, Donald
+                E.</li>
+
+                <li>Eddie van Halen <em>oder</em> van Halen,
+                Eddie</li>
+            </ul>Die zweite Form sollte f&uuml;r Autoren mit zwei
+            oder mehr Nachnamen benutzt werden, um zwischen dem
+            mittleren und dem Nachnamen zu unterscheiden.<br />
+        </li>
+
+        <li><strong>booktitle<br /></strong> Der Titel eines
+        Buches, aus dem ein Teil zitiert wird. Falls Sie ein Buch
+        zitieren wollen, nehmen Sie f&uuml;r den Titel stattdessen
+        das <tt>title</tt>-Feld.</li>
+
+        <li><strong>chapter<br /></strong> Eine Kapitelnummer (oder
+        Abschnittsnummer oder was-auch-immer-Nummer).</li>
+
+        <li><strong>crossref<br /></strong> Der <tt>key</tt> eines
+        Eintrags, auf den ein Querverweis gesetzt wird. Damit
+        lassen sich beispielsweise die Daten eines Sammelbandes in
+        einem Eintrag f&uuml;r einen Aufsatztitel wiederverwenden,
+        ohne sie bei jedem Aufsatztitel explizit einzutragen. Die
+        Funktionalit&auml;t von <tt>crossref</tt> ist jedoch nicht
+        in jedem Fall praktikabel.</li>
+
+        <li><strong>edition<br /></strong> Die Auflage eines Buch,
+        z.B. ,,Zweite``. Die Ordnungszahl sollte mit einem
+        Gro&szlig;buchstaben beginnen; sie wird von den
+        Standardstilen gegebenenfalls in Kleinbuchstaben
+        umgewandelt. Manche Stile verlangen hier eine Ziffer.</li>
+
+        <li><strong>editor<br /></strong> Dieses Feld ist analog zu
+        dem <em>author</em>-Feld. Falls zus&auml;tzlich ein
+        <tt>author</tt>-Feld angegeben wird, bezeichnet das
+        <tt>editor</tt>-Feld den Herausgeber des Buches oder des
+        Sammelbandes, in dem die referenzierte Literatur erschienen
+        ist.</li>
+
+        <li><strong>howpublished<br /></strong> Die Art, wie ein
+        Werk ver&ouml;ffentlicht wurde (meist au&szlig;erhalb eines
+        Verlags). Das erste Wort sollte mit einem
+        Gro&szlig;buchstaben beginnen.</li>
+
+        <li><strong>institution<br /></strong> Die f&ouml;rdernde
+        Institutions eines technischen Reports.</li>
+
+        <li><strong>journal<br /></strong> Ein Zeitschriftenname.
+        Mit Hilfe von "Strings" k&ouml;nnen Zeitschriftennamen
+        abgek&uuml;rzt werden. Zum Erstellen eines solchen Strings
+        k&ouml;nnen Sie den
+        <a href="StringEditorHelp.html">String-Editor</a> benutzen
+        oder die Funktionalit&auml;t zur
+        <a href="JournalAbbreviations.html">Abk&uuml;rzung von
+        Zeitschriftentiteln</a> verwenden.</li>
+
+        <li><strong>key<br /></strong> Dieses Feld wird zur
+        Sortierung, zur Erstellung von Labels (falls kein
+        <tt>author</tt> vorhanden ist) und f&uuml;r Querverweise
+        (<tt>crossref</tt>) verwendet. Verwechseln Sie dieses Feld
+        nicht mit dem <tt>Bibtexkey</tt>, der f&uuml;r die
+        <code>\cite</code>-Kommandos gebraucht wird und am Anfang
+        jedes Eintrags erscheint (im BibTeX-Quelltext).</li>
+
+        <li><strong>month<br /></strong> Der Monat, in dem ein Werk
+        ver&ouml;ffentlicht oder geschrieben wurde. Benutzen Sie am
+        besten die englischen Abk&uuml;rzungen (jan, feb, mar, apr,
+        may, jun, jul, aug, sep, oct, nov, dec).</li>
+
+        <li><strong>note<br /></strong> Zus&auml;tzliche
+        Infromationen. Das erste Wort sollte mit einem
+        Gro&szlig;buchstaben beginnen.</li>
+
+        <li><strong>number</strong><br />
+        Die Nummer einer Zeitschrift, eines technischen Reports
+        oder eines Bandes innerhalb einer Reihe (<tt>series</tt>).
+        Zeitschriften haben oft eine Band- und Heftz&auml;hlung,
+        der Band entspricht dem <tt>volume</tt>-, das Heft dem
+        <tt>number</tt>-Eintrag.</li>
+
+        <li><strong>organization<br /></strong> Die Organisation,
+        die einen Konferenzband f&ouml;rdert.</li>
+
+        <li><strong>pages<br /></strong> Die Seitenzahl(en) oder
+        der Seitenzahlbereich, z.B. <tt>42-111</tt> oder
+        <tt>7,41,73-97</tt> or <tt>43+</tt> (das `<tt>+</tt>'
+        deutet auf folgende Seiten, die nicht einen einfachen
+        Bereich umfassen). Ein einfacher Bindestrich (wie in
+        <tt>7-33</tt>) wird in einen doppelten Bindestrich
+        (<tt>--</tt>) verwandelt, der in TeX den bis-Strich anzeigt
+        (also 7&ndash;33).</li>
+
+        <li><strong>publisher<br /></strong> Der Name des
+        Verlags.</li>
+
+        <li><strong>school<br /></strong> Der Name einer
+        Universit&auml;t, an der eine Abschlussarbeit - z.B. eine
+        Dissertation (<tt>phdthesis</tt>) oder Magisterarbeit
+        (<tt>mastersthesis</tt>) - geschrieben wurde.</li>
+
+        <li><strong>series<br /></strong> Der Name einer Reihe, in
+        der ein Buch erschienen ist. Falls die B&uuml;cher einer
+        Reihe nummeriert sind, wird die entsprechende Nummer im
+        Feld <tt>number</tt> angegeben.</li>
+
+        <li><strong>title<br /></strong> Der Titel des Werkes. Die
+        Gro&szlig;- und Kleinschreibung kann von den
+        Bibliographiestilen und der benutzten Sprache abh&auml;ngig
+        sein (wobei sie mit deutschen Bibliographiestilen
+        beibehalten wird). Worte, die auch bei Verwendung
+        englischer Bibliographiestile gro&szlig; geschrieben werden
+        sollen, m&uuml;ssen in geschweifte Klammern eingefasst
+        werden (z.B. <tt>A {German} title</tt>).</li>
+
+        <li><strong>type<br /></strong> Der Typ eines technischen
+        Reports, z.B. ``Research Note''. Bei <em>jurabib</em> wird
+        dieses Feld auch f&uuml;r den Typ einer Abschlussarbeit
+        verwendet.</li>
+
+        <li><strong>volume<br /></strong> Der Band (Jahrgang) einer
+        Zeitschrift oder der Band eines Buches in einem
+        mehrb&auml;ndigen Werk.</li>
+
+        <li><strong>year<br /></strong> Das Jahr der
+        Ver&ouml;ffentlichung (oder bei einem
+        unver&ouml;ffentlichten Werk das Jahr, in dem es
+        geschrieben wurde). Normalerweise sollte im
+        <tt>year</tt>-Feld nur eine vierstellige Zahl stehen, z.B.
+        <tt>1984</tt>. Die Standardstile k&ouml;nnen aber auch mit
+        <tt>year</tt>-Eintr&auml;gen umgehen, deren letzte vier
+        Zeichen (ausgenommen Satzzeichen) Ziffern sind,
+        beispielsweise <tt>(um 1984)</tt>. Dieses Feld wird
+        f&uuml;r die meisten Eintragstypen ben&ouml;tigt.</li>
+    </ul>
+
+    <h2>Andere Felder</h2>
+
+    <p>Bibliographie-Stile f&uuml;r BibTeX
+    wurden von vielen Leuten entwickelt, und einige haben weitere
+    Felder erstellt. Es folgt eine kleine Auswahl.</p>
+
+    <p>Feldnamen, die mit einem Stern* versehen sind, werden nicht
+    direkt von JabRef unterst&uuml;tzt, k&ouml;nnen aber
+    eingebunden werden (siehe
+    <a href="CustomEntriesHelp.html">Eintragstypen anpassen</a>).</p>
+
+    <ul>
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        affiliation*</span><br /></strong> Die Zugeh&ouml;rigkeit
+        eines Autors.<br />
+        </li>
+
+        <li><strong>abstract<br /></strong> Die Zusammenfassung
+        eines Werks.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        contents*</span><br /></strong> Ein
+        Inhaltsverzeichnis.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        copyright*</span><br /></strong>
+        Copyright-Informationen.<br />
+        </li>
+
+        <li><strong>doi<br /></strong> Der <em>Digital Object
+        Identifier</em> ist eine permanente Kennung von
+        Dokumenten.<br />
+        </li>
+
+        <li><strong>eid<br /></strong> Der EID (<em>Electronic
+        identifier</em>) wird f&uuml;r elektronische Zeitschriften
+        benutzt, die auch im Druck erscheinen. Mit dieser Nummer,
+        die die Seitenzahlen ersetzt, l&auml;sst sich der Artikel
+        in der gedruckten Ausgabe finden. Der EID wird manchmal
+        auch <em>citation number</em> genannt.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISBN*</span><br /></strong> Die Internationale
+        Standardbuchnummer.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISSN*</span><br /></strong> Die Internationale
+        Standardseriennummer (f&uuml;r Zeitschriften).<br />
+        </li>
+
+        <li><strong>keywords<br /></strong> Stichworte, k&ouml;nnen
+        in JabRef gut zum Gruppieren verwendet werden.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        language*</span><br /></strong> Die Sprache des
+        Werks.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        location*</span><br /></strong> Der Ort, der mit einem Werk
+        in Verbindung steht, z.B. die Stadt, in der eine Konferenz
+        stattgefunden hat.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        LCCN*</span><br /></strong> Die <em>Library of Congress
+        Call Number</em>. Manchmal hei&szlig;t das Feld auch
+        <tt>lib-congress</tt>.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        mrnumber*</span><br /></strong> Die <i>Mathematical
+        Reviews</i>-Nummer.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        price*</span><br /></strong> Der Preis.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        size*</span><br /></strong> Die physische Gr&ouml;&szlig;e
+        eines Dokuments.<br />
+        </li>
+
+        <li><strong>url<br /></strong> Der <em>Uniform Resource
+        Locator</em> (URL, "einheitlicher Quellenanzeiger"), der
+        auf eine Webseite im Internet verweist.<br />
+        </li>
+
+        <li><strong>urldate<br /></strong> Das Datum, an dem eine
+        Webseite zuletzt besucht wurde.</li>
+    </ul><br />
+     <br />
+     <br />
+</body>
+</html>

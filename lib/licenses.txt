@@ -1,0 +1,164 @@
+Directory oo/
+-------------
+
+Path:    oo/juh.jar
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Path:    oo/jurt.jar
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Path:    oo/ridl.jar
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Path:    oo/unoil.jar
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+
+Directory plugin/
+-----------------
+
+Path:    plugin/commons-logging.jar
+Project: Apache Commongs Logging
+URL:     http://commons.apache.org/logging/
+License: Apache 2.0
+
+Path:    plugin/jpf-boot.jar
+Project: Java Plugin Framework
+URL:     http://jpf.sourceforge.net/
+License: LGPL 2.1
+
+Path:    plugin/jpf.jar
+Project: Java Plugin Framework
+URL:     http://jpf.sourceforge.net/
+License: LGPL 2.1
+
+Path:    plugin/JPFCodeGenerator-rt.jar
+Project: Part of JabRef
+URL:     jabref-git-repo:jpfcodegen
+License: LGPL 3.0
+
+Path:    plugin/JPFCodeGenerator.jar
+Project: Part of JabRef
+URL:     jabref-git-repo:jpfcodegen
+License: LGPL 3.0
+
+Path:    plugin/velocity-dep-1.5.jar
+Project: Apache Velocity
+URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
+License: Apache 2.0
+
+
+Directory spl/
+--------------
+
+Path:    spl/jersey/jersey-client-1.1.5.1.jar
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Path:    spl/jersey/jersey-core-1.1.5.1.jar
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Path:    spl/jersey/jersey-multipart-1.1.5.1.jar
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Path:    spl/jersey/mimepull-1.3.jar
+Project: Jersey multipart
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Path:    spl/sciplore/mrDlib-serialization-api.jar
+Project:
+URL:
+License:
+
+Path:    spl/sciplore/xstream-1.4.1.jar
+Project: XStream
+URL:     http://xstream.codehaus.org/
+License: BSD (http://xstream.codehaus.org/license.html)
+
+
+Main Directory
+--------------
+
+Path:    antlr.jar
+Project: ANTLR
+URL:     http://www.antlr.org/
+License: BSD
+
+Path:    antlr-3.4-complete.jar
+Project: ANTLR
+URL:     http://www.antlr.org/
+License: BSD
+
+Path:    fontbox-*.jar
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Path:    glazedlists-1.8.0_java15.jar
+Project: Glazed Lists
+URL:     http://www.glazedlists.com/
+License: LPGL 2.1
+
+Path:    jayatana-*.jar
+Project: java-swing-ayatana
+URL:     http://code.google.com/p/java-swing-ayatana/
+License: MIT
+
+Path:    jempbox-*.jar
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Path:    jgoodies-common-*.jar
+Project: JGoodies Common
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Path:    jgoodies-forms-*.jar
+Project: JGoodies Forms
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Path:    jgoodies-looks-*.jar
+Project: JGoodies Looks
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Path:    microba.jar
+Project: Microba
+URL:     http://microba.sourceforge.net/
+License: BSD
+
+Path:    mysql-connector-java-5.0.7-bin.jar
+Project: MySQL Connector/J
+URL:     http://www.mysql.de/downloads/connector/j/
+License: GPLv2
+
+Path:    pdfbox-*.jar
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Path:    postgresql-9.*.jdbc4.jar
+Project: PostgreSQL JDBC Driver
+URL:     http://jdbc.postgresql.org/download.html
+License: BSD
+
+Path:    spin.jar
+Project: Spin
+URL:     http://spin.sourceforge.net/
+License: LGPL 2.1

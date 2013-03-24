@@ -1,0 +1,10 @@
+@\bibtextype{\bibtexkey,
+\begin{author}  author = {\author},\end{author}
+\begin{title}  title  = {\format[RemoveBrackets]{\title}},\end{title}
+\begin{journal}  journal = {\journal},\end{journal}
+  year   = {\year},
+  number = {\number},
+  url    = {\url},
+\begin{doi}  doi = {\doi},\end{doi}
+  const  = {\\ text}
+}

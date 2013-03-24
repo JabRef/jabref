@@ -1,0 +1,553 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+<h1>Int&eacute;gration dans OpenOffice/LibreOffice</h1>
+
+<h2>Introduction</h2>
+
+<p>Cette fonction offre une interface pour ins&eacute;rer des citations et formater une
+    bibliographie dans un document OpenOffice ou LibreOffice Writer &agrave; partir
+    de JabRef.</p>
+
+<p>Tout au long de ce document d'aide, lorsque le nom <i>OpenOffice</i>
+    est utilis&eacute;, il peut &ecirc;tre remplac&eacute; par <i>LibreOffice</i>.</p>
+    
+<h2>Utiliser l'interface OpenOffice/LibreOffice</h2>
+
+<p>Pour communiquer avec OpenOffice, JabRef doit tout d'abord se connecter &agrave; 
+    une instance active d'OpenOffice. Vous devez d&eacute;marrez OpenOffice et ouvrir
+    votre document avant de vous y connecter &agrave; partir de JabRef. JabRef a
+    besoin de conna&icirc;tre la localisation de vos ex&eacute;cutables OpenOffice
+    (<b>soffice.exe</b> sous Windows et <b>soffice</b> sous les autres
+    syst&eacute;mes d'exploitation) et le r&eacute;pertoire o&ugrave; se trouvent plusieurs fichiers
+    OpenOffice jar. Si vous lancez la connexion en cliquant sur le bouton
+    <b>Connexion automatique</b>, JabRef tentera automatiquement de d&eacute;terminer ses
+    emplacements. Si cela ne fonctionne pas, vous devez &eacute;tablir la connexion
+    en utilisant le bouton <b>Connexion manuelle</b> qui ouvrira une
+    fen&ecirc;tre vous demandant les emplacements n&eacute;cessaires.</p>
+
+<p>Apr&egrave;s que la connexion ait &eacute;t&eacute; &eacute;tablie, vous pouvez ins&eacute;rer des citations en
+    s&eacute;lectionnant une ou plusieurs entr&eacute;es dans JabRef et en utilisant le bouton
+    <b>Envoyer vers OpenOffice</b> dans le menu d&eacute;roulant de la barre d'outils
+    de JabRef ou en utilisant le bouton appropri&eacute; dans la sous-fen&ecirc;tre
+    OpenOffice du panneau lat&eacute;ral. Cela ins&eacute;rera les citations pour les entr&eacute;es
+    s&eacute;lectionn&eacute;es &agrave; l'emplacement actuel du curseur dans le document OpenOffice
+    et mettra &agrave; jour la bibliographie afin qu'elle contienne la r&eacute;f&eacute;rence
+    compl&egrave;te.</p>
+
+<p><b>Note&nbsp;:</b> JabRef n'utilise pas le syst&egrave;me de bibliographie int&eacute;gr&eacute;
+    &agrave; OpenOffice &agrave; cause des limitations de ce syst&egrave;me. Un document contenant
+    des citations ins&eacute;r&eacute;es par JabRef ne sera en g&eacute;n&eacute;ral pas compatible avec 
+    d'autres gestionnaires de r&eacute;f&eacute;rences tels que Bibus et Zotero.</p>
+
+<p>Deux types de citations diff&eacute;rents peuvent &ecirc;tre ins&eacute;r&eacute;s - soit une citation
+    entre parenth&egrave;ses, "(Auteur 2007)", soit une citation dans le texte
+    "Author (2007)". Cette distinction est uniquement pertinente si les
+    citations auteur-ann&eacute;e sont utilis&eacute;es au lieu des citations num&eacute;rot&eacute;es, mais
+    cette distinction sera conserv&eacute;e si vous basculer entre les deux styles.</p>
+
+<p>Si vous modifiez les entr&eacute;es dans JabRef apr&egrave;s l'insertion de leurs citations
+    dans OpenOffice, vous devrez synchroniser la bibliographie. Le bouton
+    <b>Synchroniser la bibliographie OO</b> mettra &agrave; jour toutes les entr&eacute;es
+    de la bibliographie tant que leurs clefs BibTeX n'ont pas &eacute;t&eacute; modifi&eacute;es
+    (JabRef encode la clef BibTeX dans le nom de la r&eacute;f&eacute;rence pour chaque
+    citation afin de suivre quelle clef BibTeX a l'entr&eacute;e JabRef originale).</p>
+
+<h2>Le fichier de style</h2>
+
+<p>Pour configurer le style de citation, vous devez s&eacute;lectionner un style de
+    fichier ou utiliser un des styles par d&eacute;faut. Le style d&eacute;finit le format
+    des citations et le format de la bibliographie. Vous pouvez utiliser des
+    formateurs d'exportations standards de JabRef pour traiter les champs des
+    entr&eacute;es avant qu'ils soient envoy&eacute;s &agrave; OpenOffice. Gr&acirc;ce &agrave; l'existence de ce
+    fichier de style, vous disposez d'une flexibilit&eacute; aussi grande que possible
+    dans les styles de citation. Vous pouvez changer de fichier de style &agrave;
+    tout moment et utiliser le bouton <b>Mettre &agrave; jour</b> pour que votre
+    bibliographie suive ce nouveau style.</p>
+<p>En cliquant sur le bouton <b>S&eacute;lectionner le style</b> vous pouvez ouvrir
+    une fen&ecirc;tre qui permet de s&eacute;lectionner soit le style par d&eacute;faut soit un
+    fichier de style externe. Si vous voulez cr&eacute;er un nouveau style bas&eacute; sur
+    celui par d&eacute;faut, vous pouvez cliquer sur le bouton <b>Aper&ccedil;u</b> afin
+    d'afficher le contenu du style par d&eacute;faut que vous pouvez copier dans un
+    &eacute;diteur de texte et modifier.</p>
+<p>Pour choisir un fichier de style externe, vous avez deux possibilit&eacute;s.
+    Soit vous choisissez directement un fichier de style, soit vous param&eacute;trez
+    un r&eacute;pertoire de fichiers de style. Si vous choisissez cette derni&egrave;re
+    possibilit&eacute;, vous pourrez voir la liste des styles de ce r&eacute;pertoire (et
+    de ces sous-r&eacute;pertoires) et en choisir un &agrave; partir de cette liste.</p>
+
+<p>Voici un exemple de fichier de style&nbsp;:</p>
+<pre>
+NAME
+Example style file for JabRef-OpenOffice integration.
+
+JOURNALS
+Journal name 1
+Journal name 2
+
+PROPERTIES
+Title="References"
+IsSortByPosition="false"
+IsNumberEntries="false"
+ReferenceParagraphFormat="Default"
+ReferenceHeaderParagraphFormat="Heading 1"
+
+CITATION
+AuthorField="author/editor"
+YearField="year"
+MaxAuthors="3"
+MaxAuthorsFirst="3"
+AuthorSeparator=", "
+AuthorLastSeparator=" &amp; "
+EtAlString=" et al."
+ItalicEtAl="true"
+YearSeparator=" "
+InTextYearSeparator=" "
+BracketBefore="["
+BracketAfter="]"
+BracketBeforeInList="["
+BracketAfterInList="]"
+CitationSeparator="; "
+UniquefierSeparator=","
+GroupedNumbersSeparator="-"
+MinimumGroupingCount="3"
+FormatCitations="false"
+CitationCharacterFormat="Default"
+MultiCiteChronological="false"
+PageInfoSeparator="; "
+
+LAYOUT
+article=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \journal \volume\begin{pages} :
+\format[FormatPagesForHTML]{\pages}\end{pages}.
+
+book=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}\begin{editor}
+\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor},
+&lt;b&gt;\year\uniq&lt;/b&gt;. &lt;i&gt;\title&lt;/i&gt;. \publisher, \address.
+
+incollection=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;. In: \format[AuthorLastFirst,
+AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), &lt;i&gt;\booktitle&lt;/i&gt;, \publisher.
+
+inbook=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\chapter&lt;/i&gt;. In: \format[AuthorLastFirst,
+AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), &lt;i&gt;\title&lt;/i&gt;, \publisher.
+
+phdthesis=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \school.
+
+default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \journal \volume\begin{pages} :
+\format[FormatPagesForHTML]{\pages}\end{pages}.
+
+</pre>
+
+<p>(Notez que la mise en page de chaque type d'entr&eacute;e doit &ecirc;tre limit&eacute; &agrave; 
+    une seule ligne dans le fichier de style - ci-dessus, les lignes sont
+    coup&eacute;es pour faciliter la lecture)</p>
+
+<h3>Propri&eacute;t&eacute;s g&eacute;n&eacute;rales</h3>
+
+<p>La section <b>PROPERTIES</b> d&eacute;crit les propri&eacute;t&eacute;s g&eacute;n&eacute;rales de la
+    bibliographie. Le tableau ci-dessous d&eacute;crit les propri&eacute;t&eacute;s
+    disponibles&nbsp;:</p>
+
+<table border="1" rules="none" summary="propri&eacute;t&eacute;s disponibles&nbsp;">
+    <tr>
+        <td><b>Propri&eacute;t&eacute;</b></td>
+        <td><b>Type</b></td>
+        <td><b>Valeur par d&eacute;faut</b></td>
+        <td><b>Description</b></td>
+    </tr>
+    <tr>
+        <td>IsNumberEntries</td>
+        <td>bool&eacute;en</td>
+        <td><code>false</code></td>
+        <td>D&eacute;termine le type de citations &agrave; utiliser. Si <code>true</code>,
+            des citations num&eacute;rot&eacute;es seront utilis&eacute;es. Si <code>false</code>,
+            des citations auteur-ann&eacute;e seront utilis&eacute;es.
+        </td>
+    </tr>
+    <tr>
+        <td>IsSortByPosition</td>
+        <td>bool&eacute;en</td>
+        <td><code>false</code></td>
+        <td>D&eacute;termine comment la bibliographie est tri&eacute;e. Si vrai, les entr&eacute;es
+            seront tri&eacute;es selon l'ordre dans lequel elles sont cit&eacute;es. Si faux,
+            les entr&eacute;es seront class&eacute;es par ordre alphab&eacute;tique des auteurs.
+        </td>
+    </tr>
+    <tr>
+        <td>ReferenceParagraphFormat</td>
+        <td>cha&icirc;ne</td>
+        <td><code>Default</code></td>
+        <td>Donne le nom du format de paragraphe &agrave; utiliser pour la liste de
+            r&eacute;f&eacute;rences. Ce format doit &ecirc;tre d&eacute;fini dans votre document
+            OpenOffice.
+        </td>
+    </tr>
+    <tr>
+        <td>ReferenceHeaderParagraphFormat</td>
+        <td>cha&icirc;ne</td>
+        <td><code>Heading 1</code></td>
+        <td>Donne le nom du format de paragraphe &agrave; utiliser pour le titre de
+            la liste de r&eacute;f&eacute;rences. Ce format doit &ecirc;tre d&eacute;fini dans votre document
+            OpenOffice.
+        </td>
+    </tr>
+    <tr>
+        <td>Title</td>
+        <td>cha&icirc;ne</td>
+        <td><code>Bibliography</code></td>
+        <td>Le texte &agrave; entrer comme titre de la liste de r&eacute;f&eacute;rences.</td>
+    </tr>
+</table>
+
+<h3>Propri&eacute;t&eacute;s des citations</h3>
+
+<p>La section <b>CITATION</b> d&eacute;crit le format des marqueurs de citation
+    ins&eacute;r&eacute;s dans le texte.</p>
+
+<p>Le tableau ci-dessous donne une br&egrave;ve description de toutes les propri&eacute;t&eacute;s
+    de citation disponibles. Les propri&eacute;t&eacute;s qui n'apparaissent pas dans le
+    fichier de style garderont leur valeur par d&eacute;faut.</p>
+
+<table border="1" rules="none" summary="description">
+    <tr>
+        <td><b>Propri&eacute;t&eacute;</b></td>
+        <td><b>Type</b></td>
+        <td><b>Valeur par d&eacute;faut</b></td>
+        <td><b>Description</b></td>
+    </tr>
+    <tr>
+        <td>AuthorField</td>
+        <td>cha&icirc;ne</td>
+        <td><code>author/editor</code></td>
+        <td>Champ BibTeX contenant les noms des auteurs. Peut contenir des
+            champs alternatifs, par exemple <code>author/editor</code></td>
+    </tr>
+    <tr>
+        <td>AuthorLastSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code> &amp; </code></td>
+        <td>Texte ins&eacute;r&eacute; entre les deux derniers noms d'auteur.</td>
+    </tr>
+    <tr>
+        <td>AuthorLastSeparatorInText</td>
+        <td>cha&icirc;ne</td>
+        <td>&nbsp;</td>
+        <td>Si sp&eacute;cifi&eacute;s, cette propri&eacute;t&eacute; &eacute;crase
+            <code>AuthorLastSeparator</code> pour les citations dans le texte
+            telles que <code>Smith &amp; Jones (2001)</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>AuthorSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code>, </code></td>
+        <td>Texte ins&eacute;r&eacute; entre les noms d'auteurs except&eacute; pour les deux
+            derniers.</td>
+    </tr>
+    <tr>
+        <td>BracketAfter</td>
+        <td>cha&icirc;ne</td>
+        <td><code>]</code></td>
+        <td>La parenth&egrave;se fermante des citations.</td>
+    </tr>
+    <tr>
+        <td>BracketAfterInList</td>
+        <td>cha&icirc;ne</td>
+        <td>]</td>
+        <td>La parenth&egrave;se fermante pour la num&eacute;rotation des citations dans
+            la liste des r&eacute;f&eacute;rences.</td>
+    </tr>
+    <tr>
+        <td>BracketBefore</td>
+        <td>cha&icirc;ne</td>
+        <td><code>[</code></td>
+        <td>La parenth&egrave;se ouvrante des citations.</td>
+    </tr>
+    <tr>
+        <td>BracketBeforeInList</td>
+        <td>cha&icirc;ne</td>
+        <td>[</td>
+        <td>La parenth&egrave;se ouvrante pour la num&eacute;rotation des citations dans
+            la liste des r&eacute;f&eacute;rences.</td>
+    </tr>
+    <tr>
+        <td>CitationCharacterFormat</td>
+        <td>cha&icirc;ne</td>
+        <td><code>Default</code></td>
+        <td>Si <code>FormatCitations</code> est mis &agrave; <code>true</code>,
+            le format de caract&egrave;re ayant le nom donn&eacute; par cette propri&eacute;t&eacute; sera
+            appliqu&eacute; aux citations. Le format de caract&egrave;re doit &ecirc;tre d&eacute;fini
+            dans votre document OpenOffice.
+        </td>
+    </tr>
+    <tr>
+        <td>CitationSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code>; </code></td>
+        <td>Texte ins&eacute;r&eacute; entre les &eacute;l&eacute;ments quand une citation contient
+            plusieurs entr&eacute;es, par exemple <code>[Smith 2001; Jones
+            2002]</code></td>
+    </tr>
+    <tr>
+        <td>EtAlString</td>
+        <td>cha&icirc;ne</td>
+        <td><code> et al. </code></td>
+        <td>Texte ins&eacute;r&eacute; apr&egrave;s les noms d'auteur quand tous les auteurs ne
+            sont pas list&eacute;s, par exemple <code>[Smith et al. 2001]</code></td>
+    </tr>
+    <tr>
+        <td>FormatCitations</td>
+        <td>bool&eacute;en</td>
+        <td><code>false</code></td>
+        <td>D&eacute;termine si le formatage doit &ecirc;tre appliqu&eacute; aux citations. Si vrai,
+            un format de caract&egrave;re sera appliqu&eacute; aux citations. La propri&eacute;t&eacute;
+            <code>CitationCharacterFormat</code> contr&ocirc;le quel format doit &ecirc;tre
+            appliqu&eacute;.  Le format doit &ecirc;tre d&eacute;fini dans votre document
+            OpenOffice. Tout param&egrave;tre et effet de caract&egrave;re peut &ecirc;tre choisit
+            dans OpenOffice pour votre format de caract&egrave;re.
+        </td>
+    </tr>
+    <tr>
+        <td>GroupedNumbersSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code>-</code></td>
+        <td>Texte ins&eacute;r&eacute; entre les nombres quand les citations num&eacute;riques sont
+            group&eacute;es, par exemple <code>[4-6]</code></td>
+    </tr>
+    <tr>
+        <td>InTextYearSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td>Single Space</td>
+        <td>Texte ins&eacute;r&eacute; entre les noms d'auteur et la parenth&egrave;se ouvrante
+            avant l'ann&eacute;e dans les citations dans le texte.</td>
+    </tr>
+    <tr>
+        <td>ItalicEtAl</td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Si <code>true</code>, la cha&icirc;ne "et al." dans les marqueurs de citation est mis en italique.</td>
+    </tr>
+    <tr>
+        <td>MaxAuthors</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>Le nombre maximum d'auteurs &agrave; lister dans une citation qui appara&icirc;t
+            pr&eacute;c&eacute;demment dans le document.</td>
+    </tr>
+    <tr>
+        <td>MaxAuthorsFirst</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>Le nombre maximum d'auteurs &agrave; lister dans une citation qui appara&icirc;t
+            pour la premi&egrave;re fois.</td>
+    </tr>
+    <tr>
+        <td>MinimumGroupingCount</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>Le nombre minimum d'entr&eacute;es cons&eacute;cutives qu'une citation doit
+            contenir avant que les nombres soient group&eacute;s, par exemple
+            <code>[4-6]</code> ou <code>[4; 5; 6]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>MultiCiteChronological</td>
+        <td>bool&eacute;en</td>
+        <td><code>true</code></td>
+        <td>Si <code>true</code>, les entr&eacute;es multiples d'une m&ecirc;me citation
+            sont tri&eacute;es chronologiquement. Sinon, elles sont sorties
+            alphab&eacute;tiquement.
+        </td>
+    </tr>
+    <tr>
+        <td>PageInfoSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code>; </code></td>
+        <td>Pour des citations avec des informations compl&eacute;mentaires, par exemple des num&eacute;ros de page,
+            cette cha&icirc;ne est ins&eacute;r&eacute;e entre l'ann&eacute;e (pour les citations auteur-ann&eacute;e)
+            ou le num&eacute;ro de citation (pour les citations num&eacute;rot&eacute;es) et les informations compl&eacute;mentaires.
+            Par exemple, le texte entre <code>2001</code> et <code>p. 301</code> dans <code>[Smith 2001; p. 301]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>UniquefierSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td><code>, </code></td>
+        <td>Texte ins&eacute;r&eacute; entre les lettres utilis&eacute;es pour diff&eacute;rencier les
+            citations ayant des auteurs et ann&eacute;e similaires. Par exemple
+            le texte entre <code>a</code> et <code>b</code> dans
+            <code>[Smith 2001a, b]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>YearField</td>
+        <td>cha&icirc;ne</td>
+        <td><code>year</code></td>
+        <td>Le champ BibTeX pour l'ann&eacute;e de publication.</td>
+    </tr>
+    <tr>
+        <td>YearSeparator</td>
+        <td>cha&icirc;ne</td>
+        <td>Single Space</td>
+        <td>Texte ins&eacute;r&eacute; entre les noms d'auteurs et l'ann&eacute;e dans les citations
+            entre parenth&egrave;ses telle que <code>[Smith 2001]</code>.</td>
+    </tr>
+</table>
+
+<p>Si des entr&eacute;es num&eacute;rot&eacute;es sont utilis&eacute;es, les propri&eacute;t&eacute;s
+    <code>BracketBefore</code> et <code>BracketAfter</code> sont les plus
+    importantes - elles d&eacute;finissent quels caract&egrave;res sont utilis&eacute;s dans le num&eacute;ro
+    de citation. La citation est compos&eacute;e ainsi&nbsp;:<br/>
+    <code>[BracketBefore][Number][BracketAfter]</code><br/>
+    o&ugrave; [Number] est le nombre dans la citation, d&eacute;termin&eacute; selon l'ordre de la
+    bibliographie et/ou la position de cette citation dans le texte. Si une
+    citation correspond &agrave; plusieurs entr&eacute;es, elles seront s&eacute;par&eacute;es par la
+    cha&icirc;ne donn&eacute;e dans la propri&eacute;t&eacute; <code>CitationSeparator</code>
+    (par exemple, si <code>CitationSeparator</code>=;, la citation
+    ressemblera &agrave; <code>[2;4;6]</code>). Si au moins deux entr&eacute;es correspondent
+    &agrave; des num&eacute;ros cons&eacute;cutifs, ces num&eacute;ros seront group&eacute;s (par exemple
+    <code>[2-4]</code> pour 2, 3 and 4 ou <code>[2;5-7]</code> pour 2, 5, 6 et
+    7). La propri&eacute;t&eacute; <code>GroupedNumbersSeparator</code> (par d&eacute;faut
+    <code>-</code>) d&eacute;termine quelle cha&icirc;ne s&eacute;pare le premier et le dernier
+    &eacute;l&eacute;ment des num&eacute;ros group&eacute;s. La propri&eacute;t&eacute; enti&egrave;re
+    <code>MinimumGroupingCount</code> (par d&eacute;faut 3) d&eacute;termine quel nombre
+    de num&eacute;ros cons&eacute;cutifs est autoris&eacute; avant que les entr&eacute;es ne soient
+    group&eacute;es. Si <code>MinimumGroupingCount</code>=3, les num&eacute;ros 2 et 3 ne
+    seront pas group&eacute;s, tandis que 2, 3, 4 le seront. Si
+    <code>MinimumGroupingCount</code>=0, aucun groupement ne sera effectu&eacute;
+    quel que soit le nombre de num&eacute;ros cons&eacute;cutifs.
+</p>
+
+<p>Si des entr&eacute;es num&eacute;rot&eacute;es ne sont pas utilis&eacute;es, des citations auteur-ann&eacute;e
+    seront cr&eacute;&eacute;es sur la base des propri&eacute;t&eacute;s de citation.
+    Une citation entre parenth&egrave;ses est compos&eacute;e ainsi&nbsp;:<br/>
+    <code>[BracketBefore][Author][YearSeparator][Year][BracketAfter]</code><br/>
+    o&ugrave; [Author] est le r&eacute;sultat du ou des champs donn&eacute;s dans la propri&eacute;t&eacute;
+    <code>AuthorField</code> et le formatage d'une liste d'auteurs.
+    Cette liste peu contenir jusqu'&agrave; <code>MaxAuthors</code> noms - s'il y en
+    &agrave; plus, la liste sera compos&eacute;e du premier auteur et du texte sp&eacute;cifi&eacute; dans
+    la propri&eacute;t&eacute; <code>EtAlString</code>. Si la propri&eacute;t&eacute;
+    <code>MaxAuthorsFirst</code> est donn&eacute;e, elle est prioritaire sur
+    <code>MaxAuthors</code> la premi&egrave;re fois que chaque citation appara&icirc;t dans
+    le texte.</p>
+
+<p>Si plusieurs champs s&eacute;par&eacute;s par des slashs sont donn&eacute;s dans la propri&eacute;t&eacute;
+    <code>AuthorField</code>, ils seront consid&eacute;r&eacute;s successivement si le premier
+    champ est vide pour l'entr&eacute;e BibTeX consid&eacute;r&eacute;e. Dans l'exemple ci-dessus,
+    le champ "author" sera utilis&eacute;&nbsp;; mais, s'il est vide le champ "editor"
+    sera utilis&eacute; en remplacement.</p>
+
+<p>Les noms de la liste d'auteurs seront s&eacute;par&eacute;s par le texte donn&eacute; par la
+    propri&eacute;t&eacute; <code>AuthorSeparator</code>, except&eacute;s pour les deux derniers
+    noms qui seront s&eacute;par&eacute;s par le texte sp&eacute;cifi&eacute; dans 
+    <code>AuthorLastSeparator</code>.
+    Si la propri&eacute;t&eacute; <code>AuthorLastSeparatorInText</code> est sp&eacute;cifi&eacute;e, elle
+    remplace le pr&eacute;c&eacute;dent pour les citations du type "dans le texte". Cela
+    permet d'avoir des citations comme <code>(Olsen &amp; Jensen, 2008)</code>
+    et <code>Olsen and Jensen (2008)</code> avec un m&ecirc;me style.
+</p>
+
+<p>[Year] est la r&eacute;sultante du ou des champs sp&eacute;cifi&eacute;s dans la propri&eacute;t&eacute;
+    [YearField].</p>
+
+<p>Une citation "dans le texte" est compos&eacute;e comme suit&nbsp;:<br/>
+    <code>[Author][InTextYearSeparator][BracketBefore][Year][BracketAfter]</code><br/>
+    o&ugrave; [Author] et [Year] sont trait&eacute;s exactement de la m&ecirc;me fa&ccedil;on que pour
+    les citations entre parenth&egrave;ses.</p>
+
+<p>Si deux sources diff&eacute;rentes sont cit&eacute;es et si elles ont les m&ecirc;mes auteurs
+    et ann&eacute;es de publication, et si des citations auteur-ann&eacute;e sont utilis&eacute;es,
+    leurs appels n&eacute;cessiteront une modification afin d'&ecirc;tre rendue
+    discernables. Ceci est fait automatiquement en rajoutant une lettre apr&egrave;s
+    l'ann&eacute;e pour chacune de ces publications&nbsp;; 'a' pour la premi&egrave;re
+    r&eacute;f&eacute;rence cit&eacute;e, 'b' pour la suivante, et ainsi de suite.
+    Par exemple, si l'auteur "Olsen" a deux papiers cit&eacute;s pour 2005, les appels
+    de citation seront modifi&eacute;s en <code>(Olsen, 2005a)</code> et
+    <code>(Olsen, 2005b)</code>. Dans la mise en page de la bibliographie,
+    l'utisation d'une lettre "singularisante" sera indiqu&eacute;e explicitement par
+    l'insertion du champ virtuel <code>uniq</code>.</p>
+
+<p>Si plusieurs entr&eacute;es ayant &eacute;t&eacute; "singularis&eacute;es" sont cit&eacute;es ensemble, elles
+    seront group&eacute;es dans l'appel &agrave; r&eacute;f&eacute;rence. Par exemple, des deux entr&eacute;es
+    donn&eacute;es ci-dessus en exemple sont cit&eacute;es ensemble, l'appel &agrave; r&eacute;f&eacute;rence
+    sera <code>(Olsen, 2005a, b)</code> au lieu de 
+    <code>Olsen, 2005a; Olsen, 2005b)</code>. Les lettres discrimantes
+    regroup&eacute;es (a et b dans notre exemple) seront s&eacute;par&eacute;s par une cha&icirc;ne
+    sp&eacute;cifi&eacute;e par la propri&eacute;t&eacute; <code>UniquefierSeparator</code>.</p>
+
+<p>Les citations auteur-ann&eacute;e faisant r&eacute;f&eacute;rence &agrave; plus d'une entr&eacute;e seront par
+    d&eacute;faut tri&eacute;e chronologiquement. Si vous souhaitez qu'elles soient tri&eacute;es
+    alphab&eacute;tiquement, la propri&eacute;t&eacute; de citation
+    <code>MultiCiteChronological</code> doit &ecirc;tre param&eacute;tr&eacute;e &agrave;
+    <code>false.</code>.</p>
+
+<h3>Mise en page de la liste de r&eacute;f&eacute;rences</h3>
+
+<p>La section <b>LAYOUT</b> d&eacute;crit comment doit appara&icirc;tre l'entr&eacute;e
+    bibliographique correspondant &agrave; chaque type d'entr&eacute;e de JabRef.
+    Chaque ligne doit d&eacute;buter soit avec le nom d'un type d'entr&eacute;e BibTeX, soit
+    avec le mot <code>default</code>, suivi par un '='. La mise en page
+    <code>default</code> sera utilis&eacute;e pour toutes les entr&eacute;es o&ugrave; une mise
+    en page n'a pas &eacute;t&eacute; sp&eacute;cifi&eacute;e.</p>
+
+<p>Le reste de chaque ligne d&eacute;finit la mise en page, avec le texte et les
+    espaces habituels apparaissant directement dans l'entr&eacute;e bibliographique.
+    Les informations provenant de l'entr&eacute;e BibTeX sont ins&eacute;r&eacute;es en ajoutant des
+    marqueurs <code>\field</code> avec le nom de fichier appropri&eacute; (par exemple
+    <code>\author</code> pour ins&eacute;rer les noms des auteurs). Les informations
+    de formatage pour le champ peuvent &ecirc;tre inclues ici, en suivant la syntaxe
+    de JabRef pour la mise en page d'exportation. Voir
+    <a href="http://jabref.sourceforge.net/help/fr/CustomExports.php"> la
+        documentation de JabRef sur les filtres d'exportation personnalis&eacute;s</a>
+    pour plus d'informations sur les formateurs disponibles.</p>
+
+<p>Si des citations auteur-ann&eacute;e sont utilis&eacute;es, vous devez sp&eacute;cifier
+    explicitement la position de la lettre "singularisante" qui est ajout&eacute;e
+    pour distinguer des citations similaires. Ceci est effectu&eacute; en incluant
+    le champ virtuel <code>uniq</code>, typiquement juste apr&egrave;s l'ann&eacute;e (comme
+    montr&eacute; dans l'exemple du fichier de style). Le champ <code>uniq</code> est
+    automatiquement param&eacute;tr&eacute; correctement pour chaque entr&eacute;e avant que son
+    texte de r&eacute;f&eacute;rence soit mis en page.</p>
+
+<p>Pour sp&eacute;cifier le formatage dans la bibliographie, vous pouvez utiliser les
+    paires de balises de style HTML &lt;b&gt; &lt;/b&gt;,
+    &lt;i&gt; &lt;/i&gt;, &lt;sup&gt; &lt;/sup&gt; and &lt;sub&gt; &lt;/sub&gt; 
+    pour d&eacute;finir respectivement du texte en gras, en italique, en exposant et
+    en indice.</p>
+
+<p>Si vous utilisez des citations num&eacute;rot&eacute;es, le num&eacute;ro de chaque entr&eacute;e sera
+    automatiquement ins&eacute;r&eacute; au d&eacute;but de chaque entr&eacute;e dans le liste de
+    r&eacute;f&eacute;rences. Par d&eacute;faut, les num&eacute;ros seront mis entre les m&ecirc;me parenth&egrave;ses
+    que d&eacute;finies pour les citations. Les propri&eacute;t&eacute;s de citations optionelles
+    <code>BracketBeforeInList</code> et <code>BracketAfterInList</code> 
+    remplacent <code>BracketBefore</code> et <code>BracketAfter</code> si elles
+    sont param&eacute;tr&eacute;es. Elles peuvent &ecirc;tre utilis&eacute;es si vous voulez des types
+    diff&eacute;rents de parenth&egrave;ses (ou pas de parenth&egrave;ses) dans votre liste de 
+    r&eacute;f&eacute;rences. Notez que ce ne sont pas n&eacute;cessairement des parenth&egrave;ses&nbsp;;
+    cela peut &ecirc;tre toute combinaison de caract&egrave;res.</p>
+
+<h2>Probl&egrave;mes connus</h2>
+
+<ul>
+    <li>Assurez-vous d'enregistrer votre document Write dans le format
+        OpenDocument (odt). Enregistrer au format Word perdra vos marques de
+        r&eacute;f&eacute;rences.</li>
+    <li>Il n'y a actuellement pas de citations bas&eacute;s sur des notes de bas
+        de page.</li>
+    <li>Le curseur peut &ecirc;tre mal positionn&eacute; apr&egrave;s l'insertion d'une
+        citation.</li>
+    <li>Copier-coller le fichier de style en exemple directement &agrave; partir de
+        cette page donnera un fichier non utilisable. Pour &eacute;viter cela,
+        t&eacute;l&eacute;chargez le fichier d'exemple &agrave; partir du lien dans la section de
+        t&eacute;l&eacute;chargement.
+    </li>
+</ul>
+
+</body>

@@ -1,0 +1,268 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Tentang <em>bibtex</em></h1>
+
+    <p>JabRef membantu anda bekerja menggunakan basisdata
+    <em>bibtex</em>, namun ada beberapa aturan yang harus anda ikuti
+    ketika melakukan penyuntingan entri, untuk memastikan bahwa 
+    basidata anda dapat dibaca dengan benar oleh program <em>bibtex</em>.</p>
+
+    <h2>Bidang dalam <em>bibtex</em></h2>
+
+    <p>Ada banyak perbedaan di bidang-bidang 
+    dalam <em>bibtex</em>, dengan beberapa bidang tambahan
+    yang dapat anda atur di JabRef.</p>
+
+    <p>Secara umum, anda dapat menggunakan perintah LaTeX dalam bidang
+    yang berisi teks. <em>Bibtex</em> akan secara otomatis 
+    memformat daftar referensi anda, serta bidang-bidang
+    yang ada dalam daftar akan diatur huruf besar kecilnya sesuai
+    dengan gaya bibliografi yang anda gunakan. Untuk mempertahankan
+    karakter tetap dalam huruf besar, anda harus menggunakan tanda
+    kurung kurawal, seperti pada kata {B}elgia.</p>
+
+    <p>Catatan tentang beberapa tipe bidang:</p>
+
+    <ul>
+        <li><strong style="font-style: italic;">Bibtexkey<br /></strong>
+        String tertentu digunakan untuk mengacu entri di dokumen LaTeX.
+        membuat acuan di LaTeX, kunci yang digunakan harus sesuai dengan
+        string kunci bibtex. Huruf besar dan kecil akan dibedakan.<br />
+        </li>
+
+        <li><strong>address<br /></strong> Biasanya merupakan
+        alamat dari <tt>penerbit</tt> atau dari tipe institusi. Untuk
+        berbagai tempat peenrbitan, van&nbsp;Leunen menyarankan
+        menghilangkan atau tidak menggunakan informasi ini. Sebagian
+        penerbit yang masih belum berkembang, anda dapat memberikan
+        informasi pada pembaca dengan menulis alamat lengkap.</li>
+
+        <li><strong>annote<br /></strong> Untuk membuat catatan.
+        Tidak digunakan dalam gaya bibliografi standar, tetapi bisa
+        digunakan bagi yang ingin menambahkan catatan bibliografi.</li>
+
+        <li><strong>author<br /></strong> Bidang ini harus
+        berisi semua penulis yang ada. Nama tiap penulis dipisahkan dengan kata
+        <em>and</em>, meskipun jumlah penulis lebih dari dua. Cara menulis
+        nama penulis ada dua format dengan maksud yang sama:<br />
+         Donald E. Knuth <em>atau</em> Knuth, Donald E.<br />
+         Eddie van Halen <em>atau</em> van Halen, Eddie<br />
+        Format yang kedua digunakan apabila penulis lebih dari dua,
+        untuk membedakan antara nama tengah dan nama belakang.<br />
+        </li>
+
+        <li><strong>booktitle<br /></strong> Judul dari buku, 
+        bagian dari buku akan diacu. Untuk entri buku, gunakan
+        bidang <tt>title (judul)</tt>.</li>
+
+        <li><strong>chapter<br /></strong> Untuk nomor bab (atau subbab atau
+        atau yang setara).</li>
+
+        <li><strong>crossref<br /></strong> Kunci basisdata
+        dari entri yang digunakan sebagai referensi silang.</li>
+
+        <li><strong>edition<br /></strong> Edisi terbitan dari
+        buku--misalnya, ``Kedua''. Harus berupa angka urutan,
+        dan huruf pertama harus huruf besar, seperti contoh tadi;
+        gaya standar akan mengubah ke huruf kecil apabila perlu.</li>
+
+        <li><strong>editor<br /></strong> Bidang ini setara
+        dengan bidang <em>author</em>. Apabila digunakan juga bidang
+        <tt>author</tt>, maka bidang <tt>editor</tt> akan menghasilkan
+        penyunting buku atau koleksi dimana referensi akan muncul.</li>
+
+        <li><strong>howpublished<br /></strong> Bagaimana suatu karya
+        diterbitkan. Huruf pertama dari kata pertama harus huruf besar.</li>
+
+        <li><strong>institution<br /></strong> Institusi yang
+        mendukung atau memberi sponsor karya yang diterbitkan.</li>
+
+        <li><strong>journal<br /></strong> Nama jurnal. Nama jurnal
+        seringkali disingkat menggunakan "string". Untuk menuliskan
+        string, gunakan <a href="StringEditorHelp.html">penyunting string
+        </a>.</li>
+
+        <li><strong>key<br /></strong> Digunakan untuk mengurutkan,
+        referensi silang, dan membuat label apabila informasi ``author''
+        tidak ada. Bidang ini jangan diartikan sama dengan kunci bibtex yang
+        dipanggil dengan perintah <code>\cite</code>
+        serta yang ada di bagian awal entri basisdata.</li>
+
+        <li><strong>month<br /></strong> Bulan karya dipublikasikan
+        atau, untuk karya yang tidak diterbitkan, menggunakan
+        bulan waktu ditulis. Anda harus menggunakan singkatan standar
+        tiga huruf (jan, feb, mar, apr, may, jun, jul, aug, sep,
+        oct, nov, dec).</li>
+
+        <li><strong>note<br /></strong> Informasi tambahan
+        yang dapat membantu pembaca. Kata pertama harus huruf besar.
+        </li>
+
+        <li><strong>number</strong><br />
+        Nomor jurnal, majalah, laporan penelitian, atau karya
+        dalam serial. Jurnal atau majalah biasanya dikenali dari
+        nomor volume dan nomor terbitannya; organisasi yang menerbitkan
+        biasanya memberikan nomor terbitan; beberapa buku serial juga
+        mempunyai nomor terbitan.</li>
+
+        <li><strong>organization<br /></strong> Organisasi yang
+        memberikan bantuan pada konferensi atau organisasi yang
+        menerbitkan manual.</li>
+
+        <li><strong>pages<br /></strong> Halaman atau halaman yang dinyatakan
+        dengan jangkah, misalnya <tt>42-111</tt> atau
+        <tt>7,41,73-97</tt> atau <tt>43+</tt> (tanda `<tt>+</tt>' di
+        contoh terakhir menandakan halaman setelahnya yang tidak ditulis
+        dengan jangkah). Untuk mempermudah mempertahankan kompatibilitas
+        basisdata <em>Scribe</em>, standar gaya akan merubah ke satu 
+        tanda coret (seperti <tt>7-33</tt>) dari dua tanda coret yang
+        digunakan TeX untuk nomor dalam jangkah (seperti
+        <tt>7--33</tt>).</li>
+
+        <li><strong>publisher<br /></strong> Nama
+        penerbit.</li>
+
+        <li><strong>school<br /></strong> Nama sekolah atau universitas
+        dimana tesis ditulis.</li>
+
+        <li><strong>series<br /></strong> Nama seri dari
+        terbitan buku. Ketika mengacu seluruh buku, bidang
+        <tt>title</tt> memberikan judul, sedangkan tambahan bidang
+        <tt>series</tt> memberikan  nama seri atau
+        nama volume buku yang diterbitkan.</li>
+
+        <li><strong>title<br /></strong> Judul karya. Huruf besar dan kecil
+        tergantung dari gaya bibliografi serta bahasa yang digunakan.
+        Jika huruf harus huruf besar, pastikan anda menggunakan
+        tanda kurung kurawal agar tidak berubah, misalnya {I)ndonesia atau
+        {Indonesia}.</li>
+
+        <li><strong>type<br /></strong> Tipe dari laporan
+        teknis--misalnya, ``Laporan Penelitian''.</li>
+
+        <li><strong>volume<br /></strong> Nomor volume jurnal
+        atau nomor volume dari buku.</li>
+
+        <li><strong>year<br /></strong> Tahun penerbitan,
+        untuk karya yang tidak diterbitkan, tahun ditulis. Secara umum,
+        harus terdiri dari angka bulat, seperti <tt>1984</tt>,
+        meskipun gaya bibliografi standar dapat mengenali <tt>year</tt>
+        dengan kombinasi teks asalkan empat terakhir berupa angka tahun,
+        misalnya `(sekitar 1984)'. Bidang ini diperlukan hampir
+        disemua tipe entri.</li>
+    </ul><br />
+
+
+    <h2>Bidang tambahan</h2>
+
+    <p>BibTeX sangat populer sehingga banyak orang
+    menggunakan untuk menyimpan informasi. Dibawah ini adalah daftar
+    bidang tambahan yang sering digunakan:</p>
+
+    <ul>
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        affiliation*</span><br /></strong> Afiliasi
+        penulis.<br />
+        </li>
+
+        <li><strong>abstract<br /></strong> Abstrak dari
+        tulisan.<br />
+        </li>
+
+        <li><strong>doi<br /></strong> Singkatan Digital Object
+        Identifier, merupakan identitas permanen yang diberikan 
+        pada dokumen.<br />
+        </li>
+
+        <li><strong>eid<br /></strong> Singkatan dari Electronic identifier
+        yang digunakan oleh jurnal elektronik serta cetakan. Kode angka
+        menggantikan nomor halaman, serta digunakan untuk mencari
+        artikel dalam volume yang dicetak. Seringkali juga disebut
+        <em>citation number (nomor acuan)</em>.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        contents*</span><br /></strong> Daftar Isi<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        copyright*</span><br /></strong> Informasi
+        Hakcipta.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISBN*</span><br /></strong> Singkatan dari International Standard Book
+        Number.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISSN*</span><br /></strong> Singkatan dari International Standard
+        Serial Number. Digunakan sebagai identifikasi jurnal.<br />
+        </li>
+
+        <li><strong>keywords (katakunci)<br /></strong> Katakunci
+        digunakan untuk mencari topik tertentu yang sesuai.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        language*</span><br /></strong> Bahasa yang digunakan dalam
+        dokumen.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        location*</span><br /></strong> Lokasi yang berhubungan dengan
+        entri, misalnya kota tempat berlangsungnya konferensi.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        LCCN*</span><br /></strong> Singkatan dari Library of Congress Call
+        Number. Seringkali muncul dengan singkatan nama <tt>lib-congress</tt>.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        mrnumber*</span><br /></strong> Nomor dari <i>Mathematical
+        Reviews</i>.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        price*</span><br /></strong> Harga dari sebuah
+        documen.<br />
+        </li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        size*</span><br /></strong> Ukuran dimensi fisik dari suatu
+        karya.<br />
+        </li>
+
+        <li><strong>URL<br /></strong> Singkatan dari Universal Resource
+        Locator yang menunjukkan acuan www berada. Hal ini sering
+        digunakan pada laporan teknis yang mengacu situs ftp dimana dokumen
+        postscript disimpan.</li>
+    </ul>
+
+    <h3>JuraBib</h3>
+
+    <ul>
+        <li><strong>urldate<br /></strong> Tanggal terakhir 
+        dikunjungi.</li>
+    </ul><br />
+     *) tidak secara langsung didukung oleh JabRef<br />
+     <br />
+</body>
+</html>

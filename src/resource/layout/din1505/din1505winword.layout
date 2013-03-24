@@ -1,0 +1,51 @@
+{[\Bibtexkey]:}	
+{\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}}
+: \format[RTFChars]{\title}}
+\begin{journal}
+. In:
+{\\i \format[RTFChars,RemoveLatexCommands]{\journal}}
+\end{journal}
+\begin{editor}
+. In:
+ {\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}} (Hrsg.)
+\end{editor}
+\begin{organization}
+, \format[RTFChars]{\organization}
+\end{organization}
+\begin{institution}
+, Bericht, \format[RTFChars]{\institution}
+\end{institution}
+
+\begin{school}
+, Dissertation
+ (\type)
+, \format[RTFChars]{\school}
+\end{school}
+
+\begin{howpublished}
+, \format[RTFChars]{\howpublished}
+\end{howpublished}
+
+\begin{address}
+, \format[RTFChars]{\address}
+\end{address}
+
+\begin{publisher}
+: {\\i \format[RTFChars]{\publisher}}.
+\end{publisher}
+
+\begin{volume}
+ {\volume}
+\end{volume}
+\begin{number}
+, Nr. \number
+\end{number}
+\begin{booktitle}
+ : {\\i \format[RTFChars]{\booktitle}}.
+\end{booktitle}
+, \year
+\begin{pages}
+, S. \pages
+\end{pages}
+\\par
+{

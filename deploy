@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Deploy script for JabRef. Builds jar file and OSX package, and creates source zip and tarball.
+rm ~/release_jabref/$1/*
+cd ~/jabref-$1/
+ant clean
+cd ~
+zip -r release_jabref/$1/JabRef-$1-src.zip jabref-$1
+tar cjf release_jabref/$1/JabRef-$1-src.tar.bz2 jabref-$1
+cd ~/jabref-$1/
+ant compile unjarlib non_osx jars osxjar
+cd build/lib
+cp JabRef-$1.jar ~/release_jabref/$1/
+zip -r ~/release_jabref/$1/JabRef-$1.OSX.zip JabRef.app
+cd ~/jabref-$1/
+

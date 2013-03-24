@@ -1,0 +1,138 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+<h1>Penyunting entri</h1>
+
+    <p><em>Dibuka dari jendela utama dengan klik-ganda salah satu
+    baris daftar entri yang ada, atau dengan cara memilih salah satu
+    baris kemudian tekan ENTER. Untuk menutup panel penyunting 
+    dengan cara menekan tombol ESC.</em></p>
+
+    <p>Dalam panel ini anda dapat mengisikan semua informasi yang
+    relevan untuk entri yang anda pilih. Penyunting entri memeriksa
+    semua tipe entri yang ada, dan memberikan anda keleluasaan untuk
+    menyunting bidang-bidang utama yang diperlukan serta bidang tambahan
+    lainnya yang akan digunakan dalam referensi menggunakan 
+    <em>bibtex</em>. Selain itu ada beberapa bidang yang akan dimasukkan
+    dalam <em>Bidang umum</em>, yang umum ada untuk semua tipe entri.</p>
+
+    <p>Anda sepenuhnya dapat mengatur bidang mana yang anda inginkan
+    masuk dalam katagori diperlukan serta mana saja yang bersifat tambahan
+    untuk tiap tipe entri. Selain itu anda juga bisa mengatur bidang apa saja
+    yang akan masuk dalam tab Bidang umum. Silahkan baca 
+    <a href="CustomEntriesHelp.html">Pengaturan tipe entri</a>
+    untuk informasi yang lebih terperinci.</p>
+
+    <p>Informasi lain tentang bagaimana mengisi bidang yang ada, silahkan baca
+    <a href="BibtexHelp.html">Bantuan bibtex</a>.</p>
+
+    <h2>Panel penyunting entri</h2>
+
+    <p>Penyunting entri mempunyai enam panel: 
+    <em>Bidang diperlukan</em>, <em>Bidang tambahan</em>,
+    <em>Umum</em>, <em>Abstrak</em>, <em>Ulasan</em> dan
+    <em>sumber BibTeX</em>, dimana <em>Umum</em>,
+    <em>Abstrak</em> dan <em>Ulasan</em> dapat diatur (baca
+    <a href="GeneralFields.html">Pengaturan bidang umum</a> untuk
+    penjelasan terperinci). Dalam tiga panel yang pertama, TAB dan SHIFT-TAB
+    bisa digunakan untuk menggerakkan lokasi bidang teks.</p>
+
+    <p>Berpindah penyuntingan dari panel ke panel dapat menggunakan
+    tombol TAB dengan kombinasi tombol ketik lainnya:CTRL-TAB atau CTRL-PLUS
+    untuk berpindah ke tab sebelah kanan, sedangkan CTRL-SHIFT-TAB atau
+    CTRL-MINUS untuk berpindah ke tab sebelah kiri. Anda dapat berpindah
+    ke entri sebelumnya atau setelahnya dengan menekan CTRL-SHIFT-DOWN atau
+    CTRL-SHIFT-UP. Anda bisa juga menggunakan tombol panah yang ada di 
+    kotak bantuan.</p>
+
+    <p>Panel <em>Sumber BibTeX</em> menampilkan bagaimana entri
+    hasilnya jika basisdata anda simpan ke format <em>bibtex</em>.
+    Jika anda menginginkan, anda bisa menyunting sumber <em>bibtex</em>
+    langsung dari penel ini. Ketika anda berpindah ke panel lainnya,
+    tekan CTRL-S atau tutup penyunting entri, JabRef akan menyesuaikan
+    perubahan yang anda lakukan di penel Sumber BibTeX. Apabila ada 
+    kesalahan, pesan pemberitahuan akan muncul, dan memberikan pilihan
+    apakah anda akan memperbaikinya atau mengembalikan ke isi sebelumnya.
+    Jika anda memilih <strong>Tampilkan sumber BibTeX sebagai bawaan</strong> di panel
+    <strong>Penyunting Entri</strong> dari menu 
+    <strong>Pengaturan->Preferensi</strong>, panel sumber BibTeX akan muncul
+    satu-satunya panel ketika anda membuka penyunting entri. Jika anda lebih suka
+    menyunting sumber daripada menggunakan panel penyunting, inilah pilihan
+    yang tepat untuk anda.</p>
+
+    <p><strong>Saran:</strong> Apabila basisdata anda mempunyai bidang
+    yang tidak dikenal oleh JabRef, bidang tersebut akan muncul di panel 
+    sumber.</p>
+
+    <h2>Memeriksa konsistensi bidang</h2>
+
+    <p>Apabila isi dari bidang berubah, JabRef akan memeriksa apakah
+    isi yang baru dapat diterima. Untuk tipe bidang yang digunakan 
+    <em>bibtex</em>, isinya diperiksa berdasar penggunaan karakter '#'.
+    Simbol pagar ini <em>hanya</em> boleh digunakan secara berpasangan
+    (kecuali untuk penulisan, '\#'), yang bermakna melipat string
+    <em>bibtex</em> yang diacu. JabRef tidak akan memeriksa jika string
+    yang diacu benar-benar ada (ini bukan buka suatu tipuan, karena gaya
+    <em>bibtex</em> yang anda gunakan dapat mendefinisikan kumpulan
+    string bebas yang tidak dikenali JabRef).</p>
+
+    <p>Apabila isi tidak dapat diterima, bidang akan berubah warna menjadi
+    merah, yang menandakan adanya kesalahan. Jika hal ini terjadi, perubahan
+    tidak akan disimpan.</p>
+
+    <!--<h2>Word/name autocompletion</h2>
+
+    <p>The entry editor offers autocompletion of words. In the Preferences dialog
+    you can enable or disable autocompletion, and choose for which fields
+    autocompletion is active.</p>
+
+    <p>With autocompletion, JabRef records all words that appear in
+    each of the chosen fields throughout your database. Whenever you write
+    the beginning of one of these words, it will be suggested visually. To
+    ignore the suggestion, simply write on. To accept the suggestion,
+    either press <em>ENTER</em> or use your arrow keys or other keys to
+    remove the selection box around the suggested characters.</p>
+
+    <p><em>Note:</em> the words considered for suggestion are only the ones
+    appearing in the same field in entries of the same database as the one you
+    are editing. There are many ways to realise this kind of feature, and if you feel
+    it should have been implemented differently, we'd like to hear your suggestions!</p>
+
+    <h2>Copy <em>bibtex</em> key</h2>
+
+    <p>Pressing CTRL-K or the 'key' button causes the <em>bibtex</em> key for your entry
+    to be copied to the clipboard.</p>
+    -->
+
+    <h2>Kunci <em>bibtex</em> otomatis</h2>
+
+    <p>Tekan CTRL-G atau gunakan 
+    tombol 'membuat kunci BibTeX' (tongkat ajaib) untuk membuat kunci
+    <em>bibtex</em> secara otomatis berdasarkan isi dari entri yang berada di
+    Bidang diperlukan.</p>
+
+    <p>Informasi lebih lanjut bagaimana JabRef membuat kunci
+    <em>bibtex</em>, silahkan baca
+    <a href="LabelPatterns.html">Pengaturan pembuat kunci BibTex</a>.</p>
+
+    <h2>Pengisian otomatis kata/nama</h2>
+
+    <p>JabRef mempunyai fitur pengisian otomatis kata/nama.
+    Pengaturan fitur ini dapat diubah dari <b>Pengaturan -> 
+    Preferensi -> Penyunting entri</b>. Pengaturan bawaan adalah
+    aktif untuk semua bidang yang umum digunakan.</p>
+
+    <p>Ketika menyunting satu bidang yang pengisian otomatisnya aktif,
+    JabRef akan mencoba menyarankan kata lengkap ketika anda menulis,
+    berdasarkan kata-kata yang digunakan di mana-mana bidang dalam basisdata
+    anda. Saran kata akan muncul dalam bentuk teks warna terang. Jika ada
+    beberapa kata yang mungkin, anda bisa menggunakan tombol PAGE UP dan
+    PAGE DOWN untuk melihat kata-kata yang disarankan. Pilih salah satu
+    kata, kemudian tekan ENTER. Untuk mengabaikan saran, teruskan menulis kata
+    anda sendiri.</p>
+
+</body>
+</html>

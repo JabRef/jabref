@@ -1,0 +1,36 @@
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>JabRef-1.1.1.jar</jar>
+  <outfile>.\src\windows\nsis\dist\JabRef.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>./src/images/JabRef.ico</icon>
+  <jre>
+    <path></path>
+    <minVersion>1.6.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <initialHeapSize>32</initialHeapSize>
+    <maxHeapSize>512</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>2.2.2.2</fileVersion>
+    <txtFileVersion>3.3.3</txtFileVersion>
+    <fileDescription>JabRef</fileDescription>
+    <copyright>JabRef developers</copyright>
+    <productVersion>2.2.2.2</productVersion>
+    <txtProductVersion>3.3.3</txtProductVersion>
+    <productName>JabRef</productName>
+    <companyName></companyName>
+    <internalName>JabRef</internalName>
+    <originalFilename>JabRef.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>

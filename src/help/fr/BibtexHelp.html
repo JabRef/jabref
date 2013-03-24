@@ -1,0 +1,310 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+
+    <h1>A propos de <em>BibTeX</em></h1>
+
+    <p>JabRef vous aide &agrave;
+    travailler avec vos bases de donn&eacute;es <em>BibTeX</em>,
+    mais certaines r&egrave;gles doivent &ecirc;tre gard&eacute;es
+    &agrave; l'esprit lorsque vous &eacute;ditez vos entr&eacute;es
+    afin d'obtenir un traitement correct de vos bases de
+    donn&eacute;es par le programme <em>BibTeX</em>.</p>
+
+    <h2>Les champs <em>BibTeX</em></h2>
+
+    <p>Il y a un grand nombre de
+    champs possibles dans <em>BibTeX</em>, et quelques champs en
+    plus que vous pouvez param&eacute;trer dans JabRef.</p>
+
+    <p>G&eacute;n&eacute;ralement, vous pouvez utiliser des
+    commandes LaTeX &agrave; l'int&eacute;rieur de champs contenant
+    du texte. <em>BibTeX</em> formatera automatiquement vos listes
+    de r&eacute;f&eacute;rences et les champs qui sont inclus dans
+    ces listes seront mis en majuscules/minuscules selon votre
+    style bibliographique. Pour &ecirc;tre certain que certains
+    caract&egrave;res restent en majuscules, encadrez-les par des
+    accolades, comme dans le mot {B}elgique.</p>
+
+    <p>Notes &agrave; propos de certains types de champs&nbsp;:</p>
+
+    <ul>
+        <li><strong style="font-style: italic;">Bibtexkey</strong>
+        C'est une cha&icirc;ne unique utilis&eacute;e pour
+        r&eacute;f&eacute;rencer l'entr&eacute;e dans les documents
+        LaTeX. Notez que lorsque vous r&eacute;f&eacute;rencez une
+        entr&eacute;e dans LaTeX, la clef doit respecter la casse
+        (majuscules/minuscules) de la cha&icirc;ne de
+        r&eacute;f&eacute;rence.<br /></li>
+
+        <li><strong>address<br /></strong> Habituellement l'adresse
+        de l'<tt>&eacute;diteur commercial</tt> ("publisher" en
+        anglais) ou d'un autre type d'institution. Pour les
+        principales maisons d'&eacute;dition, van&nbsp;Leunen
+        recommande d'omettre compl&egrave;tement cette information.
+        Pour les petites maisons d'&eacute;dition, d'un autre
+        cot&eacute;, vous pouvez aider le lecteur en donnant
+        l'adresse compl&egrave;te.</li>
+
+        <li><strong>annote<br /></strong> Une annotation. Ce champ
+        n'est pas utilis&eacute; par les styles bibliographiques
+        standards, mais peut &ecirc;tre utilis&eacute; par d'autres
+        styles qui produisent une bibliographie
+        annot&eacute;e.</li>
+
+        <li><strong>author<br /></strong> Ce champ doit contenir la
+        liste compl&egrave;te des auteurs de votre entr&eacute;e.
+        Les noms sont s&eacute;par&eacute;s par le mot
+        <em>and</em>, m&ecirc;me si il y a plus de deux auteurs.
+        Chaque nom peut &ecirc;tre &eacute;crit dans deux formes
+        &eacute;quivalentes&nbsp;:<br />
+         Donald E. Knuth <em>ou</em> Knuth, Donald E.<br />
+         Eddie van Halen <em>ou</em> van Halen, Eddie<br />
+         La seconde forme devrait &ecirc;tre utilis&eacute;e pour
+        les auteurs ayants plus de deux noms afin de
+        diff&eacute;rencier les seconds pr&eacute;noms et les noms
+        de famille [NDT: pas sur de la traduction...].<br />
+        <br /></li>
+
+        <li><strong>booktitle<br /></strong> Titre d'un livre, dont
+        une partie est cit&eacute;e. Pour les entr&eacute;es du
+        type "book", utilisez le champ <tt>title</tt>.</li>
+
+        <li><strong>chapter<br /></strong> Un num&eacute;ro de
+        chapitre (ou de partie, ou d'autre chose).</li>
+
+        <li><strong>crossref<br /></strong> La clef de
+        l'entr&eacute;e vers laquelle on effectue le renvoi.</li>
+
+        <li><strong>edition<br /></strong> Le num&eacute;ro
+        d'&eacute;dition d'un livre -- par exemple
+        "Troisi&egrave;me". Cela doit &ecirc;tre un nombre, et la
+        premi&egrave;re lettre doit &ecirc;tre capitalis&eacute;e,
+        comme montr&eacute; ici&nbsp;; les styles standards la
+        convertisse en minuscule si n&eacute;cessaire.</li>
+
+        <li><strong>editor<br /></strong> Ce champ est analogue au
+        champ <em>author</em>. Il permet d'indiquer le nom des
+        &eacute;diteurs scientifiques, coordonateurs, etc.</li>
+
+        <li><strong>howpublished<br /></strong> Comment quelque
+        chose de non-standard a &eacute;t&eacute; publi&eacute;e.
+        Le premier mot prend une majuscule.</li>
+
+        <li><strong>institution<br /></strong> L'institution ayant
+        promue un rapport technique.</li>
+
+        <li><strong>journal<br /></strong> Un nom de journal. Le
+        nom d'un journal peut &ecirc;tre abr&eacute;g&eacute; en
+        utilisant une "cha&icirc;ne". Pour d&eacute;finir une
+        cha&icirc;ne, utilisez
+        <a href="StringEditorHelp.html">l'&eacute;diteur de
+        cha&icirc;nes</a>.</li>
+
+        <li><strong>key<br /></strong> utilis&eacute; pour
+        alphab&eacute;tiser, renvoyer et cr&eacute;er une
+        &eacute;tiquette quand l'information sur "author" est
+        manquante. Ce champ ne doit pas &ecirc;tre confondu avec la
+        clef qui est fournie dans la commande <code>\cite</code> et
+        au d&eacute;but de l'entr&eacute;e.</li>
+
+        <li><strong>month<br /></strong> Le mois au cours duquel le
+        travail a &eacute;t&eacute; publi&eacute; ou, pour un
+        travail non publi&eacute;, au cours duquel il a
+        &eacute;t&eacute; &eacute;crit. Vous devriez utiliser
+        l'abr&eacute;viation standard &agrave; trois lettres (jan,
+        feb, mar, apr, may, jun, jul, aug, sep, oct, nov,
+        dec).</li>
+
+        <li><strong>note<br /></strong> Toute information
+        additionnelle qui peut aider le lecteur. Le premier mot
+        doit prendre une majuscule.</li>
+
+        <li><strong>number</strong><br />
+        Le num&eacute;ro d'un journal, d'un magazine, d'un rapport
+        technique ou d'un travail dans une s&eacute;rie. Les
+        journaux et les magazines sont habituellement
+        identifi&eacute;s par leur volume et leur
+        num&eacute;ro&nbsp;; l'organisation qui publie un rapport
+        technique lui donne en g&eacute;n&eacute;ral un
+        num&eacute;ro&nbsp;; et parfois les livres portent des
+        num&eacute;ros lorsqu'ils appartiennent &agrave; une
+        s&eacute;rie nomm&eacute;e.</li>
+
+        <li><strong>organization<br /></strong> L'organisation
+        ayant promue une conf&eacute;rence ou qui publie un
+        manuel.</li>
+
+        <li><strong>pages<br /></strong> Un ou plusieurs
+        num&eacute;ros de page, ou une gamme de num&eacute;ros, tel
+        que <tt>42-111</tt> ou <tt>7,41,73-97</tt> ou <tt>43+</tt>
+        (le `<tt>+</tt>' dans le dernier exemple indique des pages
+        suivantes qui ne sont pas dans un ordre simple). Pour
+        garder facilement la compatibilit&eacute; avec les bases de
+        donn&eacute;es compatibles <em>Scribe</em>, les styles
+        standards convertissent le tiret simple (comme dans
+        <tt>7-33</tt>) en un tiret double utilis&eacute; par TeX
+        pour d&eacute;finir une gamme de nombres (comme dans
+        <tt>7-33</tt>).</li>
+
+        <li><strong>publisher<br /></strong> Le nom de
+        l'&eacute;diteur commercial.</li>
+
+        <li><strong>school<br /></strong> Le nom de l'&eacute;cole
+        o&ugrave; a &eacute;t&eacute; &eacute;crite une
+        th&egrave;se.</li>
+
+        <li><strong>series<br /></strong> Le nom d'une s&eacute;rie
+        ou d'un ensemble de livres. Quand on cite un livre entier,
+        le champ <tt>title</tt> donne son titre et le champ
+        optionnel <tt>series</tt> donne le nom de la s&eacute;rie
+        ou de l'ensemble de volumes dans lequel le livre est
+        publi&eacute;.</li>
+
+        <li><strong>title<br /></strong> Le titre du travail. La
+        capitalisation d&eacute;pend du style bibliographique et de
+        la langue utilis&eacute;s. Pour les mots qui doivent
+        &ecirc;tre capitalis&eacute;s (tel un nom propre), mettre
+        le mot (ou sa premi&egrave;re lettre) entre accolades.</li>
+
+        <li><strong>type<br /></strong> Le type de rapport
+        technique -- par exemple, "Note de recherche".</li>
+
+        <li><strong>volume<br /></strong> Le volume d'un journal ou
+        d'un livre en plusieurs tomes.</li>
+
+        <li><strong>year<br /></strong> L'ann&eacute;e de
+        publication ou, pour un travail non publi&eacute;,
+        l'ann&eacute;e o&ugrave; il a &eacute;t&eacute;
+        &eacute;crit. G&eacute;n&eacute;ralement, elle doit prendre
+        quatre chiffres, tel que <tt>1984</tt>, cependant les
+        styles standards peuvent g&eacute;rer toute valeur de
+        <tt>year</tt> dont les quatre derniers caract&egrave;res
+        sont des chiffres (hors caract&egrave;res de ponctuation),
+        tel que `(autour de 1984)'. Ce champ est requis par la
+        plupart des types d'entr&eacute;es.</li>
+    </ul><br />
+
+
+    <h2>Autres champs</h2>
+
+    <p>BibTeX est tr&egrave;s populaire, et
+    beaucoup de gens l'ont utilis&eacute; pour stocker des
+    informations. Voici une liste de quelque uns des champs les
+    plus communs&nbsp;:</p>
+
+    <ul>
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        affiliation*</span><br /></strong> L'affiliation des
+        auteurs.<br />
+        <br /></li>
+
+        <li><strong>abstract<br /></strong> Le r&eacute;sum&eacute;
+        d'un travail.<br />
+        <br /></li>
+
+        <li><strong>doi<br /></strong> Le Digital Object Identifier
+        ("identifiant d'objet num&eacute;rique") est l'identifiant
+        permanent donn&eacute; &agrave; un document
+        num&eacute;rique.<br />
+        <br /></li>
+
+        <li><strong>eid<br /></strong> L'Electronic IDentifier
+        ("identifiant &eacute;lectronique") est utilis&eacute; par
+        les journaux &eacute;lectroniques qui ont aussi une version
+        papier. Ce num&eacute;ro remplace le nombre de pages et est
+        utilis&eacute; pour trouver un article dans un volume
+        imprim&eacute;. Il est parfois aussi appel&eacute;
+        <em>citation number</em>.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        contents*</span><br /></strong> La table des
+        mati&egrave;res<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        copyright*</span><br /></strong> Informations sur les
+        droits d'auteur (copyright).<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISBN*</span><br /></strong> L'"International Standard Book
+        Number".<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        ISSN*</span><br /></strong> L'"International Standard
+        Serial Number". Utilis&eacute; pour identifier un
+        journal.<br />
+        <br /></li>
+
+        <li><strong>keywords<br /></strong> Mots-clefs
+        utilis&eacute;s pour la recherche, ou pour
+        annotation.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        language*</span><br /></strong> La langue du
+        document.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        location*</span><br /></strong> Une localisation
+        associ&eacute;e avec l'entr&eacute;e, telle que la ville
+        o&ugrave; la conf&eacute;rence a eu lieu.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        LCCN*</span><br /></strong> Le "Library of Congress Control
+        Number". Champ parfois nomm&eacute;
+        <tt>lib-congress</tt>.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        mrnumber*</span><br /></strong> Le num&eacute;ro de
+        <i>Mathematical Reviews</i>.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        price*</span><br /></strong> Le prix du document.<br />
+        <br /></li>
+
+        <li>
+        <strong><span style="font-weight: normal; font-style: italic;">
+        size*</span><br /></strong> La taille physique d'un
+        travail.<br />
+        <br /></li>
+
+        <li><strong>URL<br /></strong> Le "WWW Uniform Resource
+        Locator" (adresse URL) qui pointe vers
+        l'&eacute;l&eacute;ment r&eacute;f&eacute;renc&eacute;.
+        C'est souvent utilis&eacute; pour les rapports techniques
+        afin d'indiquer le site ftp o&ugrave; la source postscript
+        du rapport est localis&eacute;e.</li>
+    </ul>
+
+    <h3>JuraBib</h3>
+
+    <ul>
+        <li><strong>urldate<br /></strong> La date de la
+        derni&egrave;re visite de la page.</li>
+    </ul><br />
+     *) non support&eacute; directement par JabRef<br />
+     <br />
+</body>
+</html>

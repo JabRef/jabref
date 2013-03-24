@@ -1,0 +1,165 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Importfilter anpassen</h1>
+
+    <p>JabRef bietet Ihnen die M&ouml;glichkeit, ganz &auml;hnlich
+    den Standard-Importern, eigene Importer zu definieren und zu
+    benutzen. Man definiert einen Importer durch eine oder mehrere
+    Java <i>Klassen</i>, die Dateinhalte aus einem sogenannten
+    <i>Input stream</i> lesen und daraus BibTex-Eintr&auml;ge
+    erzeugen. Sie k&ouml;nnen vorkompilierte Importer einbinden,
+    die Sie vielleicht von SourceForge erhalten haben (siehe "Ihre
+    Arbeit anderen zur Verf&uuml;gung stellen"). Sie k&ouml;nnen
+    auch mit Grundkenntnissen der Java-Programmierung eigene
+    Importer f&uuml;r f&uuml;r Sie wichtige Referenzquellen
+    erstellen oder neue, verbesserte Versionen existierender
+    Importer einbinden, ohne JabRef neu zu kompilieren.</p>
+
+    <p>Externe Importfilter haben Vorrang vor Standard-Importern.
+    So k&ouml;nnen Sie mit Ihren Importern die existierenden in der
+    automatischen Formaterkennung und an der Kommandozeile in
+    JabRef &uuml;berschreiben. Externe Importfilter selbst sind
+    dann nach Namen sortiert.</p>
+
+    <h2>Einen externen Importfilter hinzuf&uuml;gen</h2>
+
+    <p>Stellen Sie sicher, dass Sie den Importer in kompilierter
+    Form haben (eine oder mehrere <code>.class</code> Dateien) und
+    dass die Klassendateien in einer Verzeichnisstruktur
+    entsprechend ihrer Package-Struktur liegen. Um einen neuen
+    externen Importfilter hinzuzuf&uuml;gen, &ouml;ffnen Sie den
+    Dialog <b>Optionen -&gt; Verwalte externe Importfilter</b>, und
+    klicken Sie auf <b>Aus Klassenpfad hinzuf&uuml;gen</b>. Ein
+    Dateiauswahl-Fenster erscheint, mit dem Sie den Klassenpfad des
+    Importers w&auml;hlen, dass hei&szlig;t den obersten Ordner, in
+    dem die Package-Struktur Ihres Importers beginnt. In einem
+    zweiten Dateiauswahl-Fenster w&auml;hlen Sie die
+    <i>.class</i>-Datei Ihres Importers, die von
+    <code>ImportFormat</code> abgeleitet ist. Wenn Sie <b>Klasse
+    ausw&auml;hlen</b> klicken, erscheint Ihr neuer Importer in der
+    Liste der externen Importfilter. Alle externen Importfilter
+    erscheinen in den JabRef-Submen&uuml;s <b>Datei -&gt;
+    Importieren -&gt; Externe Importfilter</b> und <b>Datei -&gt;
+    Importieren und Anh&auml;ngen -&gt; Externe
+    Importfilter</b>.</p>
+
+    <p>Bitte beachten Sie: wenn Sie die Klassen in ein anderes
+    Verzeichnis verschieben, m&uuml;ssen Sie den Importer entfernen
+    und neu hinzuf&uuml;gen. Wenn Sie einen Importfilter mit einem
+    bereits vorhandenen Namen registrieren, ersetzt JabRef den
+    vorhandenen externen Importfilter. Auch wenn es in manchen
+    F&auml;llen m&ouml;glich ist, einen schon registrierten
+    Importer zu aktualisieren ohne JabRef neu zu starten
+    (n&auml;mlich dann, wenn der Importer nicht im Klassenpfad von
+    JabRef ist), empfehlen wir, grunds&auml;tzlich JabRef neu zu
+    starten, wenn Sie ein Update eines externen Importers
+    durchgef&uuml;hrt haben. Sie k&ouml;nnen auch Importer aus ZIP-
+    oder JAR-Archiven registrieren, w&auml;hlen Sie einfach <b>Aus
+    Archiv-Datei hinzuf&uuml;gen</b>, dann das ZIP- oder JAR-Archiv
+    und dann den Eintrag (Klassendatei), der den neuen Importer
+    darstellt.</p>
+
+    <h2>Einen Importfilter entwickeln</h2>
+
+    <p>Bitte schauen Sie auf
+    unseren Download-Seiten nach Beispielen und n&uuml;tzliche
+    Dateien zur Entwicklung Ihres Importfilters.</p>
+
+    <h3>Ein einfaches Beispiel</h3>
+
+    <p>Angenommen, wir wollen Dateien der folgenden Form
+    importieren:</p>
+    <pre>
+1936;John Maynard Keynes;The General Theory of Employment, Interest and Money
+2003;Boldrin &amp; Levine;Case Against Intellectual Monopoly
+2004;ROBERT HUNT AND JAMES BESSEN;The Software Patent Experiment
+</pre>
+
+    <p>Erzeugen Sie in einem Text-Editor eine von
+    <code>ImportFormat</code> abgeleitete Klasse, die die Methoden
+    <code>getFormatName()</code>, <code>isRecognizedFormat()</code>
+    und <code>importEntries()</code> implementiert. Hier ein
+    Beispiel:</p>
+    <pre>
+import java.io.*;
+import java.util.*;
+import net.sf.jabref.*;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormatReader;
+
+public class SimpleCsvImporter extends ImportFormat {
+
+  public String getFormatName() {
+    return "Simple CSV Importer";
+  }
+
+  public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    return true; // this is discouraged except for demonstration purposes
+  }
+
+  public List importEntries(InputStream stream) throws IOException {
+        ArrayList bibitems = new ArrayList();
+    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+    String line = in.readLine();
+    while (line != null) {
+      if (!"".equals(line.trim())) {
+        String[] fields = line.split(";");
+        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+        be.setType(BibtexEntryType.getType("techreport"));
+        be.setField("year", fields[0]);
+        be.setField("author", fields[1]);
+        be.setField("title", fields[2]);
+        bibitems.add(be);
+        line = in.readLine();
+      }
+    }
+    return bibitems;
+  }
+}
+</pre>
+
+    <p>Beachten Sie, dass die Beispielklasse im Default-Package
+    liegt. Angenommen, Sie haben sie unter
+    <code>/meinpfad/SimpleCsvImporter.java</code> gespeichert.
+    Nehmen wir weiter an, die Datei <i>JabRef-2.0.jar</i> ist im
+    gleichen Verzeichnis wie <code>SimpleCsvImporter.java</code>
+    und Java ist in Ihrem Kommandopfad. Kompilieren Sie die Klasse
+    mit JSDK 1.4 zum Beispiel mit folgendem
+    Kommandozeilen-Aufruf:</p>
+    <pre>
+javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
+</pre>Nun sollte dort auch eine Datei
+<code>/mypath/SimpleCsvImporter.class</code> liegen.
+
+    <p>&Ouml;ffnen Sie in JabRef <b>Optionen -&gt; Verwaltung
+    externer Importfilter</b> und klicken Sie auf <b>Aus
+    Klassenpfad hinzuf&uuml;gen</b>. Navigieren Sie nach
+    <code>/meinpfad</code> und klicken Sie <b>Klassenpfad
+    ausw&auml;hlen</b>. W&auml;hlen Sie dann
+    <code>SimpleCsvImporter.class</code> und klicken Sie <b>Klasse
+    ausw&auml;hlen</b>. Ihr Importfilter sollte nun in der Liste
+    der externen Importfilter unter dem Namen "Simple CSV Importer"
+    erscheinen, und, sobald Sie <b>Schlie&szlig;en</b> gew&auml;hlt
+    haben, auch in den Untermen&uuml;s <b>Datei -&gt; Importieren
+    -&gt; Externe Importfilter</b> und <b>Datei -&gt; Importieren
+    und Anh&auml;ngen -&gt; Externe Importfilter</b> des
+    JabRef-Hauptfensters.</p>
+
+    <h2>Teilen Sie Ihre Arbeit</h2>
+
+    <p>Mit externen Importfiltern ist
+    es recht einfach, Importfilter zwischen Nutzern auszutauschen
+    und gemeinsam zu nutzen. Wenn Sie einen Importer f&uuml;r ein
+    Format schreiben, das JabRef noch nicht unterst&uuml;tzt, oder
+    einen Importer verbessern, bitten wir Sie, Ihre Ergebnisse auf
+    unserer SourceForge.net Seite zu ver&ouml;ffentlichen. Wir
+    bieten gerne eine Sammlung eingereichter Importfilter an oder
+    f&uuml;gen sie unserer Auswahl an Standard-Importfiltern hinzu.</p>
+
+</body>
+</html>

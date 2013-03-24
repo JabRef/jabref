@@ -1,0 +1,272 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<plugin id="net.sf.jabref.core" version="2.4b1"
+	class="net.sf.jabref.plugin.core.JabRefPlugin">
+
+	<attributes>
+		<!-- output the resulting code directly into the source directory -->
+		<attribute id="jpfcodegen">
+			<attribute id="targetDir" value="../../java/" />
+		</attribute>
+
+	</attributes>
+
+	<!-- The code of the core plugin and all its extensions is in the src/java folder.
+	     If you write your own plug-in that has resource files or 
+		 code you will need a runtime section with nested library section here. -->
+
+	<!-- To extend JabRef with an ImportFormat use the following extension point -->
+	<extension-point id="ImportFormat">
+		<parameter-def type="string" id="importFormat"
+			custom-data="net.sf.jabref.imports.ImportFormat" />
+		<parameter-def type="string" id="name" />
+		<parameter-def type="string" id="description"
+			multiplicity="none-or-one" />
+	</extension-point>
+
+	<extension id="MedlineImporter" plugin-id="net.sf.jabref.core"
+		point-id="ImportFormat">
+		<parameter id="importFormat"
+			value="net.sf.jabref.imports.MedlineImporter" />
+		<parameter id="name" value="Medline Importer" />
+		<parameter id="description"
+			value="Import format for Medline references." />
+	</extension>
+
+	<!-- To extend JabRef with an Entry Fetcher use the following extension point -->
+	<extension-point id="EntryFetcher">
+		<parameter-def type="string" id="entryFetcher"
+			custom-data="net.sf.jabref.imports.EntryFetcher" />
+		<parameter-def type="string" id="name" />
+		<parameter-def type="string" id="description"
+			multiplicity="none-or-one" />
+	</extension-point>
+
+	<extension id="IEEEFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.IEEEXploreFetcher" />
+		<parameter id="name" value="IEEEXplore Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from IEEE Xplore." />
+	</extension>
+
+    <!-- ACM Portal Fetcher disabled as the current implementation gets users banned -->
+    <extension id="ACMPortalFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.ACMPortalFetcher" />
+		<parameter id="name" value="ACM Portal Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from ACM Portal." />
+	</extension>
+
+	<extension id="CiteSeerFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.CiteSeerEntryFetcher" />
+		<parameter id="name" value="Citeseer Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from Citeseer." />
+	</extension>
+
+        <extension id="DiVAtoBibTexFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.DiVAtoBibTeXFetcher" />
+		<parameter id="name" value="DiVA" />
+		<parameter id="description"
+			value="Fetch entries from DiVA." />
+	</extension>
+
+        <extension id="DOItoBibTexFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.DOItoBibTeXFetcher" />
+		<parameter id="name" value="DOI to BibTeX Fetcher" />
+		<parameter id="description"
+			value="Fetch entries based on DOI." />
+	</extension>
+
+	<extension id="OAI2Fetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.OAI2Fetcher" />
+		<parameter id="name" value="OAI2 Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from OAI2 Archives like ArXiv." />
+	</extension>
+
+	<extension id="ADSFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.ADSFetcher" />
+		<parameter id="name" value="ADS Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from ADS." />
+	</extension>
+
+	<extension id="SPIRESFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.SPIRESFetcher" />
+		<parameter id="name" value="SPIRES Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from SLAC SPIRES Database." />
+	</extension>
+
+	<extension id="INSPIREFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.INSPIREFetcher" />
+		<parameter id="name" value="INSPIRE Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from SLAC INSPIRE Database." />
+	</extension>
+
+	<extension id="MedlineFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.MedlineFetcher" />
+		<parameter id="name" value="Medline Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from Medline." />
+	</extension>
+
+	<extension id="JSTORFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+		<parameter id="entryFetcher"
+			value="net.sf.jabref.imports.JSTORFetcher2" />
+		<parameter id="name" value="JSTOR Entry Fetcher" />
+		<parameter id="description"
+			value="Fetch Entries from JSTOR." />
+	</extension>
+
+    <extension id="CiteSeerXFetcher" plugin-id="net.sf.jabref.core"
+	       point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+		 value="net.sf.jabref.imports.CiteSeerXFetcher" />
+      <parameter id="name" value="CiteSeerX Entry Fetcher" />
+      <parameter id="description"
+		 value="Fetch Entries from CiteSeer." />
+    </extension>
+    
+    <extension id="DBLPFetcher" plugin-id="net.sf.jabref.core"
+       point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+        value="net.sf.jabref.imports.DBLPFetcher" />
+      <parameter id="name" value="DBLP Entry Fetcher" />
+      <parameter id="description"
+        value="Fetch Entries from DBLP." />
+    </extension>
+
+    <extension id="ISBNtoBibTeXFetcher" plugin-id="net.sf.jabref.core"
+       point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+        value="net.sf.jabref.imports.fetcher.ISBNtoBibTeXFetcher" />
+      <parameter id="name" value="ISBN to BibTeX Fetcher" />
+      <parameter id="description"
+        value="Fetch entries based on ISBN." />
+    </extension>
+
+    <extension id="GoogleScholarFetcher" plugin-id="net.sf.jabref.core"
+		point-id="EntryFetcher">
+      <parameter id="entryFetcher"
+		 value="net.sf.jabref.imports.GoogleScholarFetcher" />
+      <parameter id="name" value="Google Scholar Entry Fetcher" />
+      <parameter id="description"
+		 value="Fetch Entries from Google Scholar." />
+    </extension>
+    <!--<extension id="ScienceDirectFetcher" plugin-id="net.sf.jabref.core"
+        point-id="EntryFetcher">
+        <parameter id="entryFetcher"
+            value="net.sf.jabref.imports.ScienceDirectFetcher" />
+        <parameter id="name" value="ScienceDirect Entry Fetcher" />
+        <parameter id="description"
+            value="Fetch Entries from ScienceDirect." />
+    </extension>-->
+
+    <!-- To extend JabRef with an Layout Formatters use the following extension point -->
+	<extension-point id="LayoutFormatter">
+		<parameter-def type="string" id="layoutFormatter"
+			custom-data="net.sf.jabref.export.layout.LayoutFormatter" />
+		<!-- A human readable description of what the formatter does. -->
+		<parameter-def type="string" id="description"
+			multiplicity="none-or-one" />
+		<!-- An id used by JabRef to identify the formatter from text. If none is given, assumed to be the id of the extension. -->
+		<parameter-def type="string" id="name"
+			multiplicity="none-or-one" />
+	</extension-point>
+ 
+	<extension id="NameFormatter" plugin-id="net.sf.jabref.core"
+		point-id="LayoutFormatter">
+		<parameter id="layoutFormatter"
+			value="net.sf.jabref.export.layout.format.plugin.NameFormat" />
+		<parameter id="description"
+			value="Format according to Bibtex name.format$ method. Define in preferences." />
+	</extension>
+	
+	<!-- To extend JabRef with an Full Export Format use the following extension point -->
+	<extension-point id="ExportFormat">
+		<!-- 
+			The class given in this string needs to implement the 
+			IExportFormat interface.
+		 
+		 	Caution: Only the method performExport will be called 
+		 	of this class. The other methods will be automatically 
+		 	filled by the plug-in framework according to the values
+		 	given below (this allows us to initialize lazyly). 
+		 --> 
+		<parameter-def type="string" id="exportFormat"
+			custom-data="net.sf.jabref.export.IExportFormat" />
+		<!-- Name of this export format to display to the user -->
+		<parameter-def type="string" id="displayName" />
+		<!-- Identifier to use as a parameter on the console -->
+		<parameter-def type="string" id="consoleName" />
+		<!-- file extension this export format should use -->
+		<parameter-def type="string" id="extension" />
+	</extension-point>
+
+	<!-- Format Provider -->
+	<extension-point id="ExportFormatProvider">
+		<parameter-def type="string" id="formatProvider"
+			custom-data="net.sf.jabref.export.IExportFormatProvider" />
+		<!-- Name of this export format to display to the user -->
+		<parameter-def type="string" id="name" />
+		<!-- Identifier to use as a parameter on the console -->
+		<parameter-def type="string" id="description" />
+	</extension-point>
+	
+	<!-- To extend JabRef with an Template based Export Format use the following extension point -->
+	<extension-point id="ExportFormatTemplate">
+		<!-- Name of this export format to display to the user -->
+		<parameter-def type="string" id="displayName" />
+		<!-- Identifier to use as a parameter on the console -->
+		<parameter-def type="string" id="consoleName" />
+		<!-- file name of the layout file to use -->
+		<parameter-def type="string" id="layoutFilename" />
+		<!-- directory from which to load the extension -->
+		<parameter-def type="resource" id="dir" />
+		<!-- file extension this export format should use -->
+		<parameter-def type="string" id="extension" />
+        <!-- character encoding override, if needed -->
+        <parameter-def type="string" id="encoding" multiplicity="none-or-one" />
+	</extension-point>
+
+    <extension-point id="PushToApplication">
+        <parameter-def type="string" id="pushToApp"
+                       custom-data="net.sf.jabref.external.PushToApplication" />
+       <parameter-def type="string" id="name" />
+       <parameter-def type="string" id="description"
+               multiplicity="none-or-one" />
+    </extension-point>
+
+    <extension-point id="SidePanePlugin">
+        <parameter-def type="string" id="sidePanePlugin"
+                       custom-data="net.sf.jabref.plugin.SidePanePlugin" />
+       <parameter-def type="string" id="name" />
+       <parameter-def type="string" id="description"
+               multiplicity="none-or-one" />
+    </extension-point>
+
+</plugin>

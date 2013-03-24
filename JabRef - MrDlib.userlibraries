@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="resources" />
+  <library name="sciplore">
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/intellij/annotations.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/intellij/forms_rt.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jersey/jersey-client-1.1.5.1.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jersey/jersey-core-1.1.5.1.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jersey/jersey-multipart-1.1.5.1.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jersey/jsr311-api-1.1.1.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jersey/mimepull-1.3.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/sciplore/SciPloreDBAccess.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/bcel.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/commons-logging-1.0.4.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/jaxme-js-0.3.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/jibx-bind.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/jibx-extras.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/jibx-run.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/log4j-1.2.8.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/jibx/xpp3.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/bindings.jar" />
+    <archive path="C:/Users/Christoph Arbeit/Documents/Arbeit/Hiwi/JabRef - MrDlib/lib/spl/freemind.jar" />
+  </library>
+</eclipse-userlibraries>
+

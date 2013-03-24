@@ -1,0 +1,114 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>The JabRef main window</h1>
+
+    <p><em>Note:</em> most menu actions
+    referred in the following have keyboard shortcuts, and many are
+    available from the toolbar. The keyboard shortcuts are found in
+    the pull-down menus.</p>
+
+    <p>This is the main window from where you work with your
+    databases. Below the menubar and the toolbar is a tabbed pane
+    containing a panel for each of your currently open databases.
+    When you select one of these panels, a table appears, listing
+    all the database's entries, as well as a configurable selection
+    of their fields.</p>
+
+    <ul>
+        <li>You decide which fields are shown in the table by
+        checking the fields you want to see in the
+        <strong>Preferences</strong> dialog.</li>
+
+        <li>Double-click a line of the table to edit the entry
+        content. You can navigate the table with the arrow
+        keys.</li>
+
+        <li>The table is sorted according to a set of fields of
+        your choosing. The default sort order can be set up in
+        <strong>Preferences -&gt; Entry table</strong>, but to
+        more quickly change the order, click the header of a column to
+        set it as the primary sort criterion, or reverse the
+        sorting if it is already set. Another click will deselect
+        the column as sorting criterion. Hold down <b>CONTROL</b>
+        and click a column to add, reverse or remove it as a
+        sub-criterion after the primary column. You can add an
+        arbitrary number of sub-criteria, but only three levels
+        will be stored for the next time you start JabRef.</li>
+
+        <li>Adjust the width of each column by dragging the borders
+        between their headers.</li>
+
+        <li>
+            Color codes can be toggled in the
+            <strong>Preferences</strong> dialog, and they help you
+            visualize the completeness of your database by coloring
+            cells as follows:
+
+            <ul>
+                <li>A <span style="color: red">red</span> cell in the
+                leftmost column denotes an incomplete entry.</li>
+
+                <li>A <span style="color: #909000">yellow</span> cell in
+                the leftmost column denotes an entry that doesn't
+                define all required fields by itself, but that
+                contains a cross-reference.</li>
+
+                <li>A <span style="color: blue">blue</span> cell denotes a
+                required field.</li>
+
+                <li>A <span style="color: green">green</span> cell denotes
+                an optional field.</li>
+
+                <li>An uncolored cell denotes a field which is not
+                used by the <em>bibtex</em> program for this type
+                of entry. The field can still be edited in
+                JabRef.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Adding a new entry</h2>
+
+    <p>There are several ways to add a new
+    entry. The <strong>New entry</strong> menu action shows a
+    dialog where you can choose the type of the entry from a list.
+    To bypass this dialog, there are also separate menu actions for
+    each entry type, and keyboard shortcuts for the most common
+    types.</p>
+
+    <p>When a new entry is added, by default an
+    <a href="EntryEditorHelp.html">entry editor</a> for the entry
+    will be opened. This behaviour can be toggled in the
+    <strong>Preferences</strong> dialog.</p>
+
+    <p><em>Note:</em> We strongly recommend learning the shortcuts
+    for the entry types you use most often, e.g. CTRL-SHIFT-A for
+    adding an <em>article</em> entry.</p>
+
+    <h2>Editing an entry</h2>
+
+    <p>To open an
+    <a href="EntryEditorHelp.html">entry editor</a> for an
+    existing entry, simply double-click anywhere on the appropriate
+    line will open the <a href="EntryEditorHelp.html">entry editor</a>
+    (or select the entry and press ENTER).</p>
+
+    <h2>Referencing a <em>bibtex</em> string in a field</h2>
+
+    <p>In JabRef you write the contents of all fields the same way as you
+    would in a text editor, with one exception: to reference a
+    string, enclose the name of the string in a set of #
+    characters, e.g.:<br />
+    &nbsp;&nbsp;'#jan# 1997',<br />
+    which will be interpreted as the string named 'jan' followed by
+    ' 1997'.</p>
+
+    <p>See also: <a href="StringEditorHelp.html">string editor</a>.
+    </p>
+</body>
+</html>

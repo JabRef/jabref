@@ -1,0 +1,486 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Exportfilter anpassen</h1>
+
+    <p>Mit JabRef k&ouml;nnen Sie Ihre
+    eigenen Exportfilter definieren und genau so wie die
+    Standard-Exportfilter benutzen. Ein Exportfilter wird durch
+    eine oder mehr <i>Layout-Dateien</i> definiert, die mittels
+    eingebauter Formatierprogramme das Format der exportierten
+    Dateien festlegen. Ihre Layout-Datei m&uuml;ssen Sie in einem
+    separaten Texteditor erstellen.</p>
+
+    <h2>Hinzuf&uuml;gen eines Exportfilters</h2>
+
+    <p>Die einzige
+    Voraussetzung f&uuml;r einen Exportfilter ist, da&szlig; eine
+    Datei mit der Endung <b>.layout</b> vorhanden ist. Um einen
+    neuen, eigenen Exportfilter hinzuzuf&uuml;gen, &ouml;ffnen Sie
+    das Dialogfenster <b>Optionen -&gt; Verwalte externe
+    Exportfilter</b> und klicken auf die Schaltfl&auml;che
+    <b>Neu</b>. Es &ouml;ffnet sich ein neues Fenster, in dem Sie
+    einen Namen (der als Auswahl im Dateityp-Dropdownmen&uuml;
+    erscheint, wenn man <b>Datei -&gt; Exportieren</b> im
+    JabRef-Hauptfenster w&auml;hlt), eine Pfadangabe zur
+    <b>.layout</b>-Datei und die gew&uuml;nschte Dateiendung
+    f&uuml;r den Exportfilter angeben k&ouml;nnen. Wenn Sie den
+    Exportfilter benutzen, wird diese Endung im Datei-Dialog
+    automatisch vorgeschlagen.</p>
+
+    <h2>Das Erstellen des Exportfilters</h2>
+
+    <p>Um einen Eindruck zu
+    bekommen, wie Exportfilter auszusehen haben, suchen Sie am
+    besten auf unserer Homepage nach dem Paket, das die
+    Layout-Dateien der Standard-Exportfilter enth&auml;lt.</p>
+
+    <h3>Layout-Dateien</h3>
+
+    <p>Nehmen wir einmal an, dass wir einen
+    HTML-Exportfilter erstellen wollen.</p>
+
+    <p>Der Exportfilter muss lediglich aus einer einzigen
+    <b>.layout</b>-Datei bestehen, die in diesem Fall
+    <i>html.layout</i> genannt werden k&ouml;nnte. Sie k&ouml;nnen
+    dar&uuml;ber hinaus auch zwei Dateien mit den Namen
+    <i>html.begin.layout</i> und <i>html.end.layout</i> anlegen.
+    Die erste dieser beiden Dateien enth&auml;lt den Kopfteil der
+    Ausgabe, die zweite den Fu&szlig;teil. JabRef sucht jedes Mal,
+    wenn der Exportfilter benutzt wird, nach diesen Dateien und
+    f&uuml;gt sie&nbsp;&ndash; falls sie gefunden
+    werden&nbsp;&ndash; w&ouml;rtlich vor bzw. nach den einzelnen
+    Eintr&auml;gen in die Ausgabe ein.</p>
+
+    <p>Beachten Sie, dass sich diese Dateien in demselben
+    Verzeichnis wie <i>html.layout</i> befinden m&uuml;ssen und die
+    Namensbestandteile <b>.begin</b> bzw. <b>.end</b> enthalten
+    m&uuml;ssen.</p>
+
+    <p>In unserem Beispiel-Exportfilter k&ouml;nnten diese Dateien
+    folgenderma&szlig;en aussehen:</p>
+
+    <p><i>html.begin.layout</i>:<br />
+    <code>&lt;HTML&gt;<br />
+     &lt;BODY&gt; text="#275856"&gt;<br />
+    &lt;basefont size="4" color="#2F4958"
+    face="arial"&gt;</code></p>
+
+    <p><i>html.end.layout</i>:<br />
+    <code>&lt;/BODY&gt;<br />
+     &lt;/HTML&gt;</code></p>
+
+    <p>Die Datei <i>html.layout</i> stellt die
+    <i>Standard</i>-Formatvorlage f&uuml;r den Export eines
+    einzelnen Eintrags bereit. Falls Sie unterschiedliche
+    Formatvorlagen f&uuml;r verschiedene Eintragstypen anwenden
+    wollen, m&uuml;ssen Sie Eintrags-spezifische
+    <b>.layout</b>-Dateien erstellen. Diese m&uuml;ssen sich
+    ebenfalls in demselben Verzeichnis wie die Haupt-Layout-Datei
+    befinden und den Namensbestandteil <b>.entrytype</b> enthalten.
+    Der Name des Eintragstyps muss komplett in Kleinbuchstaben
+    geschrieben werden. In unserem Beispiel wollen wir eine
+    Formatvorlage f&uuml;r Eintr&auml;ge des Typs "book" haben, die
+    in der Datei <i>html.book.layout</i> abgelegt wird. F&uuml;r
+    eine Dissertation w&uuml;rden wir die Datei
+    <i>html.phdthesis.layout</i> anlegen&nbsp;&ndash; und so
+    weiter. Diese Dateien sind der Standard-Layout-Datei sehr
+    &auml;hnlich, nur dass sie lediglich f&uuml;r Eintr&auml;ge des
+    entsprechenden Typs genutzt werden. Beachten Sie, dass die
+    Standard-Layout-Datei so allgemein gehalten werden kann, dass
+    sie die meisten Eintragstypen abdeckt.</p>
+
+    <h3>Das Format der Layout-Datei</h3>
+
+    <p>Layout-Dateien werden mit
+    einem einfachen markup-Format erstellt, bei dem die Kommandos
+    mit einem "backslash" (<code>\</code>) eingeleitet werden. Alle
+    Textbestandteile, die nicht als Kommando identifiziert werden,
+    gelangen direkt in die Ausgabedatei.</p>
+
+    <h3>Feldkommandos</h3>
+
+    <p>Ein beliebiges Wort, vor dem ein backslash steht, z.B.
+    <code>\author</code>, <code>\editor</code>, <code>\title</code>
+    or <code>\year</code>, wird als Verweis auf das entsprechende
+    Feld ausgewertet, das dann direkt in die Ausgabe kopiert
+    wird.</p>
+
+    <h3>Feldformatierer</h3>
+
+    <p>Oft muss der Feldinhalt vor der Ausgabe verarbeitet werden.
+    Dies wird mit Hilfe eines <i>Feldformatierers</i> gemacht -
+    einer java class, die eine Methode zur Verarbeitung des
+    Feldinhaltes enth&auml;lt.</p>
+
+    <p>Ein Formatierer wird angewendet, indem man das Kommando
+    <code>\format</code> gefolgt vom Namen des Formatierers in
+    eckigen Klammern und dem Feldnamen in geschweiften Klammern
+    einf&uuml;gt, z.B.:</p>
+
+    <p><code>\format[ToLowerCase]{\author}</code></p>
+
+    <p>Sie k&ouml;nnen auch mehrere Formatierer angeben, getrennt
+    durch Kommas. Sie werden nacheinander aufgerufen, und zwar von
+    links nach rechts. Das Kommando</p>
+
+    <p><code>\format[ToLowerCase,HTMLChars]{\author}</code></p>
+
+    <p>ruft z.B. zun&auml;chst den Formatierer <b>ToLowerCase</b>
+    auf, <b>HTMLChars</b> formatiert anschlie&szlig;end das
+    Ergebnis. Auf diese Weise k&ouml;nnen Sie eine beliebige Anzahl
+    an Formatierern auflisten.</p>
+
+    <p>JabRef bietet die folgenden Formatierer, wobei einige von
+    anderen abh&auml;ngen:</p>
+
+    <ul>
+        <li><code>HTMLChars</code> : ersetzt TeX-spezifische
+        Sonderzeichen (z.B. {\^a} oder {\"{o}}) durch ihre
+        HTML-Entsprechungen und &uuml;bersetzt die LaTeX-Befehle
+        \emph, \textit, \textbf in ihre HTML-Entsprechungen.</li>
+
+        <li><code>HTMLParagraphs</code> : interpretiert zwei
+        aufeinanderfolgende Zeilenumbr&uuml;che (z.B. \n \n) als
+        Beginn eines neuen Absatzes und erstellt dementsprechend
+        Absatz-HTML-Tags.</li>
+
+        <li><code>XMLChars</code> : ersetzt TeX-spezifische
+        Sonderzeichen (z.B. {\^a} oder {\"{o}}) durch ihre
+        XML-Entsprechungen.</li>
+
+        <li><code>CreateDocBookAuthors</code> : formatiert das
+        author-Feld im DocBook-Stil.</li>
+
+        <li><code>CreateDocBookEditors</code> : Dokumentation
+        folgt.</li>
+
+        <li><code>CurrentDate</code> : gibt das aktuelle Datum aus.
+        Ohne Argument gibt dieser Formatierer das aktuelle Datum im
+        Format "JJJJ.MM.TT HH:MM:SS Z" (Datum, Zeit und Zeitzone)
+        aus. Mit einem anderen Format-String als Argument kann das
+        Datum angepasst werden. So ergibt
+        <code>\format[CurrentDate]{yyyy.MM.dd}</code> nur das
+        Datum, z.B. 2005.11.30.</li>
+
+        <li><code>AuthorFirstFirst</code> : formatiert die Felder
+        author/editor mit den Vornamen zuerst.</li>
+
+        <li><code>AuthorFirstFirstCommas</code> oder <code>AuthorFirstLastCommas</code> :
+        formatiert die Felder author/editor mit den Vornamen zuerst und abgetrennt
+        durch Kommas.</li>
+
+        <li><code>AuthorFirstLastOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorFirstLastCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
+
+        <li><code>AuthorFirstAbbrLastCommas</code> : formatiert die
+        Felder author/editor mit abgek&uuml;rzten Vornamen, abgetrennt durch
+        Kommas, mit einem "and" zwischen den letzten beiden Namen.</li>
+
+        <li><code>AuthorFirstAbbrLastOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorFirstAbbrLastCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
+
+        <li><code>AuthorLastFirst</code> : formatiert die Felder
+        author/editor mit den Nachnamen zuerst.</li>
+
+        <li><code>AuthorAbbreviator</code> oder <code>AuthorLastFirstAbbreviator</code> :
+        k&uuml;rzt die Vornamen und mittleren Namen aller Autoren. Dieser Formatierer gibt
+        Nachnamen zuerst aus. Wenn Sie abgek&uuml;rzte Namen mit vorangestellten Initialen
+        wollen, wenden Sie anschlie&szlig;end den Formatierer <code>AuthorFirstFirst</code> an.</li>
+
+        <li><code>AuthorLastFirstCommas</code> : formatiert die Felder
+        author/editor mit den Nachnamen zuerst, abgetrennt durch Kommas,
+        mit einem "and" zwischen den letzten beiden Namen.</li>
+
+        <li><code>AuthorLastFirstOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorLastFirstCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
+
+        <li><code>AuthorLastFirstAbbrCommas</code> : formatiert die Felder
+        author/editor mit Nachnamen zuerst und abgek&uuml;rzten Vornamen,
+        abgetrennt durch Kommas, mit einem "and" zwischen den letzten
+        beiden Namen.</li>
+
+        <li><code>AuthorLastFirstAbbrOxfordCommas</code> : &auml;hnlich wie
+        <code>AuthorLastFirstAbbrCommas</code>, au&szlig;er dass das "and"
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet
+        wird.</li>
+
+        <li><code>AuthorAndsReplacer</code> : ersetzt "and"
+        zwischen den Namen durch ";", zwischen den letzten beiden
+        Autoren steht "&amp;".</li>
+
+        <li><code>AuthorAndsCommaReplacer</code> : ersetzt "and"
+        zwischen den Namen durch "," sowie "&amp;" zwischen den
+        beiden letzten.</li>
+
+        <li><code>AuthorOrgSci</code> : Der erste Autor erscheint
+        als "Nachname, Vorname", alle anderen als "Vorname
+        Nachname". Vornamen werden abgek&uuml;rzt.</li>
+
+        <li><code>AuthorAbbreviator</code> : Dokumentation
+        folgt.</li>
+
+        <li><code>AuthorNatBib</code> : formatiert Autorennamen im
+        Natbib-Stil, also nur mit Nachnamen; zwei Autoren werden
+        durch ein "and" voneinander getrennt, bei mehr als zwei
+        Autoren wird der erste angegeben, gefolgt von "et al."</li>
+
+        <li><code>NoSpaceBetweenAbbreviations</code> : Leerzeichen
+        zwischen mehreren abgek&uuml;rzten Vornamen werden
+        gel&ouml;scht.</li>
+
+        <li><code>FileLink(Dateityp)</code> : wenn kein Argument angegeben
+        wird, gibt dieser Formatierer den ersten externen Dateityp aus, der
+        in dem Feld "file" angegeben ist.
+        <p>Dieser Formatierer nimmt den Namen eines Dateityps als optionales
+        Argument, das in Klammern nach dem Namen des Formatierers angegeben
+        wird. Zum Beispiel wird mit <code>\format[FileLink(pdf)]{\file}</code>
+        der Dateityp <code>pdf</code> als Argument angegeben. Wenn ein Argument
+        mitgegeben wird, w&auml;hlt der Formatierer den ersten Dateilink des
+        entsprechenden Typs. Im Beispiel wird der Pfad zum ersten PDF-Link
+        ausgegeben.</p></li>
+
+        <li><code>FormatPagesForHTML</code> : ersetzt "--" durch
+        "-".</li>
+
+        <li><code>FormatPagesForXML</code> : ersetzt "--" durch
+        einen XML en-dash (Gedanken- bzw. Bis-Strich).</li>
+
+        <li><code>Replace(regexp,ersetzedurch)</code> : f&uuml;hrt eine Ersetzung
+        mit einem Regul&auml;ren Ausdruck durch. Um diesen Formatierer zu
+        benutzen, muss ein zweiteiliges Argument mitgegeben werden. Die Teile
+        werden durch ein Komma getrennt. Will man ein Komma ausgeben lassen,
+        muss man es maskieren: \,
+        <p>Der erste Teil ist der Regul&auml;re Ausdruck, nach dem gesucht wird.
+        Er wird normal geschrieben, ohne Backslashes (\) zu maskieren.
+        Eine Beschreibung von Regul&auml;ren Ausdr&uuml;cken ist hier zu finden:<br />
+        http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html</p>
+        <p>Der zweite Teil ist der Text, der f&uuml;r alle Treffer eingesetzt
+        werden soll.</p></li>
+
+        <li><code>RemoveBrackets</code> : entfernt alle
+        geschweiften Klammern "{" oder "}".</li>
+
+        <li><code>RemoveBracketsAddComma</code> : Dokumentation
+        folgt.</li>
+
+        <li><code>RemoveWhitespace</code> : l&ouml;scht alle Leerzeichen.</li>
+
+        <li><code>RemoveLatexCommands</code> : entfernt LaTeX
+        Kommandos wie <code>\emph</code>, <code>\textbf</code> etc.
+        Zusammen mit <code>HTMLChars</code> oder
+        <code>XMLChars</code> sollte dieser Formatierer zuletzt
+        aufgerufen werden.</li>
+
+        <li><code>RemoveTilde</code> : ersetzt das Tilde-Zeichen
+        (~), das in LaTeX als festes Leerzeichen dient, durch ein
+        normales Leerzeichen. N&uuml;tzlich in Kombination mit dem
+        <a href="#NameFormatter">Namens-Formatierer</a>, der im
+        n&auml;chsten Abschnitt beschrieben wird.</li>
+
+        <li><code>ToLowerCase</code> : macht aus allen Buchstaben
+        Kleinbuchstaben.</li>
+
+        <li><code>ToUpperCase</code> : macht aus allen Buchstaben
+        Gro&szlig;buchstaben.</li>
+
+        <li><code>GetOpenOfficeType</code> : gibt die Nummer wieder,
+        die vom bibliographischen System von OpenOffice.org (Versionen
+        1.x und 2.x) benutzt wird, um den Typ dieses Eintrags zu
+        bezeichnen.</li>
+
+        <li><code>RTFChars</code> : ersetzt alle TeX-spezifischen
+        Sonderzeichen (z.B. {\^a} oder {\"{o}}) durch ihre
+        RTF-Entsprechung und &uuml;bersetzt LaTeX-Befehle wie \emph, \textit,
+        \textbf in ihre RTF-Entsprechungen.</li>
+
+    </ul>
+
+    <p>Falls keiner der verf&uuml;gbaren Formatierer das Ergebnis
+    erzielt, das Sie erreichen m&ouml;chten, k&ouml;nnen Sie Ihren
+    eigenen Formatierer hinzuf&uuml;gen, indem Sie das
+    <code>net.sf.jabref.export.layout.LayoutFormatter</code>-Interface
+    implementieren. Wenn Sie Ihre Klasse (class) in das Paket
+    <code>net.sf.jabref.export.layout.format</code> einf&uuml;gen,
+    k&ouml;nnen Sie den Formatierer mit seinem Klassennamen
+    aufrufen, so wie auch die Standard-Formatierer. Ansonsten
+    m&uuml;ssen Sie den Formatierer mit seinem vollen Namen
+    aufrufen (inklusive Paketname). In jedem Fall muss der
+    Formatierer in ihrem classpath sein, wenn Sie JabRef
+    starten.</p>
+
+    <h2><a name="NameFormatter"
+       id="NameFormatter">Eigene Namens-Formatierer
+       verwenden</a></h2>
+
+    <p>Mit JabRef 2.2 ist es jetzt m&ouml;glich, eigene
+    Namens-Formatierer zu definieren. Dazu wird die Syntax der
+    Bibliographie-Stile (bst) verwendet. Das erlaubt
+    &auml;u&szlig;erste Flexibilit&auml;t, ist allerdings
+    aufw&auml;ndig in der Schreibweise.</p>
+
+    <p>Sie k&ouml;nnen unter <strong>Optionen -&gt; Einstellungen
+    -&gt; Namens-Formatierer</strong> Ihren eigenen Formatierer
+    schreiben. Benutzen Sie das folgende Format:
+    <code>&lt;Fall1&gt;@&lt;Bereich11&gt;@&lt;Format&gt;@&lt;Bereich12&gt;@&lt;Format&gt;@&lt;Bereich13&gt;...@@<br />
+
+     &lt;Fall2&gt;@&lt;Bereich21&gt;@... und so weiter.</code></p>
+
+    <p>Dieses Format teilt die Aufgabe, eine Liste von Autoren zu
+    formatieren, in unterschiedliche F&auml;lle abh&auml;ngig von
+    der Zahl der Autoren (das ist n&ouml;tig, weil manche Formate
+    sich je nach der Zahl der Autoren unterscheiden). Die einzelnen
+    F&auml;lle werden durch <code>@@</code> voneinander getrennt
+    und enthalten Anweisungen, wie jeder einzelne Autor in diesem
+    Fall zu formatieren ist. Diese Anweisungen werden durch
+    <code>@</code> getrennt.</p>
+
+    <p>F&auml;lle werden durch Ganzzahlen (1, 2, 3, etc.) oder das
+    Zeichen <code>*</code> (alle Autoren) definiert. Sie geben die
+    nachfolgenden Anweisungen an den Formatierer weiter, falls
+    weniger oder gleich viele Autoren vorhanden sind.</p>
+
+    <p>Bereiche sind entweder
+    <code>&lt;Ganzzahl&gt;..&lt;Ganzzahl&gt;</code>,
+    <code>&lt;Ganzzahl&gt;</code> oder das Zeichen <code>*</code>.
+    Die Liste der Autoren f&auml;ngt bei 1 an. Die Ganzzahlen
+    k&ouml;nnen einen negativen Wert haben, um vom letzten Autor
+    der Liste zu starten, wobei -1 der Wert f&uuml;r den letzten
+    Autor ist.</p>
+
+    <p>Als Beispiel dient die Autorenliste "Joe Doe and Mary Jane
+    and Bruce Bar and Arthur Kay":</p>
+
+    <ul>
+        <li>1..3 betrifft Joe, Mary und Bruce</li>
+
+        <li>4..4 betrifft Arthur</li>
+
+        <li>* betrifft alle</li>
+
+        <li>2..-1 betrifft Mary, Bruce und Arthur</li>
+    </ul>
+
+    <p>Die <code>&lt;Format&gt;</code>-Strings nutzen das
+    BibTeX-Namensschema:</p>
+
+    <p>Die vier Buchstaben v, f, l, j stehen f&uuml;r die
+    Namensteile von, Vorname (first), Nachname (last) und Junior
+    und werden in geschweiften Klammern gesetzt. Ein einzelner
+    Buchstabe v, f, l, j bedeutet, dass der Name abgek&uuml;rzt
+    werden soll. Wenn einer dieser Buchstaben oder Buchstabenpaare
+    vorkommen, gibt JabRef alle entsprechenden Namen (eventuell
+    abgek&uuml;rzt) aus, aber der Ausdruck in geschweiften Klammern
+    wird nur ausgegeben, wenn der Namensteil existiert.</p>
+
+    <p>Beispielsweise wird beim Format "{ll} {vv {von Part}} {ff}"
+    die Autorenliste "Mary Kay and John von Neumann" von JabRef als
+    "Kay Mary" (mit zwei Leerzeichen) und "Neumann von von Part
+    John" ausgegeben.</p>
+
+    <p>Zwei weitere Beispiele sollen das Ganze verdeutlichen; die
+    BibTeX-Dokumentation gibt weitere Hinweise.</p>
+
+    <p>Kurzes Beispiel: <code>"{ll}, {f.}"</code> formatiert
+    <code>"Joe Doe"</code> als <code>"Doe, J."</code></p>
+
+    <p>Ausf&uuml;hrliches Beispiel:</p>
+
+    <blockquote>
+        <p>Um</p>
+
+        <p><code>"Joe Doe and Mary Jane and Bruce Bar and Arthur
+        Kay"</code></p>
+
+        <p>als</p>
+
+        <p><code>"Doe, J., Jane, M., Bar, B. and Kay,
+        A."</code></p>
+
+        <p>zu formatieren, nutzt man</p>
+
+        <p><code>1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll},
+        {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll},
+        {f}.</code></p>
+    </blockquote>
+
+    <p>Falls jemand eine bessere Dokumentation hierzu verfassen
+    m&ouml;chte: Wenden Sie sich einfach an die
+    JabRef-Maililnglisten!</p>
+
+    <h3>Bedingte Ausgabe</h3>
+
+    <p>Manche statische Ausgabe macht nur
+    Sinn, wenn ein bestimmtes Feld nicht leer ist. Wenn wir z.B.
+    hinter den Namen der Editoren den Text <code>(Hrsg.)</code>
+    haben wollen, brauchen wir folgendes:</p>
+
+    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
+    (Hrsg.)</code></p>
+
+    <p>Wenn nun aber das <code>editor</code>-Feld leer ist -
+    m&ouml;glicherweise ist es f&uuml;r den Eintrag, der exportiert
+    werden soll, nicht erforderlich -, dann w&uuml;rde das
+    <code>(Hrsg.)</code> dennoch erscheinen. Das kann man mit den
+    Kommandos <code>\begin</code> und <code>\end</code>
+    verhindern:</p>
+
+    <p><code>\begin{editor}<br />
+    \format[HTMLChars,AuthorFirstFirst]{\editor} (Hrsg.)<br />
+     \end{editor}</code></p>
+
+    <p>Die Kommandos <code>\begin</code> und <code>\end</code>
+    sorgen daf&uuml;r, dass der Text, den sie einschlie&szlig;en,
+    nur dann ausgegeben wird, falls das Feld, auf das in den
+    geschweiften Klammern verwiesen wird, f&uuml;r den zu
+    exportierenden Eintrag definiert und damit nicht leer ist.</p>
+
+    <p><b>Anmerkung:</b> Das Benutzen der Kommandos
+    <code>\begin</code> und <code>\end</code> ist ein
+    Schl&uuml;ssel zum Erstellen von Layout-Dateien, die mit einer
+    Vielzahl von Eintragstypen umgehen k&ouml;nnen.</p>
+
+    <h3>Gruppierte Ausgabe</h3>
+
+    <p>Wenn Sie Ihre Eintr&auml;ge auf der
+    Basis eines bestimmten Feldes gruppieren wollen, benutzen Sie
+    die Kommandos f&uuml;r die gruppierte Ausgabe. Die gruppierte
+    Ausgabe ist der bedingten Ausgabe sehr &auml;hnlich, au&szlig;
+    dass der Text zwischen den Kommandos nur ausgegeben wird, wenn
+    das Feld, auf das in den geschweiften Klammern verwiesen wird,
+    unterschiedliche Werte enth&auml;lt.</p>
+
+    <p>Nehmen wir zum Beispiel an, dass wir die Ausgabe nach dem
+    keyword (Stichwort) gruppieren wollen. Bevor die Datei
+    exportiert wird, m&uuml;ssen die Eintr&auml;ge nach dem keyword
+    sortiert worden sein. Dann benutzen Sie die folgenden
+    Kommandos, um nach keyword zu gruppieren:</p>
+
+    <p><code>\begingroup{keywords}New Category:
+    \format[HTMLChars]{\keywords}<br />
+     \endgroup{keywords}</code></p>
+
+    <h2>Teilen Sie Ihre Arbeit mit anderen</h2>
+
+    <p>Mit externen
+    Layout-Dateien ist es einfach, Ihre eigenen Export-Formate mit
+    anderen Anwendern gemeinsam zu benutzen. Falls Sie einen
+    Exportfilter f&uuml;r ein Format erstellen, das nicht von
+    JabRef unterst&uuml;tzt wird, oder falls Sie einen bestehenden
+    Exportfilter verbessern, m&ouml;chten wir Sie ermutigen, Ihre
+    Arbeit auf der SourceForge.net-Seite bereitzustellen. Dasselbe
+    gilt f&uuml;r Formatierklassen, die Sie schreiben. Wir
+    w&uuml;rden uns freuen, eine Sammlung von bereitgestellten
+    Layout-Dateien verteilen zu k&ouml;nnen oder die
+    Standard-Export-Filter und Standard-Formatierer zu erweitern.</p>
+</body>
+</html>

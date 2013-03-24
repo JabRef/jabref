@@ -1,0 +1,187 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+
+    <h1>Filtres d'importation personnalis&eacute;s</h1>
+
+    <p>JabRef vous permet de d&eacute;finir et d'utiliser vos
+    propres formats d'importation, d'une fa&ccedil;on tr&egrave;s
+    similaire aux filtres d'importation standard qui sont
+    d&eacute;finis. Un filtre d'importation est d&eacute;fini par
+    une ou plusieurs <i>classes</i> Java qui analyse le contenu
+    d'un fichier &agrave; partir d'un flux d'entr&eacute;e et
+    cr&eacute;e des entr&eacute;es BibTeX. Ainsi, avec un peu de
+    programmation de base en Java, vous pouvez ajouter un format
+    d'importation correspondant &agrave; votre source de
+    r&eacute;f&eacute;rences favorite ou enregistrer une version
+    am&eacute;lior&eacute;e d'un format d'importation existant. De
+    plus, cela vous permet d'ajouter des formats d'importation
+    personnalis&eacute;s compil&eacute;s que vous pourriez obtenir
+    &agrave; partir de SourceForge (par exemple) sans avoir
+    &agrave; recompiler JabRef (voir plus bas "Partager votre
+    travail").</p>
+
+    <p>Les formats d'importation personnalis&eacute;s sont
+    prioritaires sur les formats d'importation standard. De cette
+    fa&ccedil;on, vous pouvez remplacer les formats d'importations
+    existants pour les fonctions d'auto-d&eacute;tection et de
+    ligne de commande de JabRef. Les formats d'importation
+    personnalis&eacute;s sont class&eacute;s par nom.</p>
+
+    <h2>Ajouter un filtre d'importation personnalis&eacute;</h2>
+
+    <p>Assurez-vous que vous avez un filtre d'importation
+    personnalis&eacute; compil&eacute; (un ou plusieurs fichiers
+    <code>.class</code> sont d&eacute;crits ci-dessous) et que les
+    fichiers de classe soient dans la structure des
+    r&eacute;pertoires selon la structure de leur paquetage. Pour
+    ajouter un nouveau filtre d'importation personnalis&eacute;,
+    ouvrez la bo&icirc;te de dialogue <b>Options -&gt; G&eacute;rer
+    les importations personnalis&eacute;es</b>, et cliquez&nbsp;
+    <b>Ajouter &agrave; partir du r&eacute;pertoire</b>. Une
+    fen&ecirc;tre de s&eacute;lection de fichier appara&icirc;tra,
+    vous permettant de s&eacute;lectionner le chemin de classe de
+    votre filtre d'importation, c'est &agrave; dire le
+    r&eacute;pertoire o&ugrave; se trouve le r&eacute;pertoire
+    sup&eacute;rieur de votre structure de paquetage. Vous ouvrirez
+    autant de&nbsp; fen&ecirc;tres que n&eacute;cessaire pour
+    s&eacute;lectionner votre fichier de classe de filtre
+    d'importation, lequel doit d&eacute;river de
+    <code>ImportFormat</code>. Cela permettra ainsi d'indiquer le
+    chemin complet d'acc&egrave;s au fichier de classe. En cliquant
+    sur <b>S&eacute;lectionner une nouvelle sous-classe de format
+    d'importation</b>, votre nouveau filtre d'importation
+    appara&icirc;tra dans la liste des filtres d'importation
+    personnalis&eacute;s. Tous les filtres d'importations
+    personnalis&eacute;s appara&icirc;tront dans le menu <b>Fichier
+    -&gt; Importer -&gt; Filtres d'importation
+    personnalis&eacute;s</b> et <b>Fichier -&gt; Importer et
+    joindre -&gt; Filtres d'importation personnalis&eacute;s</b> de
+    la fen&ecirc;tre de JabRef.</p>
+
+    <p>S'il vous pla&icirc;t, notez que si vous d&eacute;placez la
+    classe vers un autre r&eacute;pertoire, vous aurez &agrave;
+    supprimer et &agrave; r&eacute;-ajouter le filtre
+    d'importation. Si vous ajoutez un filtre d'importation
+    personnalis&eacute; sous un nom qui existe d&eacute;j&agrave;,
+    le filtre d'importation existant sera remplac&eacute;. De plus,
+    dans certains cas, il est possible de mettre &agrave; jour un
+    filtre d'importation personnali s&eacute; existant sans
+    red&eacute;marrer JabRef (lorsque le filtre d'importation n'est
+    pas dans le chemin de classe). Cependant, nous recommandons de
+    red&eacute;marrer JabRef apr&egrave;s la mise &agrave; jour
+    d'un filtre d'importation personnalis&eacute;. Vous pouvez
+    aussi ajouter des filtres d'importation contenu dans un fichier
+    ZIP ou JAR&nbsp;; s&eacute;lectionnez simplement l'archive Zip
+    ou Jar, puis l'entr&eacute;e (fichier de classe) qui correspond
+    au nouveau filtre d'importation.</p>
+
+    <h2>Cr&eacute;er un filtre d'importation</h2>
+
+    <p>Pour des exemples
+    et quelques fichiers utiles sur la fa&ccedil;on de construire
+    vos propres filtres d'importation, consultez s'il vous
+    pla&icirc;t la page de t&eacute;l&eacute;chargement.</p>
+
+    <h3>Un exemple simple</h3>
+
+    <p>Supposons que vous vouliez importer des fichiers de la forme
+    suivante&nbsp;:</p>
+    <pre>
+1936;John Maynard Keynes;The General Theory of Employment, Interest and Money
+2003;Boldrin &amp; Levine;Case Against Intellectual Monopoly
+2004;ROBERT HUNT AND JAMES BESSEN;The Software Patent Experiment
+</pre>
+
+    <p>Dans votre outil de d&eacute;veloppement ou &eacute;diteur
+    de texte pr&eacute;f&eacute;r&eacute;, cr&eacute;ez une classe
+    d&eacute;riv&eacute;e de <code>ImportFormat</code> qui
+    impl&eacute;mente les m&eacute;thodes
+    <code>getFormatName()</code>, <code>isRecognizedFormat</code>
+    and <code>importEntries()</code>. En voici un
+    exemple&nbsp;:</p>
+    <pre>
+import java.io.*;
+import java.util.*;
+import net.sf.jabref.*;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormatReader;
+
+public class SimpleCsvImporter extends ImportFormat {
+
+  public String getFormatName() {
+    return "Simple CSV Importer";
+  }
+
+  public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    return true; // ceci est d&eacute;conseill&eacute; sauf pour les besoins de la d&eacute;monstration
+  }
+
+  public List importEntries(InputStream stream) throws IOException {
+        ArrayList bibitems = new ArrayList();
+    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+    String line = in.readLine();
+    while (line != null) {
+      if (!"".equals(line.trim())) {
+        String[] fields = line.split(";");
+        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+        be.setType(BibtexEntryType.getType("techreport"));
+        be.setField("year", fields[0]);
+        be.setField("author", fields[1]);
+        be.setField("title", fields[2]);
+        bibitems.add(be);
+        line = in.readLine();
+      }
+    }
+        return bibitems;
+  }
+}
+</pre>
+
+    <p>Notez que l'exemple est dans le paquetage par d&eacute;faut.
+    Supposez que vous l'avez sauv&eacute; sous
+    <code>/mypath/SimpleCsvImporter.java</code>. Supposez aussi que
+    JabRef-2.0.jar est dans le m&ecirc;me r&eacute;pertoire que
+    <code>SimpleCsvImporter.java</code> et que Java est dans votre
+    chemin d'ex&eacute;cutables. Compilez-le en utilisant par
+    exemple JSDK 1.4 avec</p>
+    <pre>
+javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
+</pre>A pr&eacute;sent il doit y avoir un fichier
+<code>/mypath/SimpleCsvImporter.class</code>.
+
+    <p>Dans JabRef, ouvrez <b>Options -&gt; G&eacute;rer les
+    importations personnalis&eacute;es</b>, et cliquez sur
+    <b>Ajouter &agrave; partir du r&eacute;pertoire</b>. Allez dans
+    <code>/mypath</code> et cliquez le bouton
+    <b>S&eacute;lectionner...</b>. S&eacute;lectionnez
+    <code>SimpleCsvImporter.class</code> et cliquez sur le bouton
+    <b>S&eacute;lectionner...</b>. Votre filtre d'importation
+    devrait maintenant appara&icirc;tre dans la liste des filtres
+    d'importation personnalis&eacute;s sous le nom "Simple CSV
+    Importer" et, apr&egrave;s avoir cliqu&eacute; sur
+    <b>Fermer</b>, aussi dans les menus <b>Fichier -&gt; Importer
+    -&gt; Filtres d'importation personnalis&eacute;s</b> et
+    <b>Fichier -&gt; Importer et joindre -&gt; Filtres
+    d'importation personnalis&eacute;s</b> de la fen&ecirc;tre de
+    JabRef.</p>
+
+    <h2>Partager votre travail</h2>
+
+    <p>Avec des fichiers de filtres d'importation
+    personnalis&eacute;s, il est vraiment simple de partager des
+    formats d'importation personnalis&eacute;s entre utilisateurs.
+    Si vous &eacute;crivez un filtre d'importation pour un format
+    non support&eacute; par JabRef, ou l'am&eacute;lioration d'un
+    filtre existant, nous vous encourageons &agrave; soumettre
+    votre travail sur notre page SourceForge.net. Nous serons
+    heureux de distribuer la collection des fichiers d'importation
+    soumis, ou d'en ajouter &agrave; la s&eacute;lection de filtres
+    d'importation standard.</p>
+</body>
+</html>

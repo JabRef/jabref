@@ -1,0 +1,88 @@
+apply plugin: 'java'
+
+// with gradle 1.1, Sonar 3.2 is not working. One needs Sonar 3.1.1
+apply plugin: 'sonar'
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/java'
+		}
+		resources {
+			srcDir 'src/resource'
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+/* ANTLR support for Bst.g
+Source: http://fenrock.wordpress.com/2012/05/17/gradle-and-antlr-3-x/
+*/
+
+configurations {
+	antlr3
+}
+
+dependencies {
+	compile 'org.antlr:antlr-runtime:3.4'
+	antlr3 'org.antlr:antlr:3.4'
+}
+task generateGrammarSource(type: JavaExec) {
+    def antlrSource = 'src/java/net/sf/jabref/bst'
+    destinationDir = antlrSource
+
+    inputs.dir file(antlrSource)
+    outputs.dir file(destinationDir)
+
+    def grammars = fileTree(antlrSource).include('**/*.g')
+
+    main = 'org.antlr.Tool'
+    classpath = configurations.antlr3
+    args = ["-o", "${destinationDir}", grammars.files].flatten()
+}
+
+/*
+ Code for JavaNCSS adapted from http://gradle.codehaus.org/Cookbook#Cookbook-usingJavaNCSS
+ JavaNCSS: http://www.kclee.de/clemens/java/javancss/
+
+Cyclomatic
+Complexity             Ease of       Risk
+Number (CCN)           maintenance
+(McCabe metric)
+---------------------------------------------
+1-10, simple           easy          minimum
+11-20, complex         moderate      moderate
+21-50, more complex    hard          high
+>50, unstable          very hard     very high
+*/
+
+configurations {
+    javancssConf
+}
+
+dependencies {
+    javancssConf 'org.codehaus.javancss:javancss:32.53'
+}
+
+task javancss << {
+    println 'Running javancss quality metrics tool'
+    ant {
+        taskdef(name:'javancss', classname:'javancss.JavancssAntTask', classpath: configurations.javancssConf.asPath)
+        javancss(
+			srcdir:'src/java',
+			includes:'**/*.java',
+			excludes:'jama/**/*.java, jmat/**/*.java, cformat/**/*.java',
+			abortOnFail:'false',
+			generateReport:'true',
+			outputfile:'build/javancss_report.plain',
+			ccnPerFuncMax:'30',
+			format:'plain',
+			packageMetrics:'true',
+			classMetrics:'false',
+			functionMetrics:'false'
+		)
+    }
+}

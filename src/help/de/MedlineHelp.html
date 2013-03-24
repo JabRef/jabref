@@ -1,0 +1,53 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Eintr&auml;ge von Medline abrufen</h1>
+
+    <p>MEDLINE ist die
+    wichtigste Datenbank der <em>U.S. National Library of
+    Medicine</em>. Sie enth&auml;lt Literaturangaben von
+    Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der
+    Biomedizin.</p>
+
+    <p>JabRef kann Literaturangaben von der Medline-Datenbank
+    herunterladen. Um diese Funktion zu nutzen, w&auml;hlen Sie
+    <b>Extras -&gt; Medline abrufen</b>, so dass der Medline-Dialog
+    im linken Seitenfeld erscheint.</p>
+
+    <p>Es gibt zwei M&ouml;glichkeiten, die Auswahl der
+    Eintr&auml;ge vorzunehmen, die heruntergeladen werden
+    sollen:</p>
+
+    <ol>
+        <li>Geben Sie eine oder mehr Medline IDs (getrennt durch
+        Komma/Semikolon) in das Textfeld ein.</li>
+
+        <li>Geben Sie Namen oder W&ouml;rter ein, nach denen
+        gesucht werden soll. Sie k&ouml;nnen dazu die Operatoren
+        <em>and</em> und <em>or</em> sowie Klammern benutzen, um
+        Ihren Suchbegriff zu verfeinern.</li>
+    </ol>In beiden F&auml;llen dr&uuml;cken Sie dann <b>Enter</b>
+    oder die Schaltfl&auml;che <b>Abrufen</b>. Wenn Sie eine
+    Textsuche durchf&uuml;hren, wird Ihnen die Anzahl der
+    gefundenen Eintr&auml;ge angezeigt, und Sie k&ouml;nnen
+    w&auml;hlen, wie viele Sie herunterladen m&ouml;chten.
+
+    <p>Die abgerufenen Eintr&auml;ge werden Ihrer zu diesem
+    Zeitpunkt aktivierten Datei zugeordnet.</p>
+
+    <h2>Benutzung eines Proxy-Servers</h2>
+
+    <p>Wenn Sie einen
+    HTTP-Proxy-Server benutzen m&uuml;ssen, &uuml;bergeben Sie den
+    Servernamen und die Portnummer an Java.</p>
+
+    <p><code>java -Dhttp.proxyHost="hostname"
+    -Dhttp.proxyPort="portnumber"</code></p>
+
+    <p>Diese Umgebungseinstellungen sind in der <a href="http://docs.oracle.com/javase/1.4.2/docs/guide/net/properties.html">Sun J2SE Dokumentation</a> beschrieben.</p>
+
+</body>
+</html>

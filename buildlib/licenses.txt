@@ -1,0 +1,20 @@
+Path:    jalopy-1.0b10.jar
+Project: Jalopy Java Source Code Formatter
+URL:     http://sourceforge.net/projects/jalopy/
+License: BSD
+
+Path:    jalopy-ant-0.6.1.jar
+Project: Jalopy Java Source Code Formatter
+URL:     http://sourceforge.net/projects/jalopy/
+License: BSD
+
+Path:    jarbundler-2.2.0.jar
+Project: Mac OS X JarBundler ANT Task
+URL:     http://informagen.com/JarBundler/index.html
+License: GPLv2
+Note:    Required to build Mac OS X Jar
+
+Path:    junit.jar
+Project: JUnit 3
+URL:     http://www.junit.org/
+License: CPL 1.0

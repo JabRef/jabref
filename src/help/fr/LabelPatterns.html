@@ -1,0 +1,224 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+
+    <h1>Personnalisation du g&eacute;n&eacute;rateur de clefs
+    BibTeX</h1>
+
+    <p>Dans le menu 'Param&eacute;trage des clefs' de la
+    fen&ecirc;tre Pr&eacute;f&eacute;rences, on peut indiquer les
+    champs &agrave; utiliser pour la g&eacute;n&eacute;ration
+    automatique des clefs BibTeX. La d&eacute;finition peut
+    &ecirc;tre faite pour chacune des entr&eacute;es standards.</p>
+
+    <h2>Les d&eacute;finitions de clefs</h2>
+
+    <p>La d&eacute;finition peut contenir n'importe quel texte au
+    choix ainsi que des marqueurs de champs qui indiquent les
+    champs particuliers de l'entr&eacute;e utilis&eacute;s et leur
+    position dans la clef. Un marqueur de champ est
+    constitu&eacute; g&eacute;n&eacute;ralement du nom du champ
+    entre crochets, par ex. <b>[volume]</b>. Si le champ n'est pas
+    d&eacute;fini dans l'entr&eacute;e lorsque la clef est
+    g&eacute;n&eacute;r&eacute;e, aucun texte n'est
+    ins&eacute;r&eacute; dans la clef.</p>
+
+    <p>Plusieurs marqueurs de champs sp&eacute;ciaux sont fournis
+    et permettent l'extraction d'une partie du contenu d'un champ.
+    Ils sont donn&eacute;s ci-dessous. Vous pouvez librement
+    sugg&eacute;rer de nouveaux marqueurs de champs
+    sp&eacute;ciaux.</p>
+
+    <p>Les marqueurs de champs sp&eacute;ciaux&nbsp;:</p>
+
+    <ul>
+        <li><b>[<code>auth</code>]</b>&nbsp;: Le nom du premier
+        auteur<br /></li>
+
+        <li><b>[<code>authors</code>]</b>&nbsp;: Le nom de tous les
+        auteurs<br /></li>
+
+        <li><b>[<code>authorLast</code>]</b>: Le nom propre du dernier
+        auteur<br /></li>
+
+        <li><b>[<code>authorsN</code>]</b>: Les noms des N premiers
+        auteurs. S'il y a plus d'auteurs, "EtAl" est
+        ajout&eacute;.<br /></li>
+                
+        <li><b>[<code>authorsAlpha</code>]</b>&nbsp;: correspond au style
+        BibTeX "alpha". Un auteur&nbsp;: les trois premi&egrave;res lettres du nom.
+        Deux &agrave; quatre auteurs&nbsp;: Les premi&egrave;res lettres des noms, concat&eacute;n&eacute;es.
+        Plus de quatre auterus&nbsp;: Les premi&egrave;res lettres des noms des trois
+        premiers auteurs, concat&eacute;n&eacute;es, avec un "+" &agrave; la fin.<br /></li>
+
+        <li><b>[<code>authIniN</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres (ou moins) du nom de chacun des
+        auteurs.<br /></li>
+
+        <li><b>[<code>authorIni</code>]</b>&nbsp;: Les 5
+        premi&egrave;res lettres du nom du premier auteur et les
+        initiales du nom des auteurs restants<br /></li>
+
+        <li><b>[<code>authN</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres du premier auteur.<br /></li>
+
+        <li><b>[<code>authN_M</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres du nom des M premiers
+        auteurs.<br /></li>
+
+        <li><b>[<code>auth.auth.ea</code>]</b>&nbsp;: Le nom des
+        deux premiers auteurs suivi de ".ea" lorsqu'ils sont plus
+        de deux.<br /></li>
+
+        <li><b>[<code>auth.etal</code>]</b>: Le nom du premier
+        auteur et le nom du second auteur, ou ".etal" s'il y en a
+        plus de deux.<br /></li>
+
+        <li><b>[<code>authshort</code>]</b>&nbsp;: Le nom s'il n'y
+        a qu'un seul auteur. Jusqu'&agrave; trois auteurs, le
+        premier caract&egrave;re du nom de chacun d'eux. Au
+        del&agrave; de trois auteurs, le caract&egrave;re plus (+)
+        est ajout&eacute;.<br /></li>
+    </ul><b>Note&nbsp;:</b> S'il n'y a pas d'auteur (dans le cas
+    d'un livre &eacute;dit&eacute;), alors tous les marqueurs
+    <b><code>[auth...]</code></b> ci-dessus utiliseront
+    l'&eacute;diteur(s) (s'il y en a) comme alternative. Ainsi
+    l'&eacute;diteur(s) d'un livre sans auteur sera trait&eacute;
+    comme l'auteur(s) pour la g&eacute;n&eacute;ration des clefs.
+    Si vous ne d&eacute;sirez pas ce comportement, c'est &agrave;
+    dire si vous voulez un marqueur qui soit vide s'il n'y a pas
+    d'auteur, utilisez le code <b><code>pureauth</code></b> au lieu
+    du code <b><code>auth</code></b> dans les marqueurs ci-dessus.
+    Par exemple, <b><code>[pureauth]</code></b> ou
+    <b><code>[pureauthors3]</code></b>.
+
+    <ul>
+        <li><b>[<code>edtr</code>]</b>&nbsp;: Le nom du premier
+        &eacute;diteur.<br /></li>
+
+        <li><b>[<code>edtrIniN</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres du nom de chaque
+        &eacute;diteur.<br /></li>
+
+        <li><b>[<code>editors</code>]</b>&nbsp;: Le nom des chacun
+        des &eacute;diteurs.<br /></li>
+
+        <li><b>[<code>editorLast</code>]</b>: Le nom propre du dernier
+        &eacute;diteur<br /></li>
+        
+        <li><b>[<code>editorIni</code>]</b>&nbsp;: Les cinq
+        premi&egrave;res lettres du nom du premier &eacute;diteur
+        suivi des initiales du nom des &eacute;diteurs
+        restants.<br /></li>
+
+        <li><b>[<code>edtrN</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres du nom du premier
+        &eacute;diteur.<br /></li>
+
+        <li><b>[<code>edtrN_M</code>]</b>&nbsp;: Les N
+        premi&egrave;res lettres du nom des M premiers
+        &eacute;diteurs.<br /></li>
+
+        <li><b>[<code>edtr.edtr.ea</code>]</b>&nbsp;: Le nom des
+        deux premiers &eacute;diteurs suivi de ".ea" lorsqu'ils
+        sont plus de deux.<br /></li>
+
+        <li><b>[<code>edtrshort</code>]</b>&nbsp;: Le nom s'il n'y
+        a qu'un seul &eacute;diteur. Jusqu'&agrave; trois
+        &eacute;diteurs, le premier caract&egrave;re du nom de
+        chacun d'eux. Au del&agrave; de trois &eacute;diteurs, le
+        caract&egrave;re plus (+) est ajout&eacute;.<br /></li>
+
+        <li><b>[<code>firstpage</code>]</b>&nbsp;: Le num&eacute;ro
+        de la premi&egrave;re page de la publication (Attention&nbsp;: cela retournera
+        le plus petit nombre trouv&eacute; dans le champ pages, puisque BibTeX
+        permet <code>7,41,73--97</code> ou <code>43+</code>).<br /></li>
+
+        <li><b>[<code>keywordN</code>]</b>: Nombre de mots-clefs
+        dans le champ "keywords" en supposant que les mots-clefs
+        sont s&eacute;par&eacute;s par des virgules ou des
+        points-virgules.<br /></li>
+
+        <li><b>[<code>lastpage</code>]</b>&nbsp;: Le num&eacute;ro
+        de la derni&egrave;re page de la publication (voir la remarque dans
+        <code>firstpage</code>).<br /></li>
+
+        <li><b>[<code>shorttitle</code>]</b>&nbsp;: Les 3 premiers
+        mots du titre.<br /></li>
+
+        <li><b>[<code>shortyear</code>]</b>&nbsp;: Les 2 derniers
+        chiffres de l'ann&eacute;e de publication.<br /></li>
+
+        <li><b>[<code>veryshorttitle</code>]</b>&nbsp;: Le premier
+        mot du titre qui ne soit pas 'the', 'a', 'an'.<br /></li>
+    </ul>
+
+    <p>Un nom de champs (ou celui de l'un des pseudo-champs vu au
+    dessus) peut, de fa&ccedil;on optionnelle, &ecirc;tre suivi par
+    un ou plusieurs modificateurs. Les modificateurs sont
+    appliqu&eacute;s dans l'ordre o&ugrave; ils sont
+    sp&eacute;cifi&eacute;s.</p>
+
+    <ul>
+        <li><b>:abbr</b>: Abr&egrave;ge le texte produit par le nom
+        du champ ou un marqueur de champ sp&eacute;cial. Uniquement
+        le premier caract&egrave;re et les caract&egrave;res
+        suivant un espace seront inclus. Par exemple,
+        <b>[journal:abbr]</b> abr&egrave;gera "Journal of Fish
+        Biology" en "JoFB".<br /></li>
+
+        <li><b>:lower</b>, force le texte ins&eacute;r&eacute; par
+        le marqueur de champ &agrave; &ecirc;tre en minuscules. Par
+        exemple, <b>[auth:lower]</b> bascule le nom du premier
+        auteur en minuscules.</li>
+    </ul>
+
+    <p>Si vous n'avez pas d&eacute;fini de mod&egrave;le de clef
+    pour un type d'entr&eacute;es donn&eacute;, le <b>Mod&egrave;le
+    de clef par d&eacute;faut</b> sera utilis&eacute;. Vous pouvez
+    changer le mod&egrave;le par d&eacute;faut - son
+    param&eacute;trage se trouve au-dessus de la liste des types
+    d'entr&eacute;es dans la section <b>Param&eacute;trage des
+    clefs</b> de la fen&ecirc;tre
+    <b>Pr&eacute;f&eacute;rences</b>.</p>
+
+    <p>La clef utilis&eacute;e par d&eacute;faut est [auth][year];
+    elle produit des clefs du type <code>Yared1998</code>. Si la
+    clef n'est pas unique dans la base de donn&eacute;e, elle est
+    modifi&eacute;e par l'ajout d'une des lettres de a &agrave; z
+    et ceci jusqu'a ce quelle soit unique. De cette fa&ccedil;on,
+    les &eacute;tiquettes ressemblent &agrave;&nbsp;:</p>
+
+    <p style="margin-left: 28pt">
+        <code>Yared1998</code><br />
+        <code>Yared1998a</code><br />
+        <code>Yared1998b</code>
+    </p>
+
+    <h2>Remplacement d'expressions r&eacute;guli&egrave;res</h2>
+
+    <p>Apr&egrave;s que la d&eacute;finition de clef ait
+    &eacute;t&eacute; appliqu&eacute;e pour produire une clef, vous
+    pouvez demander au g&eacute;n&eacute;rateur de clef de
+    rechercher les occurrences d'une expression
+    r&eacute;guli&egrave;re donn&eacute;e et de la remplacer avec
+    une cha&icirc;ne. L'expression r&eacute;guli&egrave;re et la
+    cha&icirc;ne de remplacement sont entr&eacute;es dans les
+    champs textes situ&eacute;s sous la liste des d&eacute;finition
+    de clefs.</p>
+
+    <p>Si la cha&icirc;ne de remplacement est vide, les
+    correspondances de l'expression r&eacute;guli&egrave;re seront
+    simplement supprim&eacute;es de la clef
+    g&eacute;n&eacute;r&eacute;e. Par exemple, en rempla&ccedil;ant
+    <code>\p{Punct}</code> ou <code>[:/%]</code>
+    par une cha&icirc;ne vide, on supprimera les caract&egrave;res
+    correspondants (et non d&eacute;sir&eacute;s) de la clef.
+    Cela peut &ecirc;tre utile lors du renommage des PDF sur la base
+    des clefs BibTeX.</p>
+</body>
+</html>

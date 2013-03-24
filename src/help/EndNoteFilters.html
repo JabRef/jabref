@@ -1,0 +1,82 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+    <h1>EndNote Export Filter</h1>
+
+    <h2>Export from JabRef</h2>
+
+    <p>JabRef can export databases to
+    EndNote-readable files. To use this feature, choose <b>File
+    -&gt; Export</b>, choose the file type <b>Endnote (txt)</b> and
+    then specify the name of the export file.</p>
+
+    <h2>Import to EndNote</h2>
+
+    <p>The default EndNote Import filter
+    does not handle multiple authors or editors properly. There are
+    two options to work around this:</p>
+
+    <ol>
+        <li>Use the built-in filter and fix the file later. To open
+        up the file in EndNote, create a new database or open an
+        old database in EndNote. Then select <b>File -&gt;
+        Import</b>, click on <b>Choose File</b>, then highlight the
+        exported file and click <b>Choose</b>. Click on <b>Import
+        Options</b> and select <b>EndNote Import</b>. Click
+        <b>Import</b> to start the import. After import, select
+        <b>Edit-&gt; Change Text</b>. Change <b>Any Field</b> to
+        <b>Author</b>. Enter " and " into the search field (without
+        quotes). enter a return character into the change field
+        (option-return on Mac OS X, ctrl-return on Windows XP).
+        Click <b>Change</b>. Repeat with the <b>Secondary
+        Author</b> field.</li>
+
+        <li>Install the <i>EndNote Import from JabRef filter</i> in
+        the <i>EndNote Extras</i>. Follow the instructions in
+        <i>Advanced Use</i> below. To open up the file in EndNote,
+        create a new database or open an old database in EndNote.
+        Then select <b>File -&gt; Import</b>, click on <b>Choose
+        File</b>, then highlight the exported file and click
+        <b>Choose</b>. Click on <b>Import Options</b> and select
+        <b>EndNote Import from JabRef</b> (if it does not appear,
+        select Other filters. If it still doesn't appear, it was
+        not correctly installed.) Click <b>Import</b> to start the
+        import.</li>
+    </ol>
+
+    <h2>Notes</h2>
+
+    <p>The EndNote Export filter maps BibTeX entrytypes
+    to EndNote reference types as follows:</p>
+    <pre>
+BibTeX entrytype -&gt; EndNote Reference Type
+------------------------------------------
+misc, other -&gt; Generic
+unpublished -&gt; Manuscript
+manual -&gt; Computer Program
+article -&gt; Journal Article
+book -&gt; Book
+booklet -&gt; Personal Communication
+inbook,incollection -&gt; Book Section
+inproceedings -&gt; Conference Proceedings
+techreport -&gt; Report
+mastersthesis, phdthesis -&gt; Thesis</pre>
+
+    <h2>Corporate Authors</h2>
+
+    <p>By default, the export filter assumes
+    that entries in the author or editor fields in brackets are
+    corporate authors and replaces the brackets with a trailing
+    comma. However, this means that entries that include LaTeX code
+    in brackets will be assumed to be corporate authors and
+    therefore will be improperly formatted.</p>
+
+    <h2>Advanced Use: EndNote Extras</h2>
+
+    For better interoperability between EndNote and JabRef, download the
+    EndNote filter set from the Resources page of JabRef's web page.
+</body>
+</html>

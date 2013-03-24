@@ -1,0 +1,762 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Filtres d'exportation personnalis&eacute;s</h1>
+
+    <p>JabRef vous permet de d&eacute;finir et d'utiliser vos
+    propres filtres d'exportation de la m&ecirc;me mani&egrave;re
+    que les filtres d'exportation standards. Un filtre
+    d'exportation est d&eacute;fini par un ou plusieurs <i>fichiers
+    gabarit</i> qui, avec l'aide d'un certain nombre de routines
+    internes de formatage, d&eacute;finissent le format des
+    fichiers export&eacute;s. Vos fichiers gabarit doivent
+    &ecirc;tre pr&eacute;par&eacute;s avec un &eacute;diteur de
+    texte &agrave; l'ext&eacute;rieur de JabRef.</p>
+
+    <h2>Ajout d'un filtre d'exportation personnalis&eacute;</h2>
+
+    <p>La seule obligation pour avoir un filtre d'exportation
+    valide est l'existence d'un fichier avec l'extension
+    <b>.layout</b>. Pour ajouter un nouveau filtre d'exportation,
+    on utilise le menu <b>Options -&gt; G&eacute;rer les
+    exportations personnalis&eacute;es</b>, et on clique sur
+    <b>Ajouter nouvelle</b>. Une nouvelle boite de dialogue
+    appara&icirc;t et vous permet de sp&eacute;cifier le nom du
+    nouveau filtre d'exportation (ce nom appara&icirc;tra ensuite
+    comme l'un des choix du menu d&eacute;roulant "Type de fichier"
+    de la fen&ecirc;tre de dialogue affect&eacute;e au menu
+    <b>Fichier -&gt; Exporter</b> de la fen&ecirc;tre principale de
+    JabRef), le chemin du fichier <b>.layout</b>, et l'extension de
+    fichier pr&eacute;f&eacute;r&eacute;e par le filtre
+    d'exportation (c'est cette extension qui sera
+    sugg&eacute;r&eacute;e dans la boite de dialogue lorsque le
+    filtre sera utilis&eacute;).</p>
+
+    <h2>Cr&eacute;ation d'un filtre d'exportation</h2>
+
+    <p>Pour voir des exemples de constitution de filtres
+    d'exportation, recherchez le r&eacute;pertoire contenant les
+    fichiers gabarit des filtres d'exportation standards sur notre
+    page de t&eacute;l&eacute;chargement.</p>
+
+    <h3>Les fichiers gabarit</h3>
+
+    <p>On suppose que l'on veut cr&eacute;er un filtre
+    d'exportation pour une sortie HTML.</p>
+
+    <p>Bien que le filtre d'exportation ne n&eacute;cessite qu'un
+    seul fichier <b>.layout</b>, qui dans ce cas pourrait s'appeler
+    <i>html.layout</i>, vous pouvez d&eacute;sirer ajouter deux
+    autres fichiers appel&eacute;s <i>html.begin.layout</i> et
+    <i>html.end.layout</i>. Le premier contient le d&eacute;but de
+    la sortie et le dernier la fin. JabRef recherche ces deux
+    fichiers quelque soit le fichier d'exportation utilis&eacute;
+    et, s'il les trouve, les recopie tel quel dans la sortie avant
+    et apr&egrave;s l'&eacute;criture des entr&eacute;es
+    individuelles.</p>
+
+    <p>Il faut noter que ces fichiers doivent &ecirc;tre dans le
+    m&ecirc;me r&eacute;pertoire que le fichier <i>html.layout</i>,
+    et que leur nom doit comporter <b>.begin</b> pour l'un et
+    <b>.end</b> pour l'autre.</p>
+
+    <p>Dans notre exemple de fichier d'exportation, cela pourrait
+    ressembler &agrave;</p>
+
+    <p><i>html.begin.layout</i>&nbsp;:<br />
+    <code>&lt;!DOCTYPE html&gt;<br/>&lt;html&gt;<br /> &lt;body
+    style="color:#275856; font-family: Arial, sans-serif;"&gt;</code>
+    </p>
+
+    <p><i>html.end.layout</i>&nbsp;:<br />
+    <code>&lt;/BODY&gt;<br />&lt;/HTML&gt;</code></p>
+
+    <p>Le fichier <i>html.layout</i> fournit le gabarit par
+    d&eacute;faut pour l'exportation d'une seule entr&eacute;e. Si
+    vous devez utiliser diff&eacute;rents gabarits pour les
+    diff&eacute;rentes entr&eacute;es, vous pouvez le faire en
+    ajoutant des fichiers <b>.layout</b> sp&eacute;cifiques. Les
+    fichiers doivent aussi &ecirc;tre dans le m&ecirc;me
+    r&eacute;pertoire que le gabarit principal et ils sont
+    nomm&eacute;s en ins&eacute;rant <b>.entrytype</b> dans le nom
+    du fichier gabarit principal. Le nom de l'entr&eacute;e doit
+    &ecirc;tre en minuscules. Dans notre exemple, on peut vouloir
+    ajouter un gabarit diff&eacute;rent pour les livres et cela se
+    fera via le fichier <i>html.book.layout</i>. Pour une
+    th&egrave;se, on ajoutera le fichier
+    <i>html.phdthesis.layout</i>. Ces fichiers sont similaires au
+    gabarit principal, si ce n'est qu'ils sont utilis&eacute;s pour
+    des entr&eacute;es sp&eacute;cifiques. A noter que le gabarit
+    g&eacute;n&eacute;ral peut ais&eacute;ment &ecirc;tre
+    cr&eacute;&eacute; suffisamment g&eacute;n&eacute;ral pour
+    &ecirc;tre utilisable avec la plupart des entr&eacute;es dans
+    la majorit&eacute; des filtres d'exportation.</p>
+
+    <h3>Le format des fichiers gabarit</h3>
+
+    <p>Les fichiers gabarit utilisent un simple langage de balisage
+    dans lequel les commandes sont identifi&eacute;es par
+    l'antislash (\) les pr&eacute;c&eacute;dant. Tout texte non
+    identifi&eacute; comme faisant partie d'une entr&eacute;e est
+    recopi&eacute; tel quel dans le fichier de sortie.</p>
+
+    <h3>Les commandes relatives aux champs</h3>
+
+    <p>Les mots pr&eacute;c&eacute;d&eacute;s d'un antislash, par
+    exemple <code>\author</code>, <code>\editor</code>,
+    <code>\title</code> ou <code>\year</code>, sont
+    interpr&eacute;t&eacute;s comme des r&eacute;f&eacute;rences
+    aux champs correspondants et le contenu du champ est
+    copi&eacute; directement dans la sortie.</p>
+
+    <h3>Les formateurs de champs</h3>
+
+    <p>Souvent, on a besoin de faire subir au contenu d'un champ un
+    pr&eacute;-traitement avant de le copier dans le fichier de
+    sortie. Cela est r&eacute;alis&eacute; en utilisant un
+    <i>formateur de champ</i> - une classe java contenant une seule
+    m&eacute;thode qui manipule le contenu du champ.</p>
+
+    <p>Le formateur est utilis&eacute; en ins&eacute;rant la
+    commande <code>\format</code> suivie du nom du formateur entre
+    crochets et du nom du champ entre accolades, par exemple</p>
+
+    <p><code>\format[ToLowerCase]{\author}</code></p>
+
+    <p>Vous pouvez aussi indiquer plusieurs formateurs
+    s&eacute;par&eacute;s par des virgules. Ils seront alors
+    appel&eacute;s s&eacute;quentiellement de la gauche vers la
+    droite, par exemple&nbsp;:</p>
+
+    <p><code>\format[ToLowerCase,HTMLChars]{\author}</code></p>
+
+    <p>va d'abord appliquer le formateur <b>ToLowerCase</b> puis
+    <b>HTMLChars</b> sur le r&eacute;sultat. Vous pouvez lister un
+    nombre arbitraire de formateurs de cette mani&egrave;re.</p>
+
+
+    <p>L'argument des formateurs, &agrave; l'int&eacute;rieur des accolades,
+    n'est pas obligatoirement une commande de champ. Ce peut aussi
+    &ecirc;tre du texte normal qui sera ensuite pass&eacute; aux formateurs
+    au lieu des contenus d'un champ. Cela peut &ecirc;tre utilis&eacute; pour
+    certains formateurs, par ex. le formateur CurrentDate (d&eacute;crit
+    ci-dessous).</p>
+
+    <p>Certains formateurs prennent un argument suppl&eacute;mentaire, sp&eacute;cifi&eacute; entre parenth&egrave;ses
+    imm&eacute;diatement apr&egrave;s le nom du formateur. L'argument peut &ecirc;tre mis
+    entre crochets, ce qui est n&eacute;cessaire s'il inclut les caract&egrave;res de parenth&egrave;ses.
+    Par exemple, <code>\format[Replace("\s,_")]{\journal}</code> appelle
+    le formateur <b>Replace</b> avec l'argument <b>\s,_</b> (ce qui remplace
+    tous les espaces par des soulign&eacute;s dans le champ "field").</p>
+
+
+    <p>Voir ci-dessous pour une liste des formateurs d'exportation disponibles.</p>
+
+
+    <h3>Les sorties conditionnelles</h3>
+
+    <p>Certaines informations dans les sorties ne prennent de sens
+    que si un certain champ est utilis&eacute;. Par exemple, disons
+    que l'on veuille faire suivre le nom de l'&eacute;diteur par le
+    texte <code>(Ed.)</code>. Cela peut &ecirc;tre
+    r&eacute;alis&eacute; avec le code suivant&nbsp;:</p>
+
+    <p><code>\format[HTMLChars,AuthorFirstFirst]{\editor}
+    (Ed.)</code></p>
+
+    <p>Cependant, si le champs <code>editor</code> n'a pas
+    &eacute;t&eacute; renseign&eacute; - il n'a pas de sens pour
+    l'entr&eacute;e export&eacute;e - le texte <code>(Ed.)</code>
+    doit &ecirc;tre ignor&eacute;. Cela peut &ecirc;tre
+    effectu&eacute; en utilisant les commandes <code>\begin</code>
+    et <code>\end</code>&nbsp;:</p>
+
+    <p><code>\begin{editor}<br />
+    \format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)<br />
+     \end{editor}</code></p>
+
+    <p>Les commandes <code>\begin</code> et <code>\end</code>
+    assure que le texte contenu entre les deux commandes ne sera
+    imprim&eacute; que si et seulement si le champ
+    sp&eacute;cifi&eacute; entre accolades est renseign&eacute;
+    dans l'entr&eacute;e que l'on veut exporter.</p>
+
+    <p>Un bloc conditionnel peut aussi d&eacute;pendre de plus d'un champ,
+    et le contenu du bloc est affich&eacute; uniquement
+    quand toutes les conditions sont remplies.
+    Deux op&eacute;rateurs conditionnels sont disponibles&nbsp;:</p>
+    <ul>
+        <li>op&eacute;rateur ET&nbsp;: <code>&amp;</code>, <code>&amp;&amp;</code></li>
+        <li>op&eacute;rateur OU&nbsp;: <code>|</code>, <code>||</code></li>
+    </ul>
+
+    <p>Pour imprimer du texte uniquement si &agrave; la fois les champs
+    <code>year</code> et <code>month</code> sont renseign&eacute;s, utilisez
+    un bloc tel que celui-ci&nbsp;:<br/><br/>
+    <code>\begin{year&amp;&amp;month}Month: \format[HTMLChars]
+        {\month}\end{year&amp;&amp;month}</code><br/><br/>
+    qui imprimera "Month: " plus le contenu du champ <code>month</code>, mais
+    seulement si le champ <code>year</code> est lui-aussi d&eacute;fini.</p>
+
+    <p><b>Note&nbsp;:</b> L'utilisation des commandes
+    <code>\begin</code> et <code>\end</code> est une mani&egrave;re
+    astucieuse de cr&eacute;er des gabarits qui sont communs
+    &agrave; une grande vari&eacute;t&eacute; d'entr&eacute;es.</p>
+
+
+    <h3>Les sorties group&eacute;es</h3>
+
+    <p>Si vous d&eacute;sirez s&eacute;parer vos entr&eacute;es en
+    groupes bas&eacute;s sur un certain champ, vous pouvez utiliser
+    les commandes de sorties group&eacute;es. La sortie
+    group&eacute;e est assez similaire aux sorties conditionnelles,
+    except&eacute; que le texte sp&eacute;cifi&eacute; n'est
+    imprim&eacute; que si le champ indiqu&eacute; dans les
+    accolades change de valeur.</p>
+
+    <p>Par exemple, on suppose que l'on d&eacute;sire faire des
+    groupes &agrave; partir de mots-clefs. Avant l'exportation, on
+    s'assure que les entr&eacute;es sont tri&eacute;es selon les
+    mots-clefs. Ensuite, on utilise les commandes suivantes pour
+    les grouper par mot-clefs&nbsp;:</p>
+    
+    <p><code>\begingroup{keywords}New Category:
+    \format[HTMLChars]{\keywords}<br />
+     \endgroup{keywords}</code></p>
+
+    <h2>Partage de votre travail</h2>
+
+    <p>Avec les fichiers gabarit externes, il est relativement
+    simple de partager des formats d'exportation entre
+    utilisateurs. Si vous &eacute;crivez un filtre d'exportation
+    pour un format non support&eacute; par JabRef, ou si vous
+    am&eacute;liorez un filtre d&eacute;j&agrave; existant, nous
+    vous encourageons &agrave; d&eacute;poser votre travail sur
+    notre page SourceForge.net. La m&ecirc;me chose est possible
+    pour les nouvelles classes de formateur que vous avez
+    &eacute;crites. Nous serons heureux de distribuer une
+    collection des fichiers gabarit soumis ou de les ajouter
+    &agrave; la s&eacute;rie des filtres d'exportation standard ou
+    des formateurs.</p>
+
+    <p>&Agrave; partir de JabRef 2.4 vous pouvez aussi empaqueter votre
+    format d'exportation ("ExportFormat") ou formateur de gabarit
+    ("LayoutFormatter") comme un greffon ("plug-in"). Si vous le
+    faites, vous pouvez fournir un unique fichier zip &agrave; d'autres
+    utilisateurs afin qu'ils utilisent votre format d'exportation.
+    Pour un exemple, t&eacute;l&eacute;charger le source de JabRef et jeter un
+    oeil au r&eacute;pertoire <code>src/plugins/</code>. N'h&eacute;sitez pas
+    &agrave; participer aux forums sur Sourceforge, puisque nous ne disposons
+    pas encore d'une documentation volumineuse.</p>
+
+
+    <h2>Formateurs d'exportation inclus</h2>
+
+    <p>JabRef fournit la s&eacute;rie suivante de formateurs&nbsp;:</p>
+
+    <ul>
+        <li><code>Authors</code>&nbsp;: Ce formateur fournit des options de
+            formatage pour les champs author et editor&nbsp;
+            pour des informations d&eacute;taill&eacute;es, voir ci-dessous.
+            Il rend obsol&egrave;te une s&eacute;rie de formateurs
+            d&eacute;di&eacute;s qui &eacute;taient disponibles dans les
+            versions de JabRef ant&eacute;rieures &agrave; 2.7.</li>
+
+        <li><code>CreateBibORDFAuthors</code>&nbsp;: formate les auteurs
+            selon les sp&eacute;cification de Bibliographic Ontology (bibo).</li>
+
+        <li><code>CreateDocBookAuthors</code>&nbsp;: formate le
+        contenu du champ author selon le style DocBook.</li>
+
+        <li><code>CreateDocBookEditors</code>&nbsp;: formate le
+        contenu du champ editor selon le style DocBook.</li>
+
+        <li><code>CurrentDate</code>&nbsp;: renvoie la date
+        actuelle. Sans argument, ce formateur renvoie la date et
+        l'heure actuelle au format "yyyy.MM.dd hh:mm:ss z" (date,
+        heure et fuseau horaire). En donnant une cha&icirc;ne de
+        format diff&eacute;rent comme argument, le format de la
+        date peut-&ecirc;tre adapt&eacute;. Par exemple,
+        <code>\format[CurrentDate]{yyyy.MM.dd}</code> renverra
+        uniquement la date, comme par exemple 2005.11.30.</li>
+        
+        <li><code>Default</code>&nbsp;: prend un seul argument, qui sert comme
+        valeur par d&eacute;faut. Si la cha&icirc;ne &agrave; formater
+        n'est pas vide, elle est renvoy&eacute;e sans changement.
+        Si elle est vide, la valeur par d&eacute;faut est renvoy&eacute;e.
+        Par exemple,
+        <code>\format[Default(unknown)]{\year}</code>
+        renverra l'ann&eacute;e de l'entr&eacute;e si elle existe,
+        et "unknown" si l'ann&eacute;e n'est pas pr&eacute;cis&eacute;e.</li>
+
+        <li><code>DOIStrip</code>&nbsp;: supprime tous les pr&eacute;fixes d'une
+            cha&icirc;ne de DOI.</li>
+
+        <li><code>DOICheck</code>&nbsp;: fournit l'URL compl&egrave;te pour
+            un lien DOI.</li>
+
+        <li><code>FileLink(TypeDeFichier)</code>&nbsp;: sans argument, ce formateur renvoie
+        le premier lien apparaissant dans le champ. Pour fonctionner, ce formateur doit
+        &ecirc;tre aliment&eacute; par le contenu du champ "file" (fichier).<br/>
+        Ce formateur prend comme argument optionnel l'extension du type de fichier externe
+        sp&eacute;cifi&eacute; entre parenth&egrave;ses apr&egrave;s le nom du formateur. Par exemple,
+        <code>\format[FileLink(pdf)]{\file}</code> sp&eacute;cifie <code>pdf</code> comme un
+        argument. Quand un argument est fourni, le formateur s&eacute;lectionne le premier lien
+        vers un fichier du type sp&eacute;cifi&eacute;. Dans l'exemple, le chemin vers le premier lien PDF
+        sera renvoy&eacute;.</li>
+
+        <li><code>FirstPage</code>&nbsp;: renvoie la premi&egrave;re page du champ "pages", si initialis&eacute;.
+        Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
+        ce formateur renverra "345".</li>
+
+        <li><code>FormatChars</code>&nbsp;: Ce formateur convertit les s&eacute;quences
+        de caract&egrave;res LaTeX dans les caract&egrave;res unicode &eacute;quivalents et
+        supprime les autres commandes LaTeX sans les transf&eacute;rer.</li>
+
+        <li><code>FormatPagesForHTML</code>&nbsp;: remplace "--"
+        par "-".</li>
+
+        <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par
+        un tiret XML.</li>
+        
+        <li><code>GetOpenOfficeType</code>&nbsp;: renvoie le num&eacute;ro
+        utilis&eacute; par le syst&egrave;me bibliographique d'OpenOffice.org
+        (versions 1.x et 2.x) pour d&eacute;finir le type
+        de cette &eacute;e.</li>
+        
+        <li><code>HTMLChars</code>&nbsp;: remplace les
+        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
+        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
+        repr&eacute;sentation HTML, et traduit les commandes LaTeX
+        \emph, \textit, \textbf dans leurs &eacute;quivalents HTML.</li>
+
+        <li><code>HTMLParagraphs</code>&nbsp;: interpr&egrave;te
+        deux retours-chariot cons&eacute;cutifs (comme \n \n) comme
+        le d&eacute;but d'un nouveau paragraphe et cr&eacute;e les
+        balises html de paragraphes appropri&eacute;es.</li>
+
+        <li><code>IfPlural</code>&nbsp;: renvoie son premier argument si le
+        champ d'entr&eacute;e ressemble &agrave; une liste d'auteurs avec deux
+        noms ou plus, sinon renvoie son second argument. Par exemple,
+        <code>\format[IfPlural(Eds.,Ed.)]{\editor}</code> renverra "Eds." s'il y
+        a plus d'un &eacute;diteur et "Ed." s'il n'y en a qu'un seul.</li>
+
+        <li><code>JournalAbbreviator</code>&nbsp;: Le texte donn&eacute; en entr&eacute;e
+        est abr&eacute;g&eacute; selon les listes d'abr&eacute;viations des journaux.
+        Si aucune abr&eacute;viation n'est trouv&eacute; pour l'entr&eacute;e (par exemple, si elle
+        n'est pas dans la liste ou si elle est d&eacute;j&agrave; abr&eacute;g&eacute;e), l'entr&eacute;e sera
+        renvoy&eacute;e sans modification.
+        Par exemple, en utilisant <code>\format[JournalAbbreviator]{\journal}</code>,
+	"Physical Review Letters" renvoie "Phys. Rev. Lett."</li>
+
+        <li><code>LastPage</code>&nbsp;: renvoie la derni&egrave;re page du champ "pages", si initialis&eacute;.
+        Par exemple, si le champ "pages" est initialis&eacute; avec "345-360" ou "345--360",
+        ce formateur renverra "360".</li>
+
+        <li><code>NoSpaceBetweenAbbreviations</code>&nbsp;: Un formateur de mise
+        en page qui supprime l'espace entre les initiales des pr&eacute;noms.
+        Par exemple&nbsp;: J. R. R. Tolkien devient J.R.R. Tolkien.</li>
+
+        <li><code>NotFoundFormatter</code>&nbsp;: Ce formateur est utilis&eacute;
+        pour indiquer qu'un formateur n'a pas &eacute;t&eacute; trouv&eacute;.
+        Cela peut-&ecirc;tre utilis&eacute; pour g&eacute;rer proprement les cas o&ugrave; une mise
+        en page utilise un format non d&eacute;fini.</li>
+
+        <li><code>Number</code>&nbsp;: renvoie la s&eacute;quence de nombres &agrave; base de 1 de l'entr&eacute;e actuelle dans
+        l'exportation actuelle. Ce formateur peut &ecirc;tre utilis&eacute; pour faire une liste num&eacute;rot&eacute;e d'entr&eacute;es. Le
+        num&eacute;ro de s&eacute;quence d&eacute;pend de la place de l'entr&eacute;e actuelle dans l'ordre de tri actuel, pas du
+        nombre d'appels de ce formateur.</li>
+
+        <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les
+        accolades "{" ou "}".</li>
+
+        <li><code>RemoveBracketsAddComma</code>&nbsp;: supprime toutes les
+        accolades "{" ou "}". L'accolade fermante est remplac&eacute;e par une virgule.</li>
+
+        <li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes
+        les commandes LaTeX comme <code>\em</code>,
+        <code>\textbf</code>, etc. Lorsqu'il est utilis&eacute;
+        avec <code>HTMLChars</code> ou <code>XMLChars</code>, ce
+        formateur doit &ecirc;tre appel&eacute; en dernier.</li>
+
+        <li><code>RemoveTilde</code>&nbsp;: remplace le
+        caract&egrave;re tilde (utilis&eacute; dans LaTeX comme un
+        espace ins&eacute;cable) par un espace normal. Utile en
+        combinaison avec <a href="#NameFormatter">un formateur de nom</a>        
+        comme discut&eacute; dans la prochaine section.</li>
+
+        <li><code>RemoveWhitespace</code>&nbsp;: supprime tous les caract&egrave;res espace.</li>
+
+        <li><code>Replace(ExpReg,RemplaceAvec)</code>&nbsp;: effectue le remplacement d'une expression r&eacute;guli&egrave;re.
+        Pour utiliser ce formateur, un argument en deux parties doit &ecirc;tre fourni. Les parties sont
+        s&eacute;par&eacute;es par une virgule. Pour indiquer le caract&egrave;re virgule, utilisez la s&eacute;quence
+        d'&eacute;chappement&nbsp;: \,<br/>
+        La premi&egrave;re partie est l'expression r&eacute;guli&egrave;re &agrave; rechercher. 
+        Notez bien que toute virgule doit y &ecirc;tre pr&eacute;c&eacute;d&eacute;e par un antislash,
+        et, qu'en cons&eacute;quence, un antislash dans l'expression r&eacute;guli&egrave;re
+        recherch&eacute;e y est repr&eacute;sent&eacute; par une paire d'anti-slash. Une description
+        des expression r&eacute;guli&egrave;res de Java peut &ecirc;tre trouv&eacute;e &agrave;&nbsp;:<br/>
+        &nbsp;http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html<br/>
+        La seconde partie est le texte qui remplace tous les correspondances.</li>
+
+        <li><code>RisAuthors</code>&nbsp;: &agrave; documenter.</li>
+
+        <li><code>RisKeywords</code>&nbsp;: &agrave; documenter.</li>
+
+        <li><code>RisMonth</code>&nbsp;: &agrave; documenter.</li>
+
+        <li><code>RTFChars</code>&nbsp;: remplace les
+        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
+        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
+        repr&eacute;sentation RTF, et traduit les commandes LaTeX
+        \emph, \textit, \textbf dans leurs &eacute;quivalents RTF.</li>
+
+        <li><code>ToLowerCase</code>&nbsp;: bascule tous les
+        caract&egrave;res en minuscules.</li>
+
+        <li><code>ToUpperCase</code>&nbsp;: bascule tous les
+        caract&egrave;res en majuscules.</li>
+
+        <li><code>WrapContent</code>&nbsp;: 
+        Ce formateur renvoie la valeur d'entr&eacute;e apr&egrave;s ajout d'un pr&eacute;fixe et
+        d'un suffixe, tant que la valeur d'entr&eacute;e n'est pas vide.
+        
+        Si la valeur d'entr&eacute;e est vide, une cha&icirc;ne vide est renvoy&eacute;e (le
+        pr&eacute;fixe et le suffixe ne sont pas renvoy&eacute;s dans ce cas).
+        Le formateur n&eacute;cessite un argument contenant le pr&eacute;fixe et le suffixe
+        s&eacute;par&eacute;s par une virgule.
+        Pour inclure le caract&egrave;re virgule dans l'un d'entre eux, utilisez la
+        cha&icirc;ne d'&eacute;chappement
+        (\,).</li>
+
+        <li><code>WrapFileLinks</code>&nbsp;: Voir ci-dessous.</li>
+
+        <li><code>XMLChars</code>&nbsp;: remplace les
+        caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques
+        &agrave; TeX (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur
+        repr&eacute;sentation XML.</li>
+
+    </ul>
+
+    <h3>Le formateur <code>Authors</code></h3>
+
+    <p>Pour satisfaire les nombreux styles de citation,
+        le formateur <code>Authors</code> permet un contr&ocirc;le flexible de la mise
+        en page de la liste des auteurs. Le formateur prend en argument
+        une liste d'options s&eacute;par&eacute;es par des virgules, ce qui remplace leurs
+        valeurs par d&eacute;faut. Les paires option/valeur suivantes sont actuellement
+        disponibles, les valeurs par d&eacute;faut &eacute;tant &eacute;crites entre accolades.</p>
+
+    <dl>
+    <dt><code>AuthorSort = [ {FirstFirst} | LastFirst | LastFirstFirstFirst]</code></dt>
+    <dd>d&eacute;finit l'ordre dans lequel les noms d'auteur sont format&eacute;s.
+	<ul>
+		<li><code>FirstFirst</code>&nbsp;:
+                    les pr&eacute;noms sont suivis du nom de famille.</li>
+		<li><code>LastFirst</code>&nbsp;:
+                    les noms de famille des auteurs sont suivis de leurs pr&eacute;noms,
+                    s&eacute;par&eacute;s par une virgule.</li>
+		<li><code>LastFirstFirstFirst</code>&nbsp;:
+                    Le premier auteur est format&eacute; en LastFirst&nbsp;;
+                    les auteurs suivants en FirstFirst.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorAbbr = [ FullName | LastName | {Initials} | InitialsNoSpace | FirstInitial | MiddleInitial]</code></dt>
+    <dd>d&eacute;finit comment les noms d'auteur sont abr&eacute;g&eacute;s.
+    <ul>
+		<li><code>FullName</code>&nbsp;:
+                    montre les noms complets des auteurs&nbsp;;
+                    les pr&eacute;noms ne sont pas abr&eacute;g&eacute;s.</li>
+		<li><code>LastName</code>&nbsp;:
+                    montre uniquement les noms de familles,
+                    les pr&eacute;noms sont enlev&eacute;s.</li>
+		<li><code>Initials</code>&nbsp;:
+                    tous les pr&eacute;noms sont abr&eacute;g&eacute;s.</li>
+		<li><code>InitialsNospace</code>&nbsp;:
+                    comme Initials, tous les espaces entre les initiales
+                    &eacute;tant enlev&eacute;s.</li>
+		<li><code>FirstInitial</code>&nbsp;:
+                    seule la premi&egrave;re initiale est affich&eacute;e.</li>
+		<li><code>MiddleInitial</code>&nbsp;:
+                    le premier pr&eacute;nom est affich&eacute;, mais tous les pr&eacute;noms suivants
+                    sont abr&eacute;g&eacute;s.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorPunc = [ {FullPunc} | NoPunc | NoComma | NoPeriod]</code></dt>
+    <dd>d&eacute;finit la ponctuation &agrave; utiliser dans la liste des auteurs
+        lorsque <code>AuthorAbbr</code> est utilis&eacute;
+	<ul>
+		<li><code>FullPunc</code>&nbsp;:
+                    aucun changement &agrave; la ponctuation n'est effectu&eacute;.</li>
+		<li><code>NoPunc</code>&nbsp;:
+                    tous les points et les virgules sont supprim&eacute;s du nom d'auteur.</li>
+		<li><code>NoComma</code>&nbsp;:
+                    toutes les virgules sont supprim&eacute;es du nom d'auteur.</li>
+		<li><code>NoPeriod</code>&nbsp;:
+                    tous les points sont supprim&eacute;s du nom d'auteur.</li>
+	</ul>
+    </dd>
+
+    <dt><code>AuthorSep = [ {Comma} | And | Colon | Semicolon | Sep=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit le s&eacute;parateur &agrave; utiliser entre les auteurs. Tout s&eacute;parateur
+        peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>Sep=&lt;string&gt;</code>.</dd>
+
+    <dt><code>AuthorLastSep = [ Comma | {And} | Colon | Semicolon | Amp | Oxford | LastSep=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit le dernier s&eacute;parateur dans la liste d'auteurs. Tout s&eacute;parateur
+        peut &ecirc;tre sp&eacute;cifi&eacute; gr&acirc;ce &agrave; l'option <code>LastSep=&lt;string&gt;</code>.</dd>
+
+    <dt><code>AuthorNumber = [ {inf} | &lt;integer&gt;]</code></dt>
+    <dd>d&eacute;finit le nombre d'auteurs devant &ecirc;tre affich&eacute;s. Si le nombre d'auteurs
+        exc&egrave;de le maximum d&eacute;fini, la liste d'auteurs est remplac&eacute;e par le
+        premier auteur suivi de <code>EtAlString</code>.</dd>
+
+    <dt><code>EtAlString = [ {et al.} | EtAl=&lt;string&gt;]</code></dt>
+    <dd>d&eacute;finit la cha&icirc;ne utilis&eacute;e pour remplacer des auteurs multiples.
+        Toute cha&icirc;ne peut &ecirc;tre sp&eacute;cifi&eacute;e en utilisant <code>EtAl=&lt;string&gt;</code></dd>
+
+    </dl>
+
+    <p>Si une option n'est pas sp&eacute;cifi&eacute;e, la valeur par d&eacute;faut (montr&eacute;e entre accolades
+        ci-dessus) est utilis&eacute;e. Ainsi, uniquement les options de mise en page
+        qui diff&egrave;re de celles par d&eacute;faut ont besoin d'&ecirc;tre d&eacute;finies.
+        L'ordre dans lequel les options sont d&eacute;finies est (en g&eacute;n&eacute;ral) indiff&eacute;rent.
+        Ainsi, par exemple,</p>
+    <p><code>\format[Authors(Initials,Oxford)]{\author}</code></p>
+    <p>est &eacute;quivalent &agrave;</p>
+    <p><code>\format[Authors(Oxford,Initials)]{\author}</code></p>
+    
+    <p>Comme mentionn&eacute;, l'ordre dans lequel les options sont d&eacute;finies est
+        indiff&eacute;rent. Il y a une possibilit&eacute; d'ambigu&iuml;t&eacute; si &agrave; la fois
+        <code>AuthorSep</code> et <code>AuthorLastSep</code> sont d&eacute;finis.
+        Dans ce cas, la premi&egrave;re valeur applicable rencontr&eacute;e devrait &ecirc;tre
+        pour <code>AuthorSep</code>, et la seconde pour <code>AuthorLastSep</code>.
+        Afin d'&eacute;viter toute ambigu&iuml;t&eacute;, lorsque la valeur par d&eacute;faut
+        est modifi&eacute;e, il est recommand&eacute; de sp&eacute;cifier les deux.
+    </p>
+
+
+    <h4>Exemples</h4>
+    <p>Pour les auteurs suivants, <i>"Joe James Doe and Mary Jane
+        and Bruce Bar and Arthur Kay"</i> ,le formateur <code>Authors</code>
+        donnera les r&eacute;sultats suivants&nbsp;:</p>
+    <dl>
+    <dt><code>Authors()</code> ou, de mani&egrave;re &eacute;quivalente,
+        <code>Authors(FirstFirst,Initials,FullPunc,Comma,And,inf,EtAl= et al.)</code></dt>
+    <dd><pre>J. J. Doe, M. Jane, B. Bar and A. Kay</pre></dd>
+
+    <dt><code>Authors(LastFirstFirstFirst,MiddleInitial,Semicolon)</code></dt>
+    <dd><pre>Doe, Joe J.; Mary Jane; Bruce Bar and Arthur Kay</pre></dd>
+
+    <dt><code>Authors(LastFirst,InitialsNoSpace,NoPunc,Oxford)</code></dt>
+    <dd><pre>Doe JJ, Jane M, Bar B, and Kay A</pre></dd>
+
+    <dt><code>Authors(2,EtAl= and others)</code></dt>
+    <dd><pre>J. J. Doe and others</pre></dd>
+    </dl>
+    <p>Les formats de citations les plus courants devraient &ecirc;tre r&eacute;alisables
+        avec ce formateur. Pour des options encore plus avanc&eacute;es, envisagez
+        d'utiliser les Formateurs personnalis&eacute;s d&eacute;taill&eacute;s ci-dessous.
+    </p>
+
+    <h3>Le formateur <code>WrapFileLinks</code></h3>
+
+    <p>
+    Ce formateur it&egrave;re sur tous les liens de fichiers, ou tous les liens de fichiers
+    d'un type particulier, renvoyant une cha&icirc;ne de formatage donn&eacute;e comme premier
+    argument. La cha&icirc;ne de formatage peut contenir un nombre de s&eacute;quences d'&eacute;chappement
+    indiquant les informations sur le lien de fichier &agrave; &ecirc;tre ins&eacute;r&eacute; dans la cha&icirc;ne.
+    </p>
+    <p>
+    Ce formateur peut prendre un second argument optionnel sp&eacute;cifiant le nom d'un type
+    de fichier. Si sp&eacute;cifi&eacute;, l'it&eacute;ration inclura uniquement les fichiers correspondant
+    au type de fichier recherch&eacute; (en &eacute;tant sensible &agrave; la casse des
+    caract&egrave;res). S'il est sp&eacute;cifi&eacute; comme un argument vide, tous les liens de fichiers
+    seront inclus.
+    </p>
+    <p>
+    Apr&egrave;s le second argument, des paires d'arguments additionnels peuvent &ecirc;tre ajout&eacute;es
+    afin de sp&eacute;cifier des expressions r&eacute;guli&egrave;res de remplacement devant &ecirc;tre ex&eacute;cut&eacute;es
+    sur les informations du lien ins&eacute;r&eacute; avant son insertion dans la cha&icirc;ne de sortie.
+    Un argument non appari&eacute; sera ignor&eacute;. Afin de sp&eacute;cifier des remplacements sans effectuer
+    de filtrage sur les types de fichiers, utilisez un second argument vide.
+    </p>
+    <p>
+    Les s&eacute;quences d'&eacute;chappement pour les informations incluses sont les suivantes&nbsp;:
+    </p>
+    <ul>
+        <li><code>\i</code>&nbsp;: Cela ins&egrave;re l'index d'it&eacute;ration (d&eacute;butant
+                &agrave; 1), et peut &ecirc;tre utile si la liste des fichiers en sortie
+                doit &ecirc;tre &eacute;num&eacute;r&eacute;e.</li>
+        <li><code>\p</code>&nbsp;: Cela ins&egrave;re le chemin de fichier d'un lien de fichier.</li>
+        <li><code>\f</code>&nbsp;: Cela ins&egrave;re le nom du type du lien de fichier.</li>
+        <li><code>\x</code>&nbsp;: Cela ins&egrave;re l'extension de fichier, si elle existe.</li>
+        <li><code>\d</code>&nbsp;: Cela ins&egrave;re la description du lien de fichier, si elle existe.</li>
+    </ul>
+    <p>
+    Par exemple, une entr&eacute;e pourrait contenir un lien de fichier vers le fichier    
+    "/home/john/report.pdf" de type "PDF" avec la description "John's final report".
+    En utilisant le formateur WrapFileLinks avec l'argument suivant&nbsp;:
+    </p><code>\format[WrapFileLinks(\i. \d (\p))]{\file}</code>
+    <p>donnera la sortie suivante&nbsp;:</p>
+    <pre>
+    1. John's final report (/home/john/report.pdf)
+    </pre>
+    <p>
+    Si l'entr&eacute;e contient un second lien de fichier vers le fichier "/home/john/draft.txt"
+    du type "Text file" avec la description 'An early "draft"', le sortie sera comme suit&nbsp;:</p>
+    <pre>
+    1. John's final report (/home/john/report.pdf)
+    2. An early "draft" (/home/john/draft.txt)
+
+    </pre>
+    <p>
+    Si le formateur a &eacute;t&eacute; appel&eacute; avec un second argument, la liste sera filtr&eacute;e.
+    Par exemple&nbsp;:
+    </p>
+    <p><code>\format[WrapFileLinks(\i. \d (\p),,text file)]{\file}</code></p>
+    <p>affichera uniquement le texte suivant&nbsp;:</p>
+    <pre>
+    1. An early "draft" (/home/john/draft.txt)
+
+    </pre>
+    
+    <p>
+    Si l'on veut que cette sortie soit incluse dans une sortie en style XML,
+    les guillemets dans la description de fichier pourrait causer probl&egrave;me.
+    En ajoutant deux arguments additionnels pour traduire les guillemets en
+    caract&egrave;res XML, on r&eacute;soudra ce probl&egrave;me&nbsp;:</p>
+    <p><code>\format[WrapFileLinks(\i. \d (\p),,text file,",&quot;)]{\file}
+    </code></p>
+    <p>affichera la sortie suivante&nbsp;:</p>
+    <pre>
+    1. An early &quot;draft&quot; (/home/john/draft.txt)
+
+    </pre>
+    <p>Des paires de remplacement suppl&eacute;mentaires pourraient &ecirc;tre ajout&eacute;es.</p>
+
+
+    <h3>Formateurs personnalis&eacute;s</h3>
+
+    <p>Si aucun des formateurs disponibles ne peut faire ce que
+    vous d&eacute;sirez, vous pouvez ajouter le votre &agrave;
+    l'interface
+    <code>net.sf.jabref.export.layout.LayoutFormatter</code>. Si
+    vous ins&eacute;rez votre propre classe dans
+    <code>net.sf.jabref.export.layout.format</code>, vous pouvez
+    appeler votre formateur en utilisant son nom de classe, comme
+    pour les formateurs standards. Sinon, vous devez appeler le
+    formateur par son nom complet (incluant le nom du paquetage).
+    Dans les deux cas, le formateur doit &ecirc;tre dans votre
+    chemin de classe lorsque vous lancez JabRef</p>
+
+    <h2 id="NameFormatter">Utiliser des formateurs de nom
+    personnalis&eacute;</h2>
+
+    <p>&Agrave; partir de JabRef 2.2, il est possible de
+    d&eacute;finir des formateurs de nom personnalis&eacute;s et
+    utilisant la syntaxe des fichiers de style BibTeX. Cela permet
+    une flexibilit&eacute; totale, mais c'est fastidieux &agrave;
+    &eacute;crire</p>
+
+    <p>Vous pouvez d&eacute;finir votre propre formateur dans
+    l'onglet "Formateur de nom" des pr&eacute;f&eacute;rences en
+    utilisant le format suivant et en l'utilisant ensuite avec le
+    nom que vous avez d&eacute;fini comme de n'importe quel autre
+    formateur</p>
+    <code>&lt;cas1&gt;@&lt;gamme11&gt;@&lt;format&gt;@&lt;gamme12&gt;@&lt;format&gt;@&lt;gamme13&gt;...@@<br />
+
+     &lt;cas2&gt;@&lt;gamme21&gt;@... et ainsi de suite.</code>
+
+    <p>Ce format commence par s&eacute;parer la tache de formatage
+    de la liste d'auteurs dans des cas d&eacute;pendant du nombre
+    d'auteurs qu'il y a (c'est ainsi car certains formats
+    diff&egrave;rent en fonction du nombre d'auteurs). Chaque cas
+    individuel est s&eacute;par&eacute; par @@ et contient les
+    instructions sur la fa&ccedil;on de formater chaque auteur dans
+    le cas consid&eacute;r&eacute;. Ces instructions sont
+    s&eacute;par&eacute;es par un @.</p>
+
+    <p>Les cas sont identifi&eacute;s en utilisant des entiers (1,
+    2, 3, etc.) ou le caract&egrave;re * (correspondant &agrave;
+    n'importe quel nombre d'auteurs) et sp&eacute;cifieront le
+    formateur &agrave; appliquer s'il y a un nombre
+    inf&eacute;rieur ou &eacute;gal d'auteurs.</p>
+
+    <p>Les gammes sont soit
+    <code>&lt;entier&gt;..&lt;entier&gt;</code>,
+    <code>&lt;entier&gt;</code> ou le caract&egrave;re
+    <code>*</code> en utilisant un index bas&eacute; sur 1 pour
+    indexer les auteurs d'une liste donn&eacute;e d'auteurs. Les
+    index entiers peuvent &ecirc;tre n&eacute;gatif afin de
+    signifier qu'ils commencent par la fin de la liste o&ugrave; -1
+    est le dernier auteur.</p>
+
+    <p>Par exemple, avec une liste d'auteurs comme "Joe Doe and
+    Mary Jane and Bruce Bar and Arthur Kay"&nbsp;:</p>
+
+    <ul>
+        <li>1..3 affectera Joe, Mary and Bruce</li>
+
+        <li>4..4 affectera Arthur</li>
+
+        <li>* les affectera tous</li>
+
+        <li>2..-1 affectera Mary, Bruce and Arthur</li>
+    </ul>
+
+    <p>Les cha&icirc;nes de <code>&lt;format&gt;</code> utilisent
+    le format du formateur BibTeX&nbsp;:</p>
+
+    <p>Les quatre lettres v, f, l et j indiquent les parties du nom
+    von, first, last et jr qui sont utilis&eacute;es entre
+    accolades. Une unique lettre v, f, l ou j indique que le nom
+    doit &ecirc;tre abr&eacute;g&eacute;. Si l'une de ces lettres
+    ou paires de lettres sont rencontr&eacute;es, JabRef retournera
+    tous les noms respectifs (potentiellement
+    abr&eacute;g&eacute;s), mais l'expression totale entre
+    accolades est uniquement imprim&eacute;e si la partie du nom
+    existe.</p>
+
+    <p>Par exemple, si le format est "{ll} {vv {von Part}} {ff}" et
+    si les noms sont "Mary Kay and John von Neumann", alors JabRef
+    retournera "Kay Mary" (avec deux espaces entre le nom propre et
+    le pr&eacute;nom) et "Neuman von von Part John".</p>
+
+    <p>Je donne ici deux exemples, mais je pr&eacute;f&eacute;rerai
+    vous diriger vers la documentations BibTeX.</p>
+
+    <p>Exemple court&nbsp;: <code>"{ll}, {f.}"</code> va convertir
+    <code>"Joe Doe"</code> en <code>"Doe, J."</code></p>
+
+    <p>Exemple long&nbsp;:</p>
+
+    <blockquote>
+        <p>Pour convertir&nbsp;:</p>
+
+        <p><code>"Joe Doe and Mary Jane and Bruce Bar and Arthur
+        Kay"</code></p>
+
+        <p>en</p>
+
+        <p><code>"Doe, J., Jane, M., Bar, B. and Kay,
+        A."</code></p>
+
+        <p>vous devrez utiliser</p>
+
+        <p><code>1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll},
+        {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll},
+        {f}.</code></p>
+    </blockquote>
+
+    <p>Si quelqu'un souhaite &eacute;crire un meilleur didacticiel
+    sur ce sujet, envoyez un courriel sur l'une des listes de
+    diffusion de JabRef&nbsp;!</p>
+
+</body>
+</html>

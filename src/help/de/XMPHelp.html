@@ -1,0 +1,172 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Unterst&uuml;tzung von XMP-Metadaten in JabRef</h1>
+
+    <p>XMP ist ein Standard, der von Adobe Systems entwickelt
+    wurde, um Metadaten (Daten, die Informationen &uuml;ber andere
+    Daten enthalten) in Dateien zu speichern. Ein bekanntes
+    Beispiel f&uuml;r Metadaten sind ID3-Tags, die zur Beschreibung
+    von K&uuml;nstlern, Albumtiteln und Liednamen einer MP3-Datei
+    verwendet werden. Mit Hilfe von Metadaten k&ouml;nnen
+    MP3-Dateien unabh&auml;ngig von ihrem Dateinamen identifiziert
+    und z.B. von MP3-Playern ausgelesen und angezeigt werden.</p>
+
+    <p>Mit der XMP-Unterst&uuml;tzung versucht das JabRef-Team, die
+    Vorteile von Metadaten in die Welt der Literaturmanager
+    einzuf&uuml;hren. Sie k&ouml;nnen <b>XMP schreiben</b> im
+    <b>Allgemein</b>-Tab des Eintragseditors w&auml;hlen und damit
+    alle BibTeX-Informationen in die verlinkte PDF-Datei schreiben.
+    Wenn Sie diese PDF-Datei mit anderen austauschen, k&ouml;nnen
+    diese die Datei in das JabRef-Fenster ziehen und haben damit
+    alle Informationen zur Verf&uuml;gung, die Sie eingegeben
+    haben.</p>
+
+    <h2>Benutzung</h2>
+
+    <p>Um die XMP-Funktionen in JabRef zu nutzen,
+    gehen Sie folgenderma&szlig;en vor:</p>
+
+    <ul>
+        <li>Zum <i>Importieren einer einzelnen PDF-Datei mit
+        Metadaten</i> w&auml;hlen Sie <b>Datei -&gt; Importieren in
+        [neue|aktuelle] Datenbank</b> und im anschlie&szlig;enden
+        Dialog als Dateiformat <b>PDF mit XMP-Anmerkungen</b> aus.
+        Sie k&ouml;nnen die PDF-Datei stattdessen auch mit der Maus
+        auf das Hauptfenster von JabRef ziehen.</li>
+
+        <li>Um <i>bibliographische Informationen in eine verlinkte
+        PDF-Datei zu schreiben</i>, klicken Sie auf <b>XMP
+        schreiben</b> im <b>Allgemein</b>-Tab des
+        Eintragseditors.</li>
+
+        <li>Wenn Sie <i>alle PDFs einer Datei mit Metadaten
+        versehen</i> wollen, w&auml;hlen Sie <b>Extras -&gt;
+        XMP-Metadaten in PDFs schreiben</b>.</li>
+
+        <li>Um zu &uuml;berpr&uuml;fen, ob das Schreiben der
+        Metadaten funktioniert hat, &ouml;ffnen Sie die Datei in
+        Adobe Acrobat und w&auml;hlen <b>Datei -&gt;
+        Dokumenteigenschaften</b> und dann unter dem Reiter
+        <b>Beschreibung</b> die Schaltfl&auml;che
+        <b>Zus&auml;tzliche Metadaten</b>. Wenn Sie links
+        "Erweitert" ausw&auml;hlen, sollten Sie im rechten Teil des
+        Dialogs einen Eintrag
+        "http://jabref.sourceforge.net/bibteXMP" sehen, der die
+        entsprechenden Metadaten enth&auml;lt. Dies geht nur mit
+        dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe
+        Reader.</li>
+
+        <li>Wer kein Adobe Acrobat zur Verf&uuml;gung hat, kann
+        stattdessen das Programm <i>pdfinfo</i> verwenden, um die
+        XMP-Metadaten zu &uuml;berpr&uuml;fen. <i>pdfinfo</i> ist
+        Teil von Xpdf (<code>www.foolabs.com/xpdf</code>) und
+        Poppler (<code>http://poppler.freedesktop.org</code>).</li>
+    </ul>
+
+    <h2>BibteXmp Dateiformat</h2>
+
+    <p>XMP nutzt zum Speichern der Daten eine Teilmenge des
+    <i>Resource Description Framework</i> (RDF). F&uuml;r JabRef
+    wird ein neues Metadatenformat benutzt, das BibTeX sehr gut
+    abbildet. Alle Felder und Werte werden in Knoten eines
+    XML-Dokuments verwandelt. Nur Autoren und Herausgeber werden
+    als rdf:Seq-Strukturen gespeichert, so dass die trennenden
+    'and's weggelassen werden k&ouml;nnen. Alle Strings und
+    crossrefs werden in den Metadaten aufgel&ouml;st.</p>
+
+    <p>Das folgende einfache Minimal-Schema wird benutzt:</p>
+
+    <ul>
+        <li>Der BibTeX-Key wird als <code>bibtexkey</code>
+        gespeichert.</li>
+
+        <li>Der Eintragstyp wird als <code>entrytype</code>
+        gespeichert.</li>
+
+        <li><code>author</code> und <code>editor</code> sind
+        kodiert als <code>rdf:Seq</code>s, wobei die einzelnen
+        Autoren und Herausgeber als <code>rdf:li</code>s
+        dargestellt werden.</li>
+
+        <li>Alle anderen Felder werden unter ihrem Feld-Namen
+        gespeichert.</li>
+    </ul><br />
+    <br />
+
+
+    <p>Es folgt ein Beispiel:</p>
+    <pre>
+@INPROCEEDINGS{CroAnnHow05,
+  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+  title = {Effective work practices for floss development: A model and propositions},
+  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+  year = {2005},
+  owner = {oezbek},
+  timestamp = {2006.05.29},
+  url = {http://james.howison.name/publications.html}
+}
+</pre>wird umgewandelt in
+    <pre>
+&lt;rdf:Description xmlns:bibtex="http://jabref.sourceforge.net/bibteXMP/"
+    bibtex:bibtexkey="CroAnnHow05"
+    bibtex:year="2005"
+    bibtex:title="Effective work practices for floss development: A model and propositions"
+    bibtex:owner="oezbek"
+    bibtex:url="http://james.howison.name/publications.html"
+    bibtex:booktitle="Hawaii International Conference On System Sciences (HICSS)"
+    bibtex:timestamp="2006.05.29"&gt;
+        &lt;bibtex:author&gt;
+            &lt;rdf:Seq&gt;
+                &lt;rdf:li&gt;K. Crowston&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;H. Annabi&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;J. Howison&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;C. Masango&lt;/rdf:li&gt;
+            &lt;/rdf:Seq&gt;
+        &lt;/bibtex:author&gt;
+    &lt;bibtex:entrytype&gt;Inproceedings&lt;/bibtex:entrytype&gt;
+&lt;/rdf:Description&gt;
+</pre>
+
+    <p>Beachten Sie die folgenden Warnungen, wenn Sie bibteXMP
+    parsen m&ouml;chten:</p>
+
+    <ul>
+        <li>In RDF k&ouml;nnen Attribut-Wert-Paare auch als Knoten
+        wiedergegeben werden und vice versa.</li>
+    </ul><br />
+    <br />
+
+
+    <h2>Weiterf&uuml;hrende Links</h2>
+
+    <p>Einige Links zu XMP und PDFs mit Anmerkungen (englisch):</p>
+
+    <ul>
+        <li><a href="http://freelancepropaganda.com/themp/">James
+        Howison's Blog "Themp---Managing Academic Papers like
+        MP3s"</a></li>
+
+        <li>
+        <a href="http://www.xml.com/pub/a/2004/09/22/xmp.html">XML.com-Artikel
+        zu XMP</a></li>
+
+		<li><a href="http://pdfbox.apache.org/">PDFBox</a> von der Apache Software Foundation
+		ist die von JabRef verwendete Java libraries zum Zugriff auf die PDFs und deren
+		Metadaten</li>
+
+        <li>
+        <a href="http://arstechnica.com/civis/viewtopic.php?f=19&amp;t=408429">
+        Gute Diskussion bei ArsTechnica zum Management von
+        PDFs.</a></li>
+
+        <li>
+        <a href="http://www.adobe.com/content/dam/Adobe/en/devnet/xmp/pdfs/XMPSpecificationPart1.pdf">
+        Adobe XMP Spezifikation</a></li>
+    </ul><br />
+    <br />
+</body>
+</html>

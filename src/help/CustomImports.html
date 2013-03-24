@@ -1,0 +1,151 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Custom import filters</h1>
+
+    <p>JabRef allows you to define and use your own importers, in
+    very much the same way as the standard import filters are
+    defined. An import filter is defined by one or more Java
+    <i>classes</i>, which parse the contents of a file from an
+    input stream and create BibTex-Entries. So with some basic Java
+    programming you can add an importer for your favorite source of
+    references or register a new, improved version of an existing
+    importer. Also, this allows you to add compiled custom
+    importers that you might have obtained e.g. from SourceForge
+    without rebuilding JabRef (see "Sharing your work").</p>
+
+    <p>Custom importers take precedence over standard importers.
+    This way, you can override existing importers for the
+    Autodetect and Command Line features of JabRef. Custom
+    importers are ordered by name.</p>
+
+    <h2>Adding a custom import filter</h2>
+
+    <p>Make sure, you have a compiled custom import filter (one or
+    more <code>.class</code> files as described below) and the
+    class files are in a directory structure according to their
+    package structure. To add a new custom import filter, open the
+    dialog box <b>Options -&gt; Manage custom imports</b>, and
+    click <b>Add from folder</b>. A file chooser will appear,
+    allowing you to select the classpath of your importer, i.e. the
+    directory where the top folder of the package structure of your
+    importer resides. In a second file chooser you select your
+    importer class file, which must be derived from
+    <code>ImportFormat</code>. By clicking <b>Select new
+    ImportFormat Subclass</b>, your new importer will appear in the
+    list of custom import filters. All custom importers will appear
+    in the <b>File -&gt; Import -&gt; Custom Importers</b> and
+    <b>File -&gt; Import and Append -&gt; Custom Importers</b>
+    submenus of the JabRef window.</p>
+
+    <p>Please note that if you move the class to another directory
+    you will have to remove and re-add the importer. If you add a
+    custom importer under a name that already exists, the existing
+    importer will be replaced. Although in some cases it is
+    possible to update an existing custom importer without
+    restarting JabRef (when the importer is not on the classpath),
+    we recommend restarting JabRef after updating an
+    custom-importer. You can also register importers contained in a
+    ZIP- or JAR-file, simply select the Zip- or Jar-archive, then
+    the entry (class-file) that represents the new importer.</p>
+
+    <h2>Creating an import filter</h2>
+
+    <p>For examples and some helpful
+    files on how to build your own importer, please check our
+    download page.</p>
+
+    <h3>A simple example</h3>
+
+    <p>Let us assume that we want to import files of the following
+    form:</p>
+    <pre>
+1936;John Maynard Keynes;The General Theory of Employment, Interest and Money
+2003;Boldrin &amp; Levine;Case Against Intellectual Monopoly
+2004;ROBERT HUNT AND JAMES BESSEN;The Software Patent Experiment
+</pre><br />
+    <br />
+
+    <p>In your favorite IDE or text editor create a class derived
+    from <code>ImportFormat</code> that implements methods
+    <code>getFormatName()</code>, <code>isRecognizedFormat</code>
+    and <code>importEntries()</code>. Here is an example:</p>
+    <pre>
+import java.io.*;
+import java.util.*;
+import net.sf.jabref.*;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormatReader;
+
+public class SimpleCsvImporter extends ImportFormat {
+
+  public String getFormatName() {
+    return "Simple CSV Importer";
+  }
+
+  public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    return true; // this is discouraged except for demonstration purposes
+  }
+
+  public List importEntries(InputStream stream) throws IOException {
+        ArrayList bibitems = new ArrayList();
+    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+    String line = in.readLine();
+    while (line != null) {
+      if (!"".equals(line.trim())) {
+        String[] fields = line.split(";");
+        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+        be.setType(BibtexEntryType.getType("techreport"));
+        be.setField("year", fields[0]);
+        be.setField("author", fields[1]);
+        be.setField("title", fields[2]);
+        bibitems.add(be);
+        line = in.readLine();
+      }
+    }
+        return bibitems;
+  }
+}
+</pre><br />
+    <br />
+
+    <p>Note that the example is in the default package. Suppose you
+    have saved it under
+    <code>/mypath/SimpleCsvImporter.java</code>. Also suppose the
+    JabRef-2.0.jar is in the same folder as
+    <code>SimpleCsvImporter.java</code> and Java is on your command
+    path. Compile it using a JSDK 1.4 e.g. with</p>
+    <pre>
+javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
+</pre>Now there should be a file
+<code>/mypath/SimpleCsvImporter.class</code>.<br />
+    <br />
+
+
+    <p>In JabRef, open <b>Options -&gt; Manage custom imports</b>,
+    and click <b>Add from folder</b>. Navigate to
+    <code>/mypath</code> and click the <b>Select ...</b> button.
+    Select the <code>SimpleCsvImporter.class</code> and click the
+    <b>Select ...</b> button. Your importer should now appear in
+    the list of custom importers under the name "Simple CSV
+    Importer" and, after you click <b>Close</b> also in the <b>File
+    -&gt; Import -&gt; Custom Importers</b> and <b>File -&gt;
+    Import and Append -&gt; Custom Importers</b> submenus of the
+    JabRef window.</p>
+
+    <h2>Sharing your work</h2>
+
+    <p>With custom importer files, it's fairly simple to share
+    custom import formats between users. If you write an import
+    filter for a format not supported by JabRef, or an improvement
+    over an existing one, we encourage you to post your work on our
+    SourceForge.net page. We'd be happy to distribute a collection
+    of submitted import files, or to add to the selection of
+    standard importers.</p>
+</body>
+</html>

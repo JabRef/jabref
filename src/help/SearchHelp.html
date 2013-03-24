@@ -1,0 +1,105 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Searching</h1>
+
+    <h2>Keyboard shortcuts</h2>
+
+    <p><em>CTRL-F</em> opens or focuses the search interface.
+    Pressing <em>CTRL-F</em> several times toggles search mode.
+    When searching incrementally, pressing <em>CTRL-F</em> makes
+    the program search for the next occurence of the search
+    string.</p>
+
+    <p><em>CTRL-SHIFT-F</em> opens or focuses the search interface,
+    and selects incremental search. When searching incrementally,
+    <em>CTRL-SHIFT-F</em> also finds the next occurence of the
+    search string.</p>
+
+    <h2>Search modes</h2>
+   
+    <p>There are three search modes in JabRef.</p>
+    
+    <h3>Incremental search</h3>
+
+    <p>When searching incrementally, the
+    program searches immediately each time you press a letter. The
+    status line informs you about the success of the search.
+    Pressing the search shortcut keys causes the program to find
+    the next occurrence of the current search string. If no further
+    occurrences can be found, the status line will notify you about
+    this. Repeating the search again causes the search to restart
+    at the top. The search order always follows the current sorting
+    of your database. To escape an incremental search, press ESC or
+    click "Clear search".</p>
+
+    <h3>Normal search</h3>
+
+    <p>In a normal search, the program searches your
+    database for all occurences of the words in your search string,
+    once you press ENTER. Only entries containing all words will be
+    considered matches. To search for sequences of words, enclose
+    the sequences in double quotes. For instance, the query
+    <b>progress "marine aquaculture"</b> will match entries
+    containing both the word "progress" and the phrase "marine
+    aquaculture". All entries that don't match are hidden, leaving
+    for display the matching entries only (filter mode), or are
+    grayed-out (float mode). To stop displaying the search results,
+    press ESC or click "Clear search".</p>
+
+    <h3><a name="advanced" id="advanced"></a>
+        Advanced search</h3>
+
+    <p>In order to search specific fields only
+    and/or include logical operators in the search expression, a
+    special syntax is available in which these can be specified.
+    E.g. to search for entries whose author is "Miller", enter
+    (in any but incremental search mode):</p>
+
+    <p>author = miller</p>
+
+    <p>Both the field specification and the search term support
+    regular expressions. If the search term contains spaces,
+    enclose it in quotes. Do <i>not</i> use spaces in the field
+    specification! E.g. to search for entries about image
+    processing, type:</p>
+
+    <p>title|keywords = "image processing"</p>
+
+    <p>You can use "and", "or", "not", and braces as intuitively
+    expected:</p>
+
+    <p>(author = miller or title|keywords = "image processing") and
+    not author = brown</p>
+
+    <p>The "=" sign is actually a shorthand for "contains".
+    Searching for an exact match is possible using "matches" or
+    "==". Using "!=" tests if the search term is <i>not</i>
+    contained in the field (equivalent to "not ... contains ...").
+    The selection of field types to search (required, optional,
+    all) is always overruled by the field specification in the
+    search expression. To search for entries of a certain type, a
+    pseudo field called "entrytype" is available:</p>
+
+    <p>entrytype = thesis</p>
+
+    <p>This finds entries whose type (as displayed in the
+    "Entrytype" column) contains the word "thesis" (which would be
+    "phdthesis" and "mastersthesis"). Another pseudo field
+    "bibtexkey" allows to search for citation keys, e.g.</p>
+
+    <p>bibtexkey = miller2005</p>
+
+    <h2>Search settings</h2>
+
+    <p>The <em>Settings</em> button opens a
+    menu that allows to toggle case sensitivity and use of regular
+    expressions in the search, and whether search results should be
+    selected in the table and whether the search words should be
+    highlighted in the editor and the preview.</p>
+</body>
+</html>

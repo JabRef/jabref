@@ -1,0 +1,3201 @@
+%%%%% To do %%%%%
+% DW 2007-12-03
+% - Wiki-Seite 'Translating JabRef' übersetzen und einbinden
+% - [2.4 beta] Plugin.html ergänzen 
+% - [2.4 beta?] SQLExport.html ergänzen
+
+\documentclass[
+  fontsize=10pt,
+	headings=normal,
+	paper=a5,
+	pagesize,
+	ngerman
+]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{textcomp}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\usepackage{xspace}
+
+%%%%% author, version of file %%%%%
+\newcommand{\versiondate}{26.\,1.\,2010}%
+\def\FileAuthor{Dominik Waßenhoven}
+\def\FileTitle{\jabrefversion{} Benutzerhandbuch}
+
+%%%%% Packages %%%%%
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{amssymb}
+\usepackage{hanging}
+
+\makeatletter
+%%%%% LyX command %%%%%
+\providecommand{\LyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@\xspace}
+
+%%%%% Listings %%%%%
+\usepackage{listings}
+\lstset{%
+  frame=none,
+  %backgroundcolor=\color{pyellow},
+  language=[LaTeX]TeX,
+  basicstyle=\ttfamily,%\small,
+  commentstyle=\color{red},
+  keywordstyle=, % LaTeX-Befehle werden nicht fett dargestellt
+  numbers=none,%left/right
+  %numberstyle=\tiny\lnstyle,
+  %numbersep=5pt,
+  %numberblanklines=false,
+  breaklines=true,
+  %caption=\lstname,
+  xleftmargin=25pt,
+  xrightmargin=20pt,
+  escapeinside={(*}{*)},
+  belowskip=\medskipamount,
+  prebreak=\mbox{$\hookleftarrow$}% "geklaut" vom scrguide (KOMA-Script)
+}
+
+%%%%% Environment "revhist" (for revision history) %%%%%
+\newenvironment{revhist}[1]
+    {\subsection*{#1}
+     \list{--}{\setlength\itemsep{0pt}\setlength{\parsep}{0pt}}}
+    {\endlist}
+
+%%%%% PDF 1.2 for Acrobat 3 onwards %%%%%
+\pdfoptionpdfminorversion 2
+
+%%%%% Colors %%%%%
+\usepackage[dvipsnames]{xcolor}
+\definecolor{dkblue}{rgb}{0,0.1,0.5} % dark blue
+\definecolor{dkred}{rgb}{0.66,0.04,0.04} % dark red
+\definecolor{pyellow}{rgb}{1,0.97,0.75} % pale yellow
+
+%%%%% New commands %%%%%
+%%% JabRef "logo"
+\DeclareRobustCommand{\jabref}{%
+  \texorpdfstring{% TeX string
+	  \raisebox{-.32ex}{\color{dkred}J}\kern-.06em%
+	    \hbox{$\m@th$% %% force math size calculations
+	          \csname S@\f@size\endcsname
+	          \fontsize\sf@size\z@
+	          \math@fontsfalse\selectfont
+	          \color{orange}A\kern-.025emB}\-%
+	  \hbox{\kern-.06em\-R\hspace{-.08em}%
+	    \raisebox{.16ex}{$\m@th$% %% force math size calculations
+	          \csname S@\f@size\endcsname
+	          \fontsize\sf@size\z@
+	          \math@fontsfalse\selectfont
+	          E\kern-.025emF}}\xspace}%
+	  {JabRef\xspace}% PDF string
+}
+
+%%% version number
+\newcommand{\versionnr}{\texorpdfstring{2.4}{2.4}} %
+%%% JabRef logo with version nr
+\newcommand{\jabrefversion}{\jabref~\versionnr}
+%%% BibTeX logo
+\newcommand{\bibtex}{\texorpdfstring{Bib\kern-.125em\TeX\xspace}{BibTeX}}
+%%% for Menu references
+\newcommand{\menu}[1]{\texorpdfstring{{\color{dkred}\textit{#1}}}{#1}}
+%%% Menu separator
+\newcommand{\msep}{{\color{dkred}\textit{\guilsinglright}}\xspace}
+%%% yellow box with dark blue text
+\newcommand{\tip}[2][Tipp: ]{%
+  \begin{center}%
+  \colorbox{pyellow}{\parbox{0.85\textwidth}{%
+    \color{dkblue}\textit{#1}#2}}%
+  \end{center}%
+}%
+
+\newcommand{\verfasser}[1]{%
+  \begin{flushright}%
+  \colorbox{pyellow}{\parbox{0.7\textwidth}{%
+    \color{dkblue}\textit{Dieser Abschnitt stammt von #1}}}%
+  \end{flushright}%
+}%
+
+%%% for the FAQ 
+\newcounter{faq}
+\newcommand{\faq}[2]{\refstepcounter{faq}%
+  \medskip\noindent\colorbox{pyellow}{\parbox{0.9\textwidth}{%
+    \hangpara{0.11\textwidth}{1}%
+    \color{dkblue}Frage \thefaq: \textit{#1}}}\par\smallskip%
+  \begin{hangparas}{0.11\textwidth}{0}%
+    #2\par%
+  \end{hangparas}
+}%
+
+%%% for CTAN references
+\newcommand{\ctan}[1]{%
+  {\textsc{ctan}: \color{dkred}#1}%
+}
+
+%%%%% Headings %%%%%
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+\ihead{\FileTitle{} (\versiondate{})}
+\chead{}
+\ohead{\headmark}
+\ifoot{}
+\cfoot{\pagemark}
+\ofoot{}
+\automark[section]{section}
+
+%%%%% Fonts %%%%%
+\usepackage{charter}
+\addtokomafont{sectioning}{\rmfamily} % Headings with serifs
+\renewcommand{\headfont}{\normalfont\itshape} % Headlines italic, not slanted ***
+\usepackage[scaled=.83]{beramono}
+
+%%%%% Page Dimensions %%%%%
+\usepackage{typearea}
+\typearea{calc}
+
+%%%%% Other stuff %%%%%
+\deffootnote{1.5em}{1em}{\makebox[1.5em][l]{\thefootnotemark}}
+\usepackage{microtype} % micro typography
+
+%%%%% Mini TOCs %%%%%
+\usepackage{minitoc}
+\mtcsetrules{secttoc}{off}
+%\mtcsetdepth{secttoc}{3}
+\mtcsetfont{secttoc}{subsection}{}
+%\mtcsettitle{secttoc}{In diesem Abschnitt}
+%\mtcsettitlefont{secttoc}{\itshape}
+
+%%%%% Language %%%%%
+\usepackage{babel}
+
+%%%%% Bibliography %%%%%
+\usepackage{jurabib}
+\jurabibsetup{%
+  annote=true,
+  authorformat=year,
+  dotafter=bibentry
+}
+\renewcommand{\biblnfont}{}			% Autoren-Nachnamen (Standard: fett)
+\renewcommand{\bibfnfont}{}			% Autoren-Vornamen (Standard: fett)
+\renewcommand{\bibelnfont}{}			% Hrsg-Nachnamen (Standard: fett)
+\renewcommand{\bibefnfont}{}			% Hrsg-Vornamen (Standard: fett)
+\renewcommand{\bibtfont}{\textit}	% Titel (Bücher)
+\renewcommand{\bibbtfont}{\textit}	% Titel (Sammelwerke)
+\renewcommand{\bibjtfont}{\textit}	% Titel (Zeitschriften)
+\renewcommand{\bibpldelim}{(}			% runde Klammern bei...
+\renewcommand{\bibprdelim}{)}			% ...Zeitschriften (Jahr)
+\renewcommand{\ajtsep}{}				% kein Komma nach Zs-Titeln
+\renewcommand{\biburlprefix}{\jblangle\textsc{url: }}	% Klammer und Text vor einer URL (Standard: "URL: ")
+
+\renewcommand{\bib@heading}{\addsec[Literaturverzeichnis]{Kommentiertes Literaturverzeichnis}}
+
+%%%%% Hyperref %%%%%
+\usepackage{hyperref}
+\hypersetup{%
+breaklinks=true,%
+colorlinks=true,%
+linkcolor=dkblue,%
+urlcolor=dkblue,%
+citecolor=dkblue,%
+pdftitle={JabRef \versionnr{} Benutzerhandbuch},%
+pdfsubject={Einführung in die Benutzung von JabRef},%
+pdfkeywords = {BibTeX, Bibliographie, Literaturverwaltung},%
+pdfauthor={\FileAuthor},%
+pdfstartview=FitH,%
+bookmarksopen=true,%
+bookmarksopenlevel=1,%
+}
+\urlstyle{rm}
+
+\hyphenation{
+LaTeX
+BibTeX
+Da-tei-na-men
+Me-nü-be-feh-le
+For-mat-erken-nung% verhindert Trennung "Formater-kennung"
+Werk-zeug-leis-te
+}
+
+\makeatother
+
+%%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%% %%%%%
+\begin{document}
+
+\subject{\includegraphics[scale=.5]{../../images/JabRef-icon-48}}
+
+
+\title{\jabrefversion{}\\
+Benutzerhandbuch}
+
+
+\author{Dominik Waßenhoven\\
+{\normalsize (\href{mailto:domwass@users.sourceforge.net}{domwass@users.sourceforge.net})}}
+
+
+\date{\small \versiondate}
+
+\maketitle
+
+\begin{abstract}
+\jabref ist eine grafische Java-Anwendung zur Bearbeitung von \bibtex{}-Dateien
+(.bib). Mit \jabref können Literaturangaben in Gruppen organisiert
+und mit einem einfachen Klick die Ansicht auf eine einzelne Gruppe,
+eine Schnittmenge von Gruppen oder die Gesamtmenge mehrerer Gruppen
+eingegrenzt werden. \jabref kann Literaturangaben sortieren (für
+alle Standard-\bibtex{}-Felder) und automatisch \bibtex{}-Keys erzeugen.
+Auch Links zu PDF-Dateien oder Webseiten können mit \jabref einfach
+erstellt werden.
+
+\jabref kann verschiedene Dateiformate importieren und exportieren,
+außerdem können die Exportfilter angepasst werden. \jabref kann
+auch von der Kommandozeile gestartet werden, um von einem Importformat
+in ein Exportformat zu konvertieren, ohne die grafische Benutzeroberfläche
+zu starten.
+\end{abstract}
+\begin{quote}
+\begin{spacing}{0.7}
+\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2010, Dominik
+Waßenhoven}
+\end{center}
+{\scriptsize Dieses Handbuch steht unter einer Creative Commons Namensnennung"=Weitergabe unter gleichen Bedingungen 3.0 Deutschland Lizenz (CC-by-sa). Die Lizenzbedingungen können unter
+\href{http://creativecommons.org/licenses/by-sa/3.0/de/}{http://creativecommons.org/licenses/by-sa/3.0/de}
+eingesehen werden.\par}\end{spacing}
+
+\end{quote}
+\thispagestyle{empty}
+
+\newpage
+\dosecttoc[e]
+\faketableofcontents{}
+
+\newpage
+
+\section{Einleitung}
+\secttoc
+
+\subsection{Über dieses Handbuch}\label{subsec:about}
+
+Dieses Handbuch will eine kurze Einführung zu den nützlichsten Funktionen
+von \jabref bieten, ohne dabei eine erschöpfende Beschreibung aller
+Funktionalitäten dieser Software zu liefern. \emph{}\jabref ist
+das Ergebnis der Verschmelzung von \emph{BibKeeper} und \emph{JBibtexManager}.
+Weitere Informationen gibt es im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}
+sowie im Internet unter \url{http://jabref.sourceforge.net}. Wer dann immer noch keine Antwort auf seine Frage oder keine Lösung zu seinem Problem hat, kann über die Foren oder die Mailingliste auf der Projektseite bei Sourceforge weitere Hilfe bekommen (siehe dazu den Abschnitt \nameref{sec:faq}).
+
+Die Anleitungen basieren auf den Hilfeseiten des Programms. Da dieses
+Handbuch und die Hilfeseiten unabhängig voneinander gepflegt und aktualisiert
+werden, müssen die Beschreibungen jedoch nicht immer übereinstimmen.
+Im Zweifel sind die Hilfeseiten des Programms aktueller als die hier
+vorgelegte Beschreibung.
+
+Am Anfang jedes Abschnitts sollte~(!) zunächst stehen, wie man zur
+entsprechenden Funktion gelangt (d.\,h. über welches Menü und mit
+welchem Tastenkürzel). Menü-Einträge werden in einer kursiven, dunkelroten
+Schrift dargestellt (Beispiel: \menu{Menü} \msep{} \menu{Untermenü}).
+Besondere Hinweise und Tipps werden in einem gelb hinterlegten Kasten
+mit dunkelblauer Schrift dargestellt. Hyperlinks sind ebenfalls dunkelblau
+und anklickbar~-- das gilt sowohl für die Navigation innerhalb des
+Dokuments als auch für Links ins Internet.
+
+Wenn Ihnen in diesem Handbuch Fehler auf"|fallen oder wenn Sie Anregungen zum Handbuch haben, würde ich mich über eine kurze Nachricht per \href{mailto:domwass@users.sourceforge.net}{E-Mail} freuen. Über den Stand und die einzelnen Versionen dieses Handbuchs gibt der Abschnitt ">\nameref{RevisionHistory}"< Auskunft.
+
+\subsection{Einführung in \bibtex{}}
+
+\label{BibtexHelp}\tip[]{\jabref hilft Ihnen bei der Arbeit mit
+Ihren \bibtex{}-Dateien, aber es müssen dennoch Regeln beachtet werden,
+wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden,
+dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
+
+\noindent Im Folgenden können nur einige allgemeine Hinweise gegeben werden. Ausführlichere Einführungen und weitere Erläuterungen zu \bibtex{} finden Sie bei den im \hyperlink{bibliography}{kommentierten Literaturverzeichnis} aufgeführten Beiträgen.
+
+\subsubsection{\bibtex{}-Eintragstypen}
+\label{Eintragstypen}
+Je nachdem, ob sie ein Buch, einen Zeitschriftenartikel, einen Sammelband oder ein anderes Dokument referenzieren möchten, hält \bibtex{} unterschiedliche Eintragstypen bereit. Hier folgt eine kurze Aufstellung der meist gebrauchten Eintragstypen.\footnote{Vgl. \cite[12--17]{Markey2005}; \cite[7--9]{btxdoc}.} Manche Paktete (wie ">jurabib"<) stellen weitere Eintragstypen zur Verfügung, die Sie natürlich auch in \jabref verwenden können (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}). Für die Verwendung dieser spezifischen Typen schauen Sie bitte in die jeweilige Dokumentation.
+
+\begin{itemize}
+\item \emph{@article}\\
+Ein Artikel in einer Zeitschrift.
+\item \emph{@book}\\
+Ein Buch, von einem Verlag veröffentlicht.
+\item \emph{@booklet}\\
+Ein gedrucktes und gebundenes Buch ohne Verlag.
+\item \emph{@conference}\\
+Siehe \emph{@inproceedings}
+\item \emph{@inbook}\\
+Ein Teil eines Buches, z.\,B. ein Kapitel oder Abschnitt.
+\item \emph{@incollection}\\
+Ein Beitrag aus einem Buch, z.\,B. einem Sammelband.
+\item \emph{@inproceedings}\\
+Ein Artikel aus einem Tagungsbericht, der nicht zwangsläufig in einem Verlag erschienen ist.
+\item \emph{@manual}\\
+Eine Dokumentation oder ein Handbuch.
+\item \emph{@mastersthesis}\\
+Eine Diplom-/Magisterarbeit.
+\item \emph{@misc}\\
+Dieser Typ kann benutzt werden, wenn nichts anderes passt.
+\item \emph{@phdthesis}\\
+Eine (unveröffentlichte) Dissertation.
+\item \emph{@proceedings}\\
+Ein Tagungsbericht.
+\item \emph{@techreport}\\
+Von einer Universität oder Institution (normalerweise in einer Reihe) veröffentlichter Bericht.
+\item \emph{@unpublished}\\
+Ein Dokument mit Autor und Titel, unveröffentlicht.
+\end{itemize}
+
+\subsubsection{\bibtex{}-Felder}
+
+Es gibt viele unterschiedliche Felder in \bibtex{} und einige zusätzliche Felder, die Sie in \jabref einsetzen können.
+Grundsätzlich können Sie \LaTeX{}-Befehle in Feldern, die Text beinhalten, einsetzen. \bibtex{} wird Ihr Literaturverzeichnis automatisch formatieren und je nach \bibtex{} style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass Anfangsbuchstaben groß bleiben, müssen Sie die Wörter in geschweifte Klammern einschließen, wie im Wort \{Belgien\}.\footnote{Die meisten deutschen \bibtex{}-Stile behalten die Großbuchstaben ohnehin bei.}
+
+Hinweise zu einigen Feldtypen:
+\begin{itemize}
+\item \emph{Bibtexkey}\\
+Eine eindeutige Bezeichnung, um sich in \LaTeX{}-Dokumenten auf den Eintrag beziehen zu können. Beachten Sie, dass der Bibtexkey genau mit dem Verweis im \LaTeX{}-Dokument übereinstimmen muss (auch die Groß-/Kleinschreibung).
+  \item \emph{address}\\
+    Der Ort des \emph{Verlags} oder einer anderen Institution.
+  \item \emph{annote}\\
+    Eine Anmerkung.
+Dieses Feld wird von den Standard-Bibliographiestilen nicht verwendet, kann aber bei einigen Stilen benutzt werden, um eine kommentierte Literaturliste zu erstellen.
+  \item \emph{author}\\
+    Dieses Feld sollte alle Autoren Ihres Eintrags enthalten. Die Namen werden durch das Wort \texttt{and} getrennt, auch wenn es mehr als zwei Autoren gibt. Jeder Name kann in zwei gleichwertigen Formen notiert werden:
+\begin{itemize}
+\item Donald E. Knuth \emph{oder} Knuth, Donald E.
+\item Eddie van Halen \emph{oder} van Halen, Eddie
+\end{itemize}
+Die zweite Form sollte für Autoren mit zwei oder mehr Nachnamen benutzt werden, um zwischen dem mittleren und dem Nachnamen zu unterscheiden.
+  \item \emph{booktitle}\\
+    Der Titel eines Buches, aus dem ein Teil zitiert wird. Falls Sie ein Buch zitieren wollen, nehmen Sie für den Titel stattdessen das \texttt{title}-Feld.
+  \item \emph{chapter}\\
+    Eine Kapitelnummer (oder Abschnittsnummer oder sonstige Nummer).
+  \item \emph{crossref}\\
+    Der \texttt{key} eines Eintrags, auf den ein Querverweis gesetzt wird. Damit lassen sich beispielsweise die Daten eines Sammelbandes in einem Eintrag für einen Aufsatztitel wiederverwenden, ohne sie bei jedem Aufsatztitel explizit einzutragen. Die Funktionalität von \texttt{crossref} ist jedoch nicht in jedem Fall praktikabel.
+  \item \emph{edition}\\
+    Die Auflage eines Buchs, z.\,B. \texttt{Zweite}. Die Ordnungszahl sollte mit einem Großbuchstaben beginnen; sie wird von den Standardstilen gegebenenfalls in Kleinbuchstaben umgewandelt. Manche Stile verlangen hier eine Ziffer.
+  \item \emph{editor}\\
+    Dieses Feld ist analog zu dem \emph{author}-Feld.
+Falls zusätzlich ein \texttt{author}-Feld angegeben wird, bezeichnet das \texttt{editor}-Feld den Herausgeber des Buches oder des Sammelbandes, in dem die referenzierte Literatur erschienen ist.
+  \item \emph{howpublished}\\
+    Die Art, wie ein Werk veröffentlicht wurde (meist außerhalb eines Verlags). Das erste Wort sollte mit einem Großbuchstaben beginnen.
+  \item \emph{institution}\\
+    Die fördernde Institutions eines technischen Reports.
+  \item \emph{journal}\\
+    Der Name einer Zeitschrift.
+Mit Hilfe von ">Strings"< können Zeitschriftentitel abgekürzt werden. Zum Erstellen eines solchen Strings können Sie den \nameref{StringEditorHelp} benutzen oder die Funktionalität zur \nameref{JournalAbbreviations} %Abkürzung von Zeitschriftentiteln 
+verwenden.
+  \item \emph{key}\\
+    Dieses Feld wird zur Sortierung, zur Erstellung von Labels (falls kein \texttt{author} vorhanden ist) und für Querverweise (\texttt{crossref}) verwendet. Verwechseln Sie dieses Feld nicht mit dem \texttt{Bibtexkey}, der für die \texttt{\textbackslash cite}-Kommandos gebraucht wird und am Anfang jedes Eintrags erscheint (im \bibtex{}"=Quelltext).
+  \item \emph{month}\\
+    Der Monat, in dem ein Werk veröffentlicht oder geschrieben wurde. Benutzen Sie am besten die englischen Abkürzungen (jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec).
+  \item \emph{note}\\
+    Zusätzliche Informationen. Das erste Wort sollte mit einem Großbuchstaben beginnen.
+  \item \emph{number}\\
+Die Nummer einer Zeitschrift, eines technischen Reports oder eines Bandes innerhalb einer Reihe (\texttt{series}). Zeitschriften haben oft eine Band- und Heftzählung, der Band entspricht dem \texttt{volume}-, das Heft dem \texttt{number}-Eintrag.
+  \item \emph{organization}\\
+    Die Organisation, die einen Konferenzband fördert.
+  \item \emph{pages}\\
+    Die Seitenzahl(en) oder der Seitenzahlbereich, z.\,B. \texttt{42-111} oder \texttt{7,41, 73-97} or \texttt{43+} (das \texttt{+} deutet auf folgende Seiten, die nicht einen einfachen Bereich umfassen).
+Ein einfacher Bindestrich (wie in \texttt{7-33}) wird in einen doppelten Bindestrich (\texttt{-{-}}) verwandelt, der in der Ausgabe als bis-Strich erscheint (also 7--33).
+  \item \emph{publisher}\\
+    Der Name des Verlags.
+  \item \emph{school}\\
+    Der Name einer Universität, an der eine Abschlussarbeit~-- z.\,B. eine Dissertation (\texttt{phdthesis}) oder Magisterarbeit (\texttt{mastersthesis})~-- geschrieben wurde.
+  \item \emph{series}\\
+    Der Name einer Reihe, in der ein Buch erschienen ist.
+Falls die Bücher einer Reihe nummeriert sind, wird die entsprechende Nummer im Feld \texttt{number} angegeben.
+  \item \emph{title}\\
+    Der Titel des Werkes. Die Groß- und Kleinschreibung kann von den Bibliographiestilen und der benutzten Sprache abhängig sein (wobei sie mit deutschen Bibliographiestilen beibehalten wird). Worte, die auch bei Verwendung englischer Bibliographiestile groß geschrieben werden sollen, müssen in geschweifte Klammern eingefasst werden (z.\,B. \texttt{A \{German\} title}).
+  \item \emph{type}\\
+    Der Typ eines technischen Reports, z.\,B. ">Research Note"<. Bei \emph{jurabib} wird dieses Feld auch für den Typ einer Abschlussarbeit verwendet.
+  \item \emph{volume}\\
+    Der Band (Jahrgang) einer Zeitschrift oder der Band eines Buches in einem mehrbändigen Werk.
+  \item \emph{year}\\
+    Das Jahr der Veröffentlichung (oder bei einem unveröffentlichten Werk das Jahr, in dem es geschrieben wurde). Normalerweise sollte im \texttt{year}-Feld nur eine vierstellige Zahl stehen, z.\,B. \texttt{1984}. Die Standardstile können aber auch mit \texttt{year}-Einträgen umgehen, deren letzte vier Zeichen (ausgenommen Satzzeichen) Ziffern sind, beispielsweise \texttt{(um 1984)}.
+    Dieses Feld wird für die meisten Eintragstypen benötigt.
+\end{itemize}
+
+\subsubsection{Weitere Felder}
+
+Bibliographie-Stile für \bibtex{} wurden von vielen Leuten entwickelt,
+und einige haben weitere Felder erstellt. Es folgt eine kleine Auswahl.
+
+Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref unterstützt, können aber eingebunden werden (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}).
+
+\begin{itemize}
+  \item \emph{affiliation*}\\
+    Die Zugehörigkeit eines Autors.
+  \item \emph{abstract}\\
+    Die Zusammenfassung eines Werks.
+  \item \emph{contents*}\\
+    Ein Inhaltsverzeichnis.
+  \item \emph{copyright*}\\
+    Copyright-Informationen.
+  \item \emph{doi}\\
+    Der \emph{Digital Object Identifier} ist eine permanente Kennung von Dokumenten.
+  \item \emph{eid}\\
+    Der EID \emph{(Electronic identifier)} wird für elektronische Zeitschriften benutzt, die auch im Druck erscheinen. Mit dieser Nummer, die die Seitenzahlen ersetzt, lässt sich der Artikel in der gedruckten Ausgabe finden. Der EID wird manchmal auch \emph{citation number} genannt.
+  \item \emph{ISBN*}\\
+    Die Internationale Standardbuchnummer.
+  \item \emph{ISSN*}\\
+    Die Internationale Standardseriennummer (für Zeitschriften).
+  \item \emph{keywords}\\
+    Stichworte~-- sie können in \jabref gut zum Gruppieren verwendet werden.
+  \item \emph{language*}\\
+    Die Sprache des Werks.
+  \item \emph{location*}\\
+    Der Ort, der mit einem Werk in Verbindung steht, z.\,B. die Stadt, in der eine Konferenz stattgefunden hat.
+  \item \emph{LCCN*}\\
+    Die \emph{Library of Congress Call Number}.  Das Feld kann auch \texttt{lib-congress} heißen.
+  \item \emph{mrnumber*}\\
+    Die \emph{Mathematical Reviews}-Nummer.
+  \item \emph{price*}\\
+    Der Preis.
+  \item \emph{size*}\\
+    Die physische Größe eines Dokuments.
+  \item \emph{url}\\
+    Der \emph{Uniform Resource Locator} (URL, ">einheitlicher Quellenanzeiger"<), der auf eine Webseite im Internet verweist.
+  \item \emph{urldate}\\
+    Das Datum, an dem eine Webseite zuletzt besucht wurde.
+\end{itemize}
+
+
+\clearpage 
+\section{Installation}
+\secttoc
+
+\subsection{System-Voraussetzungen}
+\label{subsec:System-Voraussetzungen}
+\jabref ist in Java programmiert und somit betriebssystemunabhängig,
+kann prinzipiell also unter Windows, Mac OS X, Linux und anderen UNIX-Systemen
+betrieben werden. Voraussetzung ist allerdings, dass die \emph{Java
+Virtual Machine} mindestens in der Version~1.5 installiert ist.\footnote{Bis zur Version 2.2 von \jabref reichte Java~1.4.2 aus.}
+Sie ist kostenlos und kann unter \url{http://java.sun.com/} heruntergeladen
+werden. Im Normalfall sollte das \emph{Java Runtime Environment} (JRE) ausreichen;
+nur wenn Sie \jabref kompilieren möchten, benötigen Sie das \emph{Java
+Development Kit} (JDK).
+
+
+\subsection{Windows}
+
+
+\subsubsection{Installer (msi)}
+
+\jabref gibt es im Windows Installer-Format (\texttt{.msi}). Ein
+Doppelklick auf die MSI-Datei installiert \jabref und fügt dem
+Startmenü eine Verknüpfung hinzu. Falls Java nicht installiert ist,
+wird eine Warnmeldung ausgegeben.%
+\footnote{Die Windows-Installation wurde von Dale Visser erstellt, der dazu
+die folgenden \emph{Open-Source-Tools} benutzt hat: JSmooth, ein \texttt{.exe}
+wrapper für Java-Anwendungen (\url{http://jsmooth.sf.net/}); Wix,
+ein Tool zum Kompilieren von MSI-Dateien aus einer XML-Spezifikation
+(\url{http://wix.sf.net/}).%
+}
+
+
+\subsubsection{Batch-Datei (jar)}
+\label{subsub:jar}
+Wenn Sie die ausführbare jar-Datei (\texttt{.jar}) heruntergeladen
+haben, probieren Sie zunächst, ob ein Doppelklick darauf das Programm
+startet~-- dies funktioniert zumindest auf einigen Systemen. Falls
+\jabref nicht direkt startet (Windows also nicht weiß, was es mit
+einer jar-Datei anfangen soll), fahren Sie folgendermaßen fort:
+
+Erstellen Sie in dem Ordner, in dem Sie die Datei \emph{JabRef.jar}
+abgelegt haben, eine Batch-Datei mit dem Namen \emph{jabref-start.bat}.
+Diese Datei soll nur eine Zeile enthalten:
+
+\begin{lstlisting}
+start javaw -jar JabRef.jar
+\end{lstlisting}
+Mit einem Doppelklick auf die Batch-Datei starten Sie \jabref.
+
+
+\subsection{Starten von der Kommandozeile}\label{subsec:Starten-Kommandozeile}
+
+\begin{enumerate}
+\item mit dem \emph{Java Runtime Environment}:
+\begin{lstlisting}
+jre -new -jar <Pfad zur jar-Datei>
+\end{lstlisting}
+oder
+\begin{lstlisting}
+jrew -new -jar <Pfad zur jar-Datei>
+\end{lstlisting}
+\item mit dem \emph{Java Development Kit}:
+\begin{lstlisting}
+java -jar <Pfad zur jar-Datei>
+\end{lstlisting}
+\end{enumerate}
+Es wird empfohlen, \jabref mit Java 1.5 zu benutzen und die Option \lstinline{-Dswing.aatext=true}
+vor der Option \lstinline{-jar} einfügen, um das Benutzen von Anti-Alias-Schriften
+im Programm zu ermöglichen.
+
+Die jar-Datei, die \jabref enthält, kann entpackt werden mit den
+Kommandos 
+\begin{lstlisting}
+jar xf <Pfad zur jar-Datei>
+\end{lstlisting}
+bzw. 
+\begin{lstlisting}
+jar xf <Pfad zur jar-Datei> <Liste der Dateien, die entpackt werden sollen>
+\end{lstlisting}
+Das Entpacken der jar-Datei ist nicht notwendig, um das Programm zu
+starten!
+
+Weitere Hinweise zur Installation finden Sie in der Datei INSTALL
+(zum Kompilieren aus den \emph{sourcen}) und auf der \href{http://jabref.sourceforge.net}{\jabref-Homepage}.
+
+
+\clearpage 
+\section{Funktionen}
+\secttoc
+\bigskip
+
+\noindent \label{JabRefHelp}\jabref ist ein Programm zur Verwaltung von
+\bibtex{}-Dateien. Es benutzt kein eigenes Dateiformat, d.\,h. dass
+Sie Ihre Dateien direkt im \bibtex{}-Format (Dateiendung \texttt{.bib})
+laden und speichern. Sie können aber auch bibliographische Datenbanken
+anderer Formate in \jabref importieren.
+
+\jabref unterstützt Sortier- und Suchfunktionen, um einen Überblick
+über den Inhalt Ihrer Datei zu bekommen. Sie können der Datei ganz
+einfach neue Einträge hinzufügen, ohne sich daran erinnern zu müssen,
+welche Informationen benötigt werden. Außerdem kann \jabref \bibtex{}-Keys
+automatisch generieren. \jabref ist sehr nützlich, wenn Sie \bibtex{}
+oder CiteMaker verwenden, kann aber auch für diejenigen sinnvoll sein,
+die andere Bibliographie-Systeme benutzen oder schlicht und einfach
+ihre Literaturquellen organisieren wollen.
+
+\subsection{Das Hauptfenster}
+
+\tip[]{Die meisten Menüfunktionen, auf die im Folgenden hingewiesen
+wird, haben Tastenkürzel, und viele Funktionen können über die Werk\-zeug\-leiste
+aufgerufen werden.}
+\label{BaseFrameHelp}Im Hauptfenster, in dem Sie mit Ihrer Datei
+arbeiten, befindet sich unter der Menüleiste und der Werkzeugleiste
+die Tableiste mit Tabs (Reitern) für jede Ihrer geöffneten Dateien.
+Wenn Sie einen dieser Tabs anklicken, erscheint eine Tabelle, die
+alle Datensätze und einige der Datenfelder auf"|listet.
+
+Mit einem Doppelklick auf eine Tabellenzeile können Sie den Inhalt bearbeiten (der \nameref{EntryEditorHelp} wird geöffnet). Sie können mit den Pfeiltasten innerhalb der Tabelle navigieren. Wenn Sie einen Buchstaben drücken, springen Sie zu dem ersten Eintrag, der mit diesem Buchstaben beginnt (abhängig von der Spalte, nach der Sie die Tabelle sortiert haben).
+
+Die Sortierung der Tabelle erfolgt nach einem Feld Ihrer Wahl. Sie können das Standardverhalten unter \menu{Optionen \msep{} Einstellungen \msep{} Tabellenansicht} angeben. Um die Sortierreihenfolge schnell zu ändern, klicken Sie einfach auf die Kopfzeile einer Spalte; damit haben Sie das primäre Sortierkriterium definiert. Klicken Sie erneut auf den Spaltenkopf, um die Sortierrichtung umzukehren. Ein weiterer Klick sorgt dafür, dass die Spalte nicht mehr zur Sortierung herangezogen wird. Halten Sie die STRG-Taste beim Klicken auf einen Spaltenknopf gedrückt, um eine zweite Spalte als sekundäres Sortierkriterium festzulegen. Sie können beliebig viele Spalten zur Sortierung heranziehen.
+
+Welche Felder (Spalten) in der Tabelle angezeigt werden sollen, können
+Sie im \menu{Einstellungs}-Dialog auswählen. Auch die Breite der
+Tabellenspalten kann eingestellt werden, indem man die Trennlinie
+zwischen den Spaltenköpfen anklickt und nach links oder rechts verschiebt.
+Im \menu{Einstellungs}-Dialog können Sie festlegen, ob die Tabelle
+an die Bildschirmgröße angepasst werden soll oder nicht. Aktivieren
+Sie diese Funktion, um sicherzustellen, dass Sie die gesamte Tabelle
+sehen können. Deaktivieren Sie diese Funktion, wenn mehr Informationen
+dargestellt werden sollen.
+
+Die Farbanzeige kann ebenfalls im \menu{Einstellungs}-Dialog ein-
+und ausgeschaltet werden. Die Farbanzeige illustriert, ob Ihre Daten
+vollständig sind, indem sie die Zellen wie folgt darstellt:
+
+\begin{itemize}
+\item Eine \colorbox{red}{\textcolor{white}{rote}} Zelle in der linken Spalte kennzeichnet
+einen unvollständigen Eintrag.
+\item Eine \colorbox{yellow}{gelbe} Zelle in der linken Spalte kennzeichnet
+einen Eintrag, der nicht alle benötigten Felder selbst enthält, der
+aber einen Querverweis enthält.
+\item Eine \colorbox{blue}{\textcolor{white}{blaue}} Zelle kennzeichnet ein benötigtes Feld.
+\item Eine \colorbox{green}{grüne} Zelle kennzeichnet ein optionales Feld.
+\item Eine farblose (weiße) Zelle kennzeichnet ein Feld, das von \bibtex{}
+für diesen Eintragstyp nicht benutzt wird. Das Feld kann selbstverständlich
+in \jabref bearbeitet werden.
+\end{itemize}
+
+\subsubsection{Einen neuen Eintrag hinzufügen}
+
+Es gibt verschiedene Möglichkeiten, einen neuen Eintrag hinzuzufügen.
+Im Menü \menu{BibTeX} führt ein Klick auf \menu{Neuer Eintrag} zu
+einem Dialog, in dem Sie den Eintragstyp aus einer Liste wählen können.
+Um diesen Dialog zu umgehen, gibt es auch eigene Menüpunkte für jeden
+Eintragstyp und außerdem Tastenkürzel für die gängigsten Typen.
+
+Wenn ein Eintrag hinzugefügt wird, wird standardmäßig ein Editor für
+den Eintrag geöffnet. Sie können dieses Verhalten im \menu{Einstellungs}-Dialog
+abstellen.
+
+\tip[]{Wir empfehlen, sich die Tastenkürzel für die Eintragstypen
+einzuprägen, die Sie am häufigsten benutzen, z.\,B. STRG-SHIFT-A
+für einen Zeitschriftenaufsatz \emph{(article)}.}
+
+
+\subsubsection{Einen Eintrag bearbeiten}
+
+Um den \nameref{EntryEditorHelp} zur Bearbeitung
+eines existierenden Eintrags zu öffnen, klicken Sie einfach doppelt
+auf die entsprechende Zeile oder markieren den Eintrag
+und drücken auf ENTER.
+
+
+\subsubsection{Einen \bibtex{}-String in einem Feld verwenden}
+
+In \jabref schreiben Sie den Inhalt aller Felder so, wie Sie es
+in einem Texteditor machen würden, mit einer Ausnahme: um einen String
+(eine Art Abkürzung) zu verwenden, umschließen Sie den Namen des Strings
+mit je einem \#, z.\,B.
+
+\begin{lstlisting}
+#jan# 1997
+\end{lstlisting}
+was interpretiert wird als String mit dem Namen \texttt{jan} gefolgt
+von \texttt{1997}. Vergleichen Sie dazu auch die Hinweise zum \nameref{StringEditorHelp}.
+
+
+\subsection{\texorpdfstring{Eintrags"=Editor}{Eintrags-Editor}}
+
+\label{EntryEditorHelp}
+
+\begin{quote}
+\emph{Geöffnet wird der Eintrags"=Editor im Hauptfenster durch einen
+Doppelklick auf die linke Spalte eines Eintrags oder durch
+Drücken auf ENTER. Der Eintrags-Editor wird geschlossen, indem man
+auf ESC drückt.}
+\end{quote}
+Im Eintrags-Editor können Sie alle relevanten Informationen eines
+Eintrags festlegen. Der Editor überprüft den Eintragstyp und zeigt
+alle benötigten und optionalen Felder für den Gebrauch mit \bibtex{}
+an. Darüber hinaus gibt es einige Felder, die \emph{Allgemeine Felder}
+genannt werden und für alle Eintragstypen gelten.
+
+Sie können die Felder, die für die einzelnen Eintragstypen als benötigt
+und optional angesehen werden, und auch die Allgemeinen Felder anpassen.
+Näheres dazu erfahren Sie im Abschnitt \nameref{CustomEntriesHelp}.
+
+\subsubsection{Die Panels des Eintrags-Editors}
+
+Der Eintrags-Editor besteht in der Standardeinstellung aus fünf Panels:
+\emph{Benötigte Felder}, \emph{Optionale Felder}, \emph{General},
+\emph{Abstract} und \emph{\bibtex{}"=Quelltext}, wobei \emph{General}
+und \emph{Abstract} vom Benutzer angepasst werden können (siehe dazu
+Abschnitt~\ref{GeneralFields}). In den ersten drei Panels können
+Sie mit TAB und SHIFT-TAB zwischen den einzelnen Feldern hin- und
+herwechseln. Zu einem anderen Panel gelangen Sie, indem Sie auf die
+Tabs klicken. Mit den folgenden Tastaturkürzeln können Sie ebenfalls
+zwischen den Panels navigieren:
+
+\begin{itemize}
+\item STRG-TAB oder STRG-+ wechselt zum Panel rechts vom aktuellen Panel,
+\item STRG-SHIFT-TAB oder STRG-{-} (MINUS) wechselt dementsprechend zum
+Panel links vom aktuellen Panel.
+\end{itemize}
+Außerdem können Sie zum nächsten oder vorherigen Eintrag wechseln,
+indem Sie >>STRG-SHIFT-$\downarrow$<< bzw. >>STRG-SHIFT-$\uparrow$<<
+oder die Pfeil-Buttons in der linken Toolbar drücken.
+
+Das Panel \emph{\bibtex{}"=Quelltext} zeigt, wie der Eintrag aussehen
+wird, wenn die Datei im \texttt{bib}-Format gespeichert wird. Wenn
+Sie wollen, können Sie den \bibtex{}"=Quelltext direkt bearbeiten.
+Sobald Sie zu einem anderen Panel wechseln, STRG-S drücken oder den
+Eintrags-Editor schließen, wird \jabref versuchen, den Inhalt des
+Quelltext"=Panels zu analysieren. Falls dabei Probleme auftreten, werden
+Sie benachrichtigt und erhalten die Möglichkeit, den Eintrag noch
+einmal zu überarbeiten oder den vorherigen Inhalt wiederherzustellen. (Nähere
+Einzelheiten dazu finden Sie im Abschnitt \nameref{subsub:feldkonsistenz}.)
+Wenn in den \menu{Einstellungen} (unter \menu{Allgemein}) die Option
+\menu{Quelltext standardmäßig anzeigen} gewählt wurde, wird das Quelltext"=Panel
+beim Öffnen des Eintrags-Editors als erstes angezeigt. Wenn Sie lieber
+den Quelltext bearbeiten als die anderen Panels zu benutzen, sollten
+Sie diese Option wählen.
+
+\tip{Wenn Ihre Datei Felder enthält, die \jabref nicht kennt,
+erscheinen diese im Quelltext"=Panel.}
+
+\tip[Und noch ein Tipp: ]{Die \emph{PDF-} und \emph{URL}-Felder unterstützen
+Drag \& Drop. Sie können z.\,B. ein URL aus Ihrem Browser dort einfügen.}
+
+
+\subsubsection{Überprüfung der Feldkonsistenz}
+\label{subsub:feldkonsistenz}
+Wenn der Inhalt eines Feldes geändert wird, überprüft \jabref,
+ob der neue Inhalt akzeptiert werden kann. Bei Feldern, die von \bibtex{}
+genutzt werden, wird der Inhalt zum einen auf die richtige Klammerung
+mit geschweiften Klammern, aber auch auf die Benutzung des Zeichens
+\texttt{\#} hin überprüft. Das >>hash<<-Symbol (im Deutschen oft
+>>Doppelkreuz<< oder >>Raute<< genannt) darf \emph{nur} paarweise
+benutzt werden, um damit den Namen eines \bibtex{}-Strings einzuschließen.
+Beachten Sie, dass \jabref nicht überprüft, ob der angeführte String
+tatsächlich vorhanden ist, da der \bibtex{}-Stil, den Sie benutzen, 
+eine beliebige Anzahl von Strings definieren kann, die \jabref nicht
+kennt.
+
+Falls die Inhalte nicht akzeptabel sind, wird das Feld mit roter Farbe
+hinterlegt, was auf einen Fehler hindeutet. In diesem Fall werden
+die Änderungen nicht gespeichert.
+
+
+\subsection{Integritätsprüfung}
+
+\begin{quote}
+\emph{Erreichbar über das Menü \menu{Extras \msep{} Datenbank durchsuchen
+\msep{} Überprüfung der Integrität}.}
+\end{quote}
+Mit dieser Funktion überprüft \jabref alle Einträge auf deren Gültigkeit
+und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
+kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
+(Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
+entsprechenden \bibtex{}-Key erstellt. Wenn Sie einen Hinweis auswählen,
+erscheint der Inhalt des Feldes, das beanstandet wird. Sie können
+nun den Feldinhalt verändern und die Veränderungen mit Klick auf die
+Schaltfläche \menu{Übernehmen} speichern.
+
+
+\subsection{\bibtex{}-Keys}
+
+Damit man sich in einem \LaTeX{}-Dokument auf einen Literaturverweis
+beziehen kann, braucht man einen eindeutigen \bibtex{}-Key. Eindeutig
+heißt, dass er nur einmal vergeben sein darf. Es wird nach Groß"~
+und Kleinschreibung unterschieden, \texttt{Yared1998} ist also nicht
+identisch mit \texttt{yared1998}. \jabref bietet einige Möglichkeiten,
+um auch bei größeren Datenbanken den Überblick über die \bibtex{}-Keys
+nicht zu verlieren.
+
+\tip{Falls Sie in einem \LaTeX{}-Dokument mehrere \bibtex{}-Dateien
+einbinden, müssen Sie selbst darauf achten, dass in den unterschiedlichen
+Dateien nicht mehrmals derselbe \bibtex{}-Key vergeben ist. Nutzen
+Sie deshalb am besten die Funktion \menu{Extras} \msep{} \menu{Neue Teildatei aus AUX-Datei}.}
+Der einfachste Weg, einen eindeutigen \bibtex{}-Key zu bekommen, ist
+das automatische Erzeugen, das Sie mit der Tastenkombination STRG-G
+oder mit dem Zauberstab-Button im Eintrags-Editor veranlassen können.
+Falls Sie sich nicht im Eintrags-Editor befinden, werden mit Hilfe
+von STRG-G oder dem Zauberstab-Button aus der Menüleiste für alle
+Einträge der Datei \bibtex{}-Keys erzeugt. Falls dabei Keys überschrieben
+werden, gibt \jabref eine Warnmeldung aus.
+
+Wie die \bibtex{}-Keys aussehen, die \jabref automatisch generiert,
+und wie Sie dieses Aussehen verändern können, erfahren Sie im Abschnitt~\ref{LabelPatterns} \nameref{LabelPatterns}.
+
+
+\subsection{Suchfunktionen}
+
+\label{SearchHelp}
+\begin{quote}
+\emph{STRG-F öffnet oder aktiviert den Suchdialog.
+Drückt man mehrmals auf STRG-F, so werden die verschiedenen Suchmodi
+ausgewählt. STRG-SHIFT-F öffnet oder aktiviert den Suchdialog
+und wählt gleichzeitig die direkte Suche aus. Bei der direkten Suche
+springt man mit STRG-F oder STRG-SHIFT-F zum nächsten Treffer.}
+\end{quote}
+
+\subsubsection{Direkte Suche}
+
+Bei der direkten Suche sucht \jabref unmittelbar, wenn Sie einen
+Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg.
+Mit STRG-F oder STRG-SHIFT-F wird zum nächsten Vorkommen des aktuellen
+Suchbegriffs gesprungen. Falls es keine weiteren Vorkommen gibt, informiert
+die Statuszeile darüber. Bei erneuter Wiederholung startet die Suche
+vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen
+Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken
+Sie ESC oder klicken Sie auf \menu{Zurücksetzen}.
+
+
+\subsubsection{Normale Suche}
+
+Hierbei sucht das Programm nach allen Vorkommen der Wörter ihres Suchausdrucks, sobald Sie ENTER drücken. Nur Einträge, die alle Wörter enthalten, gelten als Treffer. Um nach festen Ausdrücken zu suchen, müssen Sie die Wörter in doppelte Anführungszeichen einfassen. Zum Beispiel findet die Suchanfrage \texttt{progress \textquotedbl marine acquaculture\textquotedbl} Einträge, die sowohl das wort ">progress"< als auch den Ausdruck ">marine acquaculture"< aufweisen. Alle Einträge, die keine Treffer sind, werden entweder ausgeblendet, so dass nur die Treffer sichtbar sind (Suchmodus \menu{Filter}), oder sie werden grau dargestellt, während die Treffer oben angezeigt werden (Suchmodus \menu{Oben einsortieren}). Um die Trefferanzeige zu beenden, drücken Sie ESC oder klicken auf die Schaltfläche \menu{Zurücksetzen} im Suchen-Dialog.
+
+\subsubsection{Suchoptionen}
+
+Der \menu{Einstellungen}-Button im Suchdialog öffnet ein Menü, in
+dem man mehrere Optionen (de)aktivieren kann: das Beachten von Groß-
+und Kleinschreibung, das Nutzen regulärer Ausdrücke (siehe dazu den Abschnitt ">\nameref{search-regular-expressions}"<) sowie das Auswählen
+der Suchergebnisse.
+
+\tip{Suchen Sie mit der Option \menu{Treffer auswählen} und drücken
+anschließend STRG-M, so haben Sie alle Treffer markiert (vgl. Abschnitt ">\nameref{MarkingHelp}"<) und können z.\,B. eine weitere Suche durchführen,
+ohne die bisherigen Ergebnisse zu >>verlieren<<.}
+
+\subsubsection{Feldbezeichner und logische Operatoren}
+\label{SearchHelp_advanced}
+
+\tip[Achtung! ]{Die folgenden Hinweise gelten nicht für die direkte Suche.}
+Um nur einige bestimmte Felder zu durchsuchen
+und\slash{}oder logische Operatoren im Suchbegriff zu benutzen, wird
+eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach
+Einträgen mit dem Autor >>Miller<< zu suchen, geben Sie
+
+\begin{lstlisting}
+author = miller
+\end{lstlisting}
+in das Suchfeld ein. Falls der Suchbegriff Leerzeichen enthält, schließen
+Sie ihn in Anführungszeichen ein. Benutzen Sie \emph{nie} Leerzeichen
+in dem Feldbezeichner. Mehrere Feldbezeichner werden durch >>|<<
+voneinander getrennt. Um beispielsweise nach Einträgen über Karl den
+Großen zu suchen, geben Sie Folgendes ein:
+
+\begin{lstlisting}
+title|keywords = "Karl der Große"
+\end{lstlisting}
+Sie können die logischen Operatoren AND, OR und NOT sowie Klammern
+verwenden:
+
+\begin{lstlisting}
+(author = miller OR title|keywords = "Karl der Große") AND NOT author = brown
+\end{lstlisting}
+\ldots{} sucht beispielsweise nach Einträgen, in denen entweder der
+Autor >>Miller<< heißt oder im \emph{title}- oder \emph{keywords}-Feld
+der Begriff >>Karl der Große<< steht; gleichzeitig werden die Einträge
+mit dem Autor >>Brown<< nicht angezeigt.
+
+Das \texttt{=}-Zeichen ist eigentlich eine Abkürzung für >>enthält<<
+\emph{(contains)}. Wenn man nach genauen Treffern suchen möchte, muss
+man \texttt{==} oder \texttt{matches} (>>übereinstimmen<<) eingeben.
+\texttt{!=} sucht nach Einträgen, bei denen der Suchbegriff \emph{nicht}
+enthalten ist. Um nach Einträgen eines bestimmten Typs zu suchen,
+gibt es ein Pseudofeld namens \emph{entrytype}:
+
+\begin{lstlisting}
+entrytype = thesis
+\end{lstlisting}
+\ldots{} findet Einträge, deren Typ (wie in der Spalte \emph{Entrytype}
+dargestellt) das Wort >>thesis<< enthält (z.\,B. >>phdthesis<<
+und >>mastersthesis<<). Ebenso erlaubt das Pseudofeld \emph{bibtexkey}
+die Suche nach \bibtex{}-Keys, z.\,B.:
+
+\begin{lstlisting}
+bibtexkey = miller2005
+\end{lstlisting}
+
+\subsubsection{Suche mit regulären Ausdrücken}
+\label{search-regular-expressions}
+\verfasser{Pedro J. Aphalo, zuerst veröffentlicht im \jabref{}-Wiki in englischer Sprache}
+
+\paragraph{Hintergrund}
+Reguläre Ausdrücke (kurz ">regex"< für engl. ">regular expressions"<) definieren eine Sprache zum Spezifizieren von passendem Text, zum Beispiel bei Suchanfragen. \jabref{} nutzt reguläre Ausdrücke, wie sie in Java definiert sind. Eine Dokumentation dazu findet sich unter \href{http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html}{http://java.sun.com\slash{}j2se\slash{}1.4.2\slash{}docs\slash{}api\slash{}java\slash{}util\slash{}regex\slash{}Pattern.html}.
+
+\tip[]{Die folgenden Beispiele sind alle in Kleinbuchstaben, damit werden aber auch Großbuchstaben oder gemischte Varianten gefunden.}
+
+\paragraph{Suche nach Einträgen mit leerem oder fehlendem Feld}
+\tip[]{\texttt{.} bezeichnet irgendein Zeichen
+
+\texttt{+} heißt ein- oder mehrmals}
+\begin{lstlisting}
+author != .+
+\end{lstlisting}
+
+\paragraph{Wortgrenzen beachten}
+\tip[]{\texttt{\textbackslash b} bezeichnet eine Wortgrenze
+
+\texttt{\textbackslash B} heißt: keine Wortgrenze}
+\begin{lstlisting}
+keywords = \buv\b
+\end{lstlisting}
+findet ">uv"<, aber nicht ">lluvia"< (es findet allerdings ">uv-b"<)
+\begin{lstlisting}
+author = \bblack\b
+\end{lstlisting}
+findet ">black"<, aber weder ">blackwell"< noch ">blacker"<
+
+\begin{lstlisting}
+author == black
+\end{lstlisting} findet ">john black"< nicht, 
+\begin{lstlisting}
+author = \bblack\b
+\end{lstlisting} hingegen schon
+
+\begin{lstlisting}
+author = \bblack\B
+\end{lstlisting}
+findet ">blackwell"< und ">blacker"<, aber nicht ">black"<
+
+\paragraph{Suche mit optionaler Schreibweise}
+
+\tip[]{\texttt{?} bezeichnet keine oder eine Kopie des vorhergehenden Buchstaben
+
+\texttt{{n,m}} heißt mindestens n, aber nicht mehr als m Kopien des vorhergehenden Buchstaben
+
+\texttt{[ ]} definiert eine Buchstabengruppe}
+
+\begin{lstlisting}
+title =neighbou?r
+\end{lstlisting}
+findet ">neighbour"< und ">neighbor"<, aber auch ">neighbours"< und ">neighbors"<, ">neighbouring"< und ">neighboring"< etc.
+
+\begin{lstlisting}
+title = neighbou?rs?\b
+\end{lstlisting}
+findet ">neighbour"< und ">neighbor"<, auch ">neighbours"< und ">neighbors"< , aber weder ">neighbouring"< noch ">neighboring"<.
+
+\begin{lstlisting}
+author = s[aá]nchez
+\end{lstlisting}
+findet ">sanchez"< und ">sánchez"<
+
+\begin{lstlisting}
+abstract = model{1,2}ing
+\end{lstlisting}
+findet ">modeling"< und ">modelling"<
+
+\begin{lstlisting}
+abstract = modell?ing
+\end{lstlisting}
+findet ebenfalls ">modeling"< und ">modelling"<
+
+\paragraph{Das Problem von Anführungszeichen (\texorpdfstring{\texttt{"}}{"}) in Suchausdrücken}
+Sind reguläre Ausdrücke ausgeschaltet, findet 
+\begin{lstlisting}
+author = {\"O}quist
+\end{lstlisting} nichts, auch wenn der Name in der Datenbank vorkommt. Ebensowenig wird bei aktivierten regulären Ausdrücken 
+\begin{lstlisting}
+author = \{\\\"O\}quist
+\end{lstlisting} irgendetwas finden.
+
+\begin{lstlisting}
+author = \{\\\x22O\}quist
+\end{lstlisting}
+funktioniert bei aktivierten regulären Ausdrücken für ">\texttt{\{\textbackslash "{}O\}quist}"<, weil \lstinline{\"} nicht als Aufhebung von \lstinline{"} wirkt, \lstinline{\x22} aber schon (also das Zeichen hexadezimal 22 in der ASCII-Tabelle).
+
+\begin{lstlisting}
+author = Bolh{\`a}r 
+\end{lstlisting}
+funktioniert mit ausgeschalteten regulären Ausdrücken und
+
+\begin{lstlisting}
+author = Bolh\{\\`a\}r 
+\end{lstlisting}
+funktioniert mit aktivierten regulären Ausdrücken.
+
+Einfache Anführungszeichen (\texttt{'}) funktionieren ebenfalls.
+
+Es gibt also anscheinend eine Einschränkung, wie \lstinline{"} in der Eingabe behandelt wird, aber Sie können stattdessen \lstinline{\x22} nutzen, um dieses Problem zu umgehen. (Das Zeichen \lstinline{"} hat eine spezielle Bedeutung: es wird benutzt, um mehrere Wörter zu einer Phrase zu gruppieren, die exakt gefunden werden soll.)
+
+\subsection{Gruppen}
+
+Mit Gruppen können Sie Ihre \bibtex{}-Datei in einer Baumstruktur
+anordnen, vergleichbar mit einer Dateistruktur in Ordnern und Unterordnern.
+Die beiden Hauptunterschiede sind:
+
+\begin{enumerate}
+\item Während eine Datei auf einer Festplatte immer in genau einem Ordner
+abgelegt ist, kann ein Literatureintrag in \jabref mehreren Gruppen
+angehören.
+\item Gruppen benutzen bestimmte Kriterien, um ihren Inhalt dynamisch zu
+bestimmen. Neue Einträge, die den Kriterien einer Gruppe entsprechen,
+gehören automatisch zu dieser Gruppe. Diese Funktionalität gibt es
+nicht in üblichen Dateisystemen, wohl aber in einigen E-Mail-Programmen
+(z.\,B. Thunderbird und Opera).
+\end{enumerate}
+Wenn Sie eine Gruppe auswählen, werden die Einträge dieser Gruppe
+angezeigt. Wenn Sie mehrere Gruppen auswählen, werden entweder die
+Einträge angezeigt, die in einer der Gruppen sind (Vereinigung), oder
+solche, die in allen Gruppen vorhanden sind (Schnittmenge)~-- das
+hängt von Ihren Einstellungen ab. All dies wird im Folgenden detailliert
+erläutert.
+
+Gruppendefinitionen sind dateispezifisch; sie werden als \texttt{@COMMENT}-Block
+in der \texttt{bib}-Datei gespeichert und von allen Benutzern gemeinsam
+benutzt. (Künftige Versionen von \jabref werden möglicherweise
+benutzerabhängige Gruppen unterstützen.)
+
+
+\subsubsection{Die Gruppenansicht}
+\begin{quote}
+\emph{Die Gruppenansicht wird im linken Bereich des Bildschirms angezeigt.
+Sie kann mit der Tastenkombination STRG-SHIFT-G oder dem Gruppen-Button
+in der Toolbar ein- und ausgeblendet werden. Die Gruppenansicht verfügt
+über mehrere Schaltflächen, aber die meisten Funktionen werden über
+das Kontextmenü angesteuert (also mit der rechten Maustaste). Drag\,\&\,Drop
+wird ebenfalls unterstützt.}
+\end{quote}
+
+
+\subsubsection{Einige kurze Beispiele}
+
+Sie möchten vielleicht~\ldots{}
+
+\begin{itemize}
+\item [\ldots]\textbf{einfach nur eine Gruppe anlegen und ihr einige Einträge
+zuordnen}
+
+
+Vergewissern Sie sich, dass die Gruppenansicht eingeschaltet ist.
+Drücken Sie auf den Button \menu{Neue Gruppe}, geben einen Namen
+für die Gruppe ein und drücken \menu{OK}. Sie können alle Einstellungen
+auf ihren Standardwerten belassen. Jetzt wählen Sie die Einträge aus,
+die der Gruppe zugeordnet werden sollen, und ziehen diese mit der
+Maus auf die Gruppe oder wählen \menu{Zu Gruppe hinzufügen} aus dem
+Kontextmenü. Jetzt können Sie die Gruppe anklicken, um sich ihren
+Inhalt anzeigen zu lassen (das sollten die Einträge sein, die Sie
+gerade hinzugefügt haben).
+
+\item [\ldots]\textbf{das Feld} \textbf{\emph{keywords}} \textbf{benutzen,
+um die Einträge zu gruppieren}
+
+
+Stellen Sie sicher, dass die Gruppenansicht aktiviert ist. Drücken
+Sie auf den Button \menu{Neue Gruppe}, geben einen Namen für die
+Gruppe ein und wählen die Option \menu{Dynamisches Gruppieren der Einträge anhand eines Stichworts in einem Feld}.
+Geben Sie das Stichwort, nach dem gesucht werden soll, ein und drücken
+\menu{OK}. Jetzt können Sie die Gruppe anklicken, um sich ihren Inhalt
+anzeigen zu lassen (das sollten alle Einträge sein, deren \emph{keywords}-Feld
+das Stichwort enthält, das Sie angegeben haben).
+
+\item [\ldots]\textbf{einen frei wählbaren Suchausdruck verwenden, um eine
+Gruppe zu definieren}
+
+
+Stellen Sie sicher, dass die Gruppenansicht aktiviert ist. Drücken
+Sie auf den Button \menu{Neue Gruppe}, geben einen Namen für die
+Gruppe ein und wählen die Option \menu{Dynamisches Gruppieren der Einträge anhand eines beliebigen Suchausdrucks}.
+Geben Sie \texttt{author=smith} als Suchausdruck ein (ersetzen Sie
+\texttt{smith} mit einem Namen, der wirklich in Ihrer Datei vorkommt)
+und klicken \menu{OK}. Jetzt können Sie die Gruppe anklicken, um
+sich ihren Inhalt anzeigen zu lassen (das sollten alle Einträge sein,
+deren \emph{author}-Feld den Namen beinhaltet, den Sie angegeben haben).
+
+\item [\ldots]\textbf{mehrere Gruppen kombinieren }
+
+
+Erstellen sie zwei unterschiedliche Gruppen (z.\,B. so wie oben beschrieben).
+Klicken Sie auf den Button \menu{Einstellungen} in der Gruppenansicht
+und wählen \menu{Vereinigung}. Jetzt wählen Sie beide Gruppen aus
+(dazu klicken Sie auf eine Gruppe und anschließend bei gedrückter
+STRG-Taste auf die andere Gruppe). Sie sollten jetzt alle Einträge
+sehen, die in einer der beiden Gruppen aufgeführt sind. Klicken Sie
+noch einmal auf \menu{Einstellungen} und wählen \menu{Schnittmenge}
+aus. Nun sollten Sie nur die Einträge sehen, die in beiden Gruppen
+enthalten sind (das können auch keine sein, oder aber genau dieselben
+Einträge wie zuvor, sofern beide Gruppen dieselben Einträge enthalten).
+
+\item [\ldots]\textbf{sehen, welche Gruppen sich überschneiden}
+
+
+Mit \jabref können Sie ganz einfach herausfinden, welche Gruppen
+sich mit den aktuell ausgewählten Gruppen überschneiden (d.\,h. welche
+Gruppen zumindest einen Eintrag enthalten, der auch in der aktuell
+ausgewählten Gruppe ist). Klicken Sie auf \menu{Einstellungen} und
+aktivieren die Option \menu{Sich überschneidende Gruppen markieren}.
+Wählen Sie dann eine Gruppe, die sich mit anderen überschneidet. Diese
+anderen Gruppen sollten nun markiert sein.
+
+\end{itemize}
+
+\subsubsection{Arten von Gruppen}
+
+In \jabref gibt es vier verschiedene Arten von Gruppen:
+
+\begin{enumerate}
+\item Die Gruppe \emph{Alle Einträge}, die~-- wie der Name vermuten lässt~--
+alle Einträge beinhaltet, ist immer vorhanden und kann weder verändert
+noch gelöscht werden.
+\item \emph{Statische Gruppen} verhalten sich wie Ordner auf einer Festplatte
+und beinhalten nur die Einträge, die Sie ihnen explizit zuweisen.
+\item \emph{Dynamische Gruppen basierend auf einem Stichwort} beinhalten
+Einträge, die in einem bestimmten \bibtex{}-Feld (z.\,B. \emph{keywords})
+ein bestimmtes Stichwort (z.\,B. \emph{elektrisch}) aufweisen. Diese
+Methode benötigt kein manuelles Zuweisen der Einträge, sondern nutzt
+die bereits in der Datei vorhandenen Informationen. Wenn alle Einträge
+in Ihrer Datenbank passende Stichwörter haben, könnte diese Art von
+Gruppe die beste Wahl für Sie sein.
+\item \emph{Dynamische Gruppen basierend auf einer freien Suche} beinhalten
+Einträge, die mit einem bestimmten Suchausdruck übereinstimmen. Dabei
+wird dieselbe Syntax verwendet wie beim Suchen (siehe Abschnitt~\ref{SearchHelp}).
+Diese Syntax (die auf S.\,\pageref{SearchHelp_advanced} genauer
+beschrieben wird) unterstützt logische Operatoren (AND, OR, NOT) und
+erlaubt es, in einem oder mehreren \bibtex{}-Feldern zu suchen. Dadurch
+ist eine flexiblere Definition von Gruppen möglich als mit einer Stichwortsuche
+(z.\,B. \texttt{author=smith AND title=elektrisch}).
+\end{enumerate}
+Jede Gruppe, die Sie erstellen, ist von einer der drei letztgenannten
+Arten. Der Dialog \menu{Gruppe bearbeiten}, der mit einem Doppelklick
+auf eine Gruppe aufgerufen wird, zeigt eine kurze Beschreibung der
+ausgewählten Gruppe.
+
+
+\subsubsection{Gruppenstrukturen, Erstellen und Löschen von Gruppen}
+
+Die Gruppen sind~-- vergleichbar mit Datei-Ordnern~-- in einer Baumansicht
+strukturiert, in der die Gruppe \emph{Alle Einträge} das Stammelement
+ist. Mit einem Rechtsklick auf eine Gruppe können Sie dem Baum eine
+neue Gruppe hinzufügen, entweder auf derselben Ebene wie die ausgewählte
+Gruppe oder als ihre Untergruppe. Der Button \menu{Neue Gruppe} erzeugt
+eine neue Untergruppe der Gruppe \emph{Alle Einträge}, egal ob Sie
+gerade Gruppen ausgewählt haben oder nicht. Im Kontextmenü können
+Sie auch Gruppen und\slash{}oder Untergruppen löschen, Untergruppen
+alphabetisch sortieren oder Gruppen an eine andere Stelle des Baums
+verschieben. Letzteres können Sie auch mit Drag\,\&\,Drop machen,
+allerdings mit der Einschränkung, dass bei Drag\,\&\,Drop die Reihenfolge
+der Untergruppen einer Gruppe nicht verändert werden kann.
+
+Die Funktionen \menu{Rückgängig} und \menu{Wiederholen} werden für
+alle Bearbeitungsschritte unterstützt.
+
+
+\paragraph{Statische Gruppen}
+
+Statische Gruppen werden nur durch manuelles Zuweisen von Einträgen
+>>gefüttert<<. Nachdem Sie eine statische Gruppe erstellt haben,
+wählen Sie die Einträge aus, die Sie ihr zuweisen wollen, und nutzen
+entweder Drag\,\&\,Drop oder das Kontextmenü in der Tabelle, um
+die Zuweisung durchzuführen. Um Einträge aus einer Gruppe zu entfernen,
+wählen Sie sie aus und benutzen das Kontextmenü in der Tabelle. Es
+können keine weiteren Optionen angegeben werden.
+
+Diese Methode des Gruppierens setzt voraus, dass alle Einträge einen
+eindeutigen \bibtex{}-Key haben. Im Falle von fehlenden oder doppelten
+\bibtex{}-Keys kann das Zuweisen der betreffenden Einträge in künftigen
+Sitzungen nicht korrekt wiederhergestellt werden.
+
+
+\paragraph{Dynamische Gruppen}
+
+Der Inhalt einer dynamischen Gruppe wird von einer logischen Bedingung
+bestimmt. Nur Einträge, die dieser Bedingung entsprechen, gehören
+zu dieser Gruppe. Diese Methode nutzt die bereits in der Datei vorhandenen
+Informationen und wird aktualisiert, sobald Sie Veränderungen in der
+Datei vornehmen. Es gibt zwei mögliche Arten von Bedingungen:
+
+\begin{enumerate}
+\item Ein Feld nach einem Stichwort durchsuchen
+
+
+Diese Methode gruppiert Einträge, bei denen ein bestimmtes \bibtex{}-Feld
+(z.\,B. \emph{keywords}) einen bestimmten Suchausdruck (z.\,B. \emph{elektrisch})
+enthält. Damit dies funktioniert, muss das Feld, nach dem sortiert
+wird, natürlich in jedem Eintrag vorhanden und sein Inhalt fehlerfrei
+sein. Das obige Beispiel würde alle Einträge zu einer Gruppe zusammenfassen,
+die sich auf etwas Elektrisches beziehen. Benutzt man das Feld \emph{author},
+kann man sich Einträge eines bestimmten Autors gruppieren lassen,
+usw. Die Suche ist als reine Textsuche oder mit einem regulären Ausdruck
+möglich. Im ersten Fall erlaubt \jabref das manuelle Zuweisen zu
+und Entfernen aus einer Gruppe; dazu fügt \jabref den Suchausdruck
+dem entsprechenden Feld zu bzw. entfernt ihn daraus. Das macht nur
+für das Feld \emph{keywords} oder für selbstdefinierte Felder Sinn,
+aber offensichtlich nicht für Felder wie \emph{author} oder \emph{year}.
+
+\item Einen freien Suchausdruck verwenden
+
+
+Diese Vorgehensweise ist ganz ähnlich wie die eben beschriebene, aber
+statt nur ein Feld nach einem Suchausdruck zu durchsuchen, kann hierbei
+die Syntax der Suche (siehe S.\,\pageref{SearchHelp_advanced}) angewendet
+werden, die logische Operatoren (AND, OR, NOT) und die Suche in mehreren
+Feldern gleichzeitig unterstützt. So fasst z.\,B. die Suchanfrage
+\texttt{keywords=Regression AND NOT keywords=linear} Einträge, die
+sich mit nicht-linearer Regression beschäftigen, zu einer Gruppe zusammen.
+
+\end{enumerate}
+In der Gruppenansicht werden dynamische Gruppen standardmäßig \emph{kursiv}
+dargestellt. Dies kann unter \menu{Optionen} \msep{} \menu{Einstellungen}
+\msep{} \menu{Gruppen} abgestellt werden.
+
+
+\paragraph{Hierarchischer Kontext}
+
+Standardmäßig ist eine Gruppe \emph{unabhängig} von ihrer Position
+im Gruppenbaum. Ist eine Gruppe ausgewählt, wird nur der Inhalt dieser
+Gruppe angezeigt. Es ist jedoch~-- besonders beim Verwenden dynamischer
+Gruppen~-- oft nützlich, eine Untergruppe zu erstellen, die \emph{ihre
+Obergruppe einbezieht}. Wenn diese Untergruppe ausgewählt wird, werden alle Einträge dieser
+Gruppe und ihrer Obergruppe angezeigt. Erstellen Sie z.\,B. eine
+Obergrupe, die Einträge mit dem Stichwort \emph{Verteilung} enthält,
+sowie eine einbeziehende Untergruppe mit Einträgen, die das Stichwort
+\emph{Gauß} enthalten. Wenn Sie nun die Untergruppe auswählen, werden
+alle Einträge angezeigt, die beiden Bedingungen entsprechen, also
+alle, die mit Gauß'scher Verteilung zu tun haben. Indem Sie nun eine
+weitere Untergruppe für \emph{Laplace} anlegen, die dieselbe Obergruppe
+einbezieht, können Sie die Gruppierung einfach erweitern. Im Gruppenbaum
+haben solche Gruppen, die ihre Obergruppen einbeziehen, ein spezielles
+Icon. (Dieses Verhalten kann in den Einstellungen abgestellt werden.)
+
+Das logische Gegenstück zu einer solchen einbeziehenden Untergruppe
+ist eine Gruppe, die \emph{ihre Untergruppen berücksichtigt}.
+Wird sie ausgewählt, werden nicht nur die Einträge dieser Gruppe,
+sondern auch diejenigen aller Untergruppen angezeigt. Im Gruppenbaum
+hat auch diese Art von Gruppen ein spezielles Icon. (Dieses Verhalten
+kann in den Einstellungen abgestellt werden.)
+
+
+\subsubsection{Einträge einer Gruppe anzeigen, mehrere Gruppen kombinieren}
+
+Wenn Sie eine Gruppe auswählen, werden die Einträge, die dieser Gruppe
+zugeordnet sind, hervorgehoben und~-- je nach Einstellung (die mit
+einem Klick auf den \menu{Einstellungen}-Button vorgenommen werden
+kann)~-- an den Anfang der Tabelle verschoben und\slash{}oder ausgewählt.
+Diese Optionen entsprechen denen für die normale Suche (siehe Abschnitt~\ref{SearchHelp}).
+
+Wenn Sie meherere Gruppen auswählen (indem Sie die STRG-Taste gedrückt
+halten und mehrere Gruppen anklicken), wird~-- je nach Einstellung~--
+entweder die Vereinigung oder die Schnittmenge ihrer Inhalte angezeigt.
+Damit können mehrere Bedingungen schnell miteinander kombiniert werden.
+Ein Beispiel: Wenn Sie eine statische Gruppe namens \emph{Sehr wichtig}
+haben, in der alle sehr wichtigen Einträge sind, können Sie sich die
+sehr wichtigen Einträge jeder anderen Gruppe anzeigen lassen, indem
+Sie beide Gruppen auswählen (dazu muss \menu{Schnittmenge} in den
+Einstellungen aktiviert sein).
+
+
+\subsubsection{Gruppen und Suche}
+
+Wenn der Inhalt einer oder mehrerer Gruppen angezeigt wird, können
+Sie eine Suche innerhalb dieser Einträge durchführen. Benutzen Sie
+dazu die normalen Suchfunktionen (siehe Abschnitt~\ref{SearchHelp}).
+
+
+\subsubsection{Sich überschneidende Gruppen markieren}
+
+Der \menu{Einstellungen}-Button bietet eine Option zum Markieren
+von sich überschneidenden Gruppen. Wenn diese Option aktiviert ist
+und Sie eine (oder mehrere) Gruppe(n) auswählen, werden alle Gruppen
+markiert, die mindestens einen Eintrag enthalten, der auch der ausgewählten
+Gruppe zugeordnet ist. Damit können Sie schnell Überschneidungen zwischen
+den Einträgen verschiedener Gruppen erkennen. Sie könnten beispielsweise
+eine Gruppe mit dem Namen \emph{lesen} erstellen, die alle Einträge
+enthält, die sie lesen wollen. Sobald Sie nun eine Gruppe auswählen,
+wird die Gruppe \emph{lesen} markiert, sofern die ausgewählte Gruppe
+Einträge enthält, die Sie noch lesen wollten.
+
+
+\subsubsection{Erweiterte Funktionen}
+
+Wenn Sie sich mit dem oben beschriebenen Gruppenkonzept vertraut gemacht
+haben, könnten die folgenden erweiterten Funktionen nützlich sein.
+
+
+\paragraph{Dynamische Gruppen automatisch erstellen}
+
+Mit einem Klick auf den Button \menu{Automatisch Gruppen für die Datei anlegen}
+können Sie ganz schnell passende Gruppen für Ihre Datei erzeugen.
+Diese Funktion sammelt alle Wörter eines bestimmten Felds Ihrer Wahl
+und erstellt eine Gruppe für jedes Wort. Das ist zum Beispiel nützlich,
+wenn Ihre Datei geeignete Stichworte für alle Einträge enthält. Mit
+dem automatischen Erstellen von Gruppen basierend auf dem Feld \emph{keywords}
+können Sie also ohne großen Aufwand ein Grundgerüst von Gruppen anlegen.
+
+Sie können auch Zeichen angeben, die ignoriert werden sollen, z.\,B.
+Kommas, die zwischen einzelnen Stichworten stehen. Diese werden als
+Worttrenner behandelt und nicht als Teile des Wortes selbst. Dieser
+Schritt ist wichtig, damit kombinierte Stichworte wie etwa \emph{Gauß'sche
+Verteilung} als semantische Einheit interpretiert werden können. (Sie
+können diese Option allerdings nicht verwenden, um ganze Wörter zu
+ignorieren. Sie müssen stattdessen die Gruppen, die Sie nicht wollen,
+nach dem automatischen Erstellen von Hand löschen.)
+
+
+\paragraph{Ansicht aktualisieren}
+
+Der \menu{Aktualisieren}-Button in der Gruppenansicht aktualisiert
+die Tabelle in Bezug auf die aktuell ausgewählten Gruppen. Normalerweise
+erfolgt dies automatisch, aber in seltenen Fällen (z.\,B. nach einem
+Rückgängig- oder Wiederholen"=Vorgang, der mit Gruppen zusammenhängt)
+ist ein händisches Aktualisieren nötig.
+
+
+\paragraph{Einbeziehende Unter- und Obergruppen mischen}
+
+Ist eine einbeziehende Gruppe die Untergruppe von einer Gruppe,
+die ihre Untergruppen berücksichtigt~-- hat sie also sozusagen Geschwister~--, 
+dann werden diese Geschwister ignoriert,
+sobald die einbeziehende Gruppe ausgewählt wird.
+
+
+\subsection{Markieren von Einträgen}
+\label{MarkingHelp}
+
+\begin{quote}
+\emph{Mit der Tastenkombination STRG-M können
+Sie Einträge markieren und diese Markierung mit STRG-SHIFT-M wieder
+aufheben. Diese Aktionen sind auch im Menü \menu{Bearbeiten} zu finden.}
+\end{quote}
+Das Markieren ist nicht dasselbe wie das Auswählen eines Eintrags.
+Markierte Einträge verhalten sich in zweierlei Hinsicht anders als
+die restlichen Einträge:
+
+\begin{enumerate}
+\item Markierte Einträge werden immer mit einem gelben Hintergrund in der
+Tabelle angezeigt.
+\item Markierte Einträge werden an den Anfang der Eintragsliste verschoben,
+falls Ihre Tabelle nicht nach Gruppen oder aufgrund einer Suche sortiert
+ist.
+\end{enumerate}
+Wenn Sie Ihre Datei speichern, werden die Markierungen beibehalten.
+Das Markieren von Einträgen ist z.\,B. nützlich, wenn Sie verschiedene
+Suchvorgänge durchführen wollen, ohne das erste Suchergebnis zu verlieren,
+oder wenn Sie sich merken wollen, welche Artikel oder Bücher Sie noch
+einmal genauer ansehen müssen.
+
+
+\subsection{\texorpdfstring{String"=Editor}{String-Editor}}
+\label{StringEditorHelp}
+
+\begin{quote}
+\emph{Zugriff über das Menü \menu{BibTeX}} \msep{} \emph{\menu{Strings bearbeiten}
+oder durch Klick auf die Schaltfläche \menu{Strings bearbeiten}.}
+\end{quote}
+\emph{Strings} sind das \bibtex{}-Äquivalent zu Konstanten in einer
+Programmiersprache. Jeder String wird durch einen eindeutigen \emph{Namen}
+und einen \emph{Inhalt} festgelegt. Der Name kann an anderer Stelle
+in der Datei benutzt werden, um den Inhalt wiederzugeben.
+
+Ein Beispiel: Wenn viele Einträge aus einer Zeitschrift stammen, deren
+Abkürzung schwer zu behalten ist, wie etwa >>J. Theor. Biol.<< (Journal
+of Theroretical Biology), könnte ein String mit dem Namen >>JTB<<
+angelegt werden, um den Namen der Zeitschrift zu repräsentieren. Statt
+nun in jedem Eintrag den exakten Namen der Zeitschrift einzutragen,
+genügt die Zeichenfolge \texttt{\#JTB\#} im Feld \emph{journal}, und
+es ist sichergestellt, dass der Name jedesmal in identischer Schreibweise
+ausgegeben wird.
+
+Der Verweis auf einen String kann an jeder Stelle eines Feldes erscheinen, 
+wobei der Name des Strings immer von einem Paar \texttt{\#}-Zeichen
+eingeschlossen werden muss. Diese Syntax gilt nur für \jabref und
+weicht ein wenig von der \bibtex{}-Syntax ab, die erzeugt wird, wenn
+Sie Ihre Datei speichern. Strings können für alle Standard-\bibtex{}-Felder verwendet werden.
+Unter \menu{Optionen \msep{} Einstellungen \msep{} Allgemein} können Sie im Bereich \menu{Datei} festlegen, ob Strings auch in Nicht-Standard-Feldern benutzt werden dürfen. In diesem Fall können Sie Felder bestimmen, die von der Auflösung der Strings ausgenommen werden; hierbei wird empfohlen, das Feld \texttt{url} und andere Felder anzugeben, die das Zeichen \texttt{\#} enthalten können und die von \bibtex\slash\LaTeX{} verarbeitet werden können.
+
+In derselben Weise kann man auch im Inhalt eines Strings auf einen
+anderen String verweisen, vorausgesetzt, dass der String, auf den
+verwiesen wird, bereits \emph{vorher} definiert ist.
+
+Während die Reihenfolge der Strings in Ihrer \bibtex{}-Datei in einigen
+Fällen wichtig ist, brauchen Sie sich bei der Benutzung von \jabref
+darüber keine Gedanken zu machen. Die Strings werden in alphabetischer
+Reihenfolge im String-Editor aufgelistet und in derselben Reihenfolge
+gespeichert, außer wenn eine andere Reihenfolge von \bibtex{} verlangt
+wird.
+
+\subsection{Abkürzung von Zeitschriftentiteln}
+\label{JournalAbbreviations}
+\begin{quote}
+\emph{Diese Funktion kann unter \menu{Optionen \msep{} Abkürzungen der Zeitschriften verwalten} eingestellt werden.}
+\end{quote}
+\jabref kann automatisch zwischen Zeitschriftentiteln in abgekürzter und ausführlicher Form hin- und herschalten, sofern die Titel in einer Ihrer Zeitschriftenlisten enthalten ist. Sie können mehrere dieser Listen benutzen, die Sie als externe Textdateien anlegen.
+
+\subsubsection{Benutzungshinweise}
+
+Die Abkürzung von Zeitschriftentiteln können Sie vom Eintragseditor oder vom Menü \menu{Extras} aus ein- und ausschalten. Im Eintragseditor benutzen Sie dazu den Button \menu{Abkürzung an-/abschalten} neben dem \emph{Journal}-Feld. Es wird zwischen drei Modi hin- und hergeschaltet:
+\begin{itemize}
+    \item Kompletter Name, z.\,B. ">Aquacultural Engineering"<
+    \item \textls{ISO}-Abkürzung, z.\,B. ">Aquacult. Eng."<
+    \item \textls{MEDLINE}-Abkürzung, z.\,B. ">Aquacult Eng"<
+\end{itemize}
+Falls der Zeitschriftentitel sich nicht in Ihren Zeitschriftenlisten findet, wird das Feld nicht verändert.
+
+Um die Zeitschriftentitel mehrerer Einträge auf einmal zu konvertieren, können Sie eine beliebige Anzahl von Einträgen auswählen und im Menü \menu{Extras} einen der Einträge \menu{Zeitschriftentitel abkürzen (ISO)}, \menu{Zeitschriftentitel abkürzen (MEDLINE)} und \menu{Abkürzung der Zeitschriften aufheben} wählen.
+Diese drei Aktionen sorgen dafür, dass bei allen ausgewählten Einträgen die Zeitschriftentitel, die in den Zeitschriftenlisten gefunden werden konnten, abgekürzt oder komplett ausgeschrieben werden.
+
+\subsubsection{Zeitschriftenlisten verwalten}
+
+Sie können mehrere Zeitschriftenlisten als externe Textdateien benutzen, die mit \jabref verlinkt sind. Die primäre Liste kann in \jabref selbst verwaltet werden.
+
+\paragraph{Ihre persönliche Zeitschriften-Abkürzungsliste}
+
+Ihre persönliche Liste verwalten Sie im oberen Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel}.
+Wählen Sie \menu{Neue Datei} und geben einen Dateinamen ein oder klicken auf den \menu{Durchsuchen}-Button. Wenn Sie bereits eine Datei haben, die Sie als Grundlage nehmen wollen, wählen Sie stattdessen \menu{Bestehende Datei} und benutzen den \menu{Durchsuchen}-Button zum Auswählen dieser Datei. Die Tabelle zeigt dann den Inhalt der Liste, die Sie ausgewählt haben.
+
+Sie können mit Hilfe der \menu{+} und \menu{--} Buttons an der rechten Seite Einträge hinzufügen oder entfernen. Für jeden Eintrag müssen Sie den vollständigen Zeitschriftentitel und die ISO-Abkürzung angeben (z.\,B. ">Aquacultural Engineering"< und ">Aquacult. Eng."<). Mit einem Doppelklick auf die Tabellenzeile können Sie die Einträge bearbeiten.
+
+Sobald Sie auf \menu{OK} klicken (oder wenn Sie eine bestehende Datei ausgewält haben), enthält die Tabelle mindestens eine Zeile. Der Tabelleninhalt wird in die ausgewählte Datei geschrieben und die Zeitschriftenliste von \jabref wird aktualisiert.
+
+\paragraph{Externe Zeitschriftenlisten}
+
+Zusätzlich zu Ihrer persönlichen Liste können Sie mehrere externe Listen verlinken. Diese Verknüpfungen werden im unteren Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel} verwaltet. Externe Listen sind den persönlichen Listen ähnlich~-- der einzige Unterschied ist, dass Sie nicht mit \jabref selbst verwaltet werden können.
+
+Um eine externe Liste hinzuzufügen, klicken Sie zunächst auf den \menu{+} Knopf, falls nötig (das fügt eine weitere Zeile hinzu). Dann benutzen Sie entweder den \menu{Durchsuchen}- oder den \menu{Herunterladen}-Button.
+    \begin{itemize}
+    \item Mit dem \menu{Durchsuchen}-Knopf können Sie eine auf Ihrem Computer bestehende Datei auswählen.
+    \item Mit dem \menu{Herunterladen}-Knopf können Sie eine Liste aus dem Internet herunterladen, indem Sie einen URL angeben. Die Datei wird auf Ihrem Computer gespeichert und mit \jabref verlinkt.
+    Der URL ist standardmäßig die Adresse einer Zeitschriftenliste auf der \jabref-Homepage. Diese Liste ist unvollständig, wird in Zukunft aber ausgebaut.
+    \end{itemize}
+Jeder Eintrag in Ihrer persönlichen Liste überschreibt einen Eintrag mit demselben vollständigen Zeitschriftentitel in einer Ihrer externen Listen. In ähnlicher Weise werden die externen Listen in der Reihenfolge, wie sie aufgelistet werden, abgearbeitet.
+
+\subsection{Wortauswahl verwalten}
+
+\label{ContentSelectorHelp}Diese Funktion ermöglicht es, eine Auswahl
+von oft benutzten Wörtern oder Phrasen zu speichern. In der Standardeinstellung
+ist sie für die Felder \emph{journal}, \emph{keywords} und \emph{publisher}
+aktiviert, aber Sie können die Funktion auch in anderen Feldern verwenden,
+indem Sie diese Felder im oberen Teil des Dialogs \menu{Extras} \msep{}
+\menu{Wortauswahl verwalten} hinzufügen.
+
+Die Wortauswahl gilt nur für die jeweilige Datei und wird daher zusammen
+mit den Literaturangaben in der \bibtex{}-Datei gespeichert. Jedes
+Feld mit Wortauswahl erhält im Eintrags-Editor einen gesonderten Bereich
+mit einer Auswahlliste und der Schaltfläche \menu{Verwalten}. Wenn
+Sie die Auswahlliste mit der Maus anklicken, erscheint eine Liste
+der für dieses Feld verfügbaren Wörter. Sobald Sie auf das gewünschte
+Wort klicken, wird es in das entsprechende Feld geschrieben.
+
+Um ein neues Wort hinzuzufügen, schreiben Sie es einfach in das Auswahlfeld
+(über der Schaltfläche \menu{Verwalten}) und drücken ENTER. Im Dialog
+\menu{Verwalten} können Sie hinzugefügte Wörter auch wieder löschen.
+
+
+\subsection{Import}
+
+\subsubsection{Import-Kontrollfenster}
+
+\label{ImportInspectionDialog}Beim Importieren neuer Einträge aus
+einem unterstützten Format oder beim Herunterladen von Einträgen aus
+dem Internet werden diese Einträge zunächst im Import-Kontrollfenster
+gezeigt. Zu diesem Zeitpunkt wurden noch keine Einträge zu einer geöffneten
+Datei hinzugefügt.
+
+Im Kontrollfenster können Sie Einträge entfernen, die nicht übernommen
+werden sollen, und einige einfache Arbeiten durchführen wie etwa das
+Generieren von \bibtex{}-Keys für die Einträge oder das Zuordnen von
+Einträgen zu Gruppen. Wenn Sie in eine bestehende Datei importieren,
+ist es oftmals leichter, diese Arbeiten durchzuführen, bevor die neuen
+Einträge zwischen die bereits bestehenden sortiert wurden.
+
+\subsubsection[EndNote -> \jabref]{EndNote $\to$~\jabref}\label{subsubsec:endnote-jabref}
+
+EndNote hat einen Export-Stil \bibtex{}, der allerdings nicht alle
+Eintragstypen und Felder von \bibtex{} und auch nicht die zusätzlich
+von \jabref genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
+\emph{key} usw.) unterstützt. Falls Sie diese Felder nutzen wollen,
+verwenden Sie die EndNote Extras (\menu{Extras \msep{} EndNote Filter-Set entpacken}), extrahieren die Zip-Datei,
+die dabei erstellt wird und folgen den Anweisungen in der Datei \texttt{readme.txt}.
+
+\subsection{Export}
+\subsubsection[\jabref -> EndNote]{\jabref $\to$~EndNote}
+\label{EndnoteFilters}
+
+\begin{quote}
+\emph{\jabref kann Dateien so exportieren,
+dass EndNote sie lesen kann. Um diese Funktion zu nutzen, wählen Sie
+\menu{Datei \msep{} Exportieren}, dann bei \emph{Dateityp} \menu{Endnote} und
+geben den Namen der Export"=Datei an.}
+\end{quote}
+Der Standard"=Importfilter von EndNote kann nicht richtig mit mehreren
+Autoren oder Editoren umgehen. Es gibt zwei Möglichkeiten, um diese
+Schwierigkeit zu umgehen:
+
+\begin{enumerate}
+\item Benutzen Sie den eingebauten Filter und bessern Sie die Datei später
+aus.
+
+Um die Datei in EndNote zu öffnen, erstellen Sie eine neue Datei oder
+öffnen eine bestehende Datei in EndNote. Dann wählen Sie \menu{Datei}
+\msep{} \menu{Importieren}, klicken mit der Maus auf \menu{Datei wählen},
+wählen die aus \jabref exportierte Datei aus und drücken auf \menu{Auswählen}.
+Anschließend drücken Sie auf \menu{Import Optionen} und wählen \menu{EndNote Import}.
+Mit einem Klick auf \menu{Importieren} starten Sie den Importvorgang.
+Anschließend gehen Sie zum Menüpunkt \menu{Bearbeiten} \msep{} \menu{Text ändern}
+und ändern \emph{Any Field} in \emph{Author}. Geben Sie \lstinline{_and_}
+in das Suchfeld ein (die Unterstriche stehen für Leerzeichen) sowie ein RETURN-Zeichen
+in das Feld \emph{Ändern} (Option-Return unter Mac OS X, STRG-Return unter
+Windows XP). Dann klicken Sie auf \menu{Ändern}. Wiederholen Sie
+das Ganze für das Feld \emph{Secondary Author} (Zweiter Autor).
+
+\item Installieren Sie den \emph{EndNote Import from JabRef Filter}.
+
+Folgen Sie den Anweisungen im Abschnitt \nameref{EndNote_erweitert}. Um die Datei in
+EndNote zu öffnen, erstellen Sie eine neue Datei oder öffnen eine
+bestehende Datei in EndNote. Dann wählen Sie \menu{Datei} \msep{}
+\menu{Importieren}, klicken auf \menu{Datei wählen}, wählen die
+exportierte Datei aus und drücken auf \menu{Auswählen}. Anschließend
+drücken Sie auf \menu{Import Optionen} und wählen \menu{EndNote Import from JabRef}.
+(Falls dieser Eintrag nicht erscheint, wählen Sie \menu{Weitere Filter}.
+Wenn er dann immer noch nicht erscheint, wurde der Filter nicht korrekt
+installiert.) Klicken Sie schließlich auf \menu{Importieren}, um
+den Importvorgang zu starten.
+
+\end{enumerate}
+Der EndNote Exportfilter ordnet \bibtex{}-Eintragstypen folgenden
+EndNote-Re\-fe\-renz\-ty\-pen zu:
+
+\medskip{}
+\begin{center}\begin{tabular}{ll}
+\textbf{\bibtex{}-Eintragstyp}&
+\textbf{Endnote-Referenztyp}\tabularnewline
+misc, other&
+Generic\tabularnewline
+unpublished&
+Manuscript\tabularnewline
+manual&
+Computer Program\tabularnewline
+article&
+Journal Article\tabularnewline
+book&
+Book\tabularnewline
+booklet&
+Personal Communication\tabularnewline
+inbook, incollection&
+Book Section\tabularnewline
+inproceedings&
+Conference Proceedings\tabularnewline
+techreport&
+Report\tabularnewline
+mastersthesis, phdthesis~&
+Thesis\tabularnewline
+\end{tabular} \end{center}
+\medskip{}
+
+\noindent In der Standardeinstellung geht der Exportfilter davon aus,
+dass Einträge in den Feldern \emph{author} oder \emph{editor}, die
+geklammert sind, mehrere Autoren enthalten und ersetzt die Klammern
+durch ein angehängtes Komma. Dadurch werden Einträge, die \LaTeX{}-Befehle
+mit Klammern enthalten, als Eintrag mit mehreren Autoren gewertet
+und demzufolge unpassend formatiert.
+
+\subsubsection{Erweiterte Benutzung: EndNote Extras}
+
+\label{EndNote_erweitert}Einige Felder, die von \bibtex{} genutzt
+werden, gehören nicht zu EndNotes vorgegebenen Referenztypen. Während
+der Import in \jabref und der Export nach \jabref ohne ein Ändern
+der Referenztypen funktioniert, werden die Feldnamen in EndNote nicht
+korrekt dargestellt (z.\,B. wird das PDF-Feld \emph{Custom 1} heißen
+statt \emph{pdf}). Darüber hinaus können diese Felder bei neuen Einträgen
+in EndNote nicht genutzt werden, weil sie nicht im Eintragsdialog
+erscheinen. Der vorgegebene Importfilter von EndNote kann darüberhinaus
+das Feld \emph{author} nicht richtig analysieren. Der \emph{EndNote
+Import from JabRef Filter} kann dies. Außerdem erkennt dieser Filter
+ein Feld \texttt{endnotereftype}, das die vorgegebene Zuordnung überschreibt.
+Um den Filter zu installieren, nutzen Sie die EndNote Extras
+(\menu{Extras \msep{} EndNote Filter-Set entpacken})
+und entpacken die Zip-Datei, die dabei erstellt wird. Dann folgen
+Sie den Angaben in der Datei \texttt{readme.txt}.
+
+\subsubsection{\jabref-Bibliographien in OpenOffice.org benutzen}
+\label{Export-OOo}
+\jabref kann Ihre Datei sowohl in das OpenOffice.org 1.1 \texttt{.sxc}"=Tabellenkalkulationsformat als auch in das OpenDocument \texttt{.ods}"=Tabellenkalkulationsformat, das von OpenOffice.org 2.0 benutzt wird, exportieren.
+
+In beiden Fällen besteht die exportierte Tabelle aus einem Arbeitsblatt, das die Einträge in Reihen
+und die unterschiedlichen Felder in Spalten enthält. Die Reihenfolge und Benennung der Spalten ist kompatibel
+zu den Literaturverzeichnis-Funktionen von OpenOffice.org (OOo 1.1: \texttt{.sxc}, OOo 2.0: \texttt{.ods}).
+
+Je nach Ihrer Version von OpenOffice.org gibt es verschiedene
+    Vorgehensweisen, um JabRef zum Verwalten Ihrer bibliographischen
+    Datenbank zu benutzen:
+
+    \paragraph{Die exportierte Datei als bibliographische Datenbank in
+    OpenOffice.org 2.3 und 2.4 benutzen}
+
+    Mit folgenden Schritten können Sie eine aus \jabref exportierte
+    Tabelle als bibliographische Datenbank benutzen:
+
+  \begin{itemize}
+	  \item Exportieren Sie in \jabref Ihre Datei in das \texttt{.ods}-Format
+    \item Öffnen Sie OpenOffice.org Writer
+    \item Wählen Sie \menu{Bearbeiten} \msep{} \menu{Datenbank austauschen}. Klicken Sie auf
+    \menu{Durchsuchen} und wählen die Datei, die Sie in das \texttt{.ods}-Format
+    exportiert haben.
+    \item Klicken Sie auf das \menu{+} vor dem Namen der Datenbank, anschließend
+    auf den angezeigten Dateinamen und schließlich auf den Knopf \menu{Festlegen}.
+    \item Wählen Sie \menu{Extras} \msep{} \menu{Optionen} \msep{} \menu{OpenOffice.org Base} \msep{}
+    \menu{Datenbanken}. In diesem Fenster sollte die Datenbank, die Sie gerade
+    importiert haben, angezeigt werden. Die Standard-Datenbank für Bibliographien
+    von OOo sollte ebenfalls angezeigt werden (Bibliography).
+    \item Klicken Sie auf \menu{Bearbeiten} und ändern Sie den Namen der Datenbank
+    \emph{Bibliography}, z.\,B. zu \emph{Bibliography-old} (denn OpenOffice.org
+    kann nicht mit mehreren bibliographischen Datenbanken arbeiten).
+    \item Wählen Sie anschließend Ihre bibliographische Datenbank und benennen Sie sie um in
+    \emph{Bibliography} (achten Sie auf einen Großbuchstaben am Anfang des Namens).
+  \end{itemize}
+    Nach diesen Schritten sollte Ihre bibliographische Datenbank zur Benutzung
+    mit OpenOffice.org bereit sein. Um das zu prüfen, wählen Sie \menu{Einfügen} \msep{}
+    \menu{Verzeichnisse} \msep{} \menu{Literaturverzeichniseintrag\ldots}. Im folgenden Dialog sollten
+    in der Dropdownliste (unter \menu{Kurzbezeichnung}) die \bibtex-Keys Ihrer
+    Datenbank erscheinen.
+
+\paragraph{Die exportierte Datei als Bibliographiedatenbank in OpenOffice 2.0, 2.1 oder 2.2 benutzen}
+Gehen Sie folgendermaßen vor, um eine Tabelle, die von \jabref exportiert wurde, als Bibliographiedatenbank in OpenOffice.org zu benutzen:
+
+\begin{itemize}
+\item Exportieren Sie Ihre Datenbank in das \texttt{.ods} -Format.
+\item Starten Sie OpenOffice.org.
+\item Wählen Sie \menu{Extras} \msep{} \menu{Optionen} \msep{} \menu{OpenOffice.org Base} \msep{} \menu{Datenbanken}.
+\item Bearbeiten Sie die \emph{Bibliography}-Datenbank und ändern ihren Namen z.\,B. in \emph{Bibliographie-alt}.
+\item Schließen Sie das Fenster \menu{Optionen} und gehen Sie zu \menu{Datei} \msep{} \menu{Neu} \msep{} \menu{Datenbank}.
+\item Dann wählen Sie \menu{Verbindung zu einer bestehenden Datenbank herstellen}, nehmen \menu{Tabellendokument} als
+    Datenbanktyp und wählen die \texttt{.ods}-Datei, die Sie exportiert haben.
+\item Klicken Sie auf \menu{Fertig stellen} und wählen den Namen \emph{Bibliography} im Speicherdialog.
+\end{itemize}
+Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}. Ihre Datenbank sollte nun angezeigt werden.
+
+\paragraph{Eine exportierte Datei als Datenbank in OpenOffice 1.1.x benutzen}
+
+\begin{itemize}
+\item Exportieren Sie Ihre Datei in das \texttt{.sxc}-Format.
+\item Starten Sie OpenOffice.org.
+\item Wählen Sie \menu{Extras} \msep{} \menu{Datenquellen}.
+\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen beispielsweise in \emph{Bibliographie-alt}. 
+\item Drücken Sie \menu{Anwenden}.
+\item Klicken Sie \menu{Neue Datenquelle}. Ein neuer Eintrag erscheint. Ändern Sie den Namen zu \emph{Bibliography}.
+\item Ändern Sie den \menu{Dateityp} zu \menu{Tabelle}. Klicken Sie den \menu{\ldots}-Button in der Zeile \menu{Datenquellen URL}. Wählen Sie die \texttt{.sxc}-Datei, die Sie exportiert haben.
+\item Klicken Sie auf \menu{OK}, um das Fenster \menu{Datenquellen} zu schließen.
+\end{itemize}
+Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}.
+Ihre Datenbank sollte nun angezeigt werden.
+
+\subsubsection{Klartext-Import}
+
+\begin{quote}
+\emph{Sie können aus einfachen Text-Dateien oder der Zwischenablage
+einen Importvorgang starten, indem Sie \menu{BibTeX}} \msep{} \emph{\menu{Neuer Eintrag aus Klartext}
+oder die Tastenkombination STRG-SHIFT-N wählen.}
+\end{quote}
+Dieser Dialog ermöglicht das schnelle Einfügen von Einträgen aus normalem
+Text. Wählen Sie zunächst aus, welcher Eintragstyp erstellt werden
+soll. Fügen Sie dann einfach Text aus der Zwischenablage ein (über das
+Kontextmenü im Textfeld mit der Wasserzeichenschrift >>Text einfügen<<
+oder über den Button \menu{Einfügen}). Alternativ können Sie über den Button
+\menu{Datei öffnen} eine Datei auswählen, um sie in den Dialog zu laden.
+
+Jetzt markieren Sie z.\,B. den Textbereich, der zum Titel des neuen
+Eintrags werden soll, und führen im rechten Teil des Dialogfensters
+im Bereich \menu{Verfügbare BibTeX"=Felder} einen Doppelklick auf \emph{title} aus.
+So gehen Sie für alle weiteren Felder des neuen Eintrags vor. Sie
+können einem Feld natürlich auch mehrere Textbereiche zuordnen. Achten
+Sie dazu darauf, dass die Option \menu{anfügen} aktiviert ist, ansonsten
+wird bei jedem neuen Zuweisen von Textbereichen das Feld überschrieben
+(Option \menu{überschreiben}).
+
+Bereits zugewiesene Textteile werden im Tab \menu{Importtext} blau
+hervorgehoben. Um zu kontrollieren, welche Textbereiche Sie einem
+bestimmten \bibtex{}-Feld zugewiesen haben, wählen Sie das Feld im
+rechten Bereich aus; der zugeordnete Text wird nun rot hervorgehoben.
+
+Sie können sich das Ergebnis des Importvorgangs jederzeit im Tab \menu{BibTeX"=Quelltext}
+des Importdialogs ansehen. Hier können keine Änderungen vorgenommen
+werden; das ist erst möglich, sobald der Text tatsächlich importiert
+und ein neuer Eintrag angelegt wurde. Auf mögliche Fehler werden Sie
+im Tab \menu{Hinweise und Warnungen} aufmerksam gemacht.
+
+Haben Sie alle Textstellen den gewünschten \bibtex{}-Feldern zugewiesen,
+klicken Sie auf die Schaltfläche \menu{Übernehmen}. Nun erstellt
+\jabref den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
+hat.
+
+\subsection{Links zu PDF- und \texorpdfstring{PS"=Dateien}{PS-Dateien}, URLs und DOIs}
+\label{ExternalFiles}
+
+\tip[Anmerkung: ]{Ab \jabref 2.3 gibt es ein verbessertes System für Links zu externen Dateien; siehe dazu den Abschnitt ">\nameref{FileLinks}"<.}
+
+\noindent Mit \jabref können Sie Ihre Einträge mit
+den entsprechenden PDF- oder PS-Dateien, die sich auf Ihrem Computer
+befinden, verlinken. Ebenso ist es möglich, Dateien im Internet über
+einen URL oder DOI zu verlinken.
+
+
+\subsubsection{Externe Betrachter einrichten}
+
+\jabref benötigt Informationen darüber, welche Programme es für
+PDF- und PS"=Dateien und Internetseiten benutzen soll. In der Standardeinstellung
+werden sie auf Werte gesetzt, die wahrscheinlich zu Ihrem Betriebssystem
+passen, so dass eine gute Chance besteht, dass Sie diese Werte nicht
+zu verändern brauchen.
+
+\begin{quote}
+\emph{Um die Einstellungen der externen Programme zu ändern, öffnen
+Sie den Unterpunkt \menu{Externe Programme} im Dialog \menu{Optionen}}
+\msep{} \emph{\menu{Einstellungen}.}
+\end{quote}
+
+\subsubsection{Externe Dateien oder Links öffnen}
+
+Es gibt verschiedene Möglichkeiten, wie man externe Dateien oder Internetseiten
+aus \jabref öffnen kann. Im Eintrags-Editor können Sie einfach
+auf das Textfeld, das einen DOI oder URL enthält, doppelklicken. In
+der Tabellenansicht können Sie einen Eintrag auswählen und die Menüeinträge
+(unter \menu{Extras}), die Tastenkombinationen (in der Standardeinstellung
+F4 für PDF/PS und F3 für DOI/URL) oder das Kontextmenü (mit der rechten
+Maustaste) benutzen, um die Datei oder Internetseite zu öffnen. Schließlich
+können Sie auch auf ein PDF-, PS-, URL- oder DOI-Icon in der Tabelle
+klicken.
+
+In der Standardeinstellung zeigt die Tabellenansicht zwei Spalten
+mit Icons für die Einträge, die mit externen Dateien oder URLs verlinkt
+sind. Beide Spalten können im Unterpunkt \menu{Tabellenansicht} des
+Dialogs \menu{Optionen} \msep{} \menu{Einstellungen} ausgeblendet
+werden. Die zweite Spalte zeigt Icons für PDF- oder PS-Dateien (nur
+PDF, wenn beide vorhanden sind), die dritte Spalte zeigt Icons für
+URL oder DOI (nur URL, wenn beide vorhanden sind).
+
+
+\subsubsection{Der Standard-Ordner für PDF-Dateien}
+
+PDF-Dateien erhalten von \jabref eine >>Spezialbehandlung<<,
+um das Verlinken mit den entsprechenden Einträgen so einfach wie möglich
+zu gestalten. Um diese >>Spezialbehandlung<< nutzen zu können, müssen
+Sie im Unterpunkt \menu{Externe Programme} des Dialogs \menu{Optionen}
+\msep{} \menu{Einstellungen} einen Ordner als Standard-Ordner für
+Ihre PDF-Dateien angeben. Alle PDF-Dateien, die in diesem Ordner oder
+einem Unterordner gespeichert sind, werden mit einer relativen Pfadangabe
+referenziert, so dass Sie problemlos PDF-Verzeichnisse verschieben
+oder mit mehreren Benutzern von verschiedenen Netzwerkarbeitsplätzen
+aus an derselben Datei arbeiten können.
+
+Wenn Sie Ihren PDF-Dateien dann noch Namen geben, die mit dem \bibtex{}-Key
+des entsprechenden Eintrags übereinstimmen (abgesehen von der Dateiendung \texttt{.pdf}), 
+sucht \jabref in Ihrem Standard-PDF-Ordner und dessen
+Unterordnern nach der richtigen PDF-Datei. Sobald die korrekt benannte
+PDF-Datei sich dort befindet, klicken Sie auf die Schaltfläche \menu{Auto}
+neben dem PDF-Feld im Eintrags-Editor. Wenn die PDF-Datei gefunden
+wird, wird das Feld entsprechend gesetzt.
+
+Wenn Sie eine PDF-Datei wie beschrieben benennen, können Sie sie auch
+öffnen, ohne das PDF-Feld überhaupt zu benutzen. Der Nachteil ist
+in diesem Fall allerdings, dass das PDF-Icon in der Tabellenansicht
+nicht angezeigt wird, solange das PDF-Feld leer bleibt.
+
+\subsubsection{Dateispezifische PDF- und PS-Verzeichnisse}
+
+Sie können für jede Datei eigene PDF- und PS-Verzeichnisse angeben \emph{(}\menu{Datei \msep{} Eigenschaften der Datei}\emph{)}. Diese Verzeichnisse ersetzen dann die Standardverzeichnisse.
+
+\subsubsection{Die Suche mit regulären Ausdrücken für automatische Verknüpfungen nutzen}
+\label{RegularExpressionSearch}
+
+Wenn Sie Dateinamen verwenden, die dem bibtexkey ergänzt um die Dateiendung entsprechen, findet \jabref diese Dateien automatisch.
+
+Ab Version~2.2 ist mit Hilfe von regulären Ausdrücken eine größere Flexibilität beim Benennen der Dateien gewährleistet. In den meisten Fällen dürfte das Standardverhalten bereits ausreichend sein.
+
+In den Einstellungen zu externen Programmen \emph{(}\menu{Optionen \msep{} Einstellungen \msep{} Externe Programme}\emph{)} findet sich eine Option ">Suche mit regulärem Ausdruck benutzen"<. Wenn Sie diese Option aktivieren, können Sie für die Suche in PDF-Verzeichnissen einen eigenen regulären Ausdruck angeben.
+
+Die folgende Syntax wird verwendet:
+
+\begin{labeling}{MextensionM}
+  \item [\texttt{*}] Suche in allen direkten Unterverzeichnissen, NICHT im aktuellen Verzeichnis und in Unterverzeichnissen zweiter oder tieferer Ebene.
+  \item [\texttt{**}] Rekursive Suche in allen Unterverzeichnissen UND im aktuellen Verzeichnis.
+  \item [\texttt{.}] Das aktuelle Verzeichnis.
+  \item [\texttt{..}] Das Elternverzeichnis (eine Ebene höher).
+  \item [\texttt{{[}title{]}}] Alle Ausdrücke in eckigen Klammern werden durch den Inhalt des entsprechenden Felds ersetzt.
+  \item [\texttt{{[}extension{]}}] Wird durch die Dateiendung des Feldes, das Sie benutzen, ersetzt.
+  \item Anderer Text wird als regulärer Ausdruck interpretiert. Aber Vorsicht: \emph{backslashes} müssen mit einem weiteren \emph{backslash} \emph{escaped} werden (\texttt{\textbackslash\textbackslash}), damit sie nicht mit Separatoren in Pfad-Angaben verwechselt werden.
+\end{labeling}
+Der Standard ist \lstinline{**/.*[bibtexkey].*\\.[extension]}. Damit wird in allen Unterverzeichnissen des Ordners der entsprechenden Dateiendung (z.\,B. das PDF-Verzeichnis) nach allen Dateien mit der richtigen Dateiendung gesucht, die den bibtexkey in ihrem Namen haben.
+
+\subsection{Links zu externen Dateien (ab Version 2.3)}
+\label{FileLinks}
+
+\jabref lässt Sie Ihre Einträge mit Dateien jeden Typs verlinken, die Sie auf Ihrem System gespeichert haben. Außerdem sind Links zu Dokumenten im Internet in der Form eines URL oder eines DOI möglich. Jedem Eintrag kann eine beliebige Anzahl von Datei-Links zugeordnet werden und jede verlinkte Datei kann schnell aus JabRef heraus geöffnet werden.
+
+Was \bibtex angeht, werden die Datei"=Links eines Eintrags in ein einzelnes Feld geschrieben. In \jabref erscheinen sie aber als editierbare Liste von Links, die im Eintrags"=Editor zugänglich sind.
+
+\subsubsection{Einrichten der Dateitypen}
+
+Für jeden Datei"=Link muss ein Dateityp gewählt werden, damit das richtige Programm zum Öffnen der Datei und das entsprechende Icon gefunden werden. Die Liste der Dateitypen können Sie einsehen und bearbeiten, indem Sie \menu{Optionen \msep Externe Dateitypen verwalten} wählen oder auf die Schaltfläche \menu{Externe Dateitypen verwalten} im Bereich \menu{Externe Programme} des Einstellungs"=Dialogs klicken.
+
+Ein Dateityp besteht aus einem Namen, einem graphischen Icon, einer Dateierweiterung und einer Anwendung zum Öffnen der Dateien. Wenn Sie Windows benutzen, können Sie den Namen der Anwendung weglassen, wenn Sie das Standardprogramm verwenden wollen.
+
+\subsubsection{\texorpdfstring{Datei"=Links}{Datei-Links} zu einem Eintrag hinzufügen}
+
+Wenn bei den Allgemeinen Feldern (siehe Abschnitt~\ref{GeneralFields}) das Feld \texttt{file} eingetragen ist, können Sie die Liste der externen Links im \nameref{EntryEditorHelp} bearbeiten. Der Editor hat dann Schaltflächen zum Einfügen, Bearbeiten, Löschen und Sortieren der Links.
+
+Eine Datei kann mit Hilfe der \menu{Auto}"=Schaltfläche automatisch verlinkt werden, falls sie in Ihrem Dateiverzeichnis (\menu{Einstellungen \msep Externe Programme \msep Links zu externen Dateien \msep Hauptverzeichnis}) oder einem Unterordner liegt, eine Dateierweiterung hat, die \jabref bekannt ist, und einen Namen hat, der mit dem BibTeX"=Key des Eintrags übereinstimmt. Die Regeln, nach denen Dateinamen mit BibTeX"=Keys automatisch verknüpft werden, können eingestellt werden unter \menu{Einstellungen \msep Externe Programme \msep Links zu externen Dateien \msep Suche mit regulärem Ausdruck benutzen}.
+
+Um eine Datei herunterzuladen und mit einem Eintrag zu verlinken, benutzen Sie die Schaltfläche \menu{Download} im Eintrags"=Editor. Es erscheint ein Dialog, in dem Sie den URL eingeben müssen. Die Datei wird dann in Ihr Hauptverzeichnis gespeichert, anhand des BibTeX-Keys benannt und mit dem Eintrag verknüpft.
+
+\subsubsection{Externe Dateien öffnen}
+
+Es gibt mehrere Möglichkeiten, externe Dateien oder Internetseiten zu öffnen. In der Tabellenansicht können Sie einen Eintrag auswählen und mit dem Menü, einem Tastenkürzel oder dem Kontextmenü den ersten externen Link öffnen. Falls in der Tabellenansicht die Spalte \texttt{file} angezeigt wird (\menu{Einstellungen \msep Tabellenansicht \msep Spezielle Spalten \msep Datei"=Spalten anzeigen}), können Sie auch auf das Icon klicken, um den ersten Link eines Eintrags zu öffnen. Um weitere Links zu öffnen, klicken Sie mit der rechten Maustaste auf das Icon (Mac OS X: \menu{Strg-Klick}); es erscheint dann ein Menü mit allen Links.
+
+\subsection{XMP-Metadaten}
+\label{XMPHelp}
+
+XMP ist ein Standard, der von Adobe Systems entwickelt wurde, um Metadaten (Daten, die Informationen über andere Daten enthalten) in Dateien zu speichern. Ein bekanntes Beispiel für Metadaten sind ID3-Tags, die zur Beschreibung von Künstlern, Albumtiteln und Liednamen einer MP3-Datei verwendet werden. Mit Hilfe von Metadaten können MP3-Dateien unabhängig von ihrem Dateinamen identifiziert und z.B. von MP3-Playern ausgelesen und angezeigt werden.
+
+Mit der XMP-Unterstützung versucht das \jabref-Team, die Vorteile von Metadaten in die Welt der Literaturmanager einzuführen. Sie können \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors wählen und damit alle \bibtex{}"=Informationen in die verlinkte PDF-Datei schreiben. Wenn Sie diese PDF-Datei mit anderen austauschen, können diese die Datei in das \jabref-Fenster ziehen und haben damit alle Informationen zur Verfügung, die Sie eingegeben haben.
+
+\subsubsection{Benutzung}
+
+Um die XMP-Funktionen in \jabref zu nutzen, gehen Sie folgendermaßen vor:
+
+\begin{itemize}
+  \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref ziehen.
+  \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors (neben dem \emph{pdf}"=Feld).
+  \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
+  \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net\slash bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
+  \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. Rufen Sie dazu auf der Kommandozeile einfach \lstinline{pdfinfo -meta <PDF-Datei>} auf, dann werden die entsprechenden Metadaten angezeigt.
+\end{itemize}
+
+\subsubsection{bibteXMP Dateiformat}
+
+XMP nutzt zum Speichern der Daten eine Teilmenge des \emph{Resource Description Framework} (RDF). Für \jabref wird ein neues Metadatenformat benutzt, das \bibtex{} sehr gut abbildet. Alle Felder und Werte werden in Knoten eines XML-Dokuments verwandelt. Nur Autoren und Herausgeber werden als \texttt{rdf:Seq}-Strukturen gespeichert, so dass die trennenden ">and"< weggelassen werden können. Alle Strings und crossrefs werden in den Metadaten aufgelöst.
+ 
+Das folgende einfache Minimal-Schema wird benutzt:
+\begin{itemize}
+  \item Der \bibtex{}-Key wird als \texttt{bibtexkey} gespeichert.
+  \item Der Eintragstyp wird als \texttt{entrytype} gespeichert.
+  \item \texttt{author} und \texttt{editor} sind kodiert als \texttt{rdf:Seq}, wobei die einzelnen Autoren und Herausgeber als \texttt{rdf:li}s dargestellt werden.
+  \item Alle anderen Felder werden unter ihrem Feld-Namen gespeichert.
+\end{itemize}
+
+Es folgt ein Beispiel:
+\begin{lstlisting}
+@INPROCEEDINGS{CroAnnHow05,
+  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+  title = {Effective work practices for floss development: A model and propositions},
+  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+  year = {2005},
+  owner = {oezbek},
+  timestamp = {2006.05.29},
+  url = {http://james.howison.name/publications.html}
+}
+\end{lstlisting}
+
+wird umgewandelt in
+
+\begin{lstlisting}
+&lt;rdf:Description xmlns:bibtex=&quot;http://jabref.sourceforge.net/bibteXMP/&quot;
+    bibtex:bibtexkey=&quot;CroAnnHow05&quot;
+    bibtex:year=&quot;2005&quot;
+    bibtex:title=&quot;Effective work practices for floss development: A model and propositions&quot;
+    bibtex:owner=&quot;oezbek&quot;
+    bibtex:url=&quot;http://james.howison.name/publications.html&quot;
+    bibtex:booktitle=&quot;Hawaii International Conference On System Sciences (HICSS)&quot;
+    bibtex:timestamp=&quot;2006.05.29&quot;&gt;
+        &lt;bibtex:author&gt;
+            &lt;rdf:Seq&gt;
+                &lt;rdf:li&gt;K. Crowston&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;H. Annabi&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;J. Howison&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;C. Masango&lt;/rdf:li&gt;
+            &lt;/rdf:Seq&gt;
+        &lt;/bibtex:author&gt;
+    &lt;bibtex:entrytype&gt;Inproceedings&lt;/bibtex:entrytype&gt;
+&lt;/rdf:Description&gt;
+\end{lstlisting}
+
+Wenn Sie bibteXMP parsen möchten, beachten Sie, dass in RDF Attribut-Wert-Paare auch als Knoten wiedergegeben werden können und vice versa.
+
+\subsubsection{Weiterführende Links}
+
+Einige Links zu XMP und PDFs mit Anmerkungen (englisch):
+
+\begin{itemize}
+  \item James Howison's Blog \href{http://freelancepropaganda.com/themp/}{">Themp---Managing Academic Papers like MP3s"<}
+  \item \href{http://www.xml.com/pub/a/2004/09/22/xmp.html}{XML.com-Artikel} zu XMP
+  \item \href{http://jempbox.org}{JempBox} und \href{http://pdfbox.org}{PDFBox} von Ben Litchfield (Java libraries zum Zugriff auf die PDFs und die Metadaten)
+  \item Gute \href{http://episteme.arstechnica.com/eve/ubb.x/a/tpc/f/8300945231/m/377001889631}{Diskussion bei ArsTechnica} zum Management von PDFs.
+  \item \href{http://partners.adobe.com/public/developer/en/xmp/sdk/xmpspecification.pdf}{Adobe XMP Spezifikation}
+\end{itemize}
+
+\subsection{\jabref und Online-Datenbanken}
+
+\subsubsection{CiteSeer}
+
+\label{CiteSeerHelp}
+\tip[]{CiteSeer ist eine digitale Bibliothek und Suchmaschine für wissenschaftliche Literatur, vornehmlich zu den Bereichen Computer und Informatik.}
+Mit \jabref lassen sich Informationen zu einer bestimmten
+Literaturangabe aus der CiteSeer-Datenbank herunterladen. Um diesen
+Vorgang zu starten, fügen Sie Ihrer Datei einen neuen Eintrag hinzu
+und belegen das Feld \emph{citeseerurl} mit einem Link zur entsprechenden
+Inhaltsseite auf CiteSeer. Das Feld \emph{citeseerurl} muss in einem
+der folgenden Formate eingegeben werden:
+
+\begin{lstlisting}
+http://citeseer.ist.psu.edu/DDDDDD[.html] % oder
+oai:CiteSeerPSU:DDDDDD                    % oder
+DDDDDD
+\end{lstlisting}
+wobei DDDDDD eine Ziffernfolge darstellt. Um diese Ziffernfolge für
+einen CiteSeer-Eintrag zu finden, gehen Sie auf die Dokumentseite
+der Literaturangabe des Formats \texttt{http://citeseer.ist.psu.edu/}\texttt{\emph{nameYearTitle}}\texttt{.html}
+und klicken den (Update)"=Link für diese Literaturangabe. Die URL
+für den Update-Link beinhaltet die numerische ID für diese Literaturangabe.
+
+Sobald Sie das Feld \emph{citeseerurl} belegt haben, können Sie die
+CiteSeer-Felder herunterladen, indem Sie \menu{BibTeX} \msep{} \menu{Felder von CiteSeer importieren}
+auswählen. Achten Sie darauf, dass Sie die Zeile(n) ausgewählt haben,
+die Sie aktualisieren wollen.
+
+\paragraph{Eine Datei mit zitierenden Literaturangaben erzeugen}
+
+Mit einem Satz von Literaturangaben können Sie eine Liste der Dokumente
+erzeugen, die die einzelnen Literaturangaben ihrerseits zitieren. Dazu
+muss jede Literaturangabe der entsprechenden Datenbank-Datei ein
+ausgefülltes citeseerurl-Feld besitzen, dessen Inhalt dem oben
+beschriebenen Format entspricht. Sie können diese Funktion nutzen, indem
+Sie \menu{Zitierende Literatur von CiteSeer abrufen} auswählen.
+
+\subsubsection{Medline}
+\label{MedlineHelp}
+
+\tip[]{MEDLINE ist die wichtigste Datenbank der \emph{U.\,S. National Library of Medicine}. Sie enthält Literaturangaben von Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der Biomedizin.
+\jabref kann Literaturangaben der Medline"=Datenbank
+herunterladen. Um diese Funktion zu nutzen, wählen Sie \menu{Extras
+\msep{} Medline abrufen}, so dass der Medline-Dialog im linken
+Seitenfeld erscheint.}
+Es gibt zwei Möglichkeiten, die Auswahl der Einträge vorzunehmen,
+die heruntergeladen werden sollen:
+
+\begin{enumerate}
+\item Geben Sie eine oder mehr Medline IDs (getrennt durch Komma/Semikolon)
+in das Textfeld ein.
+\item Geben Sie Namen oder Wörter ein, nach denen gesucht werden soll. Sie
+können dazu die Operatoren \texttt{AND} und \texttt{OR} sowie Klammern
+benutzen, um Ihren Suchbegriff zu verfeinern.
+\end{enumerate}
+In beiden Fällen drücken Sie dann ENTER oder die Schaltfläche \menu{Abrufen}.
+Wenn Sie eine Textsuche durchführen, wird Ihnen die Anzahl der gefundenen
+Einträge angezeigt, und Sie können wählen, wie viele Sie herunterladen
+möchten.
+
+Die abgerufenen Einträge werden Ihrer zu diesem Zeitpunkt aktivierten
+Datei zugeordnet.
+
+\subsubsection{IEEEXplore}
+\label{IEEEXploreHelp}
+
+\tip[]{IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.}
+\jabref kann Literaturangaben der IEEEXplore-Datenbank herunterladen.
+Um diese Funktion zu nutzen, wählen Sie \menu{Internet \msep{} IEEEXplore abfragen}
+und geben in dem Dialog, der im linken Bildschirmbereich erscheint, Ihre
+Suchausdrücke ein. Drücken Sie anschließend die
+ENTER-Taste oder den \menu{Abrufen}-Button.
+
+Die Suche wird im Gäste-Modus durchgeführt, es werden also maximal 100 Ergebnisse
+angezeigt.
+
+Sie können die \emph{abstracts} zusammen mit den Literaturangaben herunterladen,
+indem Sie einen Haken bei \menu{Abstracts berücksichtigen} setzen. Das verursacht
+eine deutlich höhere Anzahl von Netzwerk-Anfragen; um die Webseite von IEEEXplore
+nicht übermäßig zu belasten, lädt \jabref \emph{abstracts} nur bei einer Suche,
+deren Ergebnis eine bestimmte Trefferanzahl nicht übersteigt.
+
+\subsubsection{Benutzung eines Proxy-Servers}
+
+Wenn Sie einen HTTP-Proxy-Server benutzen müssen, übergeben Sie den
+Servernamen und die Portnummer an Java. Diese Umgebungseinstellungen
+sind dokumentiert unter
+\href{http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html}{http://java.sun.com/j2se/1.4.2/docs/guide/net/proper\allowbreak ties.html}
+
+\begin{lstlisting}
+java -Dhttp.proxyHost="hostname" -Dhttp.proxyPort="portnumber"
+\end{lstlisting}
+
+\subsection{\jabref mit mehreren Benutzern verwenden}
+
+\jabref bietet einige Funktionen, die besonders dann von Nutzen
+sind, wenn eine Datenbank von mehreren Benutzern~-- z.\,B. über
+ein Netzwerk~-- bearbeitet wird. Das sind vor allem die Felder \emph{owner}
+und \emph{timestamp}.
+
+
+\subsubsection{Zeitstempel \emph{(timestamp)}}
+\label{TimeStampHelp}
+
+\begin{quote}
+\emph{Die Benutzung des Zeitstempels kann unter
+\menu{Einstellungen}} \msep{} \emph{\menu{Allgemein} an- und
+abgestellt sowie verändert werden.}
+\end{quote}
+\jabref kann automatisch das Feld \emph{timestamp} setzen, das
+das Datum enthält, an dem der Eintrag zur Datei hinzugefügt wurde.
+Die Formatierung des Zeitstempels wird von einem Ausdruck mit Bezeichnern
+bestimmt, die die Position verschiedener Bestandteile des Datums angeben.
+Es folgen einige der verfügbaren Bezeichner (die Beispiele in Klammern
+beziehen sich auf Mittwoch, den 14. September 2005, 17:45 Uhr):
+
+\begin{labeling}{00.00.0000}
+\item [\texttt{yy}]Jahr (05)
+\item [\texttt{yyyy}]Jahr (2005)
+\item [\texttt{MM}]Monat (09)
+\item [\texttt{dd}]Tag (14)
+\item [\texttt{HH}]Stunde (17)
+\item [\texttt{mm}]Minute (45)
+\end{labeling}
+Diese Bezeichner können mit Interpunktion und Leerzeichen kombiniert
+werden. Hier einige Beispiele:
+
+\begin{labeling}{dd.MM.yyyy-HH:m}
+\item [\texttt{yyyy.MM.dd}]$\to$ 2005.09.14
+\item [\texttt{yy-MM-dd}]$\to$ 05-09-14
+\item [\texttt{dd.MM.yyyy~HH:mm}]$\to$ 14.09.2005 17:45
+\end{labeling}
+
+\subsubsection{Besitzer \emph{(owner)}}
+
+\label{OwnerHelp}\jabref kann allen neuen Einträgen, die zu einer
+Datei hinzugefügt oder in sie importiert werden, Ihren Benutzernamen
+beigeben. Diese Funktion können Sie im Menü \menu{Einstellungen}
+\msep{} \menu{Allgemein} ein- und ausschalten. Dort können Sie auch
+den Namen angeben, der in den Einträgen erscheinen soll.
+
+In der Standardeinstellung wird Ihr (System-)Benutzername verwendet.
+Der Name wird in dem Feld \emph{owner} eingetragen, das in der Standardeinstellung
+im Tab \emph{General fields} des Eintragseditors angezeigt wird.
+
+
+\subsection{\jabref von der Kommandozeile}
+
+\label{CommandLine}Obwohl \jabref in erster Linie ein Programm
+mit grafischer Benutzeroberfläche ist, bietet es einige nützliche
+Optionen für die Kommandozeile und kann sogar Dateikonvertierungen
+durchführen, ohne die grafische Benutzeroberfläche zu öffnen.
+
+Sie können eine oder mehrere \bibtex{}-Dateien laden, indem Sie auf
+der Kommandozeile die entsprechenden Dateinamen auflisten. Achten
+Sie darauf, alle gewünschten Optionen anzugeben, bevor Sie die Dateinamen
+anfügen. Außerdem müssen Sie sich vergewissern, dass der erste Dateiname
+nicht als Argument einer Option missverstanden werden kann~-- falls
+eine Bool'sche Option wie \texttt{-n} oder \texttt{-l} direkt vor
+einem Dateinamen steht, müssen Sie also \texttt{true} als Argument
+angeben. Das Beispielkommando:
+
+\begin{lstlisting}
+jabref -o filetoexport.xml,docbook -n true original.bib
+\end{lstlisting}
+lädt die Datei \texttt{original.bib}, exportiert sie in das Docbook-Format,
+speichert sie unter dem Namen \texttt{filetoexport.xml} und unterdrückt
+das Laden der grafischen Oberfläche. Das Word \emph{true} verhindert,
+dass der Dateiname als Argument der Option \texttt{-n} interpretiert
+wird.
+
+
+\subsubsection{Kommandozeilen-Optionen}
+\label{kommandozeilenoptionen}
+Im folgenden werden die wichtigsten Optionen und Befehle für die Kommandozeile
+vorgestellt.
+
+\begin{itemize}
+\item Hilfe: \texttt{-h}
+
+Diese Option veranlasst \jabref, eine Zusammenfassung der Kommandozeilen"=Optionen
+anzuzeigen und das Programm unmittelbar darauf zu schließen.
+
+\item Kein GUI-Modus: \texttt{-n}
+
+Diese Option unterdrückt sowohl das \jabref-Fenster als auch den
+Eröffnungsbildschirm, der normalerweise beim Programmstart angezeigt
+wird. Das Programm wird beendet, sobald die Kommandozeilen-Optionen
+abgearbeitet wurden.
+Diese Option ist nützlich, um Dateikonvertierungen von der Kommandozeile
+oder mit Hilfe eines Scripts durchzuführen.
+
+\item Sitzung laden: \texttt{-l}
+
+Diese Option veranlasst \jabref, eine gespeicherte Sitzung zu laden,
+sofern eine vorhanden ist, bevor sich das Hauptfenster öffnet.
+
+\item Datei importieren: \texttt{-i Dateiname{[},Importformat{]}}
+
+Bei dieser Option importiert oder lädt \jabref eine bestimmte Datei.
+Wenn nur ein Dateiname angegeben wird oder ein Komma und ein {*}-Zeichen
+hinter dem Dateinamen stehen, versucht \jabref, das Dateiformat
+automatisch zu erkennen. Das sollte bei allen \bibtex{}-Dateien ebenso
+funktionieren wie bei Dateien, die in einem der von \jabref unterstützten
+Importformate vorliegen. Wenn dem Dateinamen ein Komma und ein Importformat
+folgen, wird der angegebene Importfilter benutzt. Mit der Option \texttt{-h}
+können Sie sich eine Liste der verfügbaren Importformate anzeigen
+lassen.
+
+Wenn Sie zusätzlich eine Export-Option angeben, wird der Import immer
+zuerst ausgeführt, bevor die importierte oder geladene Datei an den
+Exportfilter übergeben wird. Falls die grafische Oberfläche nicht
+mit der Option \texttt{-n} unterdrückt wird, werden alle geladenen
+oder importierten Dateien im Hauptfenster von \jabref angezeigt.
+
+Die Option \texttt{-i} kann nur einmal angegeben werden und nimmt
+als Argument maximal eine Datei.
+
+\item Datei exportieren: \texttt{-o Dateiname{[},Exportformat{]}}
+
+Diese Option veranlasst \jabref, eine Datei zu speichern oder zu
+exportieren, die von derselben Kommandozeile geladen oder importiert
+wurde. Wenn eine Datei mit der Option \texttt{-i} importiert wurde,
+wird diese Datei exportiert. Ansonsten wird die Datei exportiert,
+die \emph{zuletzt}~-- ohne die Option \texttt{-i}~-- angegeben (und
+erfolgreich geladen) wurde.
+
+Wird nur ein Dateiname angegeben, so wird diese Datei im \bibtex{}-Format
+gespeichert. Wenn dem Dateinamen ein Komma und ein Exportformat folgen,
+wird der angegebene Exportfilter benutzt. Auf diese Weise wird auch
+ein benutzerdefinierter Exportfilter angewendet; wenn der Name sowohl
+auf einen Standard-Exportfilter, als auch auf einen benutzerdefinierten
+Exportfilter zutrifft, wird der benutzerdefinierte verwendet.
+
+Mit der Option \texttt{-h} können Sie sich eine Liste der verfügbaren
+Exportformate anzeigen lassen.
+
+Falls die Option \texttt{-n} nicht aufgerufen wurde, wird jeder Exportvorgang
+durchgeführt, bevor das \jabref-Fenster geöffnet wird. Dort werden
+dann die importierten Dateien angezeigt.
+
+Die Option \texttt{-o} kann nur einmal angegeben werden und nimmt
+als Argument maximal eine Datei.
+
+\item Einstellungen exportieren: \texttt{-x Dateiname}
+
+Mit dieser Option können Sie \jabref veranlassen, alle Benutzer"=Einstellungen
+in eine XML-Datei zu speichern. Nach dem Export startet \jabref
+normal.
+
+\item Einstellungen importieren: \texttt{-p Dateiname}
+
+Mit dieser Option importiert \jabref Benutzer-Einstellungen, die
+mit der Option \texttt{-x} exportiert wurden. Nach dem Import startet
+\jabref normal.
+
+\item Nur benutzte Einträge exportieren:\\ \texttt{-a Dateiname{[}.aux{]},neueBibDatei{[}.bib{]}}
+
+Manchmal ist es nützlich, eine \bibtex{}-Datei zu haben, die nur die
+benutzten Einträge enthält. Eine Liste dieser benutzten Einträge findet
+sich in einer .aux-Datei (sobald Sie \LaTeX{} aufgerufen haben). \jabref
+kann diese Datei analysieren, um eine neue \bibtex{}-Datei zu erstellen,
+die nur die bekannten und benutzten Einträge enthält. Das bedeutet,
+dass ein Eintrag, der in der Standard-\bibtex{}-Datei nicht definiert
+ist, auch nicht in die neue Datei geschrieben werden kann.
+
+\item Aus dem Internet abrufen:\\ \lstinline{--fetch==Name des Fetchers:Suchausdruck}
+
+Die \emph{Fetcher}, also die direkte Suche in Online-Datenbanken,
+die Sie im Menü \menu{Internet} finden, können auch von der Kommandozeile
+aus gestartet werden. Nutzen Sie dazu die Option \lstinline{--fetch} und geben
+sowohl den Namen des Fetchers (z.B. ">ieee"<, ">medline"< oder ">jstor"<)
+als auch den Suchausdruck oder die ID des gesuchten Mediums an. Beachten
+Sie, dass einige Fetcher eine graphische Oberfläche (GUI) anzeigen,
+falls Sie eine Rückmeldung von Ihnen brauchen. Um eine Übersicht der
+verfügbaren Fetcher zu erhalten, geben Sie \texttt{-{-}fetch} ohne
+Parameter ein.
+
+\end{itemize}
+
+\subsubsection{Externer Zugriff}
+\label{RemoteHelp}
+\begin{quote}
+\emph{Diese Funktion kann unter \menu{Optionen \msep{} Einstellungen \msep{} Erweitert} verwaltet werden.}
+\end{quote}
+
+\tip[]{Beachten Sie, dass das Aktivieren dieser Funktion mit Windows XP SP2 (und möglicherweise auch mit anderen Konfigurationen) zu einer Meldung führen kann, die besagt, dass bestimmte Funktionen des Programms von der Windows-Firewall geblockt wurden. Sie können die Firewall anweisen, weiterhin zu blocken, denn die Firewall beeinträchtigt den Externen Zugriff von \jabref nicht.}
+Falls das Abhören von externen Zugriffen aktiviert ist, versucht \jabref beim Programmstart, den entsprechenden Port abzuhören. Das bedeutet, dass andere Anwendungen Informationen durch diesen Port an \jabref senden können. \jabref akzeptiert dabei nur lokale Verbindungen, um das Risiko eines Eingriffs von außerhalb auszuschließen.
+
+Mit dem externen Zugriff kann eine zweite Instanz von \jabref erkennen, dass eine erste Instanz bereits läuft. In diesem Fall leitet die zweite Instanz ihre Kommandozeilen"=Optionen an die erste Instanz weiter und beendet sich selbst direkt im Anschluss~-- sofern die zweite Instanz nicht ausdrücklich instruiert wurde, im Stand-Alone-Modus (als selbständige Instanz) zu starten.
+
+Die erste \jabref-Instanz liest die Kommandozeilenoptionen und führt die erforderlichen Aktionen aus, z.\,B. das Lesen oder Importieren einer Datei oder das Anhängen einer Datei an die aktive Datenbank. Falls eine Datei mit der Option \texttt{-{-}importToOpen} importiert wird, werden die Einträge an die aktive Datei angehängt. Falls keine Datei geöffnet ist, wird eine neue Datei angelegt.
+
+\clearpage 
+\section{Anpassung}
+\secttoc
+
+\subsection{Eintragstypen}
+
+\label{CustomEntriesHelp}
+
+\begin{quote}
+\emph{Um Eintragstypen anzupassen, wählen Sie den Menüpunkt \menu{Optionen}}
+\msep{} \emph{\menu{Eintragstypen anpassen}.}
+\end{quote}
+Wenn Sie einen Eintragstyp anpassen, definieren Sie sowohl sein Erscheinungsbild
+im Eintragseditor als auch die Bedingungen, nach denen \jabref
+einen Eintrag als vollständig akzeptiert. Sie können die bestehenden
+Eintragstypen verändern und neue hinzufügen.
+
+Beachten Sie, dass in diesem Dialog keine Änderungen gespeichert werden,
+solange Sie nicht auf \menu{Übernehmen} oder \menu{OK} klicken.
+Wenn Sie \menu{Abbrechen} anklicken oder einfach den Dialog schließen,
+gehen die bislang nicht übernommenen Änderungen verloren.
+
+
+\subsubsection{Der Dialog \menu{Eintragstypen anpassen}}
+
+Der Dialog \menu{Eintragstypen anpassen} ist in drei Hauptbereiche
+unterteilt. Im linken Bereich können Sie den Eintragstyp auswählen,
+den Sie bearbeiten wollen, und neue Eintragstypen hinzufügen. Im mittleren
+Bereich werden die Einstellungen für die benötigten Felder des ausgewählten
+Eintragstyps vorgenommen und im rechten Bereich diejenigen der optionalen
+Felder.
+
+
+\subsubsection{Eintragstypen hinzufügen und löschen}
+
+Die derzeit verfügbaren Eintragstypen werden im linken Bereich des
+Dialogfensters aufgelistet. Wenn Sie einen Eintragstyp auswählen,
+werden die anderen Bereiche aktualisiert und zeigen die benötigten
+und optionalen Felder dieses Eintragstyps.
+
+Um einen neuen Eintragstyp hinzuzufügen, geben Sie einfach seinen
+Namen in das Textfeld unter der Typliste ein und klicken \menu{Hinzufügen}.
+Der neue Eintragstyp wird zur Liste hinzugefügt und zur Bearbeitung
+ausgewählt.
+
+Um einen eigenen Eintragstyp zu entfernen, wählen Sie ihn aus und
+klicken auf \menu{Löschen}. Dieser Vorgang ist nur für eigene Eintragstypen
+verfügbar, die nicht nur Abwandlungen der Standard-Typen sind. Die
+Standard-Eintragstypen können nicht gelöscht werden.
+
+Um einem Eintragstyp seinen Standardwert zurückzugeben, wählen Sie
+ihn aus und drücken auf \menu{Standard}. Dieser Vorgang ist nur für
+Standard-Typen verfügbar, die bearbeitet wurden.
+
+
+\subsubsection{Eintragstypen bearbeiten}
+
+Wenn ein Eintragstyp ausgewählt ist, werden die derzeitigen benötigten
+und optionalen Felder im mittleren und rechten Bereich des Dialogfensters
+aufgelistet. Das Vorgehen beim Bearbeiten dieser Listen ist für die
+benötigten und optionalen Felder identisch.
+
+Um ein neues Feld hinzuzufügen, bearbeiten Sie das Textfeld unterhalb
+der Liste oder wählen einen Feldnamen aus dem Dropdown-Menü und klicken
+auf \menu{Hinzufügen}. Der gewählte Feldname erscheint am Ende der
+Liste.
+
+Um eines oder mehrere Felder zu löschen, wählen Sie sie in der Liste
+aus und klicken auf \menu{Löschen}. Die Reihenfolge der Felder können
+Sie ändern, indem Sie einen Feldnamen auswählen und die Pfeil"=Buttons
+benutzen, um das Feld nach oben oder nach unten zu verschieben.
+
+Es gibt eine Beschränkung beim Anpassen der Eintragstypen; bestimmte
+Typen haben eine ">und/oder"<"=Bedingung in ihren benötigten Feldern. Ein
+\emph{book}-Eintrag ist beispielsweise komplett, wenn entweder das
+Feld \emph{author} oder \emph{editor} oder beide gesetzt sind. Diese
+Art von Bedingung kann in einem angepassten Eintragstyp nicht realisiert
+werden.
+
+
+\subsection{Allgemeine Felder festlegen}
+
+\label{GeneralFields}Sie können dem Eintragseditor eine beliebige
+Anzahl von Tabs hinzufügen, die bei allen Eintragstypen sichtbar sind.
+Wählen Sie dazu den Menüeintrag \menu{Optionen} \msep{} \menu{Allgemeine Felder festlegen}.
+
+Jede Zeile repräsentiert einen Tab. Der Anfang der Zeile steht für
+den Namen des Tabs, gefolgt von einem Doppelpunkt. Anschließend listen
+Sie die einzelnen Felder auf, die der Tab enthalten soll, und trennen
+sie jeweils durch ein Semikolon.
+
+Das Beispiel
+
+\begin{lstlisting}
+Allgemeine Felder:url;keywords;doi;pdf
+Zusammenfassung:abstract;annote
+\end{lstlisting}
+ergibt somit einen Tab mit dem Namen >>Allgemeine Felder<<, der
+die Felder \emph{url}, \emph{keywords}, \emph{doi} und \emph{pdf}
+enthält, sowie einen zweiten Tab namens >>Zusammenfassung<< mit
+den Feldern \emph{abstract} und \emph{annote}.
+
+
+\subsection{Automatische Erstellung von \texorpdfstring{\bibtex{}"=Keys}{BibTeX-Keys}}
+\label{LabelPatterns}
+\begin{quote}
+\emph{Unter \menu{Optionen \msep{} Einstellungen \msep{} BibTeX"=Key"=Muster} 
+kann man die Felder bestimmen, die zur automatischen Generierung der
+\bibtex{}"=Keys herangezogen werden.}
+\end{quote}
+\jabref verwendet ein Standardmuster zur Generierung von \bibtex{}"=Keys, das Keys wie z.\,B.
+\texttt{Yared1998} erzeugt. Falls der \bibtex{}-Key in der geöffneten
+Datei nicht eindeutig sein sollte, wird einer der Buchstaben a-z angefügt,
+bis ein eindeutiger Key gefunden ist. Dementsprechend könnten die
+Labels wie folgt aussehen:
+
+\begin{lstlisting}
+Yared1998
+Yared1998a
+Yared1998b
+(*\ldots*)
+\end{lstlisting}
+Um das Aussehen der \bibtex{}-Keys zu bestimmen, benutzt \jabref
+Feldmarken. Das Key"=Muster kann für jeden der vorgegebenen Eintragstypen
+bestimmt werden. Es kann beliebigen Text enthalten, unabhängig von
+und zusätzlich zu den Feldmarken, die angeben, dass ein bestimmtes
+Feld des Eintrags an dieser Stelle des Keys eingefügt werden soll.
+Eine Feldmarke besteht gewöhnlich aus dem Feldnamen in eckigen Klammern,
+z.\,B. \texttt{{[}volume{]}}. Wenn dieses Feld zum Zeitpunkt der
+Erstellung des Keys leer ist, wird kein Text eingefügt.
+
+Es gibt außerdem mehrere spezielle Feldmarken, die nur einen bestimmten
+Teil aus einem Feld extrahieren. Sie werden unten aufgelistet. Natürlich
+können Sie auch neue spezielle Feldmarken vorschlagen.
+
+
+\subsubsection{Spezielle Feldmarken}
+\label{subsub:SpezielleFeldmarken}
+
+\begin{labeling}{auth.auth.eaMM}
+\item [\texttt{{[}auth{]}}]Der Nachname des ersten Autors.
+\item [\texttt{{[}authors{]}}]Die Nachnamen aller Autoren.
+\item [\texttt{{[}authorsN{]}}]Die Nachnamen von bis zu N Autoren. Falls
+es mehr Autoren gibt, wird EtAl angehängt.
+\item [\texttt{{[}authIniN{]}}]Der Anfang des Nachnamens von jedem Autoren,
+wobei nicht mehr als N Buchstaben verwendet werden.
+\item [\texttt{{[}authorIni{]}}]Die ersten 5 Buchstaben des Nachnamens
+des ersten Autors und die Initialen der Nachnamen der restlichen Autoren.
+\item [\texttt{{[}authN{]}}]Die ersten N Buchstaben des Nachnamens des
+ersten Autors.
+\item [\texttt{{[}authN\_M{]}}]Die ersten N Buchstaben des Nachnamens des
+M-ten Autors.
+\item [\texttt{{[}auth.auth.ea{]}}]Die Nachnamen der beiden ersten Autoren
+und \texttt{.ea}, falls es mehr als zwei Autoren sind.
+\item [\texttt{{[}auth.etal{]}}]Der Nachname des ersten Autors und der Nachname des zweiten Autors bei zwei Autoren bzw. \texttt{.etal} bei mehr als zwei Autoren.
+\item [\texttt{{[}authshort{]}}]Der Nachname bei einem Autor; der erste
+Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein
+Autor vorhanden ist. Ein Plus (+) wird angehängt, falls es mehr als
+drei Autoren gibt.
+\end{labeling}
+
+\tip[Anmerkung: ]{Falls es keinen Autor gibt (etwa bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth\ldots{]}}"=Feldmarken den oder die Herausgeber, die im editor"=Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label"=Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author"=Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B. \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
+
+\begin{labeling}{veryshorttitleMM}
+\item [\texttt{{[}edtr{]}}]Der Nachname des ersten Herausgebers.
+\item [\texttt{{[}editors{]}}]Die Nachnamen aller Herausgeber.
+\item [\texttt{{[}edtrIniN{]}}]Der Anfang des Nachnamens von jedem Herausgeber,
+wobei nicht mehr als N Buchstaben verwendet werden.
+\item [\texttt{{[}editorIni{]}}]Die ersten 5 Buchstaben des Nachnamens
+des Herausgebers und die Initialen der Nachnamen der restlichen Herausgeber.
+\item [\texttt{{[}edtrN{]}}]Die ersten N Buchstaben des Nachnamens des
+ersten Herausgebers.
+\item [\texttt{{[}edtrN\_M{]}}]Die ersten N Buchstaben des Nachnamens des
+M-ten Herausgebers.
+\item [\texttt{{[}edtr.edtr.ea{]}}]Der Nachname der ersten beiden Herausgeber
+und \texttt{.ea}, falls es mehr als zwei Herausgeber sind.
+\item [\texttt{{[}edtrshort{]}}]Der Nachname bei einem Herausgeber; der
+erste Buchstabe der Nachnamen von bis zu drei Herausgebern, falls
+mehr als ein Herausgeber vorhanden ist. Ein Plus (+) wird angehängt,
+falls es mehr als drei Herausgeber gibt.
+\item [\texttt{{[}firstpage{]}}]Die erste Seitenzahl einer Veröffentlichung
+(pages).
+\item [\texttt{{[}keywordN{]}}]Stichwort Nummer N aus dem Feld ">keywords"<, gesetzt den Fall, dass die Stichworte durch Komma oder Semikolon voneinander getrennt sind.
+\item [\texttt{{[}lastpage{]}}]Die letzte Seitenzahl einer Veröffentlichung
+(pages).
+\item [\texttt{{[}shorttitle{]}}]Die ersten 3 Worte eines Titels (title).
+\item [\texttt{{[}shortyear{]}}]Die letzten 2 Ziffern des Jahrgangs (year).
+\item [\texttt{{[}veryshorttitle{]}}]Die ersten beiden Worte des Titels
+(title), wobei >>the<<, >>a<< und >>an<< ausgelassen werden.
+\end{labeling}
+Hinter einem Feldnamen (oder einem der oben aufgeführten Pseudo"=Feldnamen)
+kann ein Modifikator stehen. Modifikatoren werden in der Reihenfolge
+angewendet, in der sie angegeben wurden.
+
+\begin{labeling}{00.00.0000}
+\item [\texttt{:abbr}]Kürzt den Text, der von einem Feldnamen oder speziellen
+Feldmarken gebildet wird. Nur der erste Buchstabe und weitere Buchstaben,
+die auf ein Leerzeichen folgen, werden berücksichtigt. So würde beispielsweise
+\texttt{[journal:abbr]} die Zeitschrift >>Journal of Fish Biology<< zu
+>>JoFB<< wandeln.
+\item [\texttt{:lower}]Wandelt den von der Feldmarke eingefügten Text in
+Kleinbuchstaben. So wird beispielsweise bei \texttt{{[}auth:lower{]}}
+der Nachname des ersten Autors in Kleinbuchstaben ausgegeben.
+\end{labeling}
+Das Standardmuster, das \bibtex{}-Keys wie \texttt{Yared1998}
+erzeugt, ist \texttt{{[}auth{]}{[}year{]}}. Wenn Sie keine Key-Muster
+für einen bestimmten Eintragstyp angeben, wird dieses vorgegebene
+Muster verwendet. Sie können das vorgegebene Muster natürlich ebenfalls
+anpassen%~-- seine Einstellung befindet sich über der Liste der Eintragstypen
+%im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
+.
+
+Beachten Sie, dass \jabref Umlaute und Buchstaben mit Akzenten
+sowie das ß beim Erstellen von \bibtex{}-Keys verändert, um möglichen
+Problemen vorzubeugen. Hierzu einige Beispiele:
+
+\begin{lstlisting}
+Díaz Ibañez (*$\to$*) DiazIbanez
+Strömbäck   (*$\to$*) Stroembaeck
+Waßenhoven  (*$\to$*) Wassenhoven
+\end{lstlisting}
+
+\subsubsection{Ersetzen eines regulären Ausdrucks}
+
+Nachdem das Key"=Muster angewendet wurde, um einen \bibtex{}"=Key zu erstellen, können Sie den Key"=Generator nach einem bestimmten regulären Ausdruck suchen und diesen durch eine Zeichenfolge ersetzen lassen. Der reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key"=Muster eingegeben. Falls das Feld zur Ersetzung des regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden regulären Ausdrücke einfach gelöscht.
+
+\subsection{Eintragsvorschau}
+
+\label{PreviewHelp}Die Eintragsvorschau wird mit denselben Mechanismen
+erstellt, die auch bei den Exportfiltern angewendet werden. Bei der
+Vorschau durchläuft ein Eintrag eins von zwei möglichen Layouts (die
+sie mit F9 wechseln können) und erstellt HTML-Code, der im Vorschaudialog
+am unteren Bildschirmrand angezeigt wird.
+
+Aussehen und Inhalt der Vorschau können mit derselben Syntax verändert
+werden, die für die Anpassung der Exportfilter verwendet wird (siehe
+Abschnitt~\ref{CustomExports}).
+
+\subsection{Exportfilter}
+
+\label{CustomExports}Mit \jabref können Sie Ihre eigenen Exportfilter
+definieren und genau so wie die Standard"=Exportfilter benutzen. Ein
+Exportfilter wird durch eine oder mehrere \emph{Layout"=Dateien} definiert,
+die mittels eingebauter Formatierprogramme das Format der exportierten
+Dateien festlegen. Ihre Layout-Datei müssen Sie in einem separaten
+Text\-editor erstellen.
+
+
+\subsubsection{Hinzufügen eines Exportfilters}\label{subsubsec:Hinzufuegen-Exportfilter}
+
+Die einzige Voraussetzung für einen Exportfilter ist, dass eine Datei
+mit der Endung \texttt{.layout} vorhanden ist. Um einen neuen, eigenen
+Exportfilter hinzuzufügen, öffnen Sie das Dialogfenster \menu{Optionen}
+\msep{} \menu{Verwalte externe Exportfilter} und klicken auf die
+Schaltfläche \menu{Neu}. Es öffnet sich ein neues Fenster, in dem
+Sie einen Namen (der als Auswahl im Dateityp"=Dropdownmenü erscheint, wenn man \menu{Datei \msep{} Exportieren} im \jabref"=Hauptfenster wählt), eine Pfadangabe zur \texttt{.layout}-Datei und die
+gewünschte Dateiendung für den Exportfilter angeben können. Wenn Sie
+den Exportfilter benutzen, wird diese Endung im Datei"=Dialog automatisch
+vorgeschlagen.
+
+
+\subsubsection{Das Erstellen des Exportfilters}
+
+Um einen Eindruck zu bekommen, wie Exportfilter auszusehen haben,
+suchen Sie am besten auf unserer Homepage nach dem Paket, das die
+Layout"=Dateien der Standard"=Exportfilter enthält.
+
+Nehmen wir einmal an, dass wir einen HTML-Exportfilter erstellen wollen.
+Der Exportfilter muss lediglich aus einer einzigen \texttt{.layout}-Datei
+bestehen, die in diesem Fall \texttt{html.layout} genannt werden könnte.
+Sie können darüber hinaus auch zwei Dateien mit den Namen \texttt{html.begin.layout}
+und \texttt{html.end.layout} anlegen. Die erste dieser beiden Dateien
+enthält den Kopfteil der Ausgabe, die zweite den Fußteil. \jabref
+sucht jedesmal wenn der Exportfilter benutzt wird nach diesen Dateien
+und fügt sie~-- falls sie gefunden werden~-- wörtlich vor bzw. nach
+den einzelnen Einträgen in die Ausgabe ein.
+
+\tip[]{Beachten Sie, dass sich diese Dateien in demselben Verzeichnis
+wie \texttt{html.layout} befinden und die Namensbestandteile \texttt{.begin}
+bzw. \texttt{.end} enthalten müssen.}
+
+\noindent In unserem Beispiel-Exportfilter könnten diese Dateien folgendermaßen
+aussehen:
+
+\begin{lstlisting}[title=html.begin.layout]
+<HTML>
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+\end{lstlisting}
+\begin{lstlisting}[title=html.end.layout]
+</BODY>
+</HTML>
+\end{lstlisting}
+Die Datei \texttt{html.layout} stellt die \emph{Standard}"=Formatvorlage
+für den Export eines einzelnen Eintrags bereit. Falls Sie unterschiedliche
+Formatvorlagen für verschiedene Eintragstypen anwenden wollen, müssen
+Sie typspezifische \texttt{.layout}"=Dateien erstellen. Diese
+müssen sich ebenfalls in demselben Verzeichnis wie die Haupt"=Layout"=Datei
+befinden und den Namensbestandteil \texttt{.entrytype} enthalten.
+Der Name des Eintragstyps muss komplett in Kleinbuchstaben geschrieben
+werden. In unserem Beispiel wollen wir eine Formatvorlage für Einträge
+des Typs \emph{book} haben, die in der Datei \texttt{html.book.layout}
+abgelegt wird. Für eine Dissertation würden wir die Datei \texttt{html.phdthesis.layout}
+anlegen~-- und so weiter. Diese Dateien sind der Standard"=Layout"=Datei
+sehr ähnlich, nur dass sie lediglich für Einträge des entsprechenden
+Typs genutzt werden. Achten Sie darauf, dass die Standard"=Layout"=Datei
+so allgemein gehalten wird, dass sie die meisten Eintragstypen abdeckt.
+
+
+\paragraph{Das Format der Layout-Datei}
+
+Layout"=Dateien werden mit einem einfachen mark\-up"=Format erstellt,
+bei dem die Kommandos mit einem >>backslash<< (\texttt{\textbackslash{}})
+eingeleitet werden. Alle Textbestandteile, die nicht als Kommando
+identifiziert werden, gelangen direkt in die Ausgabedatei.
+
+
+\paragraph{Feldkommandos}
+
+Ein beliebiges Wort, vor dem ein backslash steht, z.\,B. \texttt{\textbackslash{}author},
+\texttt{\textbackslash{}editor,} \texttt{\textbackslash{}title} oder
+\texttt{\textbackslash{}year}, wird als Verweis auf das entsprechende
+Feld ausgewertet, das dann direkt in die Ausgabe kopiert wird.
+
+
+\paragraph{Feldformatierer}
+\label{par:Feldformatierer}
+
+Oft muss der Feldinhalt vor der Ausgabe verarbeitet werden. Dies wird
+mit Hilfe eines \emph{Feldformatierers} gemacht~-- einer java class,
+die eine Methode zur Verarbeitung des Feldinhaltes enthält.
+
+Ein Formatierer wird angewendet, indem man das Kommando \texttt{\textbackslash{}format}
+gefolgt vom Namen des Formatierers in eckigen Klammern und dem Feldnamen
+in geschweiften Klammern einfügt, z.\,B.:
+
+\begin{lstlisting}
+\format[ToLowerCase]{\author}
+\end{lstlisting}
+Sie können auch mehrere Formatierer angeben, getrennt durch Kommas.
+Diese werden nacheinander aufgerufen, und zwar von links nach rechts.
+Das Kommando
+
+\begin{lstlisting}
+\format[ToLowerCase,HTMLChars]{\author}
+\end{lstlisting}
+ruft z.\,B. zunächst den Formatierer \emph{ToLowerCase} auf, \emph{HTMLChars}
+formatiert anschließend das Ergebnis. Auf diese Weise können Sie eine
+beliebige Anzahl an Formatierern auflisten.
+
+\jabref bietet die folgenden Formatierer, wobei einige von anderen
+abhängen:
+
+\begin{labeling}{MMMM}
+\item [\texttt{HTMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie
+       \texttt{\{\textbackslash{}\textasciicircum{}a\}} oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}}
+       durch ihre HTML"=Entsprechungen und übersetzt die \LaTeX"=Befehle \texttt{\textbackslash emph}, 
+       \lstinline{\textit}, \lstinline{\textbf} in ihre HTML"=Entsprechungen.
+\item [\texttt{HTMLParagraphs}]interpretiert zwei aufeinanderfolgende Zeilenumbrüche 
+       (z.\,B. \lstinline{\n\n}) als Beginn eines neuen Absatzes und erstellt dementsprechend
+       Absatz-HTML-Tags.
+\item [\texttt{XMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie       
+       \texttt{\{\textbackslash{}\textasciicircum{}a\}}
+       oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}} durch ihre XML-Entsprechungen.
+\item [\texttt{CreateDocBookAuthors}]formatiert das author-Feld im DocBook-Stil.
+\item [\texttt{CreateDocBookEditors}]\emph{Dokumentation folgt.}
+\item [\texttt{CurrentDate}]gibt das aktuelle Datum aus. Ohne Argument gibt dieser Formatierer 
+       das aktuelle Datum im Format ">JJJJ.MM.TT HH:MM:SS Z"< (Datum, Zeit und Zeitzone) aus.
+       Mit einem anderen Format-String als Argument kann das Datum angepasst werden. So ergibt
+       \lstinline{\format[CurrentDate]}\texttt{\{}\lstinline{yyyy.MM.dd}\texttt{\}} nur das 
+       Datum, z.\,B. ">2005.11.30"<.
+\item [\texttt{AuthorFirstFirst}]formatiert die Felder \emph{author}/\emph{editor}
+       mit den Vornamen zuerst.
+\item [\texttt{AuthorFirstFirstCommas} oder \texttt{AuthorFirstLastCommas}]formatiert die Felder
+       \emph{author}/\emph{editor} mit den Vornamen zuerst und abgetrennt durch Kommas.
+\item [\texttt{AuthorFirstLastOxfordCommas}] ist ähnlich wie \lstinline{AuthorFirstLastCommas}, 
+       außer dass das ">and"< zwischen den letzten beiden Namen durch ein Komma eingeleitet
+       wird.
+\item [\texttt{AuthorFirstAbbrLastCommas}]formatiert die
+       Felder \emph{author}/\emph{editor} mit abgekürzten Vornamen, abgetrennt durch
+       Kommas, mit einem ">and"< zwischen den letzten beiden Namen.
+\item [\texttt{AuthorFirstAbbrLastOxfordCommas}]ähnlich wie \texttt{AuthorFirstAbbrLastCommas}, 
+       außer dass das ">and"< zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
+\item [\texttt{AuthorLastFirst}]formatiert die Felder \emph{author}/\emph{editor}
+       mit den Nachnamen zuerst.
+\item [\texttt{AuthorLastFirstAbbreviator}]kürzt die Vornamen aller Autoren.
+       Dieser Formatierer kann nur angewendet werden, wenn \texttt{AuthorLastFirst}
+       bereits benutzt wurde.
+\item [\texttt{AuthorLastFirstCommas}]formatiert die Felder
+       \emph{author}/\emph{editor} mit den Nachnamen zuerst, abgetrennt durch Kommas,
+       mit einem ">and"< zwischen den letzten beiden Namen.
+\item [\texttt{AuthorLastFirstOxfordCommas}]ähnlich wie
+        \texttt{AuthorLastFirstCommas}, nur dass das ">and"<
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
+\item [\texttt{AuthorLastFirstAbbrCommas}]formatiert die Felder
+        \emph{author}/\emph{editor} mit Nachnamen zuerst und abgekürzten Vornamen,
+        abgetrennt durch Kommas, mit einem ">and"< zwischen den letzten
+        beiden Namen.
+\item [\texttt{AuthorLastFirstAbbrOxfordCommas}]ähnlich wie
+        \texttt{AuthorLastFirstAbbrCommas}, außer dass das ">and"<
+        zwischen den letzten beiden Namen durch ein Komma eingeleitet wird.
+\item [\texttt{AuthorAndsReplacer}]ersetzt >>and<< zwischen den Namen
+       durch >>;<<, zwischen den letzten beiden Autoren steht >>\&<<.
+\item [\texttt{AuthorAndsCommaReplacer}]ersetzt >>and<< zwischen den
+       Namen durch ein Komma (,) sowie >>\&<< zwischen den beiden letzten.
+\item [\texttt{AuthorOrgSci}]Der erste Autor erscheint als "Nachname, Vorname", 
+       alle anderen als "Vorname Nachname". Vornamen werden abgekürzt.
+\item [\texttt{AuthorAbbreviator}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorNatBib}]formatiert Autorennamen im Natbib-Stil, also nur mit Nachnamen;
+       zwei Autoren werden durch ein ">and"< voneinander getrennt, bei mehr als zwei 
+       Autoren wird der erste angegeben, gefolgt von ">et al."<
+\item [\texttt{NoSpaceBetweenAbbreviations}]Leerzeichen zwischen mehreren abgekürzten 
+       Vornamen werden gelöscht.
+\item [\texttt{FileLink(Dateityp)}] Wenn kein Argument angegeben
+        wird, gibt dieser Formatierer den ersten externen Dateityp aus, der
+        in dem Feld ">file"< angegeben ist. Dieser Formatierer nimmt den Namen 
+        eines Dateityps als optionales
+        Argument, das in Klammern nach dem Namen des Formatierers angegeben
+        wird. So wird etwa mit \texttt{\textbackslash format[FileLink(pdf)] \{%
+        \textbackslash file\}}
+        der Dateityp \lstinline{pdf} als Argument angegeben. Wenn ein Argument
+        mitgegeben wird, wählt der Formatierer den ersten Dateilink des
+        entsprechenden Typs. Im Beispiel wird der Pfad zum ersten PDF"=Link
+        ausgegeben.
+\item [\texttt{FormatPagesForHTML}]ersetzt >>\texttt{-{}-}<< durch >>\texttt{-}<<.
+\item [\texttt{FormatPagesForXML}]ersetzt >>\texttt{-{}-}<< durch einen
+       XML en-dash (>>--<<).
+\item [\texttt{Replace(regexp,ersetzedurch)}]führt eine Ersetzung
+       mit einem Regulären Ausdruck durch. Um diesen Formatierer zu
+       benutzen, muss ein zweiteiliges Argument mitgegeben werden. Die Teile
+       werden durch ein Komma getrennt. Will man ein Komma ausgeben lassen,
+       muss man es maskieren (\lstinline{\,}).
+       Der erste Teil ist der Reguläre Ausdruck, nach dem gesucht wird.
+       Er wird normal geschrieben, ohne Backslashes (\lstinline{\}) zu maskieren.\footnote{%
+       Eine Beschreibung von Regulären Ausdrücken ist hier zu finden:
+       \url{http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html}.}
+       Der zweite Teil ist der Text, der für alle Treffer eingesetzt werden soll.
+\item [\texttt{RemoveBrackets}]entfernt alle geschweiften Klammern (>>\{<<
+       und >>\}<<).
+\item [\texttt{RemoveBracketsAddComma}]\emph{Dokumentation folgt.}
+\item [\texttt{RemoveWhitespace}]löscht alle Leerzeichen.
+\item [\texttt{RemoveLatexCommands}]entfernt \LaTeX-Befehle wie \lstinline{\emph},
+       \lstinline{\textbf} etc. Zusammen mit \texttt{HTMLChars}
+       oder \texttt{XMLChars} sollte dieser Formatierer zuletzt aufgerufen
+       werden.
+\item [\texttt{RemoveTilde}]ersetzt das Tilde-Zeichen (\lstinline{~}), das in \LaTeX\ als festes
+       Leerzeichen dient, durch ein normales Leerzeichen. Nützlich in Kombination mit dem
+       Namens"=Formatierer (siehe Abschnitt \nameref{NameFormatter}).
+\item [\texttt{ToLowerCase}]macht aus allen Buchstaben Kleinbuchstaben.
+\item [\texttt{ToUpperCase}]macht aus allen Buchstaben Großbuchstaben.
+\item [\texttt{GetOpenOfficeType}]gibt die Nummer wieder,
+        die vom bibliographischen System von OpenOffice.org (Versionen
+        1.x und 2.x) benutzt wird, um den Typ dieses Eintrags zu
+        bezeichnen.
+\item [\texttt{RTFChars}]ersetzt alle \TeX-spezifischen
+        Sonderzeichen (z.B. \texttt{\{\textbackslash\^{}a\}} oder 
+        \texttt{\{\textbackslash \textquotedbl\{o\}\}}) durch ihre
+        RTF"=Entsprechung und übersetzt \LaTeX-Befehle wie \lstinline{\emph}, 
+        \lstinline{\textit}, \lstinline{\textbf} in ihre RTF"=Entsprechungen.
+\end{labeling}
+Falls keiner der verfügbaren Formatierer das Ergebnis erzielt, das
+Sie erreichen möchten, können Sie Ihren eigenen Formatierer hinzufügen,
+indem Sie das \lstinline{net.sf.jabref.export.layout.LayoutFormatter}-Interface
+implementieren. Wenn Sie in das Paket \lstinline{net.sf.jabref.export.layout.format} Ihre Klasse (class) einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
+so wie auch die Standard"=Formatierer. Ansonsten müssen Sie den Formatierer
+mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
+muss der Formatierer in ihrem classpath sein, wenn Sie \jabref
+starten.
+
+\paragraph{Eigene \texorpdfstring{Namens"=Formatierer}{Namens-Formatierer} verwenden}
+\label{NameFormatter}
+
+Mit \jabref~2.2 ist es jetzt möglich, eigene Namens"=Formatierer zu definieren. Dazu wird die Syntax der Bibliographie"=Stile (bst) verwendet. Das erlaubt äußerste Flexibilität, ist allerdings aufwändig in der Schreibweise.
+
+Sie können unter \menu{Optionen \msep Einstellungen \msep Namens"=Formatierer} Ihren eigenen Formatierer schreiben. Benutzen Sie das folgende Format:
+\begin{lstlisting}
+  <Fall1>@<Bereich11>@<Format>@<Bereich12>@<Format>@<Bereich13>(*\ldots*)@@<br>
+  <Fall2>@<Bereich21>@(*\ldots*)
+\end{lstlisting}
+Dieses Format teilt die Aufgabe, eine Liste von Autoren zu formatieren, in unterschiedliche Fälle abhängig von der Zahl der Autoren (das ist nötig, weil manche Formate sich je nach der Zahl der Autoren unterscheiden). Die einzelnen Fälle werden durch \texttt{@@} voneinander getrennt und enthalten Anweisungen, wie jeder einzelne Autor in diesem Fall zu formatieren ist. Diese Anweisungen werden durch \texttt{@} getrennt.
+
+Fälle werden durch Ganzzahlen (1, 2, 3, etc.) oder das Zeichen \texttt{*} (alle Autoren) definiert. Sie geben die nachfolgenden Anweisungen an den Formatierer weiter, falls weniger oder gleich viele Autoren vorhanden sind.
+
+Bereiche sind entweder \texttt{<Ganzzahl>..<Ganzzahl>}, \texttt{<Ganzzahl>} oder das Zeichen \texttt{*}. Die Liste der Autoren fängt bei 1 an. Die Ganzzahlen können einen negativen Wert haben, um vom letzten Autor der Liste zu starten, wobei -1 der Wert für den letzten Autor ist.
+
+Als Beispiel dient die Autorenliste ">Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"<:
+\begin{itemize}
+  \item 1..3 betrifft Joe, Mary und Bruce
+  \item 4..4 betrifft Arthur 
+  \item * betrifft alle
+  \item 2..-1 betrifft Mary, Bruce und Arthur
+\end{itemize}
+
+Die \texttt{<Format>}-Strings nutzen das BibTeX-Namensschema: Die vier Buchstaben v, f, l, j stehen für die Namensteile von, Vorname (first), Nachname (last) und Junior und werden in geschweiften Klammern gesetzt. Ein einzelner Buchstabe v, f, l, j bedeutet, dass der Name abgekürzt werden soll. Wenn einer dieser Buchstaben oder Buchstabenpaare vorkommen, gibt \jabref alle entsprechenden Namen (eventuell abgekürzt) aus, aber der Ausdruck in geschweiften Klammern wird nur ausgegeben, wenn der Namensteil existiert.
+
+Beispielsweise wird beim Format ">\texttt{\{ll\} \{vv \{von Part\}\} \{ff\}}"< die Autorenliste ">Mary Kay and John von Neumann"< von \jabref als ">Kay~~Mary"< (mit zwei Leerzeichen) und ">Neumann von von Part John"< ausgegeben.
+
+Zwei weitere Beispiele sollen das Ganze verdeutlichen; die Dokumentation von \bibtex gibt weitere Hinweise.
+
+Kurzes Beispiel: ">\texttt{\{ll\}, \{f.\}}"< formatiert ">\lstinline{Joe Doe}"< als ">\lstinline{Doe, J.}"<
+
+Ausführliches Beispiel: Um 
+\begin{quote}
+">Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"<
+\end{quote}
+als
+\begin{quote}
+">Doe, J., Jane, M., Bar, B. and Kay, A."<
+\end{quote}
+zu formatieren, nutzt man
+\begin{lstlisting}
+1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.
+\end{lstlisting}
+Falls jemand eine bessere Dokumentation hierzu verfassen möchte: Wenden Sie sich einfach an die \jabref"=Maililnglisten!
+
+\paragraph{Bedingte Ausgabe}
+
+Manche statische Ausgabe macht nur Sinn, wenn ein bestimmtes Feld
+nicht leer ist. Wenn wir z.\,B. hinter den Namen der Editoren den
+Text \texttt{(Hrsg.)} haben wollen, brauchen wir Folgendes:
+
+\begin{lstlisting}
+\format[HTMLChars,AuthorFirstFirst]{\editor} (Hrsg.)
+\end{lstlisting}
+Wenn nun aber das \emph{editor}-Feld leer ist~-- möglicherweise ist
+es für den Eintrag, der exportiert werden soll, nicht erforderlich~--,
+dann würde das \texttt{(Hrsg.)} dennoch erscheinen. Das kann man mit
+den Kommandos \texttt{\textbackslash{}begin} und \texttt{\textbackslash{}end}
+verhindern:
+
+\begin{lstlisting}
+\begin{editor}
+\format[HTMLChars,AuthorFirstFirst]{\editor} (Hrsg.)
+\end{editor}
+\end{lstlisting}
+Die Kommandos \texttt{\textbackslash{}begin} und \texttt{\textbackslash{}end}
+sorgen dafür, dass der Text, den sie einschließen, nur dann ausgegeben
+wird, wenn das Feld, auf das in den geschweiften Klammern verwiesen
+wird, für den zu exportierenden Eintrag definiert und damit nicht
+leer ist.
+
+\tip{Das Benutzen der Kommandos \texttt{\textbackslash{}begin} und
+\texttt{\textbackslash{}end} ist ein Schlüssel zum Erstellen von Layout-Dateien,
+die mit einer Vielzahl von Eintragstypen umgehen können.}
+
+
+\paragraph{Gruppierte Ausgabe}
+
+Wenn Sie Ihre Einträge auf der Basis eines bestimmten Feldes gruppieren
+wollen, benutzen Sie die Kommandos für die gruppierte Ausgabe. Die
+gruppierte Ausgabe ist der bedingten Ausgabe sehr ähnlich, außer dass
+der Text zwischen den Kommandos nur ausgegeben wird, wenn das Feld,
+auf das in den geschweiften Klammern verwiesen wird, unterschiedliche
+Werte enthält.
+
+Nehmen wir zum Beispiel an, dass wir die Ausgabe nach dem \emph{keyword}
+(Stichwort) gruppieren wollen. Bevor die Datei exportiert wird, müssen
+die Einträge nach dem \emph{keyword} sortiert worden sein. Dann benutzen
+Sie die folgenden Kommandos, um nach \emph{keyword} zu gruppieren:
+
+\begin{lstlisting}
+\begingroup{keywords}
+New Category: \format[HTMLChars]{\keywords}
+\endgroup{keywords}
+\end{lstlisting}
+
+\subsection{Importfilter}
+
+\noindent \jabref bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
+zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java"=\emph{Klassen},
+die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
+und daraus \bibtex{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
+von SourceForge erhalten haben (siehe Abschnitt ">\nameref{subsec:Ihre-Arbeit}"<). Sie können auch
+mit Grundkenntnissen der Java"=Programmierung eigene Importer für Referenzquellen, die für Sie wichtig sind,
+erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref neu zu
+kompilieren.
+
+\paragraph{Vorrangsregeln}
+
+Externe Importfilter haben Vorrang vor Standard-Importern. So können Sie mit Ihren Importern
+die existierenden Importer in der automatischen Formaterkennung und an der Kommandozeile in \jabref überschreiben. Externe Importfilter selbst sind dann nach Namen sortiert.
+
+\subsubsection{Einen externen Importfilter hinzufügen}
+
+Stellen Sie sicher, dass Sie den Importer in kompilierter Form haben (eine oder mehrere
+\texttt{.class} Dateien) und dass die Klassendateien
+in einer Verzeichnisstruktur entsprechend ihrer Package"=Struktur liegen. 
+Um einen neuen externen Importfilter hinzuzufügen, öffnen Sie den Dialog 
+\menu{Optionen \msep{} Verwalte externe Importfilter}, und klicken Sie auf
+\menu{Aus Klassenpfad hinzufügen}. Ein Dateiauswahl"=Fenster erscheint, 
+mit dem Sie den Klassenpfad des Importers wählen, das heißt den obersten Ordner,
+in dem die Package"=Struktur Ihres Importers beginnt. In einem zweiten Dateiauswahl"=Fenster
+wählen Sie die \emph{.class}"=Datei Ihres Importers, die von \texttt{\textbackslash{}ImportFormat} abgeleitet
+ist. Wenn Sie \menu{Klasse auswählen} klicken, erscheint Ihr neuer Importer
+in der Liste der externen Importfilter. Alle externen Importfilter erscheinen in den
+\jabref"=Untermenüs \menu{Datei \msep{} Importieren \msep{} Externe Importfilter} und 
+\menu{Datei \msep{} Importieren und Anhängen \msep{} Externe Importfilter}.
+
+\tip[Bitte beachten Sie: ]{Wenn Sie die Klassen in ein anderes Verzeichnis verschieben,
+müssen Sie den Importer entfernen und neu hinzufügen. Wenn Sie einen Importfilter
+mit einem bereits vorhandenen Namen registrieren, ersetzt \jabref den vorhandenen
+externen Importfilter. Auch wenn es in manchen Fällen möglich ist, einen schon registrierten
+Importer zu aktualisieren ohne \jabref neu zu starten (nämlich dann,
+wenn der Importer nicht im Klassenpfad von \jabref ist), empfehlen wir, grundsätzlich
+\jabref neu zu starten, wenn Sie ein Update eines externen Importers durchgeführt haben.
+Sie können auch Importer aus ZIP- oder JAR-Archiven registrieren, wählen Sie einfach
+\emph{\menu{Aus Archiv-Datei hinzufügen}}, dann das ZIP- oder JAR-Archiv und dann den Eintrag
+(Klassendatei), der den neuen Importer darstellt.}
+
+\subsubsection{Einen Importfilter entwickeln}
+
+Bitte schauen Sie auf unseren Download-Seiten nach Beispielen und nützlichen Dateien zur 
+Entwicklung Ihres Importfilters.
+
+\paragraph{Ein einfaches Beispiel}
+
+Angenommen, wir wollen Dateien der folgenden Form importieren:
+\begin{lstlisting}
+1936;John Maynard Keynes;The General Theory of Employment, Interest and Money
+2003;Boldrin & Levine;Case Against Intellectual Monopoly
+2004;ROBERT HUNT AND JAMES BESSEN;The Software Patent Experiment
+\end{lstlisting}
+
+\subparagraph{SimpleCsvImporter Erstellen}
+
+Erzeugen Sie in einem Text"=Editor eine Klasse, die von \texttt{ImportFormat} abgeleitet
+ist und die folgende Methoden implementiert:\\
+\texttt{getFormatName()}, 
+\texttt{isRecognizedFormat()}
+und \texttt{importEntries()}.\\
+Hier ein Beispiel:
+\begin{lstlisting}
+import java.io.*;
+import java.util.*;
+import net.sf.jabref.*;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormatReader;
+
+public class SimpleCsvImporter extends ImportFormat {
+
+  public String getFormatName() {
+    return "Simple CSV Importer";
+  }
+
+  public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    return true; // this is discouraged except for demonstration purposes
+  }
+
+  public List importEntries(InputStream stream) throws IOException {
+  	ArrayList bibitems = new ArrayList();
+    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+    String line = in.readLine();
+    while (line != null) {
+      if (!"".equals(line.trim())) {
+        String[] fields = line.split(";");
+        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+        be.setType(BibtexEntryType.getType("techreport"));
+        be.setField("year", fields[0]);
+        be.setField("author", fields[1]);
+        be.setField("title", fields[2]);
+        bibitems.add(be);
+        line = in.readLine();
+      }
+    }
+    return bibitems;
+  }
+}
+\end{lstlisting}
+
+\subparagraph{SimpleCsvImporter übersetzen}
+
+Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, sie liegt unter
+\\\lstinline{/meinpfad/SimpleCsvImporter.java}, die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
+\lstinline{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad. 
+Kompilieren Sie die Klasse mit JSDK 1.4 zum Beispiel mit folgendem Kommandozeilen"=Aufruf: 
+\begin{lstlisting}
+javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
+\end{lstlisting}
+Nun sollte dort auch eine Datei \texttt{/mypath/SimpleCsvImporter.class} liegen.
+
+\subparagraph{SimpleCsvImporter registrieren}
+
+Öffnen Sie in \jabref \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
+auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und 
+klicken Sie \menu{Klassenpfad auswählen}. Wählen Sie anschließend die Datei \texttt{SimpleCsvImporter.class}
+und klicken Sie \menu{Klasse auswählen}. Ihr Importfilter sollte nun in der Liste der
+externen Importfilter unter dem Namen >>Simple CSV Importer<< erscheinen und,
+sobald Sie \menu{Schließen} gewählt haben, auch in den Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} 
+\menu{Externe Importfilter} und \menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter} 
+des \jabref-Hauptfensters auftauchen.
+
+\subsection{Teilen Sie Ihre Arbeit mit anderen}
+\label{subsec:Ihre-Arbeit}
+Mit externen Layout-Dateien und Importfiltern ist es einfach, Ihre eigenen Export-Formate und Importfilter
+mit anderen Anwendern gemeinsam zu benutzen. Falls Sie einen Exportfilter oder einen Importfilter
+für ein Format erstellt haben, das noch nicht von \jabref unterstützt wird,
+oder falls Sie einen bestehenden Exportfilter oder Importfilter verbessern, möchten
+wir Sie ermutigen, Ihre Arbeit auf der \href{http://sourceforge.net/projects/jabref/}{SourceForge.net"=Seite} bereitzustellen.
+Dasselbe gilt für Formatierklassen, die Sie schreiben. Wir würden
+uns freuen, eine Sammlung von bereitgestellten Layout"=Dateien verteilen
+zu können oder die Standard"=Exportfilter, -Formatierer und -Importfilter
+zu erweitern.
+
+\clearpage 
+\section{Tastenkürzel}
+
+Die Menüs können alle über Tastenkürzel angesteuert werden, die meisten
+Menübefehle ebenfalls. Das ist immer am unterstrichenen Buchstaben
+sichtbar.
+
+Es folgt ein Überblick über die wichtigsten Tastenkürzel ohne Anspruch
+auf Vollständigkeit~\ldots{}
+
+\begin{longtable}{p{66mm}p{33mm}}
+\textbf{Datei (Forts.)}&
+\tabularnewline
+\endhead
+\textbf{Datei}&
+\tabularnewline
+\endfirsthead
+Datei öffnen&
+STRG-O\tabularnewline
+Datei speichern&
+STRG-S\tabularnewline
+Datei speichern unter~\ldots{}&
+STRG-SHIFT-S\tabularnewline
+Datei schließen&
+STRG-W\tabularnewline
+Sitzung speichern&
+F11\tabularnewline
+Sitzung laden&
+F12\tabularnewline
+\jabref beenden&
+STRG-Q\tabularnewline
+\end{longtable}
+
+\begin{longtable}{p{66mm}p{33mm}}
+\textbf{Bearbeiten (Forts.)}&
+\tabularnewline
+\endhead
+\textbf{Bearbeiten}&
+\tabularnewline
+\endfirsthead
+Neuer Eintrag&
+STRG-N\tabularnewline
+Neuer Eintrag -- Article&
+STRG-SHIFT-A\tabularnewline
+Neuer Eintrag -- Book&
+STRG-SHIFT-B\tabularnewline
+Neuer Eintrag -- Phdthesis&
+STRG-SHIFT-T\tabularnewline
+Neuer Eintrag -- Inbook&
+STRG-SHIFT-I\tabularnewline
+Neuer Eintrag -- Mastersthesis&
+STRG-SHIFT-M\tabularnewline
+Neuer Eintrag -- Proceedings&
+STRG-SHIFT-P\tabularnewline
+Neuer Eintrag -- Unpublished&
+STRG-SHIFT-U\tabularnewline
+Neuer Eintrag aus Klartext&
+STRG-SHIFT-N\tabularnewline
+Eintrag bearbeiten&
+STRG-E\tabularnewline
+\bibtex{}-Keys generieren&
+STRG-G\tabularnewline
+Rückgängig&
+STRG-Y\tabularnewline
+Wiederholen&
+STRG-Z\tabularnewline
+Ausschneiden&
+STRG-X\tabularnewline
+Kopieren&
+STRG-C\tabularnewline
+Einfügen&
+STRG-V\tabularnewline
+Löschen&
+Entf\tabularnewline
+Alles auswählen&
+STRG-A\tabularnewline
+\texttt{\textbackslash{}cite\{BibTeX-Key\}} kopieren&
+STRG-K\tabularnewline
+Einträge markieren&
+STRG-M\tabularnewline
+Markierung löschen&
+STRG-SHIFT-M\tabularnewline
+Präambel bearbeiten&
+STRG-P\tabularnewline
+Strings bearbeiten&
+STRG-T\tabularnewline
+\end{longtable}
+
+\begin{longtable}{p{66mm}p{33mm}}
+\textbf{Ansicht / Navigation (Forts.)}&
+\tabularnewline
+\endhead
+\textbf{Ansicht / Navigation}&
+\tabularnewline
+\endfirsthead
+Zur nächsten geöffneten Datei springen&
+STRG-Bild ab\tabularnewline
+Zum vorherigen TAB springen&
+STRG-Bild auf\tabularnewline
+Gruppendialog ein-/ausblenden&
+STRG-SHIFT-G\tabularnewline
+Eintragsvorschau ein-/ausblenden&
+STRG-F9\tabularnewline
+Layout der Eintragsvorschau wechseln&
+F9\tabularnewline
+\end{longtable}
+
+\begin{longtable}{p{66mm}p{33mm}}
+\textbf{Externe Programme / Internet (Forts.)}&
+\tabularnewline
+\endhead
+\textbf{Externe Programme / Internet}&
+\tabularnewline
+\endfirsthead
+Literaturangaben in \LyX einfügen&
+STRG-L\tabularnewline
+Literaturangaben in WinEdt einfügen&
+STRG-SHIFT-W\tabularnewline
+URL/DOI öffnen&
+F3\tabularnewline
+PDF/PS öffnen&
+F4\tabularnewline
+PDF-Links synchronisieren&
+SHIFT-F4\tabularnewline
+PS-Links synchronisieren&
+STRG-F4\tabularnewline
+Medline abrufen&
+F5\tabularnewline
+CiteSeer abrufen&
+F6\tabularnewline
+Literaturangaben von CiteSeer abrufen&
+F7\tabularnewline
+\end{longtable}
+
+\begin{longtable}{p{66mm}p{33mm}}
+\textbf{Extras / Sonstiges (Forts.)}&
+\tabularnewline
+\endhead
+\textbf{Extras / Sonstiges}&
+\tabularnewline
+\endfirsthead
+Suchen&
+STRG-F\tabularnewline
+Weitersuchen&
+STRG-SHIFT-F\tabularnewline
+Suchen \& Ersetzen&
+STRG-R\tabularnewline
+Hilfe&
+F1\tabularnewline
+\end{longtable}
+
+\clearpage 
+\section[Fragen und Antworten]{Häufige Fragen und Antworten}\label{sec:faq}
+%\secttoc
+
+Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
+\begin{enumerate}
+	\item Durchsuchen Sie die \href{http://sourceforge.net/forum/?group_id=92314}{Foren} auf der Projektseite bei Sourceforge.
+	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_name=jabref-users}{Archiv} der \jabref-Mailingliste.
+	\item Stellen Sie Ihre Frage in einem der Foren oder auf der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref-Mailingliste}.
+\end{enumerate}
+
+\faq{Läuft \jabref unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Am 13.~November~2006 hat Sun sein Java unter die GNU General Public License (Version~2) gestellt, so dass die Antwort ">Ja"< lautet. Ansonsten ist zu sagen, dass eine unserer Abhängigkeiten derzeit zu einem Absturz führt, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath.}
+
+\faq{\label{faq-linux}\jabref startet nicht unter Linux. Was kann ich tun?}{\jabref läuft unter Linux, wenn Sie eine Java Runtime Environment (JRE) von Sun in der Version~1.4.2 oder einer neueren Version verwenden. Falls \jabref dennoch nicht starten sollte, können Sie folgende Fehlersuche durchführen:
+Starten Sie \texttt{java -{-}version} von der Kommandozeile. Falls dabei kein Produkt von Sun Microsystems verwendet wird (sondern beispielsweise angezeigt wird, dass Sie GCJ VM verwenden), selbst wenn Sie die JRE von Sun installiert haben, müssen Sie Ihr Setup anpassen. Da das Vorgehen dafür sehr von Ihrer Linux-Distribution abhängt, können wir keine Hinweise für jede mögliche Konstellation geben.
+Unter Debian/Ubuntu können Sie die Einstellungen anpassen, indem Sie \texttt{sudo update-alternatives -{-}config java} aufrufen (dazu brauchen Sie admin-Rechte). In dem Dialog, der daraufhin erscheint, wählen Sie die Sun JDK oder JRE. Alternativ können Sie auch nach der Java-Programmdatei suchen und diese direkt ausführen. In Ubuntu findet man Java gewöhnlich unter \texttt{/usr\slash{}lib\slash{}jvm\slash{}java-1.5.0-sun\slash{}jre\slash{}bin\slash{}java}.
+Wenn Sie keine admin-Rechte auf dem Computer haben, können Sie die Sun JRE in ihrem Home-Verzeichnis installieren. Sie müssen dann darauf achten, dass Sie die richtige Programmdatei aufrufen. Wenn Sie die JRE z.\,B. in einen Ordner namens ">java"< in ihrem Home-Verzeichnis installiert haben, geben Sie \texttt{\texttildelow{}/java/jre/bin/java -jar JabRef-2.1.jar} (bzw. die entsprechende Versionsnummer) in der Kommandozeile ein.}
+
+\clearpage\faq{Ich arbeite unter Ubuntu und \jabref startet, wenn ich auf das Icon klicke, aber nicht von der Kommandozeile. Wo liegt das Problem?}{Sie haben mehrere Java Virtual Machines installiert und von der Kommandozeile wird die falsche gewählt. Schauen Sie unter Frage \ref{faq-linux} nach, wie Sie die Einstellungen ändern können.}
+
+\faq{Wie kann ich verhindern, dass \jabref beim Speichern der .bib"=Datei in bestimmten Feldern (wie \texttt{title}) Zeilenumbrüche einfügt?}{Öfnnen Sie \menu{Optionen \msep{} Einstellungen}. Im Bereich \menu{Allgemein} gibt es die Option \menu{Beim Speichern keinen Zeilenumbruch in den folgenden Feldern einfügen}. Diese Option enthält eine Liste von Feldnamen. In Feldern, die Sie dieser Liste hinzufügen (abgetrennt mit einem Semikolon) wird beim Speichern kein Zeilenumbruch hinzugefügt.}
+
+\faq{Mein Virenscanner sagt mir, dass \jabref ein Virus ist. Ist der Server gefährdet?}{Nein, aber der Windows"=Installer benutzt das \href{http://nsis.sourceforge.net/}{Nullsoft Scriptable Install System (NSIS)} in der Version~2.18 (seit \jabref~2.1), das unglücklicherweise Installer produziert, die von einigen Virenscannern als Virus eingeschätzt werden. Wenn Sie mehr darüber erfahren wollen, sehen Sie sich die \href{http://forums.winamp.com/showthread.php?postid=1977648}{Diskussion im NSIS"=Forum} oder die \href{http://nsis.sourceforge.net/NSIS_False_Positives}{Liste der NSIS ">false positives"<} an.
+
+Als Workaround und falls Sie Bedenken haben, den Installer zu benutzen, können Sie immer die plattformunabhängige jar"=Datei benutzen (siehe dazu Abschnitt ">\nameref{subsub:jar}"<).}
+
+\clearpage 
+\section{Entwicklung}
+\secttoc
+\bigskip
+
+\noindent \jabref ist ein \emph{Open Source} Projekt, das heißt, dass jede(r)
+dazu beitragen kann, das Programm zu verbessern und weiterzuentwickeln.
+Wenn Sie Anregungen, Wünsche oder Fragen haben, ist die erste Anlaufstelle
+die \href{http://sourceforge.net/projects/jabref/}{Projektseite bei \emph{Sourceforge}}.
+Dort gibt es Foren, in denen Sie Ihre Fragen stellen können, und eine
+Mailingliste rund um \jabref. Auch Ihre Wünsche \emph{(Feature
+Requests)} und Fehlermeldungen \emph{(Bug Reports)} können Sie dort
+loswerden. Um sich direkt als Entwickler einzubringen, wenden Sie
+sich an einen der beiden Maintainer (Morten O. Alver und Nizar N.
+Batada)~-- die E-Mail-Adressen finden Sie auf der Projektseite bei
+\emph{Sourceforge}. Sie brauchen lediglich einen Sourceforge-Login,
+der dann für das Projekt freigeschaltet werden kann.
+
+
+\subsection{Beschränkungen und bekannte Probleme (Bugs)}
+
+\begin{quote}
+\emph{Da sich die Software schneller entwickelt als dieses Handbuch, muss an dieser Stelle auf die \href{http://sourceforge.net/projects/jabref/}{Projektseite bei Sourceforge} verwiesen werden.}
+\end{quote}
+
+\subsection{Danksagung}
+
+Neben den Entwicklern, die die Hilfe"=Seiten des Programms geschrieben haben, danke ich Robert Bitsche, Daniel Förderer, Thomas Fritz, Tim Hoffmann, Axel Junge, Jan Suhr und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch.
+
+Seit den Anfängen als \emph{BibKeeper} (von Morten O.~Alver) und \emph{JBibtexManager} (von Nizar N.~Batada) haben
+zahlreiche Personen dazu beigetragen, dass \jabrefversion{} zu dem
+geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Programm beigetragen hat, können Sie im Programm unter \menu{Hilfe \msep{} Über JabRef} nachsehen.
+
+\subsection{Lizenz}
+
+\jabref ist frei verfügbar unter den Bedingungen der \href{http://www.gnu.org/copyleft/gpl.html}{GNU General Public License}. Es gibt unterschiedliche Softwarepakete, die von \jabref genutzt werden. Wenn Sie sich über die Lizenzbestimmungen dieser Fremdsoftware informieren wollen, schauen Sie bitte unter \menu{Hilfe \msep{} Über JabRef} nach.
+
+\appendix
+\newpage
+\nocite{*}
+\hypertarget{bibliography}{}
+\bibliographystyle{jurabib}
+\bibliography{JabRef-UserManual_de}
+
+
+\newpage
+\addsec[Versionsgeschichte]{Versionsgeschichte dieses Handbuchs}
+
+\label{RevisionHistory}
+
+%\begin{revhist}{\versiondate}%endgültiges Datum}
+%\item Änderung
+%\end{revhist}
+
+\begin{revhist}{\versiondate}%26.\,1.\,2010}
+\item Lizenz geändert
+\item Format von A4 auf A5 geändert (bessere Bildschirmlesbarkeit)
+\item Abschnitte ">\nameref{Export-OOo}"< und ">\nameref{CustomExports}"< aktualisiert
+\item Abschnitte ">\nameref{search-regular-expressions}"< und ">\nameref{kommandozeilenoptionen}"< ergänzt
+\item Versionsnummer (2.4) angepasst
+\item Kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{1.\,12.\,2007}
+\item Abschnitt ">\nameref{NameFormatter}"< hinzugefügt
+\item Abschnitte ">\nameref{par:Feldformatierer}"< und ">\nameref{subsub:SpezielleFeldmarken}"< ergänzt
+\end{revhist}
+
+\begin{revhist}{4.\,7.\,2007}
+\item Abschnitt ">\nameref{FileLinks}"< hinzugefügt
+\item Abschnitt ">Links zu externen Dateien"< in \nameref{ExternalFiles} umbenannt
+\item Kleine Änderungen
+\end{revhist}
+
+\begin{revhist}{8.\,6.\,2007}
+\item Abschnitt ">Import und Export"< in zwei Abschnitte unterteilt
+\item Abschnitt ">\nameref{sec:faq}"< ergänzt
+\item Abschnitte ">\nameref{EntryEditorHelp}"< und ">\nameref{subsec:System-Voraussetzungen}"< angepasst
+\item Fehler im Abschnitt ">\nameref{PreviewHelp}"< korrigiert
+\item Versionsnummer angepasst
+\item Beschreibung der Felder ">doi"< und ">eid"< hinzugefügt
+\item Fehler im Link zum Mail-Archiv beseitigt
+\item Einleitung leicht ergänzt
+\item Generelle Überarbeitung des Dokuments
+\end{revhist}
+
+\begin{revhist}{18.\,4.\,2007}
+\item Abschnitte ">\nameref{LabelPatterns}"<, ">\nameref{StringEditorHelp}"< und ">\nameref{par:Feldformatierer}"< aktualisiert
+\item Fehler in Abschnitt ">\nameref{subsec:Starten-Kommandozeile}"< entfernt
+\item \jabref-Logo geändert
+\item Ein paar Kleinigkeiten
+\end{revhist}
+
+\begin{revhist}{20.\,3.\,2007}
+\item Abschnitt ">\nameref{subsubsec:Hinzufuegen-Exportfilter}"< angepasst
+\item Kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{1.\,2.\,2007}
+\item Abschnitte ">\nameref{EndnoteFilters}"<, ">\nameref{subsubsec:endnote-jabref}"<, ">\nameref{subsec:about}"< und ">\nameref{sec:faq}"< überarbeitet
+\item Literaturverzeichnis um Eintrag von \cite{btxfaq} ergänzt
+\item Und noch ein paar kleine Änderungen
+\end{revhist}
+
+\begin{revhist}{19.\,1.\,2007}
+\item Abschnitt ">\nameref{Eintragstypen}"< hinzugefügt
+\item Grafik auf Titelseite ausgetauscht
+\item Ein paar kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{10.\,12.\,2006}
+\item Abschnitt ">XMP-Metadaten"< leicht verbessert
+\item FAQ zu freien Java-APIs aktualisiert (Suns Java ist jetzt selbst frei)
+\item Wie immer: kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{9.\,12.\,2006}
+\item Abschnitte ">Weitere Hilfen"< in ">Häufige Fragen und Antworten (FAQ)"< umbenannt
+\item FAQs von der Homepage übersetzt und integriert
+\item Literaturverzeichnis um Eintrag von \cite{Fenn2006} ergänzt
+\item Ein paar kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{30.\,11.\,2006}
+\item Abschnitte ">Weitere Hilfen"< hinzugefügt
+\end{revhist}
+
+\begin{revhist}{28.\,11.\,2006}
+\item Abschnitte ">Abkürzung von Zeitschriftentiteln"<, ">XMP-Metadaten"<, ">IEEExplore"< und ">Externer Zugriff"< hinzugefügt
+\item Abschnitte ">Einführung in \bibtex{}"<, ">Das Hauptfenster"<, ">Links zu externen Dateien"< und ">Jabref und Online-Datenbanken"< erweitert
+\item Abschnitt ">Suchfunktionen"< aktualisiert
+\item Abschnitt ">Entwicklung"< gekürzt
+\item Paket ">listings"< eingebunden (ersetzt Umgebung ">lyxcode"<)
+\item Typewriter-Schrift \texttt{beramono} eingesetzt
+\item Einige kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{30.\,1.\,2006}
+\item Abschnitt >>\jabref-Bibliographien in OpenOffice.org benutzen<< aktualisiert
+\item Abschnitt zur Erzeugung der \bibtex{}-Keys aktualisiert
+\item Neues Kapitel (>>Externe Importfilter<<), geschrieben von Andreas Rudert
+\item Einige kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{6.\,12.\,2005}
+\item Lizenzbedingungen für das Handbuch hinzugefügt
+\item von PDF~1.4 auf PDF~1.2 umgestellt
+\item mehrere kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{16.\,11.\,2005}
+\item Erstentwurf von Dominik Waßenhoven, basierend
+auf dem unveröffentlichten englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
+und den Hilfeseiten des Programms
+\end{revhist}
+
+\end{document}

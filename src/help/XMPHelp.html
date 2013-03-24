@@ -1,0 +1,169 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>XMP metadata support in JabRef</h1>
+
+    <p>XMP is a standard created by Adobe Systems for storing
+    metadata (data about data) in files. An well known example for
+    metadata are MP3 tags, which can be used to describe artist,
+    album and song name of a MP3 file. Adding metadata to MP3 helps
+    other people to identify the songs correctly independent of
+    file-name and can provide means for software (MP3 players for
+    instance) to sort and group songs.</p>
+
+    <p>With XMP-support the JabRef team tries to bring the
+    advantages of metadata to the world of reference managers. You
+    can now choose to "Write XMP" metadata in the General Tab of
+    JabRef, which will put all the Bibtex information into the PDF.
+    If you then email this PDF to a collegue she can just drag the
+    file into JabRef and all information that you entered will be
+    available to her.</p>
+
+    <h2>Usage</h2>
+
+    <p>To use the XMP-feature in JabRef you can do the
+    following:</p>
+
+    <ul>
+        <li>To <b>import a single annotated PDF-file</b> that
+        contains XMP you can select "File -&gt; Import into...
+        -&gt; XMP-annotated PDF" or drag the file into the main
+        view.</li>
+
+        <li>To <b>write the bibliographic information to the
+        associated PDF</b> do the following: Double click the entry
+        in the main view, go to the "General" tab and click on
+        "Write XMP".</li>
+
+        <li>If you want <b>to annotate all the PDFs in a given
+        database</b> you can select "Tools -&gt; Write XMP for
+        database"</li>
+
+        <li>To verify if it worked you can open the PDF in Adobe
+        Acrobat and select "File -&gt; Document Properties -&gt;
+        Additional Metadata -&gt; Advanced". In the tree to the
+        right you should see an entry called
+        "http://purl.org/net/bibteXMP". This works only with Adobe
+        Acrobat, not with Adobe Reader.</li>
+
+        <li>If you don't have Adobe Acrobat, you can use
+        <i>pdfinfo</i> instead in order to see the XMP metadata.
+        <i>pdfinfo</i> is part of Xpdf
+        (<code>www.foolabs.com/xpdf</code>) and Poppler
+        (<code>http://poppler.freedesktop.org</code>).</li>
+
+        <li style="list-style: none">
+            <div style="margin-left: 2em">
+                <h2>BibteXmp Fileformat</h2>
+
+                <p>XMP uses a subset of the Resource Description
+                Framework (RDF) to store data. For JabRef a new
+                metadata format is used which maps very closely to
+                BibTeX. Basically all fields and values are turned
+                into nodes of an XML document. Only authors and
+                editors are stored as rdf:Seq-structures, so users
+                of the data can skip the splitting on 'and's. All
+                strings and crossrefs will be resolved in the
+                data.</p>
+
+                <p>The following easy minimal schema is used:</p>
+
+                <ul>
+                    <li>The BibTeX-key is stored as
+                    <code>bibtexkey</code>.</li>
+
+                    <li>The type of the BibTeX-entry is stored as
+                    <code>entrytype</code>.</li>
+
+                    <li><code>author</code> and <code>editor</code>
+                    are encoding as <code>rdf:Seq</code>s where the
+                    individual authors are represented as
+                    <code>rdf:li</code>s.</li>
+
+                    <li>All other fields are saved using their
+                    field-name as is.</li>
+                </ul><br />
+                <br />
+
+
+                <p>The following is an example of the mapping</p>
+                <pre>
+@INPROCEEDINGS{CroAnnHow05,
+  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+  title = {Effective work practices for floss development: A model and propositions},
+  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+  year = {2005},
+  owner = {oezbek},
+  timestamp = {2006.05.29},
+  url = {http://james.howison.name/publications.html}
+}
+</pre>will be transformed into
+                <pre>
+&lt;rdf:Description xmlns:bibtex="http://jabref.sourceforge.net/bibteXMP/"
+    bibtex:bibtexkey="CroAnnHow05"
+    bibtex:year="2005"
+    bibtex:title="Effective work practices for floss development: A model and propositions"
+    bibtex:owner="oezbek"
+    bibtex:url="http://james.howison.name/publications.html"
+    bibtex:booktitle="Hawaii International Conference On System Sciences (HICSS)"
+    bibtex:timestamp="2006.05.29"&gt;
+        &lt;bibtex:author&gt;
+            &lt;rdf:Seq&gt;
+                &lt;rdf:li&gt;K. Crowston&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;H. Annabi&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;J. Howison&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;C. Masango&lt;/rdf:li&gt;
+            &lt;/rdf:Seq&gt;
+        &lt;/bibtex:author&gt;
+    &lt;bibtex:entrytype&gt;Inproceedings&lt;/bibtex:entrytype&gt;
+&lt;/rdf:Description&gt;
+</pre>
+
+                <p>Beware of the following caveats if you trying to
+                parse bibteXMP:</p>
+
+                <ul>
+                    <li>In RDF attribute-value pairs can also be
+                    expressed as nodes and vice versa.</li>
+                </ul><br />
+                <br />
+
+
+                <h2>Related Links:</h2>
+
+                <p>Some links about XMP and annotating PDFs:</p>
+
+                <ul>
+                    <li>
+                    <a href="http://freelancepropaganda.com/themp/">
+                    James Howison's blog "Themp---Managing Academic
+                    Papers like MP3s"</a></li>
+
+                    <li>
+                    <a href="http://www.xml.com/pub/a/2004/09/22/xmp.html">
+                    XML.com article about XMP</a></li>
+
+					<li><a href="http://pdfbox.apache.org/">PDFBox</a> by
+					the Apache Software Foundation is the Jaba library used to
+					access the PDFs and the metadata stream.</li>
+
+                    <li>
+                    <a href="http://arstechnica.com/civis/viewtopic.php?f=19&amp;t=408429">
+                    Good thread on ArsTechnica discussing the
+                    management of PDFs.</a></li>
+
+                    <li>
+                    <a href="http://www.adobe.com/content/dam/Adobe/en/devnet/xmp/pdfs/XMPSpecificationPart1.pdf">
+                    Adobe XMP Specification</a></li>
+                </ul><br />
+                <br />
+
+            </div>
+        </li>
+    </ul>
+</body>
+</html>

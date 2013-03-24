@@ -1,0 +1,105 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+    <h1>JabRef Plugin System</h1>
+
+    <p>Starting with version 2.4, JabRef can be extended using a plugin system which was 
+    built using Java Plugin Framework (JPF).</p>
+
+    <p>To use a plugin, it needs to be put in one of the directories where JabRef looks for plugins.
+    One such directory is the one called <code>plugins</code> below the directory where the JabRef
+    jar file is located. Another is the user plugin directory, <code>~/.jabref/plugins</code> under
+    Linux or OS X and <code>.jabref/plugins</code> under your user home directory under Windows.</p>
+
+    <p>The simplest way of installing plugins is through the <i>Plugin manager</i>, accessed from
+    the <i>Plugins</i> menu. The plugin manager lists all plugins installed in your user plugin
+    directory, and allows you to both delete installed plugins and install new ones.
+    </p>
+    
+    <h2>How to write a plugin</h2>
+    
+    <p>JabRef offers the following extension-points for developers:</p>
+    <ul>
+      <li><code>ImportFormat</code> - Add importers to JabRef accessible from the 'Import into ... database'.</li> 
+      <li><code>EntryFetcher</code> - Add access to databases like Citeseer or Medline to the <i>Web Search</i> menu.</li>
+      <li><code>ExportFormatTemplate</code> - Add a template based export like the ones accessible using the <i>Manage Custom Exports</i>.</li>
+      <li><code>ExportFormat</code> - Add an export filter to JabRef's export dialog, that is more complicated than the simple template based one.</li>
+      <li><code>ExportFormatProvider</code> - A more powerful way to add export formats to JabRef.</li> 
+      <li><code>LayoutFormatter</code> - Add formatters that can be used in the layout based exporters.</li>
+      <li><code>SidePanePlugin</code> - Add a side pane component that can do any kinds of operations. The panel is
+        accessed from a <b>Plugins</b> menu in JabRef's main window.</li>
+    </ul>
+    
+    <p>These extension-points are defined in the <code>plugin.xml</code> of the JabRef-core-plugin,
+    which can be found in <code>JabRef/src/plugins/net.sf.jabref.core/</code>.</p>
+    
+    <p>To start developing follow these rough steps:</p>
+    <ol>
+      <li>Checkout the JabRef trunk from subversion (<code>https://jabref.svn.sourceforge.net/svnroot/jabref/trunk</code>).
+    This contains both JabRef itself and plug-ins contributed so far to JabRef (you don't need the htdocs folder), which make great starting points for your own plugins.</li>
+      <li>Compile JabRef using <code>ant jars</code>.</li>
+      <li>Create your own project and define your extension in your own plugin.xml that satisfy the extension points of the core plugin.xml. 
+      In particular make sure that:
+      <ul>
+        <li>...your plugin.xml has a <code>requires</code>-section that imports the core plugin (<code>net.sf.jabref.core</code>).</li>
+        <li>...your plugin.xml has a <code>runtime</code>-section, where you tell JPF, where in your project you have stored your class files and resources.</li>
+      </ul>
+      </li>
+      <li>Create a jar of your project and put it into the <code>plugins</code>-folder of JabRef.</li>
+      <li>Your plugin should be loaded when you run JabRef from the jar.</li>
+    </ol>
+
+	<p>Feel free to ask us questions related to the plugin system on the mailing-list!</p>     
+
+    <h2>How to add an extension point to JabRef</h2>
+    
+    <p>This documentation is intended for JabRef developers who want to add further extensions points.</p>
+    
+    <p>To add a new extension-point, you need to declare this extension-point in the plugin.xml of the core plugin similar to this:</p>
+    
+<pre>    
+&lt;extension-point id=&quot;PushToApplication&quot;&gt;
+	&lt;parameter-def type=&quot;string&quot; id=&quot;pushToApp&quot;
+		custom-data=&quot;&lt;classname of the interface that plugin providers need to implement&gt;&quot; /&gt;
+	&lt;!-- optionally other parameters (we currently do not use any of these for anything)
+		&lt;parameter-def type=&quot;string&quot; id=&quot;name&quot; /&gt;
+		&lt;parameter-def type=&quot;string&quot; id=&quot;description&quot;
+			multiplicity=&quot;none-or-one&quot; /&gt;
+			--&gt;
+&lt;/extension-point&gt;
+</pre>
+
+	<p>Then you need to re-run the plugin code generator "<code>ant generate</code>", which will re-create the helper class in 
+	"<code>net.sf.jabref.plugin.core.generated</code>" so that it includes a method <code>getPushToApplicationExtensions()</code> which 
+	returns a list of all PushToTalk extensions registered with the system.</p>
+ 
+    <p>This list then can be used like this (here an example what we do with the entry fetcher extensions):</p>
+
+<pre> 
+/*
+ * Load fetchers that are plug-in extensions
+ */
+JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+if (jabrefPlugin != null){
+	for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
+		EntryFetcher fetcher = ext.getEntryFetcher();
+		if (fetcher != null){
+			fetchers.add(fetcher);
+		}
+	}
+}
+ 
+// and later...
+ 
+for (EntryFetcher fetcher : fetchers){
+  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
+  web.add(generalFetcher.getAction());
+  fetcherActions.add(generalFetcher.getAction());
+}
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Pencarian</h1>
+
+    <p>Ada tiga pola pencarian yang bisa dilakukan dalam JabRef.</p>
+
+    <p><em>CTRL-F</em> membuka dialog pencarian.
+    Menekan <em>CTRL-F</em> beberapa kali akan membuka dan menutup
+    dialog pencarian ini. Ketika melakukan pencarian secara bertahap,
+    menekan <em>CTRL-F</em> akan memerintahkan program pencarian
+    meneruskan pencarian.</p>
+
+    <p><em>CTRL-SHIFT-F</em> membuka dialog pencarian, sekaligus
+    memilih pencarian bertahap. Ketika dalam proses pencarian secara
+    bertahap, anda menekan <em>CTRL-SHIFT-F</em> maka akan mencari
+    kata berikutnya yang anda cari.</p>
+
+    <h2>Pencarian bertahap</h2>
+
+    <p>Ketika melakukan pencarian bertahap, program pencarian
+    segera memulai pencarian setelah anda menekan satu huruf. Di 
+    baris status memberikan informasi kepada anda jika menemukan
+    yang anda cari. Jika anda menggunakan tombol pintasan, maka program
+    pencarian meneruskan mencari kata pada teks berikutnya. Jika
+    sudah tidak menemukan ada kata yang sama lagi, baris status
+    akan memberitahu anda bahwa sudah tidak ada kata yang ditemukan.
+    Jika anda mengulang pencarian, akan dimulai dari paling atas lagi.
+    Urutan pencarian selalu mengikuti urutan basisdata yang sekarang.
+    Untuk menghentikan pencarian, tekan tombol ketik ESC atau tekan
+    tombol dialog "Bersihkan pencarian".</p>
+
+    <h2>Normal</h2>
+
+    <p>Pada pencarian normal, setelah menekan ENTER program pencarian
+    mulai mencari dalam berkas basisdata anda yang mengandung kata 
+    carian yang anda inginkan. Hanya entri yang mengandung kata carian
+    dengan tepat yang dipertimbangkan oleh program pencarian. Untuk
+    mencari kata yang berurutan, anda perlu harus menuliskan dalam
+    tanda petik. Misalnya, carian <b>progress "marine aquaculture"</b>
+    akan menemukan baik kata pro "progress" maupun frasa "marine
+    aquaculture". Entri lain yang tidak mempunyai kata-kata tersebut
+    kemudian akan disembunyikan, dan hanya menampilkan entri yang
+    mempunyai kata carian (mode penapis), atau entri yang tidak mengandung
+    kata carian akan menjadi kelabu (mode mengambang). Untuk 
+    menghentikan pencarian, tekan tombol ketik ESC atau tekan
+    tombol dialog "Bersihkan pencarian".</p>
+
+    <h2><a name="advanced"
+       id="advanced">Spesifikasi bidang, operator
+       logika</a></h2>
+
+       <p>Untuk melakukan pencarian hanya pada bidang tertentu
+       dan/atau menggunakan operator logika sebagai ekspresi
+       pencarian, perlu menggunakan sintaks khusus yang sudah
+       disediakan. Misalnya untuk mencari penulis "Miller",
+       tuliskan (pada semua mode kecuali pencarian bertahap):</p>
+
+    <p>author = miller</p>
+
+    <p>Baik spesifikasi bidang maupun pencarian kata mendukung
+    ekspresi reguler. Jika kata carian mengandung spasi, anda 
+    perlu menuliskan dalam tanda petik. <i>Jangan</i> menggunakan
+    spasi di spesifikasi bidang! Misalnya untuk mencari entri
+    tentang image processing, tulis:</p>
+
+    <p>title|keywords = "image processing"</p>
+
+    <p>Anda bisa menggunakan "and", "or", "not", dan ekspresi
+    kurung kurawal untuk mencari:</p>
+
+    <p>(author = miller or title|keywords = "image processing") and
+    not author = brown</p>
+
+    <p>Tanda "=" digunakan untuk pernyataan "mengandung".
+    Pencarian kata yang tepat dimungkinkan dengan pernyataan perintah
+    "matches" atau "==". Pernyataan "!=" akan menguji apakah kata
+    carian <i>tidak</i> ditemukan dalam bidang (setara dengan perintah
+    "not ... contains ..."). Pemilihan tipe bidang yang dicari (diperlukan,
+    tambahan, semua) akan selalu menindih perintah yang dituliskan
+    dalam spesifikasi bidang di ekspresi pencarian. Untuk mencari
+    entri dari tipe tertentu, bidang pseudo yang disebut "entrytype"
+    juga tersedia:</p>
+
+    <p>entrytype = thesis</p>
+
+    <p>Ekspresi ini mencari entri yang mempunyai tipe (yang ditampilkan
+    pada kolum "Entrytype") dan mengandung kata "thesis" (mungkin sebagai
+    "phdthesis" dan "mastersthesis"). Bidang psedo lainnya
+    "bibtexkey" digunakan untuk mencari kunci acuan, misalnya:</p>
+
+    <p>bibtexkey = miller2005</p>
+
+    <h2>Pengaturan pencarian</h2>
+
+    <p>Tombol <em>Pengaturan</em> membuka menu lain
+    untuk mengatur sensitivitas huruf (huruf besar atau huruf kecil),
+    mengatur ekspresi pencarian, serta mengatur apakah hasilnya
+    perlu dipilih pada tabel tertentu.</p>
+</body>
+</html>

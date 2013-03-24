@@ -1,0 +1,67 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>CiteSeer-Import</h1>
+
+    <p>CiteSeer ist eine digitale Bibliothek
+    und Suchmaschine f&uuml;r wissenschaftliche Literatur,
+    vornehmlich zu den Bereichen Computer und Informatik.</p>
+
+    <h2>Importieren eines Eintrags von CiteSeer</h2>
+
+    <p>JabRef kann
+    Informationen &uuml;ber eine bestimmte Literaturangabe aus der
+    CiteSeer-Datenbank herunterladen. Um diesen Vorgang zu starten,
+    f&uuml;gen Sie Ihrer Datei einen neuen Eintrag hinzu und
+    belegen das Feld <em>citeseerurl</em> mit einem Link zur
+    entsprechenden Inhaltsseite auf CiteSeer. Das Feld
+    <em>citeseerurl</em> muss in einem der folgenden Formate
+    eingegeben werden:</p>
+
+    <p>http://citeseer.ist.psu.edu/DDDDDD[.html], oder<br />
+     oai:CiteSeerPSU:DDDDDD, oder<br />
+     DDDDDD</p>
+
+    <p>wobei DDDDDD eine Ziffernfolge darstellt. Um diese
+    Ziffernfolge (DDDDDD) f&uuml;r einen CiteSeer-Eintrag zu
+    finden, gehen Sie auf die Dokumentseite der Literaturangabe des
+    Formats http://citeseer.ist.psu.edu/<i>nameYearTitle</i>.html
+    und klicken den (Update)-Link f&uuml;r diese Literaturangabe.
+    Die URL f&uuml;r den Update-Link beinhaltet die numerische ID
+    f&uuml;r diese Literaturangabe.</p>
+
+    <p>Sobald Sie das Feld <em>citeseerurl</em> belegt haben,
+    k&ouml;nnen Sie die CiteSeer-Felder herunterladen, indem Sie
+    <b>BibTeX -&gt; Felder von CiteSeer importieren</b>
+    ausw&auml;hlen. Achten Sie darauf, dass Sie die Zeile(n)
+    ausgew&auml;hlt haben, die Sie aktualisieren wollen.</p>
+
+    <h2>Eine Datei mit zitierenden Literaturangaben
+    erzeugen</h2>
+
+    <p>Mit einem Satz von Literaturangaben k&ouml;nnen
+    Sie eine Liste der Dokumente erzeugen, die die einzelnen
+    Literaturangaben ihrerseits zitieren. Dazu muss jede
+    Literaturangabe der entsprechenden Datenbank-Datei ein
+    ausgef&uuml;lltes citeseerurl-Feld besitzen, dessen Inhalt dem
+    in <b>Importieren eines Eintrags von CiteSeer</b> beschriebenen
+    Format entspricht. Sie k&ouml;nnen diese Funktion nutzen, indem
+    Sie <b>Zitierende Literatur von CiteSeer abrufen</b>
+    ausw&auml;hlen.</p>
+
+    <h2>Benutzung eines Proxy-Servers</h2>
+
+    <p>Wenn Sie einen
+    HTTP-Proxy-Server benutzen m&uuml;ssen, &uuml;bergeben Sie den
+    Servernamen und die Portnummer an Java.</p>
+
+    <p><code>java -Dhttp.proxyHost="hostname"
+    -Dhttp.proxyPort="portnumber"</code></p>
+
+    <p>Diese Umgebungseinstellungen sind in der <a href="http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html">Sun J2SE Dokumentation</a> beschrieben.</p>
+
+</body>
+</html>

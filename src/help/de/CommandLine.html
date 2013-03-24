@@ -1,0 +1,154 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Kommandozeilen-Optionen</h1>
+
+    <p>Obwohl JabRef in erster Linie
+    ein Programm mit grafischer Benutzeroberfl&auml;che ist, bietet
+    es einige n&uuml;tzliche Optionen f&uuml;r die Kommandozeile
+    und kann sogar Dateikonvertierungen durchf&uuml;hren, ohne die
+    grafische Benutzeroberfl&auml;che zu &ouml;ffnen.</p>
+
+    <p>Sie k&ouml;nnen eine oder mehrere BibTeX-Dateien laden,
+    indem Sie auf der Kommandozeile die entsprechenden Dateinamen
+    auflisten. Achten Sie darauf, alle gew&uuml;nschten Optionen
+    anzugeben, bevor Sie die Dateinamen anf&uuml;gen.
+    Au&szlig;erdem m&uuml;ssen Sie sich vergewissern, dass der
+    erste Dateiname nicht als Argument einer Option missverstanden
+    werden kann&nbsp;- falls eine Bool'sche Option wie
+    <code>-n</code> oder <code>-l</code> direkt vor einem
+    Dateinamen steht, m&uuml;ssen Sie also "true" als Argument
+    angeben. Das Beispielkommando:</p>
+
+    <p><code>jabref -o filetoexport.xml,docbook -n true
+    original.bib</code></p>
+
+    <p>l&auml;dt die Datei <code>original.bib</code>, exportiert
+    sie in das Docbook-Format, speichert sie unter dem Namen
+    <code>filetoexport.xml</code> und unterdr&uuml;ckt das Laden
+    der grafischen Oberfl&auml;che. Das Word <em>true</em>
+    verhindert, dass der Dateiname als Argument der Option
+    <code>-n</code> interpretiert wird.</p>
+
+    <h2>Hilfe: -h</h2>
+
+    <p>Diese Option veranlasst JabRef, eine
+    Zusammenfassung der Kommandozeilen-Optionen anzuzeigen und das
+    Programm unmittelbar darauf zu schlie&szlig;en.</p>
+
+    <h2>Kein GUI-Modus: -n</h2>
+
+    <p>Diese Option unterdr&uuml;ckt sowohl
+    das JabRef-Fenster als auch den Er&ouml;ffnungsbildschirm, der
+    normalerweise beim Programmstart angezeigt wird. Das Programm
+    wird beendet, sobald die Kommandozeilen-Optionen abgearbeitet
+    wurden.</p>
+
+    <p>Diese Option ist n&uuml;tzlich, um Dateikonvertierungen von
+    der Kommandozeile oder mit Hilfe eines Scripts
+    durchzuf&uuml;hren.</p>
+
+    <h2>Sitzung laden: -l</h2>
+
+    <p>Diese Option veranlasst JabRef, eine
+    gespeicherte Sitzung zu laden, sofern eine vorhanden ist, bevor
+    sich das Hauptfenster &ouml;ffnet.</p>
+
+    <h2>Datei importieren: -i Dateiname[,Importformat]</h2>
+
+    <p>Bei dieser Option importiert oder l&auml;dt JabRef eine bestimmte
+    Datei. Wenn nur ein Dateiname angegeben wird oder ein Komma und
+    ein *-Zeichen hinter dem Dateinamen stehen, versucht JabRef,
+    das Dateiformat automatisch zu erkennen. Das sollte bei allen
+    BibTeX-Dateien ebenso funktionieren wie bei Dateien, die in
+    einem der von JabRef unterst&uuml;tzten Importformate
+    vorliegen. Wenn dem Dateinamen ein Komma und ein Importformat
+    folgen, wird der angegebene Importfilter benutzt. Mit der
+    Option <code>-h</code> k&ouml;nnen Sie sich eine Liste der
+    verf&uuml;gbaren Importformate anzeigen lassen.</p>
+
+    <p>Wenn Sie zus&auml;tzlich eine Export-Option angeben, wird
+    der Import immer zuerst ausgef&uuml;hrt, bevor die importierte
+    oder geladene Datei an den Exportfilter &uuml;bergeben wird.
+    Falls die grafische Oberfl&auml;che nicht mit der Option
+    <code>-n</code> unterdr&uuml;ckt wird, werden alle geladenen
+    oder importierten Dateien im Hauptfenster von JabRef
+    angezeigt.</p>
+
+    <p>Die Option <code>-i</code> kann nur einmal angegeben werden
+    und nimmt als Argument maximal eine Datei.</p>
+
+    <h2>Datei exportieren: -o Dateiname[,Exportformat]</h2>
+
+    <p>Diese Option veranlasst JabRef, eine Datei zu speichern oder zu
+    exportieren, die von derselben Kommandozeile geladen oder
+    importiert wurde. Wenn eine Datei mit der Option
+    <code>-i</code> importiert wurde, wird diese Datei exportiert.
+    Ansonsten wird die Datei exportiert, die
+    <em>zuletzt</em>&nbsp;- ohne die Option <code>-i</code>&nbsp;-
+    angegeben (und erfolgreich geladen) wurde.</p>
+
+    <p>Wird nur ein Dateiname angegeben, so wird diese Datei im
+    BibTeX-Format gespeichert. Wenn dem Dateinamen ein Komma und
+    ein Exportformat folgen, wird der angegebene Exportfilter
+    benutzt. Auf diese Weise wird auch ein benutzerdefinierter
+    Exportfilter angewendet; wenn der Name sowohl auf einen
+    Standard-Exportfilter, als auch auf einen benutzerdefinierten
+    Exportfilter zutrifft, wird der benutzerdefinierte
+    verwendet.</p>
+
+    <p>Mit der Option <code>-h</code> k&ouml;nnen Sie sich eine
+    Liste der verf&uuml;gbaren Exportformate anzeigen lassen.</p>
+
+    <p>Falls die Option <code>-n</code> nicht aufgerufen wurde,
+    wird jeder Exportvorgang durchgef&uuml;hrt, bevor das
+    JabRef-Fenster ge&ouml;ffnet wird. Dort werden dann die
+    importierten Dateien angezeigt.</p>
+
+    <p>Die Option <code>-o</code> kann nur einmal angegeben werden
+    und nimmt als Argument maximal eine Datei.</p>
+
+    <h2>Einstellungen exportieren: -x Dateiname</h2>
+
+    <p>Mit dieser Option k&ouml;nnen Sie JabRef veranlassen, alle
+    Benutzer-Einstellungen in eine XML-Datei zu speichern. Nach dem
+    Export startet JabRef normal.</p>
+
+    <h2>Einstellungen importieren: -p Dateiname</h2>
+
+    <p>Mit dieser Option importiert JabRef Benutzer-Einstellungen, die mit der
+    Option <code>-x</code> exportiert wurden. Nach dem Import
+    startet JabRef normal.</p>
+
+    <h2>Nur benutzte Eintr&auml;ge exportieren: -a
+    Dateiname[.aux],neueBibDatei[.bib]</h2>
+
+    <p>Manchmal ist es
+    n&uuml;tzlich, eine BibTeX-Datei zu haben, die nur die
+    benutzten Eintr&auml;ge enth&auml;lt. Eine Liste dieser
+    benutzten Eintr&auml;ge findet sich in einer .aux-Datei (sobald
+    Sie LaTeX aufgerufen haben). JabRef kann diese Datei
+    analysieren, um eine neue BibTeX-Datei zu erstellen, die nur
+    die bekannten und benutzten Eintr&auml;ge enth&auml;lt. Das
+    bedeutet, dass ein Eintrag, der in der Standard-BibTeX-Datei
+    nicht definiert ist, auch nicht in die neue Datei geschrieben
+    werden kann.</p>
+
+    <h2>Aus dem Internet abrufen: --fetch==Name des Fetchers:Suchausdruck</h2>
+
+    <p>Die <em>Fetcher</em>, also die direkte Suche in Online-Datenbanken,
+	die Sie im Men&uuml; <b>Internet</b> finden, k&ouml;nnen auch von der Kommandozeile
+    aus gestartet werden. Nutzen Sie dazu die Option <code>--fetch</code> und geben
+    sowohl den Namen des Fetchers (z.B. 'ieee', 'medline' oder 'jstor')
+    als auch den Suchausdruck oder die ID des gesuchten Mediums an. Beachten
+    Sie, dass einige Fetcher eine graphische Oberfl&auml;che (GUI) anzeigen,
+    falls Sie eine R&uuml;ckmeldung von Ihnen brauchen. Um eine &Uuml;bersicht der
+    verf&uuml;gbaren Fetcher zu erhalten, geben Sie <code>--fetch</code> ohne
+    Parameter ein.</p>
+	
+
+</body>
+</html>

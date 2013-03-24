@@ -1,0 +1,147 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Der Eintrags-Editor</h1>
+
+    <p><em>Ge&ouml;ffnet wird der
+    Eintrags-Editor im Hauptfenster durch einen Doppelklick auf die
+    Zeile eines Eintrags oder durch Dr&uuml;cken auf ENTER. Der
+    Eintrags-Editor wird geschlossen, indem man auf ESC
+    dr&uuml;ckt.</em></p>
+
+    <p>Im Eintrags-Editor k&ouml;nnen Sie alle relevanten
+    Informationen eines Eintrags festlegen. Der Editor
+    &uuml;berpr&uuml;ft den Eintragstyp und zeigt alle
+    ben&ouml;tigten und optionalen Felder f&uuml;r den Gebrauch mit
+    <em>BibTeX</em> an. Dar&uuml;ber hinaus gibt es einige Felder,
+    die <em>Allgemeine Felder</em> genannt werden und f&uuml;r alle
+    Eintragstypen gelten.</p>
+
+    <p>Sie k&ouml;nnen die Felder, die f&uuml;r die einzelnen
+    Eintragstypen als ben&ouml;tigt und optional angesehen werden,
+    und auch die Allgemeinen Felder anpassen. Schlagen Sie unter
+    <a href="CustomEntriesHelp.html">Eintragstypen anpassen</a>
+    nach, wenn Sie mehr Informationen dar&uuml;ber erhalten
+    m&ouml;chten.</p>
+
+    <p>N&auml;here Informationen dar&uuml;ber, was in die Felder
+    eingetragen werden soll, finden sie in der
+    <a href="BibtexHelp.html">Bibtex Hilfe</a>.</p>
+
+    <h2>Die Panels des Eintrags-Editors</h2>
+
+    <p>Der Eintrags-Editor
+    besteht in der Standardeinstellung aus f&uuml;nf Panels:
+    <em>Ben&ouml;tigte Felder</em>, <em>Optionale Felder</em>,
+    <em>General</em>, <em>Abstract</em> und <em>BibTeX
+    Quelltext</em>, wobei <em>General</em> und <em>Abstract</em>
+    vom Benutzer angepasst werden k&ouml;nnen (siehe dazu
+    <a href="GeneralFields.html">Allgemeine Felder festlegen</a>).
+    In den ersten drei Panels k&ouml;nnen Sie mit TAB und SHIFT-TAB
+    zwischen den einzelnen Feldern hin- und herwechseln.</p>
+
+    <p>Zu einem anderen Panel gelangen Sie, indem Sie auf die Tabs
+    klicken. Mit den folgenden Tastaturk&uuml;rzeln k&ouml;nnen Sie
+    ebenfalls zwischen den Panels navigieren: CTRL-TAB oder
+    CTRL-PLUS wechselt zum Panel rechts vom aktuellen Panel,
+    CTRL-SHIFT-TAB oder CTRL-MINUS wechselt dementsprechend zum
+    Panel links vom aktuellen Panel. Au&szlig;erdem k&ouml;nnen Sie
+    zum n&auml;chsten oder vorherigen Eintrag wechseln, indem Sie
+    "STRG-SHIFT-Pfeil nach unten" bzw. "STRG-SHIFT-Pfeil nach oben"
+    oder die Pfeiltasten in der linken Toolbar dr&uuml;cken.</p>
+
+    <p>Das Panel <em>BibTeX Quelltext</em> zeigt, wie der Eintrag
+    aussehen wird, wenn die Datei im <em>bibtex</em>-Format
+    gespeichert wird. Wenn Sie wollen, k&ouml;nnen Sie den
+    <em>BibTeX</em> Quelltext direkt bearbeiten. Sobald Sie zu
+    einem anderen Panel wechseln, STRG-S dr&uuml;cken oder den
+    Eintrags-Editor schlie&szlig;en, wird JabRef versuchen, den
+    Inhalt des Quelltext-Panels zu analysieren. Falls dabei
+    Probleme auftreten, werden Sie benachrichtigt und erhalten die
+    M&ouml;glichkeit, den Eintrag noch einmal zu &uuml;berarbeiten
+    oder den vorherigen Inhalt wiederherzustellen. Wenn in den
+    <strong>Einstellungen</strong> (unter
+    <strong>Allgemein</strong>) die Option <strong>Quelltext
+    standardm&auml;&szlig;ig anzeigen</strong> gew&auml;hlt wurde,
+    wird das Quelltext-Panel beim &Ouml;ffnen des Eintrags-Editors
+    als erstes angezeigt. Wenn Sie lieber den Quelltext bearbeiten
+    als die anderen Panels zu benutzen, sollten Sie diese Option
+    w&auml;hlen.</p>
+
+    <p><strong>Tip:</strong> Wenn Ihre Datei Felder enth&auml;lt,
+    die JabRef nicht kennt, erscheinen diese im
+    Quelltext-Panel.</p>
+
+    <p><strong>Tip:</strong> Die <i>pdf</i> und <i>url</i>-Felder
+    unterst&uuml;tzen Drag &amp; Drop. Sie k&ouml;nnen z.B. ein URL
+    aus Ihrem Browser dort einf&uuml;gen.</p>
+
+    <h2>&Uuml;berpr&uuml;fung der Feldkonsistenz</h2>
+
+    <p>Wenn der
+    Inhalt eines Feldes ge&auml;ndert wird, &uuml;berpr&uuml;ft
+    JabRef, ob der neue Inhalt akzeptiert werden kann. Bei Feldern,
+    die von <em>BibTeX</em> genutzt werden, wird der Inhalt zum
+    einen auf die richtige Klammerung mit geschweiften Klammern,
+    aber auch auf die Benutzung des Zeichens '#' hin
+    &uuml;berpr&uuml;ft. Das "hash"-Symbol darf <em>nur</em>
+    paarweise benutzt werden, um damit den Namen eines
+    <em>BibTeX</em>-Strings einzuschlie&szlig;en. Beachten Sie,
+    dass JabRef nicht &uuml;berpr&uuml;ft, ob der angef&uuml;hrte
+    String tats&auml;chlich vorhanden ist (der
+    <em>BibTeX</em>-Stil, den Sie benutzen, kann eine beliebige
+    Anzahl von Strings definieren, die JabRef nicht kennt).</p>
+
+    <p>Falls die Inhalte nicht akzeptabel sind, wird das Feld mit
+    roter Farbe hinterlegt, was auf einen Fehler hindeutet. In
+    diesem Fall werden die &Auml;nderungen nicht gespeichert.</p>
+
+    <h2>Autovervollst&auml;ndigung von W&ouml;rtern und Namen</h2>
+
+    <p>Der Eintragseditor bietet die Autovervollst&auml;ndigung von W&ouml;rtern.
+    Im Dialog <em>Optionen -> Einstellungen</em> k&ouml;nnen Sie ausw&auml;hlen,
+    in welchen Feldern die Autovervollst&auml;ndigung aktiviert werden soll.</p>
+
+    <p>Bei aktiver Autovervollst&auml;ndigung zeichnet JabRef alle Worte
+	auf, die in jedem der ausgew&auml;hlten Felder der Datei vorkommen.
+	Immer wenn Sie den Anfang eines dieser W&ouml;rter schreiben, wird das
+	Wort sichtbar vorgeschlagen. Sie k&ouml;nnen den Vorschlag ignorieren,
+	indem Sie einfach weiterschreiben. Um den Vorschlag anzunehmen,
+	dr&uuml;cken Sie entweder auf <em>ENTER</em> oder benutzen die Pfeiltasten
+	oder andere Tasten, um die Auswahlbox um die vorgeschlagenen Buchstaben
+	zu entfernen.</p>
+
+    <p><em>Anmerkung:</em> Bei den W&ouml;rtern, die f&uuml;r
+    die Vorschl&auml;ge ber&uuml;cksichtigt werden, handelt es sich nur um
+    solche, die in demselben Feld in Eintr&auml;gen der Datei vorkommen, die Sie
+    gerade bearbeiten. Es gibt viele M&ouml;glichkeiten, um dieses Feature
+    zu realisieren, und wenn Sie der Meinung sind, das es auf eine andere
+    Art implementiert werden sollte, w&uuml;rden wir gerne Ihre
+    Vorschl&auml;ge h&ouml;ren.</p>
+
+    <h2><em>BibTeX</em> Key kopieren</h2>
+
+    <p>Mit STRG-K oder dem 'Key'-Knopf wird der <em>BibTeX</em> Key des
+    ausgew&auml;hlten Eintrags mit umgebenden <code>\cite{...}</code> in die Zwischenablage kopiert.</p>
+
+    <h2>Nur <em>BibTeX</em> Key kopieren</h2>
+
+    <p>Mit STRG-SHIFT-K wird der <em>BibTeX</em> Key des
+    ausgew&auml;hlten Eintrags in die Zwischenablage kopiert.</p>
+
+    <h2><em>BibTeX</em> Key automatisch generieren</h2>
+
+    <p>Um einen
+    <em>BibTeX</em> Key f&uuml;r einen Eintrag automatisch
+    erstellen zu lassen, dr&uuml;cken Sie STRG-G oder den
+    entsprechenden (Zauberstab-)Knopf in der Toolbar-Leiste.</p>
+
+    <p>F&uuml;r n&auml;here Informationen, wie die <em>BibTeX</em>
+    Keys generiert werden, schauen Sie bitte unter
+    <a href="LabelPatterns.html">Anpassen der automatischen
+    Generierung von BibTeX-keys</a> nach.</p>
+</body>
+</html>

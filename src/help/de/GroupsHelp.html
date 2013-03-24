@@ -1,0 +1,411 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Gruppen</h1>
+
+    <p>Mit Gruppen k&ouml;nnen Sie Ihre BibTeX-Datei
+    in einer Baumstruktur anordnen, vergleichbar mit einer
+    Dateistruktur in Ordnern und Unterordnern. Die beiden
+    Hauptunterschiede sind:</p>
+
+    <ul>
+        <li>W&auml;hrend eine Datei auf einer Festplatte immer in
+        genau einem Ordner abgelegt ist, kann ein Literatureintrag
+        in JabRef mehreren Gruppen angeh&ouml;ren.</li>
+
+        <li>Gruppen benutzen bestimmte Kriterien, um ihren Inhalt
+        dynamisch zu bestimmen. Neue Eintr&auml;ge, die den
+        Kriterien einer Gruppe entsprechen, geh&ouml;ren
+        automatisch zu dieser Gruppe. Diese Funktionalit&auml;t
+        gibt es nicht in &uuml;blichen Dateisystemen, wohl aber in
+        einigen E-Mail-Programmen (z.B. Thunderbird und
+        Opera).</li>
+    </ul>Wenn Sie eine Gruppe ausw&auml;hlen, werden die
+    Eintr&auml;ge dieser Gruppe angezeigt. Wenn Sie mehrere Gruppen
+    ausw&auml;hlen, werden entweder die Eintr&auml;ge angezeigt,
+    die in einer der Gruppen sind (Vereinigung), oder solche, die
+    in allen Gruppen vorhanden sind (Schnittmenge) -- das
+    h&auml;ngt von Ihren Einstellungen ab. All dies wird im
+    Folgenden detailliert erl&auml;utert.
+
+    <p>Gruppendefinitionen sind dateispezifisch; sie werden als
+    <tt>@COMMENT</tt>-Block in der <tt>bib</tt>-Datei gespeichert
+    und werden von allen Benutzern gemeinsam benutzt.
+    (K&uuml;nftige Versionen von JabRef werden m&ouml;glicherweise
+    benutzerabh&auml;ngige Gruppen unterst&uuml;tzen.)</p>
+
+    <h2>Die Gruppenansicht</h2>
+
+    <p>Die Gruppenansicht wird im linken
+    Bereich des Bildschirms angezeigt. Sie kann mit der
+    Tastenkombination <tt>STRG-SHIFT-G</tt> oder dem Gruppen-Button
+    in der Toolbar ein- und ausgeblendet werden. Die Gruppenansicht
+    verf&uuml;gt &uuml;ber mehrere Schaltfl&auml;chen, aber die
+    meisten Funktionen werden &uuml;ber das Kontextmen&uuml;
+    angesteuert (also mit der rechten Maustaste). Drag &amp; Drop
+    wird ebenfalls unterst&uuml;tzt.</p>
+
+    <table cellspacing="0"
+           cellpadding="5"
+           border="0"
+           style="background-color: #C0FFC0"
+		   summary="Beispiele">
+        <tr>
+            <td>
+                <h2>Einige kurze Beispiele</h2>
+
+                <p>Sie m&ouml;chten vielleicht...</p>
+
+                <h3>...einfach nur eine Gruppe anlegen und ihr
+                einige Eintr&auml;ge zuordnen</h3>
+
+                <p>Vergewissern Sie
+                sich, dass die Gruppenansicht eingeschaltet ist.
+                Dr&uuml;cken Sie auf den Button <b>Neue Gruppe</b>,
+                geben einen Namen f&uuml;r die Gruppe ein und
+                dr&uuml;cken OK. Sie k&ouml;nnen alle Einstellungen
+                auf ihren Standardwerten belassen. Jetzt
+                w&auml;hlen Sie die Eintr&auml;ge aus, die der
+                Gruppe zugeordnet werden sollen, und ziehen diese
+                mit der Maus auf die Gruppe oder w&auml;hlen <b>Zu
+                Gruppe hinzuf&uuml;gen</b> aus dem
+                Kontextmen&uuml;. Jetzt k&ouml;nnen Sie die Gruppe
+                anklicken, um sich ihren Inhalt anzeigen zu lassen
+                (das sollten die Eintr&auml;ge sein, die Sie gerade
+                hinzugef&uuml;gt haben).</p>
+
+                <h3>...das Feld <tt>keywords</tt> benutzen, um die
+                Eintr&auml;ge zu gruppieren</h3>
+
+                <p>Stellen Sie sicher,
+                dass die Gruppenansicht aktiviert ist. Dr&uuml;cken
+                Sie auf den Button <b>Neue Gruppe</b>, geben einen
+                Namen f&uuml;r die Gruppe ein und w&auml;hlen die
+                Option <b>Dynamisches Gruppieren der Eintr&auml;ge
+                anhand eines Stichworts in einem Feld</b>. Geben
+                Sie das Stichwort, nach dem gesucht werden soll,
+                ein und dr&uuml;cken OK. Jetzt k&ouml;nnen Sie die
+                Gruppe anklicken, um sich ihren Inhalt anzeigen zu
+                lassen (das sollten alle Eintr&auml;ge sein, deren
+                <tt>keywords</tt>-Feld das Stichwort enth&auml;lt,
+                das Sie angegeben haben).</p>
+
+                <h3>...einen frei w&auml;hlbaren Suchausdruck
+                verwenden, um eine Gruppe zu definieren</h3>
+
+                <p>Stellen Sie sicher, dass die Gruppenansicht aktiviert ist.
+                Dr&uuml;cken Sie auf den Button <b>Neue Gruppe</b>,
+                geben einen Namen f&uuml;r die Gruppe ein und
+                w&auml;hlen die Option <b>Dynamisches Gruppieren
+                der Eintr&auml;ge anhand eines beliebigen
+                Suchausdrucks</b>. Geben Sie <tt>author=smith</tt>
+                als Suchausdruck ein (ersetzen Sie <tt>smith</tt>
+                mit einem Namen, der wirklich in Ihrer Datei
+                vorkommt) und klicken <b>OK</b>. Jetzt k&ouml;nnen
+                Sie die Gruppe anklicken, um sich ihren Inhalt
+                anzeigen zu lassen (das sollten alle Eintr&auml;ge
+                sein, deren <tt>author</tt>-Feld den Namen
+                beinhaltet, den Sie angegeben haben).</p>
+
+                <h3>...mehrere Gruppen kombinieren</h3>
+
+                <p>Erstellen sie zwei unterschiedliche Gruppen
+                (z.B. so wie oben beschrieben).
+                Klicken Sie auf den Button
+                <b>Einstellungen</b> in der Gruppenansicht und
+                w&auml;hlen <b>Vereinigung</b>. Jetzt w&auml;hlen
+                Sie beide Gruppen aus (dazu klicken Sie auf eine
+                Gruppe und anschlie&szlig;end bei gedr&uuml;ckter
+                STRG-Taste auf die andere Gruppe). Sie sollten
+                jetzt alle Eintr&auml;ge sehen, die in einer der
+                beiden Gruppen aufgef&uuml;hrt sind. Klicken Sie
+                noch einmal auf <b>Einstellungen</b> und
+                w&auml;hlen <b>Schnittmenge</b> aus. Nun sollten
+                Sie nur die Eintr&auml;ge sehen, die in beiden
+                Gruppen enthalten sind (das k&ouml;nnen auch keine
+                sein, oder aber genau dieselben Eintr&auml;ge wie
+                zuvor, sofern beide Gruppen dieselben Eintr&auml;ge
+                enthalten).</p>
+
+                <h3>...sehen, welche Gruppen sich
+                &uuml;berschneiden</h3>
+
+                <p>Mit JabRef k&ouml;nnen Sie
+                ganz einfach herausfinden, welche Gruppen sich mit
+                den aktuell ausgew&auml;hlten Gruppen
+                &uuml;berschneiden (d.h. welche Gruppen zumindest
+                einen Eintrag enthalten, der auch in der aktuell
+                ausgew&auml;hlten Gruppe ist). Klicken Sie auf
+                <b>Einstellungen</b> und aktivieren die Option
+                <b>Sich &uuml;berschneidende Gruppen markieren</b>.
+                W&auml;hlen Sie dann eine Gruppe, die sich mit
+                anderen &uuml;berschneidet. Diese anderen Gruppen
+                sollten nun markiert sein.</p>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Arten von Gruppen</h2>
+
+    <p>In JabRef 1.8 gibt es vier verschiedene Arten von Gruppen</p>
+
+    <ol>
+        <li>Die Gruppe <b>Alle Eintr&auml;ge</b>, die -- wie der
+        Name vermuten l&auml;sst -- alle Eintr&auml;ge beinhaltet,
+        ist immer vorhanden und kann weder ver&auml;ndert noch
+        gel&ouml;scht werden.</li>
+
+        <li><b>Statische Gruppen</b> verhalten sich wie Ordner auf
+        einer Festplatte und beinhalten nur die Eintr&auml;ge, die
+        Sie ihnen explizit zuweisen.</li>
+
+        <li><b>Dynamische Gruppen basierend auf einem Stichwort</b>
+        beinhalten Eintr&auml;ge, die in einem bestimmten
+        BibTeX-Feld (z.B. <tt>keywords</tt>) ein bestimmtes
+        Stichwort (z.B. <tt>elektrisch</tt>) aufweisen. Diese
+        Methode ben&ouml;tigt kein manuelles Zuweisen der
+        Eintr&auml;ge, sondern nutzt die bereits in der Datei
+        vorhandenen Informationen. Wenn alle Eintr&auml;ge in Ihrer
+        Datenbank passende Stichw&ouml;rter haben, k&ouml;nnte
+        diese Art von Gruppe die beste Wahl f&uuml;r Sie sein.</li>
+
+        <li><b>Dynamische Gruppen basierend auf einer freien
+        Suche</b> beinhalten Eintr&auml;ge, die mit einem
+        bestimmten Suchausdruck &uuml;bereinstimmen. Dabei wird
+        dieselbe Syntax verwendet wie beim
+        <a href="SearchHelp.html">Suchen</a>. Diese
+        <a href="SearchHelp.html#advanced">Syntax</a>
+        unterst&uuml;tzt logische Operatoren (<tt>AND</tt>,
+        <tt>OR</tt>, <tt>NOT</tt>) und erlaubt es, in einem oder
+        mehreren BibTeX-Feldern zu suchen. Dadurch ist eine
+        flexiblere Definition von Gruppen m&ouml;glich als mit
+        einer Stichwortsuche (z.B. <tt>author=smith AND
+        title=elektrisch</tt>).</li>
+    </ol>Jede Gruppe, die Sie erstellen, ist von einer der drei
+    letztgenannten Arten. Der Dialog "Gruppe bearbeiten", der mit
+    einem Doppelklick auf eine Gruppe aufgerufen wird, zeigt eine
+    kurze Beschreibung der ausgew&auml;hlten Gruppe.
+
+    <h2>Gruppenstrukturen, Erstellen und L&ouml;schen von
+    Gruppen</h2>
+
+    <p>Vergleichbar mit Ordnern sind die Gruppen in einer
+    Baumansicht strukturiert, wo die Gruppe <b>Alle
+    Eintr&auml;ge</b> das Stammelement ist. Mit einem Rechtsklick
+    auf eine Gruppe k&ouml;nnen Sie dem Baum eine neue Gruppe
+    hinzuf&uuml;gen, entweder auf derselben Ebene wie die
+    ausgew&auml;hlte Gruppe oder als ihre Untergruppe. Der Button
+    <b>Neue Gruppe</b> erzeugt eine neue Untergruppe der Gruppe
+    <b>Alle Eintr&auml;ge</b>, egal ob Sie gerade Gruppen
+    ausgew&auml;hlt haben oder nicht. Im Kontextmen&uuml;
+    k&ouml;nnen Sie auch Gruppen und/oder Untergruppen
+    l&ouml;schen, Untergruppen alphabetisch sortieren oder Gruppen
+    an eine andere Stelle des Baums verschieben. Letzteres
+    k&ouml;nnen Sie auch mit Drag&nbsp;&amp;&nbsp;Drop machen,
+    allerdings mit der Einschr&auml;nkung, dass bei
+    Drag&nbsp;&amp;&nbsp;Drop die Reihenfolge der Untergruppen
+    einer Gruppe nicht ver&auml;ndert werden kann.</p>
+
+    <p>R&uuml;ckg&auml;ngig und Wiederholen wird f&uuml;r alle
+    Bearbeitungsschritte unterst&uuml;tzt.</p>
+
+    <h3>Statische Gruppen</h3>
+
+    <p>Statische Gruppen werden nur durch
+    manuelles Zuweisen von Eintr&auml;gen "gef&uuml;ttert". Nachdem
+    Sie eine statische Gruppe erstellt haben, w&auml;hlen Sie die
+    Eintr&auml;ge aus, die Sie ihr zuweisen wollen, und nutzen
+    entweder Drag&nbsp;&amp;&nbsp;Drop oder das Kontextmen&uuml; in
+    der Tabelle, um die Zuweisung durchzuf&uuml;hren. Um
+    Eintr&auml;ge aus einer Gruppe zu entfernen, w&auml;hlen Sie
+    sie aus und benutzen das Kontextmen&uuml; in der Tabelle. Es
+    k&ouml;nnen keine weiteren Optionen angegeben werden.</p>
+
+    <p>Diese Methode des Gruppierens setzt voraus, dass alle
+    Eintr&auml;ge einen eindeutigen BibTeX-Key haben. Im Falle von
+    fehlenden oder doppelten BibTeX-Keys kann das Zuweisen der
+    betreffenden Eintr&auml;ge in k&uuml;nftigen Sitzungen nicht
+    korrekt wiederhergestellt werden.</p>
+
+    <h3>Dynamische Gruppen</h3>
+
+    <p>Der Inhalt einer dynamischen Gruppe
+    wird von einer logischen Bedingung bestimmt. Nur Eintr&auml;ge,
+    die dieser Bedingung entsprechen, geh&ouml;ren zu dieser
+    Gruppe. Diese Methode nutzt die bereits in der Datei
+    vorhandenen Informationen und wird aktualisiert, sobald Sie
+    Ver&auml;nderungen in der Datei vornehmen.</p>
+
+    <p>Es gibt zwei m&ouml;gliche Arten von Bedingungen:</p>
+
+    <dl>
+        <dt><b>Ein Feld nach einem Stichwort durchsuchen</b></dt>
+
+        <dd>Diese Methode gruppiert Eintr&auml;ge, bei denen ein
+        bestimmtes BibTeX Feld (z.B. <tt>keywords</tt>) einen
+        bestimmten Suchausdruck (z.B. <tt>elektrisch</tt>)
+        enth&auml;lt. Damit dies funktioniert, muss das Feld, nach
+        dem sortiert wird, nat&uuml;rlich in jedem Eintrag
+        vorhanden und sein Inhalt fehlerfrei sein. Das obige
+        Beispiel w&uuml;rde alle Eintr&auml;ge zu einer Gruppe
+        zusammenfassen, die sich auf etwas elektrisches beziehen.
+        Benutzt man das Feld <tt>author</tt>, kann man sich
+        Eintr&auml;ge eines bestimmten Autors gruppieren lassen,
+        usw. Die Suche ist als reine Textsuche oder mit einem
+        regul&auml;ren Ausdruck m&ouml;glich. Im ersten Fall
+        erlaubt JabRef das manuelle Zuweisen zu und Entfernen aus
+        einer Gruppe; dazu f&uuml;gt JabRef den Suchausdruck dem
+        entsprechenden Feld zu bzw. entfernt ihn daraus. Das macht
+        nur f&uuml;r das Feld <tt>keywords</tt> oder f&uuml;r
+        selbstdefinierte Felder Sinn, aber offensichtlich nicht
+        f&uuml;r Felder wie <tt>author</tt> oder
+        <tt>year</tt>.</dd>
+
+        <dt><b>Einen freien Suchausdruck verwenden</b></dt>
+
+        <dd>Diese Vorgehensweise ist ganz &auml;hnlich wie die eben
+        beschriebene, aber statt nur ein Feld nach einem
+        Suchausdruck zu durchsuchen, kann hierbei die
+        <a href="SearchHelp.html#advanced">Syntax der Suche</a>
+        angewendet werden, die logische Operatoren (<tt>AND</tt>,
+        <tt>OR</tt>, <tt>NOT</tt>) und die Suche in mehreren
+        Feldern gleichzeitig unterst&uuml;tzt. So fasst z.B. die
+        Suchanfrage <tt>keywords=Regression AND NOT
+        keywords=linear</tt> Eintr&auml;ge, die sich mit
+        nicht-linearer Regression besch&auml;ftigen, zu einer
+        Gruppe zusammen.</dd>
+    </dl>In der Gruppenansicht werden dynamische Gruppen
+    standardm&auml;&szlig;ig <i>kursiv</i> dargestellt. Dies kann
+    unter <strong>Optionen -&gt; Einstellungen -&gt;
+    Gruppen</strong> abgestellt werden.
+
+    <h3>Hierarchischer Kontext</h3>
+
+    <p>Standardm&auml;&szlig;ig ist
+    eine Gruppe <b>unabh&auml;ngig</b> von ihrer Position im
+    Gruppenbaum. Ist eine Gruppe ausgew&auml;hlt, wird nur der
+    Inhalt dieser Gruppe angezeigt. Es ist jedoch -- besonders beim
+    Verwenden dynamischer Gruppen -- oft n&uuml;tzlich, eine
+    Untergruppe zu erstellen, die <b>ihre Obergruppe
+    verfeinert</b>. Wenn diese Untergruppe ausgew&auml;hlt wird,
+    werden alle Eintr&auml;ge dieser Gruppe und ihrer Obergruppe
+    angezeigt. Erstellen Sie z.B. eine Obergrupe, die Eintr&auml;ge
+    mit dem Stichwort <tt>Verteilung</tt> enth&auml;lt, sowie eine
+    verfeinernde Untergruppe mit Eintr&auml;gen, die das Stichwort
+    <tt>Gau&szlig;</tt> enthalten. Wenn Sie nun die Untergruppe
+    ausw&auml;hlen, werden alle Eintr&auml;ge angezeigt, die beiden
+    Bedingungen entsprechen, also alle, die mit Gau&szlig;'scher
+    Verteilung zu tun haben. Indem Sie nun eine weitere Untergruppe
+    f&uuml;r <tt>Laplace</tt> anlegen, die dieselbe Obergruppe
+    verfeinert, k&ouml;nnen Sie die Gruppierung einfach erweitern.
+    Im Gruppenbaum haben solche Gruppen, die ihre Obergruppen
+    verfeinern, ein spezielles Icon. (Dieses Verhalten kann in den
+    Einstellungen abgestellt werden.)</p>
+
+    <p>Das logische Gegenst&uuml;ck zu einer solchen verfeinernden
+    Untergruppe ist eine Gruppe, die <b>ihre Untergruppen
+    ber&uuml;cksichtigt</b>. Wird sie ausgew&auml;hlt, werden nicht
+    nur die Eintr&auml;ge dieser Gruppe, sondern auch diejenigen
+    aller Untergruppen angezeigt. Im Gruppenbaum hat auch diese Art
+    von Gruppen ein spezielles Icon. (Dieses Verhalten kann in den
+    Einstellungen abgestellt werden.)</p>
+
+    <h2>Eintr&auml;ge einer Gruppe anzeigen, mehrere Gruppen
+    kombinieren</h2>
+
+    <p>Wenn Sie eine Gruppe ausw&auml;hlen, werden die
+    Eintr&auml;ge, die dieser Gruppe zugeordnet sind, hervorgehoben
+    und -- je nach Einstellung (die mit einem Klick auf den
+    <b>Einstellungen</b>-Button vorgenommen werden kann) -- an den
+    Anfang der Tabelle verschoben und/oder ausgew&auml;hlt. Diese
+    Optionen entsprechen denen f&uuml;r die normale Suche.</p>
+
+    <p>Wenn Sie meherere Gruppen ausw&auml;hlen (indem Sie die
+    STRG-Taste gedr&uuml;ckt halten und mehrere Gruppen anklicken),
+    wird -- je nach Einstellung -- entweder die Vereinigung oder
+    die Schnittmenge ihrer Inhalte angezeigt. Damit k&ouml;nnen
+    mehrere Bedingungen schnell miteinander kombiniert werden. Ein
+    Beispiel: Wenn Sie eine statische Gruppe <tt>Sehr wichtig</tt>
+    haben, in der alle sehr wichtigen Eintr&auml;ge sind,
+    k&ouml;nnen Sie sich die sehr wichtigen Eintr&auml;ge jeder
+    anderen Gruppe anzeigen lassen, indem Sie beide Gruppen
+    ausw&auml;hlen (dazu muss <b>Schnittmenge</b> in den
+    Einstellungen aktiviert sein).</p>
+
+    <h2>Gruppen und Suche</h2>
+
+    <p>Wenn der Inhalt einer oder mehrerer
+    Gruppen angezeigt wird, k&ouml;nnen Sie eine Suche innerhalb
+    dieser Eintr&auml;ge durchf&uuml;hren. Benutzen Sie dazu die
+    normalen Suchfunktionen.</p>
+
+    <h2>Sich &uuml;berschneidende Gruppen markieren</h2>
+
+    <p>Der <b>Einstellungs</b>-Button bietet eine Option zum Markieren von
+    sich &uuml;berschneidenden Gruppen. Wenn diese Option aktiviert
+    ist und Sie eine (oder mehrere) Gruppe(n) ausw&auml;hlen,
+    werden alle Gruppen markiert, die mindestens einen Eintrag
+    enthalten, der auch der ausgew&auml;hlten Gruppe zugeordnet
+    ist. Damit k&ouml;nnen Sie schnell &Uuml;berschneidungen
+    zwischen den Eintr&auml;gen verschiedener Gruppen erkennen. Sie
+    k&ouml;nnten beispielsweise eine Gruppe <tt>lesen</tt>
+    erstellen, die alle Eintr&auml;ge enth&auml;lt, die sie lesen
+    wollen. Sobald Sie nun eine Gruppe ausw&auml;hlen, wird die
+    Gruppe <tt>lesen</tt> markiert, sofern die ausgew&auml;hlte
+    Gruppe Eintr&auml;ge enth&auml;lt, die Sie noch lesen wollten.</p>
+
+    <h2>Erweiterte Funktionen</h2>
+
+    <p>Wenn Sie sich mit dem oben
+    beschriebenen Gruppenkonzept vertraut gemacht haben,
+    k&ouml;nnten die folgenden erweiterten Funktionen n&uuml;tzlich
+    sein.</p>
+
+    <h3>Dynamische Gruppen automatisch erstellen</h3>
+
+    <p>Mit einem
+    Klick auf den Button <b>Automatisch Gruppen f&uuml;r die Datei
+    anlegen</b> k&ouml;nnen Sie ganz schnell passende Gruppen
+    f&uuml;r Ihre Datei erzeugen. Diese Funktion sammelt alle
+    W&ouml;rter eines bestimmten Felds Ihrer Wahl und erstellt eine
+    Gruppe f&uuml;r jedes Wort. Das ist zum Beispiel n&uuml;tzlich,
+    wenn Ihre Datei geeignete Stichworte f&uuml;r alle
+    Eintr&auml;ge enth&auml;lt. Mit dem automatischen Erstellen von
+    Gruppen basierend auf dem Feld <tt>keywords</tt> k&ouml;nnen
+    Sie also ohne gro&szlig;en Aufwand ein Grundger&uuml;st von
+    Gruppen anlegen.</p>
+
+    <p>Sie k&ouml;nnen auch Buchstaben angeben, die ignoriert
+    werden sollen, z.B. Kommas, die zwischen einzelnen Stichworten
+    stehen. Diese werden als Worttrenner behandelt und nicht als
+    Teile des Wortes selbst. Dieser Schritt ist wichtig, damit
+    kombinierte Stichworte wie etwa <tt>Gau&szlig;'sche
+    Verteilung</tt> als semantische Einheit interpretiert werden
+    k&ouml;nnen. (Sie k&ouml;nnen diese Option allerdings nicht
+    verwenden, um ganze W&ouml;rter zu ignorieren. Sie m&uuml;ssen
+    stattdessen die Gruppen, die Sie nicht wollen, nach dem
+    automatischen Erstellen von Hand l&ouml;schen.)</p>
+
+    <h3>Ansicht aktualisieren</h3>
+
+    <p>Der <b>Aktualisieren</b>-Button
+    aktualisiert die Tabelle in Bezug auf die aktuell
+    ausgew&auml;hlten Gruppen. Normalerweise erfolgt dies
+    automatisch, aber in seltenen F&auml;llen (z.B. nach einem
+    R&uuml;ckg&auml;ngig- oder Wiederholen-Vorgang, der mit Gruppen
+    zusammenh&auml;ngt) ist ein h&auml;ndisches Aktualisieren
+    n&ouml;tig.</p>
+
+    <h3>Verfeinernde Untergruppen und einbeziehende Obergruppen
+    mischen</h3>
+
+    <p>Wenn eine verfeinernde Gruppe die Untergruppe von
+    einer Gruppe ist, die ihre Untergruppen ber&uuml;cksichtigt --
+    also sozusagen die Geschwister der verfeinernden Gruppe --,
+    dann werden diese Geschwister ignoriert, sobald die
+    verfeinernde Gruppe ausgew&auml;hlt wird.</p>
+</body>
+</html>

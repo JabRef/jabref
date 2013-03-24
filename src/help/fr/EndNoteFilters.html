@@ -1,0 +1,105 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+ />
+
+    <h1>Filtre d'exportation EndNote</h1>
+
+    <h2>Exportation &agrave; partir de JabRef</h2>
+
+    <p>JabRef peut
+    exporter des bases de donn&eacute;es dans des fichiers lisibles
+    par EndNote. Pour utiliser cette fonction, choisissez
+    <b>Fichier -&gt; Export</b>, choisissez le type de fichier
+    <b>Endnote (*.txt)</b> et sp&eacute;cifiez le nom du fichier
+    d'exportation.</p>
+
+    <h2>Importer dans EndNote</h2>
+
+    <p>Le fichier par d&eacute;faut
+    d'importation d'EndNote ne traite pas proprement les auteurs ou
+    les &eacute;diteurs multiples. Il y a deux fa&ccedil;ons de
+    contourner cela&nbsp;:</p>
+
+    <ol>
+        <li>Utiliser le filtre interne et corriger ensuite le
+        fichier. Pour ouvrir le fichier dans EndNote, cr&eacute;ez
+        une nouvelle base de donn&eacute;es ou ouvrez une ancienne
+        base de donn&eacute;es dans EndNote. Ensuite,
+        s&eacute;lectionnez <b>Fichier -&gt; Importer</b>, cliquer
+        sur <b>Choisir le filtre</b>, puis s&eacute;lectionnez le
+        fichier export&eacute; et cliquez sur <b>Choisir</b>.
+        Cliquez sur <b>Options d'importation</b> et
+        s&eacute;lectionnez <b>Importation EndNote</b>. Cliquez sur
+        <b>Importer</b> pour d&eacute;marrer l'importation.
+        Apr&egrave;s l'importation, s&eacute;lectionnez
+        <b>Edition-&gt; Changer le texte</b>. Changez <b>N'importe
+        quel champ</b> en <b>Author</b>. Entrez " and " &agrave;
+        l'int&eacute;rieur du champ de recherche (sans les
+        guillemets). Entrez un retour chariot dans le champ
+        Remplacer (option-return pour Mac OS X, ctrl-return pour
+        Windows XP). Cliquez sur <b>Remplacer</b>.
+        R&eacute;p&eacute;tez avec le champ <b>Secondary
+        Author</b>. [NdT: difficile &agrave; traduire sans avoir
+        EndNote... oui]</li>
+
+        <li>Installer le <i>filtre d'importation d'EndNote depuis
+        JabRef</i> dans le <i>EndNote Extras</i>. Suivez les
+        instructions dans la section <i>Utilisation
+        avanc&eacute;e</i> ci-dessous. Pour ouvrir le fichier dans
+        EndNote, cr&eacute;ez une nouvelle base de donn&eacute;es
+        ou ouvrez une ancienne base de donn&eacute;es dans EndNote.
+        Ensuite, s&eacute;lectionnez <b>Fichier -&gt; Importer</b>,
+        cliquez sur <b>Choisir le filtre</b>, puis
+        s&eacute;lectionnez le fichier export&eacute; et cliquez
+        sur <b>Choisir</b>. Cliquez sur <b>Options
+        d'importation</b> et s&eacute;lectionnez <b>Filtre
+        d'importation d'EndNote depuis JabRef</b> (s'il n'est pas
+        pr&eacute;sent, s&eacute;lectionnez Autres filtres. S'il
+        n'appara&icirc;t toujours pas, il n'a pas &eacute;t&eacute;
+        install&eacute; correctement). Cliquer sur <b>Importer</b>
+        pour d&eacute;marrer l'importation.</li>
+    </ol>
+
+    <h2>Notes</h2>
+
+    <p>Le filtre d'exportation EndNote fait correspondre
+    les types d'entr&eacute;es BibTeX avec les types de
+    r&eacute;f&eacute;rence d'EndNote de la fa&ccedil;on
+    suivante&nbsp;:</p>
+    <pre>
+Type d'entr&eacute;e BibTeX -&gt; Type de r&eacute;f&eacute;rence d'EndNote
+---------------------------------------------------
+misc, other -&gt; Generic
+unpublished -&gt; Manuscript
+manual -&gt; Computer Program
+article -&gt; Journal Article
+book -&gt; Book
+booklet -&gt; Personal Communication
+inbook,incollection -&gt; Book Section
+inproceedings -&gt; Conference Proceedings
+techreport -&gt; Report
+mastersthesis, phdthesis -&gt; Thesis</pre>
+
+    <h2>Auteurs collectifs</h2>
+
+    <p>Par d&eacute;faut, le filtre
+    d'exportation suppose que le contenu des champs author ou
+    editor qui sont dans des accolades sont des auteurs collectifs
+    et remplace les accolades par une virgule. Cependant, cela
+    signifie que les champs qui contiennent du code LaTeX entre
+    accolades seront suppos&eacute;s &ecirc;tre des auteurs
+    collectifs et seront donc improprement format&eacute;s.</p>
+
+    <h2>Utilisation avanc&eacute;e&nbsp;: Suppl&eacute;ments
+    EndNote</h2>
+
+    Pour une meilleure interop&eacute;rabilit&eacute; entre Endnote et JabRef,
+    t&eacute;l&eacute;charger l'ensemble de filtres Endnote depuis la page de
+    ressources du site de JabRef.
+    
+</body>
+</html>

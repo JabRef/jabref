@@ -1,0 +1,8 @@
+<tr id="\format{\bibtexkey}" class="entry">
+	<td>\format[Authors(LastFirst,InitialsNoSpace),HTMLChars]{\author}</td>
+	<td>\format[HTMLChars]{\title}</td>
+	<td>\year</td>
+	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
+	<td>\format[ToLowerCase]{\bibtextype}</td>
+	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a> \end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url}&nbsp;</td>
+</tr>

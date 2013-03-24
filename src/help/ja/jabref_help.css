@@ -1,0 +1,73 @@
+/* CSS for JabRef */
+@charset ‘UTF-8′;
+
+body {
+	font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ', Meiryo, Osaka, 'ＭＳ Ｐゴシック','MS PGothic', sans-serif;
+	font-size: 13pt;
+	color: #393939;
+	margin: 0px;
+	padding: 20px 50px;
+}
+
+h1 {
+	font-size: 19pt;
+	padding: 2px 5px;
+	margin-top: 0px;
+
+	color: #3D3C5E;
+	background-color: #D8D4EC;
+
+	border-width: 1px;
+	border-style: solid;
+	border-color: #3D3C5E;
+
+}
+
+h2 { font-size: 15pt; margin-top: 15px ; margin-bottom: 5px; color: #3D3C5E; }
+h3 { font-size: 13pt; margin-top: 10px ; margin-bottom: 5px; }
+
+p { text-align: justify; margin-top: 0px; margin-bottom: 10px; line-height: 16pt; }
+
+code { font-family: Courier, monospace; font-size: 13pt; background-color: #f3f2fa; }
+
+ul, dl { margin-top: 0px; }
+li, dd { text-align: justify; margin-top: 0px; margin-bottom: 3px; }
+
+ul { margin-left: 10px; }
+
+blockquote { background-color: #f3f2fa; padding: 5px; }
+
+a, a:visited { text-decoration: underline; color: #4f5f8f; }
+
+#aboutpage { text-align: center; }
+#logo { margin-bottom: 10px; }
+
+.withRuby {
+    display: inline-block;
+    position: relative;
+    top: -1em;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    white-space: nowrap;
+    text-indent: 0;
+    line-height: 100%;
+    vertical-align: text-bottom;
+    text-align: center;
+    text-decoration: none;
+    }
+
+.withRuby:after {
+    display: block;
+    margin: -3em 0 0;
+    padding: 0;
+    border: none;
+    white-space: nowrap;
+    font: inherit;
+    font-size: 50%;
+    line-height: 100%;
+    text-decoration: none;
+    text-align: center;
+    content: attr(title);
+    }

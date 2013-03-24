@@ -1,0 +1,209 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+
+    <h1>Customizing the BibTeX key generator</h1>
+
+    <p>In the 'Key pattern' tab in Preferences, one can set the fields
+    used in auto generation of BibTex labels. The pattern can be
+    set for each of the standard entry types.</p>
+
+    <h2>Key patterns</h2>
+
+    <p>The pattern can contain any text you wish,
+    in addition to field markers that indicate that a specific
+    field of the entry should be inserted at that position of the
+    key. A field marker generally consists of the field name
+    enclosed in square braces, e.g. <b>[volume]</b>. If the field
+    is undefined in an entry at the time of key generation, no text
+    will be inserted by the field marker.</p>
+
+    <p>Several special field markers are offered, which extract
+    only a specific part of a field. These are listed below. Feel
+    free to suggest new special field markers.</p>
+
+    <p>Special field markers:</p>
+
+    <ul>
+        <li><b>[<code>auth</code>]</b>: The last name of the first
+        author<br /></li>
+
+        <li><b>[<code>authors</code>]</b>: The last name of all
+        authors<br /></li>
+
+        <li><b>[<code>authorLast</code>]</b>: The last name of the last
+        author<br /></li>
+
+        <li><b>[<code>authorsN</code>]</b>: The last name of up to
+        N authors. If there are more authors, "EtAl" is
+        appended.<br /></li>
+        
+        <li><b>[<code>authorsAlpha</code>]</b>: Corresponds to the BibTeX
+        style "alpha". One author: First three letters of the last name.
+        Two to four authors: First letters of last names concatenated.
+        More than four authors: First letters of last names of first three
+        authors concatenated. "+" at the end. <br /></li>  
+
+        <li><b>[<code>authIniN</code>]</b>: The beginning of each
+        author's last name, using no more than N
+        characters.<br /></li>
+
+        <li><b>[<code>authorIni</code>]</b>: The first 5 characters
+        of the first author's last name, and the last name initials
+        of the remaining authors.<br /></li>
+
+        <li><b>[<code>authN</code>]</b>: The first N characters of
+        the first author's last name<br /></li>
+
+        <li><b>[<code>authN_M</code>]</b>: The first N characters
+        of the Mth author's last name<br /></li>
+
+        <li><b>[<code>auth.auth.ea</code>]</b>: The last name of
+        the first two authors, and ".ea" if there are more than
+        two.<br /></li>
+
+        <li><b>[<code>auth.etal</code>]</b>: The last name of the
+        first author, and the last name of the second author if
+        there are two authors or ".etal" if there are more than
+        two.<br /></li>
+
+        <li><b>[<code>authshort</code>]</b>: The last name if one
+        author is given; the first character of up to three
+        authors' last names if more than one author is given. A
+        plus character is added, if there are more than three
+        authors.<br /></li>
+    </ul><b>Note:</b> If there is no author (as in the case of an
+    edited book), then all of the above
+    <b><code>[auth...]</code></b> markers will use the editor(s)
+    (if any) as a fallback. Thus, the editor(s) of a book with no
+    author will be treated as the author(s) for label-generation
+    purposes. If you do not want this behaviour, i.e. you require a
+    marker which expands to nothing if there is no author, use
+    <b><code>pureauth</code></b> instead of
+    <b><code>auth</code></b> in the above codes. For example,
+    <b><code>[pureauth]</code></b>, or
+    <b><code>[pureauthors3]</code></b>.
+
+    <ul>
+        <li><b>[<code>edtr</code>]</b>: The last name of the first
+        editor<br /></li>
+
+        <li><b>[<code>edtrIniN</code>]</b>: The beginning of each
+        editor's last name, using no more than N
+        characters<br /></li>
+
+        <li><b>[<code>editors</code>]</b>: The last name of all
+        editors<br /></li>
+
+        <li><b>[<code>editorLast</code>]</b>: The last name of the last
+        editor<br /></li>
+
+        <li><b>[<code>editorIni</code>]</b>: The first 5 characters
+        of the first editor's last name, and the last name initials
+        of the remaining editors.<br /></li>
+
+        <li><b>[<code>edtrN</code>]</b>: The first N characters of
+        the first editor's last name<br /></li>
+
+        <li><b>[<code>edtrN_M</code>]</b>: The first N characters
+        of the Mth editor's last name<br /></li>
+
+        <li><b>[<code>edtr.edtr.ea</code>]</b>: The last name of
+        the first two editors, and ".ea" if there are more than
+        two.<br /></li>
+
+        <li><b>[<code>edtrshort</code>]</b>: The last name if one
+        editor is given; the first character of up to three
+        editors' last names if more than one editor is given. A
+        plus character is added, if there are more than three
+        editors.<br /></li>
+
+        <li><b>[<code>firstpage</code>]</b>: The number of the
+        first page of the publication (Caution: this will return 
+        the lowest number found in the pages field, since bibtex 
+        allows <code>7,41,73--97</code> or <code>43+</code>.)<br /></li>
+
+        <li><b>[<code>keywordN</code>]</b>: Keyword number N from
+        the "keywords" field, assuming keywords are separated by
+        commas or semicolons.<br /></li>
+
+        <li><b>[<code>lastpage</code>]</b>: The number of the last
+        page of the publication (See the remark on 
+        <code>firstpage</code>)<br /></li>
+
+        <li><b>[<code>shorttitle</code>]</b>: The first 3 words of
+        the title<br /></li>
+
+        <li><b>[<code>shortyear</code>]</b>: The last 2 digits of
+        the publication year<br /></li>
+
+        <li><b>[<code>veryshorttitle</code>]</b>: The first word of
+        the title, discounting 'the', 'a', 'an'.<br /></li>
+    </ul>
+
+    <p>A field name (or one of the above pseudo-field names) may
+    optionally be followed by one or more modifiers. Modifiers are
+    applied in the order they are specified.</p>
+
+    <ul>
+        <li><b>:abbr</b>: Abbreviates the text produced by the
+        field name or spcial field marker. Only the first character
+        and subsequent characters following white space will be
+        included. For example, <b>[journal:abbr]</b> would from the
+        journal name "Journal of Fish Biology" produce
+        "JoFB".<br /></li>
+
+        <li><b>:lower</b>: Forces the text inserted by the field
+        marker to be in lowercase. For example, <b>[auth:lower]</b>
+        expands the last name of the first author in
+        lowercase.<br /></li>
+
+        <li><b>:upper</b>: Forces the text inserted by the field
+        marker to be in uppercase. For example, <b>[auth:upper]</b>
+        expands the last name of the first author in
+        uppercase.<br /></li>
+
+        <li><b>:(x)</b>: Replace x by any string. The string between
+        the parentheses will be inserted if the field marker preceding this
+        modifier resolves to an empty value. For instance, the marker
+        <b>[volume:(unknown)]</b> will return the entry's volume if set, and the
+        string <b>unknown</b> if the entry's <code>volume</code> field is not set.
+        </li>
+    </ul>
+
+    <p>If you haven't defined a key pattern for a certain entry
+    type, the <b>Default key pattern</b> will be used. You can
+    change the default pattern - its setting is above the list of
+    entry types in the <b>Key pattern</b> section of the
+    <b>Preferences</b> dialog.</p>
+
+    <p>The default key pattern is [auth][year], and this could
+    produce keys like e.g. <code>Yared1998</code> If the key is not
+    unique in the current database, it is made unique by adding one
+    of the letters a-z until a unique key is found. Thus, the
+    labels might look like:</p>
+
+    <p style="margin-left: 28pt">
+        <code>Yared1998</code><br />
+        <code>Yared1998a</code><br />
+        <code>Yared1998b</code>
+    </p>
+
+    <h2>Regular expression replace</h2>
+
+    <p>After the key pattern has
+    been applied to produce a key, you can choose to have the key
+    generator search for occurrences of a specific regular
+    expression, and replace it with a string. The regular
+    expression and replacement string are entered in the text
+    fields below the list of key patterns. If the replacement
+    string is empty, matches of the regular expression will simply
+    be removed from the generated key. For instance,
+    <code>\p{Punct}</code> or <code>[:/%]</code> can be replaced
+    by nothing to remove unwanted characters from the key.
+    This may be useful when naming PDFs according to BibTeX keys.</p>
+</body>
+</html>

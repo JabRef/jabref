@@ -1,0 +1,199 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<body text="#275856">
+    <basefont size="4" color="#2F4958" face="arial" />
+
+    <h1>Anpassen der automatischen Erstellung von
+    BibTeX-Keys</h1>
+
+    <p>Im Tab "Key-Muster" im Dialog "Einstellungen"
+    kann man die Felder bestimmen, die zur automatischen
+    Generierung der BibTeX-Labels (bibtexkey) herangezogen werden.
+    Das Muster kann f&uuml;r jeden der vorgegebenen Eintragstypen
+    bestimmt werden.</p>
+
+    <h2>Key-Muster</h2>
+
+    <p>Das Muster kann beliebigen Text enthalten,
+    unabh&auml;ngig von und zus&auml;tzlich zu den Feldmarken, die
+    angeben, dass ein bestimmtes Feld des Eintrags an dieser Stelle
+    des Keys eingef&uuml;gt werden soll. Eine Feldmarke besteht
+    gew&ouml;hnlich aus dem Feldnamen in eckigen Klammern, z.B.
+    <b>[volume]</b>. Wenn dieses Feld zum Zeitpunkt der Erstellung
+    des Keys leer ist, wird kein Text eingef&uuml;gt.</p>
+
+    <p>Es gibt au&szlig;erdem mehrere spezielle Feldmarken, die nur
+    einen bestimmten Teil aus einem Feld extrahieren. Sie werden
+    unten aufgelistet. Nat&uuml;rlich k&ouml;nnen Sie auch neue
+    spezielle Feldmarken vorschlagen.</p>
+
+    <p>Spezielle Feldmarken:</p>
+
+    <ul>
+        <li><b>[<code>auth</code>]</b>: Der Nachname des ersten
+        Autors.<br /></li>
+
+        <li><b>[<code>authors</code>]</b>: Die Nachnamen aller
+        Autoren.<br /></li>
+
+        <li><b>[<code>authorLast</code>]</b>: Der Nachname des
+        letzten Autors<br /></li>
+
+        <li><b>[<code>authorsN</code>]</b>: Die Nachnamen von bis
+        zu N Autoren. Falls es mehr Autoren gibt, wird EtAl
+        angeh&auml;ngt.<br /></li>
+
+        <li><b>[<code>authorsAlpha</code>]</b>: Wie bei dem BibTeX-Stil
+        "alpha". Ein Autor: Erste drei Buchstaben des Nachnamens.
+        Zwei bis vier Autoren: Der erste Buchstabe jedes Nachnamens wird 
+        hintereinandergeh&auml;gt. Mehr als vier Autoren: Jeweils der erste 
+        Buchstabe der ersten drei Nachnamens wird hintereinandergeh&auml;ngt. 
+        Zus&auml;tzlich ein "+" am Ende. <br /></li>  
+
+        <li><b>[<code>authIniN</code>]</b>: Der Anfang des
+        Nachnamens von jedem Autoren, wobei nicht mehr als N
+        Buchstaben verwendet werden.<br /></li>
+
+        <li><b>[<code>authorIni</code>]</b>: Die ersten 5
+        Buchstaben des Nachnamens des ersten Autors und die
+        Initialen der Nachnamen der restlichen Autoren.<br /></li>
+
+        <li><b>[<code>authN</code>]</b>: Die ersten N Buchstaben
+        des Nachnamens des ersten Autors.<br /></li>
+
+        <li><b>[<code>authN_M</code>]</b>: Die ersten N Buchstaben
+        des Nachnamens des M. Autors.<br /></li>
+
+        <li><b>[<code>auth.auth.ea</code>]</b>: Die Nachnamen der
+        beiden ersten Autoren und ".ea", falls es mehr als zwei
+        Autoren sind.<br /></li>
+
+        <li><b>[<code>auth.etal</code>]</b>: Der Nachname des
+        ersten Autors und der Nachname des zweiten Autors bei zwei
+        Autoren bzw. ".etal" bei mehr als zwei Autoren.</li>
+
+        <li><b>[<code>authshort</code>]</b>: Der Nachname bei einem
+        Autor; der erste Buchstabe der Nachnamen von bis zu drei
+        Autoren, falls mehr als ein Autor vorhanden ist. Ein Plus
+        (+) wird angeh&auml;ngt, falls es mehr als drei Autoren
+        gibt.<br /></li>
+    </ul><b>Anmerkung:</b>Falls es keinen Autor gibt (z.B. bei
+    einem Buch mit Herausgeber), benutzen die genannten
+    [auth...]-Feldmarken den oder die Herausgeber, die im
+    editor-Feld angegeben wurden. Also werden die Herausgeber eines
+    Buches ohne Autor f&uuml;r die Label-Erstellung wie Autoren
+    behandelt. Falls Sie dieses Verhalten nicht w&uuml;nschen und
+    die Feldmarke stattdessen bei einem leeren author-Feld zu
+    nichts expandieren soll, m&uuml;ssen Sie <b>pureauth</b> statt
+    <b>auth</b> verwenden, z.B.: <b>[pureauth]</b> oder
+    <b>[pureauthors3]</b>.
+
+    <ul>
+        <li><b>[<code>edtr</code>]</b>: Der Nachname des ersten
+        Herausgebers.<br /></li>
+
+        <li><b>[<code>editors</code>]</b>: Die Nachnamen aller
+        Herausgeber.<br /></li>
+
+        <li><b>[<code>editorLast</code>]</b>: Der Nachname des letzten
+        Herausgebers.<br /></li>
+
+        <li><b>[<code>edtrIniN</code>]</b>: Der Anfang des
+        Nachnamens von jedem Herausgeber, wobei nicht mehr als N
+        Buchstaben verwendet werden.<br /></li>
+
+        <li><b>[<code>editorIni</code>]</b>: Die ersten 5
+        Buchstaben des Nachnamens des Herausgebers und die Initialen der
+        Nachnamen der restlichen Herausgeber.<br /></li>
+
+        <li><b>[<code>edtrN</code>]</b>: Die ersten N Buchstaben
+        des Nachnamens des ersten Herausgebers.<br /></li>
+
+        <li><b>[<code>edtrN_M</code>]</b>: Die ersten N Buchstaben
+        des Nachnamens des M. Herausgebers.<br /></li>
+
+        <li><b>[<code>edtr.edtr.ea</code>]</b>: Der Nachname der
+        ersten beiden Herausgeber und ".ea", falls es mehr als zwei
+        Herausgeber sind.<br /></li>
+
+        <li><b>[<code>edtrshort</code>]</b>: Der Nachname bei einem
+        Herausgeber; der erste Buchstabe der Nachnamen von bis zu drei
+        Herausgebern, falls mehr als ein Herausgeber vorhanden ist. Ein Plus
+        (+) wird angeh&auml;ngt, falls es mehr als drei Herausgeber
+        gibt.<br /></li>
+
+        <li><b>[<code>firstpage</code>]</b>: Die erste Seitenzahl
+        einer Ver&ouml;ffentlichung (pages).<br /></li>
+
+        <li><b>[<code>keywordN</code>]</b>: Stichwort Nummer N aus
+        dem Feld "keywords", gesetzt den Fall, dass die Stichworte
+        durch Komma oder Semikolon voneinander getrennt
+        sind.<br /></li>
+
+        <li><b>[<code>lastpage</code>]</b>: Die letzte Seitenzahl
+        einer Ver&ouml;ffentlichung (pages).<br /></li>
+
+        <li><b>[<code>shorttitle</code>]</b>: Die ersten 3 Worte
+        eines Titels (title).<br /></li>
+
+        <li><b>[<code>shortyear</code>]</b>: Die letzten 2 Ziffern
+        des Jahrgangs (year).<br /></li>
+
+        <li><b>[<code>veryshorttitle</code>]</b>: Die ersten beiden
+        Worte des Titels (title), wobei 'the', 'a' und 'an'
+        ausgelassen werden.<br /></li>
+    </ul>
+
+    <p>Hinter einem Feldnamen (oder einem der oben
+    aufgef&uuml;hrten Pseudo-Feldnamen) kann ein Modifikator
+    stehen. Modifikatoren werden in der Reihenfolge angewendet, in
+    der sie angegeben wurden.</p>
+
+    <ul>
+        <li><b>:abbr</b>: K&uuml;rzt den Text, der von einem
+        Feldnamen oder speziellen Feldmarken gebildet wird. Nur der
+        erste Buchstabe und weitere Buchstaben, die auf ein
+        Leerzeichen folgen, werden ber&uuml;cksichtigt. Zum
+        Beispiel w&uuml;rde <b>[journal:abbr]</b> die Zeitschrift
+        "Jorunal of Fish Biology" zu "JoFB" wandeln.<br /></li>
+
+        <li><b>:lower</b>: Wandelt den von der Feldmarke
+        eingef&uuml;gten Text in Kleinbuchstaben. So wird
+        beispielsweise bei <b>[auth:lower]</b> der Nachname des
+        ersten Autors in Kleinbuchstaben ausgegeben.</li>
+    </ul>
+
+    <p>Wenn Sie keine Key-Muster f&uuml;r einen bestimmten
+    Eintragstyp angeben, wird das vorgegebene Muster (default
+    pattern) verwendet. Sie k&ouml;nnen das vorgegebene Muster
+    nat&uuml;rlich ebenfalls anpassen - seine Einstellung befindet
+    sich &uuml;ber der Liste der Eintragstypen im Tab
+    <b>Key-Muster</b> des Dialogs <b>Einstellungen</b>.</p>
+
+    <p>Das vorgegebene Key-Muster ist [auth][year], das Keys wie
+    z.B. <code>Yared1998</code> generiert. Falls der Key in der
+    ge&ouml;ffneten Datei nicht eindeutig sein sollte, wird einer
+    der Buchstaben a-z angef&uuml;gt, bis ein eindeutiger Key
+    gefunden ist. Dementsprechend k&ouml;nnten die Labels wie folgt
+    aussehen:</p>
+
+    <p style="margin-left: 28pt">
+        <code>Yared1998</code><br />
+        <code>Yared1998a</code><br />
+        <code>Yared1998b</code>
+    </p>
+
+    <h2>Ersetzen eines regul&auml;ren Ausdrucks</h2>
+
+    <p>Nachdem das Key-Muster angewendet wurde, um einen BibTeX-Key
+    zu erstellen, k&ouml;nnen Sie den Key-Generator nach einem bestimmten
+    regul&auml;ren Ausdruck suchen und ihn durch eine Zeichenfolge
+    ersetzen lassen. Der regul&auml;re Ausdruck und die
+    Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern
+    unter der Liste der Key-Muster eingegeben. Falls das Feld zur
+    Ersetzung des regul&auml;ren Ausdrucks leer ist, werden die mit
+    der Suche &uuml;bereinstimmenden regul&auml;ren Ausdr&uuml;cke
+    einfach gel&ouml;scht.</p>
+</body>
+</html>

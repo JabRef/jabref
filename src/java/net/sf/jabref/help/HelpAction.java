@@ -1,0 +1,111 @@
+/*  Copyright (C) 2003-2011 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+package net.sf.jabref.help;
+
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.KeyStroke;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MnemonicAwareAction;
+
+/**
+ * This Action keeps a reference to a URL. When activated, it shows the help
+ * Dialog unless it is already visible, and shows the URL in it.
+ */
+public class HelpAction extends MnemonicAwareAction {
+
+	protected HelpDialog diag;
+
+    protected Class resourceOwner = null;
+
+	protected String helpFile;
+
+	public HelpAction(HelpDialog diag, String helpFile) {
+		super(GUIGlobals.getImage("help"));
+		putValue(NAME, "Help");
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+	public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
+		super(GUIGlobals.getImage("help"));
+		putValue(NAME, "Help");
+		putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+	public HelpAction(HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
+		super(new ImageIcon(iconFile));
+		putValue(NAME, "Help");
+		putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+	public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
+		super(GUIGlobals.getImage("help"));
+		putValue(NAME, title);
+		putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+	public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
+		super(GUIGlobals.getImage("help"));
+		putValue(NAME, title);
+		putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+		putValue(ACCELERATOR_KEY, key);
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+	public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
+		super(new ImageIcon(iconFile));
+		putValue(NAME, title);
+		putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+		this.diag = diag;
+		this.helpFile = helpFile;
+	}
+
+    public void setResourceOwner(Class resourceOwner) {
+        this.resourceOwner = resourceOwner;
+    }
+
+	public JButton getIconButton() {
+		JButton hlp = new JButton(this);
+		hlp.setText(null);
+		hlp.setPreferredSize(new Dimension(24, 24));
+		return hlp;
+	}
+
+    public void setHelpFile(String helpFile) {
+        this.helpFile = helpFile;
+    }
+
+	public void actionPerformed(ActionEvent e) {
+        if (resourceOwner == null)
+		    diag.showPage(helpFile);
+        else
+            diag.showPage(helpFile, resourceOwner);
+	}
+}

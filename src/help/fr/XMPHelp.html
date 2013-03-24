@@ -1,0 +1,186 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../jabref_help.css"/>
+</head>
+
+<body>
+
+
+    <h1>Support des metadonn&eacute;es XMP dans
+    JabRef</h1>
+
+    <p>NdT&nbsp;: Menus &agrave; v&eacute;rifier !!!</p>
+
+    <p>XMP est un standard cr&eacute;&eacute; par Adobe Systems
+    pour stocker des m&eacute;tadonn&eacute;es (des donn&eacute;es
+    sur les donn&eacute;es) dans des fichiers. A exemple bien connu
+    de m&eacute;tadonn&eacute;es sont les balises MP3 qui peuvent
+    &ecirc;tre utilis&eacute;es pour d&eacute;crire l'artiste,
+    l'album et le nom de la chanson dans un fichier MP3. Ajouter
+    des m&eacute;tadonn&eacute;es &agrave; des fichiers MP3 aide
+    les autres utilisateurs &agrave; identifier correctement les
+    chansons ind&eacute;pendamment du nom du fichier et permet aux
+    logiciels (lecteurs MP3 par exemple) de trier et de grouper les
+    chansons.</p>
+
+    <p>Avec le support de XMP, l'&eacute;quipe de
+    d&eacute;veloppement de JabRef introduit les avantages des
+    m&eacute;tadonn&eacute;es au monde des gestionnaires de
+    r&eacute;f&eacute;rences. Vous avez maintenant la
+    possibilit&eacute; d'"&eacute;crire des
+    m&eacute;tadonn&eacute;es XMP" dans l'onglet General de Jabref,
+    ce qui mettra toutes les informations BibTex dans un fichier
+    PDF. En transf&eacute;rant ce fichier &agrave; un
+    coll&egrave;gue, il aura simplement &agrave; faire glisser le
+    fichier dans JabRef pour que toutes les informations que vous y
+    avez entr&eacute;es lui soient disponibles.</p>
+
+    <h2>Utilisation</h2>
+
+    <p>Pour utiliser la fonction XMP dans JabRef,
+    vous pouvez faire les choses suivantes&nbsp;:</p>
+
+    <ul>
+        <li><b>Importer un unique fichier PDF annot&eacute;</b>
+        contenant les m&eacute;tadonn&eacute;es XMP. Vous pouvez
+        s&eacute;lectionner "Fichier -&gt; Importer dans... -&gt;
+        PDF avec annotations XMP" ou faire glisser le fichier dans
+        la fen&ecirc;tre principale.</li>
+
+        <li><b>Ecrire les informations bibliographiques dans le
+        fichier PDF associ&eacute;.</b> Pour cela, double-cliquez
+        sur l'entr&eacute;e dans la fen&ecirc;tre principale, allez
+        dans l'onglet "General" et cliquer sur "Ecrire XMP".</li>
+
+        <li>Si vous voulez <b>annoter tous les PDFs dans une base
+        de donn&eacute;es d&eacute;termin&eacute;e</b> vous pouvez
+        s&eacute;lectionner "Outils -&gt; Ecrire XMP pour la base
+        de donn&eacute;es"</li>
+
+        <li>Pour v&eacute;rifier si cela a fonctionn&eacute;, vous
+        pouvez ouvrir le PDF dans Adobe Acrobat et
+        s&eacute;lectionner "Fichier -&gt; Propri&eacute;t&eacute;s
+        du Document -&gt; M&eacute;tadonn&eacute;es additionnelles
+        -&gt; Avanc&eacute;". Dans l'arborescence sur la droite
+        vous devriez voir une entr&eacute;e nomm&eacute;e
+        "http://purl.org/net/bibteXMP". Cela fonctionne uniquement
+        avec Adobe Acrobat, et pas avec Adobe Reader.</li>
+
+        <li>Si vous n'avez pas Adobe Acrobat, vous pouvez utiliser
+        <i>pdfinfo</i> &agrave; la place afin de voir les
+        m&eacute;tadonn&eacute;es XMP. <i>pdfinfo</i> fait partie
+        de Xpdf (<code>www.foolabs.com/xpdf</code>) et Poppler
+        (<code>http://poppler.freedesktop.org</code>).</li>
+    </ul>
+
+    <h2>Format de fichier BibteXmp</h2>
+
+    <p>XMP utilise un sous-ensemble du Sch&eacute;ma de Description
+    des Ressources (Resource Description Framework - RDF) pour
+    stocker les donn&eacute;es. Pour JabRef, un nouveau format de
+    m&eacute;tadonn&eacute;es est utilis&eacute;&nbsp;; il
+    ressemble beaucoup au format BibTeX. Fondamentalement, tous les
+    champs et valeurs sont transform&eacute;s en noeuds dans un
+    document XML. Seuls les auteurs et les &eacute;diteurs sont
+    stock&eacute;s comme des rdf:Seq-structures, aussi les
+    utilisateurs des donn&eacute;es peuvent &eacute;viter la
+    s&eacute;paration bas&eacute;es sur des 'and'. Toutes les
+    cha&icirc;nes et les r&eacute;f&eacute;rences crois&eacute;es
+    seront pr&eacute;sentes dans les donn&eacute;es.</p>
+
+    <p>Le sch&eacute;ma suivant, facile et minimal, est
+    utilis&eacute;&nbsp;:</p>
+
+    <ul>
+        <li>La clef BibTeX est stock&eacute;e comme une
+        <code>bibtexkey</code>.</li>
+
+        <li>Le type d'entr&eacute;e BibTeX est stock&eacute; comme
+        une <code>entrytype</code>.</li>
+
+        <li>les champs <code>author</code> et <code>editor</code>
+        sont encod&eacute;s comme des <code>rdf:Seq</code>s
+        o&ugrave; les auteurs individuels sont
+        repr&eacute;sent&eacute;s par des
+        <code>rdf:li</code>s.</li>
+
+        <li>Tous les autres champs sont sauv&eacute;s en utilisant
+        directement le nom de leur champ.</li>
+    </ul><br />
+    <br />
+
+
+    <p>Ci-dessous, un exemple de mise en correspondance</p>
+    <pre>
+@INPROCEEDINGS{CroAnnHow05,
+  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+  title = {Effective work practices for floss development: A model and propositions},
+  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+  year = {2005},
+  owner = {oezbek},
+  timestamp = {2006.05.29},
+  url = {http://james.howison.name/publications.html}
+}
+</pre>sera transform&eacute; en
+    <pre>
+&lt;rdf:Description xmlns:bibtex="http://jabref.sourceforge.net/bibteXMP/"
+    bibtex:bibtexkey="CroAnnHow05"
+    bibtex:year="2005"
+    bibtex:title="Effective work practices for floss development: A model and propositions"
+    bibtex:owner="oezbek"
+    bibtex:url="http://james.howison.name/publications.html"
+    bibtex:booktitle="Hawaii International Conference On System Sciences (HICSS)"
+    bibtex:timestamp="2006.05.29"&gt;
+        &lt;bibtex:author&gt;
+            &lt;rdf:Seq&gt;
+                &lt;rdf:li&gt;K. Crowston&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;H. Annabi&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;J. Howison&lt;/rdf:li&gt;
+                &lt;rdf:li&gt;C. Masango&lt;/rdf:li&gt;
+            &lt;/rdf:Seq&gt;
+        &lt;/bibtex:author&gt;
+    &lt;bibtex:entrytype&gt;Inproceedings&lt;/bibtex:entrytype&gt;
+&lt;/rdf:Description&gt;
+</pre>
+
+    <p>Faites attention aux pi&egrave;ges suivants si vous essayez
+    de traiter les m&eacute;tadonn&eacute;es bibtexXMP&nbsp;:</p>
+
+    <ul>
+        <li>Selon RDF, les couples attribut-valeur peuvent aussi
+        &ecirc;tre exprim&eacute;s comme des noeuds, et
+        vice-versa.</li>
+    </ul><br />
+    <br />
+
+
+    <h2>Liens&nbsp;:</h2>
+
+    <p>Quelques liens (en anglais) &agrave; propos de XMP et de
+    l'annotation des PDFs&nbsp;:</p>
+
+    <ul>
+        <li><a href="http://freelancepropaganda.com/themp/">James
+        Howison's blog "Themp---Managing Academic Papers like
+        MP3s"</a></li>
+
+        <li>
+        <a href="http://www.xml.com/pub/a/2004/09/22/xmp.html">XML.com
+        article about XMP</a></li>
+
+		<li><a href="http://pdfbox.apache.org/">PDFBox</a> by
+		the Apache Software Foundation is the Jaba library used to
+		access the PDFs and the metadata stream.</li>
+
+        <li>
+        <a href="http://arstechnica.com/civis/viewtopic.php?f=19&amp;t=408429">
+        Good thread on ArsTechnica discussing the management of
+        PDFs.</a></li>
+
+        <li>
+        <a href="http://www.adobe.com/content/dam/Adobe/en/devnet/xmp/pdfs/XMPSpecificationPart1.pdf">
+        Adobe XMP Specification</a></li>
+    </ul><br />
+    <br />
+</body>
+</html>

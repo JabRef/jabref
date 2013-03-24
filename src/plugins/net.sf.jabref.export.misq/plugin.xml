@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<plugin id="net.sf.jabref.export.misq" version="1.0">
+	
+	<requires>
+		<import plugin-id="net.sf.jabref.core"/>
+	</requires>
+	
+	<runtime>
+		<library type="resources" path="templates/" id="templates"/>
+	</runtime>
+	
+	<extension id="MISQuarterly" plugin-id="net.sf.jabref.core"
+		point-id="ExportFormatTemplate">
+		<parameter id="displayName" value="MIS Quarterly" />
+		<parameter id="consoleName" value="misq" />
+		<parameter id="layoutFilename" value="misq" />
+		<parameter id="dir" value="templates/"/>
+		<parameter id="extension" value=".rtf" />
+	</extension>
+
+</plugin>

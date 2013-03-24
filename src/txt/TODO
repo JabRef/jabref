@@ -1,0 +1,28 @@
+
+Chris:
+------
+  * Think about synchronizing XMP.
+  * Document data schema used (BibteXmp)
+  * Add build.xml target to export standalone XMPUtil for the CLI.
+  * Allow search relativ to bibtex-file
+  * Plugin-System may crash...
+  
+Morten:
+
+* Encoding used for reading URLs. URLDownload.java
+
+* Look into whether incremental search could be made more persistent when search panel loses focus.
+* Problem: when looking at group with hiding non-hits, newly created entry doesn't appear in entry editor.
+
+* Plugins like SVN plugin might need hooks for performing actions before a database is
+  closed, and may need the ability to cancel the closing, and to avoid questions about
+  saving changes.
+
+* Enable "Open spires entry" ("openSpires" action)? Think about better integration of this?
+  Look into which viewer is used.
+* Add "Copy all externally linked files for this set of entries"-feature.
+  Basic functionality in AccessLinksForEntries.
+* Problem setting today with Microba calendar.
+
+* [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
+

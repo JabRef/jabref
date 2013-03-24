@@ -1,0 +1,467 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" type="text/css" href="jabref_help.css"/>
+</head>
+
+<body>
+<h1>OpenOffice/LibreOffice integration</h1>
+
+<h2>Introduction</h2>
+
+<p>This feature offers an interface for inserting citations and formatting a Bibliography in an OpenOffice
+    or LibreOffice Writer document from JabRef.</p>
+
+<p>Throughout this help document, whenever the name <i>OpenOffice</i>
+    is used, it can be interchanged with <i>LibreOffice</i>.</p>
+
+<h2>Using the OpenOffice/LibreOffice interface</h2>
+
+<p>To communicate with OpenOffice, JabRef must first connect to a running OpenOffice instance. You need to start
+    OpenOffice and enter your document before connecting from JabRef. JabRef needs to know the location of your
+    OpenOffice executable (<b>soffice.exe</b> on Windows, and <b>soffice</b> on other platforms), and the directory
+    where several OpenOffice jar files reside. If you connect by clicking the <b>Connect</b> button, JabRef will try
+    to automatically determine these locations. If this does not work, you need to connect using the <b>Manual
+    connect</b> button, which will open a window asking you for the needed locations.</p>
+
+<p>After the connection has been established, you can insert citations by selecting one or more entries in JabRef and
+    using the <b>Push to OpenOffice</b> button in the dropdown menu of JabRef's toolbar, or by using the appropriate
+    button in the OpenOffice panel in the side pane. This will insert citations for the selected entries at the
+    current cursor position in the OpenOffice document, and update the bibliography to contain the full reference.</p>
+
+<p><b>Note:</b> JabRef does not use OpenOffice's built-in bibliography system, because of the limitations of that
+    system. A document containing citations inserted from JabRef will not generally be compatible with other reference
+    managers such as Bibus and Zotero.</p>
+
+<p>Two different types of citations can be inserted - either a citation in parenthesis, "(Author 2007)", or an in-text
+    citation, "Author (2007)". This distinction is only meaningful if author-year citations are used instead of numbered
+    citations, but the distinction will be preserved if you switch between the two styles.</p>
+
+<p>If you modify entries in JabRef after inserting their citations into OpenOffice, you will need to synchronize the
+    bibliography. The <b>Sync OO bibliography</b> button will update all entries of the bibliography, provided their
+    BibTeX keys have not been altered (JabRef encodes the BibTeX key into the reference name for each citation to keep
+    track of which BibTeX key the original JabRef entry has).</p>
+
+<h2>The style file</h2>
+
+<p>To customize the citation style you need to select a style file, or use one of the default styles.
+   The style defines the format of citations and the format of the bibliography. You can use standard
+   JabRef export formatters to process entry fields before they are sent to OpenOffice. Through the style file, the
+   intention is to give as much flexibility in citation styles as possible. You can switch style files at any time,
+   and use the <b>Update</b> button to refresh your bibliography to follow the new style.</p>
+<p>By clicking the <b>Select style</b> button you can bring up a window that allows selection of either the default
+   style or an external style file. If you want to create a new style based on the default, you can click the
+   <b>View</b> button to bring up the default style contents, which can be copied into a text editor and modified.</p>
+<p>To choose an external style file, you have two options. Either you can choose a style file directly, or you can
+   set a style file directory. If you do the latter, you will see a list of styles from that directory (and
+   subdirectories), and can choose one from that list.</p>
+
+<p>Here is an example style file:</p>
+<pre>
+NAME
+Example style file for JabRef-OpenOffice integration.
+
+JOURNALS
+Journal name 1
+Journal name 2
+
+PROPERTIES
+Title="References"
+IsSortByPosition="false"
+IsNumberEntries="false"
+ReferenceParagraphFormat="Default"
+ReferenceHeaderParagraphFormat="Heading 1"
+
+CITATION
+AuthorField="author/editor"
+YearField="year"
+MaxAuthors="3"
+MaxAuthorsFirst="3"
+AuthorSeparator=", "
+AuthorLastSeparator=" &amp; "
+EtAlString=" et al."
+ItalicEtAl="true"
+YearSeparator=" "
+InTextYearSeparator=" "
+BracketBefore="["
+BracketAfter="]"
+BracketBeforeInList="["
+BracketAfterInList="]"
+CitationSeparator="; "
+UniquefierSeparator=","
+GroupedNumbersSeparator="-"
+MinimumGroupingCount="3"
+FormatCitations="false"
+CitationCharacterFormat="Default"
+MultiCiteChronological="false"
+PageInfoSeparator="; "
+
+LAYOUT
+article=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \journal \volume\begin{pages} :
+\format[FormatPagesForHTML]{\pages}\end{pages}.
+
+book=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}\begin{editor}
+\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor},
+&lt;b&gt;\year\uniq&lt;/b&gt;. &lt;i&gt;\title&lt;/i&gt;. \publisher, \address.
+
+incollection=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;. In: \format[AuthorLastFirst,
+AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), &lt;i&gt;\booktitle&lt;/i&gt;, \publisher.
+
+inbook=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\chapter&lt;/i&gt;. In: \format[AuthorLastFirst,
+AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), &lt;i&gt;\title&lt;/i&gt;, \publisher.
+
+phdthesis=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \school.
+
+default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+(&lt;b&gt;\year\uniq&lt;/b&gt;). &lt;i&gt;\title&lt;/i&gt;, \journal \volume\begin{pages} :
+\format[FormatPagesForHTML]{\pages}\end{pages}.
+
+</pre>
+
+<p>(Note that the layout for each entry type must be constrained to a single line in the style file - above, the lines
+    are broken up to improve readability.)</p>
+
+<h3>Global properties</h3>
+
+<p>The <b>PROPERTIES</b> section describes global properties for the bibliography.
+    The following table describes the available properties:</p>
+
+<table border="1" rules="none" summary="Available Properties">
+    <tr>
+        <td><b>Property</b></td>
+        <td><b>Type</b></td>
+        <td><b>Default value</b></td>
+        <td><b>Description</b></td>
+    </tr>
+    <tr>
+        <td>IsNumberEntries</td>
+        <td>boolean</td>
+        <td><code>false</code></td>
+        <td>Determines the type of citations to use. If <code>true</code>, number citations will be
+            used. If <code>false</code>, author-year citations will be used.
+        </td>
+    </tr>
+    <tr>
+        <td>IsSortByPosition</td>
+        <td>boolean</td>
+        <td><code>false</code></td>
+        <td>Determines how the bibliography is sorted. If true, the entries
+            will be sorted according to the order in which they are cited. If false, the entries will be
+            sorted alphabetically by authors.
+        </td>
+    </tr>
+    <tr>
+        <td>ReferenceParagraphFormat</td>
+        <td>string</td>
+        <td><code>Default</code></td>
+        <td>Gives the name of the paragraph format to be used for the reference list. This format
+            must be defined in your OpenOffice document.
+        </td>
+    </tr>
+    <tr>
+        <td>ReferenceHeaderParagraphFormat</td>
+        <td>string</td>
+        <td><code>Heading 1</code></td>
+        <td>Gives the name of the paragraph format to be used for the headline of the reference list.
+            This format must be defined in your OpenOffice document.
+        </td>
+    </tr>
+    <tr>
+        <td>Title</td>
+        <td>string</td>
+        <td><code>Bibliography</code></td>
+        <td>The text to enter as the headline of the reference list.</td>
+    </tr>
+</table>
+
+<h3>Citation properties</h3>
+
+<p>The <b>CITATION</b> section describes the format of the citation markers inserted into the text.</p>
+
+<p>The following table gives a brief description of all the available citation properties. Properties that are not
+    given in the style file will keep their default value.</p>
+
+<table border="1" rules="none" summary="Brief Description">
+    <tr>
+        <td><b>Property</b></td>
+        <td><b>Type</b></td>
+        <td><b>Default value</b></td>
+        <td><b>Description</b></td>
+    </tr>
+    <tr>
+        <td>AuthorField</td>
+        <td>string</td>
+        <td><code>author/editor</code></td>
+        <td>BibTeX field containing author names. Can specify fallback field, e.g. <code>author/editor</code></td>
+    </tr>
+    <tr>
+        <td>AuthorLastSeparator</td>
+        <td>string</td>
+        <td><code> &amp; </code></td>
+        <td>Text inserted between the two last author names.</td>
+    </tr>
+    <tr>
+        <td>AuthorLastSeparatorInText</td>
+        <td>string</td>
+        <td>&nbsp;</td>
+        <td>If specified, this propery overrides <code>AuthorLastSeparator</code> for in-text citations such as
+            <code>Smith &amp; Jones (2001)</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>AuthorSeparator</td>
+        <td>string</td>
+        <td><code>, </code></td>
+        <td>Text inserted between author names except the last two.</td>
+    </tr>
+    <tr>
+        <td>BracketAfter</td>
+        <td>string</td>
+        <td><code>]</code></td>
+        <td>The closing bracket of citations.</td>
+    </tr>
+    <tr>
+        <td>BracketAfterInList</td>
+        <td>string</td>
+        <td>]</td>
+        <td>The closing bracket for citation numbering in the reference list.</td>
+    </tr>
+    <tr>
+        <td>BracketBefore</td>
+        <td>string</td>
+        <td><code>[</code></td>
+        <td>The opening bracket of citations.</td>
+    </tr>
+    <tr>
+        <td>BracketBeforeInList</td>
+        <td>string</td>
+        <td>[</td>
+        <td>The opening bracket for citation numbering in the reference list.</td>
+    </tr>
+    <tr>
+        <td>CitationCharacterFormat</td>
+        <td>string</td>
+        <td><code>Default</code></td>
+        <td>If <code>FormatCitations</code> is set to <code>true</code>, the character format with the name
+            given by this property will be applied to citations. The character format must be defined in your
+            OpenOffice document.
+        </td>
+    </tr>
+    <tr>
+        <td>CitationSeparator</td>
+        <td>string</td>
+        <td><code>; </code></td>
+        <td>Text inserted between items when a citation contains multiple entries, e.g. <code>[Smith 2001; Jones
+            2002]</code></td>
+    </tr>
+    <tr>
+        <td>EtAlString</td>
+        <td>string</td>
+        <td><code> et al. </code></td>
+        <td>Text inserted after author names when not all authors are listed, e.g. <code>[Smith et al. 2001]</code></td>
+    </tr>
+    <tr>
+        <td>FormatCitations</td>
+        <td>boolean</td>
+        <td><code>false</code></td>
+        <td>Determines whether formatting should be applied to citations. If true, a character format will be
+            applied to the citations. The property <code>CitationCharacterFormat</code> controls which format
+            should be applied, and the given format must be defined in your OpenOffice document. Any font settings
+            and effects can be chosen within OpenOffice for your chosen character format.
+        </td>
+    </tr>
+    <tr>
+        <td>GroupedNumbersSeparator</td>
+        <td>string</td>
+        <td><code>-</code></td>
+        <td>Text inserted between numbers when numbered citations are grouped, e.g. <code>[4-6]</code></td>
+    </tr>
+    <tr>
+        <td>InTextYearSeparator</td>
+        <td>string</td>
+        <td>Single Space</td>
+        <td>Text inserted between author names and starting bracket before year in in-text citations.</td>
+    </tr>
+    <tr>
+        <td>ItalicEtAl</td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>If true, the "et al." string in citation markers is italicized.</td>
+    </tr>
+    <tr>
+        <td>MaxAuthors</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>The maximum number of authors to list in a citation that has appeared earlier in the document.</td>
+    </tr>
+    <tr>
+        <td>MaxAuthorsFirst</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>The maximum number of authors to list in a citation when appearing for the first time.</td>
+    </tr>
+    <tr>
+        <td>MinimumGroupingCount</td>
+        <td>integer</td>
+        <td><code>3</code></td>
+        <td>The minimum number of consecutive entries a citation should contain before the numbers are grouped,
+            e.g. <code>[4-6]</code> vs. <code>[4; 5; 6]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>MultiCiteChronological</td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>If <code>true</code>, multiple entries in the same citation are sorted chronologically, otherwise
+            they are sorted alphabetically.
+        </td>
+    </tr>
+    <tr>
+        <td>PageInfoSeparator</td>
+        <td>string</td>
+        <td><code>; </code></td>
+        <td>For citations with extra information, e.g. page numbers, this string is inserted between the year
+            (for author-year citations) or the citation number (for numbered citations) and the extra information.
+            E.g. the text between <code>2001</code> and <code>p. 301</code> in <code>[Smith 2001; p. 301]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>UniquefierSeparator</td>
+        <td>string</td>
+        <td><code>, </code></td>
+        <td>Text inserted between letters used to differentiate citations with similar authors and year. E.g.
+            the text between <code>a</code> and <code>b</code> in <code>[Smith 2001a, b]</code>.
+        </td>
+    </tr>
+    <tr>
+        <td>YearField</td>
+        <td>string</td>
+        <td><code>year</code></td>
+        <td>The BibTeX field to get publication year from.</td>
+    </tr>
+    <tr>
+        <td>YearSeparator</td>
+        <td>string</td>
+        <td>Single Space</td>
+        <td>Text inserted between author names and year in parenthesis citations such as <code>[Smith 2001]</code>.</td>
+    </tr>
+</table>
+
+<p>If numbered entries are used, the <code>BracketBefore</code> and <code>BracketAfter</code> properties
+    are the most important - they define which characters the citation number is wrapped in. The citation is composed
+    as follows:<br/>
+    <code>[BracketBefore][Number][BracketAfter]</code><br/>
+    where [Number] is the number of the citation, determined according to the ordering of the bibliography and/or
+    the position of the citation in the text. If a citation refers to several entries, these will be separated
+    by the string given in the property <code>CitationSeparator</code> (for instance, if <code>CitationSeparator</code>=;,
+    the citation could look like <code>[2;4;6]</code>). If two or more of the entries have a series of consecutive
+    numbers, the numbers can be grouped (for instance <code>[2-4]</code> for 2, 3 and 4 or <code>[2;5-7]</code> for
+    2, 5, 6 and 7). The property <code>GroupedNumbersSeparator</code> (default <code>-</code>) determines which string
+    separates the first and last
+    of the grouped numbers. The integer property <code>MinimumGroupingCount</code> (default 3) determines what number of
+    consecutive numbers is required before entries are grouped. If <code>MinimumGroupingCount</code>=3, the numbers
+    2 and 3 will not be grouped, while 2, 3, 4 will be. If <code>MinimumGroupingCount</code>=0, no grouping will be
+    done regardless of the number of consecutive numbers.
+</p>
+
+<p>If numbered entries are not used, author-year citations will be created based on the citation properties.
+    A parenthesis citation is composed as follows:<br/>
+    <code>[BracketBefore][Author][YearSeparator][Year][BracketAfter]</code><br/>
+    where [Author] is the result of looking up the field or fields given in the <code>AuthorField</code> property,
+    and formatting a list of authors. The list can contain up to <code>MaxAuthors</code> names - if more are present,
+    the list will be composed as the first author plus the text specified in the property <code>EtAlString</code>.
+    If the property <code>MaxAuthorsFirst</code> is given, it overrides <code>MaxAuthors</code> the first time each
+    citation appears in the text.</p>
+
+<p>If several, slash-separated, fields are given in the <code>AuthorField</code> property, they will be looked up
+    successively if the first field is empty for the given BibTeX entry. In the example above, the "author" field will
+    be used, but if empty, the "editor" field will be used as a backup.</p>
+
+<p>The names in the author list will be separated by the text given by the <code>AuthorSeparator</code>
+    property, except for the last two names, which will be separated by the text given by
+    <code>AuthorLastSeparator</code>.
+    If the property <code>AuthorLastSeparatorInText</code> is given, it overrides the former for citations of the
+    in-text
+    type. This makes it possible to get citations like <code>(Olsen &amp; Jensen, 2008)</code> and <code>Olsen and
+        Jensen (2008)</code>
+    for the same style.
+</p>
+
+<p>[Year] is the result of looking up the field or fields given in the [YearField] property.</p>
+
+<p>An in-text citation is composed as follows:<br/>
+    <code>[Author][InTextYearSeparator][BracketBefore][Year][BracketAfter]</code><br/>
+    where [Author] and [Year] are resolved in exactly the same way as for the parenthesis citations.
+</p>
+
+<p>If two different cited sources have the same authors and publication year, and author-year citations are used,
+    their markers will need modification in order to be distinguishable. This is done automatically by appending a
+    letter after the year for
+    each of the publications; 'a' for the first cited reference, 'b' for the next, and so on.
+    For instance, if the author "Olsen" has two cited papers from 2005, the citation markers will be modified to
+    <code>(Olsen, 2005a)</code> and <code>(Olsen, 2005b)</code>. In the bibliography
+    layout, the placement of the "uniquefier" letter is indicated explicitly by inserting the virtual field
+    <code>uniq</code>.</p>
+
+<p>If several entries that have been "uniquefied" are cited together, they will be grouped in the citation
+    marker. For instance, of the two entries in the example above are cited together, the citation marker will
+    be <code>(Olsen, 2005a, b)</code> rather than <code>Olsen, 2005a; Olsen, 2005b)</code>. The grouped uniquefier
+    letters (a and b in our example) will be separated by the string specified by the <code>UniquefierSeparator</code>
+    property.
+</p>
+
+<p>Author-year citations referring more than one entry will by default be sorted chronologically. If you wish them
+    to be sorted alphabetically, the citation property <code>MultiCiteChronological</code> should be set to
+    <code>false.</code>.</p>
+
+
+<h3>Reference list layout</h3>
+
+<p>The <b>LAYOUT</b> section describes how the bibliography entry for each entry type in JabRef
+    should appear. Each line should start with either the name of a BibTeX entry type, or the word
+    <code>default</code>, followed by a '='. The <code>default</code> layout will be used for all
+    entry types for which an explicit layout hasn't been given.</p>
+
+<p>The remainder of each line defines the layout, with normal text and spaces appearing literally
+    in the bibliography entry. Information from the BibTeX entry is inserted by adding <code>\field</code> markers
+    with the appropriate field name (e.g. <code>\author</code> for inserting the author names). Formatting
+    information for the field can be included here, following JabRef's standard export layout syntax.
+    Refer to <a href="http://jabref.sourceforge.net/help/CustomExports.php">JabRef's documentation on custom export
+        filters</a>
+    for more information about which formatters are available.</p>
+
+<p>If author-year citations are used, you have to explicitly specify the position of the "uniquefier" letter
+    that is added to distinguish similar-looking citations. This is done by including a marker for the virtual field
+    <code>uniq</code>, typically right after the year (as shown in the example style file). The <code>uniq</code>
+    field is automatically set correctly for each entry before its reference text is laid out.
+</p>
+
+<p>To indicate formatting in the bibliography, you can use the HTML-like tag pairs &lt;b&gt; &lt;/b&gt;,
+    &lt;i&gt; &lt;/i&gt;, &lt;sup&gt; &lt;/sup&gt; and &lt;sub&gt; &lt;/sub&gt; to specify bold text,
+    italic text, superscript and subscript, respectively.</p>
+
+<p>If you are using numbered citations, the number for each entry will be automatically inserted at the start
+    of each entry in the reference list. By default, the numbers will be enclosed in the same brackets defined for
+    citations. The optional citation properties <code>BracketBeforeInList</code> and
+    <code>BracketAfterInList</code> override <code>BracketBefore</code> and <code>BracketAfter</code> if set. These
+    can be used if you want different types of brackets (or no brackets) in the reference list. Note that these need
+    not be brackets as such - they can be any combination of characters.</p>
+
+<h2>Known issues</h2>
+
+<ul>
+    <li>Make sure to save your Writer document in OpenDocument format (odt). Saving to Word format will lose your
+        reference marks.
+    </li>
+    <li>There is currently no support for footnote based citations.</li>
+    <li>The cursor may be poorly positioned after inserting a citation.</li>
+    <li>Copy-pasting the example style file directly from this page can give an unparseable file. To avoid this, instead
+        download the example file from the link in the download section.
+    </li>
+</ul>
+
+</body>
+</html>
