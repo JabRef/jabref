@@ -83,7 +83,7 @@
 	<property name="osxbin.dir" value="osx" />
 
 	<!-- Load user dependent properties. Has to happen before setting the properties here -->
-	<!-- For instance to redefine the NSIS-compiler write 
+	<!-- For instance to redefine the NSIS-compiler write
 		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
 	  -->
 	<property file="user.properties" />
@@ -137,7 +137,7 @@
         <include name="spl/*.jar" />
     </fileset>
 	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
-	        <exclude name="services/**/*" />	        
+	        <exclude name="services/**/*" />
 	</fileset>
     <!-- Done by MrDlib -->
 
@@ -241,9 +241,9 @@
 	<!-- Jars up project -->
 	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
-        
+
 		<mkdir dir="${build.tmp}" />
-		<jar destfile="${build.lib}/${build.jar}" > 
+		<jar destfile="${build.lib}/${build.jar}" >
         <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
 
 			<fileset dir="${build.classes}" />
@@ -336,10 +336,10 @@
 		<!-- Insert version informations -->
 		<replace dir="${build.help}">
 		    <replacefilter
-			    token="${jabref.placeholder.version}" 
+			    token="${jabref.placeholder.version}"
 				value="${jabref.version}" />
 		    <replacefilter
-			    token="${jabref.placeholder.year}" 
+			    token="${jabref.placeholder.year}"
 				value="${jabref.year}" />
 			<include name="**/About.html" />
 		</replace>
@@ -405,8 +405,8 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://docs.oracle.com/javase/6/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
-			<!-- 
-                 create javadoc only selectively for classes that 
+			<!--
+                 create javadoc only selectively for classes that
                  users extending JabRef are likely to use
               -->
 			<fileset dir="${java.dir}" defaultexcludes="yes">
