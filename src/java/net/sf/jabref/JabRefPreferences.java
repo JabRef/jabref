@@ -457,7 +457,7 @@ public class JabRefPreferences {
         defaults.put("searchDialogWidth", new Integer(650));
         defaults.put("searchDialogHeight", new Integer(500));
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
-        defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
+        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
         defaults.put("runAutomaticFileSearch", Boolean.FALSE);
         defaults.put("useLockFiles", Boolean.TRUE);
@@ -555,6 +555,7 @@ public class JabRefPreferences {
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+    public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
 
 	public static final String EMAIL_SUBJECT = "emailSubject";
 	public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";

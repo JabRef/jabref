@@ -996,7 +996,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			result.put(entry, new ArrayList<File>());
 		}
 
-        boolean exactOnly = Globals.prefs.getBoolean("autolinkExactKeyOnly");
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
 		nextFile:
 		for (File file : filesWithExtension){

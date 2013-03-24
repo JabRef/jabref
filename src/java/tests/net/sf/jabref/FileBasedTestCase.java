@@ -14,10 +14,6 @@ import net.sf.jabref.imports.ParserResult;
 /**
  * A base class for Testing in JabRef that comes along with some useful
  * functions.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FileBasedTestCase extends TestCase {
 
@@ -109,6 +105,8 @@ public class FileBasedTestCase extends TestCase {
 	private String oldPdfDirectory;
 
 	private boolean oldUseRegExp;
+	
+	private boolean oldAutoLinkExcatKeyOnly;
 
 	public static BibtexEntry getBibtexEntry() {
 
@@ -144,9 +142,11 @@ public class FileBasedTestCase extends TestCase {
 
 		Globals.prefs = JabRefPreferences.getInstance();
 		oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
+		oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
 		oldPdfDirectory = Globals.prefs.get("pdfDirectory");
 
 		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
+		Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
 		
 		getBibtexEntry();
 		assertNotNull(database);
@@ -209,10 +209,10 @@ public class FileBasedTestCase extends TestCase {
 			File graphicsSubDir = new File(graphicsDir, "subDir");
 			graphicsSubDir.mkdir();
 			
-			File jpg = new File(graphicsSubDir, "testHipKro03test.jpg");
+			File jpg = new File(graphicsSubDir, "HipKro03test.jpg");
 			jpg.createNewFile();
 
-			File png = new File(graphicsSubDir, "testHipKro03test.png");
+			File png = new File(graphicsSubDir, "HipKro03test.png");
 			png.createNewFile();
 			
 		} catch (Exception e) {
@@ -222,6 +222,7 @@ public class FileBasedTestCase extends TestCase {
 
 	public void tearDown() {
 		deleteRecursive(root);
+		Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
 		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
 		Globals.prefs.put("pdfDirectory", oldPdfDirectory);
 		// TODO: This is not a great way to do this, sure ;-)

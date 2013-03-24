@@ -77,8 +77,8 @@ public class UtilFindFileTest extends FileBasedTestCase {
 		Map<BibtexEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
 		
 		assertEquals(2, results.get(entry).size());
-		assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/testHipKro03test.jpg")));
-		assertFalse(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/testHipKro03test.png")));
+		assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.jpg")));
+		assertFalse(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/HipKro03test.png")));
 		assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/pdfs/sub/HipKro03-sub.pdf")));
 	}
 	
