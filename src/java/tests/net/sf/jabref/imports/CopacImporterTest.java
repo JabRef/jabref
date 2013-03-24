@@ -53,10 +53,10 @@ public class CopacImporterTest extends TestCase {
 			.getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
 		assertEquals(1, entries.size());
 		BibtexEntry entry = entries.get(0);
-		
+
 		assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
 		assertEquals(
-			"Prechelt, Lutz and Universit‰t Karlsruhe. Fakult‰t f¸r Informatik",
+			"Prechelt, Lutz and Universit√§t Karlsruhe. Fakult√§t f√ºr Informatik",
 			entry.getField("author"));
 		assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
 		assertEquals("1992", entry.getField("year"));
@@ -71,11 +71,11 @@ public class CopacImporterTest extends TestCase {
 			.getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
 		assertEquals(2, entries.size());
 		BibtexEntry one = entries.get(0);
-		
+
 		assertEquals("Computing and operational research at the London Hospital", one.getField("title"));
-		
+
 		BibtexEntry two = entries.get(1);
-	
+
 		assertEquals("Real time systems : management and design", two.getField("title"));
 	}
 }

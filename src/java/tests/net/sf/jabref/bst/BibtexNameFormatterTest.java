@@ -19,7 +19,7 @@ public class BibtexNameFormatterTest extends TestCase {
 				}
 			}));
 		}
-		
+
 		{
 			AuthorList al = AuthorList
 				.getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
@@ -55,7 +55,7 @@ public class BibtexNameFormatterTest extends TestCase {
 					}
 				}));
 		}
-		
+
 		assertNameFormatA("Meyer, J?", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 			assertNameFormatB("J.~Meyer", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 			assertNameFormatC("Jonathan Meyer", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
@@ -65,10 +65,10 @@ public class BibtexNameFormatterTest extends TestCase {
 			assertNameFormatA("{\\\"{U}}nderwood, U?", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
 			assertNameFormatB("U.~{\\\"{U}}nderwood", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
 			assertNameFormatC("Ulrich {\\\"{U}}nderwood", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
-			assertNameFormatA("Victor, P.~{\\'E}?", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
-			assertNameFormatB("P.~{\\'E}. Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
-			assertNameFormatC("Paul~{\\'E}mile Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
-		
+			assertNameFormatA("Victor, P.~{\\'E}?", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\â€™\\i}u, Juan");
+			assertNameFormatB("P.~{\\'E}. Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\â€™\\i}u, Juan");
+			assertNameFormatC("Paul~{\\'E}mile Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\â€™\\i}u, Juan");
+
 	}
 
 	private void assertNameFormat(String string, String string2, int which, String format){
@@ -79,7 +79,7 @@ public class BibtexNameFormatterTest extends TestCase {
 				}
 			}));
 	}
-	
+
 	private void assertNameFormatC(String string, String string2) {
 		assertNameFormat(string, string2, 1, "{ff }{vv }{ll}{ jj}");
 	}
