@@ -201,14 +201,13 @@
 	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8"
-		   source="1.6" target="1.6">
+		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
 		</javac>
-		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.6" target="1.6">
+		<javac debug="off" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="**/JabRefMain.java" />
 		</javac>
@@ -217,7 +216,7 @@
 	<!-- Compiles project including tests -->
 	<target name="compiletest">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" destdir="${build.classes}" source="1.6" target="1.6">
+		<javac debug="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="tests/**" />
 			<classpath refid="classpathTest" />
