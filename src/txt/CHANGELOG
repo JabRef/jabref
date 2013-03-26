@@ -25,6 +25,7 @@
     - After a search has been done, the first entry of the entry table is selected (feature 656).
     - Entries contained in an .aux file can now be selected (feature 644).
     - Number of entries in a group is now displayed in brackets (patch 124).
+      Feature has to be enabled at the group settings as calculating the numbers takes a long time at huge databases.
     - New entries are now always be added to a group. Fixes bug 1093.
     - Configurable: Timestamp is now automatically updated on a change of an entry (feature 799)
     - Re-enabled customization of shortcut keys

@@ -115,6 +115,8 @@ public class GroupSelector extends SidePaneComponent implements
             false), select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
     JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
                     Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
+    JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
+            Globals.lang("Show number of elements contained in each group"));
 	JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
 			Globals.lang("Automatically assign new entry to selected groups")); 
     ButtonGroup bgr = new ButtonGroup();
@@ -204,6 +206,17 @@ public class GroupSelector extends SidePaneComponent implements
             andCb.setSelected(false);
         }
 
+        showNumberOfElements.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, showNumberOfElements.isSelected());
+                if (groupsTree != null) {
+                    groupsTree.invalidate();
+                    groupsTree.validate();
+                    groupsTree.repaint();
+                }
+            }
+        });
         
         autoAssignGroup.addChangeListener(new ChangeListener() {
         	public void stateChanged(ChangeEvent event) {
@@ -216,6 +229,7 @@ public class GroupSelector extends SidePaneComponent implements
         select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
+        showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
         autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
 
         openset.setMargin(new Insets(0, 0, 0, 0));
@@ -233,6 +247,7 @@ public class GroupSelector extends SidePaneComponent implements
         settings.addSeparator();
         settings.add(showOverlappingGroups);
         settings.addSeparator();
+        settings.add(showNumberOfElements);
         settings.add(autoAssignGroup);
         // settings.add(moreRow);
         // settings.add(lessRow);
@@ -244,6 +259,7 @@ public class GroupSelector extends SidePaneComponent implements
                     // settings.setVisible(false);
                 } else {
                     JButton src = (JButton) e.getSource();
+                    showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
                     autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup")); 
                     settings.show(src, 0, openset.getHeight());
                 }

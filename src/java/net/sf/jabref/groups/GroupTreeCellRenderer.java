@@ -27,7 +27,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 
 /**
@@ -105,16 +105,18 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (italics)
             sb.append("<i>");
         sb.append(Util.quoteForHTML(name));
-    	if (group instanceof ExplicitGroup) {
-    	    sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
-    	} else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
-    		int hits = 0;
-    		for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()){
-    		    if (group.contains(entry))
-    			hits++;
-    		}
-    		sb.append(" [").append(hits).append("]");
-    	}
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
+        	if (group instanceof ExplicitGroup) {
+        	    sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
+        	} else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+        		int hits = 0;
+        		for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()){
+        		    if (group.contains(entry))
+        			hits++;
+        		}
+        		sb.append(" [").append(hits).append("]");
+        	}
+        }
         if (italics)
             sb.append("</i>");
         if (underline)
