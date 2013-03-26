@@ -19,6 +19,7 @@
     - Added new BibTeX label pattern authEtAl
     - Added new BibTeX label pattern authForeIne, authorLastForeIni, edtrForeIni, and editorLastForeIni
       (patch 199)
+    - New translation: Spanish. By Jorge Tornero et al.
     - Adapted the required and optional fields of entry types according to
       http://en.wikipedia.org/wiki/BibTeX#Entry_types
     - After a search has been done, the first entry of the entry table is selected (feature 656).

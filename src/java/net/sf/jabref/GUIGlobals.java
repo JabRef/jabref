@@ -223,7 +223,7 @@ public class GUIGlobals {
 		LANGUAGES.put("Japanese", "ja");
 		LANGUAGES.put("Nederlands", "nl");
 		LANGUAGES.put("Norsk", "no");
-		//LANGUAGES.put("Español", "es"); // Not complete
+		LANGUAGES.put("Español", "es");
 		//LANGUAGES.put("Polski", "pl");
 		LANGUAGES.put("Turkish", "tr");
 		LANGUAGES.put("Simplified Chinese", "zh");
