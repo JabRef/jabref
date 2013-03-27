@@ -3437,37 +3437,43 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
     }
     
-    public static void openFolder(String link) throws IOException {
-        if(Globals.ON_WIN){
-            openFolderOnWindows(link);
-        }else if(Globals.ON_LINUX){
-            openFolderOnLinux(link);
-        }else{
-            openFolderGeneric(link);
+    /**
+     * Opens a file browser of the folder of the given file. If possible, the file is selected
+     * @param fileLink the location of the file
+     * @throws IOException
+     */
+    public static void openFolderAndSelectFile(String fileLink) throws IOException {
+        if (Globals.ON_WIN) {
+            openFolderAndSelectFileOnWindows(fileLink);
+        } else if (Globals.ON_LINUX){
+            openFolderAndSelectFileOnLinux(fileLink);
+        } else {
+            openFolderAndSelectFileGeneric(fileLink);
         }
     }
 
-    private static void openFolderOnLinux(String link) throws IOException {
+    private static void openFolderAndSelectFileOnLinux(String fileLink) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
         
         String cmd = "";
         
-        if(desktopSession.contains("gnome")){
-            cmd = "nautilus " + link;
-        }else if(desktopSession.contains("kde")){
-            cmd = "dolphin --select " + link;
-        }else{
-            cmd = "xdg-open " + link.substring(0, link.lastIndexOf(File.separator));
-        }
+		if (desktopSession.contains("gnome")) {
+			cmd = "nautilus " + fileLink;
+		} else if (desktopSession.contains("kde")) {
+			cmd = "dolphin --select " + fileLink;
+		} else {
+			cmd = "xdg-open " + fileLink.substring(0, fileLink.lastIndexOf(File.separator));
+		}
         
         Runtime.getRuntime().exec(cmd);
     }
 
-    private static void openFolderGeneric(String link) throws IOException {
-        Desktop.getDesktop().open(new File(link.substring(0, link.lastIndexOf(File.separator))));
+    private static void openFolderAndSelectFileGeneric(String fileLink) throws IOException {
+    	File f = new File(fileLink);
+        Desktop.getDesktop().open(f.getParentFile());
     }
 
-    private static void openFolderOnWindows(String link) throws IOException {
+    private static void openFolderAndSelectFileOnWindows(String link) throws IOException {
         link = link.replace("&", "\"&\"");
 
         String cmd = "explorer.exe /select,\"" + link + "\"";

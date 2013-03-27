@@ -19,6 +19,7 @@
     - Added new BibTeX label pattern authEtAl
     - Added new BibTeX label pattern authForeIne, authorLastForeIni, edtrForeIni, and editorLastForeIni
       (patch 199)
+    - The folder of attachments can now be opened (feature 726, patch by Douglas Nassif Roma Junior).
     - New translation: Spanish. By Jorge Tornero et al.
     - Adapted the required and optional fields of entry types according to
       http://en.wikipedia.org/wiki/BibTeX#Entry_types

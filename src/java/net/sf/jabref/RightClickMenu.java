@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -34,6 +35,8 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class RightClickMenu extends JPopupMenu
         implements PopupMenuListener {
+
+	private static final Logger logger = Logger.getLogger(RightClickMenu.class.getName());
 
     BasePanel panel;
     MetaData metaData;
@@ -191,7 +194,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openFolder");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         
