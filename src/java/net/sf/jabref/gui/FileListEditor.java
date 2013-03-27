@@ -23,6 +23,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -48,6 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileListEditor extends JTable implements FieldEditor,
         DownloadExternalFile.DownloadCallback {
+    private static final Logger logger = Logger.getLogger(FileListEditor.class.getName());
 
     FieldNameLabel label;
     FileListEntryEditor editor = null;
@@ -62,6 +65,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     private JPopupMenu menu = new JPopupMenu();
 
     private JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
+    private JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
     private JMenuItem rename = new JMenuItem(Globals.lang("Move/Rename file"));
     private JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
 
@@ -182,6 +186,23 @@ public class FileListEditor extends JTable implements FieldEditor,
                 openSelectedFile();
             }
         });
+        
+        menu.add(openFolder);
+        openFolder.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		        int row = getSelectedRow();
+		        if (row >= 0) {
+		            FileListEntry entry = tableModel.getEntry(row);
+		            try {
+		            	Util.openFolderAndSelectFile(entry.getLink());
+		            } catch (IOException ex) {
+		                logger.fine(ex.getMessage());
+		            }
+		        }
+			}
+		});
+        
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
