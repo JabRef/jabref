@@ -69,21 +69,27 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copy");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         add(new AbstractAction(Globals.lang("Paste"), GUIGlobals.getImage("paste")) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("paste");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         add(new AbstractAction(Globals.lang("Cut"), GUIGlobals.getImage("cut")) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("cut");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
@@ -93,10 +99,11 @@ public class RightClickMenu extends JPopupMenu
              public void run() {*/
                 try {
                     panel.runCommand("delete");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
                 /*}
                }); */
-
             }
         });
         addSeparator();
@@ -105,14 +112,18 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("exportToClipboard");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         add(new AbstractAction(Globals.lang("Send as email")) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("sendAsEmail");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         addSeparator();
@@ -127,7 +138,9 @@ public class RightClickMenu extends JPopupMenu
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("markEntries");
-                    } catch (Throwable ex) {}
+                    } catch (Throwable ex) {
+                    	logger.warning(ex.getMessage());
+                    }
                 }
             });
 
@@ -137,7 +150,9 @@ public class RightClickMenu extends JPopupMenu
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("unmarkEntries");
-                    } catch (Throwable ex) {}
+                    } catch (Throwable ex) {
+                    	logger.warning(ex.getMessage());
+                    }
                 }
             });
             addSeparator();
@@ -148,7 +163,9 @@ public class RightClickMenu extends JPopupMenu
                     public void actionPerformed(ActionEvent e) {
                         try {
                             panel.runCommand("markEntries");
-                        } catch (Throwable ex) {}
+                        } catch (Throwable ex) {
+                        	logger.warning(ex.getMessage());
+                        }
                     }
                 });
 
@@ -159,7 +176,9 @@ public class RightClickMenu extends JPopupMenu
                     public void actionPerformed(ActionEvent e) {
                         try {
                             panel.runCommand("unmarkEntries");
-                        } catch (Throwable ex) {}
+                        } catch (Throwable ex) {
+                        	logger.warning(ex.getMessage());
+                        }
                     }
                 });
             }
@@ -204,7 +223,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openExternalFile");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
@@ -212,7 +233,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("addFileLink");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         /*add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("openFile")) {
@@ -227,7 +250,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openUrl");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
@@ -235,7 +260,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copyKey");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
@@ -243,7 +270,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copyCiteKey");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
@@ -256,7 +285,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("importPlainText");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         
@@ -274,8 +305,9 @@ public class RightClickMenu extends JPopupMenu
                     //BibtexEntry[] bes = panel.getSelectedEntries();
                     //JMenu groupMenu = buildGroupMenu(bes, true, false);
 
-
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         add(groupAdd);
@@ -284,7 +316,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("removeFromGroup");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
         add(groupRemove);
@@ -294,7 +328,9 @@ public class RightClickMenu extends JPopupMenu
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("removeFromGroup");
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {
+                	logger.warning(ex.getMessage());
+                }
             }
         });
 
