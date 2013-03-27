@@ -285,7 +285,7 @@ public class Globals {
 
 	public static JournalAbbreviations journalAbbrev;
 
-	public static String lang(String key, String[] params) {
+	public static String lang(String key, String... params) {
 		String translation = null;
 		try {
 			if (Globals.messages != null) 
@@ -334,22 +334,6 @@ public class Globals {
 			return sb.toString();
 		}
 		return key;
-	}
-
-	public static String lang(String key) {
-		return lang(key, (String[]) null);
-	}
-
-	public static String lang(String key, String s1) {
-		return lang(key, new String[] { s1 });
-	}
-
-	public static String lang(String key, String s1, String s2) {
-		return lang(key, new String[] { s1, s2 });
-	}
-
-	public static String lang(String key, String s1, String s2, String s3) {
-		return lang(key, new String[] { s1, s2, s3 });
 	}
 
 	public static String menuTitle(String key) {
