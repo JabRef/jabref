@@ -1,4 +1,4 @@
-2.10 beta
+[master branch]
     - Applied fix for JStor fetcher, submitted by Nicolas Brouard.
     - Added Settings menu item "Clear connection settings" in OpenOffice/LibreOffice panel.
     - Added support for specifying a BibTeX file at "--importToOpen". This allows a usage in browsers
