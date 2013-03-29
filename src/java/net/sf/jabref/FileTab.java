@@ -37,7 +37,7 @@ public class FileTab extends JPanel implements PrefsTab {
 
     private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
             promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
-    private JComboBox<String> valueDelimiter;
+    private JComboBox valueDelimiter;
     private JRadioButton
         saveOriginalOrder, saveAuthorOrder, saveTableOrder, saveTitleOrder,
         exportOriginalOrder, exportAuthorOrder, exportTableOrder, exportTitleOrder,
@@ -67,7 +67,7 @@ public class FileTab extends JPanel implements PrefsTab {
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox<String>(new String[]{
+        valueDelimiter = new JComboBox(new String[]{
                 Globals.lang("Quotes") + ": \", \"",
                 Globals.lang("Curly Brackets") + ": {, }" });
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
