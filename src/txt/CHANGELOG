@@ -1,3 +1,5 @@
+[2.10 branch]
+    - Fixed compatibility issue with OpenOffice plugin
 2.10 beta
     - Applied fix for JStor fetcher (patch 202 by Nicolas Brouard)
     - Added Settings menu item "Clear connection settings" in OpenOffice/LibreOffice panel.
