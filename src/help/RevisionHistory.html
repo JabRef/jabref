@@ -6,7 +6,62 @@
 <body>
 
   <h1>Revision history</h1>
-    <h3>2.9.3</h3>
+	<h3>2.10 beta</h3>
+    <ul>
+    <li>Applied fix for JStor fetcher (<a href="https://sourceforge.net/p/jabref/patches/202">patch 202</a> by Nicolas Brouard)</li>
+    <li>Added Settings menu item &ldquo;Clear connection settings&rdquo; in OpenOffice/LibreOffice panel.</li>
+    <li>Added support for specifying a BibTeX file at <code>--importToOpen</code>. This allows a usage in browsers
+      to directly append downloaded entries to the currently opened database.</li>
+    <li>Added Unicode to LaTeX conversion for Medline imports (<a href="https://sourceforge.net/p/jabref/feature-requests/721">feature 721</a>)</li>
+    <li>Added Unicode to LaTeX conversion cleanup action (<a href="https://sourceforge.net/p/jabref/feature-requests/721">feature 721</a>)</li>
+    <li>Added countries, weekdays and months to the case keeper</li>
+    <li>Added support for Emacs key bindings at the entry editor.
+      To avoid collisions of common key bindings, Page up and page down (C-v) are not supported as C-v is &ldquo;paste&rdquo; in Windows key bindings.</li>
+    <li>Added a formatter for units which keeps the case and adds non-breaking separators</li>
+    <li>Added a Merge entries functionality</li>
+    <li>Added a setting to choose either a DOI link or a URL to be standard (<a href="https://sourceforge.net/p/jabref/feature-requests/710">feature 710</a>)</li>
+    <li>Added button to change entry type. Removed this functionality from the type label, and
+      reduced the font size.</li>
+    <li>Added Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
+      (<a href="https://sourceforge.net/p/jabref/patches/123">patch 123</a> by Laura Hernández Gómez)</li>
+    <li>Added menu option &ldquo;Automatically set file links for selected entries&rdquo;.</li>
+    <li>Added new BibTeX label pattern authEtAl</li>
+    <li>Added new BibTeX label pattern authForeIne, authorLastForeIni, edtrForeIni, and editorLastForeIni
+      (<a href="https://sourceforge.net/p/jabref/patches/199">patch 199</a>)</li>
+    <li>The folder of attachments can now be opened (<a href="https://sourceforge.net/p/jabref/feature-requests/726">feature 726</a>, patch by Douglas Nassif Roma Junior).</li>
+    <li>New translation: Spanish. By Jorge Tornero et al.</li>
+    <li>Adapted the required and optional fields of entry types according to
+      <a href="http://en.wikipedia.org/wiki/BibTeX#Entry_types">http://en.wikipedia.org/wiki/BibTeX#Entry_types</a></li>
+    <li>After a search has been done, the first entry of the entry table is selected (<a href="https://sourceforge.net/p/jabref/feature-requests/656">feature 656</a>).</li>
+    <li>Entries contained in an .aux file can now be selected (<a href="https://sourceforge.net/p/jabref/feature-requests/644">feature 644</a>).</li>
+    <li>Number of entries in a group is now displayed in brackets (<a href="https://sourceforge.net/p/jabref/patches/124">patch 124</a>).
+      Feature has to be enabled at the group settings as calculating the numbers takes a long time at huge databases.</li>
+    <li>New entries are now always be added to a group. Fixes <a href="https://sourceforge.net/p/jabref/bugs/1093">bug 1093</a>.</li>
+    <li>Configurable: Timestamp is now automatically updated on a change of an entry (<a href="https://sourceforge.net/p/jabref/feature-requests/799">feature 799</a>)</li>
+    <li>Re-enabled customization of shortcut keys</li>
+    <li>Changed serialization of BibTeX entries:
+	<ul>
+      <li>First, the required, then the optional and then all other fields are written.
+        Thereby, fields are now ordered by name. Except the title, which is written first.</li>
+      <li>The second word in of the BibTeX type is capitalized. E.g., Inproceedings got InProceedings</li>
+      <li>Configurable: Start field contents in same column. Enabled by default.</li>
+      <li>Configurable: Use camel case for field names (e.g., <code>HowPublished</code> instead of <code>howpublished</code>). Enabled by default.</li>
+      <li>If no field name is given, then <code>UNKNOWN</code> is used. For instance, <code> = {X}</code> gets <code> UNKNOWN = {X}</code>.</li>
+	</ul>
+	</li>
+    <li>Saving a part of the database now also writes entries with a crossref field first.</li>
+    <li>Author field is now resolved using <code>@String</code> data.</li>
+    <li>A custom proxy can be specified (<a href="https://sourceforge.net/p/jabref/patches/198">patch 198</a> by Michael).</li>
+    <li>Default key binding for Write XMP is now &ldquo;CTRL+F7&rdquo; instead of &ldquo;CTRL+F4&rdquo;
+      as the latter conflicts with &ldquo;Synchronize files&rdquo; (by Adrian Daerr)</li>
+    <li>WriteXMPAction now uses database to resolve strings even for selected entries (by Adrian Daerr)</li>
+    <li>Extend XMP privacy filtering to Dublin Core Schema (by Adrian Daerr)</li>
+    <li>IEEE search should include author field again (<a href="https://sourceforge.net/p/jabref/patches/201">patch 201</a> by Christopher S. Lester, fixes <a href="https://sourceforge.net/p/jabref/bugs/1137">bug 1137</a>)</li>
+    </ul>
+    </div>
+    </div>
+
+	<h3>2.9.2</h3>
     <ul>
      <li>Fixed handling of empty author parts in rare cases. Fixes <a href="https://sourceforge.net/p/jabref/bugs/1124">bug 1124</a>.</li>
      <li>Fetchers work again: Import inspection dialog is not modal any more.</li>

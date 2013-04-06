@@ -44,6 +44,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JabRefFrame frame;
 
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
+    private JRadioButton preferUrl, preferDoi;
+    private ButtonGroup preferUrlDoiGroup;
     
     private JCheckBox showOneLetterHeadingForIconColumns;
     private boolean oldShowOneLetterHeadingForIconColumns;
@@ -184,6 +186,19 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         fileColumn = new JCheckBox(Globals.lang("Show file column"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
 		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
+                preferUrl = new JRadioButton(Globals.lang("Show URL first"));
+                preferDoi = new JRadioButton(Globals.lang("Show DOI first"));
+                preferUrlDoiGroup = new ButtonGroup();
+                preferUrlDoiGroup.add(preferUrl);
+		preferUrlDoiGroup.add(preferDoi);
+                
+                urlColumn.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				preferUrl.setEnabled(urlColumn.isSelected());
+                                preferDoi.setEnabled(urlColumn.isSelected());
+			}
+		});
 		arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
 
 		/*** begin: special table columns and special fields ***/
@@ -232,7 +247,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		builder.append(pan);
 
 		DefaultFormBuilder specialTableColumnsBuilder = new DefaultFormBuilder(new FormLayout(
-				"8dlu, 8dlu, 8cm, 8dlu, left:pref", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
+				"8dlu, 8dlu, 8cm, 8dlu, 8dlu, left:pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
         CellConstraints cc = new CellConstraints();
 		
         specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
@@ -246,10 +261,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 9, 5));
 		specialTableColumnsBuilder.add(hlb, cc.xyw(1, 10, 2));
 
-		specialTableColumnsBuilder.add(fileColumn, cc.xy(5, 1));	
-		specialTableColumnsBuilder.add(pdfColumn, cc.xy(5, 2));	
-		specialTableColumnsBuilder.add(urlColumn, cc.xy(5, 3));	
-		specialTableColumnsBuilder.add(arxivColumn, cc.xy(5, 4));	
+		specialTableColumnsBuilder.add(fileColumn, cc.xyw(5, 1, 2));	
+		specialTableColumnsBuilder.add(pdfColumn, cc.xyw(5, 2, 2));	
+		specialTableColumnsBuilder.add(urlColumn, cc.xyw(5, 3, 2));	
+		specialTableColumnsBuilder.add(preferUrl, cc.xy(6, 4));	
+		specialTableColumnsBuilder.add(preferDoi, cc.xy(6, 5));	
+		specialTableColumnsBuilder.add(arxivColumn, cc.xyw(5, 6, 2));	
 
 		builder.append(specialTableColumnsBuilder.getPanel());
 		builder.nextLine();
@@ -280,6 +297,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
 		urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
+               preferUrl.setSelected(!_prefs.getBoolean("preferUrlDoi"));
+               preferDoi.setSelected(_prefs.getBoolean("preferUrlDoi"));
         fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
 
@@ -543,6 +562,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("fileColumn", fileColumn.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
+		_prefs.putBoolean("preferUrlDoi", preferDoi.isSelected());
 		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
 		
 		_prefs.putBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS, showOneLetterHeadingForIconColumns.isSelected());

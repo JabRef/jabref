@@ -24,7 +24,7 @@ import net.sf.jabref.util.QuotedStringTokenizer;
 
 /**
  * @author jzieren
- * 
+ *
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "ExplicitGroup:";
@@ -209,8 +209,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     public static String getDescriptionForPreview() {
-        return Globals
-                .lang("This group contains entries based on manual assignment. "
+        return Globals.lang("This group contains entries based on manual assignment. "
                         + "Entries can be assigned to this group by selecting them "
                         + "then using either drag and drop or the context menu. "
                         + "Entries can be removed from this group by selecting them "
@@ -234,7 +233,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         }
         return sb.toString();
     }
-    
+
     /**
      * Update the group to handle the situation where the group
      * is applied to a different BibtexDatabase than it was created for.
@@ -267,4 +266,9 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public String getTypeId() {
         return ID;
     }
+
+	public int getNumEntries() {
+		return m_entries.size();
+	}
+
 }

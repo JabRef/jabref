@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -50,7 +51,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -71,10 +71,7 @@ import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEditor;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.VerticalLabelUI;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
@@ -130,7 +127,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // The action which generates a bibtexkey for this entry.
     public GenerateKeyAction generateKeyAction;
 
-    public AutoSetFileAction autoLink = new AutoSetFileAction();
+    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    private FileListEditor fileListEditor = null;
+    private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
     public AbstractAction writeXmp;
 
@@ -154,7 +153,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     JLabel lab;
 
-    TypeLabel typeLabel;
+    TypeButton typeButton;
 
     JabRefFrame frame;
 
@@ -236,6 +235,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (fields != null)
             fieldList = java.util.Arrays.asList(fields);
         reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, Globals.lang("Required fields"));
+        if (reqPan.fileListEditor != null) fileListEditor = reqPan.fileListEditor;
         tabbed.addTab(Globals.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
             .getPane(), Globals.lang("Show required fields"));
         tabs.add(reqPan);
@@ -244,6 +244,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (!prefs.getBoolean("biblatexMode")) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
                     false, Globals.lang("Optional fields"));
+                if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
@@ -252,6 +253,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 optPan = new CompressedEntryEditorTab(frame, panel,
                         java.util.Arrays.asList(entry.getType().getPrimaryOptionalFields()), this,
                     false, Globals.lang("Optional fields"));
+                if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
@@ -259,10 +261,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         java.util.Arrays.asList(Util.getRemainder(entry.getOptionalFields(),
                                 entry.getType().getPrimaryOptionalFields())), this,
                     false, Globals.lang("Optional fields 2"));
+                if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
-
             }
         }
 
@@ -270,6 +272,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
                 tabList.getTabName(i));
+            if (newTab.fileListEditor != null) fileListEditor = newTab.fileListEditor;
             tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
             tabs.add(newTab);
         }
@@ -288,6 +291,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         return type;
     }
 
+    /**
+     * @return reference to the currently edited entry
+     */
     public BibtexEntry getEntry() {
         return entry;
     }
@@ -318,7 +324,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         im.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
         am.put("generateKey", generateKeyAction);
         im.put(prefs.getKey("Automatically link files"), "autoLink");
-        am.put("autoLink", autoLink);
+        am.put("autoLink", autoLinkAction);
         im.put(prefs.getKey("Entry editor, previous entry"), "prev");
         am.put("prev", prevEntryAction);
         im.put(prefs.getKey("Entry editor, next entry"), "next");
@@ -336,18 +342,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         JButton closeBut = new JButton(closeAction);
         closeBut.setText(null);
         closeBut.setBorder(null);
+        closeBut.setMargin(new Insets(8,0,8,0));
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        typeLabel = new TypeLabel(entry.getType().getName());
-        leftPan.add(typeLabel, BorderLayout.CENTER);
+        leftPan.add(new TypeLabel(entry.getType().getName()), BorderLayout.CENTER);
+        typeButton = new TypeButton(entry.getType().getName());
 
-        //tlb.add(typeL);
-
-        tlb.addSeparator();
-        
+        tlb.add(typeButton);
         tlb.add(generateKeyAction);
-        tlb.add(autoLink);
+        tlb.add(autoLinkAction);
 
         tlb.add(writeXmp);
 
@@ -535,7 +539,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         //DefaultFormBuilder builder = new DefaultFormBuilder
         //        (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));
-        source.setEditable(true); // prefs.getBoolean("enableSourceEditing"));
+        source.setEditable(true);
         source.setLineWrap(true);
         source.setTabSize(GUIGlobals.INDENT);
         source.addFocusListener(new FieldEditorFocusListener());
@@ -996,43 +1000,44 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         movingToDifferentEntry = true;
     }
 
-    private class TypeLabel extends JLabel {
-        public TypeLabel(String type) {
-            super(type+" ");
-            setUI(new VerticalLabelUI(false));
-            setForeground(GUIGlobals.entryEditorLabelColor);
-            setHorizontalAlignment(RIGHT);
-            setFont(GUIGlobals.typeNameFont);
-            addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    boolean ctrlClick = prefs.getBoolean("ctrlClick");
+    private class TypeButton extends JButton {
+        public TypeButton(String type) {
+            super(GUIGlobals.getImage("edit"));
+            setToolTipText(Globals.lang("Change entry type"));
+            addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JPopupMenu typeMenu = new JPopupMenu();
+                    for (String s: BibtexEntryType.ALL_TYPES.keySet())
+                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
 
-                    if ((e.getButton() == MouseEvent.BUTTON3)
-                        || (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-                        JPopupMenu typeMenu = new JPopupMenu();
-
-                        // typeMenu.addSeparator();
-                        for (String s: BibtexEntryType.ALL_TYPES.keySet())
-                            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
-
-                        typeMenu.show(ths, e.getX(), e.getY());
-                    }
+                    typeMenu.show(ths, 0, 0);
                 }
             });
         }
 
-        public void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g;
-            //g2.setColor(GUIGlobals.entryEditorLabelColor);
-            //g2.setFont(GUIGlobals.typeNameFont);
-            //FontMetrics fm = g2.getFontMetrics();
-            //int width = fm.stringWidth(label);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            super.paintComponent(g2);
-            //g2.rotate(-Math.PI / 2, 0, 0);
-            //g2.drawString(label, -width - 7, 28);
-        }
     }
+
+    private class TypeLabel extends JLabel {
+            public TypeLabel(String type) {
+                super(type);
+                setUI(new VerticalLabelUI(false));
+                setForeground(GUIGlobals.entryEditorLabelColor);
+                setHorizontalAlignment(RIGHT);
+                setFont(GUIGlobals.typeNameFont);
+            }
+
+            public void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                //g2.setColor(GUIGlobals.entryEditorLabelColor);
+                //g2.setFont(GUIGlobals.typeNameFont);
+                //FontMetrics fm = g2.getFontMetrics();
+                //int width = fm.stringWidth(label);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                super.paintComponent(g2);
+                //g2.rotate(-Math.PI / 2, 0, 0);
+                //g2.drawString(label, -width - 7, 28);
+            }
+        }
 
     class FieldListener extends FocusAdapter {
         /*
@@ -1173,8 +1178,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
-                panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-                    oldValue, newValue));
+                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.database, entry.getId(), oldValue, newValue);
+                if (Util.updateTimeStampIsSet()) {
+                    NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableKeyChange);
+                    panel.undoManager.addEdit(ce);
+                } else {
+                    panel.undoManager.addEdit(undoableKeyChange);
+                }
 
                 if ((newValue != null) && (newValue.length() > 0))
                     // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
@@ -1243,16 +1253,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         if (aComp != null)
                             aComp.addBibtexEntry(entry);
 
-                        // Add an UndoableFieldChange to the baseframe's
-                        // undoManager.
-                        panel.undoManager.addEdit(new UndoableFieldChange(entry, fe.getFieldName(),
-                            oldValue, toSet));
+                        // Add an UndoableFieldChange to the baseframe's undoManager.
+                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fe.getFieldName(), oldValue, toSet);
+                        if (Util.updateTimeStampIsSet()) {
+                            NamedCompound ce = Util.doUpdateTimeStamp(entry, undoableFieldChange);
+                            panel.undoManager.addEdit(ce);
+                        } else {
+                            panel.undoManager.addEdit(undoableFieldChange);
+                        }
                         updateSource();
                         panel.markBaseChanged();
-
                     } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(), Globals
-                            .lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(),
+                                Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                         fe.setInvalidBackgroundColor();
                     }
                 } else {
@@ -1559,28 +1572,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }*/
     }
 
-
-    class AutoSetFileAction extends AbstractAction {
-        public AutoSetFileAction() {
+    private class AutoLinkAction extends AbstractAction {
+        public AutoLinkAction() {
             putValue(SMALL_ICON, GUIGlobals.getImage("autoGroup"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Automatically set file links for this entry")
-                    +" (Alt-F)");
+            putValue(SHORT_DESCRIPTION, Globals.lang("Automatically set file links for this entry") + " (Alt-F)");
         }
 
         public void actionPerformed(ActionEvent event) {
-            JDialog diag = new JDialog(frame, true);
-            final FileListTableModel tableModel = new FileListTableModel();
-            tableModel.setContent(entry.getField(GUIGlobals.FILE_FIELD));
-            FileListEditor.autoSetLinks(entry, tableModel, panel.metaData(), new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (e.getID() > 0) {
-                        entry.setField(GUIGlobals.FILE_FIELD, tableModel.getStringRepresentation());
-                        frame.output(Globals.lang("Finished autosetting external links."));
-                    }
-                    else frame.output(Globals.lang("Finished autosetting external links.")
-                        +" "+Globals.lang("No files found."));
-                }
-            }, diag);
+            FileListEditor fileListEditor = EntryEditor.this.fileListEditor;
+            if (fileListEditor == null) {
+                logger.log(Level.WARNING, "No file list editor found.");
+            } else {
+                fileListEditor.autoSetLinks();
+            }
         }
     }
+
 }

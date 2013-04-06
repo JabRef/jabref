@@ -1,3 +1,52 @@
+[2.10 branch]
+    - Fixed compatibility issue with OpenOffice plugin
+2.10 beta
+    - Applied fix for JStor fetcher (patch 202 by Nicolas Brouard)
+    - Added Settings menu item "Clear connection settings" in OpenOffice/LibreOffice panel.
+    - Added support for specifying a BibTeX file at "--importToOpen". This allows a usage in browsers
+      to directly append downloaded entries to the currently opened database.
+    - Added Unicode to LaTeX conversion for Medline imports (feature 721)
+    - Added Unicode to LaTeX conversion cleanup action (feature 721)
+    - Added countries, weekdays and months to the case keeper
+    - Added support for Emacs key bindings at the entry editor.
+      To avoid collisions of common key bindings, Page up and page down (C-v) are not supported as C-v is "paste" in Windows key bindings. 
+    - Added a formatter for units which keeps the case and adds non-breaking separators
+    - Added a Merge entries functionality
+    - Added a setting to choose either a DOI link or a URL to be standard (feature 710)
+    - Added button to change entry type. Removed this functionality from the type label, and
+      reduced the font size.
+    - Added Iso690 export including two new formatters: Iso690FormatDate and Iso690NamesAuthors
+      (patch 123 by Laura Hernández Gómez)
+    - Added menu option "Automatically set file links for selected entries".
+    - Added new BibTeX label pattern authEtAl
+    - Added new BibTeX label pattern authForeIne, authorLastForeIni, edtrForeIni, and editorLastForeIni
+      (patch 199)
+    - The folder of attachments can now be opened (feature 726, patch by Douglas Nassif Roma Junior).
+    - New translation: Spanish. By Jorge Tornero et al.
+    - Adapted the required and optional fields of entry types according to
+      http://en.wikipedia.org/wiki/BibTeX#Entry_types
+    - After a search has been done, the first entry of the entry table is selected (feature 656).
+    - Entries contained in an .aux file can now be selected (feature 644).
+    - Number of entries in a group is now displayed in brackets (patch 124).
+      Feature has to be enabled at the group settings as calculating the numbers takes a long time at huge databases.
+    - New entries are now always be added to a group. Fixes bug 1093.
+    - Configurable: Timestamp is now automatically updated on a change of an entry (feature 799)
+    - Re-enabled customization of shortcut keys
+    - Changed serialization of BibTeX entries:
+      * First, the required, then the optional and then all other fields are written.
+        Thereby, fields are now ordered by name. Except the title, which is written first.
+      * The second word in of the BibTeX type is capitalized. E.g., Inproceedings got InProceedings
+      * Configurable: Start field contents in same column. Enabled by default.
+      * Configurable: Use camel case for field names (e.g., "HowPublished" instead of "howpublished"). Enabled by default.
+      * If no field name is given, then "UNKNOWN" is used. For instance, " = {X}" gets " UNKNOWN = {X}".
+    - Saving a part of the database now also writes entries with a crossref field first.
+    - Author field is now resolved using @String data.
+    - A custom proxy can be specified (patch 198 by Michael).
+    - Default key binding for Write XMP is now "CTRL+F7" instead of "CTRL+F4"
+      as the latter conflicts with "Synchronize files" (by Adrian Daerr)
+    - WriteXMPAction now uses database to resolve strings even for selected entries (by Adrian Daerr)
+    - Extend XMP privacy filtering to Dublin Core Schema (by Adrian Daerr)
+    - IEEE search should include author field again (patch 201 by Christopher S. Lester, fixes bug 1137)
 2.9.2
     - Fixed handling of empty author parts in rare cases. Fixes bug 1124.
     - Fetchers work again: Import inspection dialog is not modal any more.
@@ -22,9 +71,9 @@
       as text or an equation via the preferences
     - Added initial support for adding curly brackets {} for certain
       key words to keep the character case independent of .bst, e.g., for
-      names and abbreviations (use via "Cleanup entries") and can be controlled 
+      names and abbreviations (use via "Cleanup entries") and can be controlled
       via preferences if it should be used at searches
-    - Fixed author and DOI import from IEEE Xplore 
+    - Fixed author and DOI import from IEEE Xplore
     - Improved import of equations in IEEE Xplore titles handling images, (sub) and /spl / representations
     - Rewrote the HTML import in a more general way. A few characters need to be added.
     - IEEE Xplore abstract fetching should now be working again.
@@ -34,7 +83,7 @@
     - Added alternate entry fetcher type where a preview can be displayed so the user can choose
       which entries to download. This can reduce server load significantly and prevent users from
       getting locked out of search services.
-    - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Sv�rd)
+    - Fix for exception and minor bugs in HTML import parsing (patch 3575998 by Daniel Svärd)
     - HTML import handles more characters. Cleanup can also do HTML cleanup. (Patch 3582375 by Oscar Gustafsson)
     - During file renaming: More illegal characters are removed (idea by Sarel Botha)
     - Rudimentary support for IEEEtranBSTCTL added (patch 3582376 by Oscar Gustafsson)
@@ -68,7 +117,7 @@
     - Text-based citations can now be imported using FreeCite by Brown University
       (http://freecite.library.brown.edu). By Kai Mindermann and Daniel Maurer.
     - JabRef supports synchronization of unlinked PDFs. Feature request "[2163626] Scan database - find unlinked files".
-      Based on patch 3122104. 
+      Based on patch 3122104.
     - Added command line argument -d/-prdef for resetting preferences to default values. Can
       reset a comma-separated list of preference values, or all values.
     - Added small right-click popup menu at each tab
@@ -76,7 +125,7 @@
     - Drag'n'drop of text from the preview panel to other applications is now working
     - Added highlighting in preview area for search text (based on patch 3121914 by
       Maximilian Lengsfeld).
-    - New context menu option "Switch preview layout" in the preview panel. 
+    - New context menu option "Switch preview layout" in the preview panel.
     - BibTeX key generator patterns can now be stored in per database (implements feature 3495993)
     - Braces around author names are now dropped internally. They remain in the .bib though
       Effects (incomplete list): Authors in the main window are shown without braces,
@@ -86,9 +135,9 @@
       (default is 2)
     - Autocompletion: in case lower case letters are used, the search is case-insenstive,
       otherwise the search is case sensitive.
-    - Autocompletion: new preference to choose how to deal with first names 
+    - Autocompletion: new preference to choose how to deal with first names
       (always full/always abbreviated/both full and abbreviated)
-    - Added functionality "clean up entries" 
+    - Added functionality "clean up entries"
       - Includes clean up DOI functionality by Florian Straßer and Marius Kleiner
         (move of DOIs from ee, note, and url field is supported)
       - Option to rename PDF of entry according to configured PDF-naming-scheme
@@ -170,10 +219,10 @@
     - Bugfix for NullPointerException in Biblatex mode (patch 3222388 by Matthias Erll).
     - ToggleButton added to GroupSelector to ease adding/removing references to/from groups
       (based on patch 3313564 updated by Andreas Schlicker).
-    - Export filter "tablerefsandbib" updated to contain links to files and notes 
+    - Export filter "tablerefsandbib" updated to contain links to files and notes
       (patch 2787096 by Thomas Arildsen).
     - "of" added to the list of skip words (patch 2781830).
-    - Added cli-function for exporting entries filtered by a search term 
+    - Added cli-function for exporting entries filtered by a search term
       (patch 1817093 by Silberer, Zirn)
     - Added highlighting in textarea for search text (patch 3117881 by Ben).
       Slightly modified to cope with words[]={""}, support for "BibTeX source" tab, and that
@@ -226,8 +275,8 @@
     - Restricted remote listener port numbers to interval 1025-65535.
     - Added Japanese translation by Koji Yokota.
     - Added scrollbar to entry editor when it is too high to fit in its panel. Patch
-      by Matthias Erll 
-    - Made it possible to copy entries from the search dialog.    
+      by Matthias Erll
+    - Made it possible to copy entries from the search dialog.
     - Added proper error message when trying to search with invalid regular expression.
     - Added error dialog on startup if custom look and feel cannot be loaded.
     - Applied Alexander Hug's patch for correctly importing doi from ScienceDirect RIS files.
@@ -254,13 +303,13 @@
       externally after merging changes.
     - Fixed bug in Move/rename file link feature that could cause the wrong link to be
       stored for certain directory structures.
-    - Fixed bug: curly braces can now be used in arguments to formatters. 
+    - Fixed bug: curly braces can now be used in arguments to formatters.
     - Fixed lockup bug when generating key for entries with crossref fields.
     - BibTeX strings are now resolved before attempting to (un)abbreviate journal names.
     - Modified [shorttitle] and [veryshorttitle] key generator markers so they consider
       a hyphen a word boundary, and remove punctuation characters (keep only numbers and
       letters).
-    - deprecate various export formatters with new Authors formatter, which provides flexible 
+    - deprecate various export formatters with new Authors formatter, which provides flexible
       formatting options.
 2.6
     - Fixed IEEExplorer and ACM fetchers to adapt to web site changes.
@@ -294,11 +343,11 @@
     - Added "review" field to BibTeXML export.
     - Added Reset button to entry fetchers. Patch by Dennis Hartrampf and Ines Moosdorf.
     - Changed Microsoft Office XML export so "number" rather than "issue" is exported
-      as <b:Issue>, which conforms with import format. 
+      as <b:Issue>, which conforms with import format.
     - Added confirmation dialog that allows saving without backup in cases when
       backup creation fails.
     - Fixed bug 2938562: using the move/rename feature on a file link could give an
-      absolute link even if the file was put below the main file directory. 
+      absolute link even if the file was put below the main file directory.
     - Fixed bug 2931293: error generating key with [authorsAlpha] for short names.
     - When checking for external modifications, file size is now checked in addition
       to the time stamp.
@@ -331,7 +380,7 @@
       group selection is active.
     - Fixed bug in writing of metadata on Windows. For certain metadata lengths newlines would be
       messed up after the metadata comment in a bib file.
-    - Search dialog now automatically previews first hit, and hides preview if there are no hits. 
+    - Search dialog now automatically previews first hit, and hides preview if there are no hits.
 2.6b2
     - Added export formatter "Default" which takes a single argument. Outputs the string to format
       unchanged if it is non-empty, otherwise outputs the argument.
@@ -390,7 +439,7 @@
       author field.
     - Fixed bug in autocompleter. Current suggested completion would be added to the field
       if the user closed the entry editor or mouse clicked on another field.
-    - Fixed problem with exporting to some MySql versions. Patch by François Dorin. 
+    - Fixed problem with exporting to some MySql versions. Patch by François Dorin.
     - Fixed bug in handling of LaTeX character sequences - now sequences with = as command
       character (e.g. "\={A}") are recognized.
     - Fixed bug: gray out / hide setting in groups panel is overridden on startup
@@ -482,7 +531,7 @@
     - Fixed bug in HTMLConverter.
     - Fixed NullPointerException in key generator for incomplete names.
     - Fixed bug in removing custom export filters.
-    - Fixed bug 2225371: restart is no longer required after adding a new custom export filter. 
+    - Fixed bug 2225371: restart is no longer required after adding a new custom export filter.
     - Fixed bug in "Move/rename file" feature in file field editor with regard to undefined
       file directory.
     - Fixed bug in Ris importer.
@@ -493,7 +542,7 @@
     - Fixed crash during initalization of journal abbreviation list.
     - Added option to have JabRef search for external file when "Open file" function is chosen
       for an entry without any linked files. This is similar to what was always done in
-      JabRef 2.3.1 and earlier. 
+      JabRef 2.3.1 and earlier.
     - Improved regular expression file search, so the regular expression can contain field
       markers as used for BibTeX key generation in addition to just regular fields. It is
       no longer possible to call arbitrary layout formatters, but the modifiers "upper",
@@ -563,15 +612,15 @@
     - Fixed bug where the external update notification in the side pane would remain
       even if the referred database was closed.
     - Added two new search modes - display search results in a dialog, and global search.
-    - Support for fetching from the command line using --fetch (contributed by 
+    - Support for fetching from the command line using --fetch (contributed by
       Jan F. Boldt and David Kaltschmidt).
     - Support for fetching from Spires (contributed by Fedor Bezrukov).
-    - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane 
+    - Support for fetching from JSTOR (contributed by Tobias Langner, Juliane
       Doege, Sebastian de Hoog and Christoph Jacob)
     - Added context menu for file list editor with options to move/rename linked file
       as well as to automatically move the file to file directory and optionally rename
       after BibTeX key.
-	- JabRef can now be extended by plugins (using the Java Plugin Framework 
+	- JabRef can now be extended by plugins (using the Java Plugin Framework
 	  JPF as the underlying technology). Currently extension points exist for:
 		- ImportFormat
 		- ExportFormat based on Templates
@@ -583,7 +632,7 @@
 	  generate helper classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
 	- Print warnings if insufficient Java version is used or if JRE is not from Sun.
-	- Memory Stick Mode: JabRef automatically loads configuration settings from 
+	- Memory Stick Mode: JabRef automatically loads configuration settings from
 	  jabref.xml and also writes them there if enabled.
 	- Improved handling of crossrefs. Fields are now resolved in preview and export.
 	- Updated dependencies, now using: JempBox-0.2
@@ -611,7 +660,7 @@
     - Fixed handling of quotes when using the "abbr" modifier for key generator (Debian bug
       #448917).
     - Download file procedure now strips query string in order to find correct file extension
-      (Debian bug #448027).    
+      (Debian bug #448027).
 2.3b3
     - Export formats that output the character encoding now use common names for encodings
       instead of Java-specific names.

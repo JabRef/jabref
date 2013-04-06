@@ -44,7 +44,7 @@ public class FieldWeightDialog extends JDialog {
 
     JabRefFrame frame;
     HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    JButton ok = new JButton(Globals.lang("OK")),
+    JButton ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
 
    public static void main(String[] args) {

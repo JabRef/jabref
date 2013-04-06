@@ -17,16 +17,20 @@ package net.sf.jabref.collab;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 /**
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes
 * in the file's last modification time stamp. The
  */
 public class FileUpdateMonitor extends Thread {
+
+	private static Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
   final int WAIT = 4000;
   static int tmpNum = 0;
@@ -62,6 +66,12 @@ public class FileUpdateMonitor extends Thread {
       try {
         sleep(WAIT);
       } catch (InterruptedException ex) {
+    	  logger.finest("FileUpdateMonitor has been interrupted.");
+    	  /*  the (?) correct way to interrupt threads, according to
+    	   *  http://www.roseindia.net/javatutorials/shutting_down_threads_cleanly.shtml
+    	   */
+    	  Thread.currentThread().interrupt(); // very important
+    	  break;
       }
     }
   }

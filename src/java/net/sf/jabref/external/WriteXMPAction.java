@@ -62,27 +62,25 @@ public class WriteXMPAction extends AbstractWorker {
 
 	public void init() {
 
+		database = panel.getDatabase();
 		// Get entries and check if it makes sense to perform this operation
 		entries = panel.getSelectedEntries();
 
 		if (entries.length == 0) {
 
-			database = panel.getDatabase();
 			entries = database.getEntries().toArray(new BibtexEntry[]{});
 
 			if (entries.length == 0) {
 
-				JOptionPane.showMessageDialog(panel, Globals
-					.lang("This operation requires at least one entry."), Globals
-					.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(panel, Globals.lang("This operation requires at least one entry."),
+                                        Globals.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
 				goOn = false;
 				return;
 
 			} else {
 
-				int response = JOptionPane.showConfirmDialog(panel, Globals
-					.lang("Write XMP-metadata for all PDFs in current database?"), Globals
-					.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
+				int response = JOptionPane.showConfirmDialog(panel, Globals.lang("Write XMP-metadata for all PDFs in current database?"),
+                                        Globals.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
 
 				if (response != JOptionPane.YES_OPTION) {
@@ -189,8 +187,8 @@ public class WriteXMPAction extends AbstractWorker {
 
 		private static final long serialVersionUID = 7459164400811785958L;
 
-		JButton okButton = new JButton(Globals.lang("Ok")), cancelButton = new JButton(Globals
-			.lang("Cancel"));
+		JButton okButton = new JButton(Globals.lang("Ok")), cancelButton = new JButton(
+                        Globals.lang("Cancel"));
 
 		boolean canceled;
 

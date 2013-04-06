@@ -73,8 +73,8 @@ public class PushToLyx implements PushToApplication {
 
 
 	    t.start();
-	    /*new Timeout(2000, t, Globals.lang("Error")+": "+
-            Globals.lang("unable to access LyX-pipe"));*/
+	    //new Timeout(2000, t, Globals.lang("Error")+": "+
+            //Globals.lang("unable to access LyX-pipe"));
         try {
             t.join();
         } catch (InterruptedException e) {

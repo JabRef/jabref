@@ -39,10 +39,17 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
 	this.newValue = newValue;
     }
 
+    @Override
+    public String getPresentationName() {
+        return Globals.lang("change key");
+    }
+
+    @Override
     public String getUndoPresentationName() {
 	return Globals.lang("Undo")+": "+Globals.lang("change key");
     }
 
+    @Override
     public String getRedoPresentationName() {
 	return Globals.lang("Redo")+": "+Globals.lang("change key");
     }

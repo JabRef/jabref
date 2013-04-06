@@ -235,7 +235,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
         if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
             useRegExpComboBox.setSelected(true);
-        else if (_prefs.getBoolean("autolinkExactKeyOnly"))
+        else if (_prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY))
             matchExactKeyOnly.setSelected(true);
         else
             matchStartsWithKey.setSelected(true);
@@ -254,7 +254,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put(GUIGlobals.FILE_FIELD+"Directory", fileDir.getText());
         _prefs.putBoolean("bibLocationAsFileDir", bibLocationAsFileDir.isSelected());
         _prefs.putBoolean("bibLocAsPrimaryDir", bibLocAsPrimaryDir.isSelected());
-		_prefs.putBoolean("autolinkExactKeyOnly", matchExactKeyOnly.isSelected());
+		_prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());
         _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
         _prefs.putBoolean("allowFileAutoOpenBrowse", allowFileAutoOpenBrowse.isSelected());
         _prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());

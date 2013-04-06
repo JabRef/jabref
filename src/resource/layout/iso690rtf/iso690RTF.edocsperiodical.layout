@@ -1,0 +1,16 @@
+\begin{author}\format[Iso690NamesAuthors,RTFChars]{\author}. \end{author}
+\begin{title}{\\i \format[RTFChars]{\title}}. \end{title}
+\begin{type}[\format[RTFChars]{\type}]. \end{type}
+\begin{editor}\format[RTFChars]{\editor}. \end{editor}
+\begin{number}\format[RTFChars]{\number}. \end{number}
+\begin{year}\format[RTFChars]{\year}. \end{year}
+\begin{address}\format[RTFChars]{\address}: \end{address}
+\\begin{yearfield}\format[RTFChars]{\yearfield}, \end{yearfield}
+\begin{yearconsults}[\format[RTFChars]{\yearconsults}]. \end{yearconsults}
+\begin{series}(\format[RTFChars]{series}). \end{volume}
+\begin{note}\format[RTFChars]{\note}. \end{note}
+\begin{availability} Disponible en: \format[RTFChars]{\availability}. \end{availability}
+\begin{url}\format[RTFChars]{\url}. \end{url}
+\begin{issn}ISSN: \format[RTFChars]{\issn}. \end{issn}
+\\par
+\\par

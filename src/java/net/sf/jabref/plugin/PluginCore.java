@@ -153,8 +153,8 @@ public class PluginCore {
 
             if (plugins.size() <= 0) {
                 log
-                    .warning(Globals
-                        .lang("No plugins were found in the following folders:") +
+                    .warning(
+                        Globals.lang("No plugins were found in the following folders:") +
                         "\n  " +
                         Util.join(directoriesToSearch
                             .toArray(new String[directoriesToSearch.size()]),
@@ -165,8 +165,7 @@ public class PluginCore {
                         Util.join(jarLocationsToSearch, "\n  ", 0,
                             jarLocationsToSearch.length) +
                         "\n" +
-                        Globals
-                            .lang("At least the plug-in 'net.sf.jabref.core' should be there."));
+                        Globals.lang("At least the plug-in 'net.sf.jabref.core' should be there."));
             } else {
                 result.publishPlugins(plugins.toArray(new PluginLocation[] {}));
 
@@ -188,8 +187,7 @@ public class PluginCore {
 
         } catch (Exception e) {
             log
-                .severe(Globals
-                    .lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
+                .severe(Globals.lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
                     "\n" + e.getLocalizedMessage());
         }
         return result;

@@ -234,8 +234,8 @@ public class MedlineFetcher implements EntryFetcher {
             }
             return true;
         }
-        frame.showMessage(Globals
-            .lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
+        frame.showMessage(
+            Globals.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
             Globals.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }

@@ -18,6 +18,7 @@ package net.sf.jabref.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
 
 /**
@@ -39,12 +40,19 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 	this.newValue = newValue;
     }
 
-    public String getUndoPresentationName() {
-	return "Undo: change field";
+    @Override
+    public String getPresentationName() {
+        return Globals.lang("change field");
     }
 
+    @Override
+    public String getUndoPresentationName() {
+    return Globals.lang("Undo")+": "+Globals.lang("change field");
+    }
+
+    @Override
     public String getRedoPresentationName() {
-	return "Redo: change field";
+    return Globals.lang("Redo")+": "+Globals.lang("change field");
     }
 
     public void undo() {

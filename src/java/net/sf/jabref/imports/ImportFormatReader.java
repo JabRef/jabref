@@ -58,6 +58,7 @@ public class ImportFormatReader {
     formats.add(new PdfXmpImporter());
     formats.add(new CopacImporter());
     formats.add(new MsBibImporter());
+    formats.add(new BibtexImporter());
 
     /**
      * Get import formats that are plug-ins

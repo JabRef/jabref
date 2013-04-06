@@ -1,0 +1,2 @@
+\begin{author}\format[FormatChars,Iso690NamesAuthors]{\author}. \end{author}\begin{title}\format[FormatChars]{\title}. \end{title}\begin{editor}\format[FormatChars]{\editor}. \end{editor}\begin{note}\format[FormatChars]{\note}. \end{note}\begin{address}\format[FormatChars]{\address}. \end{address}\begin{type}\format[FormatChars]{\type}. \end{type}\begin{number}\format[FormatChars]{\number}. \end{number}\begin{year}\format[FormatChars,Iso690FormatDate]{\year}.\end{year}
+

@@ -191,7 +191,7 @@ public class ImportCustomizationDialog extends JDialog {
            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
          }
        } else {
-         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer"));
+         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
        }
      }
     });

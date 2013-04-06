@@ -336,39 +336,18 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
         changeFiles = 1
     else:
         changeFiles = 0
-        
-    handleFileSet("resource/JabRef_en.properties", ("resource/JabRef_de.properties",\
-        "resource/JabRef_fr.properties", "resource/JabRef_it.properties",\
-        "resource/JabRef_ja.properties", "resource/JabRef_pt_BR.properties",\
-        "resource/JabRef_nl.properties", "resource/JabRef_da.properties",\
-        "resource/JabRef_no.properties", "resource/JabRef_tr.properties",\
-        "resource/JabRef_vi.properties", "resource/JabRef_in.properties", \
-        "resource/JabRef_zh.properties"), changeFiles)
-    handleFileSet("resource/Menu_en.properties", ("resource/Menu_de.properties",\
-        "resource/Menu_fr.properties", "resource/Menu_it.properties",\
-        "resource/Menu_ja.properties", "resource/Menu_pt_BR.properties",\
-        "resource/Menu_nl.properties", "resource/Menu_da.properties",\
-        "resource/Menu_es.properties",\
-        "resource/Menu_no.properties", "resource/Menu_tr.properties",\
-        "resource/Menu_vi.properties", "resource/Menu_in.properties",\
-        "resource/Menu_zh.properties"), changeFiles)
-        
+
+    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resource"));
+    filesJabRef = ["resource/" + i for i in filesJabRef];
+    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resource"));
+    filesMenu = ["resource/" + i for i in filesMenu];
+
+    handleFileSet("resource/JabRef_en.properties", filesJabRef, changeFiles)
+    handleFileSet("resource/Menu_en.properties", filesMenu, changeFiles)
+
 elif (len(sys.argv) >= 2) and ((sys.argv[1] == "-d") or (sys.argv[1] == "-c")):
-    files = ("resource/JabRef_en.properties", "resource/JabRef_de.properties",\
-        "resource/JabRef_fr.properties", "resource/JabRef_it.properties",\
-        "resource/JabRef_ja.properties", "resource/JabRef_pt_BR.properties",\
-        "resource/JabRef_no.properties", "resource/JabRef_nl.properties",\
-        "resource/JabRef_da.properties",\
-        "resource/JabRef_tr.properties",\
-        "resource/JabRef_vi.properties", "resource/JabRef_in.properties",\
-        "resource/JabRef_zh.properties",\
-        "resource/Menu_en.properties", "resource/Menu_de.properties",\
-        "resource/Menu_fr.properties", "resource/Menu_it.properties",\
-        "resource/Menu_ja.properties", "resource/Menu_pt_BR.properties",\
-        "resource/Menu_no.properties", "resource/Menu_nl.properties",\
-        "resource/Menu_da.properties", "resource/Menu_es.properties", \
-        "resource/Menu_tr.properties",\
-        "resource/Menu_vi.properties", "resource/Menu_in.properties",\
-        "resource/Menu_zh.properties")
+    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resource"));
+    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resource")));
+    files = ["resource/" + i for i in files];
     for file in files:
         lookForDuplicates(file, sys.argv[1] == "-d")

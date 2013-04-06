@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.export.layout.format;
 
+import java.util.logging.Logger;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
@@ -32,12 +34,11 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  *   4.) Take special care to save all unicode characters correctly.
  *
  *   5.) Replace --- by \emdash and -- by \endash.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- *
  */
 public class RTFChars implements LayoutFormatter {
+	
+    // Instantiate logger:
+    private static Logger logger = Logger.getLogger(RTFChars.class.toString());
 
 	public String format(String field) {
 
@@ -46,13 +47,13 @@ public class RTFChars implements LayoutFormatter {
 		boolean escaped = false, incommand = false;
 		for (int i = 0; i < field.length(); i++) {
 
-            /*System.out.println("incommand="+incommand+". escaped="+escaped
+            System.out.println("incommand="+incommand+". escaped="+escaped
                             +". currentCommand='"+(currentCommand!=null?currentCommand.toString():"")+"'");
-            System.out.println("sb: '"+sb.toString()+"'");*/
+            System.out.println("sb: '"+sb.toString()+"'");/**/
 
             char c = field.charAt(i);
 
-            //System.out.println("Char: '"+((char)c)+"'");
+            System.out.println("Char: '"+((char)c)+"'");
 
             if (escaped && (c == '\\')) {
 				sb.append('\\');
@@ -85,7 +86,7 @@ public class RTFChars implements LayoutFormatter {
 						c = field.charAt(i);
 						String combody;
 						if (c == '{') {
-							IntAndString part = getPart(field, i);
+							IntAndString part = getPart(field, i, true);
 							i += part.i;
 							combody = part.s;
 						} else {
@@ -110,6 +111,7 @@ public class RTFChars implements LayoutFormatter {
                     && (c != '}')))
 					sb.append(c);
 				else {
+					assert(incommand);
 
                     // First test for braces that may be part of a LaTeX command:
                     if ((c == '{') && (currentCommand.length() == 0)) {
@@ -133,18 +135,24 @@ public class RTFChars implements LayoutFormatter {
 					if (i >= field.length() - 1)
 						break testContent;
 
-					if ((c == '{') && (currentCommand.length() > 0)) {
+					if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
                         String command = currentCommand.toString();
 						// Then test if we are dealing with a italics or bold
 						// command. If so, handle.
 						if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
-							IntAndString part = getPart(field, i);
+							IntAndString part = getPart(field, i, (c == '{'));
 							i += part.i;
-							sb.append("}{\\i ").append(part.s).append("}{");
+							sb.append("{\\i ").append(part.s).append("}");
 						} else if (command.equals("textbf")) {
-							IntAndString part = getPart(field, i);
+							IntAndString part = getPart(field, i, (c == '{'));
 							i += part.i;
-							sb.append("}{\\b ").append(part.s).append("}{");
+							sb.append("{\\b ").append(part.s).append("}");
+						} else {
+							logger.fine("Unknown command " + command);
+						}
+						if (c == ' ') {
+							// command was separated with the content by ' '
+							// We have to add the space a
 						}
                     } else
 						sb.append(c);
@@ -170,21 +178,38 @@ public class RTFChars implements LayoutFormatter {
 		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''","{\\\\rdblquote}");
 	}
 
-	private IntAndString getPart(String text, int i) {
+	/**
+	 * @param text the text to extract the part from
+	 * @param i the position to start
+	 * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy) 
+	 * @return a tuple of number of added characters and the extracted part
+	 */
+	private IntAndString getPart(String text, int i, boolean commandNestedInBraces) {
 		char c;
 		int count = 0;
 		StringBuffer part = new StringBuffer();
-		while ((count >= 0) && (i < text.length())) {
+		loop: while ((count >= 0) && (i < text.length())) {
 			i++;
 			c = text.charAt(i);
-			if (c == '}')
-				count--;
-			else if (c == '{')
-				count++;
-
+			switch(c) {
+				case '}':
+					count--;
+					break;
+				case '{':
+					count++;
+					break;
+				case ' ':
+					if (commandNestedInBraces) {
+						// in any case, a space terminates the loop
+						break loop;
+					}
+					break;
+			}
 			part.append(c);
 		}
-		return new IntAndString(part.length(), format(part.toString()));
+		String res = part.toString();
+		// the wrong "}" at the end is removed by "format(res)"
+		return new IntAndString(part.length(), format(res));
 	}
 
 	private class IntAndString {

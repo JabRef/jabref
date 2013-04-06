@@ -42,8 +42,12 @@ public class JSTORFetcher2 implements EntryFetcher {
     protected static final String SEARCH_URL = JSTOR_URL + "/action/doBasicSearch?Query=";
     protected static final String SEARCH_URL_END = "&x=0&y=0&wc=on";
     protected static final String SINGLE_CIT_ENC =
-            "http://www.jstor.org/action/exportSingleCitation?singleCitation=true&suffix=";
-            //"http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
+            //"http://www.jstor.org/action/exportSingleCitation?singleCitation=true&suffix=";
+            "http://www.jstor.org/action/exportSingleCitation?singleCitation=true&doi=10.2307/";
+    // suffix doesn't work anymore (March 2013), changed to doi=10.2307/citations but only if it a doi
+    // to be improved...
+
+    //"http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
             //+"%3Dtrue%26suffix%3D";
     protected static final Pattern idPattern = Pattern.compile(
             "<a class=\"title\" href=\"/stable/(\\d+)\\?");

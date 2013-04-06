@@ -198,7 +198,7 @@ public class ExternalFilePanel extends JPanel {
 					
 				} catch (TransformerException e) {
 					JOptionPane.showMessageDialog(editor.getParent(), 
-            Globals.lang("Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), 
+            Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()), 
             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
 					  Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
 						finalFile.getAbsolutePath()));
@@ -255,8 +255,8 @@ public class ExternalFilePanel extends JPanel {
 	public void downLoadFile(final String fieldName, final FieldEditor fieldEditor,
 		final Component parent) {
 
-		final String res = JOptionPane.showInputDialog(parent, Globals
-			.lang("Enter URL to download"));
+		final String res = JOptionPane.showInputDialog(parent,
+                        Globals.lang("Enter URL to download"));
 
 		if (res == null || res.trim().length() == 0)
 			return;
@@ -282,8 +282,8 @@ public class ExternalFilePanel extends JPanel {
 				if (getKey() != null)
 					plannedName = getKey() + suffix;
 				else {
-					plannedName = JOptionPane.showInputDialog(parent, Globals
-						.lang("BibTeX key not set. Enter a name for the downloaded file"));
+					plannedName = JOptionPane.showInputDialog(parent,
+                                                Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
 					if (plannedName != null && !off.accept(plannedName))
 						plannedName += suffix;
 				}
@@ -396,8 +396,8 @@ public class ExternalFilePanel extends JPanel {
 					}
 
 				} catch (MalformedURLException e1) {
-					JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"), Globals
-						.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"),
+                                                Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
 				} finally {
 					// If stuff goes wrong along the road, put back original
 					// value

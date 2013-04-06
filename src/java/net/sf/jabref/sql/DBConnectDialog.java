@@ -64,7 +64,7 @@ public class DBConnectDialog extends JDialog {
     /** Creates a new instance of DBConnectDialog */
     public DBConnectDialog( JFrame parent, DBStrings dbs) {
 
-        super(parent, Globals.lang("Connect to SQL Database"), true);
+        super(parent, Globals.lang("Connect to SQL database"), true);
 
         this.setResizable(false);
         this.setLocationRelativeTo(parent);

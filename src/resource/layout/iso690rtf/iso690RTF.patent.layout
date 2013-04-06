@@ -1,0 +1,11 @@
+\begin{author}\format[Iso690NamesAuthors,RTFChars]{\author}. \end{author}
+\begin{title}{\\i \format[RTFChars]{\title}}. \end{title}
+\begin{editor}\format[RTFChars]{\editor}. \end{editor}
+\begin{note}\format[RTFChars]{\note}. \end{note}
+\begin{address}\format[RTFChars]{\address}. \end{address}
+\begin{nationality}\format[RTFChars]{\nationality}. \end{nationality}
+\begin{type}\format[RTFChars]{\type}. \end{type}
+\begin{number}\format[RTFChars]{\number}. \end{number}
+\begin{year}\format[RTFChars,Iso690FormatDate]{\year}.\end{year}
+\\par
+\\par

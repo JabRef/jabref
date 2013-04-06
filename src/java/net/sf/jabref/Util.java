@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -50,7 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -59,18 +59,22 @@ import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
@@ -79,6 +83,7 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
+import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.KeywordGroup;
@@ -126,7 +131,7 @@ public class Util {
     public static int MARK_COLOR_LEVELS = 6,
             MAX_MARKING_LEVEL = MARK_COLOR_LEVELS-1,
             IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
-    public static Pattern markNumberPattern = Pattern.compile(Globals.prefs.MARKING_WITH_NUMBER_PATTERN);
+    public static Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
 
     static {
@@ -296,7 +301,7 @@ public class Util {
 	public static String checkLegalKey(String key) {
 		if (key == null)
 			return null;
-        if (!Globals.prefs.getBoolean("enforceLegalBibtexKey")) {
+        if (!JabRefPreferences.getInstance().getBoolean("enforceLegalBibtexKey")) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:
@@ -992,7 +997,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			result.put(entry, new ArrayList<File>());
 		}
 
-        boolean exactOnly = Globals.prefs.getBoolean("autolinkExactKeyOnly");
+        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
 		nextFile:
 		for (File file : filesWithExtension){
@@ -3203,16 +3208,277 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 */
 	public static String getResults(URLConnection source) throws IOException {
 	    
-	    InputStream in = source.getInputStream();
+
+	    return getResultsWithEncoding(source, null);
+	}
+
+	/**
+	 * Download the URL using specified encoding and return contents as a String.
+	 * @param source
+         * encoding
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getResultsWithEncoding(URLConnection source, String encoding) throws IOException {
+	    
+	    InputStreamReader in;
+            if(encoding != null) {
+                in = new InputStreamReader(source.getInputStream(), encoding);
+            } else {
+                in = new InputStreamReader(source.getInputStream());
+            }
+            
 	    StringBuffer sb = new StringBuffer();
-	    byte[] buffer = new byte[256];
 	    while(true) {
-	        int bytesRead = in.read(buffer);
-	        if(bytesRead == -1) break;
-	        for (int i=0; i<bytesRead; i++)
-	            sb.append((char)buffer[i]);
+	        int byteRead = in.read();
+	        if(byteRead == -1) break;
+                sb.append((char)byteRead);
 	    }
 	    return sb.toString();
 	}
+
+    public static boolean updateTimeStampIsSet() {
+        return (Globals.prefs.getBoolean("useTimeStamp") &&
+                Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+    }
+
+    /**
+     * Updates the timestamp of the given entry,
+     * nests the given undaoableEdit in a named compound,
+     * and returns that named compound
+     */
+    public static NamedCompound doUpdateTimeStamp(BibtexEntry entry, AbstractUndoableEdit undoableEdit) {
+        NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
+        ce.addEdit(undoableEdit);
+        String timeStampField = Globals.prefs.get("timeStampField");
+        String timestamp = Util.easyDateFormat();
+        Util.updateField(entry, timeStampField, timestamp, ce);
+        return ce;
+    }
+
+    /**
+     * Automatically add links for this set of entries, based on the globally stored list of
+     * external file types. The entries are modified, and corresponding UndoEdit elements
+     * added to the NamedCompound given as argument. Furthermore, all entries which are modified
+     * are added to the Set of entries given as an argument.
+     *
+     * The entries' bibtex keys must have been set - entries lacking key are ignored.
+     * The operation is done in a new thread, which is returned for the caller to wait for
+     * if needed.
+     *
+     * @param entries A collection of BibtexEntry objects to find links for.
+     * @param ce A NamedCompound to add UndoEdit elements to.
+     * @param changedEntries MODIFIED, optional. A Set of BibtexEntry objects to which all modified entries is added. This is used for status output and debugging
+     * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not duplicated or removed. This parameter has to be null if entries.count() != 1.
+     *   The hack has been introduced as a bibtexentry does not (yet) support the function getListTableModel() and the FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the search has succeeded. 
+     * @param metaData The MetaData providing the relevant file directory, if any.
+     * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is
+     *  finished. The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added.
+     *  This parameter can be null, which means that no callback will be notified.
+     * @param diag An instantiated modal JDialog which will be used to display the progress of the autosetting.
+     *      This parameter can be null, which means that no progress update will be shown.
+     * @return the thread performing the autosetting
+     */
+    public static Thread autoSetLinks(final Collection<BibtexEntry> entries,
+                                      final NamedCompound ce,
+                                      final Set<BibtexEntry> changedEntries,
+                                      final FileListTableModel singleTableModel,
+                                      final MetaData metaData,
+                                      final ActionListener callback,
+                                      final JDialog diag) {
+        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        if (diag != null) {
+            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length-1);
+            final JLabel label = new JLabel(Globals.lang("Searching for files"));
+            prog.setIndeterminate(true);
+            prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            diag.setTitle(Globals.lang("Autosetting links"));
+            diag.getContentPane().add(prog, BorderLayout.CENTER);
+            diag.getContentPane().add(label, BorderLayout.SOUTH);
+
+            diag.pack();
+            diag.setLocationRelativeTo(diag.getParent());
+        }
+
+        Runnable r = new Runnable() {
+            public void run() {
+
+                // determine directories to search in
+                ArrayList<File> dirs = new ArrayList<File>();
+                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                for (int i=0; i<dirsS.length; i++) {
+                    dirs.add(new File(dirsS[i]));
+                }
+
+                // determine extensions
+                Collection<String> extensions = new ArrayList<String>();
+                for (int i = 0; i < types.length; i++) {
+                    final ExternalFileType type = types[i];
+                    extensions.add(type.getExtension());
+                }
+                // Run the search operation:
+                Map<BibtexEntry, java.util.List<File>> result;
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                    String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
+                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                } else {
+                    result = Util.findAssociatedFiles(entries, extensions, dirs);
+                }
+
+
+                boolean foundAny = false;
+
+                // Iterate over the entries:
+                for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
+                    BibtexEntry anEntry = i.next();
+                    FileListTableModel tableModel;
+                    String oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
+                    if (singleTableModel == null) {
+                        tableModel = new FileListTableModel();
+                        if (oldVal != null)
+                            tableModel.setContent(oldVal);
+                    } else {
+                        assert(entries.size() == 1);
+                        tableModel = singleTableModel;
+                    }
+                    List<File> files = result.get(anEntry);
+                    for (File f : files) {
+                        f = Util.shortenFileName(f, dirsS);
+                        boolean alreadyHas = false;
+                        //System.out.println("File: "+f.getPath());
+                        for (int j = 0; j < tableModel.getRowCount(); j++) {
+                            FileListEntry existingEntry = tableModel.getEntry(j);
+                            //System.out.println("Comp: "+existingEntry.getLink());
+                            if (new File(existingEntry.getLink()).equals(f)) {
+                                alreadyHas = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyHas) {
+                            foundAny = true;
+                            ExternalFileType type;
+                            int index = f.getPath().lastIndexOf('.');
+                            if ((index >= 0) && (index < f.getPath().length()-1)) {
+                                type = Globals.prefs.getExternalFileTypeByExt
+                                    (f.getPath().substring(index+1).toLowerCase());
+                            } else {
+                                type = new UnknownExternalFileType("");
+                            }
+                            FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
+                            tableModel.addEntry(tableModel.getRowCount(), flEntry);
+
+                            String newVal = tableModel.getStringRepresentation();
+                            if (newVal.length() == 0)
+                                newVal = null;
+                            if (ce != null) {
+                                // store undo information
+                                UndoableFieldChange change = new UndoableFieldChange(anEntry,
+                                        GUIGlobals.FILE_FIELD, oldVal, newVal);
+                                ce.addEdit(change);
+                            }
+                            // hack: if table model is given, do NOT modify entry
+                            if (singleTableModel == null) {
+                                anEntry.setField(GUIGlobals.FILE_FIELD, newVal);
+                            }
+                            if (changedEntries != null)
+                                changedEntries.add(anEntry);
+                        }
+                    }
+                }
+                
+                // handle callbacks and dialog
+                final int id = foundAny ? 1 : 0;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (diag != null)
+                            diag.dispose();
+                        if (callback != null)
+                            callback.actionPerformed(new ActionEvent(this, id, ""));
+                    }
+                });
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+        if (diag != null) {
+            diag.setVisible(true);
+        }
+        return t;
+    }
+
+
+    /**
+     * Automatically add links for this entry to the table model given as an argument, based on
+     * the globally stored list of external file types. The entry itself is not modified. The entry's
+     * bibtex key must have been set.
+     * The operation is done in a new thread, which is returned for the caller to wait for
+     * if needed.
+     *
+     * @param entry The BibtexEntry to find links for.
+     * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or removed.
+     * @param metaData The MetaData providing the relevant file directory, if any.
+     * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is
+     *  finished. The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added.
+     *  This parameter can be null, which means that no callback will be notified. The passed ActionEvent is constructed with
+     *  (this, id, ""), where id is 1 if something has been done and 0 if nothing has been done.
+     * @param diag An instantiated modal JDialog which will be used to display the progress of the autosetting.
+     *      This parameter can be null, which means that no progress update will be shown.
+     * @return the thread performing the autosetting
+     */
+    public static Thread autoSetLinks(
+            final BibtexEntry entry, 
+            final FileListTableModel singleTableModel,
+            final MetaData metaData,
+            final ActionListener callback,
+            final JDialog diag) {
+        final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        entries.add(entry);
+        
+        return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+    }
+    
+    /**
+     * Opens a file browser of the folder of the given file. If possible, the file is selected
+     * @param fileLink the location of the file
+     * @throws IOException
+     */
+    public static void openFolderAndSelectFile(String fileLink) throws IOException {
+        if (Globals.ON_WIN) {
+            openFolderAndSelectFileOnWindows(fileLink);
+        } else if (Globals.ON_LINUX){
+            openFolderAndSelectFileOnLinux(fileLink);
+        } else {
+            openFolderAndSelectFileGeneric(fileLink);
+        }
+    }
+
+    private static void openFolderAndSelectFileOnLinux(String fileLink) throws IOException {
+        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
+        
+        String cmd = "";
+        
+		if (desktopSession.contains("gnome")) {
+			cmd = "nautilus " + fileLink;
+		} else if (desktopSession.contains("kde")) {
+			cmd = "dolphin --select " + fileLink;
+		} else {
+			cmd = "xdg-open " + fileLink.substring(0, fileLink.lastIndexOf(File.separator));
+		}
+        
+        Runtime.getRuntime().exec(cmd);
+    }
+
+    private static void openFolderAndSelectFileGeneric(String fileLink) throws IOException {
+    	File f = new File(fileLink);
+        Desktop.getDesktop().open(f.getParentFile());
+    }
+
+    private static void openFolderAndSelectFileOnWindows(String link) throws IOException {
+        link = link.replace("&", "\"&\"");
+
+        String cmd = "explorer.exe /select,\"" + link + "\"";
+
+        Runtime.getRuntime().exec(cmd);
+    }
 }
 

@@ -14,18 +14,18 @@ public class HTMLCharsTest extends TestCase {
 
 		assertEquals("hallo", layout.format("hallo"));
 
-		assertEquals("Réflexions sur le timing de la quantité", layout
-			.format("Réflexions sur le timing de la quantité"));
+		assertEquals("RÃ©flexions sur le timing de la quantitÃ©", layout
+			.format("RÃ©flexions sur le timing de la quantitÃ©"));
 
 		assertEquals("h&aacute;llo", layout.format("h\\'allo"));
-		
+
 		assertEquals("&#305; &#305;", layout.format("\\i \\i"));
 		assertEquals("&#305;", layout.format("\\i"));
 		assertEquals("&#305;", layout.format("\\{i}"));
 		assertEquals("&#305;&#305;", layout.format("\\i\\i"));
-		
+
 		assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
-		
+
 		assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
 	}
 

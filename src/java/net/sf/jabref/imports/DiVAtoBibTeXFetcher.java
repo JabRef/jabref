@@ -37,6 +37,8 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s"; 
     private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s"; 
     final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
+    final HTMLConverter htmlConverter = new HTMLConverter();
     
 	@Override
     public void stopFetching() {
@@ -79,7 +81,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         
        String bibtexString;
         try {
-	        bibtexString = Util.getResults(conn);
+	        bibtexString = Util.getResultsWithEncoding(conn,"UTF-8");
         } catch (FileNotFoundException e) {
                status.showMessage(Globals.lang("Unknown DiVA entry: '%0'.",
                         query),
@@ -95,11 +97,23 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
             String title = (String)entry.getField("title");
-            if (title != null) {
+            if (title != null) {                           
+                // Unit formatting
+                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                    title = unitFormatter.format(title);
+                }
+            
+                // Case keeping
                 if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
+            }
+            
+            String institution = (String) entry.getField("institution");
+            if (institution!=null) {
+                institution = htmlConverter.formatUnicode(institution);
+                entry.setField("institution",institution);
             }
             // Do not use the provided key
             // entry.setField(BibtexFields.KEY_FIELD,null);

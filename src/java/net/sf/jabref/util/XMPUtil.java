@@ -601,9 +601,20 @@ public class XMPUtil {
 		if (database != null)
 			entry = database.resolveForStrings(entry, false);
 
+		// Query privacy filter settings
+		JabRefPreferences prefs = JabRefPreferences.getInstance();
+		boolean useXmpPrivacyFilter =
+			prefs.getBoolean("useXmpPrivacyFilter");
+		// Fields for which not to write XMP data later on:
+		TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilters")));
+
 		// Set all the values including key and entryType
 		
 		for (String field : entry.getAllFields()){
+
+			if (useXmpPrivacyFilter && filters.contains(field)) {
+				continue;
+			}
 
 			if (field.equals("editor")) {
 				String o = entry.getField(field.toString()).toString();

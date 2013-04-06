@@ -389,9 +389,9 @@ public class SearchManager2 extends SidePaneComponent
     /** force the search button to be large enough for
      * the longer of the two texts */
     private void setSearchButtonSizes() {
-        search.setText(Globals.lang("Search Specified Field(s)"));
+        search.setText(Globals.lang("Search specified field(s)"));
         Dimension size1 = search.getPreferredSize();
-        search.setText(Globals.lang("Search All Fields"));
+        search.setText(Globals.lang("Search all fields"));
         Dimension size2 = search.getPreferredSize();
         size2.width = Math.max(size1.width,size2.width);
         search.setMinimumSize(size2);
@@ -521,7 +521,8 @@ public class SearchManager2 extends SidePaneComponent
         worker.getWorker().run();
         worker.getCallBack().update();
         escape.setEnabled(true);
-        
+
+        frame.basePanel().mainTable.setSelected(0);
     }
     }
 
@@ -703,9 +704,8 @@ public class SearchManager2 extends SidePaneComponent
 
 
             if (incSearchPos >= panel.getDatabase().getEntryCount()) {
-            panel.output("'"+text+"' : "+Globals.lang
-
-                     ("Incremental search failed. Repeat to search from top.")+".");
+            panel.output("'"+text+"' : "+
+                    Globals.lang("Incremental search failed. Repeat to search from top.")+".");
             incSearchPos = -1;
             return;
             }
@@ -719,8 +719,8 @@ public class SearchManager2 extends SidePaneComponent
                 if (incSearchPos < panel.getDatabase().getEntryCount())
                     be = panel.mainTable.getEntryAt(incSearchPos);
             else {
-                panel.output("'"+text+"' : "+Globals.lang
-                     ("Incremental search failed. Repeat to search from top."));
+                panel.output("'"+text+"' : "+
+                     Globals.lang("Incremental search failed. Repeat to search from top."));
                 incSearchPos = -1;
                 return;
             }
@@ -728,9 +728,8 @@ public class SearchManager2 extends SidePaneComponent
             if (incSearchPos >= 0) {
 
             panel.selectSingleEntry(incSearchPos);
-            panel.output("'"+text+"' "+Globals.lang
-
-                     ("found")+".");
+            panel.output("'"+text+"' "+
+                     Globals.lang("found")+".");
 
             }
         }
@@ -763,8 +762,8 @@ public class SearchManager2 extends SidePaneComponent
                 searchField.getText(),
                 caseSensitive.isSelected(),
                 regExpSearch.isSelected()) != null
-                ? Globals.lang("Search Specified Field(s)")
-                : Globals.lang("Search All Fields"));
+                ? Globals.lang("Search specified field(s)")
+                : Globals.lang("Search all fields"));
     }
 
     /**

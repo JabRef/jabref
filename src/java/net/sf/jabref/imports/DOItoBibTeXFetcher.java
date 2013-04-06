@@ -36,6 +36,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 	
     private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
     final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
     
 	@Override
     public void stopFetching() {
@@ -44,68 +45,10 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
 	@Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-		String q;
-		try {
-	        q = URLEncoder.encode(query, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        	// this should never happen
-        	status.setStatus(Globals.lang("Error"));
-	        e.printStackTrace();
-	        return false;
-        }
-		
-        String urlString = String.format(URL_PATTERN, q);
 
-        // Send the request
-        URL url;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        URLConnection conn;
-        try {
-	        conn = url.openConnection();
-        } catch (IOException e) {
-	        e.printStackTrace();
-	        return false;
-        }
-        
-        conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
-        
-        
-       String bibtexString;
-        try {
-	        bibtexString = Util.getResults(conn);
-        } catch (FileNotFoundException e) {
-               status.showMessage(Globals.lang("Unknown DOI: '%0'.",
-                        query),
-                        Globals.lang("Get BibTeX entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
-	        return false;
-        }
-        catch (IOException e) {
-	        e.printStackTrace();
-	        return false;
-        }
-        
-       
-        
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        
-        if(entry != null) {
-            // Optionally add curly brackets around key words to keep the case
-            String title = (String)entry.getField("title");
-            if (title != null) {
-                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-                    title = caseKeeper.format(title);
-                }
-                entry.setField("title", title);
-            }
-            
-            // Do not use the provided key
-            // entry.setField(BibtexFields.KEY_FIELD,null);
+       BibtexEntry entry = getEntryFromDOI(query, status);
+       if (entry != null)
+       {
             inspector.addEntry(entry);
 	    return true;
         } else {
@@ -142,5 +85,75 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 	    return null;
     }
 
+    public BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
+        String q;
+        try {
+            q = URLEncoder.encode(doi, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // this should never happen
+            e.printStackTrace();
+            return null;
+        }
 
+        String urlString = String.format(URL_PATTERN, q);
+
+        // Send the request
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        URLConnection conn;
+        try {
+            conn = url.openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
+
+
+        String bibtexString;
+        try {
+            bibtexString = Util.getResults(conn);
+        } catch (FileNotFoundException e) {
+
+            if (status != null) {
+                status.showMessage(Globals.lang("Unknown DOI: '%0'.",
+                        doi),
+                        Globals.lang("Get BibTeX entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            }
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+
+
+        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+
+        if (entry != null) {
+            // Optionally add curly brackets around key words to keep the case
+            String title = (String) entry.getField("title");
+            if (title != null) {
+
+                // Unit formatting
+                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                    title = unitFormatter.format(title);
+                }
+
+                // Case keeping
+                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                    title = caseKeeper.format(title);
+                }
+                entry.setField("title", title);
+            }
+        }
+        return entry;
+    }
 }

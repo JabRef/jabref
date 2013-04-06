@@ -216,8 +216,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 						// Inform the user... we don't know what to do.
 						JOptionPane.showMessageDialog(PreviewPanel.this,
 							Globals.lang("Could not print preview") + ".\n"
-								+ e.getMessage(), Globals
-								.lang("Printing Entry Preview"),
+								+ e.getMessage(),
+                                                                Globals.lang("Printing Entry Preview"),
 							JOptionPane.ERROR_MESSAGE);
 					}
 				}

@@ -52,7 +52,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     // These values are also used to put a heading into the table; see getColumnName(int)
     public static final String[]
     PDF = {"pdf", "ps"},
-    URL_ = {"url", "doi"},
+    URL_FIRST = {"url", "doi"},
+    DOI_FIRST = {"doi", "url"},
     CITESEER = {"citeseerurl"},
     ARXIV = {"eprint"},
     RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING},
@@ -217,8 +218,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             for (int i = 0; i < fld.length; i++) {
                 if (fld[i].equals(GUIGlobals.TYPE_HEADER))
                     o = be.getType().getName();
-                else
+                else {
                     o = be.getField(fld[i]);
+                    if (getColumnName(col).equals("Author") && o != null) {
+                        o = panel.database().resolveForStrings((String) o);
+                    }
+                }
                 if (o != null) {
                     j = i;
                     break;
@@ -303,8 +308,15 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             iconCols.put(coln++, FILE);
         if (Globals.prefs.getBoolean("pdfColumn"))
             iconCols.put(coln++, PDF);
-        if (Globals.prefs.getBoolean("urlColumn"))
-            iconCols.put(coln++, URL_);
+        if (Globals.prefs.getBoolean("urlColumn")) {
+            if(Globals.prefs.getBoolean("preferUrlDoi")) {
+                iconCols.put(coln++, DOI_FIRST);
+            } else {
+                iconCols.put(coln++, URL_FIRST);
+            }
+           
+        }
+            
         if (Globals.prefs.getBoolean("arxivColumn"))
             iconCols.put(coln++, ARXIV);
 

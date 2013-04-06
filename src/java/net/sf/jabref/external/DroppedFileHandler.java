@@ -361,9 +361,9 @@ public class DroppedFileHandler {
         return true;
     }
 
-    /**
-     * @return true if user pushed "OK", false otherwise
-     */
+    //
+    // @return true if user pushed "Ok", false otherwise
+    //
     public boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
         BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
     	String citeKey = entry.getCiteKey();
@@ -377,7 +377,7 @@ public class DroppedFileHandler {
                 break;
             }
         if (found < 0) {
-            destDirLabel.setText(Globals.lang("File directory is not set or does not exist."));
+            destDirLabel.setText(Globals.lang("File directory is not set or does not exist!"));
             copyRadioButton.setEnabled(false);
             moveRadioButton.setEnabled(false);
             renameToTextBox.setEnabled(false);
@@ -402,14 +402,12 @@ public class DroppedFileHandler {
 		};
 
 		if (multipleEntries) {
-			linkInPlace.setText(Globals
-					.lang("Leave files in their current directory."));
+			linkInPlace.setText(Globals.lang("Leave files in their current directory."));
 			copyRadioButton.setText(Globals.lang("Copy files to file directory."));
 
 			moveRadioButton.setText(Globals.lang("Move files to file directory."));
 		} else {
-			linkInPlace.setText(Globals
-					.lang("Leave file in its current directory."));
+			linkInPlace.setText(Globals.lang("Leave file in its current directory."));
 			copyRadioButton.setText(Globals.lang("Copy file to file directory."));
 			moveRadioButton.setText(Globals.lang("Move file to file directory."));
 		}

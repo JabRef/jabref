@@ -22,10 +22,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-
-import javax.swing.JOptionPane;
+import java.util.logging.Logger;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.gui.FileListEntry;
@@ -42,6 +39,7 @@ import net.sf.jabref.gui.FileListTableModel;
  * preferences/external programs   
  */
 public class SendAsEMailAction extends AbstractWorker {
+    private static final Logger logger = Logger.getLogger(SendAsEMailAction.class.getName());
 
 	String message = null;
 	private JabRefFrame frame;
@@ -60,7 +58,7 @@ public class SendAsEMailAction extends AbstractWorker {
 		if (panel == null)
 			return;
 		if (panel.getSelectedEntries().length == 0) {
-			message = Globals.lang("No entries selected") + ".";
+			message = Globals.lang("No entries selected.");
 			return;
 		}
 
@@ -70,16 +68,10 @@ public class SendAsEMailAction extends AbstractWorker {
 		LatexFieldFormatter ff = new LatexFieldFormatter();
 
 		ArrayList<String> attachments = new ArrayList<String>();
-		HashSet<File> directories = new HashSet<File>();
 		
 		// open folders is needed to indirectly support email programs, which cannot handle
 		//   the unofficial "mailto:attachment" property 
 		boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
-		
-		// Quick hack for Windows feature
-		// If OS is windows, then class Desktop is not used, but a direct call to explorer.exe
-		String osName = System.getProperty("os.name");
-		boolean isWindows = osName.startsWith("Windows");
 		
 		for (BibtexEntry entry : bes) {
 			try {
@@ -94,11 +86,10 @@ public class SendAsEMailAction extends AbstractWorker {
                 		// file exists
                 		attachments.add(f.getPath());
                 		if (openFolders) {
-                			if (isWindows) {
-                				String command = "explorer.exe /select,\"".concat(f.getAbsolutePath().concat("\""));
-                				Runtime.getRuntime().exec(command);
-                			} else {
-                				directories.add(f.getParentFile());
+                			try {
+                				Util.openFolderAndSelectFile(f.getAbsolutePath());
+                			} catch (IOException e) {
+                				logger.fine(e.getMessage());
                 			}
                 		}
                    	}
@@ -134,19 +125,6 @@ public class SendAsEMailAction extends AbstractWorker {
 			e.printStackTrace();
 			message = Globals.lang("Error creating email");
 			return;
-		}
-
-		if (openFolders) {
-			for (File d: directories) {
-				try {
-					desktop.open(d);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					message = String.format("%s: %s", Globals.lang("Could not open directory"), d.getAbsolutePath());
-					return;
-				}
-			}
 		}
 
 		message = String.format("%s: %d",

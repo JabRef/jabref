@@ -74,8 +74,11 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
 	private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
 
+	/**
+	 * @param groupSelector the parent UI component
+	 */
 	public GroupsTree(GroupSelector groupSelector) {
-	    // Adjust hight according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
+	    // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
 	    FontMetrics metrics = getFontMetrics(getFont());
 	    setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
 

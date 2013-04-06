@@ -43,7 +43,7 @@ public class WaitForSaveOperation implements ActionListener {
         prog = new JProgressBar(0);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        diag = new JDialog(frame, Globals.lang("Please wait"), true);
+        diag = new JDialog(frame, Globals.lang("Please wait..."), true);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();

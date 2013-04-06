@@ -28,6 +28,8 @@ import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
+
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
@@ -172,6 +174,8 @@ public class GUIGlobals {
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
     public static final String FILE_FIELD = "file";
+    
+    public static final String FOLDER_FIELD = "folder";
 
     public static final double
 	SMALL_W = 0.30,
@@ -221,7 +225,7 @@ public class GUIGlobals {
 		LANGUAGES.put("Japanese", "ja");
 		LANGUAGES.put("Nederlands", "nl");
 		LANGUAGES.put("Norsk", "no");
-		//LANGUAGES.put("Español", "es"); // Not complete
+		LANGUAGES.put("Español", "es");
 		//LANGUAGES.put("Polski", "pl");
 		LANGUAGES.put("Turkish", "tr");
 		LANGUAGES.put("Simplified Chinese", "zh");
@@ -381,7 +385,7 @@ public class GUIGlobals {
 	 * on Un*x is unavailable.
 	 */
 	public static void init() {
-		typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
+		typeNameFont = new Font("dialog", Font.ITALIC+Font.BOLD, 18);
 		fieldNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 14);
 		JLabel lab;
 		lab = new JLabel(getImage("pdfSmall"));
@@ -402,6 +406,9 @@ public class GUIGlobals {
 		lab = new JLabel(getImage("psSmall"));
 		lab.setToolTipText(Globals.lang("Open")+" PS");
 		tableIcons.put("ps", lab);
+		lab = new JLabel(getImage("psSmall"));
+        lab.setToolTipText(Globals.lang("Open folder"));
+        tableIcons.put(GUIGlobals.FOLDER_FIELD, lab);
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
         tableIcons.put(GUIGlobals.FILE_FIELD, lab);
@@ -427,6 +434,10 @@ public class GUIGlobals {
         tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
         
         //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
+        	EmacsKeyBindings.load();
+        }
 	}
 
 }

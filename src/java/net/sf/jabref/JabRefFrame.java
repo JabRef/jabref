@@ -124,8 +124,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
-        .lang("Status")
+    JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(
+        Globals.lang("Status")
         + ":", SwingConstants.LEFT);
     JProgressBar progressBar = new JProgressBar();
 
@@ -145,9 +145,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
 
-  // References to the toggle buttons in the toolbar:
-  public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,
-      highlightAll;
+  /* References to the toggle buttons in the toolbar */
+  // the groups interface
+  public JToggleButton groupToggle;
+  public JToggleButton searchToggle, previewToggle, highlightAny, highlightAll;
+
   OpenDatabaseAction
       open = new OpenDatabaseAction(this, true);
   AbstractAction
@@ -198,14 +200,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
               "right", prefs.getKey("Forward")),
       back = new GeneralAction("back", "Back", Globals.lang("Back"),
               "left", prefs.getKey("Back")),
-      /*cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
-         GUIGlobals.cutIconFile,
-         prefs.getKey("Cut")),*/
+      //cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
+      //   GUIGlobals.cutIconFile,
+      //   prefs.getKey("Cut")),
       delete = new GeneralAction("delete", "Delete", Globals.lang("Delete"),
                                  prefs.getKey("Delete")),
-      /*copy = new GeneralAction("copy", "Copy", Globals.lang("Copy"),
-                               GUIGlobals.copyIconFile,
-                               prefs.getKey("Copy")),*/
+      //copy = new GeneralAction("copy", "Copy", Globals.lang("Copy"),
+      //                         GUIGlobals.copyIconFile,
+      //                         prefs.getKey("Copy")),
       copy = new EditAction("copy", GUIGlobals.getIconUrl("copy")),
       paste = new EditAction("paste", GUIGlobals.getIconUrl("paste")),
       cut = new EditAction("cut", GUIGlobals.getIconUrl("cut")),
@@ -289,18 +291,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
+      openFolder = new GeneralAction("openFolder", "Open folder",
+                                        Globals.lang("Open folder"),
+                                        prefs.getKey("Open folder")),
       openFile = new GeneralAction("openExternalFile", "Open file",
-                                   Globals.lang("Open file"),
-                                   prefs.getKey("Open file")),
+                                   		Globals.lang("Open file"),
+                                   		prefs.getKey("Open file")),
       openPdf = new GeneralAction("openFile", "Open PDF or PS",
-                                   Globals.lang("Open PDF or PS"),
-                                   prefs.getKey("Open PDF or PS")),
+                                   		Globals.lang("Open PDF or PS"),
+                                   		prefs.getKey("Open PDF or PS")),
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
-                                  Globals.lang("Open URL or DOI"),
-                                  prefs.getKey("Open URL or DOI")),
+                                  		Globals.lang("Open URL or DOI"),
+                                  		prefs.getKey("Open URL or DOI")),
       openSpires = new GeneralAction("openSpires", "Open SPIRES entry",
-                                          Globals.lang("Open SPIRES entry"),
-                                          prefs.getKey("Open SPIRES entry")),
+                                        Globals.lang("Open SPIRES entry"),
+                                        prefs.getKey("Open SPIRES entry")),
       /*
 	   * It looks like this wasn't being implemented for spires anyway so we
 	   * comment it out for now.
@@ -352,6 +357,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     Cleanup = new GeneralAction("Cleanup", "Cleanup entries", 
 					Globals.lang("Cleanup entries"), 
 					GUIGlobals.getIconUrl("cleanupentries") ),
+          
+    mergeEntries = new GeneralAction("mergeEntries", "Merge entries", 
+					Globals.lang("Merge entries"),
+                                        GUIGlobals.getIconUrl("mergeentries")),
 					
     dbImport = new DbImportAction(this).getAction(),
     //downloadFullText = new GeneralAction("downloadFullText", "Look up full text document",
@@ -373,7 +382,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   			FindUnlinkedFilesDialog.ACTION_ICON,
   			prefs.getKey(FindUnlinkedFilesDialog.ACTION_COMMAND)
   	);
-    
+
+	AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
+
     PushToApplicationButton pushExternalButton;
 
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
@@ -610,7 +621,32 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             sidePaneManager.show("search");
     }
 
-
+    // The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    public void openAction(String filePath) {
+    	File file = new File(filePath);
+    	
+        // Check if the file is already open.
+    	for (int i=0; i<this.getTabbedPane().getTabCount(); i++) {
+    		BasePanel bp = this.baseAt(i);
+    		if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+    			//The file is already opened, so just raising its tab.
+    			this.getTabbedPane().setSelectedComponent(bp);
+    			return;
+    		}
+    	}
+        
+    	if (file.exists()) {
+    		// Run the actual open in a thread to prevent the program
+    		// locking until the file is loaded.
+    		final File theFile = new File(filePath);
+    		(new Thread() {
+    			public void run() {
+    				open.openIt(theFile, true);
+    			}
+    		}).start();
+    	}
+    } 
+    
 AboutAction aboutAction = new AboutAction();
   class AboutAction
       extends AbstractAction {
@@ -815,28 +851,30 @@ public JabRefPreferences prefs() {
   private void macOSXRegistration() {
     if (Globals.osName.equals(Globals.MAC)) {
       try {
-        Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
-
-        Class<?>[] defArgs = {
-            JabRefFrame.class};
-        Method registerMethod = osxAdapter.getDeclaredMethod(
-            "registerMacOSXApplication", defArgs);
-        if (registerMethod != null) {
-          Object[] args = {
-              this};
-          registerMethod.invoke(osxAdapter, args);
-        }
-        // This is slightly gross.  to reflectively access methods with boolean args,
-        // use "boolean.class", then pass a Boolean object in as the arg, which apparently
-
-        defArgs[0] = boolean.class;
-        Method prefsEnableMethod = osxAdapter.getDeclaredMethod("enablePrefs",
-            defArgs);
-        if (prefsEnableMethod != null) {
-          Object args[] = {
-              Boolean.TRUE};
-          prefsEnableMethod.invoke(osxAdapter, args);
-        }
+    	  Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
+		  
+		  Class<?>[] defArgs = {Object.class, Method.class};
+		  Class<?> thisClass = JabRefFrame.class;
+		  Method registerMethod = osxAdapter.getDeclaredMethod("setAboutHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("about", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setPreferencesHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("preferences", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setQuitHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("quit", (Class[])null)};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
+		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
+		  if (registerMethod != null) {
+			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", new Class[] { String.class })};
+			  registerMethod.invoke(osxAdapter, args);
+		  }
       }
       catch (NoClassDefFoundError e) {
         // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
@@ -1364,6 +1402,7 @@ public JabRefPreferences prefs() {
       
       tools.add(makeKeyAction);
       tools.add(Cleanup);
+      tools.add(mergeEntries);
       //tools.add(downloadFullText);
       tools.add(newSubDatabaseAction);
       tools.add(writeXmpAction);
@@ -1374,11 +1413,13 @@ public JabRefPreferences prefs() {
       tools.addSeparator();
       tools.add(manageSelectors);
       tools.addSeparator();
+      tools.add(openFolder);
       tools.add(openFile);
       tools.add(openPdf);
       tools.add(openUrl);
       //tools.add(openSpires);
       tools.add(findUnlinkedFiles);
+      tools.add(autoLinkFile);
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
@@ -1429,7 +1470,7 @@ public JabRefPreferences prefs() {
       mb.add(pluginMenu);
 
 
-      //options.add(selectKeys);
+      options.add(selectKeys);
       mb.add(options);
 
       helpMenu.add(help);
@@ -1512,7 +1553,8 @@ public JabRefPreferences prefs() {
     tlb.addAction(editStrings);
     tlb.addAction(makeKeyAction);
     tlb.addAction(Cleanup);
-
+    tlb.addAction(mergeEntries);
+    
     tlb.addSeparator();
     tlb.addAction(mark);
     tlb.addAction(unmark);
@@ -1573,6 +1615,7 @@ public JabRefPreferences prefs() {
       //tlb.addAction(winEdtPushAction);
       tlb.add(pushExternalButton.getComponent());
 
+      tlb.addAction(openFolder);
       tlb.addAction(openFile);
     //tlb.addAction(openPdf);
     //tlb.addAction(openUrl);
@@ -1619,7 +1662,7 @@ public JabRefPreferences prefs() {
             incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
-                openPdf, openUrl, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
@@ -1761,7 +1804,7 @@ public JabRefPreferences prefs() {
       KeyBindingsDialog d = new KeyBindingsDialog
           ( new HashMap<String, String>(prefs.getKeyBindings()),
            prefs.getDefaultKeys());
-      d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       d.pack(); //setSize(300,500);
       Util.placeDialog(d, JabRefFrame.this);
       d.setVisible(true);
@@ -1817,8 +1860,8 @@ public JabRefPreferences prefs() {
             }
 
             if (basePanel().isBaseChanged()) {
-                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this, Globals
-                    .lang("Database has changed. Do you want to save " + "before closing?"),
+                int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
+                    Globals.lang("Database has changed. Do you want to save before closing?"),
                     Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
                 if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
                     close = false; // The user has cancelled.
@@ -1901,7 +1944,7 @@ public JabRefPreferences prefs() {
         Util.placeDialog(dialog, JabRefFrame.this);
         dialog.setVisible(true) ;
 
-        if (dialog.okPressed())
+        if (dialog.generatePressed())
         {
           BasePanel bp = new BasePanel( JabRefFrame.this,
                                         dialog.getGenerateDB(),   // database

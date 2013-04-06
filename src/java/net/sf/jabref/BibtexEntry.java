@@ -52,6 +52,77 @@ public class BibtexEntry
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;
 
+    /** Display name map for entry field names. */
+    private static final Map<String, String> tagDisplayNameMap = new HashMap<String, String>();
+    /** The maximum length of a field name to properly make the alignment of the
+     *  equal sign. */
+    private static final int maxFieldLength;
+    static{
+        // The field name display map.
+        tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
+        tagDisplayNameMap.put("howpublished", "HowPublished");
+        tagDisplayNameMap.put("lastchecked", "LastChecked");
+        tagDisplayNameMap.put("isbn", "ISBN");
+        tagDisplayNameMap.put("issn", "ISSN");
+        tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
+
+        // Looking for the longest field name.
+        // XXX JK: Look for all used field names not only defined once, since
+        //         there may be some unofficial field name used.
+        int max = 0;
+        for (BibtexEntryType t : BibtexEntryType.ALL_TYPES.values()) {
+            if (t.getRequiredFields() != null) {
+                for(String field : t.getRequiredFields()) {
+                    max = Math.max(max, field.length());
+                }
+            }
+            if (t.getOptionalFields() != null) {
+                for(String field : t.getOptionalFields()) {
+                    max = Math.max(max, field.length());
+                }
+            }
+        }
+        maxFieldLength = max;
+    }
+
+    /**
+     * Get display version of a entry field.
+     *
+     * BibTeX is case-insensitive therefore there is no difference between:
+     * howpublished, HOWPUBLISHED, HowPublished, etc. Since the camel case
+     * version is the most easy to read this should be the one written in the
+     * *.bib file. Since there is no way how do detect multi-word strings by
+     * default the first character will be made uppercase. In other characters
+     * case needs to be changed the {@link #tagDisplayNameMap} will be used. 
+     *
+     * @param field The name of the field.
+     * @return The display version of the field name.
+     */
+	private static final String getFieldDisplayName(String field) {
+        if (field.length() == 0) {
+            // hard coded "UNKNOWN" is assigned to a field without any name
+            field = "UNKNOWN";
+        }
+
+        String suffix = "";
+		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
+			for (int i = maxFieldLength - field.length(); i > 0; i--)
+				suffix += " ";
+		}
+
+		String res;
+		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
+			if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
+				res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
+			} else {
+				res = (field.charAt(0)+"").toUpperCase() + field.substring(1) + suffix;
+			}
+		} else {
+			res = field + suffix;
+		}
+		return res;
+	}
+
     public BibtexEntry(){
     	this(Util.createNeutralId());
     }
@@ -329,7 +400,7 @@ public class BibtexEntry
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@"+_type.getName().toUpperCase(Locale.US)+"{");
+        out.write("@"+_type.getName()+"{");
 
         String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
@@ -337,18 +408,33 @@ public class BibtexEntry
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
+        // Thereby, write the title field first.
+        hasWritten = hasWritten | writeField("title", out, ff, hasWritten, false);
+        written.put("title", null);
         String[] s = getRequiredFields();
-        if (s != null) for (int i=0; i<s.length; i++) {
-            hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten);
-            written.put(s[i], null);
+        if (s != null) {
+            Arrays.sort(s); // Sorting in alphabetic order.
+            for (int i=0; i<s.length; i++) {
+                if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+                    hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten, false);
+                    written.put(s[i], null);
+                }
+            }
         }
         // Then optional fields.
         s = getOptionalFields();
-        if (s != null) for (int i=0; i<s.length; i++) {
-            if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
-                //writeField(s[i], out, ff);
-                hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten);
-                written.put(s[i], null);
+        boolean first = true, previous = true;
+        previous = false;
+        if (s != null) {
+            Arrays.sort(s); // Sorting in alphabetic order.
+            for (int i=0; i<s.length; i++) {
+                if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+                    //writeField(s[i], out, ff);
+                    hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten, hasWritten && first);
+                    written.put(s[i], null);
+                    first = false;
+                    previous = true;
+                }
             }
         }
         // Then write remaining fields in alphabetic order.
@@ -359,8 +445,11 @@ public class BibtexEntry
             if (!written.containsKey(key) && writeIt)
                        remainingFields.add(key);
         }
-        for (String field: remainingFields)
-            hasWritten = hasWritten | writeField(field, out, ff, hasWritten);
+        first = previous;
+        for (String field: remainingFields) {
+            hasWritten = hasWritten | writeField(field, out, ff, hasWritten, hasWritten && first);
+            first = false;
+        }
 
         // Finally, end the entry.
         out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
@@ -371,22 +460,24 @@ public class BibtexEntry
      * @param name The field name
      * @param out The Writer to send it to
      * @param ff A formatter to filter field contents before writing
-     * @param isFirst Indicates whether this is the first field written for
+     * @param isNotFirst Indicates whether this is the first field written for
      *    this entry - if not, start by writing a comma and newline
      * @return true if this field was written, false if it was skipped because
      *    it was not set
      * @throws IOException In case of an IO error
      */
     private boolean writeField(String name, Writer out,
-                            FieldFormatter ff, boolean isFirst) throws IOException {
+                            FieldFormatter ff, boolean isNotFirst, boolean isNextGroup) throws IOException {
         String o = getField(name);
-        if (o != null) {
-            if (isFirst)
+        if (o != null || Globals.prefs.getBoolean("includeEmptyFields")) {
+            if (isNotFirst)
                 out.write(","+Globals.NEWLINE);
-            out.write("  "+name+" = ");
+            if (isNextGroup)
+                out.write(Globals.NEWLINE);
+            out.write("  "+ getFieldDisplayName(name) + " = ");
 
             try {
-                out.write(ff.format(o.toString(), name));
+                out.write(ff.format(o, name));
             } catch (Throwable ex) {
                 throw new IOException
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());

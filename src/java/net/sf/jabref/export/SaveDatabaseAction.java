@@ -63,9 +63,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                         + "What do you want to do?"), Globals.lang("File updated externally"),
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
-                /*  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
-+"Are you sure you want to save?"), Globals.lang("File updated externally"),
-               JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
+                //  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
+                // +"Are you sure you want to save?"), Globals.lang("File updated externally"),
+                // JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;

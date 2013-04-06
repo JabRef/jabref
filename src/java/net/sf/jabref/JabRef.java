@@ -88,10 +88,6 @@ public class JabRef {
 
 		singleton = this;
 
-		// The following two lines signal that the system proxy settings should
-		// be used:
-		System.setProperty("java.net.useSystemProxies", "true");
-		System.getProperties().put("proxySet", "true");
 
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 
@@ -101,6 +97,23 @@ public class JabRef {
             PluginInstaller.deletePluginsOnStartup(toDelete);
             prefs.put("deletePlugins", "");
         }
+
+        if (prefs.getBoolean("useProxy")) {
+        	// NetworkTab.java ensures that proxyHostname and proxyPort are not null
+			System.getProperties().put("http.proxyHost", prefs.get("proxyHostname"));
+			System.getProperties().put("http.proxyPort", prefs.get("proxyPort"));
+
+			// currently, the following cannot be configured
+			if (prefs.get("proxyUsername") != null) {
+				System.getProperties().put("http.proxyUser", prefs.get("proxyUsername"));
+				System.getProperties().put("http.proxyPassword", prefs.get("proxyPassword"));
+			}
+		} else {
+			// The following two lines signal that the system proxy settings
+			// should be used:
+			System.setProperty("java.net.useSystemProxies", "true");
+			System.getProperties().put("proxySet", "true");
+		}
 
         Globals.startBackgroundTasks();
         Globals.setupLogging();
@@ -622,7 +635,7 @@ public class JabRef {
         }
 
         System.out.println(Globals.lang("Running Query '%0' with fetcher '%1'.", query, engine) +
-            " " + Globals.lang("Please wait!"));
+            " " + Globals.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
         if (result == null || result.size() == 0) {

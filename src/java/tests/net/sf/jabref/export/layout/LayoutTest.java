@@ -80,7 +80,7 @@ public class LayoutTest extends TestCase {
 		layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
 			"@other{bla, author={This\nis\na\n\ntext}}");
 
-		assertEquals("This is a<p>text ", layoutText);
+		assertEquals("This is a<br>text ", layoutText);
 	}
 	
 	public void testPluginLoading() throws Exception {

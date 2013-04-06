@@ -7,7 +7,7 @@
 
     <h1>Customizing the BibTeX key generator</h1>
 
-    <p>In the 'Key pattern' tab in Preferences, one can set the fields
+    <p>In the &lsquo;Key pattern&rsquo; tab in Preferences, one can set the fields
     used in auto generation of BibTex labels. The pattern can be
     set for each of the standard entry types.</p>
 
@@ -38,14 +38,14 @@
         author<br /></li>
 
         <li><b>[<code>authorsN</code>]</b>: The last name of up to
-        N authors. If there are more authors, "EtAl" is
+        N authors. If there are more authors, &ldquo;EtAl&rdquo; is
         appended.<br /></li>
         
         <li><b>[<code>authorsAlpha</code>]</b>: Corresponds to the BibTeX
-        style "alpha". One author: First three letters of the last name.
+        style &ldquo;alpha&rdquo;. One author: First three letters of the last name.
         Two to four authors: First letters of last names concatenated.
         More than four authors: First letters of last names of first three
-        authors concatenated. "+" at the end. <br /></li>  
+        authors concatenated. &ldquo;+&rdquo; at the end. <br /></li>
 
         <li><b>[<code>authIniN</code>]</b>: The beginning of each
         author's last name, using no more than N
@@ -62,19 +62,34 @@
         of the Mth author's last name<br /></li>
 
         <li><b>[<code>auth.auth.ea</code>]</b>: The last name of
-        the first two authors, and ".ea" if there are more than
+        the first two authors, and &ldquo;.ea&rdquo; if there are more than
         two.<br /></li>
 
         <li><b>[<code>auth.etal</code>]</b>: The last name of the
         first author, and the last name of the second author if
-        there are two authors or ".etal" if there are more than
+        there are two authors or &ldquo;.etal&rdquo; if there are more than
         two.<br /></li>
+
+        <li><b>[<code>authEtAl</code>]</b>: The last name of the
+        first author, and the last name of the second author if
+        there are two authors or &ldquo;EtAl&rdquo; if there are more than
+        two. This is similar to <code>auth.etal</code>. The
+        difference is  that the authors are not separated by &ldquo;.&rdquo;
+        and in case of more than 2 authors &ldquo;EtAl&rdquo; instead of &ldquo;.etal&rdquo;
+        is appended.<br /></li>
 
         <li><b>[<code>authshort</code>]</b>: The last name if one
         author is given; the first character of up to three
         authors' last names if more than one author is given. A
         plus character is added, if there are more than three
         authors.<br /></li>
+
+	<li><b>[<code>authForeIni</code>]</b>: The forename initial 
+        of the first author.<br /></li>
+
+	<li><b>[<code>authorLastForeIni</code>]</b>: The forename initial 
+        of the last author.<br /></li>
+
     </ul><b>Note:</b> If there is no author (as in the case of an
     edited book), then all of the above
     <b><code>[auth...]</code></b> markers will use the editor(s)
@@ -112,7 +127,7 @@
         of the Mth editor's last name<br /></li>
 
         <li><b>[<code>edtr.edtr.ea</code>]</b>: The last name of
-        the first two editors, and ".ea" if there are more than
+        the first two editors, and &ldquo;.ea&rdquo; if there are more than
         two.<br /></li>
 
         <li><b>[<code>edtrshort</code>]</b>: The last name if one
@@ -121,13 +136,19 @@
         plus character is added, if there are more than three
         editors.<br /></li>
 
+	<li><b>[<code>edtrForeIni</code>]</b>: The forename initial 
+        of the first editor.<br /></li>
+
+	<li><b>[<code>editorLastForeIni</code>]</b>: The forename initial 
+        of the last editor.<br /></li>
+
         <li><b>[<code>firstpage</code>]</b>: The number of the
         first page of the publication (Caution: this will return 
         the lowest number found in the pages field, since bibtex 
         allows <code>7,41,73--97</code> or <code>43+</code>.)<br /></li>
 
         <li><b>[<code>keywordN</code>]</b>: Keyword number N from
-        the "keywords" field, assuming keywords are separated by
+        the &ldquo;keywords&rdquo; field, assuming keywords are separated by
         commas or semicolons.<br /></li>
 
         <li><b>[<code>lastpage</code>]</b>: The number of the last
@@ -141,7 +162,7 @@
         the publication year<br /></li>
 
         <li><b>[<code>veryshorttitle</code>]</b>: The first word of
-        the title, discounting 'the', 'a', 'an'.<br /></li>
+        the title, discounting &lsquo;the&rsquo;, &lsquo;a&rsquo;, &lsquo;an&rsquo;.<br /></li>
     </ul>
 
     <p>A field name (or one of the above pseudo-field names) may
@@ -153,8 +174,8 @@
         field name or spcial field marker. Only the first character
         and subsequent characters following white space will be
         included. For example, <b>[journal:abbr]</b> would from the
-        journal name "Journal of Fish Biology" produce
-        "JoFB".<br /></li>
+        journal name &ldquo;Journal of Fish Biology&rdquo; produce
+        &ldquo;JoFB&rdquo;.<br /></li>
 
         <li><b>:lower</b>: Forces the text inserted by the field
         marker to be in lowercase. For example, <b>[auth:lower]</b>

@@ -63,6 +63,9 @@ public class EntryEditorTab {
 
 	private FieldEditor activeField = null;
 
+   // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    public FileListEditor fileListEditor = null;
+
     protected EntryEditorTab() {
 
     }
@@ -139,6 +142,7 @@ public class EntryEditorTab {
             int wHeight = (int) (50.0 * BibtexFields.getFieldWeight(fields[i]));
             if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
                 ta = new FileListEditor(frame, bPanel.metaData(), fields[i], null, parent);
+                fileListEditor = (FileListEditor) ta;
                 defaultHeight = 0;
             }
             else {

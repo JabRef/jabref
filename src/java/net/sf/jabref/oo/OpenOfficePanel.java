@@ -36,6 +36,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -515,11 +516,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             }
         }
 
-        //String unoilDir = "/opt/openoffice.org/basis3.0/program/classes";
-        //String ooBaseDirectory = Globals.prefs.get("ooJarsPath");//"/usr/share/java/openoffice";
-        //String sOffice = Globals.prefs.get("ooExecutablePath");
-        //System.getProperty( "os.name" ).startsWith( "Windows" ) ? "soffice.exe" : "soffice";
-
         // Add OO jars to the classpath:
         try {
             File[] jarFiles = new File[] {
@@ -850,6 +846,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 (Globals.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem
                 (Globals.lang("Look up BibTeX entries in all open databases"));
+        final JMenuItem clearConnectionSettings = new JMenuItem
+                (Globals.lang("Clear connection settings"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
         bg.add(useAllBases);
@@ -873,10 +871,29 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 Globals.prefs.putBoolean("useAllOpenBases", !useActiveBase.isSelected());
             }
         });
+        clearConnectionSettings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    Globals.prefs.clear("ooPAth");
+                    Globals.prefs.clear("ooExecutablePath");
+                    Globals.prefs.clear("ooJarsPath");
+                    Globals.prefs.clear("connectToOO3");
+                    Globals.prefs.clear("ooUnoilPath");
+                    Globals.prefs.clear("ooJurtPath");
+                    frame.output(Globals.lang("Cleared connection settings."));
+                } catch (BackingStoreException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
         menu.add(autoSync);
         menu.addSeparator();
         menu.add(useActiveBase);
         menu.add(useAllBases);
+        menu.addSeparator();
+        menu.add(clearConnectionSettings);
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 

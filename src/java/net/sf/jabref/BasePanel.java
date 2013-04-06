@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -54,6 +56,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sf.jabref.DatabaseChangeEvent.ChangeType;
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
@@ -62,12 +65,20 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.export.ExportToClipboardAction;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.OpenFolder;
 import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.external.*;
+import net.sf.jabref.external.AttachFileAction;
+import net.sf.jabref.external.AutoSetExternalFileForEntries;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.FindFullTextAction;
+import net.sf.jabref.external.RegExpFileSearch;
+import net.sf.jabref.external.SynchronizeFileField;
+import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
@@ -80,17 +91,17 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.sql.DBConnectDialog;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.sql.exporter.DBExporter;
 import net.sf.jabref.undo.CountingUndoManager;
@@ -110,6 +121,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
+    private static Logger logger = Logger.getLogger(BasePanel.class.getName());
 
     public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
     
@@ -138,6 +150,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
+
+    // Hashtable indexing the only search auto completer
+    // required for the SearchAutoCompleterUpdater
+    HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
 
     HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
@@ -263,6 +279,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         metaData.setFile(file);
 
+        // ensure that at each addition of a new entry, the entry is added to the groups interface
+        db.addDatabaseChangeListener(new GroupTreeUpdater());
+
         if (file == null) {
             if (!database.getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -276,7 +295,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
-                System.err.println(ex);
+                logger.warning(ex.toString());
             }
         }
         
@@ -602,7 +621,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               be.setId(Util.createNeutralId());
                               database.insertEntry(be);
                               
-                              addToSelectedGroup(be); 
                               ce.addEdit(new UndoableInsertEntry
                                          (database, be, BasePanel.this));
                             } catch (KeyCollisionException ex) {
@@ -924,6 +942,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         
      // The action for cleaning up entry.
         actions.put("Cleanup", cleanUpAction);
+        
+        actions.put("mergeEntries", new BaseAction() {
+            public void action() {
+                MergeEntriesDialog med = new MergeEntriesDialog(BasePanel.this);
+                
+            }
+        });
 
         actions.put("search", new BaseAction() {
                 public void action() {
@@ -1082,6 +1107,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 
+          actions.put("openFolder", new OpenFolder(frame));
 
         actions.put("openFile", new BaseAction() {
             public void action() {
@@ -1614,6 +1640,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("resolveDuplicateKeys", new SearchFixDuplicateLabels(this));
 
+        actions.put("addToGroup", new GroupAddRemoveDialog(this, true));
+        actions.put("removeFromGroup", new GroupAddRemoveDialog(this, false));
+
         //actions.put("downloadFullText", new FindFullTextAction(this));
     }
 
@@ -1774,7 +1803,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 database.insertEntry(be);
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
-                list.add(be);                
+                list.add(be);
                 Util.setAutomaticFields(list, true, true, false);
 
                 // Create an UndoableInsertEntry object.
@@ -1800,10 +1829,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 markBaseChanged(); // The database just changed.
-                new FocusRequester(getEntryEditor(be));              
-
-                //Add the new entry to the group(s) selected in the Group Panel
-                addToSelectedGroup(be);
+                new FocusRequester(getEntryEditor(be));
 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1814,14 +1840,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * This method is called to add a new entry to a group (or a set of groups)
+     * This listener is used to add a new entry to a group (or a set of groups)
      * in case the Group View is selected and one or more groups are marked
-     * @param bibEntry The new entry.
-     */    
-	private void addToSelectedGroup(final BibtexEntry bibEntry) {
-		if (Globals.prefs.getBoolean("autoAssignGroup")){
-			if (frame.groupToggle.isSelected()){
-				BibtexEntry[] entries = {bibEntry};
+     */
+    private class GroupTreeUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ( (e.getType() == ChangeType.ADDED_ENTRY)
+                 && (Globals.prefs.getBoolean("autoAssignGroup"))
+                 && (frame.groupToggle.isSelected())) {
+				BibtexEntry[] entries = {e.getEntry()};
 				TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
 				if (selection != null) {
 					// it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1829,11 +1856,40 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 						((GroupTreeNode)(tree.getLastPathComponent())).addToGroup(entries);
 					}
 				}
-				this.updateEntryEditorIfShowing();
-				this.getGroupSelector().valueChanged(null);
-			}
-		}
-	}
+				//BasePanel.this.updateEntryEditorIfShowing(); // doesn't seem to be necessary
+				SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        BasePanel.this.getGroupSelector().valueChanged(null);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Ensures that the search auto completer is up to date when entries are changed
+     * AKA Let the auto completer, if any, harvest words from the entry
+     */
+    private class SearchAutoCompleterUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
+                Util.updateCompletersForEntry(BasePanel.this.searchAutoCompleterHM, e.getEntry());
+            }
+        }
+    }
+
+    /**
+     * Ensures that auto completers are up to date when entries are changed
+     * AKA Let the auto completer, if any, harvest words from the entry
+     */
+    private class AutoCompletersUpdater implements DatabaseChangeListener {
+        public void databaseChanged(DatabaseChangeEvent e) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
+                Util.updateCompletersForEntry(BasePanel.this.getAutoCompleters(), e.getEntry());
+            }
+        }
+    }
 
     /**
      * This method is called from JabRefFrame when the user wants to
@@ -2040,11 +2096,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         add(splitPane, BorderLayout.CENTER);
 
         // Set up name autocompleter for search:
+        //if (!Globals.prefs.getBoolean("searchAutoComplete")) {
         instantiateSearchAutoCompleter();
+        this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean("autoComplete")) {
             instantiateAutoCompleters();
+            // ensure that the autocompleters are in sync with entries
+            this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         }
 
         splitPane.revalidate();
@@ -2065,13 +2125,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void instantiateSearchAutoCompleter() {
-        //if (!Globals.prefs.getBoolean("searchAutoComplete"))
-        //    return;
         searchCompleter = new NameFieldAutoCompleter(new String[] {"author", "editor"}, true);
-        HashMap<String, AbstractAutoCompleter> hm = new HashMap<String, AbstractAutoCompleter>();
-        hm.put("x", searchCompleter);
+        searchAutoCompleterHM.put("x", searchCompleter);
         for (BibtexEntry entry : database.getEntries()){
-            Util.updateCompletersForEntry(hm, entry);
+            Util.updateCompletersForEntry(searchAutoCompleterHM, entry);
         }
         searchCompleteListener = new AutoCompleteListener(searchCompleter);
         searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice

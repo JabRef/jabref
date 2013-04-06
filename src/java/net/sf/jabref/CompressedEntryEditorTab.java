@@ -35,10 +35,8 @@ import java.util.List;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
- *
- * @author $Author$
- * @version $Revision$ ($Date$)
- *
+ * 
+ * Used in Biblatex mode (called from setupFiledPanels())
  */
 public class CompressedEntryEditorTab extends EntryEditorTab {
 
@@ -54,6 +52,9 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 	private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
 	private FieldEditor activeField = null;
+
+	// UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+	public FileListEditor fileListEditor = null;
 
 	public CompressedEntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
                           boolean addKeyField, String name) {
@@ -126,9 +127,10 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
             int editorType = BibtexFields.getEditorType(fields[i]);
 
             final FieldEditor ta;
-            if (editorType == GUIGlobals.FILE_LIST_EDITOR)
+            if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
                 ta = new FileListEditor(frame, bPanel.metaData(), fields[i], null, parent);
-            else{
+                fileListEditor = (FileListEditor) ta;
+            } else {
                 ta = new FieldTextArea(fields[i], null);
                 //inform the fieldtextarea of search events to highlight searchstrings
                 frame.getSearchManager().addSearchListener((FieldTextArea)ta);                

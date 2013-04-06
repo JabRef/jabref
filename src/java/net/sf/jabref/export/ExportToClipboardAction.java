@@ -51,7 +51,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         if (panel == null)
             return;
         if (panel.getSelectedEntries().length == 0) {
-            message = Globals.lang("No entries selected") + ".";
+            message = Globals.lang("No entries selected.");
             getCallBack().update();
             return;
         }

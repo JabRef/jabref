@@ -23,14 +23,17 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its
  * toString() method.
- * 
+ *
  * @author jzieren
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -56,7 +59,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             selected = true; // show as selected
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
-        // this is sometimes called from deep within somewhere, with a dummy 
+        // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
         if (!(value instanceof GroupTreeNode))
             return c;
@@ -102,6 +105,18 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (italics)
             sb.append("<i>");
         sb.append(Util.quoteForHTML(name));
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
+        	if (group instanceof ExplicitGroup) {
+        	    sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
+        	} else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+        		int hits = 0;
+        		for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()){
+        		    if (group.contains(entry))
+        			hits++;
+        		}
+        		sb.append(" [").append(hits).append("]");
+        	}
+        }
         if (italics)
             sb.append("</i>");
         if (underline)
@@ -137,7 +152,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /**
      * For use when dragging: The sepcified cell is always rendered as selected.
-     * 
+     *
      * @param cell
      *            The cell over which the user is currently dragging.
      */
@@ -162,7 +177,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * Highlights the specified cells (by drawing a border around it), 
+     * Highlights the specified cells (by drawing a border around it),
      * or disables highlight if highlightBorderCell == null.
      */
     void setHighlightBorderCell(Object highlightBorderCell) {

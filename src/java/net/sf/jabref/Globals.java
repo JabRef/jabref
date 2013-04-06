@@ -175,13 +175,15 @@ public class Globals {
 
     public static AutoSaveManager autoSaveManager = null;
 
+    // In the main program, this field is initialized in JabRef.java
+    // Each test case initializes this field if required
 	public static JabRefPreferences prefs = null;
 
 	public static HelpDialog helpDiag = null;
 
 	public static final String osName = System.getProperty("os.name", "def");
 
-	public static final boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows");
+	public static final boolean ON_MAC = (osName.equals(MAC)), ON_WIN = osName.startsWith("Windows"), ON_LINUX = osName.startsWith("Linux");
 
 	public static final String[] SKIP_WORDS = { "a", "an", "the", "for", "on", "of" };
 	

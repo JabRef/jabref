@@ -176,8 +176,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 				getTestEntry();
 				PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout2.getText());
 				testPanel.setPreferredSize(new Dimension(800, 350));
-				JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Globals
-					.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
+                                        Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
 			}
 		});
 	}

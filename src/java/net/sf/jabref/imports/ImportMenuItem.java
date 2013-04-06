@@ -28,7 +28,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -231,9 +230,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                         LabelPatternUtil.makeLabel(bibtexResult.getMetaData(), toAddTo, entry);
                                         //System.out.println("gen:"+entry.getCiteKey());
                                     }
-                                    // Let the autocompleters, if any, harvest words from the entry: 
-                                    Util.updateCompletersForEntry(panel.getAutoCompleters(), entry);
-
                                     ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
                                 }
                             } catch (KeyCollisionException e) {

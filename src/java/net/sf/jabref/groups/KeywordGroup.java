@@ -146,8 +146,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		if (!supportsAdd())
 			return null;
 		if ((entries != null) && (entries.length > 0)) {
-			NamedCompound ce = new NamedCompound(Globals
-					.lang("add entries to group"));
+			NamedCompound ce = new NamedCompound(
+                                        Globals.lang("add entries to group"));
 			boolean modified = false;
 			for (int i = 0; i < entries.length; i++) {
 				if (applyRule(null, entries[i]) == 0) {
@@ -179,8 +179,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 			return null;
 
 		if ((entries != null) && (entries.length > 0)) {
-			NamedCompound ce = new NamedCompound(Globals
-					.lang("remove from group"));
+			NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
 			boolean modified = false;
 			for (int i = 0; i < entries.length; ++i) {
 				if (applyRule(null, entries[i]) > 0) {

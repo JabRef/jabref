@@ -35,8 +35,8 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.9.2" />
-	<property name="jabref.version.full" value="2.9.2.0" /> <!-- a version number with 4 places. Required by launch4j -->
+	<property name="jabref.version" value="2.10b" />
+	<property name="jabref.version.full" value="2.10.0.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2013" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
@@ -83,7 +83,7 @@
 	<property name="osxbin.dir" value="osx" />
 
 	<!-- Load user dependent properties. Has to happen before setting the properties here -->
-	<!-- For instance to redefine the NSIS-compiler write 
+	<!-- For instance to redefine the NSIS-compiler write
 		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
 	  -->
 	<property file="user.properties" />
@@ -137,7 +137,7 @@
         <include name="spl/*.jar" />
     </fileset>
 	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
-	        <exclude name="services/**/*" />	        
+	        <exclude name="services/**/*" />
 	</fileset>
     <!-- Done by MrDlib -->
 
@@ -201,14 +201,13 @@
 	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8"
-		   source="1.6" target="1.6">
+		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
 		</javac>
-		<javac debug="off" deprecation="on" destdir="${build.classes}" source="1.6" target="1.6">
+		<javac debug="off" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="**/JabRefMain.java" />
 		</javac>
@@ -217,7 +216,7 @@
 	<!-- Compiles project including tests -->
 	<target name="compiletest">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" destdir="${build.classes}" source="1.6" target="1.6">
+		<javac debug="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="tests/**" />
 			<classpath refid="classpathTest" />
@@ -241,9 +240,9 @@
 	<!-- Jars up project -->
 	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
-        
+
 		<mkdir dir="${build.tmp}" />
-		<jar destfile="${build.lib}/${build.jar}" > 
+		<jar destfile="${build.lib}/${build.jar}" >
         <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
 
 			<fileset dir="${build.classes}" />
@@ -336,10 +335,10 @@
 		<!-- Insert version informations -->
 		<replace dir="${build.help}">
 		    <replacefilter
-			    token="${jabref.placeholder.version}" 
+			    token="${jabref.placeholder.version}"
 				value="${jabref.version}" />
 		    <replacefilter
-			    token="${jabref.placeholder.year}" 
+			    token="${jabref.placeholder.year}"
 				value="${jabref.year}" />
 			<include name="**/About.html" />
 		</replace>
@@ -405,8 +404,8 @@ version=${jabref.version}</echo>
 		</copy>
 
 		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://docs.oracle.com/javase/6/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
-			<!-- 
-                 create javadoc only selectively for classes that 
+			<!--
+                 create javadoc only selectively for classes that
                  users extending JabRef are likely to use
               -->
 			<fileset dir="${java.dir}" defaultexcludes="yes">
@@ -475,7 +474,7 @@ version=${jabref.version}</echo>
 		<jarbundler dir="${build.lib}"
                     name="JabRef"
                     mainclass="net.sf.jabref.JabRef"
-                    jars="${build.lib}/${build.jar}"
+                    jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
                     jvmversion="1.6+"
@@ -698,7 +697,8 @@ version=${jabref.version}</echo>
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
-	<!-- creates all distribution files in ${build.lib} -->
-	<target name="release" depends="clean, win.installer, non_osx, osxjar, bzip2src, zipsrc" />
-	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, bzip2src, zipsrc" />
+	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, osxjar" description="creates development snapshot binaries" />
+
+	<target name="release" depends="clean, win.installer, non_osx, osxjar, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>

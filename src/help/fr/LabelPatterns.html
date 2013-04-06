@@ -9,7 +9,7 @@
     <h1>Personnalisation du g&eacute;n&eacute;rateur de clefs
     BibTeX</h1>
 
-    <p>Dans le menu 'Param&eacute;trage des clefs' de la
+    <p>Dans le menu &lsquo;Param&eacute;trage des clefs&rsquo; de la
     fen&ecirc;tre Pr&eacute;f&eacute;rences, on peut indiquer les
     champs &agrave; utiliser pour la g&eacute;n&eacute;ration
     automatique des clefs BibTeX. La d&eacute;finition peut
@@ -46,14 +46,14 @@
         auteur<br /></li>
 
         <li><b>[<code>authorsN</code>]</b>: Les noms des N premiers
-        auteurs. S'il y a plus d'auteurs, "EtAl" est
+        auteurs. S'il y a plus d'auteurs, &ldquo;EtAl&rdquo; est
         ajout&eacute;.<br /></li>
                 
         <li><b>[<code>authorsAlpha</code>]</b>&nbsp;: correspond au style
-        BibTeX "alpha". Un auteur&nbsp;: les trois premi&egrave;res lettres du nom.
+        BibTeX &ldquo;alpha&rdquo;. Un auteur&nbsp;: les trois premi&egrave;res lettres du nom.
         Deux &agrave; quatre auteurs&nbsp;: Les premi&egrave;res lettres des noms, concat&eacute;n&eacute;es.
-        Plus de quatre auterus&nbsp;: Les premi&egrave;res lettres des noms des trois
-        premiers auteurs, concat&eacute;n&eacute;es, avec un "+" &agrave; la fin.<br /></li>
+        Plus de quatre auteurs&nbsp;: Les premi&egrave;res lettres des noms des trois
+        premiers auteurs, concat&eacute;n&eacute;es, avec un &ldquo;+&rdquo; &agrave; la fin.<br /></li>
 
         <li><b>[<code>authIniN</code>]</b>&nbsp;: Les N
         premi&egrave;res lettres (ou moins) du nom de chacun des
@@ -71,18 +71,31 @@
         auteurs.<br /></li>
 
         <li><b>[<code>auth.auth.ea</code>]</b>&nbsp;: Le nom des
-        deux premiers auteurs suivi de ".ea" lorsqu'ils sont plus
+        deux premiers auteurs suivi de &ldquo;.ea&rdquo; lorsqu'ils sont plus
         de deux.<br /></li>
 
         <li><b>[<code>auth.etal</code>]</b>: Le nom du premier
-        auteur et le nom du second auteur, ou ".etal" s'il y en a
+        auteur et le nom du second auteur, ou &ldquo;.etal&rdquo; s'il y en a
         plus de deux.<br /></li>
+        
+        <li><b>[<code>authEtAl</code>]</b>: Le nom du premier auteur et
+        le nom du second auteur s'il y a deux auteurs ou &ldquo;EtAl&rdquo; s'il
+        y en a plus de deux. C'est similaire &agrave; <code>auth.etal</code>. La
+        diff&eacute;rence est que les auteurs ne sont pas s&eacute;par&eacute;s par &ldquo;.&rdquo;
+        et dans le cas de plus de deux auteurs &ldquo;EtAl&rdquo; est ajout&eacute;
+        au lieu de &ldquo;.etal&rdquo;.<br /></li>
 
         <li><b>[<code>authshort</code>]</b>&nbsp;: Le nom s'il n'y
         a qu'un seul auteur. Jusqu'&agrave; trois auteurs, le
-        premier caract&egrave;re du nom de chacun d'eux. Au
-        del&agrave; de trois auteurs, le caract&egrave;re plus (+)
+        premier caract&egrave;re du nom de chacun d'eux. Au-del&agrave;
+        de trois auteurs, le caract&egrave;re plus (+)
         est ajout&eacute;.<br /></li>
+        
+        <li><b>[<code>authForeIni</code>]</b>&nbsp;: L'initiale du pr&eacute;nom
+        du premier auteur.<br /></li>
+
+	<li><b>[<code>authorLastForeIni</code>]</b>: &nbsp;: L'initiale du pr&eacute;nom
+        du dernier auteur.<br /></li>
     </ul><b>Note&nbsp;:</b> S'il n'y a pas d'auteur (dans le cas
     d'un livre &eacute;dit&eacute;), alors tous les marqueurs
     <b><code>[auth...]</code></b> ci-dessus utiliseront
@@ -124,22 +137,28 @@
         &eacute;diteurs.<br /></li>
 
         <li><b>[<code>edtr.edtr.ea</code>]</b>&nbsp;: Le nom des
-        deux premiers &eacute;diteurs suivi de ".ea" lorsqu'ils
+        deux premiers &eacute;diteurs suivi de &ldquo;.ea&rdquo; lorsqu'ils
         sont plus de deux.<br /></li>
 
         <li><b>[<code>edtrshort</code>]</b>&nbsp;: Le nom s'il n'y
         a qu'un seul &eacute;diteur. Jusqu'&agrave; trois
         &eacute;diteurs, le premier caract&egrave;re du nom de
-        chacun d'eux. Au del&agrave; de trois &eacute;diteurs, le
+        chacun d'eux. Au-del&agrave; de trois &eacute;diteurs, le
         caract&egrave;re plus (+) est ajout&eacute;.<br /></li>
 
+        <li><b>[<code>edtrForeIni</code>]</b>&nbsp;: L'initiale du pr&eacute;nom
+        du premier &eacute;diteur.<br /></li>
+
+	<li><b>[<code>edtrLastForeIni</code>]</b>: &nbsp;: L'initiale du pr&eacute;nom
+        du dernier &eacute;diteur.<br /></li>
+        
         <li><b>[<code>firstpage</code>]</b>&nbsp;: Le num&eacute;ro
         de la premi&egrave;re page de la publication (Attention&nbsp;: cela retournera
         le plus petit nombre trouv&eacute; dans le champ pages, puisque BibTeX
         permet <code>7,41,73--97</code> ou <code>43+</code>).<br /></li>
 
         <li><b>[<code>keywordN</code>]</b>: Nombre de mots-clefs
-        dans le champ "keywords" en supposant que les mots-clefs
+        dans le champ &ldquo;keywords&rdquo; en supposant que les mots-clefs
         sont s&eacute;par&eacute;s par des virgules ou des
         points-virgules.<br /></li>
 
@@ -154,27 +173,40 @@
         chiffres de l'ann&eacute;e de publication.<br /></li>
 
         <li><b>[<code>veryshorttitle</code>]</b>&nbsp;: Le premier
-        mot du titre qui ne soit pas 'the', 'a', 'an'.<br /></li>
+        mot du titre qui ne soit pas &lsquo;the&rsquo;, &lsquo;a&rsquo;, &lsquo;an&rsquo;.<br /></li>
     </ul>
 
-    <p>Un nom de champs (ou celui de l'un des pseudo-champs vu au
-    dessus) peut, de fa&ccedil;on optionnelle, &ecirc;tre suivi par
+    <p>Un nom de champs (ou celui de l'un des pseudo-champs vu
+    au-dessus) peut, de fa&ccedil;on optionnelle, &ecirc;tre suivi par
     un ou plusieurs modificateurs. Les modificateurs sont
     appliqu&eacute;s dans l'ordre o&ugrave; ils sont
     sp&eacute;cifi&eacute;s.</p>
 
     <ul>
-        <li><b>:abbr</b>: Abr&egrave;ge le texte produit par le nom
+        <li><b><code>:abbr</code></b>&nbsp;: Abr&egrave;ge le texte produit par le nom
         du champ ou un marqueur de champ sp&eacute;cial. Uniquement
         le premier caract&egrave;re et les caract&egrave;res
         suivant un espace seront inclus. Par exemple,
-        <b>[journal:abbr]</b> abr&egrave;gera "Journal of Fish
-        Biology" en "JoFB".<br /></li>
+        <b>[journal:abbr]</b> abr&eacute;gera &ldquo;Journal of Fish
+        Biology&rdquo; en &ldquo;JoFB&rdquo;.</li>
 
-        <li><b>:lower</b>, force le texte ins&eacute;r&eacute; par
+        <li><b><code>:lower</code></b>&nbsp;: Force le texte ins&eacute;r&eacute; par
         le marqueur de champ &agrave; &ecirc;tre en minuscules. Par
         exemple, <b>[auth:lower]</b> bascule le nom du premier
         auteur en minuscules.</li>
+        
+        <li><b><code>:upper</code></b>&nbsp;: Force le texte ins&eacute;r&eacute; par
+        le marqueur de champ &agrave; &ecirc;tre en majuscules. Par
+        exemple, <b>[auth:upper]</b> bascule le nom du premier
+        auteur en majuscules.</li>
+
+        <li><b><code>:(x)</code></b>&nbsp;: Remplace x par une cha&icirc;ne quelconque.
+        La cha&icirc;ne entre les parenth&egrave;ses sera ins&eacute;r&eacute;e si le marqueur
+        de champ pr&eacute;c&eacute;dent ce modifieur produit une valeur vide. Par exemple le
+        marqueur <b>[volume:(unknown)]</b> renverra le volume de l'entr&eacute;e
+        s'il existe, et la cha&icirc;ne <b>unknown</b> si le champ
+        <code>volume</code> de l'entr&eacute;e est vide.
+        </li>
     </ul>
 
     <p>Si vous n'avez pas d&eacute;fini de mod&egrave;le de clef
@@ -188,9 +220,9 @@
 
     <p>La clef utilis&eacute;e par d&eacute;faut est [auth][year];
     elle produit des clefs du type <code>Yared1998</code>. Si la
-    clef n'est pas unique dans la base de donn&eacute;e, elle est
+    clef n'est pas unique dans la base de donn&eacute;es, elle est
     modifi&eacute;e par l'ajout d'une des lettres de a &agrave; z
-    et ceci jusqu'a ce quelle soit unique. De cette fa&ccedil;on,
+    et ceci jusqu'&agrave; ce quelle soit unique. De cette fa&ccedil;on,
     les &eacute;tiquettes ressemblent &agrave;&nbsp;:</p>
 
     <p style="margin-left: 28pt">
@@ -208,7 +240,7 @@
     r&eacute;guli&egrave;re donn&eacute;e et de la remplacer avec
     une cha&icirc;ne. L'expression r&eacute;guli&egrave;re et la
     cha&icirc;ne de remplacement sont entr&eacute;es dans les
-    champs textes situ&eacute;s sous la liste des d&eacute;finition
+    champs textes situ&eacute;s sous la liste des d&eacute;finitions
     de clefs.</p>
 
     <p>Si la cha&icirc;ne de remplacement est vide, les

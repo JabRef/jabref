@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2012 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -70,16 +70,27 @@ public class JabRefPreferences {
 
         SHOWONELETTERHEADINGFORICONCOLUMNS = "showOneLetterHeadingForIconColumns",
 
+        EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings",
+        EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA",
+
         SHORTEST_TO_COMPLETE = "shortestToComplete",
         AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
         // here are the possible values for _MODE:
         AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both",
         AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly",
-        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
+        AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly",
+
+        WRITEFIELD_ADDSPACES = "writeFieldAddSpaces",
+        WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase",
+
+        UPDATE_TIMESTAMP = "updateTimestamp";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
+
+    private static final char[][] VALUE_DELIMITERS =
+            new char[][]{ {'"', '"'}, {'{', '}'} };
 
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
@@ -179,6 +190,9 @@ public class JabRefPreferences {
         	defaults.put(EMACS_23, false);
         	defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
 		}
+		defaults.put("useProxy", Boolean.FALSE);
+        defaults.put("proxyHostname", "my proxy host");
+        defaults.put("proxyPort", "my proxy port");
         defaults.put(PDF_PREVIEW, Boolean.FALSE);
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
@@ -232,7 +246,6 @@ public class JabRefPreferences {
         defaults.put("defaultShowSource", Boolean.FALSE);
         defaults.put("showSource", Boolean.TRUE);
         defaults.put("defaultAutoSort", Boolean.FALSE);
-        defaults.put("enableSourceEditing", Boolean.TRUE);
         defaults.put("caseSensitiveSearch", Boolean.FALSE);
         defaults.put("searchReq", Boolean.TRUE);
         defaults.put("searchOpt", Boolean.TRUE);
@@ -242,13 +255,17 @@ public class JabRefPreferences {
         defaults.put("searchAutoComplete", Boolean.TRUE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
         defaults.put("saveInOriginalOrder", Boolean.FALSE);
+        defaults.put("saveInTitleOrder", Boolean.FALSE);
         defaults.put("exportInStandardOrder", Boolean.TRUE);
         defaults.put("exportInOriginalOrder", Boolean.FALSE);
+        defaults.put("exportInTitleOrder", Boolean.FALSE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("highLightWords", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
+        defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
@@ -267,6 +284,7 @@ public class JabRefPreferences {
         defaults.put("groupExpandTree", Boolean.TRUE);
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
+        defaults.put(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put("autoAssignGroup", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
@@ -323,6 +341,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
         defaults.put("pdfColumn", Boolean.FALSE);
         defaults.put("urlColumn", Boolean.TRUE);
+        defaults.put("preferUrlDoi", Boolean.FALSE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("arxivColumn", Boolean.FALSE);
         
@@ -409,7 +428,12 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
+
+        // behavior of JabRef before 2.10: both: false
+        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
+        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", new Integer(6050));
@@ -434,7 +458,7 @@ public class JabRefPreferences {
         defaults.put("searchDialogWidth", new Integer(650));
         defaults.put("searchDialogHeight", new Integer(500));
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
-        defaults.put("autolinkExactKeyOnly", Boolean.TRUE);
+        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
         defaults.put("runAutomaticFileSearch", Boolean.FALSE);
         defaults.put("useLockFiles", Boolean.TRUE);
@@ -444,6 +468,10 @@ public class JabRefPreferences {
         defaults.put("deletePlugins", "");
         defaults.put("enforceLegalBibtexKey", Boolean.TRUE);
         defaults.put("biblatexMode", Boolean.FALSE);
+        // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
+        // Currently, JabRef does not escape them
+        defaults.put("valueDelimiters", 1);
+        defaults.put("includeEmptyFields", Boolean.FALSE);
         defaults.put("keyGenFirstLetterA", Boolean.TRUE);
         defaults.put("keyGenAlwaysAddLetter", Boolean.FALSE);
         defaults.put(JabRefPreferences.EMAIL_SUBJECT, Globals.lang("References"));
@@ -496,6 +524,7 @@ public class JabRefPreferences {
         defaults.put("useIEEEAbrv", Boolean.TRUE);
         defaults.put("useConvertToEquation", Boolean.FALSE);
         defaults.put("useCaseKeeperOnSearch", Boolean.TRUE);
+        defaults.put("useUnitFormatterOnSearch", Boolean.TRUE);
 
 	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
 	try {
@@ -527,9 +556,12 @@ public class JabRefPreferences {
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+    public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
 
 	public static final String EMAIL_SUBJECT = "emailSubject";
 	public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
+
+    public static final String GROUP_SHOW_NUMBER_OF_ELEMENTS = "groupShowNumberOfElements";
 
 
 	public boolean putBracesAroundCapitals(String fieldName) {
@@ -552,6 +584,15 @@ public class JabRefPreferences {
                 nonWrappableFields.add(fields[i].trim());
         }
 
+    }
+
+    public char getValueDelimiters(int index) {
+        return getValueDelimiters()[index];
+    }
+
+    public char[] getValueDelimiters() {
+        return VALUE_DELIMITERS[getInt(
+                "valueDelimiters")];
     }
 
     /**
@@ -906,7 +947,7 @@ public class JabRefPreferences {
 
         // First read the bindings, and their names.
         String[] bindNames = getStringArray("bindNames"),
-            bindings = getStringArray("bindings");
+                 bindings  = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
         if ((bindNames == null) || (bindings == null)
@@ -1007,7 +1048,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Search ACM Portal", "ctrl shift F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Search JSTOR", "shift F9");
-        defKeyBinds.put("Write XMP", "ctrl F4");
+        defKeyBinds.put("Write XMP", "ctrl F7");
         defKeyBinds.put("New file link", "ctrl N");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");
         defKeyBinds.put("Fetch INSPIRE", "ctrl F2");
@@ -1027,8 +1068,17 @@ public class JabRefPreferences {
     }
 
     private String getNextUnit(Reader data) throws IOException {
-        int c;
-        boolean escape = false, done = false;
+        // character last read
+        // -1 if end of stream
+        // initialization necessary, because of Java compiler
+        int c = -1;
+
+        // last character was escape symbol
+        boolean escape = false;
+
+        // true if a ";" is found
+        boolean done = false;
+
         StringBuffer res = new StringBuffer();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
@@ -1050,10 +1100,14 @@ public class JabRefPreferences {
                 escape = false;
             }
         }
-        if (res.length() > 0)
+        if (res.length() > 0) {
             return res.toString();
-        else
+        } else if (c ==-1) {
+            // end of stream
             return null;
+        } else {
+            return "";
+        }
     }
 
     private String makeEscape(String s) {
