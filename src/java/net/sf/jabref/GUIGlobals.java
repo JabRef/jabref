@@ -231,7 +231,8 @@ public class GUIGlobals {
 		LANGUAGES.put("Simplified Chinese", "zh");
 		LANGUAGES.put("Vietnamese", "vi");
 		LANGUAGES.put("Bahasa Indonesia", "in");
-        LANGUAGES.put("Brazilian Portugese", "pt_BR");
+		LANGUAGES.put("Brazilian Portugese", "pt_BR");
+		LANGUAGES.put("Russian", "ru");
 
 
 
