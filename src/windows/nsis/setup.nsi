@@ -1,7 +1,6 @@
 # owner		JabRef Team
-# license	GPL version 2
-# author	Uwe Stöhr
-# file version	1.0	date	18-01-2007
+# license	GPL version 3
+# author	Uwe Stöhr and others
 
 ; To compile this script NSIS 2.23 and newer are required
 ; http://nsis.sourceforge.net/
@@ -143,7 +142,7 @@ VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
 VIAddVersionKey FileDescription "JabRef installation program"
-VIAddVersionKey LegalCopyright "under the GPL version 2"
+VIAddVersionKey LegalCopyright "under the GPL version 3"
 VIAddVersionKey FileVersion ""
 
 
