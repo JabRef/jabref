@@ -120,12 +120,14 @@ Var InstDestination
 !insertmacro MUI_LANGUAGE "French"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "Italian"
+!insertmacro MUI_LANGUAGE "Russian"
 !insertmacro MUI_LANGUAGE "Spanish"
 
 !include "installer_languages\english.nsh"
 !include "installer_languages\french.nsh"
 !include "installer_languages\german.nsh"
 !include "installer_languages\italian.nsh"
+!include "installer_languages\russian.nsh"
 !include "installer_languages\spanish.nsh"
 
 
