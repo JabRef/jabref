@@ -67,7 +67,7 @@ public class PushToWinEdt implements PushToApplication {
                     .append(Globals.prefs.get("citeCommandWinEdt")).append("{")
                     .append(keyString.replaceAll("'", "''"))
                     .append("}');]\"");
-            Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
+            Runtime.getRuntime().exec(new String[] {winEdt, toSend.toString()});
 
         }
 
