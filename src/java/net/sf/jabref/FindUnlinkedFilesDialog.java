@@ -61,7 +61,6 @@ import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
 import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
-import net.sf.jabref.undo.CountingUndoManager;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -77,9 +76,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * Keys to be used for referencing this Action.
 	 */
 	public static final String ACTION_COMMAND = "findUnlinkedFiles";
-	public static final String ACTION_TITLE = "Find unlinked Files...";
+	public static final String ACTION_TITLE = Globals.lang("Find unlinked files") + "..."; // this entry is NOT in Menu_en.properties as the same string also appears in JabRef_en.properties
 	public static final String ACTION_ICON = "toggleSearch";
-	public static final String ACTION_SHORT_DESCRIPTION = "Searches for unlinked PDF files on the file system";
+	public static final String ACTION_SHORT_DESCRIPTION = Globals.lang("Searches for unlinked PDF files on the file system");
 
 	private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 	private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
