@@ -3046,7 +3046,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     }
     
     // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
-    private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'<>])\\S)+)\\b";
+    // Some DOI's are not caught by the regexp in the above link, i.e. 10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S
+    // Removed <> from non-permitted characters
+    private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'])\\S)+)\\b";
     private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
     private static final Pattern PATTERN_PLAINDOI = Pattern.compile(REGEXP_PLAINDOI);
 
