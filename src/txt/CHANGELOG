@@ -1,4 +1,6 @@
 [master branch]
+    - Find unlinked files tool doesn't always use PDF content importer any more,
+      but the dialog opened when a file is dropped into JabRef
 [2.10 branch]
     - Fixed compatibility issue with OpenOffice plugin
     - Added Russian as language
