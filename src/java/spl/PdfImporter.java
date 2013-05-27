@@ -3,6 +3,7 @@ package spl;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.*;
@@ -39,11 +40,24 @@ public class PdfImporter {
     private MainTable entryTable;
     private int dropRow;
 
+    /**
+     * Creates the PdfImporter
+     * 
+     * @param frame the JabRef frame
+     * @param panel the panel to use
+     * @param entryTable the entry table to work on
+     * @param dropRow the row the entry is dropped to. May be -1 to indicate that no row is selected.
+     */
     public PdfImporter(JabRefFrame frame, BasePanel panel, MainTable entryTable, int dropRow) {
         this.frame = frame;
         this.panel = panel;
         this.entryTable = entryTable;
         this.dropRow = dropRow;
+    }
+    
+    public class ImportPdfFilesResult {
+    	public String[] noPdfFiles;
+    	public List<BibtexEntry> entries;
     }
 
     /**
@@ -51,9 +65,12 @@ public class PdfImporter {
      * Imports the PDF files given by fileNames
      * 
      * @param fileNames states the names of the files to import
-     * @return list of non-PDF files
+     * @return list of successful created BibTeX entries and list of non-PDF files
      */
-    public String[] importPdfFiles(String[] fileNames, OutputPrinter status){
+    public ImportPdfFilesResult importPdfFiles(String[] fileNames, OutputPrinter status){
+    	// sort fileNames in PDFfiles to import and other files
+    	// PDFfiles: variable files
+    	// other files: variable noPdfFiles
         List<String> files = new ArrayList<String>(Arrays.asList(fileNames));
         List<String> noPdfFiles = new ArrayList<String>();
         PdfFileFilter pdfFilter = new PdfFileFilter();
@@ -63,18 +80,26 @@ public class PdfImporter {
             }
         }
         files.removeAll(noPdfFiles);
-        importPdfFiles(files, status);
+        // files and noPdfFiles correctly sorted
+        
+        // import the files
+        List<BibtexEntry> entries = importPdfFiles(files, status);
+        
         String[] noPdfFilesArray = new String[noPdfFiles.size()];
         noPdfFiles.toArray(noPdfFilesArray);
-        return noPdfFilesArray;
+        
+        ImportPdfFilesResult res = new ImportPdfFilesResult();
+        res.noPdfFiles = noPdfFilesArray;
+        res.entries = entries;
+        return res;
     }
 
     /**
      * @param fileNames - PDF files to import
      * @return true if the import succeeded, false otherwise
      */
-    private boolean importPdfFiles(List<String> fileNames, OutputPrinter status){
-        if(panel == null) return false;
+    private List<BibtexEntry> importPdfFiles(List<String> fileNames, OutputPrinter status){
+        if(panel == null) return Collections.emptyList();
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
         boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
@@ -82,11 +107,14 @@ public class PdfImporter {
 
         // Get a list of file directories:
         String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        
+        List<BibtexEntry> res = new ArrayList<BibtexEntry>();
 
+fileNameLoop:
         for(String fileName : fileNames){
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
-            	importDialog = new ImportDialog(dropRow, fileName);
+            	importDialog = new ImportDialog((dropRow >= 0), fileName);
             	if(!hasXmpEntries(xmpEntriesInFile)){
                 	importDialog.disableXMPChoice();
             	}
@@ -100,7 +128,7 @@ public class PdfImporter {
             	BibtexEntry entry;
             	BibtexEntryType type;
                 InputStream in = null;
-                List<BibtexEntry> res = null;
+                List<BibtexEntry> localRes = null;
             	MetaDataListDialog metaDataListDialog;
                 switch (choice) {
     			case ImportDialog.XMP:
@@ -110,7 +138,7 @@ public class PdfImporter {
                     PdfXmpImporter importer = new PdfXmpImporter();
                     try {
                         in = new FileInputStream(fileName);
-                        res = importer.importEntries(in, frame);
+                        localRes = importer.importEntries(in, frame);
                         //importer.automatedImport(new String[]{ fileName });
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -118,14 +146,16 @@ public class PdfImporter {
                         try { in.close(); } catch (Exception f) {}
                     }
 
-                    // import failed -> generate default entry
-                    if ((res == null) || (res.size() == 0)) {
-                        createNewBlankEntry(fileName);
-                        return true;
+                    if ((localRes == null) || (localRes.size() == 0)) {
+                        // import failed -> generate default entry
+						Globals.logger(Globals.lang("Import failed"));
+                        entry = createNewBlankEntry(fileName);
+                        res.add(entry);
+                        continue fileNameLoop;
                     }
 
                     // only one entry is imported
-                    entry = res.get(0);
+                    entry = localRes.get(0);
 
                     // insert entry to database and link file
                     panel.database().insertEntry(entry);
@@ -136,7 +166,7 @@ public class PdfImporter {
                             Util.shortenFileName(toLink, dirsS).getPath(),
                             Globals.prefs.getExternalFileTypeByName("pdf")));
                     entry.setField(GUIGlobals.FILE_FIELD, tm.getStringRepresentation());
-
+                    res.add(entry);
 			        break;
 
     			case ImportDialog.CONTENT:
@@ -150,29 +180,32 @@ public class PdfImporter {
 						// import failed -> generate default entry
 						Globals.logger(Globals.lang("Import failed"));
 						e.printStackTrace();
-						createNewBlankEntry(fileName);
-						return true;
+						entry = createNewBlankEntry(fileName);
+	                    res.add(entry);
+						continue fileNameLoop;
 					}
 					try {
-						res = contentImporter.importEntries(in, status);
+						localRes = contentImporter.importEntries(in, status);
 					} catch (Exception e) {
 						// import failed -> generate default entry
 						Globals.logger(Globals.lang("Import failed"));
 						e.printStackTrace();
-						createNewBlankEntry(fileName);
-						return true;
+						entry = createNewBlankEntry(fileName);
+	                    res.add(entry);
+						continue fileNameLoop;
 					} finally {
 						try { in.close(); } catch (Exception f) {}
 					}
 					
 					// import failed -> generate default entry
-					if ((res == null) || (res.size() == 0)) {
-						createNewBlankEntry(fileName);
-						return true;
+					if ((localRes == null) || (localRes.size() == 0)) {
+						entry = createNewBlankEntry(fileName);
+	                    res.add(entry);
+						continue fileNameLoop;
 					}
 					
 					// only one entry is imported
-					entry = res.get(0);
+					entry = localRes.get(0);
 					
 					// insert entry to database and link file
 					
@@ -187,12 +220,14 @@ public class PdfImporter {
                         panel.showEntryEditor(editor);
                         panel.adjustSplitter();
                     }
+                    res.add(entry);
                     break;
     			case ImportDialog.MRDLIB:
                     metaDataListDialog = new MetaDataListDialog(fileName, true);
                     Tools.centerRelativeToWindow(metaDataListDialog, frame);
                     metaDataListDialog.showDialog();
                     Document document = metaDataListDialog.getXmlDocuments();
+                    entry = null; // to satisfy the Java compiler
                     if(document != null /*&& documents.getDocuments() != null && documents.getDocuments().size() > 0*/ && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
                         if(selected > -1 /*&& selected < documents.getDocuments().size()*/){
@@ -221,21 +256,24 @@ public class PdfImporter {
                             LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
                         }
                         else{
-                            createNewBlankEntry(fileName);
+                            entry = createNewBlankEntry(fileName);
                         }
                     }
                     else if(metaDataListDialog.getResult() == JOptionPane.CANCEL_OPTION ){
                         continue;
                     }
                     else if(metaDataListDialog.getResult() == JOptionPane.NO_OPTION ){
-                        createNewBlankEntry(fileName);
+                        entry = createNewBlankEntry(fileName);
                     }
                     else if(document == null /*|| document.getDocuments() == null || document.getDocuments().size() <= 0*/ && metaDataListDialog.getResult() == JOptionPane.OK_OPTION){
-                        createNewBlankEntry(fileName);
+                        entry = createNewBlankEntry(fileName);
                     }
+                    assert(entry != null);
+                    res.add(entry);
                     break;
     			case ImportDialog.NOMETA:
-                    createNewBlankEntry(fileName);
+                    entry = createNewBlankEntry(fileName);
+                    res.add(entry);
                     break;
     			case ImportDialog.UPDATEEMPTYFIELDS:
                     metaDataListDialog = new MetaDataListDialog(fileName, false);                   
@@ -272,15 +310,16 @@ public class PdfImporter {
 
 
         }
-        return true;
+        return res;
     }
 
-    private void createNewBlankEntry(String fileName) {
+    private BibtexEntry createNewBlankEntry(String fileName) {
         BibtexEntry newEntry = createNewEntry();
         if(newEntry != null){
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
             dfh.linkPdfToEntry(fileName, entryTable, newEntry);
         }
+        return newEntry;
     }
 
     private void insertFields(String[] fields, BibtexEntry entry, Document xmlDocument) {

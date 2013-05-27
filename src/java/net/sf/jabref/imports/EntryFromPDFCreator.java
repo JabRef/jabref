@@ -14,8 +14,13 @@ import java.util.logging.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
+import spl.PdfImporter;
+import spl.PdfImporter.ImportPdfFilesResult;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.external.ExternalFileType;
@@ -65,24 +70,11 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 			return null;
 		}
 
-		BibtexEntry entry = new BibtexEntry();
-
-		// Read pdf specific metadata
-		// use PdfContentImporter
-		PdfContentImporter pci = new PdfContentImporter();
-		try {
-			ArrayList<BibtexEntry> list =  (ArrayList<BibtexEntry>) pci.importEntries(new FileInputStream(pdfFile), new OutputPrinterToNull());
-			// there should only be one entry in the arraylist
-			if(list != null && !list.isEmpty()) {
-				return list.iterator().next();
-			}
-		} catch (FileNotFoundException e) {
-		    logger.log(Level.SEVERE, "File not found", e);
-		} catch (IOException e) {
-            logger.log(Level.SEVERE, "Error opening file", e);
-		}
-		
-		return null;
+		PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.basePanel(), JabRef.jrf.basePanel().mainTable, -1);
+		String[] fileNames = {pdfFile.toString()};
+		ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
+		assert(res.entries.size() == 1);
+		return res.entries.get(0);
 		
 		/*addEntryDataFromPDDocumentInformation(pdfFile, entry);
 		addEntyDataFromXMP(pdfFile, entry);

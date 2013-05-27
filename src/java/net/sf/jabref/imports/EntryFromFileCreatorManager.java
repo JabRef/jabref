@@ -140,15 +140,18 @@ public final class EntryFromFileCreatorManager {
 				 * does 'true' mean "There were duplicates", while 'false' means
 				 * "Everything alright"?
 				 */
-				if (database.insertEntry(entry)) {
-					importGUIMessages.add("Problem importing " + f.getPath()
-							+ ": Insert into BibtexDatabase failed.");
+				if (database.getEntryById(entry.getId()) == null) {
+					// Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
+					// Therefore, we only insert the entry if it is not already present
+					if (database.insertEntry(entry)) {
+						importGUIMessages.add("Problem importing " + f.getPath()
+								+ ": Insert into BibtexDatabase failed.");
+					} else {
+	                    count++;
+	                    if (panel != null)
+	                        ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+	                }
 				}
-                else {
-                    count++;
-                    if (panel != null)
-                        ce.addEdit(new UndoableInsertEntry(database, entry, panel));
-                }
 			} else {
 				importGUIMessages.add("Problem importing " + f.getPath()
 						+ ": Unknown filetype.");

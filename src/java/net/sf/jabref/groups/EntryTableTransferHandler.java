@@ -46,6 +46,7 @@ import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
 import spl.PdfImporter;
+import spl.PdfImporter.ImportPdfFilesResult;
 import spl.Tools;
 
 public class EntryTableTransferHandler extends TransferHandler {
@@ -379,9 +380,9 @@ public class EntryTableTransferHandler extends TransferHandler {
 		new Thread(new Runnable() {
 			public void run() {
 				// Done by MrDlib
-                final String[] newfileNames = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
-                if(newfileNames.length > 0){
-                    loadOrImportFiles(newfileNames, dropRow);
+                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
+                if(importRes.noPdfFiles.length > 0){
+                    loadOrImportFiles(importRes.noPdfFiles, dropRow);
                 }
                 //loadOrImportFiles(fileNames, dropRow);
                 // Done by MrDlib
