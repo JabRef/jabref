@@ -1,6 +1,7 @@
 [2.10 branch]
     - Fixed compatibility issue with OpenOffice plugin
     - Added Russian as language
+    - Fix for bug 1160: Certain DOI references with "<" characters are not processed correctly (by Jonathan Powell)
 2.10 beta
     - Applied fix for JStor fetcher (patch 202 by Nicolas Brouard)
     - Added Settings menu item "Clear connection settings" in OpenOffice/LibreOffice panel.
