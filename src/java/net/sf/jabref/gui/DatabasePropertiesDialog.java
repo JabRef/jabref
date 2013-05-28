@@ -153,13 +153,24 @@ public class DatabasePropertiesDialog extends JDialog {
                 fileDir.setText((fileD.get(0)).trim());
         }
 
-        Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual"));
-        if (fileDI == null)
-            fileDirIndv.setText("");
-        else {
+        Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual")); // File dir setting
+        Vector<String> fileDIL = metaData.getData(Globals.prefs.get("userFileDirInd_Legacy")); // Legacy file dir setting for backward comp.
+        if (fileDI == null) {
+	    oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
+	    if (fileDIL == null)
+		fileDirIndv.setText("");
+	    else {
+		// Insert path from legacy setting if possible
+		// Better be a little careful about how many entries the Vector has:
+		if (fileDIL.size() >= 1)
+		    fileDirIndv.setText((fileDIL.get(0)).trim());
+	    }
+	}
+	else {
             // Better be a little careful about how many entries the Vector has:
             if (fileDI.size() >= 1)
                 fileDirIndv.setText((fileDI.get(0)).trim());
+	    oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
         Vector<String> pdfD = metaData.getData("pdfDirectory");
@@ -190,7 +201,6 @@ public class DatabasePropertiesDialog extends JDialog {
 
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
-        oldFileIndvVal = fileDir.getText();
         oldPdfVal = pdfDir.getText();
         oldPsVal = psDir.getText();
         oldProtectVal = protect.isSelected();
