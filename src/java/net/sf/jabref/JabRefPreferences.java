@@ -528,10 +528,12 @@ public class JabRefPreferences {
 
 	defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
 	try {
-	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "@" + InetAddress.getLocalHost().getHostName());
+	    defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "@" + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "-" + InetAddress.getLocalHost().getHostName()); // Valid setting name
 	}
 	catch(UnknownHostException ex) {
 	    Globals.logger("Hostname not found.");
+	    defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
 	    defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
 	}
     }
