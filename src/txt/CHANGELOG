@@ -1,4 +1,5 @@
 [2.10 branch]
+    - Reintroduced right-click on type label in entry editor to change entry type.
     - Fixed compatibility issue with OpenOffice plugin
     - Added Russian as language
     - Fix for bug 1160: Certain DOI references with "<" characters are not processed correctly (by Jonathan Powell)
