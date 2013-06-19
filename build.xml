@@ -35,7 +35,7 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.10b" />
+	<property name="jabref.version" value="2.10b2" />
 	<property name="jabref.version.full" value="2.10.0.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2013" />
 	<property name="jabref.placeholder.version" value="@version@" />
@@ -478,6 +478,7 @@ version=${jabref.version}</echo>
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
                     jvmversion="1.6+"
+		    vmoptions="-Xms128m -Xmx512m"
                     stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">
             <documenttype name="BibTeX file" extensions="bib" role="Editor"
