@@ -48,6 +48,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.util.CaseChangeMenu;
 import net.sf.jabref.util.NameListNormalizer;
+import net.sf.jabref.util.GoogleUrlCleaner;
 
 public class FieldTextMenu implements MouseListener
 {
@@ -65,6 +66,8 @@ public class FieldTextMenu implements MouseListener
     inputMenu.add( copyAct ) ;
     inputMenu.addSeparator();
     inputMenu.add(new ReplaceAction());
+    inputMenu.add(new UrlAction());
+
     if (myFieldName.getTextComponent() instanceof JTextComponent)
         inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
   }
@@ -219,5 +222,18 @@ public class FieldTextMenu implements MouseListener
     }
   }
 
+  class UrlAction extends BasicAction{
+    public UrlAction(){
+        super("Clean Google URL");
+        putValue(SHORT_DESCRIPTION, Globals.lang("If possible, clean URL that Google search returned"));
+    }
+    public void actionPerformed(ActionEvent evt){
+        if (myFieldName.getText().equals("")){
+            return;
+        }
+        String input = myFieldName.getText();
+        myFieldName.setText(GoogleUrlCleaner.cleanUrl(input));
+    }
+  }
 
 }
