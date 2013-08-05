@@ -23,8 +23,10 @@ Name "JabRef ${VERSION}"
 !define COMPANY "JabRef Team"
 !define URL "http://jabref.sourceforge.net"
 !define PRODUCT_EXE "JabRef.exe"
+!define PRODUCT_NAME "JabRef"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 !define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
+
 
 
 # Variables
@@ -98,7 +100,7 @@ Var InstDestination
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM"
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "$(^Name)"
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "${PRODUCT_NAME}"
 !insertmacro MUI_PAGE_STARTMENU ${PRODUCT_NAME} $StartmenuFolder
 
 ; Watch the components being installed.
