@@ -827,7 +827,7 @@ public class LabelPatternUtil {
             words++;
         }
 
-        return _sbvalue.toString();
+        return keepLettersAndDigitsOnly(_sbvalue.toString());
     }
 
     static String keepLettersAndDigitsOnly(String in) {
