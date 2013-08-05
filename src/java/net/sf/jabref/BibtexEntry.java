@@ -366,6 +366,16 @@ public class BibtexEntry
         return true;
     }
 
+    protected boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
+        for (int i = 0; i < fields.length; i++) {
+            String value = BibtexDatabase.getResolvedField(fields[i], this, database);
+            if ((value != null) && value.length()>0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void firePropertyChangedEvent(String fieldName, Object oldValue,
         Object newValue) throws PropertyVetoException
     {

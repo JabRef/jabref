@@ -1,4 +1,5 @@
 [2.10 branch]
+    - Fixed completeness indicator in main table for entries with crossrefs and either/or required fields.
     - Fixed [shorttitle] and [veryshorttitle] key generator markers, so they remove punctuation as described
       in the documentation.
     - Patched Windows install script to avoid wrong placement of Start menu items.
