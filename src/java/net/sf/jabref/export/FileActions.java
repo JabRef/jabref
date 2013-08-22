@@ -285,7 +285,7 @@ public class FileActions
 	}
 
     private enum SaveOrder {
-    	Standard, Original, Title, TableSort
+    	Specified, TableSort
     }
     
     private static class SaveSettings {
@@ -301,10 +301,8 @@ public class FileActions
         	 */
         	SaveOrder saveOrder;
         	String prefix = isSaveOperation ? "save" :  "export";
-        	if (Globals.prefs.getBoolean(prefix + "InStandardOrder")) {
-        		saveOrder = SaveOrder.Standard;
-        	} else if (Globals.prefs.getBoolean(prefix + "InTitleOrder")) {
-        		saveOrder = SaveOrder.Title;
+        	if (Globals.prefs.getBoolean(prefix + "InSpecifiedOrder")) {
+        		saveOrder = SaveOrder.Specified;
 //        	} else if (Globals.prefs.getBoolean(prefix + "InOriginalOrder")) {
         		// this case is never hit as SaveSettings() is never called if InOriginalOrder is true
 //        		saveOrder = SaveOrder.Original;
@@ -323,24 +321,15 @@ public class FileActions
                 secD = Globals.prefs.getBoolean("secDescending");
                 terD = Globals.prefs.getBoolean("terDescending");
                 break;
-        	case Title:
-        		// The setting is to not save in standard order, but in title order: title, author, editor
-        		pri = "title";
-                sec = "author";
-                ter = "editor";
-                priD = false;
-                secD = false;
-                terD = false;
-                break;
-        	case Standard:
-        	default: // required to get rid of Java compile errors
-                pri = "author";
-                sec = "editor";
-                ter = "year";
-                priD = false;
-                secD = false;
-                terD = true;
-        		break;
+                case Specified:
+                default:
+                // The setting is to save according to the specified order.
+                pri = Globals.prefs.get(prefix + "PriSort");
+                sec = Globals.prefs.get(prefix + "SecSort");
+                ter = Globals.prefs.get(prefix + "TerSort");
+                priD = Globals.prefs.getBoolean(prefix + "PriDescending");
+                secD = Globals.prefs.getBoolean(prefix + "SecDescending");
+                terD = Globals.prefs.getBoolean(prefix + "TerDescending");
         	}
         }
     }
