@@ -2,8 +2,15 @@
     - Find unlinked files tool doesn't always use PDF content importer any more,
       but the dialog opened when a file is dropped into JabRef
 [2.10 branch]
+    - Fixed completeness indicator in main table for entries with crossrefs and either/or required fields.
+    - Fixed [shorttitle] and [veryshorttitle] key generator markers, so they remove punctuation as described
+      in the documentation.
+    - Patched Windows install script to avoid wrong placement of Start menu items.
+    - Reintroduced right-click on type label in entry editor to change entry type.
     - Fixed compatibility issue with OpenOffice plugin
     - Added Russian as language
+    - Fix for bug 1160: Certain DOI references with "<" characters are not processed correctly (by Jonathan Powell)
+    - Fix for bug 1153: Bug in user-specific file paths stored in @comment (by  Thomas Arildsen)
 2.10 beta
     - Applied fix for JStor fetcher (patch 202 by Nicolas Brouard)
     - Added Settings menu item "Clear connection settings" in OpenOffice/LibreOffice panel.

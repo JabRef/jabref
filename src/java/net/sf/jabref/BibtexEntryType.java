@@ -192,10 +192,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     {
                         "title", "publisher", "year", "bibtexkey"
                     }, database) &&
-		    (((entry.getField("author") != null) ||
-		      (entry.getField("editor") != null)) &&
-		     ((entry.getField("chapter") != null) ||
-		      (entry.getField("pages") != null)));
+                        entry.atLeastOnePresent(new String[] {"author", "editor"}, database) &&
+                        entry.atLeastOnePresent(new String[] {"chapter", "pages"}, database);
             }
         };
 
@@ -243,8 +241,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     {
                         "title", "publisher", "year", "bibtexkey"
                     }, database) &&
-                ((entry.getField("author") != null) ||
-                (entry.getField("editor") != null));
+                        entry.atLeastOnePresent(new String[] {"author", "editor"}, database);
+
             }
         };
 
@@ -675,8 +673,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     {
                         "number", "bibtexkey"
                     }, database) &&
-                ((entry.getField("year") != null) ||
-                (entry.getField("yearfiled") != null));
+                        entry.atLeastOnePresent(new String[] {"year", "yearfiled"}, database);
+
             }
         };
 
@@ -720,8 +718,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     {
                         "title", "bibtexkey"
                     }, database) &&
-                ((entry.getField("organization") != null) ||
-                (entry.getField("institution") != null));
+                        entry.atLeastOnePresent(new String[] {"organization", "institution"}, database);
+
             }
         };
 

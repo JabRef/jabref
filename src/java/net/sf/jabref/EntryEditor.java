@@ -1024,6 +1024,29 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 setForeground(GUIGlobals.entryEditorLabelColor);
                 setHorizontalAlignment(RIGHT);
                 setFont(GUIGlobals.typeNameFont);
+
+                // Add a mouse listener so the user can right-click the type label to change the entry type:
+                addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
+                            handleTypeChange();
+                        }
+                    }
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
+                            handleTypeChange();
+                        }
+                    }
+
+                    private void handleTypeChange() {
+                        JPopupMenu typeMenu = new JPopupMenu();
+                        for (String s: BibtexEntryType.ALL_TYPES.keySet())
+                            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                        typeMenu.show(ths, 0, 0);
+                    }
+                });
             }
 
             public void paintComponent(Graphics g) {
