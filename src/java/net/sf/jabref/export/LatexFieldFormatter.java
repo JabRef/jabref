@@ -42,6 +42,13 @@ public class LatexFieldFormatter implements FieldFormatter {
             text = Util.putBracesAroundCapitals(text);
         }
 
+        // normalize newlines
+        if (!text.contains(Globals.NEWLINE) && text.contains("\n")) {
+            // if we don't have real new lines, but pseudo newlines, we replace them
+            // On Win 8.1, this is always true for multiline fields
+            text = text.replaceAll("\n", Globals.NEWLINE);
+        }
+
         // If the field is non-standard, we will just append braces,
         // wrap and write.
         boolean resolveStrings = true;
@@ -83,6 +90,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             //if (Globals.prefs.getBoolean("preserveFieldFormatting"))
             //  sb.append(text);
             //else
+            // currently, we do not do any more wrapping
             //if (!Globals.prefs.isNonWrappableField(fieldName))
             //    sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
             //else
@@ -116,7 +124,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             }
 
             if (pos1 == -1) {
-                pos1 = text.length(); // No more occurences found.
+                pos1 = text.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
                 pos2 = text.indexOf('#', pos1 + 1);
@@ -136,7 +144,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 writeText(text, pivot, pos1);
             if ((pos1 < text.length()) && (pos2 - 1 > pos1))
                 // We check that the string label is not empty. That means
-                // an occurence of ## will simply be ignored. Should it instead
+                // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
                 writeStringLabel(text, pos1 + 1, pos2, (pos1 == pivot),
                         (pos2 + 1 == text.length()));
@@ -146,9 +154,12 @@ public class LatexFieldFormatter implements FieldFormatter {
             //if (tell++ > 10) System.exit(0);
         }
 
-        //if (!Globals.prefs.isNonWrappableField(fieldName))
-        //    return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);
-        //else
+        // currently, we do not add newlines and new formatting
+        //if (!Globals.prefs.isNonWrappableField(fieldName)) {
+            // introduce a line break to be read at the parser
+            // the old code called Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH), but that lead to ugly .tex
+            // alternative: return sb.toString().replaceAll(Globals.NEWLINE, Globals.NEWLINE + Globals.NEWLINE);
+        //} else
             return sb.toString();
 
 

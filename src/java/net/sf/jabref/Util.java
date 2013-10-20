@@ -288,6 +288,10 @@ public class Util {
 		s = s.substring(beg, end);
 		return s;
 	}
+	
+	public static String rtrim(String s) {
+	    return s.replaceAll("\\s+$","");
+	}
 
 	/**
 	 * This method returns a String similar to the one passed in, except that it
