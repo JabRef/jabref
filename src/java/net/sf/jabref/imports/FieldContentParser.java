@@ -17,6 +17,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Util;
 
 
 /**
@@ -59,7 +60,7 @@ public class FieldContentParser {
                 if ((content.length()>i+1) && (content.charAt(i+1)=='\t')
                     && ((content.length()==i+2) || !Character.isWhitespace(content.charAt(i+2)))) {
                     // We have either \n\t followed by non-whitespace, or \n\t at the
-                    // end. Bothe cases indicate a wrap made by JabRef. Remove and insert space if necessary.
+                    // end. Both cases indicate a wrap made by JabRef. Remove and insert space if necessary.
 
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
@@ -107,16 +108,25 @@ public class FieldContentParser {
                     }
                 }
                 else if ((content.length()>i+1) && (content.charAt(i+1)!='\n')) {
-                    // We have a line break not followed by another line break. This is probably a normal
-                    // line break made by whatever other editor, so we will remove the line break.
-                    content.deleteCharAt(i);
-                    // If the line break is not accompanied by other whitespace we must add a space:
-                    if (!Character.isWhitespace(content.charAt(i)) &&  // No whitespace after?
-                            (i>0) && !Character.isWhitespace(content.charAt(i-1))) // No whitespace before?
-                        content.insert(i, ' ');
+                    // We have a line break not followed by another line break.
+                    // Interpretation before JabRef 2.10:
+                    //   line break made by whatever other editor, so we will remove the line break.
+                    // Current interpretation:
+                    //   keep line break
+                    i++;
                 }
-
-                //else if ((content.length()>i+1) && (content.charAt(i+1)=='\n'))
+                else if ((content.length()>i+1) && (content.charAt(i+1)=='\n')) {
+                    // we have a line break followed by another line break.
+                    // This is a linebreak was manually input by the user
+                    // Handling before JabRef 2.10:
+                    //   just delete the additional linebreak
+                    //   content.deleteCharAt(i+1);
+                    // Current interpretation:
+                    //   keep line break
+                    i++;
+                    // do not handle \n again
+                    i++;
+                }
                 else
                     i++;
                 //content.deleteCharAt(i);
@@ -143,7 +153,11 @@ public class FieldContentParser {
                 i++;
 
         }
-        
+
+        // normalize to linebreaks of the operating system
+        // not necessary as linebreaks are normalized during writing (at LatexFieldFormatter)
+        //content = new StringBuffer(content.toString().replaceAll("\n", Globals.NEWLINE));
+
         return content;
 	}
 
@@ -176,7 +190,10 @@ public class FieldContentParser {
                 res.append('\t');
                 res.append(Globals.NEWLINE);
                 res.append('\t');
-                addWrappedLine(res, lines[i], wrapAmount);
+                String line = lines[i];
+                // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+                line = Util.rtrim(line);
+                addWrappedLine(res, line, wrapAmount);
             } else {
                 res.append(Globals.NEWLINE);
                 res.append('\t');
