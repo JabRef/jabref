@@ -434,6 +434,19 @@ public class BibtexFields
   {
     return runtime.PUBLIC_FIELDS ;
   }
+  
+  /** returns an string-array with only private fieldnames */
+  public static String[] getAllPrivateFieldNames(){
+	  Vector<String> pFields = new Vector<String>() ;
+	  for (BibtexSingleField sField : runtime.fieldSet.values()){
+		  if (sField.isPrivate()) {
+			  pFields.add( sField.getFieldName() );
+		  }
+	  }
+	  return pFields.toArray(new String[pFields.size()]);
+
+ }
+
 
   /** returns the fieldname of the entry at index t */
   public static String getFieldName( int t )
