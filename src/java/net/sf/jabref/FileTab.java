@@ -39,8 +39,6 @@ public class FileTab extends JPanel implements PrefsTab {
             promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
     private JComboBox valueDelimiter;
     private JRadioButton
-        saveOriginalOrder, saveTableOrder, saveSpecifiedOrder,
-        exportOriginalOrder, exportTableOrder, exportSpecifiedOrder,
         resolveStringsStandard, resolveStringsAll;
     private JTextField bracesAroundCapitalsFields, nonWrappableFields,
             doNotResolveStringsFor;
@@ -56,12 +54,6 @@ public class FileTab extends JPanel implements PrefsTab {
                 GUIGlobals.getIconUrl("helpSmall"));
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
-        saveOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
-        exportOriginalOrder = new JRadioButton(Globals.lang("Export entries in their original order"));
-        saveTableOrder = new JRadioButton(Globals.lang("Save in current table sort order"));
-        exportTableOrder = new JRadioButton(Globals.lang("Export in current table sort order"));
-        saveSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
-        exportSpecifiedOrder = new JRadioButton(Globals.lang("Export entries ordered as specified"));
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
@@ -71,17 +63,9 @@ public class FileTab extends JPanel implements PrefsTab {
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
         sameColumn = new JCheckBox(Globals.lang("Start field contents in same column"));
         camelCase = new JCheckBox(Globals.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(saveOriginalOrder);
-        bg.add(saveTableOrder);
-        bg.add(saveSpecifiedOrder);
-        bg = new ButtonGroup();
-        bg.add(exportOriginalOrder);
-        bg.add(exportTableOrder);
-        bg.add(exportSpecifiedOrder);
         resolveStringsAll = new JRadioButton(Globals.lang("Resolve strings for all fields except")+":");
         resolveStringsStandard = new JRadioButton(Globals.lang("Resolve strings for standard BibTeX fields only"));
-        bg = new ButtonGroup();
+        ButtonGroup bg = new ButtonGroup();
         bg.add(resolveStringsAll);
         bg.add(resolveStringsStandard);
 
@@ -140,16 +124,6 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(promptBeforeUsingAutoSave);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Sort order"));
-        builder.append(saveSpecifiedOrder, 1);
-        builder.append(exportSpecifiedOrder, 1);
-        builder.nextLine();
-        builder.append(saveTableOrder, 1);
-        builder.append(exportTableOrder, 1);
-        builder.nextLine();
-        builder.append(saveOriginalOrder, 1);
-        builder.append(exportOriginalOrder, 1);
-        builder.nextLine();
         builder.appendSeparator(Globals.lang("Field saving options"));
         builder.nextLine();
         builder.append(camelCase);
@@ -178,20 +152,6 @@ public class FileTab extends JPanel implements PrefsTab {
         openLast.setSelected(_prefs.getBoolean("openLastEdited"));
         backup.setSelected(_prefs.getBoolean("backup"));
         
-        if (_prefs.getBoolean("saveInOriginalOrder"))
-            saveOriginalOrder.setSelected(true);
-        else if (_prefs.getBoolean("saveInSpecifiedOrder"))
-            saveSpecifiedOrder.setSelected(true);
-        else
-            saveTableOrder.setSelected(true);
-        
-        if (_prefs.getBoolean("exportInOriginalOrder"))
-            exportOriginalOrder.setSelected(true);
-        else if (_prefs.getBoolean("exportInSpecifiedOrder"))
-            exportSpecifiedOrder.setSelected(true);
-        else
-            exportTableOrder.setSelected(true);
-
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
         resolveStringsAll.setSelected(_prefs.getBoolean("resolveStringsAllFields"));
@@ -213,10 +173,6 @@ public class FileTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         _prefs.putBoolean("backup", backup.isSelected());
         _prefs.putBoolean("openLastEdited", openLast.isSelected());
-        _prefs.putBoolean("saveInOriginalOrder", saveOriginalOrder.isSelected());
-        _prefs.putBoolean("saveInSpecifiedOrder", saveSpecifiedOrder.isSelected());
-        _prefs.putBoolean("exportInOriginalOrder", exportOriginalOrder.isSelected());
-        _prefs.putBoolean("exportInSpecifiedOrder", exportSpecifiedOrder.isSelected());
         _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
         _prefs.putBoolean("resolveStringsAllFields", resolveStringsAll.isSelected());
         _prefs.put("doNotResolveStringsFor", doNotResolveStringsFor.getText().trim());
