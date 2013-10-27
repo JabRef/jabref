@@ -3,6 +3,7 @@
     - Fixed completeness indicator in main table for entries with crossrefs and either/or required fields.
     - Fixed [shorttitle] and [veryshorttitle] key generator markers, so they remove punctuation as described
       in the documentation.
+2.10 beta 2
     - Patched Windows install script to avoid wrong placement of Start menu items.
     - Reintroduced right-click on type label in entry editor to change entry type.
     - Fixed compatibility issue with OpenOffice plugin
