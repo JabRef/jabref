@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
 
 /**
  * 
@@ -109,7 +108,7 @@ public class SQLUtil {
 		if (array != null) {
 			for (int i = 0; i < array.length; i++) {
 				if (!list.contains(array[i]))
-					if (array[i] != "#")
+					if (!array[i].equals("#"))
 					list.add(array[i]);
 			}
 		}
