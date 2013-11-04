@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
 
 /**
  * 
@@ -62,6 +61,7 @@ public class SQLUtil {
 			allFields.clear();
 		}
 		uniqueInsert(allFields, BibtexFields.getAllFieldNames());
+		uniqueInsert(allFields, BibtexFields.getAllPrivateFieldNames());
 	}
 
 	/**
@@ -108,12 +108,12 @@ public class SQLUtil {
 		if (array != null) {
 			for (int i = 0; i < array.length; i++) {
 				if (!list.contains(array[i]))
+					if (!array[i].equals("#"))
 					list.add(array[i]);
 			}
 		}
 		return list;
 	}
-
 	/**
 	 * Generates DML specifying table columns and their datatypes. The output of
 	 * this routine should be used within a CREATE TABLE statement.
