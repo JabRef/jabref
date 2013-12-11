@@ -83,14 +83,40 @@ public class JabRefPreferences {
         WRITEFIELD_ADDSPACES = "writeFieldAddSpaces",
         WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase",
 
-        UPDATE_TIMESTAMP = "updateTimestamp";
+        UPDATE_TIMESTAMP = "updateTimestamp",
 
+        PRIMARY_SORT_FIELD = "priSort",
+        PRIMARY_SORT_DESCENDING = "priDescending",
+        SECONDARY_SORT_FIELD = "secSort",
+        SECONDARY_SORT_DESCENDING = "secDescending",
+        TERTIARY_SORT_FIELD = "terSort",
+        TERTIARY_SORT_DESCENDING = "terDescending",
+        SAVE_IN_ORIGINAL_ORDER  = "saveInOriginalOrder",
+        SAVE_IN_SPECIFIED_ORDER = "saveInSpecifiedOrder",
+        SAVE_PRIMARY_SORT_FIELD = "savePriSort",
+        SAVE_PRIMARY_SORT_DESCENDING = "savePriDescending",
+        SAVE_SECONDARY_SORT_FIELD = "saveSecSort",
+        SAVE_SECONDARY_SORT_DESCENDING = "saveSecDescending",
+        SAVE_TERTIARY_SORT_FIELD = "saveTerSort",
+        SAVE_TERTIARY_SORT_DESCENDING = "saveTerDescending",
+        EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder",
+        EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder",
+        EXPORT_PRIMARY_SORT_FIELD = "exportPriSort",
+        EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending",
+        EXPORT_SECONDARY_SORT_FIELD = "exportSecSort",
+        EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending",
+        EXPORT_TERTIARY_SORT_FIELD = "exportTerSort",
+        EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
+
+    
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
     private static final char[][] VALUE_DELIMITERS =
             new char[][]{ {'"', '"'}, {'{', '}'} };
+    
+    
 
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
@@ -111,7 +137,6 @@ public class JabRefPreferences {
 
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList = null;
-
     // Map containing all registered external file types:
     private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
@@ -215,12 +240,31 @@ public class JabRefPreferences {
         defaults.put("namesLastOnly", Boolean.TRUE); // "Show last names only"
         defaults.put("language", "en");
         defaults.put("showShort", Boolean.TRUE);
-        defaults.put("priSort", "author");
-        defaults.put("priDescending", Boolean.FALSE);
-        defaults.put("secSort", "year");
-        defaults.put("secDescending", Boolean.TRUE);
-        defaults.put("terSort", "author");
-        defaults.put("terDescending", Boolean.FALSE);
+        
+        // Sorting preferences
+        defaults.put(PRIMARY_SORT_FIELD, "author");
+        defaults.put(PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SECONDARY_SORT_FIELD, "year");
+        defaults.put(SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(TERTIARY_SORT_FIELD, "author");
+        defaults.put(TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(SAVE_PRIMARY_SORT_FIELD , "bibtexkey");
+        defaults.put(SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
+        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(SAVE_TERTIARY_SORT_FIELD, "");
+        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_PRIMARY_SORT_FIELD , "bibtexkey");
+        defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(EXPORT_SECONDARY_SORT_FIELD, "author");
+        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
+        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths","75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY, 
@@ -252,22 +296,7 @@ public class JabRefPreferences {
         defaults.put("searchAll", Boolean.FALSE);
         defaults.put("incrementS", Boolean.FALSE);
         defaults.put("searchAutoComplete", Boolean.TRUE);
-        defaults.put("saveInOriginalOrder", Boolean.FALSE);
-        defaults.put("saveInSpecifiedOrder", Boolean.FALSE);
-        defaults.put("savePriSort", "bibtexkey");
-        defaults.put("savePriDescending", Boolean.FALSE);
-        defaults.put("saveSecSort", "author");
-        defaults.put("saveSecDescending", Boolean.TRUE);
-        defaults.put("saveTerSort", "");
-        defaults.put("saveTerDescending", Boolean.FALSE);
-        defaults.put("exportInOriginalOrder", Boolean.FALSE);
-        defaults.put("exportInSpecifiedOrder", Boolean.FALSE);
-        defaults.put("exportPriSort", "bibtexkey");
-        defaults.put("exportPriDescending", Boolean.FALSE);
-        defaults.put("exportSecSort", "author");
-        defaults.put("exportSecDescending", Boolean.TRUE);
-        defaults.put("exportTerSort", "");
-        defaults.put("exportTerDescending", Boolean.FALSE);
+
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("highLightWords", Boolean.TRUE);
@@ -293,7 +322,7 @@ public class JabRefPreferences {
         defaults.put("groupExpandTree", Boolean.TRUE);
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
+        defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put("autoAssignGroup", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
