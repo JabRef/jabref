@@ -42,7 +42,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     final static String SEARCH_URL = URL_START+"/scholar?q="+QUERY_MARKER
             +"&amp;hl=en&amp;btnG=Search";
 
-    final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\">[A-Za-z ]*BibTeX");
+    final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
     final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
     final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
