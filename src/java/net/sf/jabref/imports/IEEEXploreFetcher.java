@@ -103,6 +103,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
     
+    Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
     // Common words in IEEE Xplore that should always be 
     
     public IEEEXploreFetcher() {
@@ -111,7 +112,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         
     	fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         //fieldPatterns.put("author", "</h3>\\s*(.+)");
-        fieldPatterns.put("author", "(?s)</h3>\\s*(.+)</br>");
+        //fieldPatterns.put("author", "(?s)</h3>\\s*(.+)</br>");
+       // fieldPatterns.put("author", "<span id=\"preferredName\" class=\"(.+)\">");
         fieldPatterns.put("volume", "Volume:\\s*([A-Za-z-]*\\d+)");
         fieldPatterns.put("number", "Issue:\\s*(\\d+)");
         //fieldPatterns.put("part", "Part (\\d+),&nbsp;(.+)");
@@ -390,7 +392,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
         
     	// clean up author
-    	String author = (String)entry.getField("author");
+ /*   	String author = (String)entry.getField("author");
     	if (author != null) {
 	    if (author.indexOf("a href=") >= 0) {  // Author parsing failed because it was empty
 		entry.setField("author","");  // Maybe not needed anymore due to another change
@@ -406,7 +408,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	    	author = author.replaceAll("[ ,;]+$", "");
 	    	entry.setField("author", author);
 	    }
-	}
+	}*/
     	// clean up month
     	String month = (String)entry.getField("month");
     	if ((month != null) && (month.length() > 0)) {
@@ -702,6 +704,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
             		}
             	} 
             }
+            
+            Matcher authorMatcher = authorPattern.matcher(text);
+            // System.out.println(text);
+            StringBuffer authorNames = new StringBuffer("");
+            int authorCount=0;
+            while(authorMatcher.find()) {
+                if(authorCount >= 1) {
+                    authorNames.append(" and ");
+                }
+                authorNames.append(htmlConverter.format(authorMatcher.group(1)));
+                //System.out.println(authorCount + ": " + authorMatcher.group(1));
+                authorCount++;
+            }
+            entry.setField("author",authorNames.toString());
             if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
                     entry.getField("author").startsWith("Topic(s)")) {  // Fix for some documents without authors
                 entry.setField("author","");

@@ -1,3 +1,6 @@
+[Changes since last beta release]
+    - Made IEEEXploreFetcher author parsing work again.
+    - Added a few more characters in the HTML/Unicode to LaTeX conversion.
 2.10 beta 3
     - Fix GoogleScholarFetcher (patch 207)
     - Line breaks in BibTeX fields (e.g., abstract and review) are now kept.

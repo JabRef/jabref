@@ -76,6 +76,7 @@ public class HTMLConverter implements LayoutFormatter {
         {"180", "acute", "\\{\\\\'\\{\\}\\}"}, // acute accent = spacing acute, 
         //                                 U+00B4 ISOdia 
         {"181", "micro", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
+        {"", "mu", "\\$\\\\mu\\$"}, // micro sign, U+00B5 ISOnum  
         {"182", "para", "\\{\\\\P\\}"}, // pilcrow sign = paragraph sign, 
         //                                 U+00B6 ISOnum 
         {"183", "middot", "\\$\\\\cdot\\$"}, // middle dot = Georgian comma 
@@ -418,13 +419,14 @@ public class HTMLConverter implements LayoutFormatter {
         //                                    U+22A5 ISOtech 
         {"8901", "sdot", "\\$\\\\cdot\\$"}, // dot operator, U+22C5 ISOamsb  
         /* dot operator is NOT the same character as U+00B7 middle dot */
-        /* Miscellaneous Technical */
         {"8968", "lceil", "\\$\\\\lceil\\$"}, // left ceiling = apl upstile, 
         //                                    U+2308 ISOamsc  
         {"8969", "rceil", "\\$\\\\rceil\\$"}, // right ceiling, U+2309 ISOamsc   
         {"8970", "lfloor", "\\$\\\\lfloor\\$"}, // left floor = apl downstile, 
         //                                    U+230A ISOamsc  
         {"8971", "rfloor", "\\$\\\\rfloor\\$"}, // right floor, U+230B ISOamsc   
+        
+        /* Miscellaneous Technical */
         {"9001", "lang", "\\$\\\\langle\\$"}, // left-pointing angle bracket = bra, 
         //                                    U+2329 ISOtech 
         /*    lang is NOT the same character as U+003C 'less than' 
@@ -557,6 +559,8 @@ public class HTMLConverter implements LayoutFormatter {
         {"", "imath", "\\{\\\\i\\}"},    // Small i without the dot
         {"321", "Lstrok", "\\{\\\\L\\}"},    // upper case l with stroke
         {"322", "lstrok", "\\{\\\\l\\}"},    // lower case l with stroke
+        {"348", "Scirc", "\\{\\\\\\^\\{S\\}\\}"},    // upper case S with circumflex
+        {"349", "scirc", "\\{\\\\\\^\\{s\\}\\}"},    // lower case s with circumflex
         {"370", "Uogon", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
         {"371", "uogon", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
         {"381", "Zcaron", "\\{\\\\v\\{Z\\}\\}"}, // capital Z with caron
@@ -590,12 +594,15 @@ public class HTMLConverter implements LayoutFormatter {
         {"8198", "", "\\\\hspace\\{0.167em\\}"}, // Six-Per-Em Space
         {"8208", "hyphen", "-"},    // Hyphen
         {"8229", "nldr", "\\.\\."},    // Double dots - en leader
+        {"8450", "complexes", "\\$\\\\mathbb\\{C\\}\\$"}, // double struck capital C -- requires e.g. amsfonts
         {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
         {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
         {"8460", "Hfr", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
         {"8466", "Lscr", "\\$\\\\mathcal\\{L\\}\\$"}, // script capital L -- possibly use \mathscr
         {"8467", "ell", "\\{\\\\ell\\}"}, // script small l 
         {"8469", "naturals", "\\$\\\\mathbb\\{N\\}\\$"}, // double struck capital N -- requires e.g. amsfonts
+        {"8474", "Qopf", "\\$\\\\mathbb\\{Q\\}\\$"}, // double struck capital Q -- requires e.g. amsfonts
+        {"8477", "reals", "\\$\\\\mathbb\\{R\\}\\$"}, // double struck capital R -- requires e.g. amsfonts
         {"8486", "", "\\$\\{\\\\Omega\\}\\$"}, // Omega
         {"8491", "angst", "\\{\\\\AA\\}"}, // Angstrom 
         {"8496", "Escr", "\\$\\\\mathcal\\{E\\}\\$"}, // script capital E 
@@ -631,6 +638,11 @@ public class HTMLConverter implements LayoutFormatter {
         {"8883", "vrtri", "\\$\\\\triangleright\\$"}, // Right triangle
         {"8896", "xwedge", "\\$\\\\bigwedge\\$"}, // Big wedge
         {"8897", "xvee", "\\$\\\\bigvee\\$"}, // Big vee
+        {"8942", "vdots", "\\$\\\\vdots\\$"}, // vertical ellipsis U+22EE
+        {"8943", "cdots", "\\$\\\\cdots\\$"}, // midline horizontal ellipsis U+22EF
+        /*{"8944", "", "\\$\\\\ddots\\$"}, // up right diagonal ellipsis U+22F0 */
+        {"8945", "ddots", "\\$\\\\ddots\\$"}, // down right diagonal ellipsis U+22F1
+
         {"9426", "circledc", "\\{\\\\copyright\\}"}, // circled small letter C
         {"9633", "square", "\\$\\\\square\\$"}, // White square
         {"9651", "xutri", "\\$\\\\bigtriangleup\\$"}, // White up-pointing big triangle 
