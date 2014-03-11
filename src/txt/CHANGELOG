@@ -1,6 +1,9 @@
-[Changes since last beta release]
+2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
+    - Find unlinked files tool doesn't always use PDF content importer any more,
+      but the dialog opened when a file is dropped into JabRef
+    - Uninstaller doesn't delete whole directory any more. Fixes bugs 1142, 1175, 1212.
 2.10 beta 3
     - Fix GoogleScholarFetcher (patch 207)
     - Line breaks in BibTeX fields (e.g., abstract and review) are now kept.

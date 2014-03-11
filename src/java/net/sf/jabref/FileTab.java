@@ -71,8 +71,8 @@ public class FileTab extends JPanel implements PrefsTab {
                 Globals.lang("Quotes") + ": \", \"",
                 Globals.lang("Curly Brackets") + ": {, }" });
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
-        camelCase = new JCheckBox(Globals.lang("Start field contents in same column"));
-        sameColumn = new JCheckBox(Globals.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
+        sameColumn = new JCheckBox(Globals.lang("Start field contents in same column"));
+        camelCase = new JCheckBox(Globals.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAuthorOrder);
         bg.add(saveOriginalOrder);

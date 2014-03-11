@@ -41,11 +41,12 @@ public class ImportDialog extends JDialog {
     private JLabel labelMrDlib1;
     private JLabel labelMrDlib2;
     private int result;
-    private int dropRow;
     private String fileName;
+    // indicates whether the drop target is a row in the table or whether other kinds of imports are used
+    private Boolean targetIsARow;
     
-    public ImportDialog(int dropRow, String fileName) {
-        this.dropRow = dropRow;
+    public ImportDialog(boolean targetIsARow, String fileName) {
+        this.targetIsARow = targetIsARow;
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
@@ -110,9 +111,7 @@ public class ImportDialog extends JDialog {
         contentPane.add(b.getPanel(), BorderLayout.CENTER);
         contentPane.add(bb.getPanel(), BorderLayout.SOUTH);
 
-        //$$$setupUI$$$();
-        //this.setText();
-        if (this.dropRow < 0) {
+        if (!this.targetIsARow) {
             this.radioButtononlyAttachPDF.setEnabled(false);
             this.radioButtonUpdateEmptyFields.setEnabled(false);
             this.labelMrDlib2.setEnabled(false);
