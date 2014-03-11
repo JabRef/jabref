@@ -209,8 +209,11 @@ SectionEnd
 Section "un.JabRef" un.SecUnProgramFiles
 
   SectionIn RO
-  ; delete installation folder
-  RMDir /r $INSTDIR	
+  ; delete executables
+  Delete $INSTDIR\${PRODUCT_EXE}
+  Delete $INSTDIR\uninstall.exe
+  ; delete dir only if empty
+  RMDir $INSTDIR
   ; delete start menu entry
   ReadRegStr $0 SHCTX "${PRODUCT_UNINST_KEY}" "StartMenu"
   RMDir /r "$0"
