@@ -1,3 +1,9 @@
+bin
+build.number
+build/
+nbproject/private/
+src/resource/build.properties
+src/windows/nsis/dist/
 .gradle
 jabref-launch4j.tmp
 user.properties
