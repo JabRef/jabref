@@ -1,7 +1,8 @@
 [master branch]
     - Find unlinked files tool doesn't always use PDF content importer any more,
       but the dialog opened when a file is dropped into JabRef
-[2.10 branch]
+2.10 beta 3
+    - Fix GoogleScholarFetcher (patch 207)
     - Line breaks in BibTeX fields (e.g., abstract and review) are now kept.
     - Fixed completeness indicator in main table for entries with crossrefs and either/or required fields.
     - Fixed [shorttitle] and [veryshorttitle] key generator markers, so they remove punctuation as described
