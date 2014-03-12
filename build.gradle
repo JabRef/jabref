@@ -68,6 +68,8 @@ task generate(type: JavaExec) {
     classpath = configurations.generateClasspath
 }
 
+mainClassName = "net.sf.jabref.JabRefMain"
+
 task wrapper(type: Wrapper) {
     gradleVersion = '1.11'
 }
