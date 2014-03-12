@@ -214,9 +214,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		autoResizeMode
 			.setSelected((_prefs.getInt("autoResizeMode") == JTable.AUTO_RESIZE_ALL_COLUMNS));
 
-		priField.setText(_prefs.get("priSort"));
-		secField.setText(_prefs.get("secSort"));
-		terField.setText(_prefs.get("terSort"));
+		priField.setText(_prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
+		secField.setText(_prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
+		terField.setText(_prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD));
 		priSort.setSelectedIndex(0);
 		secSort.setSelectedIndex(0);
 		terSort.setSelectedIndex(0);
@@ -235,9 +235,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			lastNamesOnly.setSelected(true);
 		else
 			noAbbrNames.setSelected(true);
-		priDesc.setSelected(_prefs.getBoolean("priDescending"));
-		secDesc.setSelected(_prefs.getBoolean("secDescending"));
-		terDesc.setSelected(_prefs.getBoolean("terDescending"));
+		priDesc.setSelected(_prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
+		secDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
+		terDesc.setSelected(_prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
 
 		floatMarked.setSelected(_prefs.getBoolean("floatMarkedEntries"));
 
@@ -268,16 +268,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 		_prefs.putInt("autoResizeMode",
 			autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
-		_prefs.putBoolean("priDescending", priDesc.isSelected());
-		_prefs.putBoolean("secDescending", secDesc.isSelected());
-		_prefs.putBoolean("terDescending", terDesc.isSelected());
-		// _prefs.put("secSort",
+		_prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, priDesc.isSelected());
+		_prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, secDesc.isSelected());
+		_prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, terDesc.isSelected());
+		// _prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD,
 		// GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
-		// _prefs.put("terSort",
+		// _prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD,
 		// GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
-		_prefs.put("priSort", priField.getText().toLowerCase().trim());
-		_prefs.put("secSort", secField.getText().toLowerCase().trim());
-		_prefs.put("terSort", terField.getText().toLowerCase().trim());
+		_prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, priField.getText().toLowerCase().trim());
+		_prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
+		_prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
 
 		_prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
 		// updatefont
