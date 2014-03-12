@@ -1,0 +1,61 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "application"
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/java"
+        }
+        resources {
+            srcDirs = ["src"]
+        }
+    }
+}
+
+dependencies {
+
+    // jgoodies
+    compile 'com.jgoodies:jgoodies-common:1.4.0'
+    compile 'com.jgoodies:jgoodies-forms:1.6.0'
+    compile 'com.jgoodies:jgoodies-looks:2.5.2'
+
+    compile 'org.apache.pdfbox:pdfbox:1.7.1'
+    compile 'org.apache.pdfbox:fontbox:1.7.1'
+    compile 'org.apache.pdfbox:jempbox:1.7.1'
+
+
+    compile 'org.openoffice:juh:3.2.1'
+    compile 'org.openoffice:jurt:3.2.1'
+    compile 'org.openoffice:ridl:3.2.1'
+    compile 'org.openoffice:unoil:3.2.1'
+
+    compile 'org.antlr:antlr:3.4'
+
+    compile 'mysql:mysql-connector-java:5.0.7'
+    compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
+
+    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'jayatana-1.2.4.jar', 'microba.jar', 'spin.jar'])
+
+    // not available in maven repository
+    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'commons-logging.jar', 'JPFCodeGenerator-rt.jar'])
+
+    compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
+    compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
+
+    compile 'junit:junit:3.8.2'
+}
+
+// use ant targets with prefix antTargets.XXXXX
+ant.importBuild "build-wrapper.xml"
+
+compileJava.dependsOn "antTargets.generate"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}

@@ -13,8 +13,14 @@ public class SimpleCsvImporter extends ImportFormat {
   public boolean isRecognizedFormat(InputStream stream) throws IOException {
     return true; // this is discouraged except for demonstration purposes
   }
-  
-  public List importEntries(InputStream stream) throws IOException {    
+
+    @Override
+    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+        // MUST BE IMPLEMENTED
+        return null;
+    }
+
+    public List importEntries(InputStream stream) throws IOException {
     ArrayList bibitems = new ArrayList();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
       
