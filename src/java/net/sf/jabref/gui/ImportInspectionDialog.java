@@ -1352,11 +1352,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         /*
          * // Default sort order: String[] sortFields = new String[]
-         * {Globals.prefs.get("priSort"), Globals.prefs.get("secSort"),
-         * Globals.prefs.get("terSort")}; boolean[] sortDirections = new
-         * boolean[] {Globals.prefs.getBoolean("priDescending"),
-         * Globals.prefs.getBoolean("secDescending"),
-         * Globals.prefs.getBoolean("terDescending")}; // descending
+         * {Globals.prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD), Globals.prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD),
+         * Globals.prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD)}; boolean[] sortDirections = new
+         * boolean[] {Globals.prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING),
+         * Globals.prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING),
+         * Globals.prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING)}; // descending
          */
         sortedList.getReadWriteLock().writeLock().lock();
         comparatorChooser.appendComparator(PAD, 0, false);
