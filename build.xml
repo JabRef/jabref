@@ -606,22 +606,6 @@ version=${jabref.version}</echo>
 	   Auxiliary targets
 	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-	<target name="profile" depends="jars" description="Profile JabRef">
-		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-
-		<nbprofiledirect>
-			<classpath refid="classpath" />
-		</nbprofiledirect>
-
-		<property environment="env" />
-		<java fork="true" classname="net.sf.jabref.JabRef" dir="${build.dir}" jvm="${profiler.info.jvm}">
-			<jvmarg value="${profiler.info.jvmargs.agent}" />
-			<jvmarg line="${profiler.info.jvmargs}" />
-			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
-			<classpath refid="classpath" />
-		</java>
-	</target>
-
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 	<target name="compresssrc">
