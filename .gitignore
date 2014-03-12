@@ -7,3 +7,7 @@ src/windows/nsis/dist/
 .gradle
 jabref-launch4j.tmp
 user.properties
+out/
+*.iws
+*.ipr
+*.iml
