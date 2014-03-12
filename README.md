@@ -34,7 +34,7 @@ Just fork JabRef and create a pull request.
 
 ## Introduction
 
-JabRef is a graphical Java application for editing bibtex (.bib)
+JabRef is a graphical Java application for editing bibtex (`.bib`)
 databases. JabRef lets you organize your entries into overlapping
 logical groups, and with a single click limit your view to a single
 group or an intersection or union of several groups. You can customize
@@ -62,11 +62,8 @@ box for details.
 
 ## Requirements
 
-JabRef runs on any system equipped with the Java Virtual Machine
-(1.5 or newer), which can be downloaded at no cost from
-http://java.sun.com. If you do not plan to compile JabRef, the Java
-Runtime Environment may be a better choice than the Java Development
-Kit.
+JabRef runs on any system equipped with the Java Virtual Machine (1.6 or newer), which can be downloaded at no cost from http://java.sun.com.
+If you do not plan to compile JabRef, the Java Runtime Environment may be a better choice than the Java Development Kit.
 
 
 ## Installing and running, Windows:
