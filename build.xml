@@ -622,29 +622,6 @@ version=${jabref.version}</echo>
 		</java>
 	</target>
 
-	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        What's about the software design ?!;-)
-    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-
-	<target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
-		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
-			<classpath>
-				<pathelement path="${classpath}" />
-				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-				<fileset dir="${buildlib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<jalopy fileformat="unix" convention="${src.dir}/java/jalopy.format.convention.xml" history="file" historymethod="adler32" loglevel="error" threads="2" classpathref="classpath" backup="bak">
-			<fileset dir="${src.dir}">
-				<include name="java/net/sf/jabref/**/*.java" />
-			</fileset>
-		</jalopy>
-	</target>
-
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
 	<target name="compresssrc">
