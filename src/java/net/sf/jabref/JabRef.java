@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
+
 import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
@@ -52,6 +53,8 @@ import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstaller;
 import net.sf.jabref.plugin.SidePanePlugin;
 import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
