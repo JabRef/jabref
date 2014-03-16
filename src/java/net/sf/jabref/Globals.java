@@ -18,6 +18,11 @@ package net.sf.jabref;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,27 +30,71 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Filter;
-import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
+import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.util.ErrorConsole;
 import net.sf.jabref.util.TBuildInfo;
-import net.sf.jabref.export.AutoSaveManager;
 
 
 public class Globals {
+	
+	/**
+	 * {@link Control} class allowing properties bundles to be in different encodings.
+	 * 
+	 * @see http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle
+	 */
+	private static class EncodingControl extends Control {
+		private final String encoding;
+
+		public EncodingControl(String encoding) {
+			this.encoding = encoding;
+		}
+		
+		public ResourceBundle newBundle(String baseName, Locale locale,
+				String format, ClassLoader loader, boolean reload)
+				throws IllegalAccessException, InstantiationException,
+				IOException {
+			// The below is a copy of the default implementation.
+			String bundleName = toBundleName(baseName, locale);
+			String resourceName = toResourceName(bundleName, "properties");
+			ResourceBundle bundle = null;
+			InputStream stream = null;
+			if (reload) {
+				URL url = loader.getResource(resourceName);
+				if (url != null) {
+					URLConnection connection = url.openConnection();
+					if (connection != null) {
+						connection.setUseCaches(false);
+						stream = connection.getInputStream();
+					}
+				}
+			} else {
+				stream = loader.getResourceAsStream(resourceName);
+			}
+			if (stream != null) {
+				try {
+					// Only this line is changed to make it to read properties files as UTF-8.
+					bundle = new PropertyResourceBundle(new InputStreamReader(stream, encoding));
+				} finally {
+					stream.close();
+				}
+			}
+			return bundle;
+		}
+	}
 
 	private static int SHORTCUT_MASK = -1;
     public static int
@@ -276,9 +325,9 @@ public class Globals {
 
 	public static void setLanguage(String language, String country) {
         locale = new Locale(language, country);
-		messages = ResourceBundle.getBundle(resourcePrefix, locale);
-		menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale);
-		intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale);
+		messages = ResourceBundle.getBundle(resourcePrefix, locale, new EncodingControl("UTF-8"));
+		menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale, new EncodingControl("UTF-8"));
+		intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale, new EncodingControl("UTF-8"));
         Locale.setDefault(locale);
 		javax.swing.JComponent.setDefaultLocale(locale);
 	}
