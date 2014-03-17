@@ -883,19 +883,20 @@ public class XMPUtilTest extends TestCase {
 
 		for (String field : expected.getAllFields()){
 		
-			if (field.toString().toLowerCase().equals("author")
-					|| field.toString().toLowerCase().equals("editor")) {
+			if (field.toLowerCase().equals("author")
+					|| field.toLowerCase().equals("editor")) {
 
 				AuthorList expectedAuthors = AuthorList.getAuthorList(expected
-						.getField(field.toString()).toString());
+                        .getField(field));
 				AuthorList actualAuthors = AuthorList.getAuthorList(actual
-						.getField(field.toString()).toString());
+                        .getField(field));
 				assertEquals(expectedAuthors, actualAuthors);
 			} else {
 				assertEquals(
-						"" + field.toString(),
-						expected.getField(field.toString()).toString(), actual
-								.getField(field.toString()).toString());
+						"" + field,
+                        expected.getField(field), actual
+                                .getField(field)
+                );
 			}
 		}
 
@@ -1490,7 +1491,7 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(
 				AuthorList
 						.getAuthorList("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-				AuthorList.getAuthorList(x.getField("author").toString()));
+				AuthorList.getAuthorList(x.getField("author")));
 	}
 
 	/**
@@ -1556,7 +1557,7 @@ public class XMPUtilTest extends TestCase {
 			BibtexEntry b = XMPUtil.readXMP(pdfFile).get(0);
 
 			assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField(
-					"author").toString()));
+                    "author")));
 
 			// Next check from Document Information
 			PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
@@ -1568,7 +1569,7 @@ public class XMPUtilTest extends TestCase {
 				b = XMPUtil.getBibtexEntryFromDocumentInformation(document
 						.getDocumentInformation());
 				assertEquals(originalAuthors, AuthorList.getAuthorList(b
-						.getField("author").toString()));
+                        .getField("author")));
 
 				// Now check from Dublin Core
 				PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1599,7 +1600,7 @@ public class XMPUtilTest extends TestCase {
 
 				b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema);
 				assertEquals(originalAuthors, AuthorList.getAuthorList(b
-						.getField("author").toString()));
+                        .getField("author")));
 			} finally {
 				document.close();
 			}

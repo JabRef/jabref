@@ -175,7 +175,7 @@ public class VersionHandling {
             int level;
             String s;
             for (int i = 0; i < data.size(); ++i) {
-                s = data.elementAt(i).toString();
+                s = data.elementAt(i);
                 
                 // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();

@@ -207,8 +207,8 @@ public class BibtexParserTest extends TestCase {
 		assertNotSame(e.getId(), e2.getId());
 
 		for (String field : e.getAllFields()){
-			if (!e.getField(field.toString()).equals(e2.getField(field.toString()))) {
-				fail("e and e2 differ in field " + field.toString());
+			if (!e.getField(field).equals(e2.getField(field))) {
+				fail("e and e2 differ in field " + field);
 			}
 		}
 	}

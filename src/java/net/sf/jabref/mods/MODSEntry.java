@@ -85,31 +85,31 @@ public class MODSEntry {
 		LayoutFormatter chars = new XMLChars();
 		if (bibtex.getField("title") != null) {
 			if(CHARFORMAT)
-				title = chars.format(bibtex.getField("title").toString());
+				title = chars.format(bibtex.getField("title"));
 			else
-				title = bibtex.getField("title").toString();
+				title = bibtex.getField("title");
 		}
 		
 		if (bibtex.getField("publisher") != null) {
 			if(CHARFORMAT)
-				publisher = chars.format(bibtex.getField("publisher").toString());
+				publisher = chars.format(bibtex.getField("publisher"));
 			else
-				publisher = bibtex.getField("publisher").toString();
+				publisher = bibtex.getField("publisher");
 		}
 			
 		if (bibtex.getField("bibtexkey") != null)
-			id = bibtex.getField("bibtexkey").toString();
+			id = bibtex.getField("bibtexkey");
 		if (bibtex.getField("place") != null) {
 			if(CHARFORMAT)
-				place = chars.format(bibtex.getField("place").toString());
+				place = chars.format(bibtex.getField("place"));
 			else
-				place = bibtex.getField("place").toString();
+				place = bibtex.getField("place");
 		}
 			
 		date = getDate(bibtex);	
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
-			authors = getAuthors(bibtex.getField("author").toString());
+			authors = getAuthors(bibtex.getField("author"));
 		if (bibtex.getType() == BibtexEntryType.ARTICLE || 
 			bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
 		{
@@ -165,9 +165,9 @@ public class MODSEntry {
 	protected String getDate(BibtexEntry bibtex) {
 		String result = "";
 		if (bibtex.getField("year") != null)
-			result += (bibtex.getField("year").toString());
+			result += (bibtex.getField("year"));
 		if (bibtex.getField("month") != null)
-			result += "-" + bibtex.getField("month").toString();
+			result += "-" + bibtex.getField("month");
 		
 		return result;
 	}

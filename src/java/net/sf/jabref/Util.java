@@ -1717,7 +1717,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		if (!dir.endsWith(System.getProperty("file.separator")))
 			dir = dir.concat(System.getProperty("file.separator"));
 
-		if (longName.toString().startsWith(dir)) {
+		if (longName.startsWith(dir)) {
 			// result is based on original name, not on lower-cased name
 			String newName = fileName.toString().substring(dir.length());
 			return new File(newName);

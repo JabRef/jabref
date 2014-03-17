@@ -831,11 +831,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             for (String field : entry.getAllFields()){
-                if (BibtexFields.isDisplayableField(field.toString())) {
-                    if (nu.getField(field.toString()) == null) {
-                        compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
-                            .getField(field.toString()), null));
-                        entry.clearField(field.toString());
+                if (BibtexFields.isDisplayableField(field)) {
+                    if (nu.getField(field) == null) {
+                        compound.addEdit(new UndoableFieldChange(entry, field, entry
+                            .getField(field), null));
+                        entry.clearField(field);
                         anyChanged = true;
                     }
                 }
@@ -843,15 +843,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // Then set all fields that have been set by the user.
             for (String field : nu.getAllFields()){
-                if (entry.getField(field.toString()) != nu.getField(field.toString())) {
-                    String toSet = nu.getField(field.toString());
+                if (entry.getField(field) != nu.getField(field)) {
+                    String toSet = nu.getField(field);
 
                     // Test if the field is legally set.
-                    (new LatexFieldFormatter()).format(toSet, field.toString());
+                    (new LatexFieldFormatter()).format(toSet, field);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
-                        .getField(field.toString()), toSet));
-                    entry.setField(field.toString(), toSet);
+                    compound.addEdit(new UndoableFieldChange(entry, field, entry
+                        .getField(field), toSet));
+                    entry.setField(field, toSet);
                     anyChanged = true;
                 }
             }
@@ -1238,7 +1238,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     set = entry.getField(fe.getFieldName()) != null;
                 } else {
                     set = !((entry.getField(fe.getFieldName()) != null)
-                            && toSet.equals(entry.getField(fe.getFieldName()).toString()));
+                            && toSet.equals(entry.getField(fe.getFieldName())));
                 }
 
                 if (set) {

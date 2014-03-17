@@ -126,7 +126,7 @@ public class CopacImporter extends ImportFormat {
 			BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
 				BibtexEntryType.BOOK);
 
-			String[] lines = it.next().toString().split("\n");
+			String[] lines = it.next().split("\n");
 
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i].trim();

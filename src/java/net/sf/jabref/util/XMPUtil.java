@@ -617,7 +617,7 @@ public class XMPUtil {
 			}
 
 			if (field.equals("editor")) {
-				String o = entry.getField(field.toString()).toString();
+				String o = entry.getField(field);
 
 				/**
 				 * Editor -> Contributor
@@ -634,7 +634,7 @@ public class XMPUtil {
 				 * Bibtex-Fields used: editor
 				 */
 
-				String authors = o.toString();
+				String authors = o;
 				AuthorList list = AuthorList.getAuthorList(authors);
 
 				int n = list.size();
@@ -668,8 +668,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: author
 			 */
 			if (field.equals("author")) {
-				String o = entry.getField(field.toString()).toString();
-				String authors = o.toString();
+				String o = entry.getField(field);
+				String authors = o;
 				AuthorList list = AuthorList.getAuthorList(authors);
 
 				int n = list.size();
@@ -721,8 +721,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: abstract
 			 */
 			if (field.equals("abstract")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setDescription(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setDescription(o);
 				continue;
 			}
 
@@ -740,8 +740,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("doi")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setIdentifier(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setIdentifier(o);
 				continue;
 			}
 
@@ -768,8 +768,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("publisher")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.addPublisher(o.toString());
+				String o = entry.getField(field);
+				dcSchema.addPublisher(o);
 				continue;
 			}
 
@@ -806,8 +806,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("keywords")) {
-				String o = entry.getField(field.toString()).toString();
-				String[] keywords = o.toString().split(",");
+				String o = entry.getField(field);
+				String[] keywords = o.split(",");
 				for (int i = 0; i < keywords.length; i++) {
 					dcSchema.addSubject(keywords[i].trim());
 				}
@@ -830,8 +830,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: title
 			 */
 			if (field.equals("title")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setTitle(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setTitle(o);
 				continue;
 			}
 
@@ -852,8 +852,8 @@ public class XMPUtil {
 			 * All others (including the bibtex key) get packaged in the
 			 * relation attribute
 			 */
-			String o = entry.getField(field.toString()).toString();
-			dcSchema.addRelation("bibtex/" + field.toString() + "/" + o);
+			String o = entry.getField(field);
+			dcSchema.addRelation("bibtex/" + field + "/" + o);
 		}
 
 		/**
@@ -997,16 +997,16 @@ public class XMPUtil {
 
 		for (String field : fields){
 			if (field.equals("author")) {
-				di.setAuthor(entry.getField("author").toString());
+				di.setAuthor(entry.getField("author"));
 			} else if (field.equals("title")) {
-				di.setTitle(entry.getField("title").toString());
+				di.setTitle(entry.getField("title"));
 			} else if (field.equals("keywords")) {
-				di.setKeywords(entry.getField("keywords").toString());
+				di.setKeywords(entry.getField("keywords"));
 			} else if (field.equals("abstract")) {
-				di.setSubject(entry.getField("abstract").toString());
+				di.setSubject(entry.getField("abstract"));
 			} else {
-				di.setCustomMetadataValue("bibtex/" + field.toString(),
-						entry.getField(field.toString()).toString());
+				di.setCustomMetadataValue("bibtex/" + field,
+                        entry.getField(field));
 			}
 		}
 		di

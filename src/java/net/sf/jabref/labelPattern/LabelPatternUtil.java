@@ -433,7 +433,7 @@ public class LabelPatternUtil {
             int _alSize = _al.size();
             boolean field = false;
             for (int i = 1; i < _alSize; i++) {
-                String val = _al.get(i).toString();
+                String val = _al.get(i);
                 if (val.equals("[")) {
                     field = true;
                 } else if (val.equals("]")) {
@@ -561,7 +561,7 @@ public class LabelPatternUtil {
                     // Abbreviate - that is,
                     // System.out.println(_sbvalue.toString());
                     StringBuffer abbr = new StringBuffer();
-                    String[] words = label.toString().replaceAll("[\\{\\}']","")
+                    String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
                     for (int word = 0; word < words.length; word++)
                         if (words[word].length() > 0)
@@ -678,43 +678,41 @@ public class LabelPatternUtil {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if (val.equals("edtr")) {
-                    return firstAuthor(_entry.getField("editor").toString());
+                    return firstAuthor(_entry.getField("editor"));
                 } else if (val.equals("edtrForeIni")) {
-                	return firstAuthorForenameInitials(_entry.getField("editor").toString());
+                	return firstAuthorForenameInitials(_entry.getField("editor"));
                 } else if (val.equals("editors")) {
-                    return allAuthors(_entry.getField("editor").toString());
+                    return allAuthors(_entry.getField("editor"));
                 // Last author's last name
                 } else if (val.equals("editorLast")) {
-                    return lastAuthor(_entry.getField("editor").toString());
+                    return lastAuthor(_entry.getField("editor"));
                 } else if (val.equals("editorLastForeIni")) {
-                	return lastAuthorForenameInitials(_entry.getField("editor").toString());
+                	return lastAuthorForenameInitials(_entry.getField("editor"));
                 } else if (val.equals("editorIni")) {
-                    String s = oneAuthorPlusIni(_entry.getField("editor")
-                        .toString());
+                    String s = oneAuthorPlusIni(_entry.getField("editor"));
                     return s == null ? "" : s;
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(_entry.getField("editor").toString(), num);
+                    String s = authIniN(_entry.getField("editor"), num);
                     return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authN_M(_entry.getField("editor").toString(),
+                    String s = authN_M(_entry.getField("editor"),
                         Integer.parseInt(nums[0]),
                         Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
                 } else if (val.equals("edtr.edtr.ea")) {
-                    String s = authAuthEa(_entry.getField("editor").toString());
+                    String s = authAuthEa(_entry.getField("editor"));
                     return s == null ? "" : s;
                 } else if (val.equals("edtrshort")) {
-                    String s = authshort(_entry.getField("editor").toString());
+                    String s = authshort(_entry.getField("editor"));
                     return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
                     int num = Integer.parseInt(val.substring(4));
-                    String fa = firstAuthor(_entry.getField("editor")
-                        .toString());
+                    String fa = firstAuthor(_entry.getField("editor"));
                     if (fa == null)
                         return "";
                     if (num > fa.length())
@@ -793,7 +791,7 @@ public class LabelPatternUtil {
 
 
     static String getTitleWords(int number, BibtexEntry _entry) {
-        String ss = (new RemoveLatexCommands()).format(_entry.getField("title").toString());
+        String ss = (new RemoveLatexCommands()).format(_entry.getField("title"));
         StringBuffer _sbvalue = new StringBuffer(),
         current;
         int piv=0, words = 0;

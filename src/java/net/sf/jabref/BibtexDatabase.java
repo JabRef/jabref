@@ -407,7 +407,7 @@ public class BibtexDatabase {
     	}
     	
     	for (Object field : entry.getAllFields()){
-    		entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString()).toString()));
+    		entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
     	}
     	
     	return entry;

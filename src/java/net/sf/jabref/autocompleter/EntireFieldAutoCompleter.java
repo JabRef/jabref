@@ -47,7 +47,7 @@ public class EntireFieldAutoCompleter extends AbstractAutoCompleter {
 		if (entry != null) {
 			String fieldValue = entry.getField(_fieldName);
 			if (fieldValue != null) {
-				addWordToIndex(fieldValue.toString().trim());
+				addWordToIndex(fieldValue.trim());
 			}
 		}
 	}

@@ -272,7 +272,7 @@ public class LabelPatternPanel  extends JPanel {
             tf.setText("");
         else {
             //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
-            tf.setText(keypatterns.getValue(fieldName).get(0).toString());
+            tf.setText(keypatterns.getValue(fieldName).get(0));
         }
     }
 

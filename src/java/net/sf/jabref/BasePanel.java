@@ -1333,9 +1333,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((bes != null) && (bes.length == 1)) {
                 	Object link = null;
                     if (bes[0].getField("eprint") != null)
-                      link = SPIRESFetcher.constructUrlFromEprint(bes[0].getField("eprint").toString());
+                      link = SPIRESFetcher.constructUrlFromEprint(bes[0].getField("eprint"));
                     else if (bes[0].getField("slaccitation") != null)
-                        link = SPIRESFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation").toString());
+                        link = SPIRESFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation"));
                     if (link != null) {
                       //output(Globals.lang("Calling external viewer..."));
                       try {

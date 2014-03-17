@@ -106,7 +106,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 					if (creationDate != null) {
 						String date = new SimpleDateFormat("yyyy.MM.dd")
 								.format(creationDate.getTime());
-						appendToField(entry, "timestamp", date.toString());
+						appendToField(entry, "timestamp", date);
 					}
 		
 					if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null){

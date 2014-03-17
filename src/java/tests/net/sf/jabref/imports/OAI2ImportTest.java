@@ -83,7 +83,7 @@ public class OAI2ImportTest extends TestCase {
 	public void testOai23xml() throws Throwable {
 		try {
             saxParser.parse(this.getClass().getResourceAsStream("oai23.xml"), handler);
-			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
+			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author"));
 		} catch (SAXException e) {
 			throw e.getException();
 		}
@@ -121,9 +121,9 @@ public class OAI2ImportTest extends TestCase {
 
 			assertEquals("math/0612188", be.getField("eprint"));
 			assertEquals("On the classification and properties of noncommutative duplicates", be
-				.getField("title").toString());
-			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
-			assertEquals("2007", be.getField("year").toString());
+                    .getField("title"));
+			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author"));
+			assertEquals("2007", be.getField("year"));
 
 			Thread.sleep(20000);
 		}
@@ -136,7 +136,7 @@ public class OAI2ImportTest extends TestCase {
 			assertEquals("astro-ph/0702080", be.getField("eprint"));
 			assertEquals(
 				"Magnetized Hypermassive Neutron Star Collapse: a candidate central engine for short-hard GRBs",
-				be.getField("title").toString());
+                    be.getField("title"));
 
 			Thread.sleep(20000);
 		}

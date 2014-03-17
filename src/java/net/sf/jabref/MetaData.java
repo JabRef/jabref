@@ -68,7 +68,7 @@ public class MetaData implements Iterable<String> {
             }
             if (key.equals("groupsversion")) {
                 if (orderedData.size() >= 1)
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString());
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
             } else if (key.equals("groupstree")) {
                 groupsTreePresent = true;
                 treeGroupsData = orderedData; // save for later user
@@ -179,7 +179,7 @@ public class MetaData implements Iterable<String> {
                 String relDir;
                 if (dir.equals(".")) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = file.getParent().toString(); 
+                    relDir = file.getParent();
                 } else {
                     relDir = new StringBuffer(file.getParent()).
                             append(System.getProperty("file.separator")).

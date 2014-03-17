@@ -164,7 +164,7 @@ public class IsiImporterTest extends TestCase {
 			+ "and less than 10 dB/cm at 266 nm. In our first experiments, a second "
 			+ "harmonic power of 24 mu W has been generated at 278 nm in an 8 mm long "
 			+ "waveguide pumped by 153 mW at 556 nm.".replaceFirst("266", "\n"), a.getField(
-			"abstract").toString());
+                "abstract"));
 		/*
 		 * DE Experimental/ barium compounds; ion implantation; optical harmonic
 		 * generation; optical losses; optical pumping; photolithography; solid
@@ -197,7 +197,7 @@ public class IsiImporterTest extends TestCase {
 		// Check B
 		assertEquals(
 			"Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
-			b.getField("title").toString());
+                b.getField("title"));
 		assertEquals(BibtexEntryType.ARTICLE, b.getType());
 	}
 
@@ -356,7 +356,7 @@ public class IsiImporterTest extends TestCase {
 		// Check B
 		assertEquals(
 			"Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
-			b.getField("title").toString());
+                b.getField("title"));
 		assertEquals(
 			"Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
 			b.getField("author"));
