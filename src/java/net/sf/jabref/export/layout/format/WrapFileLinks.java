@@ -200,8 +200,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
 
     protected String replaceStrings(String text) {
-        for (Iterator<String> i=replacements.keySet().iterator(); i.hasNext();) {
-            String from = i.next();
+        for (String from : replacements.keySet()) {
             String to = replacements.get(from);
             text = text.replaceAll(from, to);
         }

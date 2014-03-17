@@ -204,9 +204,9 @@ public class EntryTableTransferHandler extends TransferHandler {
 		// all supported flavors failed
 		System.err.println("can't transfer input: ");
 		DataFlavor inflavs[] = t.getTransferDataFlavors();
-		for (int i = 0; i < inflavs.length; i++) {
-			System.out.println("  " + inflavs[i].toString());
-		}
+        for (DataFlavor inflav : inflavs) {
+            System.out.println("  " + inflav.toString());
+        }
 
 		return false;
 	}
@@ -223,12 +223,11 @@ public class EntryTableTransferHandler extends TransferHandler {
 			return false;
 
 		// accept this if any input flavor matches any of our supported flavors
-		for (int i = 0; i < transferFlavors.length; i++) {
-			DataFlavor inflav = transferFlavors[i];
-			if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-				|| inflav.match(DataFlavor.javaFileListFlavor))
-				return true;
-		}
+        for (DataFlavor inflav : transferFlavors) {
+            if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
+                    || inflav.match(DataFlavor.javaFileListFlavor))
+                return true;
+        }
 
 		// System.out.println("drop type forbidden");
 		// nope, never heard of this type
@@ -308,8 +307,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 		// Split into lines:
 		String[] lines = s.replaceAll("\r", "").split("\n");
 		List<File> files = new ArrayList<File>();
-		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];
+        for (String line1 : lines) {
+            String line = line1;
 
             // Try to use url.toURI() to translate URL specific sequences like %20 into
             // standard characters:
@@ -317,7 +316,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             try {
                 URL url = new URL(line);
                 fl = new File(url.toURI());
-            } catch(URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -327,19 +326,19 @@ public class EntryTableTransferHandler extends TransferHandler {
             if (fl != null)
                 line = fl.getPath();
             else if (line.startsWith("file:"))
-				line = line.substring(5);
-			else
-				continue;
+                line = line.substring(5);
+            else
+                continue;
             // Under Gnome, the link is given as file:///...., so we
-			// need to strip the extra slashes:
-			if (line.startsWith("//"))
-				line = line.substring(2);
+            // need to strip the extra slashes:
+            if (line.startsWith("//"))
+                line = line.substring(2);
 
             File f = new File(line);
             if (f.exists()) {
-				files.add(f);
-			}
-		}
+                files.add(f);
+            }
+        }
         return files;
     }
 
@@ -369,11 +368,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 	private boolean handleDraggedFiles(List<File> files, final int dropRow) {
 		final String[] fileNames = new String[files.size()];
 		int i = 0;
-		for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
-			File file = iterator.next();
-			fileNames[i] = file.getAbsolutePath();
-			i++;
-		}
+        for (File file : files) {
+            fileNames[i] = file.getAbsolutePath();
+            i++;
+        }
 		// Try to load bib files normally, and import the rest into the current
 		// database.
 		// This process must be spun off into a background thread:
@@ -406,57 +404,57 @@ public class EntryTableTransferHandler extends TransferHandler {
 		OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
 		ArrayList<String> notBibFiles = new ArrayList<String>();
 		String encoding = Globals.prefs.get("defaultEncoding");
-		for (int i = 0; i < fileNames.length; i++) {
-			// Find the file's extension, if any:
+        for (String fileName : fileNames) {
+            // Find the file's extension, if any:
             String extension = "";
-			ExternalFileType fileType = null;
-			int index = fileNames[i].lastIndexOf('.');
-			if ((index >= 0) && (index < fileNames[i].length())) {
-				extension = fileNames[i].substring(index + 1).toLowerCase();
-				fileType = Globals.prefs.getExternalFileTypeByExt(extension);
-			}
-			if (extension.equals("bib")) {
-				File f = new File(fileNames[i]);
-				try {
-					ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
-					if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
-						notBibFiles.add(fileNames[i]);
-					} else {
-						openAction.addNewDatabase(pr, f, true);
-                        frame.getFileHistory().newFile(fileNames[i]);
+            ExternalFileType fileType = null;
+            int index = fileName.lastIndexOf('.');
+            if ((index >= 0) && (index < fileName.length())) {
+                extension = fileName.substring(index + 1).toLowerCase();
+                fileType = Globals.prefs.getExternalFileTypeByExt(extension);
+            }
+            if (extension.equals("bib")) {
+                File f = new File(fileName);
+                try {
+                    ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
+                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                        notBibFiles.add(fileName);
+                    } else {
+                        openAction.addNewDatabase(pr, f, true);
+                        frame.getFileHistory().newFile(fileName);
                     }
-				} catch (IOException e) {
-					notBibFiles.add(fileNames[i]);
-					// No error message, since we want to try importing the
-					// file?
-					//
-					// Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
-				}
-				continue;
-			}
+                } catch (IOException e) {
+                    notBibFiles.add(fileName);
+                    // No error message, since we want to try importing the
+                    // file?
+                    //
+                    // Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
+                }
+                continue;
+            }
 
 			/*
-			 * This is a linkable file. If the user dropped it on an entry, we
+             * This is a linkable file. If the user dropped it on an entry, we
 			 * should offer options for autolinking to this files:
-			 * 
+			 *
 			 * TODO we should offer an option to highlight the row the user is on too.
 			 */
-			if (fileType != null && dropRow >= 0) {
+            if (fileType != null && dropRow >= 0) {
 
 				/*
 				 * TODO: need to signal if this is a local or autodownloaded
 				 * file
 				 */
-				boolean local = true;
+                boolean local = true;
 
 				/*
 				 * TODO: make this an instance variable?
 				 */
-				DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-				dfh.handleDroppedfile(fileNames[i], fileType, local, entryTable, dropRow);
+                DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
+                dfh.handleDroppedfile(fileName, fileType, local, entryTable, dropRow);
 
-				continue;
-			}
+                continue;
+            }
 /*
 			if (extension.equals("pdf")) {
 				Collection c;
@@ -505,8 +503,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 			}
 			*/
 
-			notBibFiles.add(fileNames[i]);
-		}
+            notBibFiles.add(fileName);
+        }
 
 		if (notBibFiles.size() > 0) {
 			String[] toImport = new String[notBibFiles.size()];

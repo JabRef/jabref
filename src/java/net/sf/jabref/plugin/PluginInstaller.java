@@ -209,8 +209,7 @@ public class PluginInstaller {
         boolean success = true;
         VersionNumber num = new VersionNumber(nav[1]);
         Map<VersionNumber, File> versions = getInstalledVersions(nav[0]);
-        for (Iterator<VersionNumber> iterator = versions.keySet().iterator(); iterator.hasNext();) {
-            VersionNumber versionNumber = iterator.next();
+        for (VersionNumber versionNumber : versions.keySet()) {
             if (num.compareTo(versionNumber) < 0) {
                 String vnString = versionNumber.equals(VersionNumber.ZERO) ? null : versionNumber.toString();
                 File file = versions.get(versionNumber);//buildFileName(nav[0], vnString);
@@ -324,9 +323,8 @@ public class PluginInstaller {
             }
         });
         Map<VersionNumber, File> versions = new TreeMap<VersionNumber, File>();
-        for (int i = 0; i < files.length; i++) {
-            String file = files[i];
-            File f = new File(PluginCore.userPluginDir,file);
+        for (String file : files) {
+            File f = new File(PluginCore.userPluginDir, file);
             String[] nav = getNameAndVersion(f);
             if (nav != null) {
                 if (nav[0].equals(pluginName)) {
@@ -334,7 +332,7 @@ public class PluginInstaller {
                     versions.put(vn, f);
                 }
             }
-                
+
         }
 
         return versions;
@@ -362,15 +360,13 @@ public class PluginInstaller {
      * @param filenames An array of names of the files to be deleted.
      */
     public static void deletePluginsOnStartup(String[] filenames) {
-        for (int i = 0; i < filenames.length; i++) {
-            String s = filenames[i];
+        for (String s : filenames) {
             File f = new File(s);
             if (f.getParentFile().equals(PluginCore.userPluginDir)) {
-            //if (s.startsWith(PluginCore.userPluginDir.getPath())) {
+                //if (s.startsWith(PluginCore.userPluginDir.getPath())) {
                 boolean success = f.delete();
-            }
-            else
-                System.out.println("File outside of user plugin dir: "+s);
+            } else
+                System.out.println("File outside of user plugin dir: " + s);
         }
     }
 
@@ -473,15 +469,15 @@ public class PluginInstaller {
                 urls.put(desc.getId(), desc);
             }
         }
-        
-        for (int i=0; i<files.length; i++) {
-            File file = new File(PluginCore.userPluginDir, files[i]);
+
+        for (String file1 : files) {
+            File file = new File(PluginCore.userPluginDir, file1);
             String[] nav = getNameAndVersion(file);
             if (nav != null) {
                 VersionNumber vn = nav[1] != null ? new VersionNumber(nav[1]) : null;
                 NameAndVersion nameAndVersion = new NameAndVersion(nav[0], vn, true,
                         file);
-                for (Iterator<String> it = urls.keySet().iterator(); it.hasNext();) {
+                for (Iterator<String> it = urls.keySet().iterator(); it.hasNext(); ) {
                     String loc = it.next();
                     if (loc.indexOf(nav[0]) >= 0) {
                         PluginDescriptor desc = urls.get(loc);
@@ -560,9 +556,9 @@ public class PluginInstaller {
         public VersionNumber(String number) {
             digits = new ArrayList<Integer>();
             String[] elms = number.split("\\.");
-            for (int i = 0; i < elms.length; i++) {
+            for (String elm : elms) {
                 try {
-                    int num = Integer.parseInt(elms[i]);
+                    int num = Integer.parseInt(elm);
                     digits.add(num);
                 } catch (NumberFormatException ex) {
                     // Do nothing

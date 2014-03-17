@@ -50,17 +50,15 @@ public class MyEditorKit extends LargeHTMLEditorKit {
             Action[] actions = super.getActions();
             Action[] newActions = new Action[2];
 
-            for (int i = 0; i < actions.length; i++) {
-                Action actn = actions[i];
-
+            for (Action actn : actions) {
                 String name = (String) actn.getValue(Action.NAME);
 
                 if (name.equals(DefaultEditorKit.upAction)) {
-                    newActions[0] = new MyNextVisualPositionAction(actions[i],
-                        SwingConstants.NORTH);
+                    newActions[0] = new MyNextVisualPositionAction(actn,
+                            SwingConstants.NORTH);
                 } else if (name.equals(DefaultEditorKit.downAction)) {
-                    newActions[1] = new MyNextVisualPositionAction(actions[i],
-                        SwingConstants.SOUTH);
+                    newActions[1] = new MyNextVisualPositionAction(actn,
+                            SwingConstants.SOUTH);
                 }
             }
 

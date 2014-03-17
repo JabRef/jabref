@@ -73,12 +73,11 @@ public class EntrySorter implements DatabaseChangeListener {
             idArray = new String[count];
             entryArray = new BibtexEntry[count];
 	        int piv = 0;
-	        for (Iterator<BibtexEntry> i=set.iterator(); i.hasNext();) {
-	            //        for (int i=0; i<idArray.length; i++) {
-    	        BibtexEntry entry = i.next();
-    	        idArray[piv] = entry.getId();
-    	        entryArray[piv] = entry;
-    	        piv++;
+            for (BibtexEntry entry : set) {
+                //        for (int i=0; i<idArray.length; i++) {
+                idArray[piv] = entry.getId();
+                entryArray[piv] = entry;
+                piv++;
             }
         }
     }

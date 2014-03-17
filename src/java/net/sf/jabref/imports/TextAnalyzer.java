@@ -149,13 +149,13 @@ public class TextAnalyzer {
       Substring ss;
       Vector<String> free = new Vector<String>();
       int piv = 0;
-      for (Iterator<Substring> i=usedParts.iterator(); i.hasNext();) {
-        ss = i.next();
-        if (ss.begin()-piv > 10) {
-          Util.pr("... "+text.substring(piv, ss.begin()));
-          free.add(clean(text.substring(piv, ss.begin())));
-        }
-        piv = ss.end();
+      for (Substring usedPart : usedParts) {
+          ss = usedPart;
+          if (ss.begin() - piv > 10) {
+              Util.pr("... " + text.substring(piv, ss.begin()));
+              free.add(clean(text.substring(piv, ss.begin())));
+          }
+          piv = ss.end();
       }
       if (text.length()-piv > 10) {
         free.add(clean(text.substring(piv)));

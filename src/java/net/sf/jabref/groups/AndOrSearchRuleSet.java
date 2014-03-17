@@ -22,7 +22,7 @@ import net.sf.jabref.SearchRule;
 import net.sf.jabref.SearchRuleSet;
 
 /**
- * Subclass of SearchRuleSet that ANDs or ORs between its rules, eturning 0 or
+ * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
  * 1.
  */
 class AndOrSearchRuleSet extends SearchRuleSet {

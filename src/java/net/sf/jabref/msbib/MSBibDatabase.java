@@ -117,13 +117,12 @@ public class MSBibDatabase {
 	   		Element msbibCollection = result.createElement("b:Sources");
 	   		msbibCollection.setAttribute("SelectedStyle","");
 	   		msbibCollection.setAttribute("xmlns", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
-	   		msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");	   			   		 
-	   		
-	   		for(Iterator<MSBibEntry> iter = entries.iterator(); iter.hasNext(); ) {
-	   			MSBibEntry entry = iter.next();
-	   			Node node = entry.getDOMrepresentation(result);
-	   			msbibCollection.appendChild(node);
-	   		}
+	   		msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
+
+            for (MSBibEntry entry : entries) {
+                Node node = entry.getDOMrepresentation(result);
+                msbibCollection.appendChild(node);
+            }
 	   		
 	   		result.appendChild(msbibCollection);	   		
 	   	}

@@ -32,10 +32,10 @@ public class CaseKeeper implements LayoutFormatter {
         }
         Arrays.sort(listOfWords, new LengthComparator());  
         // For each word in the list
-	for (int i = 0; i < listOfWords.length; i++) {
+        for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, ", or } or if it is at the start of the string but not if it is followed by a }
-	    text = text.replaceAll("(^|[- /\\[(}\"])" + listOfWords[i] + "($|[^}])","$1\\{" + listOfWords[i] + "\\}$2");
-	}
+            text = text.replaceAll("(^|[- /\\[(}\"])" + listOfWord + "($|[^}])", "$1\\{" + listOfWord + "\\}$2");
+        }
 	return text;
     }
     

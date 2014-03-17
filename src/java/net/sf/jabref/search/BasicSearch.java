@@ -125,8 +125,8 @@ public class BasicSearch implements SearchRule {
             }
 
         }
-        for (int i = 0; i < matchFound.length; i++) {
-            if (!matchFound[i])
+        for (boolean aMatchFound : matchFound) {
+            if (!aMatchFound)
                 return 0; // Didn't match all words.
         }
         return 1; // Matched all words.

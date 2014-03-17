@@ -184,11 +184,11 @@ public class Globals {
 		// Build list of encodings, by filtering out all that are not supported
 		// on this system:
 		List<String> encodings = new ArrayList<String>();
-		for (int i = 0; i < ALL_ENCODINGS.length; i++) {
-			if (Charset.isSupported(ALL_ENCODINGS[i])) {
-				encodings.add(ALL_ENCODINGS[i]);
-			}
-		}
+        for (String ALL_ENCODING : ALL_ENCODINGS) {
+            if (Charset.isSupported(ALL_ENCODING)) {
+                encodings.add(ALL_ENCODING);
+            }
+        }
 		ENCODINGS = encodings.toArray(new String[0]);
         // Build a map for translating Java encoding names into common encoding names:
         ENCODING_NAMES_LOOKUP = new HashMap<String,String>();

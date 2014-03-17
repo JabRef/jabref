@@ -415,13 +415,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 */
 	private void disOrEnableAllElements(Container startContainer, boolean enable) {
 		Component[] children = startContainer.getComponents();
-		for (int i = 0; i < children.length; i++) {
-			Component child = children[i];
-			if (child instanceof Container) {
-				disOrEnableAllElements((Container) child, enable);
-			}
-			child.setEnabled(enable);
-		}
+        for (Component child : children) {
+            if (child instanceof Container) {
+                disOrEnableAllElements((Container) child, enable);
+            }
+            child.setEnabled(enable);
+        }
 	}
 
 	/**

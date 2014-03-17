@@ -561,18 +561,18 @@ public class CleanUpAction extends AbstractWorker {
 	 */
         private void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
         final String[] fields = {"title", "author", "abstract"};
-        for(int i=0;i<fields.length;i++) {
-            String oldValue = entry.getField(fields[i]);
-            if (oldValue == null) {
-                return;
+            for (String field : fields) {
+                String oldValue = entry.getField(field);
+                if (oldValue == null) {
+                    return;
+                }
+                final HTMLConverter htmlConverter = new HTMLConverter();
+                String newValue = htmlConverter.formatUnicode(oldValue);
+                if (!oldValue.equals(newValue)) {
+                    entry.setField(field, newValue);
+                    ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                }
             }
-            final HTMLConverter htmlConverter = new HTMLConverter();
-            String newValue = htmlConverter.formatUnicode(oldValue);
-            if (!oldValue.equals(newValue)) {
-                entry.setField(fields[i], newValue);
-                ce.addEdit(new UndoableFieldChange(entry, fields[i], oldValue, newValue));
-            }   
-        }
     }
 
 	/**

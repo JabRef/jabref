@@ -128,35 +128,35 @@ public class CopacImporter extends ImportFormat {
 
 			String[] lines = it.next().split("\n");
 
-			for (int i = 0; i < lines.length; i++) {
-				String line = lines[i].trim();
-				if (line.length() < 4)
-					continue;
-				String code = line.substring(0, 4);
+            for (String line1 : lines) {
+                String line = line1.trim();
+                if (line.length() < 4)
+                    continue;
+                String code = line.substring(0, 4);
 
-				if (code.equals("TI- "))
-					setOrAppend(b, "title", line.substring(4).trim(), ", ");
-				else if (code.equals("AU- "))
-					setOrAppend(b, "author", line.substring(4).trim(), " and ");
-				else if (code.equals("PY- "))
-					setOrAppend(b, "year", line.substring(4).trim(), ", ");
-				else if (code.equals("PU- "))
-					setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
-				else if (code.equals("SE- "))
-					setOrAppend(b, "series", line.substring(4).trim(), ", ");
-				else if (code.equals("IS- "))
-					setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
-				else if (code.equals("KW- "))
-					setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
-				else if (code.equals("NT- "))
-					setOrAppend(b, "note", line.substring(4).trim(), ", ");
-				else if (code.equals("PD- "))
-					setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
-				else if (code.equals("DT- "))
-					setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
-				else
-					setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
-			}
+                if (code.equals("TI- "))
+                    setOrAppend(b, "title", line.substring(4).trim(), ", ");
+                else if (code.equals("AU- "))
+                    setOrAppend(b, "author", line.substring(4).trim(), " and ");
+                else if (code.equals("PY- "))
+                    setOrAppend(b, "year", line.substring(4).trim(), ", ");
+                else if (code.equals("PU- "))
+                    setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
+                else if (code.equals("SE- "))
+                    setOrAppend(b, "series", line.substring(4).trim(), ", ");
+                else if (code.equals("IS- "))
+                    setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
+                else if (code.equals("KW- "))
+                    setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
+                else if (code.equals("NT- "))
+                    setOrAppend(b, "note", line.substring(4).trim(), ", ");
+                else if (code.equals("PD- "))
+                    setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
+                else if (code.equals("DT- "))
+                    setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
+                else
+                    setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
+            }
 			results.add(b);
 		}
 

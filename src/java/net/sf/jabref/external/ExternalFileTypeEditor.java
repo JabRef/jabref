@@ -73,9 +73,9 @@ public class ExternalFileTypeEditor extends JDialog {
     public void setValues() {
         fileTypes.clear();
         ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-        for (int i = 0; i < types.length; i++) {
+        for (ExternalFileType type : types) {
 
-            fileTypes.add(types[i].copy());
+            fileTypes.add(type.copy());
         }
         Collections.sort(fileTypes);
     }

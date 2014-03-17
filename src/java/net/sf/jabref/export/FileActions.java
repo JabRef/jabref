@@ -83,15 +83,13 @@ public class FileActions {
         // First, make a Map of all entries:
         HashMap<String, BibtexString> remaining = new HashMap<String, BibtexString>();
         int maxKeyLength = 0;
-        for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
-            BibtexString string = i.next();
+        for (BibtexString string : strings) {
             remaining.put(string.getName(), string);
             maxKeyLength = Math.max(maxKeyLength, string.getName().length());
         }
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
-            for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
-                BibtexString bs = i.next();
+            for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && bs.getType() == t) {
                     writeString(fw, bs, remaining, maxKeyLength);
                 }
@@ -255,9 +253,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (Iterator<String> i = types.keySet().iterator(); i
-                        .hasNext();) {
-                    BibtexEntryType type = types.get(i.next());
+                for (String s : types.keySet()) {
+                    BibtexEntryType type = types.get(s);
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         tp.save(fw);
@@ -396,17 +393,17 @@ public class FileActions {
             SortedList sorter = new SortedList(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
 
             if ((bes != null) && (bes.length > 0)) {
-                for (int i = 0; i < bes.length; i++) {
-                    sorter.add(bes[i]);
+                for (BibtexEntry be1 : bes) {
+                    sorter.add(be1);
                 }
             }
 
             FieldFormatter ff = new LatexFieldFormatter();
 
-            for (Iterator<BibtexEntry> i = sorter.iterator(); i.hasNext();) {
-                be = (i.next());
+            for (BibtexEntry aSorter : (Iterable<BibtexEntry>) sorter) {
+                be = (aSorter);
 
-        // Check if we must write the type definition for this
+                // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
                 BibtexEntryType tp = be.getType();
@@ -425,8 +422,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (Iterator<String> i = types.keySet().iterator(); i.hasNext();) {
-                    CustomEntryType tp = (CustomEntryType) types.get(i.next());
+                for (String s : types.keySet()) {
+                    CustomEntryType tp = (CustomEntryType) types.get(s);
                     tp.save(fw);
                     fw.write(Globals.NEWLINE);
                 }

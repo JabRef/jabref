@@ -156,10 +156,9 @@ public class SidePaneManager {
 	 * @param panel
 	 */
 	public void setActiveBasePanel(BasePanel panel) {
-		for (Iterator<String> i = components.keySet().iterator(); i.hasNext();) {
-			Object key = i.next();
-			components.get(key).setActiveBasePanel(panel);
-		}
+        for (String key : components.keySet()) {
+            components.get(key).setActiveBasePanel(panel);
+        }
 	}
 
 	public void updateView() {

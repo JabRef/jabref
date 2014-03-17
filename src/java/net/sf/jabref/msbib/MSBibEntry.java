@@ -577,9 +577,8 @@ public class MSBibEntry {
         else
         {
             String[] names = authors.split(" and ");
-            for (int i=0; i<names.length; i++)
-            {
-            		result.add(new PersonName(names[i]));
+            for (String name : names) {
+                result.add(new PersonName(name));
             }
         }
 		return result;
@@ -678,14 +677,13 @@ public class MSBibEntry {
 			return;
 		Element authorTop = d.createElement(bcol+entryName);
 		Element nameList = d.createElement(bcol+"NameList");
-		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = iter.next();
-			Element person = d.createElement(bcol+"Person");
-			addField(d, person,"Last",name.getSurname());
-			addField(d, person,"Middle",name.getMiddlename());
-			addField(d, person,"First",name.getFirstname());
-			nameList.appendChild(person);
-		}
+        for (PersonName name : authorsLst) {
+            Element person = d.createElement(bcol + "Person");
+            addField(d, person, "Last", name.getSurname());
+            addField(d, person, "Middle", name.getMiddlename());
+            addField(d, person, "First", name.getFirstname());
+            nameList.appendChild(person);
+        }
 		authorTop.appendChild(nameList);
 		
 		allAuthors.appendChild(authorTop);
@@ -870,13 +868,12 @@ public class MSBibEntry {
 			return;
 		String allAuthors = "";
 		boolean First = true;
-		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = iter.next();
-			if(!First)
-				allAuthors += " and ";
-			allAuthors += name.getFullname();
-			First = false;
-		}
+        for (PersonName name : authorsLst) {
+            if (!First)
+                allAuthors += " and ";
+            allAuthors += name.getFullname();
+            First = false;
+        }
 		hm.put(type,allAuthors);
 	}
 

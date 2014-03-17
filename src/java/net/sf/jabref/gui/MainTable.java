@@ -325,8 +325,7 @@ public class MainTable extends JTable {
     public List<Boolean> getCurrentSortOrder() {
         List<Boolean> order = new ArrayList<Boolean>();
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
-        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
-            int i = iterator.next();
+        for (Integer i : sortCols) {
             order.add(comparatorChooser.isColumnReverse(i));
         }
         return order;
@@ -335,8 +334,7 @@ public class MainTable extends JTable {
     public List<String> getCurrentSortFields() {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         List<String> fields = new ArrayList<String>();
-        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
-            int i =  iterator.next();
+        for (Integer i : sortCols) {
             String name = tableFormat.getColumnType(i);
             if (name != null)
                 fields.add(name.toLowerCase());

@@ -103,8 +103,8 @@ public class DBConnectDialog extends JDialog {
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
         String[] srv = dbStrings.getServerTypes();
-        for (int i=0; i<srv.length; i++) {
-           cmbServerType.addItem(srv[i]);
+        for (String aSrv : srv) {
+            cmbServerType.addItem(aSrv);
         }
 
         cmbServerType.setSelectedItem(srvSel);
@@ -255,8 +255,8 @@ public class DBConnectDialog extends JDialog {
 
         char[] pwd = pwdPassword.getPassword();
         String tmp = "";
-        for (int i=0; i<pwd.length; i++) {
-            tmp = tmp + pwd[i];
+        for (char aPwd : pwd) {
+            tmp = tmp + aPwd;
         }
         dbStrings.setPassword(tmp);
         tmp = "";

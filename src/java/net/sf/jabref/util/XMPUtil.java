@@ -808,9 +808,9 @@ public class XMPUtil {
 			if (field.equals("keywords")) {
 				String o = entry.getField(field);
 				String[] keywords = o.split(",");
-				for (int i = 0; i < keywords.length; i++) {
-					dcSchema.addSubject(keywords[i].trim());
-				}
+                for (String keyword : keywords) {
+                    dcSchema.addSubject(keyword.trim());
+                }
 				continue;
 			}
 

@@ -63,8 +63,7 @@ public class ColorSetupPanel extends JPanel {
         buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Globals.lang("Entry editor active background color")));
         buttons.add(new ColorButton("invalidFieldBackgroundColor", Globals.lang("Entry editor invalid field color")));
 
-        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = i.next();
+        for (ColorButton but : buttons) {
             builder.append(but);
             builder.append(but.getDefaultButton());
             builder.append(but.getName());
@@ -81,16 +80,14 @@ public class ColorSetupPanel extends JPanel {
     }
 
     public void setValues() {
-        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = i.next();
+        for (ColorButton but : buttons) {
             but.setColor(Globals.prefs.getColor(but.getKey()));
         }
 
     }
 
     public void storeSettings() {
-        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = i.next();
+        for (ColorButton but : buttons) {
             Globals.prefs.putColor(but.getKey(), but.getColor());
         }
     }

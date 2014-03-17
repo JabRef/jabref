@@ -106,11 +106,11 @@ public class SQLUtil {
 	private static ArrayList<String> uniqueInsert(ArrayList<String> list,
 			String[] array) {
 		if (array != null) {
-			for (int i = 0; i < array.length; i++) {
-				if (!list.contains(array[i]))
-					if (!array[i].equals("#"))
-					list.add(array[i]);
-			}
+            for (String anArray : array) {
+                if (!list.contains(anArray))
+                    if (!anArray.equals("#"))
+                        list.add(anArray);
+            }
 		}
 		return list;
 	}

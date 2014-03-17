@@ -228,10 +228,10 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
 	private void importAction() {
 		int[] selectedInt = table.getSelectedRows();
-		for (int i=0; i < selectedInt.length;i++) {
-			listOfDBs.add((String)table.getValueAt(selectedInt[i], 0));
-			moreThanOne = true;
-		}
+        for (int aSelectedInt : selectedInt) {
+            listOfDBs.add((String) table.getValueAt(aSelectedInt, 0));
+            moreThanOne = true;
+        }
 		diag.dispose();
 	}
 	

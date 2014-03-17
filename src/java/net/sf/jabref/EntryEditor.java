@@ -367,8 +367,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         Component[] comps = tlb.getComponents();
 
-        for (int i = 0; i < comps.length; i++)
-            ((JComponent) comps[i]).setOpaque(false);
+        for (Component comp : comps) ((JComponent) comp).setOpaque(false);
 
         leftPan.add(tlb, BorderLayout.SOUTH);
         add(leftPan, BorderLayout.WEST);
@@ -680,8 +679,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Sets the enabled status of all text fields of the entry editor.
      */
     public void setEnabled(boolean enabled) {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEnabled(enabled);
             }
@@ -941,8 +939,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void setField(String fieldName, String newFieldData) {
 
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).updateField(fieldName, newFieldData);
             }
@@ -954,8 +951,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Sets all the text areas according to the shown entry.
      */
     public void updateAllFields() {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEntry(entry);
             }
@@ -966,8 +962,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Removes the "invalid field" color from all text areas.
      */
     public void validateAllFields() {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).validateAllFields();
             }
@@ -976,8 +971,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void updateAllContentSelectors() {
         if (contentSelectors.size() > 0) {
-            for (Iterator<FieldContentSelector> i = contentSelectors.iterator(); i.hasNext();)
-                i.next().rebuildComboBox();
+            for (FieldContentSelector contentSelector : contentSelectors) contentSelector.rebuildComboBox();
         }
     }
 

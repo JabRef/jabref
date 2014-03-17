@@ -304,23 +304,23 @@ public class CsaImporter extends ImportFormat {
                     Type = null;
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
-                    for (int ii = 0; ii < types.length; ++ii) {
-                        if ((types[ii].indexOf("article")>=0) ||
-                            (types[ii].indexOf("journal article")>=0)) {
+                    for (String type : types) {
+                        if ((type.indexOf("article") >= 0) ||
+                                (type.indexOf("journal article") >= 0)) {
                             Type = "article";
                             break;
-                        } else if (types[ii].equals("dissertation")) {
+                        } else if (type.equals("dissertation")) {
                             Type = "phdthesis";
                             break;
-                        } else if (types[ii].equals("conference")) {
+                        } else if (type.equals("conference")) {
                             Type = "inproceedings";
                             break;
-                        } else if (types[ii].equals("book monograph") &&
-                                   Type == null) {
+                        } else if (type.equals("book monograph") &&
+                                Type == null) {
                             Type = "book";
                             break;
-                        } else if (types[ii].equals("report") &&
-                                   Type == null) {
+                        } else if (type.equals("report") &&
+                                Type == null) {
                             Type = "techreport";
                             break;
                         }

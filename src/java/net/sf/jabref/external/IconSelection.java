@@ -92,8 +92,8 @@ public class IconSelection extends JDialog {
 
         listModel = new DefaultListModel();
         icons = new JList(listModel);
-        for (Iterator<ImageIcon> iterator = iconSet.iterator(); iterator.hasNext();) {
-            listModel.addElement(new JLabel(iterator.next()));
+        for (ImageIcon anIconSet : iconSet) {
+            listModel.addElement(new JLabel(anIconSet));
         }
         class MyRenderer implements ListCellRenderer {
             JLabel comp = new JLabel();

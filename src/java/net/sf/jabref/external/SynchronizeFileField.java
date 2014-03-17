@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -103,8 +104,8 @@ public class SynchronizeFileField extends AbstractWorker {
         // First we try to autoset fields
         if (autoSet) {
             Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
-            for (int i = 0; i < sel.length; i++) {
-                entries.add(sel[i]);
+            for (BibtexEntry aSel : sel) {
+                entries.add(aSel);
             }
 
             // Start the autosetting process:                
@@ -143,9 +144,9 @@ public class SynchronizeFileField extends AbstractWorker {
         if (checkExisting) {
             boolean removeAllBroken = false;
             mainLoop:
-            for (int i = 0; i < sel.length; i++) {
+            for (BibtexEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final String old = sel[i].getField(fieldName);
+                final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
@@ -154,10 +155,10 @@ public class SynchronizeFileField extends AbstractWorker {
                     // We need to specify which directories to search in for Util.expandFilename:
                     String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<File>();
-                    for (int k=0; k<dirsS.length; k++)
+                    for (int k = 0; k < dirsS.length; k++)
                         dirs.add(new File(dirsS[k]));
 
-                    for (int j=0; j<tableModel.getRowCount(); j++) {
+                    for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
                         boolean httpLink = flEntry.getLink().toLowerCase().startsWith("http");
@@ -174,13 +175,13 @@ public class SynchronizeFileField extends AbstractWorker {
                             int answer;
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
-                                    Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                            new String[]{flEntry.getLink(), sel[i].getCiteKey()}),
-                                    Globals.lang("Broken link"),
-                                    JOptionPane.YES_NO_CANCEL_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
-                            }
-                            else {
+                                        Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
+                                                new String[]{flEntry.getLink(), aSel.getCiteKey()}),
+                                        Globals.lang("Broken link"),
+                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
+                                );
+                            } else {
                                 answer = 2; // We should delete this link.
                             }
                             switch (answer) {
@@ -214,23 +215,23 @@ public class SynchronizeFileField extends AbstractWorker {
                         if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
                             String[] options = new String[]
                                     {Globals.lang("Define '%0'", flEntry.getType().getName()),
-                                    Globals.lang("Change file type"), Globals.lang("Cancel")};
+                                            Globals.lang("Change file type"), Globals.lang("Cancel")};
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                    flEntry.getType().getName()),
+                                            flEntry.getType().getName()),
                                     Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE, null, options, defOption);
+                                    JOptionPane.QUESTION_MESSAGE, null, options, defOption
+                            );
                             if (answer == JOptionPane.CANCEL_OPTION) {
                                 // User doesn't want to handle this unknown link type.
-                            }
-                            else if (answer == JOptionPane.YES_OPTION) {
+                            } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
                                 ExternalFileType newType = new ExternalFileType(flEntry.getType().getName(), "", "", "", "new");
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:
-                                    java.util.List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+                                    List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
                                     ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
                                     for (int k = 0; k < oldTypes.length; k++) {
                                         fileTypes.add(oldTypes[k]);
@@ -240,8 +241,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                     Globals.prefs.setExternalFileTypes(fileTypes);
                                     panel.mainTable.repaint();
                                 }
-                            }
-                            else {
+                            } else {
                                 // User wants to change the type of this link.
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
@@ -256,10 +256,10 @@ public class SynchronizeFileField extends AbstractWorker {
                         String toSet = tableModel.getStringRepresentation();
                         if (toSet.length() == 0)
                             toSet = null;
-                        ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old,
+                        ce.addEdit(new UndoableFieldChange(aSel, fieldName, old,
                                 toSet));
-                        sel[i].setField(fieldName, toSet);
-                        changedEntries.add(sel[i]);
+                        aSel.setField(fieldName, toSet);
+                        changedEntries.add(aSel);
                         //System.out.println("Changed to: "+tableModel.getStringRepresentation());
                     }
 

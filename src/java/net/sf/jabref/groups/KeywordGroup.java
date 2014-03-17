@@ -149,22 +149,22 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 			NamedCompound ce = new NamedCompound(
                                         Globals.lang("add entries to group"));
 			boolean modified = false;
-			for (int i = 0; i < entries.length; i++) {
-				if (applyRule(null, entries[i]) == 0) {
-					String oldContent = entries[i]
-							.getField(m_searchField), 
-							pre = Globals.prefs.get("groupKeywordSeparator");
-					String newContent = (oldContent == null ? "" : oldContent
-							+ pre)
-							+ m_searchExpression;
-					entries[i].setField(m_searchField, newContent);
+            for (BibtexEntry entry : entries) {
+                if (applyRule(null, entry) == 0) {
+                    String oldContent = entry
+                            .getField(m_searchField),
+                            pre = Globals.prefs.get("groupKeywordSeparator");
+                    String newContent = (oldContent == null ? "" : oldContent
+                            + pre)
+                            + m_searchExpression;
+                    entry.setField(m_searchField, newContent);
 
-					// Store undo information.
-					ce.addEdit(new UndoableFieldChange(entries[i],
-							m_searchField, oldContent, newContent));
-					modified = true;
-				}
-			}
+                    // Store undo information.
+                    ce.addEdit(new UndoableFieldChange(entry,
+                            m_searchField, oldContent, newContent));
+                    modified = true;
+                }
+            }
 			if (modified)
 				ce.end();
 
@@ -181,18 +181,19 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		if ((entries != null) && (entries.length > 0)) {
 			NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
 			boolean modified = false;
-			for (int i = 0; i < entries.length; ++i) {
-				if (applyRule(null, entries[i]) > 0) {
-					String oldContent = entries[i]
-							.getField(m_searchField);
-					removeMatches(entries[i]);
-					// Store undo information.
-					ce.addEdit(new UndoableFieldChange(entries[i],
-							m_searchField, oldContent, entries[i]
-									.getField(m_searchField)));
-					modified = true;
-				}
-			}
+            for (BibtexEntry entry : entries) {
+                if (applyRule(null, entry) > 0) {
+                    String oldContent = entry
+                            .getField(m_searchField);
+                    removeMatches(entry);
+                    // Store undo information.
+                    ce.addEdit(new UndoableFieldChange(entry,
+                            m_searchField, oldContent, entry
+                            .getField(m_searchField)
+                    ));
+                    modified = true;
+                }
+            }
 			if (modified)
 				ce.end();
 

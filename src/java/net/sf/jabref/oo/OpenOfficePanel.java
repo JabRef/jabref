@@ -617,8 +617,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         try {
 			Method method = sysclass.getDeclaredMethod("addURL",parameters);
 			method.setAccessible(true);
-            for (int i=0; i<u.length; i++)
-                method.invoke(sysloader, u[i]);
+            for (URL anU : u) method.invoke(sysloader, anU);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			throw new IOException("Error, could not add URL to system classloader");
@@ -780,8 +779,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (panel != null) {
                 BibtexEntry[] e = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
-                for (int i = 0; i < e.length; i++) {
-                    entries.put(e[i], database);
+                for (BibtexEntry anE : e) {
+                    entries.put(anE, database);
                 }
 
                 ooBase.insertFullReferenceAtViewCursor(entries, style, "Default");
@@ -817,8 +816,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
-                for (int i = 0; i < entries.length; i++) {
-                    el.add(entries[i]);
+                for (BibtexEntry entry : entries) {
+                    el.add(entry);
                 }
 
                 BstWrapper wrapper = new BstWrapper();

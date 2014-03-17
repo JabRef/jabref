@@ -109,11 +109,11 @@ public class BiomailImporter extends ImportFormat {
         // skip the first entry as it is either empty or has document header
         HashMap<String, String> hm = new HashMap<String, String>();
 
-        for (int i = 0; i < entries.length; i++) {
-            String[] fields = entries[i].split(" ## ");
+        for (String entry : entries) {
+            String[] fields = entry.split(" ## ");
 
             if (fields.length == 0)
-                fields = entries[i].split("\n");
+                fields = entry.split("\n");
 
             String Type = "";
             String pages = "";
@@ -122,7 +122,7 @@ public class BiomailImporter extends ImportFormat {
             hm.clear();
 
             for (int j = 0; j < fields.length; j++) {
-                System.out.println(">>>"+fields[j]+"<<<");
+                System.out.println(">>>" + fields[j] + "<<<");
 
                 //empty field don't do anything
                 if (fields[j].length() <= 2)

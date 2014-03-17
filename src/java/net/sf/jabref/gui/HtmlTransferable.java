@@ -51,8 +51,8 @@ public class HtmlTransferable implements Transferable {
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        for (int i = 0; i < FLAVORS.length; i++) {
-            if (flavor.equals(FLAVORS[i])) {
+        for (DataFlavor FLAVOR : FLAVORS) {
+            if (flavor.equals(FLAVOR)) {
                 return true;
             }
         }

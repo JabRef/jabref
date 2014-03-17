@@ -75,10 +75,9 @@ public class StrictDuplicateSearch extends Thread {
             return;
         
         panel.output(Globals.lang("Duplicates removed")+": "+toRemove.size());
-        
-        for (Iterator<BibtexEntry> i=toRemove.iterator(); i.hasNext();) {
-            BibtexEntry entry = i.next();
-            panel.database.removeEntry(entry.getId());        
+
+        for (BibtexEntry entry : toRemove) {
+            panel.database.removeEntry(entry.getId());
             ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
         }
      

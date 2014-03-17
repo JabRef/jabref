@@ -92,15 +92,13 @@ public class TagToMarkedTextStore
 
 		if (ll != null) {
 			// iterate over all saved selections
-			for (ListIterator<TMarkedStoreItem> lIt = ll.listIterator(); lIt
-				.hasNext();) {
-				Object du2 = lIt.next();
-				if (du2 != null) {
-					TMarkedStoreItem item = (TMarkedStoreItem) du2;
-					doc.setCharacterAttributes(item.start, item.end
-						- item.start, doc.getStyle(style), true);
-				}
-			}
+            for (TMarkedStoreItem du2 : ll) {
+                if (du2 != null) {
+                    TMarkedStoreItem item = (TMarkedStoreItem) du2;
+                    doc.setCharacterAttributes(item.start, item.end
+                            - item.start, doc.getStyle(style), true);
+                }
+            }
 		}
 	}
 

@@ -55,11 +55,10 @@ public class CitationManager {
         list = new BasicEventList<CitEntry>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
-        for (int i=0; i<names.length; i++) {
-            String name = names[i];
+        for (String name : names) {
             List<String> keys = ooBase.parseRefMarkName(name);
             list.add(new CitEntry(name, keys,
-                    "<html>..."+ooBase.getCitationContext(nameAccess, name, 30, 30, true)+"...</html>",
+                    "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
         tableModel = new EventTableModel(list, new CitEntryFormat());

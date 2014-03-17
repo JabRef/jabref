@@ -205,9 +205,9 @@ class ReplaceStringDialog extends JDialog {
                     counter += replaceField(be, s, ce);
             }
         } else {
-            for (int i=0; i<flds.length; i++) {
-                if (!flds[i].equals(BibtexFields.KEY_FIELD))
-                    counter += replaceField(be, flds[i], ce);
+            for (String fld : flds) {
+                if (!fld.equals(BibtexFields.KEY_FIELD))
+                    counter += replaceField(be, fld, ce);
             }
 
         }

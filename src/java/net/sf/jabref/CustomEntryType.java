@@ -33,10 +33,8 @@ public class CustomEntryType extends BibtexEntryType {
         name = name_;
         parseRequiredFields(req_);
         ArrayList<String> allOpt = new ArrayList<String>();
-        for (int i = 0; i < opt_.length; i++)
-            allOpt.add(opt_[i]);
-        for (int i=0; i<opt2_.length; i++)
-            allOpt.add(opt2_[i]);
+        for (String anOpt_ : opt_) allOpt.add(anOpt_);
+        for (String anOpt2_ : opt2_) allOpt.add(anOpt2_);
         opt = allOpt.toArray(new String[allOpt.size()]);
         priOpt = opt_;
     }
@@ -67,10 +65,10 @@ public class CustomEntryType extends BibtexEntryType {
     protected void parseRequiredFields(String[] parts) {
         ArrayList<String> fields = new ArrayList<String>();
         ArrayList<String[]> sets = new ArrayList<String[]>();
-        for (int i = 0; i < parts.length; i++) {
-            String[] subParts = parts[i].split("/");
-            for (int j = 0; j < subParts.length; j++) {
-                fields.add(subParts[j]);
+        for (String part : parts) {
+            String[] subParts = part.split("/");
+            for (String subPart : subParts) {
+                fields.add(subPart);
             }
             // Check if we have either/or fields:
             if (subParts.length > 1) {
@@ -154,14 +152,14 @@ public class CustomEntryType extends BibtexEntryType {
     protected boolean isCoupledFieldSet(String field, BibtexEntry entry, BibtexDatabase database) {
         if (reqSets == null)
             return false;
-        for (int i=0; i<reqSets.length; i++) {
+        for (String[] reqSet : reqSets) {
             boolean takesPart = false, oneSet = false;
-            for (int j=0; j<reqSets[i].length; j++) {
+            for (int j = 0; j < reqSet.length; j++) {
                 // If this is the field we're looking for, note that the field is part of the set:
-                if (reqSets[i][j].equalsIgnoreCase(field))
+                if (reqSet[j].equalsIgnoreCase(field))
                     takesPart = true;
-                // If it is a different field, check if it is set:
-                else if (BibtexDatabase.getResolvedField(reqSets[i][j], entry, database) != null)
+                    // If it is a different field, check if it is set:
+                else if (BibtexDatabase.getResolvedField(reqSet[j], entry, database) != null)
                     oneSet = true;
             }
             // Ths the field is part of the set, and at least one other field is set, return true:

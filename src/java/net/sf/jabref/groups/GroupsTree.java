@@ -262,10 +262,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
 						.getTransferData(TransferableEntrySelection.flavorInternal);
 				final BibtexEntry[] entries = selection.getSelection();
 				int assignedEntries = 0;
-				for (int i = 0; i < entries.length; ++i) {
-					if (!target.getGroup().contains(entries[i]))
-						++assignedEntries;
-				}
+                for (BibtexEntry entry : entries) {
+                    if (!target.getGroup().contains(entry))
+                        ++assignedEntries;
+                }
 
 				// warn if assignment has undesired side effects (modifies a
 				// field != keywords)

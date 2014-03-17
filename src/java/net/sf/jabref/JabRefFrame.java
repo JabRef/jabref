@@ -1389,8 +1389,8 @@ public JabRefPreferences prefs() {
       mb.add(view);
 
       bibtex.add(newEntryAction);
-      for (int i = 0; i < newSpecificEntryAction.length; i++) {
-          newSpec.add(newSpecificEntryAction[i]);
+      for (NewEntryAction aNewSpecificEntryAction : newSpecificEntryAction) {
+          newSpec.add(aNewSpecificEntryAction);
       }
       bibtex.add(newSpec);
       bibtex.add(plainTextImport);
@@ -2125,22 +2125,21 @@ public JabRefPreferences prefs() {
         boolean dupli = false;
         // Check for duplicates among the current entries:
         if (checkForDuplicates) {
-            loop: for (Iterator<String> i2=database.getKeySet().iterator();
-                       i2.hasNext();) {
-                BibtexEntry existingEntry = database.getEntryById(i2.next());
+            loop:
+            for (String s : database.getKeySet()) {
+                BibtexEntry existingEntry = database.getEntryById(s);
                 if (DuplicateCheck.isDuplicate(entry, existingEntry
                 )) {
                     DuplicateResolverDialog drd = new DuplicateResolverDialog
-                        (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                            (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                     drd.setVisible(true);
                     int res = drd.getSelected();
-                    if (res == DuplicateResolverDialog.KEEP_LOWER)   {
+                    if (res == DuplicateResolverDialog.KEEP_LOWER) {
                         dupli = true;
-                    }
-                    else if (res == DuplicateResolverDialog.KEEP_UPPER) {
+                    } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
                         database.removeEntry(existingEntry.getId());
                         ce.addEdit(new UndoableRemoveEntry
-                                   (database, existingEntry, basePanel));
+                                (database, existingEntry, basePanel));
                     } else if (res == DuplicateResolverDialog.BREAK) {
                         break mainLoop;
                     }

@@ -291,40 +291,39 @@ public class ContentSelectorDialog2 extends JDialog {
 	// First remove the mappings for fields that have been deleted.
 	// If these were re-added, they will be added below, so it doesn't
 	// cause any harm to remove them here.
-	for (Iterator<String> i=removedFields.iterator(); i.hasNext();) {
-	    String fieldName = i.next();
-	    metaData.remove(Globals.SELECTOR_META_PREFIX+fieldName);
-	    changedFieldSet = true;
-	}
+        for (String fieldName : removedFields) {
+            metaData.remove(Globals.SELECTOR_META_PREFIX + fieldName);
+            changedFieldSet = true;
+        }
 
 	// Cycle through all fields that we have created listmodels for:
-	loop: for (Iterator<String> i=wordListModels.keySet().iterator(); i.hasNext();) {
-	    // For each field name, store the values:
-	    String fieldName = i.next();
-	    if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
-		continue loop;
-	    DefaultListModel lm = wordListModels.get(fieldName);
-	    int start = 0;
-	    // Avoid storing the <new word> marker if it is there:
-	    if (lm.size() > 0)
-		while ((start<lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
-		    start++;
-	    Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
-	    boolean newField = false;
-	    if (data == null) {
-		newField = true;
-		data = new Vector<String>();
-		changedFieldSet = true;
+	loop:
+    for (String fieldName : wordListModels.keySet()) {
+        // For each field name, store the values:
+        if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
+            continue loop;
+        DefaultListModel lm = wordListModels.get(fieldName);
+        int start = 0;
+        // Avoid storing the <new word> marker if it is there:
+        if (lm.size() > 0)
+            while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+                start++;
+        Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
+        boolean newField = false;
+        if (data == null) {
+            newField = true;
+            data = new Vector<String>();
+            changedFieldSet = true;
 
-	    } else
-		data.clear();
-	    for (int wrd=start; wrd<lm.size(); wrd++) {
-		String word = (String)lm.get(wrd);
-		data.add(word);
-	    }
-	    if (newField)
-		metaData.putData(Globals.SELECTOR_META_PREFIX+fieldName, data);
-	}
+        } else
+            data.clear();
+        for (int wrd = start; wrd < lm.size(); wrd++) {
+            String word = (String) lm.get(wrd);
+            data.add(word);
+        }
+        if (newField)
+            metaData.putData(Globals.SELECTOR_META_PREFIX + fieldName, data);
+    }
 
 	// System.out.println("TODO: remove metadata for removed selector field.");
 	panel.markNonUndoableBaseChanged();

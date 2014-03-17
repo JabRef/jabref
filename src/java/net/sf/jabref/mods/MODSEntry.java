@@ -151,11 +151,11 @@ public class MODSEntry {
         else
         {
             String[] names = authors.split(" and ");
-            for (int i=0; i<names.length; i++) {
-            	if(CHARFORMAT)
-            		result.add(new PersonName(chars.format(names[i])));
-            	else
-            		result.add(new PersonName(names[i]));
+            for (String name : names) {
+                if (CHARFORMAT)
+                    result.add(new PersonName(chars.format(name)));
+                else
+                    result.add(new PersonName(name));
             }
         }
 		return result;
@@ -210,30 +210,29 @@ public class MODSEntry {
 		   		mods.appendChild(titleInfo);
 	   		}
 	   		if (authors != null) {
-	   			for(Iterator<PersonName> iter = authors.iterator(); iter.hasNext();) {
-	   				PersonName name = iter.next();
-	   				Element modsName = d.createElement("name");
-	   				modsName.setAttribute("type", "personal");
-	   				if (name.getSurname() != null) {
-	   					Element namePart = d.createElement("namePart");
-	   					namePart.setAttribute("type", "family");
-	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
-	   					modsName.appendChild(namePart);
-	   				}
-	   				if (name.getGivenNames() != null) {
-	   					Element namePart = d.createElement("namePart");
-	   					namePart.setAttribute("type", "given");
-	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
-	   					modsName.appendChild(namePart);
-	   				}
-	   				Element role = d.createElement("role");
-	   				Element roleTerm = d.createElement("roleTerm");
-	   				roleTerm.setAttribute("type", "text");
-	   				roleTerm.appendChild(d.createTextNode("author"));
-	   				role.appendChild(roleTerm);
-	   				modsName.appendChild(role);
-	   				mods.appendChild(modsName);
-	   			}
+                for (PersonName name : authors) {
+                    Element modsName = d.createElement("name");
+                    modsName.setAttribute("type", "personal");
+                    if (name.getSurname() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "family");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
+                        modsName.appendChild(namePart);
+                    }
+                    if (name.getGivenNames() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "given");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
+                        modsName.appendChild(namePart);
+                    }
+                    Element role = d.createElement("role");
+                    Element roleTerm = d.createElement("roleTerm");
+                    roleTerm.setAttribute("type", "text");
+                    roleTerm.appendChild(d.createTextNode("author"));
+                    role.appendChild(roleTerm);
+                    modsName.appendChild(role);
+                    mods.appendChild(modsName);
+                }
 	   		}
 	   		//publisher
 	   		Element originInfo = d.createElement("originInfo");

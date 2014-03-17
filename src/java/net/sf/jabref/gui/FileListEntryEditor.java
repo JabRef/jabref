@@ -287,13 +287,13 @@ public class FileListEntryEditor {
             entry.setLink(link.getText().trim());
         } else {
             boolean found = false;
-            for (int i=0; i<dirs.length; i++) {
-                String canPath = (new File(dirs[i])).getCanonicalPath();
+            for (String dir : dirs) {
+                String canPath = (new File(dir)).getCanonicalPath();
                 File fl = new File(link.getText().trim());
                 if (fl.isAbsolute()) {
                     String flPath = fl.getCanonicalPath();
                     if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                        String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
+                        String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
                         entry.setLink(relFileName);
                         found = true;
                         break;

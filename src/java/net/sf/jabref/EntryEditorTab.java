@@ -121,7 +121,7 @@ public class EntryEditorTab {
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
         String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < fields.length; i++) {
+        for (String field : fields) {
             sb.append("fill:pref:grow, ");
         }
         if (addKeyField)
@@ -296,16 +296,15 @@ public class EntryEditorTab {
 	}
 
 	public void validateAllFields() {
-		for (Iterator<String> i = editors.keySet().iterator(); i.hasNext();) {
-			String field = i.next();
-			FieldEditor ed = editors.get(field);
+        for (String field : editors.keySet()) {
+            FieldEditor ed = editors.get(field);
             ed.updateFontColor();
-			ed.setEnabled(true);
-			if (((Component) ed).hasFocus())
-				ed.setActiveBackgroundColor();
-			else
-				ed.setValidBackgroundColor();
-		}
+            ed.setEnabled(true);
+            if (((Component) ed).hasFocus())
+                ed.setActiveBackgroundColor();
+            else
+                ed.setValidBackgroundColor();
+        }
 	}
 
 	public void setEnabled(boolean enabled) {

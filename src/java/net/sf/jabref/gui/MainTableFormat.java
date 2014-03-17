@@ -230,8 +230,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 }
             }
 
-            for (int i = 0; i < nameCols.length; i++) {
-                if ((col - padleft == nameCols[i][0]) && (nameCols[i][1] == j)) {
+            for (int[] nameCol : nameCols) {
+                if ((col - padleft == nameCol[0]) && (nameCol[1] == j)) {
                     return formatName(o);
                 }
             }

@@ -148,8 +148,8 @@ public class FileListEditorTransferHandler extends TransferHandler {
         // all supported flavors failed
         System.err.println("can't transfer input: ");
         DataFlavor inflavs[] = t.getTransferDataFlavors();
-        for (int i = 0; i < inflavs.length; i++) {
-            System.out.println("  " + inflavs[i].toString());
+        for (DataFlavor inflav : inflavs) {
+            System.out.println("  " + inflav.toString());
         }
 
         return false;
@@ -165,10 +165,9 @@ public class FileListEditorTransferHandler extends TransferHandler {
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
 
         // accept this if any input flavor matches any of our supported flavors
-        for (int i = 0; i < transferFlavors.length; i++) {
-            DataFlavor inflav = transferFlavors[i];
+        for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor))
                 return true;
         }
 

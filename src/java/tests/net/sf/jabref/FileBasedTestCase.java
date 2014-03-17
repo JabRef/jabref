@@ -90,8 +90,7 @@ public class FileBasedTestCase extends TestCase {
 			File[] fileArray = file.listFiles();
 
 			if (fileArray != null)
-				for (int i = 0; i < fileArray.length; i++)
-					deleteRecursive(fileArray[i]);
+                for (File aFileArray : fileArray) deleteRecursive(aFileArray);
 		}
 		file.delete();
 	}

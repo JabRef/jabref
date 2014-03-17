@@ -153,8 +153,8 @@ public class ManagePluginsDialog {
             if (reply != JOptionPane.YES_OPTION)
                 return;
             boolean success = true;
-            for (int i=0; i<sel.length; i++) {
-                PluginInstaller.NameAndVersion nav = plugins.get(sel[i]);
+            for (int aSel : sel) {
+                NameAndVersion nav = plugins.get(aSel);
                 success = PluginInstaller.deletePlugin(nav) & success;
             }
             if (!success) {

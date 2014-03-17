@@ -294,8 +294,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 		Component[] comps = tlb.getComponents();
 
-		for (int i = 0; i < comps.length; i++)
-			((JComponent) comps[i]).setOpaque(false);
+        for (Component comp : comps) ((JComponent) comp).setOpaque(false);
 
 		return tlb;
 	}

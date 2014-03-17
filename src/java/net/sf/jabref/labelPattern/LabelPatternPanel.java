@@ -254,8 +254,7 @@ public class LabelPatternPanel  extends JPanel {
      * @param keypatterns the LabelPattern to use as initial value
      */
     public void setValues(LabelPattern keypatterns) {
-        for (Iterator<String> i=textFields.keySet().iterator(); i.hasNext();) {
-            String name = i.next();
+        for (String name : textFields.keySet()) {
             JTextField tf = textFields.get(name);
             setValue(tf, name, keypatterns);
         }

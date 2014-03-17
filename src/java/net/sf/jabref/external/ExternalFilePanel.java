@@ -318,9 +318,9 @@ public class ExternalFilePanel extends JPanel {
 					String[] dirs = metaData.getFileDirectory(fieldName);
                     String directory = null;
                     // Look for the first one in the list that exists:
-                    for (int i=0; i<dirs.length; i++) {
-                        if (new File(dirs[i]).exists()) {
-                            directory = dirs[i];
+                    for (String dir : dirs) {
+                        if (new File(dir).exists()) {
+                            directory = dir;
                             break;
                         }
                     }
@@ -445,8 +445,8 @@ public class ExternalFilePanel extends JPanel {
 				 */
 				LinkedList<String> list = new LinkedList<String>();
                 String[] dirs = metaData.getFileDirectory(fieldName);
-                for (int i = 0; i < dirs.length; i++) {
-                    list.add(dirs[i]);
+                for (String dir : dirs) {
+                    list.add(dir);
                 }
 
 				String found = Util.findPdf(getEntry(), fieldName, list

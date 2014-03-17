@@ -748,9 +748,9 @@ public class GroupSelector extends SidePaneComponent implements
         final AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb.isSelected(), invCb.isSelected());
         TreePath[] selection = groupsTree.getSelectionPaths();
 
-        for (int i = 0; i < selection.length; ++i) {
-            searchRules.addRule(((GroupTreeNode) selection[i].getLastPathComponent()).getSearchRule());
-                }
+        for (TreePath aSelection : selection) {
+            searchRules.addRule(((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule());
+        }
         Hashtable<String, String> searchOptions = new Hashtable<String, String>();
         searchOptions.put("option", "dummy");
         GroupingWorker worker = new GroupingWorker(searchRules, searchOptions);
@@ -1540,14 +1540,14 @@ public class GroupSelector extends SidePaneComponent implements
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
           node = e.nextElement();
           rule = node.getSearchRule();
-            for (Iterator<BibtexEntry> it = matches.iterator(); it.hasNext();) {
-              entry = it.next();
+            for (BibtexEntry matche : matches) {
+                entry = matche;
                 if (rule.applyRule(dummyMap, entry) == 0) {
-                      continue;
+                    continue;
                 }
-              vec.add(node);
-              break;
-          }
+                vec.add(node);
+                break;
+            }
       }
       groupsTree.setHighlight2Cells(vec.toArray());
     }

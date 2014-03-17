@@ -105,15 +105,15 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         // First we try to autoset fields
         if (autoSet) {
-            for (int i = 0; i < sel.length; i++) {
+            for (BibtexEntry aSel : sel) {
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);
 
-                final String old = sel[i].getField(fieldName);
+                final String old = aSel.getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
-                extPan.setEntry(sel[i], panel.getDatabase());
+                extPan.setEntry(aSel, panel.getDatabase());
                 editor.setText((old != null) ? old : "");
                 Thread t = extPan.autoSetFile(fieldName, editor);
                 // Wait for the autoset process to finish:
@@ -127,8 +127,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 if (!editor.getText().equals("") && !editor.getText().equals(old)) {
                     // Store an undo edit:
                     //System.out.println("Setting: "+sel[i].getCiteKey()+" "+editor.getText());
-                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, editor.getText()));
-                    sel[i].setField(fieldName, editor.getText());
+                    ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, editor.getText()));
+                    aSel.setField(fieldName, editor.getText());
                     entriesChanged++;
                 }
             }
@@ -137,9 +137,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             mainLoop:
-            for (int i = 0; i < sel.length; i++) {
+            for (BibtexEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final String old = sel[i].getField(fieldName);
+                final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
@@ -150,27 +150,28 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),
                                         Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{old, sel[i].getCiteKey()}),
+                                                new String[]{old, aSel.getCiteKey()}),
                                         Globals.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
-                                        JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
+                                        JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
+                                );
                         switch (answer) {
                             case 1:
                                 // Assign new file.
                                 AttachFileDialog afd = new AttachFileDialog(panel.frame(),
-                                        panel.metaData(), sel[i], fieldName);
+                                        panel.metaData(), aSel, fieldName);
                                 Util.placeDialog(afd, panel.frame());
                                 afd.setVisible(true);
                                 if (!afd.cancelled()) {
-                                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, afd.getValue()));
-                                    sel[i].setField(fieldName, afd.getValue());
+                                    ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, afd.getValue()));
+                                    aSel.setField(fieldName, afd.getValue());
                                     entriesChanged++;
                                 }
                                 break;
                             case 2:
                                 // Clear field
-                                ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, null));
-                                sel[i].setField(fieldName, null);
+                                ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, null));
+                                aSel.setField(fieldName, null);
                                 entriesChanged++;
                                 break;
                             case 3:

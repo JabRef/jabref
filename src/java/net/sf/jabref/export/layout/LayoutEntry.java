@@ -78,10 +78,10 @@ public class LayoutEntry {
 
 				option = getOptionalLayout(v.get(1), classPrefix);
                 // See if there was an undefined formatter:
-                for (int i = 0; i < option.length; i++) {
-                    if (option[i] instanceof NotFoundFormatter) {
-                        String notFound = ((NotFoundFormatter)option[i]).getNotFound();
-                        
+                for (LayoutFormatter anOption : option) {
+                    if (anOption instanceof NotFoundFormatter) {
+                        String notFound = ((NotFoundFormatter) anOption).getNotFound();
+
                         if (invalidFormatter == null)
                             invalidFormatter = new ArrayList<String>();
                         invalidFormatter.add(notFound);
@@ -195,18 +195,18 @@ public class LayoutEntry {
 		// split the strings along &, && or ; for AND formatter
                 String[] parts = text.split("\\s*(;|(\\&+))\\s*");
                 field = null;
-                for (int i = 0; i < parts.length; i++) {
-                    field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
+                for (String part : parts) {
+                    field = BibtexDatabase.getResolvedField(part, bibtex, database);
                     if (field == null)
                         break;
-                    
+
                 }
             } else { 
 		// split the strings along |, ||  for OR formatter
                 String[] parts = text.split("\\s*(\\|+)\\s*");
                 field = null;
-                for (int i = 0; i < parts.length; i++) {
-                    field = BibtexDatabase.getResolvedField(parts[i], bibtex, database);
+                for (String part : parts) {
+                    field = BibtexDatabase.getResolvedField(part, bibtex, database);
                     if (field != null)
                         break;
                 }
@@ -300,9 +300,9 @@ public class LayoutEntry {
 
 			//System.out.println("OPTION: "+option);
 			if (option != null) {
-				for (int i = 0; i < option.length; i++) {
-					fieldEntry = option[i].format(fieldEntry);
-				}
+                for (LayoutFormatter anOption : option) {
+                    fieldEntry = anOption.format(fieldEntry);
+                }
 			}
 
             // If a post formatter has been set, call it:
@@ -345,9 +345,9 @@ public class LayoutEntry {
 		} else if (type == LayoutHelper.IS_OPTION_FIELD) {
 			String field = BibtexDatabase.getText(text, database);
 			if (option != null) {
-				for (int i = 0; i < option.length; i++) {
-					field = option[i].format(field);
-				}
+                for (LayoutFormatter anOption : option) {
+                    field = anOption.format(field);
+                }
 			}
             // If a post formatter has been set, call it:
             if (postFormatter != null)

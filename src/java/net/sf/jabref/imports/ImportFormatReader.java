@@ -158,16 +158,14 @@ public class ImportFormatReader {
 
     BibtexDatabase database = new BibtexDatabase();
 
-    for (Iterator<BibtexEntry> i = bibentries.iterator(); i.hasNext();) {
-      BibtexEntry entry = i.next();
-
-      try {
-        entry.setId(Util.createNeutralId());
-        database.insertEntry(entry);
-      } catch (KeyCollisionException ex) {
-        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+      for (BibtexEntry entry : bibentries) {
+          try {
+              entry.setId(Util.createNeutralId());
+              database.insertEntry(entry);
+          } catch (KeyCollisionException ex) {
+              System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+          }
       }
-    }
 
     return database;
   }

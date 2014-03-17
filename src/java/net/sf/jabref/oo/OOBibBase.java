@@ -373,9 +373,9 @@ public class OOBibBase {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
         ArrayList<String> tmp = new ArrayList<String>();
-        for (int i = 0; i < names.length; i++) {
-            if (citePattern.matcher(names[i]).find())
-                tmp.add(names[i]);
+        for (String name : names) {
+            if (citePattern.matcher(name).find())
+                tmp.add(name);
         }
         names = tmp.toArray(new String[tmp.size()]);
         return names;
@@ -407,8 +407,7 @@ public class OOBibBase {
             entries = newMap;
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
-            for (Iterator<BibtexEntry> iterator = entries.keySet().iterator(); iterator.hasNext();) {
-                BibtexEntry entry = iterator.next();
+            for (BibtexEntry entry : entries.keySet()) {
                 cited.add(entry.getCiteKey());
             }
             names = nameAccess.getElementNames();
@@ -421,9 +420,9 @@ public class OOBibBase {
 
         // Remove all reference marks that don't look like JabRef citations:
         ArrayList<String> tmp = new ArrayList<String>();
-        for (int i = 0; i < names.length; i++) {
-            if (citePattern.matcher(names[i]).find())
-                tmp.add(names[i]);
+        for (String name : names) {
+            if (citePattern.matcher(name).find())
+                tmp.add(name);
         }
         names = tmp.toArray(new String[tmp.size()]);
 
@@ -760,8 +759,7 @@ public class OOBibBase {
             set.add(new ComparableMark(names[i], positions[i]));
         }
         int i=0;
-        for (Iterator<ComparableMark> iterator = set.iterator(); iterator.hasNext();) {
-            ComparableMark mark = iterator.next();
+        for (ComparableMark mark : set) {
             //System.out.println(mark.getPosition().X+" -- "+mark.getPosition().Y+" : "+mark.getName());
             names[i++] = mark.getName();
         }
@@ -863,12 +861,12 @@ public class OOBibBase {
         XNameAccess xNamedMarks = supplier.getReferenceMarks();
         String[] names = xNamedMarks.getElementNames();
         ArrayList<String> keys = new ArrayList<String>();
-        for (int i = 0; i < names.length; i++) {
-            Object bookmark = xNamedMarks.getByName(names[i]);
+        for (String name1 : names) {
+            Object bookmark = xNamedMarks.getByName(name1);
             XTextContent xTextContent = UnoRuntime.queryInterface(
                     XTextContent.class, bookmark);
 
-            String name = names[i];
+            String name = name1;
             List<String> newKeys = parseRefMarkName(name);
             for (String key : newKeys)
                 if (!keys.contains(key))
@@ -886,8 +884,8 @@ public class OOBibBase {
         
         LinkedHashMap<BibtexEntry,BibtexDatabase> newList = new LinkedHashMap<BibtexEntry,BibtexDatabase>();
         HashMap<BibtexEntry,BibtexEntry> adaptedEntries = new HashMap<BibtexEntry,BibtexEntry>();
-        for (int i = 0; i < names.length; i++) {
-            Matcher m = citePattern.matcher(names[i]);
+        for (String name : names) {
+            Matcher m = citePattern.matcher(name);
             if (m.find()) {
                 String[] keys = m.group(2).split(",");
                 for (int j = 0; j < keys.length; j++) {
@@ -895,8 +893,8 @@ public class OOBibBase {
                     BibtexEntry origEntry = null;
                     if (database != null) origEntry = database.getEntryByKey(keys[j]);
                     if (origEntry == null) {
-                        System.out.println("Bibtex key not found : '"+keys[j]+"'");
-                        System.out.println("Problem with reference mark: '"+names[i]+"'");
+                        System.out.println("Bibtex key not found : '" + keys[j] + "'");
+                        System.out.println("Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(keys[j]), null);
                         //throw new BibtexEntryNotFoundException(keys[j], "");
                     } else {
@@ -931,9 +929,9 @@ public class OOBibBase {
         Matcher m = citePattern.matcher(name);
         if (m.find()) {
             String[] keystring = m.group(2).split(",");
-            for (int j = 0; j < keystring.length; j++) {
-                if (!keys.contains(keystring[j]))
-                    keys.add(keystring[j]);
+            for (String aKeystring : keystring) {
+                if (!keys.contains(aKeystring))
+                    keys.add(aKeystring);
             }
         }
         return keys;

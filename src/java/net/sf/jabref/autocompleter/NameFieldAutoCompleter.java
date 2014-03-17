@@ -75,8 +75,8 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
 	public void addBibtexEntry(BibtexEntry entry) {
         if (entry != null) {
-            for (int i=0; i<fieldNames.length; i++) {
-                String fieldValue = entry.getField(fieldNames[i]);
+            for (String fieldName : fieldNames) {
+                String fieldValue = entry.getField(fieldName);
                 if (fieldValue != null) {
                     AuthorList authorList = AuthorList.getAuthorList(fieldValue);
                     for (int j = 0; j < authorList.size(); j++) {
@@ -85,26 +85,26 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
                             addWordToIndex(author.getLastOnly());
                         } else {
                             if (autoCompLF) {
-                            	if (autoCompShortFirstOnly) {
-                            		addWordToIndex(author.getLastFirst(true));
-                            	} else if (autoCompFullFirstOnly) {
-                            		addWordToIndex(author.getLastFirst(false));
-                            	} else {
-                            		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
-                            		addWordToIndex(author.getLastFirst(true));
-                            		addWordToIndex(author.getLastFirst(false));
-                            	}
+                                if (autoCompShortFirstOnly) {
+                                    addWordToIndex(author.getLastFirst(true));
+                                } else if (autoCompFullFirstOnly) {
+                                    addWordToIndex(author.getLastFirst(false));
+                                } else {
+                                    // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                                    addWordToIndex(author.getLastFirst(true));
+                                    addWordToIndex(author.getLastFirst(false));
+                                }
                             }
                             if (autoCompFF) {
-                            	if (autoCompShortFirstOnly) {
-                            		addWordToIndex(author.getFirstLast(true));
-                            	} else if (autoCompFullFirstOnly) {
-                            		addWordToIndex(author.getFirstLast(false));
-                            	} else {
-                            		// JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                                if (autoCompShortFirstOnly) {
+                                    addWordToIndex(author.getFirstLast(true));
+                                } else if (autoCompFullFirstOnly) {
+                                    addWordToIndex(author.getFirstLast(false));
+                                } else {
+                                    // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
                                     addWordToIndex(author.getFirstLast(true));
                                     addWordToIndex(author.getFirstLast(false));
-                            	}
+                                }
                             }
                         }
                     }

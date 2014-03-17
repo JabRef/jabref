@@ -56,8 +56,7 @@ public class TransferableBibtexEntry implements Transferable {
 	    try {
 		StringWriter sw = new StringWriter();
 		LatexFieldFormatter ff = new LatexFieldFormatter();
-		for (int i=0; i<data.length; i++)
-		    data[i].write(sw, ff, false);
+            for (BibtexEntry aData : data) aData.write(sw, ff, false);
 		return sw.toString();
 	    } catch (IOException ex) {
 		JOptionPane.showMessageDialog

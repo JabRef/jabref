@@ -197,8 +197,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         for (String field : fields)
             newListModel.addElement(field);
         this.listModel = newListModel;
-        for (Iterator<ListDataListener> i=modelListeners.iterator(); i.hasNext();)
-            newListModel.addListDataListener(i.next());
+        for (ListDataListener modelListener : modelListeners) newListModel.addListDataListener(modelListener);
         list.setModel(newListModel);
     }
 
@@ -232,8 +231,8 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     protected void addFieldUncritically(String s) {
         listModel.addElement(s);
         changesMade = true;
-        for (Iterator<ActionListener> i=additionListeners.iterator(); i.hasNext();) {
-            i.next().actionPerformed(new ActionEvent(this, 0, s));
+        for (ActionListener additionListener : additionListeners) {
+            additionListener.actionPerformed(new ActionEvent(this, 0, s));
         }
         
     }

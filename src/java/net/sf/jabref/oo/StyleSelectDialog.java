@@ -361,8 +361,7 @@ public class StyleSelectDialog {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
             File[] files = dirF.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
+            for (File file : files) {
                 // If the file looks like a style file, parse it:
                 if (!file.isDirectory() && (file.getName().endsWith(STYLE_FILE_EXTENSION))) {
                     addSingleFile(file);

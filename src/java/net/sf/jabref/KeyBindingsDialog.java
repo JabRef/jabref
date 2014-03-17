@@ -202,10 +202,9 @@ class KeyBindingsDialog extends JDialog {
         Object[] selected = list.getSelectedValues();
 
         // Iterate all selected items
-        for (int i = 0; i < selected.length; i++) {
-          Object sel = selected[i];
-          keyTF.setText( bindHM.get(sel));
-        }
+          for (Object sel : selected) {
+              keyTF.setText(bindHM.get(sel));
+          }
       }
     }
   }
@@ -319,8 +318,7 @@ class KeyBindingsDialog extends JDialog {
                 setList();
             }
         } else {
-            for (int i=0; i<selected.length; i++) {
-                int row = selected[i];
+            for (int row : selected) {
                 String name = (String) table.getValueAt(row, 0);
                 String newKey = setToDefault(name);
                 keyTF.setText(newKey);

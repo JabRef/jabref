@@ -73,8 +73,7 @@ public class AppendDatabaseAction extends BaseAction {
           //                                       null, JFileChooser.OPEN_DIALOG, false);
           if(chosen == null)
             return;
-          for (int i=0; i<chosen.length; i++)
-            filesToOpen.add(new File(chosen[i]));
+            for (String aChosen : chosen) filesToOpen.add(new File(aChosen));
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
@@ -93,8 +92,7 @@ public class AppendDatabaseAction extends BaseAction {
                 boolean importGroups, boolean importSelectorWords) {
         if (filesToOpen.size() == 0)
             return;
-        for (Iterator<File> i = filesToOpen.iterator(); i.hasNext();) {
-            File file = i.next();
+        for (File file : filesToOpen) {
             try {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
@@ -160,8 +158,7 @@ public class AppendDatabaseAction extends BaseAction {
                       ExplicitGroup group = new ExplicitGroup("Imported",
                               AbstractGroup.INDEPENDENT); // JZTODO lyrics
                       newGroups.setGroup(group);
-                      for (int i = 0; i < appendedEntries.size(); ++i)
-                          group.addEntry(appendedEntries.get(i));
+                      for (BibtexEntry appendedEntry : appendedEntries) group.addEntry(appendedEntry);
                   }
 
                   // groupsSelector is always created, even when no groups

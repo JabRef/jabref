@@ -148,8 +148,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      */
     public boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()){
-            for (int i = 0; i < fields.length; i++) {
-                if (entry.getField(fields[i]) != null)
+            for (String field : fields) {
+                if (entry.getField(field) != null)
                     return true;
             }
         }
@@ -203,8 +203,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         outer: for (int i=0; i<tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
-            for (Iterator<String> j=fields.iterator(); j.hasNext();) {
-                String field = j.next();
+            for (String field : fields) {
                 if (field.equals(GUIGlobals.FILE_FIELD)) {
                     found = true;
                     break outer;

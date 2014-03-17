@@ -50,8 +50,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
             map.put(tabbedPane.getTitleAt(i), panel);
         }
         tabbedPane.removeAll();
-        for (Iterator<String> i=map.keySet().iterator(); i.hasNext();) {
-            String title = i.next();
+        for (String title : map.keySet()) {
             BasePanel panel = map.get(title);
             tabbedPane.addTab(title, panel);
         }

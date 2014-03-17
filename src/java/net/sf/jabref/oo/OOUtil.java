@@ -250,17 +250,15 @@ public class OOUtil {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         Property[] pr = props.getPropertySetInfo().getProperties();
-        for (int i = 0; i < pr.length; i++) {
-            Property property1 = pr[i];
-            System.out.println(property1.Name+" : "+props.getPropertyValue(property1.Name));
+        for (Property property1 : pr) {
+            System.out.println(property1.Name + " : " + props.getPropertyValue(property1.Name));
         }
     }
 
     public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {
         String[] values = new String[list.size()];
         int ii=0;
-        for (Iterator<XTextDocument> iterator = list.iterator(); iterator.hasNext();) {
-            XTextDocument doc = iterator.next();
+        for (XTextDocument doc : list) {
             values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
         }
         JList sel = new JList(values);

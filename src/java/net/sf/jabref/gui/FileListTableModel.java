@@ -284,8 +284,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     public void print() {
         System.out.println("----");
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry fileListEntry = iterator.next();
+        for (FileListEntry fileListEntry : list) {
             System.out.println(fileListEntry);
         }
         System.out.println("----");

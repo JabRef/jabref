@@ -348,15 +348,15 @@ public class GUIGlobals {
 			while ((c = in.read()) != -1)
 				buffer.append((char)c);
 			String[] lines = buffer.toString().split("\n");
-			for (int i=0; i<lines.length; i++) {
-				String line = lines[i].trim();
-				int index = line.indexOf("=");
-				if (index >= 0) {
-					String key = line.substring(0, index).trim();
-					String value = prefix+line.substring(index+1).trim();
-					map.put(key, value);
-				}
-			}
+            for (String line1 : lines) {
+                String line = line1.trim();
+                int index = line.indexOf("=");
+                if (index >= 0) {
+                    String key = line.substring(0, index).trim();
+                    String value = prefix + line.substring(index + 1).trim();
+                    map.put(key, value);
+                }
+            }
 		} finally {
 			try {
 				if (in != null) in.close();

@@ -53,8 +53,8 @@ public class AbbreviateAction extends AbstractWorker {
             return;
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;
-        for (int i = 0; i < entries.length; i++) {
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entries[i], "journal", ce, iso))
+        for (BibtexEntry entry : entries) {
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso))
                 count++;
         }
         if (count > 0) {

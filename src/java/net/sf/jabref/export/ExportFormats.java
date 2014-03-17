@@ -153,16 +153,15 @@ public class ExportFormats {
 		StringBuffer sb = new StringBuffer();
 		int lastBreak = -firstLineSubtr;
 
-		for (Iterator<String> i = exportFormats.keySet().iterator(); i.hasNext();) {
-			String name = i.next();
-			if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
-				sb.append(",\n");
-				lastBreak = sb.length();
-				sb.append(linePrefix);
-			} else if (sb.length() > 0)
-				sb.append(", ");
-			sb.append(name);
-		}
+        for (String name : exportFormats.keySet()) {
+            if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
+                sb.append(",\n");
+                lastBreak = sb.length();
+                sb.append(linePrefix);
+            } else if (sb.length() > 0)
+                sb.append(", ");
+            sb.append(name);
+        }
 
 		return sb.toString();
 	}
@@ -243,8 +242,7 @@ public class ExportFormats {
                     if (selectedOnly) {
                         BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
                         entryIds = new HashSet<String>();
-                        for (int i = 0; i < selected.length; i++) {
-                            BibtexEntry bibtexEntry = selected[i];
+                        for (BibtexEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
                         }
                     }

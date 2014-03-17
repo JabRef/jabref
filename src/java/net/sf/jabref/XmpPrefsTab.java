@@ -198,9 +198,9 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		tableRows.clear();
 		String[] names = JabRefPreferences.getInstance().getStringArray("xmpPrivacyFilters");
-		for (int i = 0; i < names.length; i++) {
-			tableRows.add(names[i]);
-		}
+        for (String name : names) {
+            tableRows.add(name);
+        }
 		rowCount = tableRows.size() + 5;
 
 		privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(

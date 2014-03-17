@@ -191,10 +191,10 @@ public class OOBibStyle implements Comparable {
         String[] lines = sb.toString().split("\n");
         int mode = NONE;
 
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            if ((line.length() > 0) && (line.charAt(line.length()-1) == '\r'))
-                line = line.substring(0, line.length()-1);
+        for (String line1 : lines) {
+            String line = line1;
+            if ((line.length() > 0) && (line.charAt(line.length() - 1) == '\r'))
+                line = line.substring(0, line.length() - 1);
             // Check for empty line or comment:
             if ((line.trim().length() == 0) || (line.charAt(0) == '#'))
                 continue;
@@ -202,20 +202,16 @@ public class OOBibStyle implements Comparable {
             if (line.equals(NAME_MARK)) {
                 mode = NAME;
                 continue;
-            }
-            else if (line.equals(LAYOUT_MRK)) {
+            } else if (line.equals(LAYOUT_MRK)) {
                 mode = LAYOUT;
                 continue;
-            }
-            else if (line.equals(PROPERTIES_MARK)) {
+            } else if (line.equals(PROPERTIES_MARK)) {
                 mode = PROPERTIES;
                 continue;
-            }
-            else if (line.equals(CITATION_MARK)) {
+            } else if (line.equals(CITATION_MARK)) {
                 mode = CITATION;
                 continue;
-            }
-            else if (line.equals(JOURNALS_MARK)) {
+            } else if (line.equals(JOURNALS_MARK)) {
                 mode = JOURNALS;
                 continue;
             }
@@ -720,8 +716,7 @@ public class OOBibStyle implements Comparable {
      */
     public String getCitationMarkerField(BibtexEntry entry, BibtexDatabase database, String field) {
         String[] fields = field.split("/");
-        for (int i = 0; i < fields.length; i++) {
-            String s = fields[i];
+        for (String s : fields) {
             String content = BibtexDatabase.getResolvedField(s, entry, database);
             if ((content != null) && (content.trim().length() > 0)) {
                 if (fieldFormatter != null)

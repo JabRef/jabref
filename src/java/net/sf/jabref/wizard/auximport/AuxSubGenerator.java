@@ -217,16 +217,13 @@ public class AuxSubGenerator
               if ( keys != null )
               {
                 int keyCount = keys.length ;
-                for ( int t = 0 ; t < keyCount ; t++ )
-                {
-                  String dummyStr = keys[t] ;
-                  if ( dummyStr != null )
-                  {
-                    // delete all unnecessary blanks and save key into an set
-                    mySet.add( dummyStr.trim() ) ;
+                  for (String dummyStr : keys) {
+                      if (dummyStr != null) {
+                          // delete all unnecessary blanks and save key into an set
+                          mySet.add(dummyStr.trim());
 //                System.out.println("found " +str +" in AUX") ;
+                      }
                   }
-                }
               }
             }
           }

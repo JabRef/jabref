@@ -45,8 +45,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         StringBuffer sb = new StringBuffer(Globals.lang("Custom entry types found in file") + ": ");
         Object[] types = pr.getEntryTypes().keySet().toArray();
         Arrays.sort(types);
-        for (int i = 0; i < types.length; i++) {
-            sb.append(types[i].toString()).append(", ");
+        for (Object type : types) {
+            sb.append(type.toString()).append(", ");
         }
         String s = sb.toString();
         int answer = JOptionPane.showConfirmDialog(panel.frame(),

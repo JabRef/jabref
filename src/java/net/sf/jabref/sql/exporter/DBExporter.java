@@ -250,9 +250,9 @@ public abstract class DBExporter extends DBImporterExporter{
 				String insert = "INSERT INTO entry_types (label, " + fieldStr
 						+ ") VALUES (";
 				query = insert + "'" + val.getName().toLowerCase() + "'";
-				for (int i = 0; i < fieldRequirement.size(); i++) {
-					query = query + ", '" + fieldRequirement.get(i) + "'";
-				}
+                for (String aFieldRequirement : fieldRequirement) {
+                    query = query + ", '" + aFieldRequirement + "'";
+                }
 				query = query + ");";
 			} else {
 				String[] update = fieldStr.split(",");
@@ -368,12 +368,11 @@ public abstract class DBExporter extends DBImporterExporter{
 		if (quantidade == 0) {
 			String[] typeNames = new String[] { AllEntriesGroup.ID,
 					ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID };
-			for (int i = 0; i < typeNames.length; i++) {
-				String typeName = typeNames[i];
-				String insert = "INSERT INTO group_types (label) VALUES ('"
-						+ typeName + "');";
-				SQLUtil.processQuery(out, insert);
-			}
+            for (String typeName : typeNames) {
+                String insert = "INSERT INTO group_types (label) VALUES ('"
+                        + typeName + "');";
+                SQLUtil.processQuery(out, insert);
+            }
 		}
 	}
 

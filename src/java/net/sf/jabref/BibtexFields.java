@@ -254,8 +254,8 @@ public class BibtexFields
             return;
         // Build a Set of field names for the fields that should be sorted numerically:
         HashSet<String> nF = new HashSet<String>();
-        for (int i = 0; i < numFields.length; i++) {
-            nF.add(numFields[i]);
+        for (String numField : numFields) {
+            nF.add(numField);
         }
         // Look through all registered fields, and activate numeric sorting if necessary:
         for (String fieldName : runtime.fieldSet.keySet()) {

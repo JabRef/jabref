@@ -111,91 +111,89 @@ public class OvidImporter extends ImportFormat {
     for (int i = 1; i < items.length; i++){
         HashMap<String, String> h = new HashMap<String, String>();
         String[] fields = items[i].split("__NEWFIELD__");
-        for (int j = 0; j < fields.length; j++){
-            int linebreak = fields[j].indexOf('\n');
-            String fieldName = fields[j].substring(0, linebreak).trim();
-            String content = fields[j].substring(linebreak).trim();
+        for (String field : fields) {
+            int linebreak = field.indexOf('\n');
+            String fieldName = field.substring(0, linebreak).trim();
+            String content = field.substring(linebreak).trim();
 
             // Check if this is the author field (due to a minor special treatment for this field):
             boolean isAuthor = fieldName.indexOf("Author") == 0
-                && fieldName.indexOf("Author Keywords") == -1
-                && fieldName.indexOf("Author e-mail") == -1;
+                    && fieldName.indexOf("Author Keywords") == -1
+                    && fieldName.indexOf("Author e-mail") == -1;
 
             // Remove unnecessary dots at the end of lines, unless this is the author field,
             // in which case a dot at the end could be significant:
             if (!isAuthor && content.endsWith("."))
-                    content = content.substring(0, content.length()-1);
+                content = content.substring(0, content.length() - 1);
             //fields[j] = fields[j].trim();
             if (isAuthor) {
 
                 h.put("author", content);
 
 
-        }else if (fieldName.indexOf("Title") == 0) {
+            } else if (fieldName.indexOf("Title") == 0) {
                 content = content.replaceAll("\\[.+\\]", "").trim();
                 if (content.endsWith("."))
-                    content = content.substring(0, content.length()-1);
+                    content = content.substring(0, content.length() - 1);
                 h.put("title", content);
-        }
+            } else if (fieldName.indexOf("Chapter Title") == 0) h.put("chaptertitle", content);
 
-        else if (fieldName.indexOf("Chapter Title") == 0) h.put("chaptertitle", content);
-
-        // The "Source" field is a complete mess - it can have several different formats,
-        // but since it can contain journal name, book title, year, month, volume etc. we
-        // must try to parse it. We use different regular expressions to check different
-        // possible formattings.
-        else if (fieldName.indexOf("Source") == 0){
+                // The "Source" field is a complete mess - it can have several different formats,
+                // but since it can contain journal name, book title, year, month, volume etc. we
+                // must try to parse it. We use different regular expressions to check different
+                // possible formattings.
+            else if (fieldName.indexOf("Source") == 0) {
                 Matcher matcher;
-            if ((matcher = ovid_src_pat.matcher(content)).find()) {
-            h.put("journal", matcher.group(1));
-            h.put("volume", matcher.group(2));
-            h.put("issue", matcher.group(3));
-            h.put("pages", matcher.group(4));
-            h.put("year", matcher.group(5));
-            } else if ((matcher = ovid_src_pat_no_issue.matcher(content)).find()) {// may be missing the issue
-                h.put("journal", matcher.group(1));
-                h.put("volume", matcher.group(2));
-                h.put("pages", matcher.group(3));
-                h.put("year", matcher.group(4));
-            } else if ((matcher = ovid_src_pat_2.matcher(content)).find()) {
+                if ((matcher = ovid_src_pat.matcher(content)).find()) {
+                    h.put("journal", matcher.group(1));
+                    h.put("volume", matcher.group(2));
+                    h.put("issue", matcher.group(3));
+                    h.put("pages", matcher.group(4));
+                    h.put("year", matcher.group(5));
+                } else if ((matcher = ovid_src_pat_no_issue.matcher(content)).find()) {// may be missing the issue
+                    h.put("journal", matcher.group(1));
+                    h.put("volume", matcher.group(2));
+                    h.put("pages", matcher.group(3));
+                    h.put("year", matcher.group(4));
+                } else if ((matcher = ovid_src_pat_2.matcher(content)).find()) {
 
-                h.put("journal", matcher.group(1));
-                h.put("volume", matcher.group(2));
-                h.put("issue", matcher.group(3));
-                h.put("month", matcher.group(4));
-                h.put("year", matcher.group(5));
-                h.put("pages", matcher.group(6));
+                    h.put("journal", matcher.group(1));
+                    h.put("volume", matcher.group(2));
+                    h.put("issue", matcher.group(3));
+                    h.put("month", matcher.group(4));
+                    h.put("year", matcher.group(5));
+                    h.put("pages", matcher.group(6));
 
-            } else if ((matcher = incollection_pat.matcher(content)).find()) {
-                h.put("editor", matcher.group(1).replaceAll(" \\(Ed\\)", ""));
-                h.put("year", matcher.group(2));
-                h.put("booktitle", matcher.group(3));
-                h.put("pages", matcher.group(4));
-                h.put("address", matcher.group(5));
-                h.put("publisher", matcher.group(6));
-            } else if ((matcher = book_pat.matcher(content)).find()) {
-                h.put("year", matcher.group(1));
-                h.put("pages", matcher.group(2));
-                h.put("address", matcher.group(3));
-                h.put("publisher", matcher.group(4));
+                } else if ((matcher = incollection_pat.matcher(content)).find()) {
+                    h.put("editor", matcher.group(1).replaceAll(" \\(Ed\\)", ""));
+                    h.put("year", matcher.group(2));
+                    h.put("booktitle", matcher.group(3));
+                    h.put("pages", matcher.group(4));
+                    h.put("address", matcher.group(5));
+                    h.put("publisher", matcher.group(6));
+                } else if ((matcher = book_pat.matcher(content)).find()) {
+                    h.put("year", matcher.group(1));
+                    h.put("pages", matcher.group(2));
+                    h.put("address", matcher.group(3));
+                    h.put("publisher", matcher.group(4));
 
-            }
-            // Add double hyphens to page ranges:
-            if (h.get("pages") != null) {
-                h.put("pages", h.get("pages").replaceAll("-", "--"));
-            }
+                }
+                // Add double hyphens to page ranges:
+                if (h.get("pages") != null) {
+                    h.put("pages", h.get("pages").replaceAll("-", "--"));
+                }
 
-        } else if (fieldName.equals("Abstract")) {
+            } else if (fieldName.equals("Abstract")) {
                 h.put("abstract", content);
 
-        } else if (fieldName.equals("Publication Type")) {
-             if (content.indexOf("Book") >= 0)
-                h.put("entrytype", "book");
-             else if (content.indexOf("Journal") >= 0)
-                h.put("entrytype", "article");
-             else if (content.indexOf("Conference Paper") >= 0)
-                h.put("entrytype", "inproceedings");
-        }
+            } else if (fieldName.equals("Publication Type")) {
+                if (content.indexOf("Book") >= 0)
+                    h.put("entrytype", "book");
+                else if (content.indexOf("Journal") >= 0)
+                    h.put("entrytype", "article");
+                else if (content.indexOf("Conference Paper") >= 0)
+                    h.put("entrytype", "inproceedings");
+            }
         }
 
         // Now we need to check if a book entry has given editors in the author field;

@@ -123,10 +123,6 @@ public abstract class DBImporter extends DBImporterExporter{
 						BibtexEntryType.getType(rsEntryType.getString("label")));
 			}
 			rsEntryType.getStatement().close();
-			for (Iterator<String> iterator = types.keySet().iterator(); iterator
-					.hasNext();) {
-				iterator.next();
-			}
 
 			ResultSet rsColumns = this.readColumnNames(conn);
 			ArrayList<String> colNames = new ArrayList<String>();
@@ -147,16 +143,14 @@ public abstract class DBImporter extends DBImporterExporter{
 						types.get(rsEntries.getString("entry_types_id")));
 				entry.setField(BibtexFields.KEY_FIELD,
 						rsEntries.getString("cite_key"));
-				for (Iterator<String> iterator = colNames.iterator(); iterator
-						.hasNext();) {
-					String col = iterator.next();
-					String value = rsEntries.getString(col);
-					if (value != null) {
-						col = col.charAt(col.length() - 1) == '_' ? col
-								.substring(0, col.length() - 1) : col;
-						entry.setField(col, value);
-					}
-				}
+                for (String col : colNames) {
+                    String value = rsEntries.getString(col);
+                    if (value != null) {
+                        col = col.charAt(col.length() - 1) == '_' ? col
+                                .substring(0, col.length() - 1) : col;
+                        entry.setField(col, value);
+                    }
+                }
 				entries.put(id, entry);
 				database.insertEntry(entry);
 			}
@@ -254,17 +248,15 @@ public abstract class DBImporter extends DBImporterExporter{
 			// Ok, we have collected a map of all groups and their parent IDs,
 			// and another map of all group IDs and their group nodes.
 			// Now we need to build the groups tree:
-			for (Iterator<GroupTreeNode> i = parentIds.keySet().iterator(); i
-					.hasNext();) {
-				GroupTreeNode node = i.next();
-				String parentId = parentIds.get(node);
-				GroupTreeNode parent = groups.get(parentId);
-				if (parent == null) {
-					// TODO: missing parent
-				} else {
-					parent.add(node);
-				}
-			}
+            for (GroupTreeNode node : parentIds.keySet()) {
+                String parentId = parentIds.get(node);
+                GroupTreeNode parent = groups.get(parentId);
+                if (parent == null) {
+                    // TODO: missing parent
+                } else {
+                    parent.add(node);
+                }
+            }
 			ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn,
 					"entry_group");
 			while (rsEntryGroup.next()) {

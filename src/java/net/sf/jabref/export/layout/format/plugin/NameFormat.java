@@ -135,22 +135,22 @@ public class NameFormat implements LayoutFormatter {
 		}
 		
 		String[] cases = parameters.split("@@");
-		for (int i = 0; i < cases.length; i++){
-			String[] formatString = cases[i].split("@");
-			
-			if (formatString.length < 3){
-				// Error
-				return toFormat;
-			}
-			
-			if (formatString[0].equals("*")){
-				return format(toFormat, al, formatString);
-			} else {
-				if (al.size() <= Integer.parseInt(formatString[0])){
-					return format(toFormat, al, formatString);
-				}
-			}
-		}
+        for (String aCase : cases) {
+            String[] formatString = aCase.split("@");
+
+            if (formatString.length < 3) {
+                // Error
+                return toFormat;
+            }
+
+            if (formatString[0].equals("*")) {
+                return format(toFormat, al, formatString);
+            } else {
+                if (al.size() <= Integer.parseInt(formatString[0])) {
+                    return format(toFormat, al, formatString);
+                }
+            }
+        }
 		return toFormat;
 	}
 

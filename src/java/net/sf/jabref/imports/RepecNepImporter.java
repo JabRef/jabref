@@ -365,9 +365,9 @@ public class RepecNepImporter extends ImportFormat {
         String content = readMultipleLines();
         String[] keywords = content.split("[,;]");
         String keywordStr = "";
-        for (int i = 0; i < keywords.length; i++) {
-          keywordStr += " '" + keywords[i].trim() + "'";
-        }
+          for (String keyword1 : keywords) {
+              keywordStr += " '" + keyword1.trim() + "'";
+          }
         be.setField("keywords", keywordStr.trim());
         
       // parse JEL field

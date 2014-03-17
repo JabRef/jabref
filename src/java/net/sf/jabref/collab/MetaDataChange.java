@@ -68,8 +68,7 @@ public class MetaDataChange extends Change {
 
     JComponent description() {
         StringBuilder sb = new StringBuilder("<html>"+Globals.lang("Changes have been made to the following metadata elements")+":<p>");
-        for (Iterator<MetaDataChangeUnit> iterator = changes.iterator(); iterator.hasNext();) {
-            MetaDataChangeUnit unit = iterator.next();
+        for (MetaDataChangeUnit unit : changes) {
             sb.append("<br>&nbsp;&nbsp;");
             sb.append(unit.key);
             /*switch (unit.type) {
@@ -90,8 +89,7 @@ public class MetaDataChange extends Change {
     }
 
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-        for (Iterator<MetaDataChangeUnit> iterator = changes.iterator(); iterator.hasNext();) {
-            MetaDataChangeUnit unit = iterator.next();
+        for (MetaDataChangeUnit unit : changes) {
             switch (unit.type) {
                 case ADD:
                     md.putData(unit.key, unit.value);

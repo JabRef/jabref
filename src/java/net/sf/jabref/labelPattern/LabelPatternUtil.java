@@ -563,9 +563,9 @@ public class LabelPatternUtil {
                     StringBuffer abbr = new StringBuffer();
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
-                    for (int word = 0; word < words.length; word++)
-                        if (words[word].length() > 0)
-                            abbr.append(words[word].charAt(0));
+                    for (String word1 : words)
+                        if (word1.length() > 0)
+                            abbr.append(word1.charAt(0));
                     label = abbr.toString();
 
                 } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
@@ -1021,10 +1021,10 @@ public class LabelPatternUtil {
     			// replace all whitespaces by " "
     			// split the lastname at " "
     			String[] curAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
-    			for (int j=0; j<curAuthor.length; j++) {
-    				// use first character of each part of lastname
-    				authors = authors.concat(curAuthor[j].substring(0, 1));
-    			}
+                for (String aCurAuthor : curAuthor) {
+                    // use first character of each part of lastname
+                    authors = authors.concat(aCurAuthor.substring(0, 1));
+                }
     		}
     		if (tokens.length > 4) {
     			authors = authors.concat("+");

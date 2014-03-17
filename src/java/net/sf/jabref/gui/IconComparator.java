@@ -32,29 +32,29 @@ public class IconComparator implements Comparator<BibtexEntry> {
 
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
-        for (int i=0; i<fields.length; i++) {
-            String val1 = e1.getField(fields[i]);
-            String val2 = e2.getField(fields[i]);
-			if (val1 == null) {
-				if (val2 != null) {
-					return 1;
-				} else {
-					// continue loop and check for next field
-				}
-			} else {
-				if (val2 == null) {
-					return -1;
-				} else {
-					// val1 is not null AND val2 is not null
-					int compareToRes = val1.compareTo(val2);
-					if (compareToRes != 0) {
-						return compareToRes;
-					} else {
-						// continue loop as current two values are equal
-					}
-				}
-			}
-		}
+        for (String field : fields) {
+            String val1 = e1.getField(field);
+            String val2 = e2.getField(field);
+            if (val1 == null) {
+                if (val2 != null) {
+                    return 1;
+                } else {
+                    // continue loop and check for next field
+                }
+            } else {
+                if (val2 == null) {
+                    return -1;
+                } else {
+                    // val1 is not null AND val2 is not null
+                    int compareToRes = val1.compareTo(val2);
+                    if (compareToRes != 0) {
+                        return compareToRes;
+                    } else {
+                        // continue loop as current two values are equal
+                    }
+                }
+            }
+        }
         return 0;
     }
 

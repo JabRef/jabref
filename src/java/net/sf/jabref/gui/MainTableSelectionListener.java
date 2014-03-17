@@ -421,15 +421,15 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         		// full pop should be shown as left click already shows short popup
                 showDefaultPopup = true;
         	} else {
-	            for (int i=0; i<iconType.length; i++) {
-	                Object o = entry.getField(iconType[i]);
-	                if (o != null) {
-	                    menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String)o, (String)o,
-	                            GUIGlobals.getTableIcon(iconType[i]).getIcon(),
-	                            panel.metaData(), iconType[i]));
-	                    showDefaultPopup = false;
-	                }
-	            }
+                for (String anIconType : iconType) {
+                    Object o = entry.getField(anIconType);
+                    if (o != null) {
+                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String) o, (String) o,
+                                GUIGlobals.getTableIcon(anIconType).getIcon(),
+                                panel.metaData(), anIconType));
+                        showDefaultPopup = false;
+                    }
+                }
             }
         }
         if (showDefaultPopup) {

@@ -282,15 +282,14 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 	}
 
 	public void validateAllFields() {
-		for (Iterator<String> i = editors.keySet().iterator(); i.hasNext();) {
-			String field = i.next();
-			FieldEditor ed = editors.get(field);
-			ed.setEnabled(true);
-			if (((Component) ed).hasFocus())
-				ed.setActiveBackgroundColor();
-			else
-				ed.setValidBackgroundColor();
-		}
+        for (String field : editors.keySet()) {
+            FieldEditor ed = editors.get(field);
+            ed.setEnabled(true);
+            if (((Component) ed).hasFocus())
+                ed.setActiveBackgroundColor();
+            else
+                ed.setValidBackgroundColor();
+        }
 	}
 
 	public void setEnabled(boolean enabled) {

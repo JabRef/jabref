@@ -750,24 +750,24 @@ public class HTMLConverter implements LayoutFormatter {
 	
 	public HTMLConverter() {
 		super();
-                for (int i=0;i<conversionList.length;i++) {
-                    if (conversionList[i][2].length() >= 1) {
-                        if (conversionList[i][1].length() >= 1) {
-                            escapedSymbols.put("&" + conversionList[i][1] + ";" , conversionList[i][2]);
-                        }
-                        if (conversionList[i][0].length() >= 1) {
-                            numSymbols.put(Integer.decode(conversionList[i][0]) , conversionList[i][2]);
-                            if(Integer.decode(conversionList[i][0]).intValue()>128) {
-                                Character c = new Character((char) Integer.decode(conversionList[i][0]).intValue());
-                                unicodeSymbols.put(c, conversionList[i][2]);
-                                // System.err.println(Integer.decode(conversionList[i][0]).toString() + ": " + c.toString() + ": "+ conversionList[i][2]);
-                            }
-                        }
+        for (String[] aConversionList : conversionList) {
+            if (aConversionList[2].length() >= 1) {
+                if (aConversionList[1].length() >= 1) {
+                    escapedSymbols.put("&" + aConversionList[1] + ";", aConversionList[2]);
+                }
+                if (aConversionList[0].length() >= 1) {
+                    numSymbols.put(Integer.decode(aConversionList[0]), aConversionList[2]);
+                    if (Integer.decode(aConversionList[0]).intValue() > 128) {
+                        Character c = new Character((char) Integer.decode(aConversionList[0]).intValue());
+                        unicodeSymbols.put(c, aConversionList[2]);
+                        // System.err.println(Integer.decode(conversionList[i][0]).toString() + ": " + c.toString() + ": "+ conversionList[i][2]);
                     }
                 }
-                for (int i=0;i<accentList.length;i++) {
-                    escapedAccents.put(Integer.decode(accentList[i][0]), accentList[i][1]);
-                }
+            }
+        }
+        for (String[] anAccentList : accentList) {
+            escapedAccents.put(Integer.decode(anAccentList[0]), anAccentList[1]);
+        }
 	}
         
     public String formatUnicode(String text) {

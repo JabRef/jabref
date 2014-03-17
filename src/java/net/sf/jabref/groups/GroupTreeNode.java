@@ -138,8 +138,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 	 */
 	public GroupTreeNode getNode(int[] indexedPath) {
 		GroupTreeNode cursor = this;
-		for (int i = 0; i < indexedPath.length; ++i)
-			cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
+        for (int anIndexedPath : indexedPath) cursor = (GroupTreeNode) cursor.getChildAt(anIndexedPath);
 		return cursor;
 	}
 

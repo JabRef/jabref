@@ -166,14 +166,12 @@ public class RTFChars implements LayoutFormatter {
 		char[] chars = sb.toString().toCharArray();
 		sb = new StringBuffer();
 
-		for (int i = 0; i < chars.length; i++) {
-			char c = chars[i];
-
-			if (c < 128) 
-				sb.append(c);
-			 else
-				sb.append("\\u").append((long) c).append('?');
-		}
+        for (char c : chars) {
+            if (c < 128)
+                sb.append(c);
+            else
+                sb.append("\\u").append((long) c).append('?');
+        }
 
 		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''","{\\\\rdblquote}");
 	}

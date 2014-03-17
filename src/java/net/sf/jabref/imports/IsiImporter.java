@@ -107,48 +107,48 @@ public class IsiImporter extends ImportFormat {
 
 		String[] subsup = { "title", "abstract", "review", "notes" };
 
-		for (int i = 0; i < subsup.length; i++) {
-			if (map.containsKey(subsup[i])) {
+        for (String aSubsup : subsup) {
+            if (map.containsKey(aSubsup)) {
 
-				Matcher m = subsupPattern.matcher(map.get(subsup[i]));
-				StringBuffer sb = new StringBuffer();
+                Matcher m = subsupPattern.matcher(map.get(aSubsup));
+                StringBuffer sb = new StringBuffer();
 
-				while (m.find()) {
+                while (m.find()) {
 
-					String group2 = m.group(2);
-					group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping
-					// insanity!
-					// :-)
-					if (group2.length() > 1) {
-						group2 = "{" + group2 + "}";
-					}
-					if (m.group(1).equals("sub")) {
-						m.appendReplacement(sb, "\\$_" + group2 + "\\$");
-					} else {
-						m.appendReplacement(sb, "\\$^" + group2 + "\\$");
-					}
-				}
-				m.appendTail(sb);
-				map.put(subsup[i], sb.toString());
-			}
-		}
+                    String group2 = m.group(2);
+                    group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping
+                    // insanity!
+                    // :-)
+                    if (group2.length() > 1) {
+                        group2 = "{" + group2 + "}";
+                    }
+                    if (m.group(1).equals("sub")) {
+                        m.appendReplacement(sb, "\\$_" + group2 + "\\$");
+                    } else {
+                        m.appendReplacement(sb, "\\$^" + group2 + "\\$");
+                    }
+                }
+                m.appendTail(sb);
+                map.put(aSubsup, sb.toString());
+            }
+        }
 	}
 
 	static public void processCapitalization(HashMap<String, String> map) {
 
 		String[] subsup = { "title", "journal", "publisher" };
 
-		for (int i = 0; i < subsup.length; i++) {
+        for (String aSubsup : subsup) {
 
-			if (map.containsKey(subsup[i])) {
+            if (map.containsKey(aSubsup)) {
 
-				String s = map.get(subsup[i]);
+                String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
                     s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST, true);
-					map.put(subsup[i], s);
-				}
-			}
-		}
+                    map.put(aSubsup, s);
+                }
+            }
+        }
 	}
 
 	/**
@@ -197,154 +197,155 @@ public class IsiImporter extends ImportFormat {
 		HashMap<String, String> hm = new HashMap<String, String>();
 
 		// skip the first entry as it is either empty or has document header
-		for (int i = 0; i < entries.length; i++) {
-			String[] fields = entries[i].split(" ## ");
+        for (String entry : entries) {
+            String[] fields = entry.split(" ## ");
 
-			if (fields.length == 0)
-				fields = entries[i].split("\n");
+            if (fields.length == 0)
+                fields = entry.split("\n");
 
-			String Type = "";
-			String PT = "";
-			String pages = "";
-			hm.clear();
+            String Type = "";
+            String PT = "";
+            String pages = "";
+            hm.clear();
 
-			nextField: for (int j = 0; j < fields.length; j++) {
-				// empty field don't do anything
-				if (fields[j].length() <= 2)
-					continue;
+            nextField:
+            for (int j = 0; j < fields.length; j++) {
+                // empty field don't do anything
+                if (fields[j].length() <= 2)
+                    continue;
 
-				String beg = fields[j].substring(0, 2);
-				String value = fields[j].substring(3);
-				if (value.startsWith(" - ")) {
-					value = value.substring(3);
-				}
-				value = value.trim();
+                String beg = fields[j].substring(0, 2);
+                String value = fields[j].substring(3);
+                if (value.startsWith(" - ")) {
+                    value = value.substring(3);
+                }
+                value = value.trim();
 
-				if (beg.equals("PT")) {
-					if (value.startsWith("J")) {
-						PT = "article";
-					} else {
-						PT = value;
-					}
-					Type = "article"; // make all of them PT?
-				} else if (beg.equals("TY")) {
-					if ("JOUR".equals(value))
-						Type = "article";
-					else if ("CONF".equals(value))
-						Type = "inproceedings";
-				} else if (beg.equals("JO"))
-					hm.put("booktitle", value);
-				else if (beg.equals("AU")) {
-					String author = isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
+                if (beg.equals("PT")) {
+                    if (value.startsWith("J")) {
+                        PT = "article";
+                    } else {
+                        PT = value;
+                    }
+                    Type = "article"; // make all of them PT?
+                } else if (beg.equals("TY")) {
+                    if ("JOUR".equals(value))
+                        Type = "article";
+                    else if ("CONF".equals(value))
+                        Type = "inproceedings";
+                } else if (beg.equals("JO"))
+                    hm.put("booktitle", value);
+                else if (beg.equals("AU")) {
+                    String author = isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
 
-					// if there is already someone there then append with "and"
-					if (hm.get("author") != null)
-						author = hm.get("author") + " and " + author;
+                    // if there is already someone there then append with "and"
+                    if (hm.get("author") != null)
+                        author = hm.get("author") + " and " + author;
 
-					hm.put("author", author);
-				} else if (beg.equals("TI"))
-					hm.put("title", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("SO") || beg.equals("JA"))
-					hm.put("journal", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("ID") || beg.equals("KW")) {
-				
-					value = value.replaceAll("EOLEOL", " ");
-					String existingKeywords = hm.get("keywords");
-					if (existingKeywords != null && existingKeywords.indexOf(value) == -1) {
-						existingKeywords += ", " + value;
-					} else {
-						existingKeywords = value;
-					}
-					hm.put("keywords", existingKeywords);
+                    hm.put("author", author);
+                } else if (beg.equals("TI"))
+                    hm.put("title", value.replaceAll("EOLEOL", " "));
+                else if (beg.equals("SO") || beg.equals("JA"))
+                    hm.put("journal", value.replaceAll("EOLEOL", " "));
+                else if (beg.equals("ID") || beg.equals("KW")) {
 
-				} else if (beg.equals("AB"))
-					hm.put("abstract", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("BP") || beg.equals("BR") || beg.equals("SP"))
-					pages = value;
-				else if (beg.equals("EP")) {
-					int detpos = value.indexOf(' ');
+                    value = value.replaceAll("EOLEOL", " ");
+                    String existingKeywords = hm.get("keywords");
+                    if (existingKeywords != null && existingKeywords.indexOf(value) == -1) {
+                        existingKeywords += ", " + value;
+                    } else {
+                        existingKeywords = value;
+                    }
+                    hm.put("keywords", existingKeywords);
 
-					// tweak for IEEE Explore
-					if (detpos != -1 && value.substring(0, detpos).trim().length() > 0)
-						value = value.substring(0, detpos);
+                } else if (beg.equals("AB"))
+                    hm.put("abstract", value.replaceAll("EOLEOL", " "));
+                else if (beg.equals("BP") || beg.equals("BR") || beg.equals("SP"))
+                    pages = value;
+                else if (beg.equals("EP")) {
+                    int detpos = value.indexOf(' ');
 
-					pages = pages + "--" + value;
-				} else if (beg.equals("PS")) {
-					pages = parsePages(value);
-				} else if (beg.equals("AR"))
-					pages = value;
-				else if (beg.equals("IS"))
-					hm.put("number", value);
-				else if (beg.equals("PY"))
-					hm.put("year", value);
-				else if (beg.equals("VL"))
-					hm.put("volume", value);
-				else if (beg.equals("PU"))
-					hm.put("publisher", value);
+                    // tweak for IEEE Explore
+                    if (detpos != -1 && value.substring(0, detpos).trim().length() > 0)
+                        value = value.substring(0, detpos);
+
+                    pages = pages + "--" + value;
+                } else if (beg.equals("PS")) {
+                    pages = parsePages(value);
+                } else if (beg.equals("AR"))
+                    pages = value;
+                else if (beg.equals("IS"))
+                    hm.put("number", value);
+                else if (beg.equals("PY"))
+                    hm.put("year", value);
+                else if (beg.equals("VL"))
+                    hm.put("volume", value);
+                else if (beg.equals("PU"))
+                    hm.put("publisher", value);
                 else if (beg.equals("DI"))
                     hm.put("doi", value);
-				else if (beg.equals("PD")) {
+                else if (beg.equals("PD")) {
 
-					String month = parseMonth(value);
-					if (month != null) {
-						hm.put("month", month);
-						continue nextField;
-					}
+                    String month = parseMonth(value);
+                    if (month != null) {
+                        hm.put("month", month);
+                        continue nextField;
+                    }
 
-				} else if (beg.equals("DT")) {
-					Type = value;
-					if (Type.equals("Review")) {
-						Type = "article"; // set "Review" in Note/Comment?
-					} else if (Type.startsWith("Article") || Type.startsWith("Journal")
-						|| PT.equals("article")) {
-						Type = "article";
-						continue;
-					} else {
-						Type = "misc";
-					}
-				} else if (beg.equals("CR")) {
-					hm.put("CitedReferences", value.replaceAll("EOLEOL", " ; ").trim());
-				} else {
-					// Preserve all other entries except
-					if (beg.equals("ER") || beg.equals("EF") || beg.equals("VR")
-						|| beg.equals("FN"))
-						continue nextField;
-					hm.put(beg, value);
-				}
-			}
+                } else if (beg.equals("DT")) {
+                    Type = value;
+                    if (Type.equals("Review")) {
+                        Type = "article"; // set "Review" in Note/Comment?
+                    } else if (Type.startsWith("Article") || Type.startsWith("Journal")
+                            || PT.equals("article")) {
+                        Type = "article";
+                        continue;
+                    } else {
+                        Type = "misc";
+                    }
+                } else if (beg.equals("CR")) {
+                    hm.put("CitedReferences", value.replaceAll("EOLEOL", " ; ").trim());
+                } else {
+                    // Preserve all other entries except
+                    if (beg.equals("ER") || beg.equals("EF") || beg.equals("VR")
+                            || beg.equals("FN"))
+                        continue nextField;
+                    hm.put(beg, value);
+                }
+            }
 
-			if (!"".equals(pages))
-				hm.put("pages", pages);
+            if (!"".equals(pages))
+                hm.put("pages", pages);
 
-			// Skip empty entries
-			if (hm.size() == 0)
-				continue;
+            // Skip empty entries
+            if (hm.size() == 0)
+                continue;
 
-			BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
-				.getEntryType(Type));
-			// id assumes an existing database so don't
+            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
+                    .getEntryType(Type));
+            // id assumes an existing database so don't
 
-			// Remove empty fields:
-			ArrayList<Object> toRemove = new ArrayList<Object>();
-			for (Iterator<String> it = hm.keySet().iterator(); it.hasNext();) {
-				Object key = it.next();
-				String content = hm.get(key);
-				if ((content == null) || (content.trim().length() == 0))
-					toRemove.add(key);
-			}
-			for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
-				hm.remove(iterator.next());
+            // Remove empty fields:
+            ArrayList<Object> toRemove = new ArrayList<Object>();
+            for (Iterator<String> it = hm.keySet().iterator(); it.hasNext(); ) {
+                Object key = it.next();
+                String content = hm.get(key);
+                if ((content == null) || (content.trim().length() == 0))
+                    toRemove.add(key);
+            }
+            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext(); ) {
+                hm.remove(iterator.next());
 
-			}
+            }
 
-			// Polish entries
-			processSubSup(hm);
-			processCapitalization(hm);
+            // Polish entries
+            processSubSup(hm);
+            processCapitalization(hm);
 
-			b.setField(hm);
+            b.setField(hm);
 
-			bibitems.add(b);
-		}
+            bibitems.add(b);
+        }
 
 		return bibitems;
 	}
@@ -357,24 +358,24 @@ public class IsiImporter extends ImportFormat {
 	public static String parseMonth(String value) {
 
 		String[] parts = value.split("\\s|\\-");
-		for (int ii = 0; ii < parts.length; ii++) {
-			if (Globals.MONTH_STRINGS.containsKey(parts[ii].toLowerCase())) {
-				return "#" + parts[ii].toLowerCase() + "#";
-			}
-		}
+        for (String part1 : parts) {
+            if (Globals.MONTH_STRINGS.containsKey(part1.toLowerCase())) {
+                return "#" + part1.toLowerCase() + "#";
+            }
+        }
 
 		// Try two digit month
-		for (int ii = 0; ii < parts.length; ii++) {
-			int number;
-			try {
-				number = Integer.parseInt(parts[ii]);
-				if (number >= 1 && number <= 12) {
-					return "#" + Globals.MONTHS[number - 1] + "#";
-				}
-			} catch (NumberFormatException ignored) {
+        for (String part : parts) {
+            int number;
+            try {
+                number = Integer.parseInt(part);
+                if (number >= 1 && number <= 12) {
+                    return "#" + Globals.MONTHS[number - 1] + "#";
+                }
+            } catch (NumberFormatException ignored) {
 
-			}
-		}
+            }
+        }
 		return null;
 	}
 

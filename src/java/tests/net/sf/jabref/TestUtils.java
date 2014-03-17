@@ -28,12 +28,12 @@ public class TestUtils {
 		if (parent instanceof Container) {
 			Component[] children = ((Container) parent).getComponents();
 
-			for (int i = 0; i < children.length; ++i) {
-				Component child = getChildNamed(children[i], name);
-				if (child != null) {
-					return child;
-				}
-			}
+            for (Component aChildren : children) {
+                Component child = getChildNamed(aChildren, name);
+                if (child != null) {
+                    return child;
+                }
+            }
 		}
 		return null;
 	}

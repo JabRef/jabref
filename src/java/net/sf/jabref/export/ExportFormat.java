@@ -325,15 +325,15 @@ public class ExportFormat implements IExportFormat {
                     }
                     String[] lines = sb.toString().split("\n");
                     // Go through each line:
-                    for (int i=0; i<lines.length; i++) {
-                        String line = lines[i].trim();
+                    for (String line1 : lines) {
+                        String line = line1.trim();
                         // Do not deal with empty lines:
                         if (line.length() == 0)
                             continue;
                         int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
-                        if ((index > 0) && (index+1 < line.length())) {
+                        if ((index > 0) && (index + 1 < line.length())) {
                             String formatterName = line.substring(0, index);
-                            String contents = line.substring(index+1);
+                            String contents = line.substring(index + 1);
                             //System.out.println("Name: '"+formatterName+"'");
                             //System.out.println("Contents: '"+contents+"'");
                             formatters.put(formatterName, contents);

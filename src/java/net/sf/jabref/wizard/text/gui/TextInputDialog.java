@@ -569,15 +569,15 @@ public class TextInputDialog
       String[] req = entry.getRequiredFields();
       String[] opt = entry.getOptionalFields();
       String[] allFields = BibtexFields.getAllFieldNames();
-      for (int i=0; i<req.length; i++) {
-          f.add(req[i]);
+      for (String aReq : req) {
+          f.add(aReq);
       }
-      for (int i=0; i<opt.length; i++) {
-          f.add(opt[i]);
+      for (String anOpt : opt) {
+          f.add(anOpt);
       }
-      for (int i=0; i<allFields.length; i++) {
-          if (!f.contains(allFields[i]))
-              f.add(allFields[i]);
+      for (String allField : allFields) {
+          if (!f.contains(allField))
+              f.add(allField);
       }
       return f.toArray(new String[f.size()]);
    }

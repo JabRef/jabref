@@ -55,8 +55,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         if (Globals.prefs.getBoolean("resolveStringsAllFields")) {
             // Resolve strings for all fields except some:
             String[] exceptions = Globals.prefs.getStringArray("doNotResolveStringsFor");
-            for (int i = 0; i < exceptions.length; i++) {
-                if (exceptions[i].equals(fieldName)) {
+            for (String exception : exceptions) {
+                if (exception.equals(fieldName)) {
                     resolveStrings = false;
                     break;
                 }

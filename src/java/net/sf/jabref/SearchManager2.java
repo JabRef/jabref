@@ -317,8 +317,8 @@ public class SearchManager2 extends SidePaneComponent
      */
     protected void updateKeyListeners() {
         KeyListener[] listeners = searchField.getKeyListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            searchField.removeKeyListener(listeners[i]);
+        for (KeyListener listener : listeners) {
+            searchField.removeKeyListener(listener);
         }
         if (increment.isSelected()) {
             searchField.addKeyListener(this);
@@ -363,9 +363,9 @@ public class SearchManager2 extends SidePaneComponent
 		// for now ... just seperate words by whitespace
 		String[] strings = t.split(" ");
 		ArrayList<String> words = new ArrayList<String>(strings.length);
-		for (int i = 0; i < strings.length; i++) {
-			words.add(strings[i]);
-		}
+        for (String string : strings) {
+            words.add(string);
+        }
 		return words;
 	}
     /**

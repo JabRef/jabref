@@ -647,16 +647,16 @@ public class JabRefPreferences {
         String fieldString = get("putBracesAroundCapitals");
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
-            for (int i = 0; i < fields.length; i++) {
-                putBracesAroundCapitalsFields.add(fields[i].trim());
+            for (String field : fields) {
+                putBracesAroundCapitalsFields.add(field.trim());
             }
         }
         nonWrappableFields.clear();
         fieldString = get("nonWrappableFields");
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
-            for (int i = 0; i < fields.length; i++) {
-                nonWrappableFields.add(fields[i].trim());
+            for (String field : fields) {
+                nonWrappableFields.add(field.trim());
             }
         }
 
@@ -965,9 +965,7 @@ public class JabRefPreferences {
             String[] bindNames = new String[newBindings.size()],
                     bindings = new String[newBindings.size()];
             int index = 0;
-            for (Iterator<String> i = newBindings.keySet().iterator();
-                    i.hasNext();) {
-                String nm = i.next();
+            for (String nm : newBindings.keySet()) {
                 String bnd = newBindings.get(nm);
                 bindNames[index] = nm;
                 bindings[index] = bnd;
@@ -991,8 +989,8 @@ public class JabRefPreferences {
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
-                for (int i = 0; i < keys.length; i++) {
-                    keyPattern.addLabelPattern(keys[i], pre.get(keys[i], null));
+                for (String key : keys) {
+                    keyPattern.addLabelPattern(key, pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
@@ -1243,11 +1241,11 @@ public class JabRefPreferences {
             return new CustomEntryType(Util.nCase(name), req, opt);
         }
         ArrayList<String> secOpt = new ArrayList<String>();
-        for (int i = 0; i < opt.length; i++) {
-            secOpt.add(opt[i]);
+        for (String anOpt : opt) {
+            secOpt.add(anOpt);
         }
-        for (int i = 0; i < priOpt.length; i++) {
-            secOpt.remove(priOpt[i]);
+        for (String aPriOpt : priOpt) {
+            secOpt.remove(aPriOpt);
         }
         return new CustomEntryType(Util.nCase(name), req, priOpt,
                 secOpt.toArray(new String[secOpt.size()]));
@@ -1282,8 +1280,7 @@ public class JabRefPreferences {
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:
-        for (Iterator<ExternalFileType> iterator = list.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : list) {
             type.setOpenWith("");
         }
 
@@ -1301,8 +1298,7 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByName(String name) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if (type.getName().equals(name)) {
                 return type;
             }
@@ -1318,8 +1314,7 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
             }
@@ -1336,8 +1331,7 @@ public class JabRefPreferences {
     public ExternalFileType getExternalFileTypeForName(String filename) {
         int longestFound = -1;
         ExternalFileType foundType = null;
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getExtension() != null) && filename.toLowerCase().
                     endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
@@ -1357,8 +1351,7 @@ public class JabRefPreferences {
      * type "text/html", a valid file type is guaranteed to be returned.
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
                 return type;
             }
@@ -1384,8 +1377,7 @@ public class JabRefPreferences {
         List<ExternalFileType> unchanged = new ArrayList<ExternalFileType>();
 
         externalFileTypes.clear();
-        for (Iterator<ExternalFileType> iterator = types.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : types) {
             externalFileTypes.add(type);
 
             // See if we can find a type with matching name in the default type list:
@@ -1446,12 +1438,12 @@ public class JabRefPreferences {
         }
         // Read the prefs information for file types:
         String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
-        for (int i = 0; i < vals.length; i++) {
-            if ((vals[i].length == 2) && (vals[i][1].equals(FILE_TYPE_REMOVED_FLAG))) {
+        for (String[] val : vals) {
+            if ((val.length == 2) && (val[1].equals(FILE_TYPE_REMOVED_FLAG))) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {
-                    if (type.getName().equals(vals[i][0])) {
+                    if (type.getName().equals(val[0])) {
                         toRemove = type;
                         break;
                     }
@@ -1462,7 +1454,7 @@ public class JabRefPreferences {
                 }
             } else {
                 // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = new ExternalFileType(vals[i]);
+                ExternalFileType type = new ExternalFileType(val);
                 // Check if there is a default type with the same name. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;

@@ -79,9 +79,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                     true);
-            if (chosen != null) for (int i=0; i<chosen.length; i++) {
-                if (chosen[i] != null)
-                    filesToOpen.add(new File(chosen[i]));
+            if (chosen != null) for (String aChosen : chosen) {
+                if (aChosen != null)
+                    filesToOpen.add(new File(aChosen));
             }
 
             /*
@@ -126,13 +126,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
             (new Thread() {
                 public void run() {
-                    for (Iterator<File> i=theFiles.iterator(); i.hasNext();)
-                        openIt(i.next(), true);
+                    for (File theFile : theFiles) openIt(theFile, true);
 
                 }
             }).start();
-            for (Iterator<File> i=theFiles.iterator(); i.hasNext();)
-                frame.getFileHistory().newFile(i.next().getPath());
+            for (File theFile : theFiles) frame.getFileHistory().newFile(theFile.getPath());
         }
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
@@ -271,8 +269,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult pr,
                                               boolean mustRaisePanel) {
-        for (Iterator<PostOpenAction> iterator = postOpenActions.iterator(); iterator.hasNext();) {
-            PostOpenAction action = iterator.next();
+        for (PostOpenAction action : postOpenActions) {
             if (action.isActionNecessary(pr)) {
                 if (mustRaisePanel)
                     panel.frame().getTabbedPane().setSelectedComponent(panel);

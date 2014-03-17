@@ -64,11 +64,11 @@ public class SearchManagerNoGUI {
         
         Collection entries = database.getEntries();
         Vector matchEntries = new Vector();
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
+        for (Object entry1 : entries) {
+            BibtexEntry entry = (BibtexEntry) entry1;
             boolean hit = searchRules.applyRule(searchOptions, entry) > 0;
             entry.setSearchHit(hit);
-            if(hit) {
+            if (hit) {
                 hits++;
                 matchEntries.add(entry);
             }

@@ -251,19 +251,19 @@ public class EmacsKeyBindings
 			return;
 		}
 
-		for (int i = 0; i < JTCS.length; i++) {
-			Keymap orig = JTCS[i].getKeymap();
-			Keymap backup = JTextComponent.addKeymap
-				(JTCS[i].getClass().getName(), null);
-			Action[] bound = orig.getBoundActions();
-			for (int j = 0; j < bound.length; j++) {
-				KeyStroke[] strokes = orig.getKeyStrokesForAction(bound[j]);
-				for (int k = 0; k < strokes.length; k++) {
-					backup.addActionForKeyStroke(strokes[k], bound[j]);
-				}
-			}
-			backup.setDefaultAction(orig.getDefaultAction());
-		}
+        for (JTextComponent JTC : JTCS) {
+            Keymap orig = JTC.getKeymap();
+            Keymap backup = JTextComponent.addKeymap
+                    (JTC.getClass().getName(), null);
+            Action[] bound = orig.getBoundActions();
+            for (int j = 0; j < bound.length; j++) {
+                KeyStroke[] strokes = orig.getKeyStrokesForAction(bound[j]);
+                for (int k = 0; k < strokes.length; k++) {
+                    backup.addActionForKeyStroke(strokes[k], bound[j]);
+                }
+            }
+            backup.setDefaultAction(orig.getDefaultAction());
+        }
 	}
 
 	/**
@@ -282,13 +282,13 @@ public class EmacsKeyBindings
 				current.removeBindings();
 
 				Action[] bound = backup.getBoundActions();
-				for (int j = 0; j < bound.length; j++) {
-					KeyStroke[] strokes = 
-						backup.getKeyStrokesForAction(bound[i]);
-					for (int k = 0; k < strokes.length; k++) {
-						current.addActionForKeyStroke(strokes[k], bound[j]);
-					}
-				}
+                for (Action aBound : bound) {
+                    KeyStroke[] strokes =
+                            backup.getKeyStrokesForAction(bound[i]);
+                    for (int k = 0; k < strokes.length; k++) {
+                        current.addActionForKeyStroke(strokes[k], aBound);
+                    }
+                }
 				current.setDefaultAction(backup.getDefaultAction());
 			}
 		}
@@ -301,27 +301,27 @@ public class EmacsKeyBindings
     private static void loadEmacsKeyBindings()
     {
 		logger.debug("Loading emacs keybindings");
-		
 
-		for (int i = 0; i < JTCS.length; i++) {
-			Action[] origActions = JTCS[i].getActions();
-			Action[] actions = new Action[origActions.length + EMACS_ACTIONS.length];
-			System.arraycopy(origActions,   0, actions, 0,                  origActions.length);
-			System.arraycopy(EMACS_ACTIONS, 0, actions, origActions.length, EMACS_ACTIONS.length);
-			
-			Keymap k = JTCS[i].getKeymap();
 
-			JTextComponent.KeyBinding[] keybindings;
-			if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA)) {
-			    int size = EMACS_KEY_BINDINGS_BASE.length + 1;
-			    keybindings = new JTextComponent.KeyBinding[size];
-	            System.arraycopy(EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EMACS_KEY_BINDINGS_BASE.length);
-	            keybindings[EMACS_KEY_BINDINGS_BASE.length] = EMACS_KEY_BINDING_C_A;
-			} else {
-			    keybindings = EMACS_KEY_BINDINGS_BASE;
-			}
-			JTCS[i].loadKeymap(k, keybindings, actions);
-		}
+        for (JTextComponent JTC : JTCS) {
+            Action[] origActions = JTC.getActions();
+            Action[] actions = new Action[origActions.length + EMACS_ACTIONS.length];
+            System.arraycopy(origActions, 0, actions, 0, origActions.length);
+            System.arraycopy(EMACS_ACTIONS, 0, actions, origActions.length, EMACS_ACTIONS.length);
+
+            Keymap k = JTC.getKeymap();
+
+            JTextComponent.KeyBinding[] keybindings;
+            if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA)) {
+                int size = EMACS_KEY_BINDINGS_BASE.length + 1;
+                keybindings = new JTextComponent.KeyBinding[size];
+                System.arraycopy(EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EMACS_KEY_BINDINGS_BASE.length);
+                keybindings[EMACS_KEY_BINDINGS_BASE.length] = EMACS_KEY_BINDING_C_A;
+            } else {
+                keybindings = EMACS_KEY_BINDINGS_BASE;
+            }
+            JTC.loadKeymap(k, keybindings, actions);
+        }
     }
 
     /**

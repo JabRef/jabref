@@ -76,8 +76,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         && group.isDynamic();
         boolean red = false;
         if (highlight2Cells != null) {
-            for (int i = 0; i < highlight2Cells.length; ++i) {
-                if (highlight2Cells[i] == value) {
+            for (Object highlight2Cell : highlight2Cells) {
+                if (highlight2Cell == value) {
                     // label.setForeground(Color.RED);
                     red = true;
                     break;
@@ -86,8 +86,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         boolean underline = false;
         if (highlight3Cells != null) {
-            for (int i = 0; i < highlight3Cells.length; ++i) {
-                if (highlight3Cells[i] == value) {
+            for (Object highlight3Cell : highlight3Cells) {
+                if (highlight3Cell == value) {
                     underline = true;
                     break;
                 }

@@ -163,14 +163,12 @@ public class ChangeScanner extends Thread {
         ArrayList<String> handledOnDisk = new ArrayList<String>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
-        for (Iterator i = inTemp.iterator(); i.hasNext();) {
-            String key = (String)i.next();
+        for (String key : inTemp) {
             // See if the key is missing in the disk database:
             Vector<String> vod = onDisk.getData(key);
             if (vod == null) {
                 mdc.insertMetaDataRemoval(key);
-            }
-            else {
+            } else {
                 // Both exist. Check if they are different:
                 Vector<String> vit = inTemp.getData(key);
                 if (!vod.equals(vit))
@@ -181,8 +179,7 @@ public class ChangeScanner extends Thread {
         }
 
         // See if there are unhandled keys in the disk database:
-        for (Iterator i = onDisk.iterator(); i.hasNext();) {
-            String key = (String)i.next();
+        for (String key : onDisk) {
             if (!handledOnDisk.contains(key)) {
                 mdc.insertMetaDataAddition(key, onDisk.getData(key));
             }
@@ -460,8 +457,7 @@ public class ChangeScanner extends Thread {
 
         if (notMatched.size() > 0) {
             // Still one or more non-matched strings. So they must have been removed.
-            for (Iterator<String> i = notMatched.iterator(); i.hasNext(); ) {
-                String nmId = i.next();
+            for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
                 BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                 if (mem != null) { // The removed string is not removed from the mem version.
@@ -473,8 +469,7 @@ public class ChangeScanner extends Thread {
 
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.
-        for (Iterator<String> i=onDisk.getStringKeySet().iterator(); i.hasNext();) {
-            String diskId = i.next();
+        for (String diskId : onDisk.getStringKeySet()) {
             if (!used.contains(diskId)) {
                 BibtexString disk = onDisk.getString(diskId);
                 //System.out.println(disk.getName());
@@ -487,8 +482,7 @@ public class ChangeScanner extends Thread {
     private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name))
             return null;
-        for (Iterator<String> i=base.getStringKeySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (String key : base.getStringKeySet()) {
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
                 used.add(key);

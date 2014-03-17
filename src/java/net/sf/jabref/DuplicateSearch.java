@@ -123,8 +123,7 @@ public void run() {
         public void run() {
             // Now, do the actual removal:
             if (toRemove.size() > 0) {
-                for (Iterator<BibtexEntry> iterator = toRemove.iterator(); iterator.hasNext();) {
-                    BibtexEntry entry = iterator.next();
+                for (BibtexEntry entry : toRemove) {
                     panel.database.removeEntry(entry.getId());
                     ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
                 }

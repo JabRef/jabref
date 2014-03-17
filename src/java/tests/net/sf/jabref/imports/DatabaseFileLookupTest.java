@@ -212,34 +212,33 @@ public class DatabaseFileLookupTest extends TestCase {
 	private static <T> T getInstanceFromNonDefaultConstructor(Class<T> targetClass) {
 		Constructor<?>[] constructors = targetClass.getDeclaredConstructors();
 		constructors = orderByParamCount(constructors);
-		for (int i = 0; i < constructors.length; i++) {
-			Constructor<?> constructor = constructors[i];
-			constructor.setAccessible(true);
-			Class<?>[] parameterTypes = constructor.getParameterTypes();
-			try {
-				/**
-				 * Trying to invoke constructor with <code>null</code> values.
-				 */
-				@SuppressWarnings("unchecked")
-				T instance = (T) constructor.newInstance(new Object[parameterTypes.length]);
-				return instance; 
-			} catch (Exception ignored) {
-			}
-			/**
-			 * Creating proper instances for the parameter types.
-			 */
-			Object[] arguments = createArguments(parameterTypes, targetClass);
-			if (arguments == null) {
-				continue;
-			}
-			try {
-				@SuppressWarnings("unchecked")
-				T instance = (T) constructor.newInstance(arguments);
-				return instance;
-			} catch (Exception e) {
-				continue;
-			}
-		}
+        for (Constructor<?> constructor : constructors) {
+            constructor.setAccessible(true);
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            try {
+                /**
+                 * Trying to invoke constructor with <code>null</code> values.
+                 */
+                @SuppressWarnings("unchecked")
+                T instance = (T) constructor.newInstance(new Object[parameterTypes.length]);
+                return instance;
+            } catch (Exception ignored) {
+            }
+            /**
+             * Creating proper instances for the parameter types.
+             */
+            Object[] arguments = createArguments(parameterTypes, targetClass);
+            if (arguments == null) {
+                continue;
+            }
+            try {
+                @SuppressWarnings("unchecked")
+                T instance = (T) constructor.newInstance(arguments);
+                return instance;
+            } catch (Exception e) {
+                continue;
+            }
+        }
 		return null;
 	}
 
