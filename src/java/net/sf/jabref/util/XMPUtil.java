@@ -30,6 +30,7 @@ import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
 import org.apache.jempbox.xmp.XMPSchemaDublinCore;
+import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -223,8 +224,8 @@ public class XMPUtil {
 			entry.setField("abstract", s);
 
 		COSDictionary dict = di.getDictionary();
-        for (COSName o : dict.keyList()) {
-            String key = (o).getName();
+        for (Map.Entry<COSName,COSBase> o : dict.entrySet()) {
+            String key = o.getKey().getName();
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());

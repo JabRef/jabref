@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -135,7 +136,7 @@ public class CleanUpAction extends AbstractWorker {
 
 		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
-        builder.setDefaultDialogBorder();
+        builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
         builder.add(cleanUpHTML, cc.xyw(1,1,2));
         builder.add(cleanUpUnicode, cc.xyw(1,2,2));

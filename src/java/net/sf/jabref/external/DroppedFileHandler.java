@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileListTableModel;
@@ -82,7 +83,7 @@ public class DroppedFileHandler {
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref","bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
-        builder.setDefaultDialogBorder();
+        builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
         
         builder.add(linkInPlace, cc.xyw(1, 1, 4));
