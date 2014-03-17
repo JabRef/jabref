@@ -2241,10 +2241,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			buf.append((char) c);
 
 			// Check if we are entering an escape sequence:
-			if ((c == '\\') && !escaped)
-				escaped = true;
-			else
-				escaped = false;
+            escaped = (c == '\\') && !escaped;
 
 		}
 		// Check if we have an unclosed brace:

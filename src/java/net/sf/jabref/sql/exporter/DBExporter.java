@@ -577,12 +577,8 @@ public abstract class DBExporter extends DBImporterExporter{
 
 	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName)
 			throws SQLException {
-		if (desiredName.trim().length() <= 1)
-			return false;
-		if (dbNames.contains(desiredName))
-			return false;
-		return true;
-	}
+        return desiredName.trim().length() > 1 && !dbNames.contains(desiredName);
+    }
 
 
 	/**

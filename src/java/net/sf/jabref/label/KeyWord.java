@@ -47,17 +47,11 @@ public class KeyWord extends HashSet<String> {
 	}
 
 	public boolean isKeyWord(String matchWord) {
-		if (contains(matchWord.toLowerCase())) {
-			return true;
-		}
-		return false;
-	}
+        return contains(matchWord.toLowerCase());
+    }
 
 	public boolean isKeyWordMatchCase(String matchWord) {
-		if (contains(matchWord)) {
-			return true;
-		}
-		return false;
-	}
+        return contains(matchWord);
+    }
 
 }

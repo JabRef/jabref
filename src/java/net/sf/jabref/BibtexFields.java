@@ -615,10 +615,8 @@ public class BibtexFields
 
     private boolean isSet( int flagID )
     {
-      if ( (flag & flagID) == flagID)
-        return true ;
+        return (flag & flagID) == flagID;
 
-      return false ;
     }
 
     // -----------------------------------------------------------------------

@@ -259,9 +259,7 @@ public class LayoutHelper {
                 }
             }
             else if (c == '"') {
-                if (!inQuotes)
-                    inQuotes = true;
-                else inQuotes = false;
+                inQuotes = !inQuotes;
 
                 if (buffer == null)
                     buffer = new StringBuffer(100);

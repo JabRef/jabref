@@ -81,9 +81,7 @@ public class SearchManagerNoGUI {
     }//end getDBfromMatches()
     
     private boolean specifiedYears() {
-        if (searchTerm.matches("year=[0-9]{4}-[0-9]{4}"))
-            return true;
-        return false;
+        return searchTerm.matches("year=[0-9]{4}-[0-9]{4}");
     }
     
     private String fieldYear() {
