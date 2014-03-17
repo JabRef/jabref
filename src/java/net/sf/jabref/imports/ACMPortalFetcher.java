@@ -240,19 +240,15 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     private String getEntryBibTeXURL(String fullCitation, boolean abs) {
-       	String ID = "";
-
         // Get ID
         Matcher idMatcher = idPattern.matcher(fullCitation);
         if (idMatcher.find()) {
-            ID = idMatcher.group(1);
+            return idMatcher.group(1);
         }
         else {
             System.out.println("Did not find ID in: " + fullCitation);
             return null;
         }
-
-        return ID;
 
     }
 

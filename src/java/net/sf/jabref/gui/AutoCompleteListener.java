@@ -143,7 +143,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         alltext.insert(startPos, sno.subSequence(0, lastBeginning.length()));
         
         // replace suffix with new suffix
-        int deletedChars = oldSelectionEnd - oldSelectionStart;
         alltext.delete(oldSelectionStart, oldSelectionEnd);
         //int cp = oldSelectionEnd - deletedChars;
         alltext.insert(oldSelectionStart, toSetIn.substring(1));
