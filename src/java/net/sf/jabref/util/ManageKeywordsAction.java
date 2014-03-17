@@ -77,14 +77,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     // keyword to add
     private JTextField keyword;
 
-    private DefaultListModel keywordListModel;
-    private JList keywordList;
-    private JScrollPane kPane;
-    
-	private JRadioButton intersectKeywords, mergeKeywords;
+    private DefaultListModel<String> keywordListModel;
+    private JList<String> keywordList;
 
-    private JButton ok, cancel, add, remove;
-	private boolean cancelled;
+    private JRadioButton intersectKeywords, mergeKeywords;
+
+    private boolean cancelled;
 
 	private TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
 	
@@ -96,17 +94,17 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private void createDialog() {
         keyword = new JTextField();
 
-        keywordListModel = new DefaultListModel();
-        keywordList = new JList(keywordListModel);
+        keywordListModel = new DefaultListModel<String>();
+        keywordList = new JList<String>(keywordListModel);
         keywordList.setVisibleRowCount(8);
-        kPane = new JScrollPane(keywordList);
+        JScrollPane kPane = new JScrollPane(keywordList);
 
         diag = new JDialog(frame, Globals.lang("Manage keywords"), true);
 
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
-        add = new JButton(Globals.lang("Add"));
-        remove = new JButton(Globals.lang("Remove"));
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton add = new JButton(Globals.lang("Add"));
+        JButton remove = new JButton(Globals.lang("Remove"));
         
         keywordList.setVisibleRowCount(10);
         
@@ -147,7 +145,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         ok.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 cancelled = false;
                 diag.dispose();
             }
@@ -172,7 +170,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 					keywordListModel.addElement(text);
 				} else {
 					int idx = 0;
-                    String element = (String)keywordListModel.getElementAt(idx);
+                    String element = keywordListModel.getElementAt(idx);
 					while ((idx < keywordListModel.size()) &&
                             (element.compareTo(text) < 0)) {
 						idx++;
@@ -196,10 +194,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             public void actionPerformed(ActionEvent arg0) {
 				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                List<Object> values = keywordList.getSelectedValuesList();
-				List<String> selectedValuesList = new ArrayList<String>();
-                for (Object value : values) selectedValuesList.add((String) value);
-				for (String val: selectedValuesList) {
+                List<String> values = keywordList.getSelectedValuesList();
+
+				for (String val: values) {
 					keywordListModel.removeElement(val);
 				}
 			}
@@ -273,8 +270,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-        for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
-        	String keyword = (String)keywords.nextElement();
+        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
+        	String keyword = keywords.nextElement();
         	userSelectedKeywords.add(keyword);
         	if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
         		keywordsToAdd.add(keyword);

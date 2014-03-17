@@ -56,7 +56,7 @@ public class PrefsDialog3 extends JDialog {
 		final JabRefPreferences prefs = JabRefPreferences.getInstance();
 		frame = parent;
 
-		final JList chooser;
+		final JList<String> chooser;
 
 		JButton importPrefs = new JButton(Globals.lang("Import preferences"));
 		JButton exportPrefs = new JButton(Globals.lang("Export preferences"));
@@ -105,7 +105,7 @@ public class PrefsDialog3 extends JDialog {
 
 		upper.setBorder(BorderFactory.createEtchedBorder());
 
-		chooser = new JList(names);
+		chooser = new JList<String>(names);
 		chooser.setBorder(BorderFactory.createEtchedBorder());
 		// Set a prototype value to control the width of the list:
 		chooser.setPrototypeCellValue("This should be wide enough");
@@ -118,7 +118,7 @@ public class PrefsDialog3 extends JDialog {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting())
 					return;
-				String o = (String) chooser.getSelectedValue();
+				String o = chooser.getSelectedValue();
 				cardLayout.show(main, o);
 			}
 		});
