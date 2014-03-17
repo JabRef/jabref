@@ -72,9 +72,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
 
         InputStream source;

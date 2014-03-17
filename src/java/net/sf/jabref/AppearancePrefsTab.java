@@ -65,7 +65,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
                         "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.setLeadingColumnOffset(2);
+        builder.leadingColumnOffset(2);
         JLabel lab;
         builder.appendSeparator(Globals.lang("General"));
         JPanel p1 = new JPanel();

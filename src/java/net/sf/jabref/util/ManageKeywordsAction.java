@@ -196,7 +196,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             public void actionPerformed(ActionEvent arg0) {
 				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                Object[] values = keywordList.getSelectedValues();
+                List<Object> values = keywordList.getSelectedValuesList();
 				List<String> selectedValuesList = new ArrayList<String>();
                 for (Object value : values) selectedValuesList.add((String) value);
 				for (String val: selectedValuesList) {

@@ -50,7 +50,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         this._frame = frame;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.setLeadingColumnOffset(1);
+        builder.leadingColumnOffset(1);
 
         { // SAVE SORT ORDER
             // create Components

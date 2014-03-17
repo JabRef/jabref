@@ -33,6 +33,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FieldContentSelector;
@@ -193,7 +194,7 @@ class GroupDialog extends JDialog {
                                                 + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
                 DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
-                builderAll.setDefaultDialogBorder();
+                builderAll.border(Borders.DIALOG);
                 builderAll.appendSeparator(Globals.lang("General"));
                 builderAll.nextLine();
                 builderAll.nextLine();

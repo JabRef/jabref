@@ -18,11 +18,8 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -199,7 +196,7 @@ class KeyBindingsDialog extends JDialog {
         JList list = (JList) evt.getSource();
 
         // Get all selected items
-        Object[] selected = list.getSelectedValues();
+        List<Object> selected = list.getSelectedValuesList();
 
         // Iterate all selected items
           for (Object sel : selected) {
