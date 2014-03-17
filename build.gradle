@@ -36,6 +36,8 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:1.7.1'
     compile 'org.apache.pdfbox:jempbox:1.7.1'
 
+    // option parser
+    compile fileTree(dir: 'lib/ritopt/', includes: ['*.jar']) // instead of having the source code inside
 
     compile 'org.openoffice:juh:3.2.1'
     compile 'org.openoffice:jurt:3.2.1'
