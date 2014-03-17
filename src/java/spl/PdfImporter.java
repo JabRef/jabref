@@ -447,12 +447,7 @@ fileNameLoop:
     }
 
     private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile){
-        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0)) {
-            return false;
-        }
-        else{
-            return true;
-        }
+        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0));
     }
 
     public MainTable getEntryTable() {

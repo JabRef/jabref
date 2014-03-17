@@ -26,12 +26,7 @@ public class PdfFileFilter implements FileFilter {
 
     private boolean isMatchingFileFilter(String path) {
         String dateiEndung = path.substring(path.lastIndexOf(".") + 1);
-        if(dateiEndung.equalsIgnoreCase("pdf")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return dateiEndung.equalsIgnoreCase("pdf");
     }
     
 }
