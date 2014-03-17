@@ -284,7 +284,7 @@ public class SQLUtil {
 	 */
 	public static String processQueryWithSingleResult(Connection conn,
 			String query) throws SQLException {
-		ResultSet rs = ((Statement) executeQueryWithResults(conn, query))
+		ResultSet rs = executeQueryWithResults(conn, query)
 				.getResultSet();
 		rs.next();
 		String result = rs.getString(1);

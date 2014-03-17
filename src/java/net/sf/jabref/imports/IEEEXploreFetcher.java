@@ -338,7 +338,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             int bytesRead = bufr.read(buffer);
             if(bytesRead == -1) break;
             for (int i=0; i<bytesRead; i++)
-                sb.append((char)buffer[i]);
+                sb.append(buffer[i]);
         }
         System.out.println(sb.toString());
         
@@ -352,7 +352,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     		return null;
     	
         // clean up title
-        String title = (String)entry.getField("title");
+        String title = entry.getField("title");
         if (title != null) {
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
@@ -410,7 +410,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	    }
 	}*/
     	// clean up month
-    	String month = (String)entry.getField("month");
+    	String month = entry.getField("month");
     	if ((month != null) && (month.length() > 0)) {
 	    	month = month.replaceAll("\\.", "");
 	    	month = month.toLowerCase();

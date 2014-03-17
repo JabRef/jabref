@@ -60,7 +60,7 @@ public class OOUtil {
         final String UNIQUEFIER_FIELD = "uniq";
 
         // Backup the value of the uniq field, just in case the entry already has it:
-        String oldUniqVal = (String)entry.getField(UNIQUEFIER_FIELD);
+        String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
 
         // Set the uniq field with the supplied uniquefier:
         entry.setField(UNIQUEFIER_FIELD, uniquefier);
@@ -87,9 +87,9 @@ public class OOUtil {
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
               String lText, String parStyle) throws UndefinedParagraphFormatException, Exception {
 
-        XParagraphCursor parCursor = (XParagraphCursor)UnoRuntime.queryInterface(
+        XParagraphCursor parCursor = UnoRuntime.queryInterface(
             XParagraphCursor.class, cursor);
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
             XPropertySet.class, parCursor);
 
         try {
@@ -162,7 +162,7 @@ public class OOUtil {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
-        XPropertySet xCursorProps = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet xCursorProps = UnoRuntime.queryInterface(
             XPropertySet.class, cursor);
         if (bold)
             xCursorProps.setPropertyValue("CharWeight",
@@ -223,11 +223,11 @@ public class OOUtil {
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
                                                    String parStyle) throws Exception {
         text.insertString(cursor, string, true);
-        XParagraphCursor parCursor = (XParagraphCursor)UnoRuntime.queryInterface(
+        XParagraphCursor parCursor = UnoRuntime.queryInterface(
             XParagraphCursor.class, cursor);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
             XPropertySet.class, parCursor);
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
@@ -241,13 +241,13 @@ public class OOUtil {
 
 
     public static Object getProperty(Object o, String property) throws Exception {
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
     }
 
     public static void listProperties(Object o) throws Exception {
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         Property[] pr = props.getPropertySetInfo().getProperties();
         for (int i = 0; i < pr.length; i++) {

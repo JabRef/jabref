@@ -250,7 +250,7 @@ public class VM implements Warn {
 					throw new VMException("Can only concatenate two String with *");
 				}
 
-				stack.push(((String) o1) + ((String) o2));
+				stack.push((String) o1 + (String) o2);
 			}
 		});
 
@@ -473,7 +473,7 @@ public class VM implements Warn {
 						"Can only transform an integer to an string using int.to.str$");
 				}
 
-				stack.push(((Integer) o1).toString());
+				stack.push(o1.toString());
 			}
 		});
 

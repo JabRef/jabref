@@ -220,7 +220,7 @@ public class StringDialog extends JDialog {
 	                // which might now be outside
 	    if (col == 0) {
 		// Change name of string.
-		if (!((String)value).equals(((BibtexString)strings[row]).getName())) {
+		if (!value.equals(((BibtexString) strings[row]).getName())) {
 		    if (base.hasStringLabel((String)value))
 			JOptionPane.showMessageDialog(parent,
 						      Globals.lang("A string with that label "
@@ -264,7 +264,7 @@ public class StringDialog extends JDialog {
 		// Change content of string.
 		BibtexString subject = (BibtexString)strings[row];
 
-		if (!((String)value).equals(subject.getContent())) {
+		if (!value.equals(subject.getContent())) {
                     try {
                         (new LatexFieldFormatter()).format((String)value, "__dummy");
                     } catch (IllegalArgumentException ex) {

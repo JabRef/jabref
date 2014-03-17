@@ -114,7 +114,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
                 extPan.setEntry(sel[i], panel.getDatabase());
-                editor.setText((old != null) ? (String) old : "");
+                editor.setText((old != null) ? old : "");
                 Thread t = extPan.autoSetFile(fieldName, editor);
                 // Wait for the autoset process to finish:
                 if (t != null)

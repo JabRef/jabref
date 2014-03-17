@@ -490,8 +490,8 @@ public class RightClickMenu extends JPopupMenu
      */
     private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection,
                                      boolean add, boolean move) {
-        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node, move,
-                panel) : (AbstractAction) new RemoveFromGroupAction(node, panel);
+        AbstractAction action = add ? new AddToGroupAction(node, move,
+                panel) : new RemoveFromGroupAction(node, panel);
         AbstractGroup group = node.getGroup();
         if (!move) {
             action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)

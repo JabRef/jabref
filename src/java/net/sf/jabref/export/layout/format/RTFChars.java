@@ -53,7 +53,7 @@ public class RTFChars implements LayoutFormatter {
 
             char c = field.charAt(i);
 
-            System.out.println("Char: '"+((char)c)+"'");
+            System.out.println("Char: '"+ c +"'");
 
             if (escaped && (c == '\\')) {
 				sb.append('\\');

@@ -406,7 +406,7 @@ public class JabRef {
                 String searchTerm = data[0].replace("\\$"," "); //enables blanks within the search term:
                                                                 //? stands for a blank
                 ParserResult pr =
-                    (ParserResult) loaded.elementAt(loaded.size() - 1);
+                        loaded.elementAt(loaded.size() - 1);
                 BibtexDatabase dataBase = pr.getDatabase();
                 SearchManagerNoGUI smng = new SearchManagerNoGUI(searchTerm, dataBase);
                 BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries

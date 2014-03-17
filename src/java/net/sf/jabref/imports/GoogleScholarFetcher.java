@@ -284,7 +284,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     // Clean up some remaining HTML code from Elsevier(?) papers
                     // Search for: Poincare algebra
                     // to see an example
-                    String title = (String) entry.getField("title");
+                    String title = entry.getField("title");
                     if (title != null) {
                         String newtitle = title.replaceAll("<.?i>([^<]*)</i>","$1");
                         if(!newtitle.equals(title)) {
