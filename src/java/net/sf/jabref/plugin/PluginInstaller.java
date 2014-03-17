@@ -289,15 +289,20 @@ public class PluginInstaller {
             ex.printStackTrace();
             return UNABLE_TO_COPY_FILE;
         } finally {
-            if (in != null) try {
-                in.close();
-            } catch (IOException ex) {
-                return UNABLE_TO_COPY_FILE;
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                    // UNABLE_TO_COPY_FILE;
+                }
             }
-            if (out != null) try {
-                out.close();
-            } catch (IOException ex) {
-                return UNABLE_TO_COPY_FILE;
+
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ignore) {
+                    // UNABLE_TO_COPY_FILE;
+                }
             }
         }
         return SUCCESS;
