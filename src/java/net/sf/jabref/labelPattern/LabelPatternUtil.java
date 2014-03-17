@@ -237,7 +237,7 @@ public class LabelPatternUtil {
     private static String generateInstitutionKey(String content) {
         if (content == null) return null;
         content = unifyDiacritics(content);
-        List<String> ignore = Arrays.asList(new String[]{ "press", "the" });
+        List<String> ignore = Arrays.asList("press", "the");
         content = content.replaceAll("^\\{", "").replaceAll("\\}$", "");
         Pattern regex = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
         Matcher matcher = regex.matcher(content);

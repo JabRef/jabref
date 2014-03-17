@@ -70,9 +70,9 @@ public class UtilFindFileTest extends FileBasedTestCase {
 	}
 
 	public void testFindAssociatedFiles() throws IOException {
-		Collection<BibtexEntry> entries = Arrays.asList(new BibtexEntry[]{entry});
-		Collection<String> extensions = Arrays.asList(new String[]{"jpg", "pdf"});
-		Collection<File> dirs = Arrays.asList(new File[] { new File(root.getAbsoluteFile() + "/pdfs/"), new File(root.getAbsoluteFile() + "/graphicsDir/") });
+		Collection<BibtexEntry> entries = Arrays.asList(entry);
+		Collection<String> extensions = Arrays.asList("jpg", "pdf");
+		Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"), new File(root.getAbsoluteFile() + "/graphicsDir/"));
 		
 		Map<BibtexEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
 		

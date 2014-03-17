@@ -1445,7 +1445,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                   if (tidialog.okPressed())
                   {
-                      Util.setAutomaticFields(Arrays.asList(new BibtexEntry[] {bibEntry}),
+                      Util.setAutomaticFields(Arrays.asList(bibEntry),
                               false, false, false);
                     insertEntry(bibEntry) ;
                   }

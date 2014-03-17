@@ -1654,20 +1654,20 @@ public JabRefPreferences prefs() {
   
     protected void initActions() {
         openDatabaseOnlyActions = new LinkedList<Object>();
-        openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
-            mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
-            redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
-            selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-            makeKeyAction, normalSearch,
-            incrementalSearch, replaceAll, importMenu, exportMenu,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
+                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
+                redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
+                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
+                makeKeyAction, normalSearch,
+                incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
                 openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-            highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
-            closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
-            toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-            abbreviateMedline, unabbreviate, exportAll, exportSelected,
-            importCurrent, saveAll, dbConnect, dbExport, focusTable}));
+                highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
+                abbreviateMedline, unabbreviate, exportAll, exportSelected,
+                importCurrent, saveAll, dbConnect, dbExport, focusTable));
         
         openDatabaseOnlyActions.addAll(fetcherActions);
 
@@ -1675,7 +1675,7 @@ public JabRefPreferences prefs() {
 
         severalDatabasesOnlyActions = new LinkedList<Object>();
         severalDatabasesOnlyActions.addAll(Arrays
-            .asList(new Action[] { nextTab, prevTab, sortTabs }));
+            .asList(nextTab, prevTab, sortTabs));
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {

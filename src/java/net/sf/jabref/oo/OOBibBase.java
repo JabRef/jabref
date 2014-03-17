@@ -161,7 +161,7 @@ public class OOBibBase {
 
                  Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
                  method.setAccessible(true);
-                 method.invoke(cl, new Object[]{new File(pathToExecutable).toURI().toURL()});
+                 method.invoke(cl, new File(pathToExecutable).toURI().toURL());
              } catch (Throwable t) {
                  t.printStackTrace();
                  throw new IOException("Error, could not add URL to system classloader");

@@ -189,9 +189,9 @@ public class DatabaseFileLookupTest extends TestCase {
 		T instance = null;
 		try {
 			Constructor<? extends T> constructor;
-			constructor = targetClass.getDeclaredConstructor(new Class<?>[] {});
+			constructor = targetClass.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			instance = constructor.newInstance(new Object[] {});
+			instance = constructor.newInstance();
 		} catch (Exception e) {
 			instance = getInstanceFromNonDefaultConstructor(targetClass);
 		}
