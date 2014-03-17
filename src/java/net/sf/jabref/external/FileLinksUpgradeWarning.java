@@ -184,13 +184,13 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             // Modify General fields if necessary:
             // If we don't find the file field, insert it at the bottom of the first tab:
             if (!showsFileInGenFields()) {
-                String gfs = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+"0");
+                String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS +"0");
                 //System.out.println(gfs);
                 StringBuffer sb = new StringBuffer(gfs);
                 if (gfs.length() > 0)
                     sb.append(";");
                 sb.append(GUIGlobals.FILE_FIELD);
-                Globals.prefs.put(Globals.prefs.CUSTOM_TAB_FIELDS+"0", sb.toString());
+                Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS +"0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
             }
