@@ -357,8 +357,6 @@ public class GUIGlobals {
 					map.put(key, value);
 				}
 			}
-		} catch (IOException ex) {
-			throw ex;
 		} finally {
 			try {
 				if (in != null) in.close();

@@ -1880,15 +1880,14 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			while ((el = in.read()) >= 0) {
 				out.write(el);
 			}
-		} catch (IOException ex) {
-			throw ex;
 		} finally {
 			if (out != null) {
 				out.flush();
 				out.close();
 			}
-			if (in != null)
-				in.close();
+			if (in != null) {
+                in.close();
+            }
 		}
 		return true;
 	}

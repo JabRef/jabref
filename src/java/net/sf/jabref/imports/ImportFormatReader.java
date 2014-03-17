@@ -145,12 +145,8 @@ public class ImportFormatReader {
 
             result = importer.importEntries(stream, status);
         } finally {
-
-            try {
-                if (stream != null)
-                    stream.close();
-            } catch (IOException ex) {
-                throw ex;
+            if (stream != null) {
+                stream.close();
             }
         }
 
