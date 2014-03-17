@@ -63,7 +63,7 @@
 
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
-	<property name="src.tests" value="src/java/tests" />
+	<property name="src.tests" value="test" />
 	<property name="plugin.dir" value="src/plugins/" />
 	<property name="txt.dir" value="src/txt" />
 	<property name="java.dir" value="${src.dir}/java" />
