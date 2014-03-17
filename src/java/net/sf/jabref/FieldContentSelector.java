@@ -205,9 +205,7 @@ public class FieldContentSelector extends JComponent {
 		comboBox.addItem("");
 		Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
 		if (items != null) {
-			Iterator<String> i = items.iterator();
-			while (i.hasNext())
-				comboBox.addItem(i.next());
+            for (String item : items) comboBox.addItem(item);
 		}
 	}
 

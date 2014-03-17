@@ -2154,9 +2154,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + field) != null) {
                 Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + field);
                 if (items != null) {
-                    Iterator<String> i = items.iterator();
-                    while (i.hasNext())
-                        ac.addWordToIndex(i.next());
+                    for (String item : items) ac.addWordToIndex(item);
                 }
             }
         }

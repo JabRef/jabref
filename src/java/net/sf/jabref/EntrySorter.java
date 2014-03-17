@@ -34,9 +34,8 @@ public class EntrySorter implements DatabaseChangeListener {
         this.comp = comp;
         Set<String> keySet = entries.keySet();
 	    if (keySet != null) {
-    	    Iterator<String> i = keySet.iterator();
-    	    while (i.hasNext()) {
-    		    set.add(entries.get(i.next()));
+            for (String aKeySet : keySet) {
+                set.add(entries.get(aKeySet));
             }
             //Collections.sort(set, comp);
             changed = true;

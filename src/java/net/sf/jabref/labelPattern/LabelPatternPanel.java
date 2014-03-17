@@ -164,9 +164,7 @@ public class LabelPatternPanel  extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // reset all fields
-                Iterator<String> i=textFields.keySet().iterator();
-                while (i.hasNext()) {
-                    String s = i.next();
+                for (String s : textFields.keySet()) {
                     JTextField tf = textFields.get(s);
                     tf.setText("");
                 }
@@ -231,10 +229,9 @@ public class LabelPatternPanel  extends JPanel {
         LabelPattern keypatterns = new LabelPattern();
         
         // each entry type
-        Iterator<String> i=textFields.keySet().iterator();
-        while (i.hasNext()) {
-            String s = i.next(),
-                text = textFields.get(s).getText();
+        for (String s1 : textFields.keySet()) {
+            String s = s1,
+                    text = textFields.get(s).getText();
             if (!"".equals(text.trim()))
                 keypatterns.addLabelPattern(s, text);
         }

@@ -39,9 +39,8 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
         list.getReadWriteLock().writeLock().lock();
         Set<String> keySet = entries.keySet();
         if (keySet != null) {
-            Iterator<String> i = keySet.iterator();
-            while (i.hasNext()) {
-                list.add(entries.get(i.next()));
+            for (String aKeySet : keySet) {
+                list.add(entries.get(aKeySet));
             }
         }
 

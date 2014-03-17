@@ -224,9 +224,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
             // Mod. Morten A.
             //"Use --menu to invoke the interactive built-in menu.\n\n" +
             Option.getHelpHeader() + "\n\n" + generalModule.getHelp();
-        Iterator<OptionModule> it = modules.values().iterator();
-        while ( it.hasNext() ) {
-            OptionModule module = it.next();
+        for (OptionModule module : modules.values()) {
             retval += "\n\nOption Listing for " + module.getName() + "\n";
             retval += module.getHelp() + "\n";
         }

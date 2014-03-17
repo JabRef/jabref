@@ -251,11 +251,9 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
-
-            while (it.hasNext()) {
+            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = it.next();
+                    BibtexEntry entry = aXmpEntriesInFile;
                     entry.setId(Util.createNeutralId());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
@@ -342,11 +340,9 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
-
-            while (it.hasNext()) {
+            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = it.next();
+                    BibtexEntry entry = aXmpEntriesInFile;
                     entry.setId(Util.createNeutralId());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);

@@ -402,15 +402,13 @@ public abstract class DBExporter extends DBImporterExporter{
 					+ "'" + database_id + "');";
 			SQLUtil.processQuery(out, dml);
 		}
-		Iterator<String> it = database.getStringKeySet().iterator();
-		while (it.hasNext()) {
-			String key = it.next();
-			BibtexString string = database.getString(key);
-			String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
-					+ "', " + "'" + Util.quote(string.getContent(), "'", '\\')
-					+ "', " + "'" + database_id + "'" + ");";
-			SQLUtil.processQuery(out, dml);
-		}
+        for (String key : database.getStringKeySet()) {
+            BibtexString string = database.getString(key);
+            String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
+                    + "', " + "'" + Util.quote(string.getContent(), "'", '\\')
+                    + "', " + "'" + database_id + "'" + ");";
+            SQLUtil.processQuery(out, dml);
+        }
 	}
 
 	/**

@@ -180,22 +180,16 @@ public class BibtexDatabase {
       Set<String> keySet = _entries.keySet();
       if (keySet != null)
       {
-          Iterator<String> it = keySet.iterator();
-          while(it.hasNext())
-          {
-            String entrieID = it.next() ;
-            BibtexEntry entry = getEntryById(entrieID) ;
-            if ((entry != null) && (entry.getCiteKey() != null))
-            {
-              String citeKey = entry.getCiteKey() ;
-              if (citeKey != null)
-              {
-                if (keyHash == citeKey.hashCode() )
-                {
-                  back = entry ;
-                }
+          for (String entrieID : keySet) {
+              BibtexEntry entry = getEntryById(entrieID);
+              if ((entry != null) && (entry.getCiteKey() != null)) {
+                  String citeKey = entry.getCiteKey();
+                  if (citeKey != null) {
+                      if (keyHash == citeKey.hashCode()) {
+                          back = entry;
+                      }
+                  }
               }
-            }
           }
       }
       return back ;

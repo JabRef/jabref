@@ -276,40 +276,34 @@ public class AuxSubGenerator
     auxDB = new BibtexDatabase() ;
     notFoundList.clear();
 
-    Iterator<String> it = mySet.iterator() ;
-
-    // forall bibtex keys (found in aux-file) try to find an equivalent
+      // forall bibtex keys (found in aux-file) try to find an equivalent
     // entry into reference database
-    while (it.hasNext())
-    {
-      String str = it.next() ;
-      BibtexEntry entry = db.getEntryByKey(str);
+      for (String str : mySet) {
+          BibtexEntry entry = db.getEntryByKey(str);
 
-      if (entry == null)
-      {
-        notFoundList.add(str) ;
-      } else
-      {
-          insertEntry(auxDB, entry);
-          // Check if the entry we just found references another entry which
-          // we don't already have in our list of entries to include. If so,
-          // pull in that entry as well:
-          String crossref = entry.getField("crossref");
-          if ((crossref != null) && (!mySet.contains(crossref))) {
-              BibtexEntry refEntry = db.getEntryByKey(crossref);
-              /**
-               * [ 1717849 ] Patch for aux import by Kai Eckert
-               */
-              if (refEntry == null) {
-                  notFoundList.add(crossref);
-              } else {
-                  insertEntry(auxDB, refEntry);
-                  crossreferencedEntriesCount++;
+          if (entry == null) {
+              notFoundList.add(str);
+          } else {
+              insertEntry(auxDB, entry);
+              // Check if the entry we just found references another entry which
+              // we don't already have in our list of entries to include. If so,
+              // pull in that entry as well:
+              String crossref = entry.getField("crossref");
+              if ((crossref != null) && (!mySet.contains(crossref))) {
+                  BibtexEntry refEntry = db.getEntryByKey(crossref);
+                  /**
+                   * [ 1717849 ] Patch for aux import by Kai Eckert
+                   */
+                  if (refEntry == null) {
+                      notFoundList.add(crossref);
+                  } else {
+                      insertEntry(auxDB, refEntry);
+                      crossreferencedEntriesCount++;
+                  }
               }
-          }
 
+          }
       }
-    }
 
 
       // If we have inserted any entries, make sure to copy the source database's preamble and

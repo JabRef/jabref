@@ -259,14 +259,12 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 	public void setEntry(BibtexEntry entry) {
 		try {
 			updating = true;
-			Iterator<FieldEditor> i = editors.values().iterator();
-			while (i.hasNext()) {
-				FieldEditor editor = i.next();
-				Object content = entry.getField(editor.getFieldName());
+            for (FieldEditor editor : editors.values()) {
+                Object content = entry.getField(editor.getFieldName());
                 String toSet = (content == null) ? "" : content.toString();
                 if (!toSet.equals(editor.getText()))
-				    editor.setText(toSet);
-			}
+                    editor.setText(toSet);
+            }
 			this.entry = entry;
 		} finally {
 			updating = false;
@@ -293,11 +291,9 @@ public class CompressedEntryEditorTab extends EntryEditorTab {
 	}
 
 	public void setEnabled(boolean enabled) {
-		Iterator<FieldEditor> i = editors.values().iterator();
-		while (i.hasNext()) {
-			FieldEditor editor = i.next();
-			editor.setEnabled(enabled);
-		}
+        for (FieldEditor editor : editors.values()) {
+            editor.setEnabled(enabled);
+        }
 	}
 
 	public Component getPane() {

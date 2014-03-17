@@ -1109,10 +1109,9 @@ public class VM implements Warn {
 	private void iterate(Tree child) {
 		BstFunction f = functions.get(child.getChild(0).getText());
 
-		Iterator<BstEntry> i = entries.iterator();
-		while (i.hasNext()) {
-			f.execute(i.next());
-		}
+        for (BstEntry entry : entries) {
+            f.execute(entry);
+        }
 	}
 
 	/**

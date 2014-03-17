@@ -118,15 +118,14 @@ public class CopacImporter extends ImportFormat {
 
 		List<BibtexEntry> results = new LinkedList<BibtexEntry>();
 
-		Iterator<String> it = entries.iterator();
-		while (it.hasNext()) {
+        for (String entry : entries) {
 
-			// Copac does not contain enough information on the type of the
-			// document. A book is assumed.
-			BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
-				BibtexEntryType.BOOK);
+            // Copac does not contain enough information on the type of the
+            // document. A book is assumed.
+            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                    BibtexEntryType.BOOK);
 
-			String[] lines = it.next().split("\n");
+            String[] lines = entry.split("\n");
 
             for (String line1 : lines) {
                 String line = line1.trim();
@@ -157,8 +156,8 @@ public class CopacImporter extends ImportFormat {
                 else
                     setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
             }
-			results.add(b);
-		}
+            results.add(b);
+        }
 
 		return results;
 	}
