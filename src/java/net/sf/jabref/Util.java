@@ -762,43 +762,35 @@ public class Util {
         // Check if we have arrived at a file type, and either an http link or an existing file:
 		if ((httpLink || file.exists()) && (fileType != null)) {
             // Open the file:
-			try {
-                String filePath = httpLink ? link : file.getPath();
-                if (Globals.ON_MAC) {
-                    // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-                    String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
-                            new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
-                            new String[] { "/usr/bin/open", filePath };
-					Runtime.getRuntime().exec(cmd);
-				} else if (Globals.ON_WIN) {
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                        // Application is specified. Use it:
-                        openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-                    } else
-                        openFileOnWindows(filePath, true);
-				} else {
-                    // Use the given app if specified, and the universal "xdg-open" otherwise:
-                    String[] openWith;
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
-                        openWith = fileType.getOpenWith().split(" ");
-                    else
-                        openWith = new String[] {"xdg-open"};
-                    
-                    String[] cmdArray = new String[openWith.length+1];
-                    System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-                    cmdArray[cmdArray.length-1] = filePath;
-                    Runtime.getRuntime().exec(cmdArray);
-				}
-                return true;
-            } catch (IOException e) {
-                throw e;
-                /*e.printStackTrace();
-				System.err.println("An error occured on the command: " + fileType.getOpenWith()
-					+ " #" + link);
-				System.err.println(e.getMessage());*/
-			}
+            String filePath = httpLink ? link : file.getPath();
+            if (Globals.ON_MAC) {
+                // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+                String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+                        new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
+                        new String[] { "/usr/bin/open", filePath };
+                Runtime.getRuntime().exec(cmd);
+            } else if (Globals.ON_WIN) {
+                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                    // Application is specified. Use it:
+                    openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+                } else
+                    openFileOnWindows(filePath, true);
+            } else {
+                // Use the given app if specified, and the universal "xdg-open" otherwise:
+                String[] openWith;
+                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+                    openWith = fileType.getOpenWith().split(" ");
+                else
+                    openWith = new String[] {"xdg-open"};
 
-		} else {
+                String[] cmdArray = new String[openWith.length+1];
+                System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+                cmdArray[cmdArray.length-1] = filePath;
+                Runtime.getRuntime().exec(cmdArray);
+            }
+            return true;
+
+        } else {
 
             return false;
             // No file matched the name, or we didn't know the file type.
