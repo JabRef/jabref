@@ -512,7 +512,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 						abrv = parts[1];
 					}
 				}
-				if (prefix.matches(abrvPattern) == false) {
+				if (!prefix.matches(abrvPattern)) {
 					fullName = prefix + " " + postfix + " " + abrv;
 					fullName = fullName.trim();
 				} else {
@@ -534,7 +534,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 				if (m2.find()) {
 					String prefix = m2.group(2); 
 					String postfix = m2.group(1).replaceAll("\\.$", "");
-					if (prefix.matches(abrvPattern) == false) {
+					if (!prefix.matches(abrvPattern)) {
 						String abrv = "";
 					
 						String[] parts = postfix.split("\\. ", 2);
@@ -561,7 +561,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 				String year = entry.getField("year");
 				fullName = fullName.replaceAll(", " + year + "\\.?", "");
 				
-	        	if (fullName.contains("Abstract") == false && fullName.contains("Summaries") == false && fullName.contains("Conference Record") == false)
+	        	if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record"))
 	        		fullName = "Proc. " + fullName;
 	        }
 			entry.setField(sourceField, fullName);

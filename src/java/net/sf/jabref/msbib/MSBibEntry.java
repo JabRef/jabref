@@ -390,7 +390,7 @@ public class MSBibEntry {
 		}
 		
 		
-		if ( (sourceType.equals("InternetSite")==true || sourceType.equals("DocumentFromInternetSite")==true)
+		if ( (sourceType.equals("InternetSite") || sourceType.equals("DocumentFromInternetSite"))
 				&& bibtex.getField("title") != null)
 			internetSiteTitle = bibtex.getField("title").toString();
 		if (bibtex.getField(MSBIB+"accessed") != null)
@@ -400,14 +400,14 @@ public class MSBibEntry {
 		if (bibtex.getField(MSBIB+"productioncompany") != null)
 			productionCompany = bibtex.getField(MSBIB+"productioncompany").toString();
 		
-		if ( (sourceType.equals("ElectronicSource")==true 
-				|| sourceType.equals("Art")==true
-				|| sourceType.equals("Misc")==true)
+		if ( (sourceType.equals("ElectronicSource")
+				|| sourceType.equals("Art")
+				|| sourceType.equals("Misc"))
 				&& bibtex.getField("title") != null)
 			publicationTitle = bibtex.getField("title").toString();
 		if (bibtex.getField(MSBIB+"medium") != null)
 			medium = bibtex.getField(MSBIB+"medium").toString();
-		if (sourceType.equals("SoundRecording")==true && bibtex.getField("title") != null)
+		if (sourceType.equals("SoundRecording") && bibtex.getField("title") != null)
 			albumTitle = bibtex.getField("title").toString();
 		if (bibtex.getField(MSBIB+"recordingnumber") != null)
 			recordingNumber = bibtex.getField(MSBIB+"recordingnumber").toString();
@@ -415,7 +415,7 @@ public class MSBibEntry {
 			theater = bibtex.getField(MSBIB+"theater").toString();
 		if (bibtex.getField(MSBIB+"distributor") != null)
 			distributor = bibtex.getField(MSBIB+"distributor").toString();
-		if (sourceType.equals("Interview")==true && bibtex.getField("title") != null)
+		if (sourceType.equals("Interview") && bibtex.getField("title") != null)
 			broadcastTitle = bibtex.getField("title").toString();
 		if (bibtex.getField(MSBIB+"broadcaster") != null)
 			broadcaster = bibtex.getField(MSBIB+"broadcaster").toString();
@@ -872,7 +872,7 @@ public class MSBibEntry {
 		boolean First = true;
 		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
 			PersonName name = iter.next();
-			if(First == false)
+			if(!First)
 				allAuthors += " and ";
 			allAuthors += name.getFullname();
 			First = false;

@@ -532,7 +532,7 @@ public class BibtexDatabase {
                 duplicate = addKeyToSet( newKey );
             }
         }
-        if(duplicate==true && issueWarning==true){
+        if(duplicate && issueWarning){
             JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
                                           Globals.lang("Duplicate Key Warning"),
                                           JOptionPane.WARNING_MESSAGE);//, options);

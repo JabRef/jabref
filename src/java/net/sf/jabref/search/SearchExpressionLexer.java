@@ -105,11 +105,11 @@ tryAgain:
 						mSTRING(true);
 						theRetToken=_returnToken;
 					}
-					else if ((LA(1)=='=') && (true)) {
+					else if ((LA(1) == '=')) {
 						mEQUAL(true);
 						theRetToken=_returnToken;
 					}
-					else if ((LA(1)=='"') && (true)) {
+					else if ((LA(1) == '"')) {
 						mQUOTE(true);
 						theRetToken=_returnToken;
 					}

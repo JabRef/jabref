@@ -290,12 +290,12 @@ public class CsaImporter extends ImportFormat {
                 // check for start of new record
                 if (fabbr.equals("DN") &&
                     fname.equalsIgnoreCase("Database Name")) {
-                    if (first == false) {
+                    if (!first) {
                         throw new IOException("format error at line " + fline +
                                               ": DN out of order");
                     }
                     first = false;
-                } else if (first == true) {
+                } else if (first) {
                     throw new IOException("format error at line " + fline +
                                               ": missing DN");
                 }
