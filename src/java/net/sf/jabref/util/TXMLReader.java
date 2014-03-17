@@ -63,7 +63,21 @@ public class TXMLReader
         config = builder.parse( stream ) ;
         ready = true ;
       }
-    } catch (Exception oe)
+    }
+
+    catch ( SAXException sxe )
+    {
+      sxe.printStackTrace() ;
+    }
+    catch ( ParserConfigurationException pce )
+    {
+      pce.printStackTrace() ;
+    }
+    catch ( IOException ioe )
+    {
+      ioe.printStackTrace() ;
+    }
+    catch (Exception oe)
     {
       oe.printStackTrace();
     }
@@ -82,6 +96,45 @@ public class TXMLReader
     return config.getElementsByTagName( name ) ;
   }
 
+  // ---------------------------------------------------------------------------
+
+  private Element getFirstElement( Element element, String name )
+  {
+    NodeList nl = element.getElementsByTagName( name ) ;
+    if ( nl.getLength() < 1 )
+    {
+      throw new RuntimeException(
+          "Element: " + element + " does not contain: " + name ) ;
+    }
+    return ( Element ) nl.item( 0 ) ;
+  }
+
+  /** returns all "plain" data of a subnode with name <name> */
+  public String getSimpleElementText( Element node, String name )
+  {
+    Element namedElement = getFirstElement( node, name ) ;
+    return getSimpleElementText( namedElement ) ;
+  }
+
+  /** collect all "plain" data of a xml node */
+  public String getSimpleElementText( Element node )
+  {
+    StringBuffer sb = new StringBuffer() ;
+    NodeList children = node.getChildNodes() ;
+    for ( int i = 0 ; i < children.getLength() ; i++ )
+    {
+      Node child = children.item( i ) ;
+      if ( child instanceof Text )
+      {
+        sb.append( child.getNodeValue().trim() ) ;
+      }
+    }
+    return sb.toString() ;
+  }
+
+  // ---------------------------------------------------------------------------
+  // read some attributes
+  // --------------------------------------------------------------------------
   public int readIntegerAttribute( Element node, String attrName, int defaultValue )
   {
     int back = defaultValue ;
@@ -113,6 +166,22 @@ public class TXMLReader
         if ( data.length() > 0 )
         {
           return data ;
+        }
+      }
+    }
+    return defaultValue ;
+  }
+
+  public double readDoubleAttribute( Element node, String attrName, double defaultValue )
+  {
+    if ( node != null )
+    {
+      String data = node.getAttribute( attrName ) ;
+      if ( data != null )
+      {
+        if ( data.length() > 0 )
+        {
+          return Double.parseDouble( data ) ;
         }
       }
     }

@@ -884,6 +884,31 @@ public class XMPUtil {
 	}
 
 	/**
+	 * Try to write the given BibTexEntry as a DublinCore XMP Schema
+	 * 
+	 * Existing DublinCore schemas in the document are not modified.
+	 * 
+	 * @param document
+	 *            The pdf document to write to.
+	 * @param entry
+	 *            The Bibtex entry that is written as a schema.
+	 * @param database
+	 *            maybenull An optional database which the given bibtex entries
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
+	public static void writeDublinCore(PDDocument document, BibtexEntry entry,
+			BibtexDatabase database) throws IOException, TransformerException {
+
+		List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+		entries.add(entry);
+
+		writeDublinCore(document, entries, database);
+	}
+
+	/**
 	 * Try to write the given BibTexEntries as DublinCore XMP Schemas
 	 * 
 	 * Existing DublinCore schemas in the document are removed
