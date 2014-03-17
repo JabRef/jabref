@@ -21,7 +21,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**

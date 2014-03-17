@@ -17,7 +17,6 @@ package net.sf.jabref.oo;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -26,7 +25,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.gui.FileListEntry;
 
 import javax.swing.*;
 import java.awt.*;

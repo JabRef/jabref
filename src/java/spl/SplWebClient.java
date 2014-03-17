@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
 
 import org.sciplore.beans.Author;
 import org.sciplore.beans.Document;

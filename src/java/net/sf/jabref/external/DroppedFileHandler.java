@@ -17,8 +17,6 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.*;
@@ -26,8 +24,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
@@ -37,7 +33,6 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 

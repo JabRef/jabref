@@ -40,8 +40,6 @@ import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -62,7 +60,6 @@ import net.sf.jabref.undo.NamedCompound;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.sun.star.bridge.oleautomation.Date;
 
 /**
  * An Action for launching mass field.

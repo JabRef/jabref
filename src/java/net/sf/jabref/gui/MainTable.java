@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;

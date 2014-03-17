@@ -27,8 +27,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.sun.star.logging.LogLevel;
-
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
 

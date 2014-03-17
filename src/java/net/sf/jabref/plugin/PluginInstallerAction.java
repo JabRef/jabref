@@ -20,11 +20,7 @@ import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 /**
  * Created by IntelliJ IDEA.

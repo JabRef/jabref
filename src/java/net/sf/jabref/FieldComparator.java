@@ -21,7 +21,6 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
-import java.util.Locale;
 
 /**
  * 

@@ -9,7 +9,6 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;

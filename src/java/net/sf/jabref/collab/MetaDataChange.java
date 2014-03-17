@@ -24,7 +24,6 @@ import net.sf.jabref.undo.NamedCompound;
 import javax.swing.*;
 import java.util.Vector;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * 

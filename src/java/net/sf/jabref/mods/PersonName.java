@@ -18,7 +18,6 @@ package net.sf.jabref.mods;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
-import net.sf.jabref.export.layout.format.XMLChars;
 
 import net.sf.jabref.AuthorList;
 

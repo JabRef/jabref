@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * This class contains utility method for duplicate checking of entries.

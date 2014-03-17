@@ -17,9 +17,7 @@ package net.sf.jabref.specialfields;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
 public class SpecialFieldValue {

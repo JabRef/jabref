@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -41,8 +40,6 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-
-import org.w3c.dom.views.AbstractView;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;

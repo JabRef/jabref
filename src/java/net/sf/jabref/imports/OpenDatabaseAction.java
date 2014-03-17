@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,7 +36,6 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 import net.sf.jabref.label.HandleDuplicateWarnings;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.undo.NamedCompound;
 
 // The action concerned with opening an existing database.
 

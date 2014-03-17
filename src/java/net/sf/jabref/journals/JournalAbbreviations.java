@@ -30,7 +30,6 @@ import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.*;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.util.CaseChanger;
 
 /**
  * Created by IntelliJ IDEA.

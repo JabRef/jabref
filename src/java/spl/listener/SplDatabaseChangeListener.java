@@ -4,9 +4,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.MainTable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Christoph Arbeit

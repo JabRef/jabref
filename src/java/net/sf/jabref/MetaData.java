@@ -21,7 +21,6 @@ import java.util.*;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.VersionHandling;
 import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 import net.sf.jabref.sql.DBStrings;
 

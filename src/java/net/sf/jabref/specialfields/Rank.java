@@ -15,12 +15,6 @@
 */
 package net.sf.jabref.specialfields;
 
-import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 
 public abstract class Rank extends SpecialField {

@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -47,7 +46,6 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
 import spl.PdfImporter;
 import spl.PdfImporter.ImportPdfFilesResult;
-import spl.Tools;
 
 public class EntryTableTransferHandler extends TransferHandler {
 

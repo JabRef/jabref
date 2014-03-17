@@ -27,16 +27,13 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.*;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.jar.JarFile;
 
 import org.java.plugin.registry.PluginDescriptor;
-import org.java.plugin.registry.PluginRegistry;
 import org.java.plugin.registry.ManifestProcessingException;
 import org.java.plugin.registry.ManifestInfo;
-import org.java.plugin.registry.xml.PluginRegistryImpl;
 
 /**
  *

@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * Utility methods for processing OO Writer documents.

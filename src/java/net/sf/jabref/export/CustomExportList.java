@@ -15,12 +15,10 @@
 */
 package net.sf.jabref.export;
 
-import java.util.TreeSet;
 import java.util.Comparator;
 import java.util.TreeMap;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.BasicEventList;

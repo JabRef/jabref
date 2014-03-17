@@ -5,16 +5,13 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportSettingsTab;
-import net.sf.jabref.JabRefPreferences;
 import spl.listener.LabelLinkListener;
 import spl.localization.LocalizationSupport;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ResourceBundle;
 
 public class ImportDialog extends JDialog {
 	public final static int NOMETA = 0;

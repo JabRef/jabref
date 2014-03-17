@@ -3,7 +3,6 @@ package tests.net.sf.jabref.imports;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

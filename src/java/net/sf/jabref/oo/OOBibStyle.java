@@ -22,7 +22,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 import java.io.*;
 import java.util.*;

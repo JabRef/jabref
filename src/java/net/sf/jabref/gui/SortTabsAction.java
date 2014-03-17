@@ -17,7 +17,6 @@ package net.sf.jabref.gui;
 
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import javax.swing.JTabbedPane;

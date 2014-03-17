@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sciplore.beans.Abstract;
 import org.sciplore.beans.Author;
-import org.sciplore.beans.Authors;
 import org.sciplore.beans.Document;
 import org.sciplore.formatter.Bean;
 import org.sciplore.formatter.SimpleTypeElementBean;

@@ -23,7 +23,6 @@
 
 package net.sf.jabref.imports;
 
-import java.util.Set;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

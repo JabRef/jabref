@@ -16,7 +16,6 @@
 package net.sf.jabref;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;

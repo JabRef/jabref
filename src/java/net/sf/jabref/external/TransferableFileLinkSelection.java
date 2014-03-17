@@ -21,13 +21,11 @@ import net.sf.jabref.Util;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.ArrayList;
 

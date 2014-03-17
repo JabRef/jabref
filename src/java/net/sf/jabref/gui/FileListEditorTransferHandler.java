@@ -23,7 +23,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
@@ -31,9 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.EntryContainer;
-import net.sf.jabref.EntryEditor;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;

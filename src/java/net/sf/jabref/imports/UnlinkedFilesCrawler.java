@@ -7,7 +7,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.FindUnlinkedFilesDialog.FileNodeWrapper;
 

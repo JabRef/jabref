@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.imports;
 
-import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
 

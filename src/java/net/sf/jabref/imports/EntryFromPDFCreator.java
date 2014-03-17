@@ -1,14 +1,10 @@
 package net.sf.jabref.imports;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,11 +14,8 @@ import spl.PdfImporter;
 import spl.PdfImporter.ImportPdfFilesResult;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.OutputPrinterToNull;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.util.EncryptionNotSupportedException;
 import net.sf.jabref.util.XMPUtil;

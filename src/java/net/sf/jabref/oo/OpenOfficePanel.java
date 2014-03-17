@@ -36,7 +36,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.prefs.BackingStoreException;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an

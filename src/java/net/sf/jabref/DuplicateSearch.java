@@ -22,7 +22,6 @@
 package net.sf.jabref;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.SwingUtilities;

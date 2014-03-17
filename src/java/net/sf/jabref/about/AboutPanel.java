@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.io.BufferedReader;
 import java.io.InputStream;

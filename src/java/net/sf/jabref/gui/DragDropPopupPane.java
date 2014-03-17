@@ -26,7 +26,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 
 /**
  * Adds popup functionality to DragDropPane 

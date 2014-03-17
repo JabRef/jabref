@@ -3,7 +3,6 @@ package net.sf.jabref.imports;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 
-import javax.swing.*;
 import java.util.Map;
 
 /**

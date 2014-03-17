@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.net;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.imports.ImportFormatReader;
 
 import java.awt.Component;

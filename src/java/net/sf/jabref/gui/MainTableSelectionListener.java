@@ -35,7 +35,6 @@ import net.sf.jabref.EntryEditor;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
