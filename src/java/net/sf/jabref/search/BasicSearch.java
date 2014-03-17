@@ -110,7 +110,7 @@ public class BasicSearch implements SearchRule {
                     if (!regExp) {
                         String s = words.get(j);
                         matchFound[index] = matchFound[index]
-                            || (fieldContent.indexOf(s) >= 0);
+                            || (fieldContent.contains(s));
                     } else {
                         if (fieldContent != null) {
                             Matcher m = pattern[j].matcher

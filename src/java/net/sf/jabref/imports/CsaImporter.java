@@ -338,7 +338,7 @@ public class CsaImporter extends ImportFormat {
                     ftype = "affiliation";
                 else if (fabbr.equals("AU")) {
                     ftype = "author";
-                    if (fstr.indexOf(";") >= 0)
+                    if (fstr.contains(";"))
                         fstr = fstr.replaceAll("; ", " and ");
                 }
                 else if (fabbr.equals("CA"))

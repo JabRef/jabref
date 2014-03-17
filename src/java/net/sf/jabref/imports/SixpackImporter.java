@@ -61,7 +61,7 @@ public class SixpackImporter extends ImportFormat {
         int i=0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-			if (str.indexOf(SEPARATOR) >= 0)
+			if (str.contains(SEPARATOR))
 				return true;
 
             i++;

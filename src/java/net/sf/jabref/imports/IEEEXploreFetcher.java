@@ -156,28 +156,28 @@ public class IEEEXploreFetcher implements EntryFetcher {
         	URL url = new URL(searchUrl);
         	String page = getResults(url);
             
-            if (page.indexOf("You have entered an invalid search") >= 0) {
+            if (page.contains("You have entered an invalid search")) {
                 status.showMessage(Globals.lang("You have entered an invalid search '%0'.",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             
-            if (page.indexOf("Bad request") >= 0) {
+            if (page.contains("Bad request")) {
             	status.showMessage(Globals.lang("Bad Request '%0'.",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             
-            if (page.indexOf("No results were found.") >= 0) {
+            if (page.contains("No results were found.")) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
                         
-            if (page.indexOf("Error Page") >= 0) {
+            if (page.contains("Error Page")) {
                 status.showMessage(Globals.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;

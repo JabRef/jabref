@@ -161,15 +161,15 @@ public class BibtexCaseChanger {
 		switch (format) {
 		case TITLE_LOWERS:
 		case ALL_LOWERS:
-			if ("L O OE AE AA".indexOf(s) != -1)
+			if ("L O OE AE AA".contains(s))
 				sb.append(s.toLowerCase());
 			else
 				sb.append(s);
 			break;
 		case ALL_UPPERS:
-			if ("l o oe ae aa".indexOf(s) != -1)
+			if ("l o oe ae aa".contains(s))
 				sb.append(s.toUpperCase());
-			else if ("i j ss".indexOf(s) != -1) {
+			else if ("i j ss".contains(s)) {
 
 				sb.deleteCharAt(sb.length() - 1); // Kill backslash
 				sb.append(s.toUpperCase());

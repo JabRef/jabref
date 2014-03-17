@@ -339,7 +339,7 @@ public class FontSelectorDialog extends JDialog {
 
                         for(int i = 0, j; i < nameArray.length; i++){
                                 for(j = 0; j < HIDEFONTS.length; j++){
-                                        if(nameArray[i].indexOf(HIDEFONTS[j]) >= 0) break;
+                                        if(nameArray[i].contains(HIDEFONTS[j])) break;
                                 }
 
                                 if(j == HIDEFONTS.length) nameVector.addElement(nameArray[i]);

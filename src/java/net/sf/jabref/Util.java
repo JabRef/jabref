@@ -1900,12 +1900,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		// Jabref 1.55 moves the abstract to its own tab.
 		String genFields = Globals.prefs.get("generalFields");
 		// pr(genFields+"\t"+genFields.indexOf("abstract"));
-		if (genFields.indexOf("abstract") >= 0) {
+		if (genFields.contains("abstract")) {
 			// pr(genFields+"\t"+genFields.indexOf("abstract"));
 			String newGen;
 			if (genFields.equals("abstract"))
 				newGen = "";
-			else if (genFields.indexOf(";abstract;") >= 0) {
+			else if (genFields.contains(";abstract;")) {
 				newGen = genFields.replaceAll(";abstract;", ";");
 			} else if (genFields.indexOf("abstract;") == 0) {
 				newGen = genFields.replaceAll("abstract;", "");

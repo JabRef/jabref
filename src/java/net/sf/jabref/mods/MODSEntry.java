@@ -142,7 +142,7 @@ public class MODSEntry {
 		List<PersonName> result = new LinkedList<PersonName>();
 		LayoutFormatter chars = new XMLChars();
 		
-		if (authors.indexOf(" and ") == -1) {
+		if (!authors.contains(" and ")) {
 			if(CHARFORMAT)
 				result.add(new PersonName(chars.format(authors)));
 			else

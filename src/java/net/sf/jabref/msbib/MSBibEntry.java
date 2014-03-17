@@ -570,7 +570,7 @@ public class MSBibEntry {
 	protected List<PersonName> getAuthors(String authors) {
 		List<PersonName> result = new LinkedList<PersonName>();
 		
-		if (authors.indexOf(" and ") == -1)
+		if (!authors.contains(" and "))
 		{
 				result.add(new PersonName(authors));
 		}

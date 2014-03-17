@@ -48,11 +48,10 @@ public class IncrementalSearcher {
 				       +pattern.toString()+"'.");*/
 			if (bibtexEntry.getField(field) != null) {
 			    if (prefs.getBoolean("caseSensitiveSearch")) {
-				if (bibtexEntry.getField(field).indexOf(searchString) > -1)
+				if (bibtexEntry.getField(field).contains(searchString))
 				    found = true;
 			    } else {
-				if (bibtexEntry.getField(field).toLowerCase()
-				    .indexOf(searchString.toLowerCase()) > -1)
+				if (bibtexEntry.getField(field).toLowerCase().contains(searchString.toLowerCase()))
 				    found = true;
 			    }
 			    

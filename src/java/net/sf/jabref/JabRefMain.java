@@ -67,7 +67,7 @@ public class JabRefMain {
         }
 
         String javaVendor = System.getProperty("java.vendor", null);
-        if ((javaVendor.indexOf("Sun Microsystems") == -1) && (javaVendor.indexOf("Oracle") == -1)) {
+        if ((!javaVendor.contains("Sun Microsystems")) && (!javaVendor.contains("Oracle"))) {
             System.out.println("\n" + 
                     "WARNING: You are not running a Java version from Oracle (or Sun Microsystems).\n" +
                     "         Your java vendor is: " + javaVendor + "\n" +

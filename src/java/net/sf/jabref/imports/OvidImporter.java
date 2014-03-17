@@ -199,7 +199,7 @@ public class OvidImporter extends ImportFormat {
         // Now we need to check if a book entry has given editors in the author field;
         // if so, rearrange:
         String auth = h.get("author");
-        if ((auth != null) && (auth.indexOf(" [Ed]") >= 0)) {
+        if ((auth != null) && (auth.contains(" [Ed]"))) {
             h.remove("author");
             h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
         }

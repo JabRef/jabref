@@ -32,7 +32,7 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
     }
 
     public boolean supportsSite(URL url) {
-        return url.getHost().toLowerCase().indexOf("www.springerlink.com") != -1;
+        return url.getHost().toLowerCase().contains("www.springerlink.com");
     }
 
 

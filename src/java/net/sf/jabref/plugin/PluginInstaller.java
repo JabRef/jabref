@@ -496,7 +496,7 @@ public class PluginInstaller {
         for (String url : urls.keySet()) {
             PluginDescriptor desc = urls.get(url);
             File location =  new File(desc.getLocation().getFile());
-            if (location.getPath().indexOf(PluginCore.userPluginDir.getPath()) >= 0)
+            if (location.getPath().contains(PluginCore.userPluginDir.getPath()))
                 continue; // This must be a loaded user dir plugin that's been deleted.
             //System.out.println("File: "+desc.getLocation().getFile());
             NameAndVersion nameAndVersion = new NameAndVersion(desc.getId(),

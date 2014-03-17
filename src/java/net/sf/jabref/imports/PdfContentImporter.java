@@ -449,7 +449,7 @@ public class PdfContentImporter extends ImportFormat {
 						}
 					}
 					
-					if ((publisher==null) && (curString.indexOf("IEEE")>=0)) {
+					if ((publisher==null) && (curString.contains("IEEE"))) {
 						// IEEE has the conference things at the end
 						publisher = "IEEE";
 

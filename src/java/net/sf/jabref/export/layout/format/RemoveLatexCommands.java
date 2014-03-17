@@ -44,7 +44,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
       }
 
       else if (Character.isLetter(c) ||
-                (Globals.SPECIAL_COMMAND_CHARS.indexOf(""+c) >= 0)) {
+                (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
          escaped = false;
          if (!incommand)
            sb.append(c);
@@ -52,7 +52,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
          else {
            currentCommand.append( c);
            if ((currentCommand.length() == 1)
-               && (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
+               && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
              // This indicates that we are in a command of the type \^o or \~{n}
  /*            if (i >= field.length()-1)
                break testCharCom;

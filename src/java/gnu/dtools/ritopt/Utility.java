@@ -47,7 +47,7 @@ public class Utility {
 
     public static boolean contains( String check, String list ) {
 	for ( int n = 0; n < list.length(); n++ ) {
-	    if ( check.indexOf( list.substring( n, n + 1 ) ) != -1 )
+	    if (check.contains(list.substring(n, n + 1)))
 		return true;
 	}
 	return false;

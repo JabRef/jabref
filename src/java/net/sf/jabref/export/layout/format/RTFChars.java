@@ -67,7 +67,7 @@ public class RTFChars implements LayoutFormatter {
 			} else if (!incommand && (c == '{' || c == '}')) {
 				// Swallow the brace.
 			} else if (Character.isLetter(c)
-				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + c) >= 0)) {
+				|| (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
 				escaped = false;
 				if (!incommand){
 					sb.append(c);
@@ -75,7 +75,7 @@ public class RTFChars implements LayoutFormatter {
 					// Else we are in a command, and should not keep the letter.
 					currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
+						&& (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
 						// This indicates that we are in a command of the type
 						// \^o or \~{n}
 						if (i >= field.length() - 1)

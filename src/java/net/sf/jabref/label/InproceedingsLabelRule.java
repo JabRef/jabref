@@ -68,7 +68,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
                 }
             }
 
-            if(tempString!=null && (tempString.indexOf("null")<0) ){
+            if(tempString!=null && (!tempString.contains("null")) ){
                 newLabel += String.valueOf( tempString.toLowerCase()) ;
             }
           }

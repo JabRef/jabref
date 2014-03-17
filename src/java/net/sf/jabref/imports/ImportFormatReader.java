@@ -255,7 +255,7 @@ public class ImportFormatReader {
       String[] authors = name.split(" and ");
       StringBuffer sb = new StringBuffer();
       for (int i=0; i<authors.length; i++) {
-          if (authors[i].indexOf(", ") >= 0) {
+          if (authors[i].contains(", ")) {
               String[] names = authors[i].split(", ");
               if (names.length > 0) {
                   sb.append(names[0]);

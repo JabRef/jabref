@@ -227,14 +227,14 @@ public class StringDialog extends JDialog {
 								   +"already exists"),
 						      Globals.lang("Label"),
 						      JOptionPane.ERROR_MESSAGE);
-                      else if (((String)value).indexOf(" ") >= 0) {
+                      else if (((String) value).contains(" ")) {
                         JOptionPane.showMessageDialog
                             (parent,
                              Globals.lang("The label of the string can not contain spaces."),
                              Globals.lang("Label"),
                              JOptionPane.ERROR_MESSAGE);
                       }
-                      else if (((String)value).indexOf("#") >= 0) {
+                      else if (((String) value).contains("#")) {
                         JOptionPane.showMessageDialog
                             (parent,
                             Globals.lang("The label of the string can not contain the '#' character."),
@@ -365,7 +365,7 @@ public class StringDialog extends JDialog {
 		     JOptionPane.ERROR_MESSAGE);
 		return;
 	    }
-            if (name.indexOf("#") >= 0) {
+            if (name.contains("#")) {
              JOptionPane.showMessageDialog
                  (parent,
                   Globals.lang("The label of the string can not contain the '#' character."),
@@ -373,7 +373,7 @@ public class StringDialog extends JDialog {
                   JOptionPane.ERROR_MESSAGE);
              return;
            }           
-           if (name.indexOf(" ") >= 0) {
+           if (name.contains(" ")) {
              JOptionPane.showMessageDialog
                  (parent,
                   Globals.lang("The label of the string can not contain spaces."),

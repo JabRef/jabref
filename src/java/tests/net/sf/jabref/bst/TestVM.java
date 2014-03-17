@@ -638,7 +638,7 @@ public class TestVM extends TestCase {
 		VM vm = new VM(new File("src/tests/net/sf/jabref/bst/abbrv.bst"));
 		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
-		assertTrue(vm.run(v).indexOf("J.-P. Sartre") != -1);
+		assertTrue(vm.run(v).contains("J.-P. Sartre"));
 	}
 
 	public BibtexEntry t1BibtexEntry() throws IOException {
