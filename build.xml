@@ -106,6 +106,7 @@
         <include name="jgoodies-common-1.4.0.jar" />
 		<include name="jgoodies-looks-2.5.2.jar" />
 		<include name="jgoodies-forms-1.6.0.jar" />
+        <include name="jgoodies/jgoodies-uif-lite.jar" />
 		<include name="jayatana-1.2.4.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
