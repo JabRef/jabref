@@ -49,7 +49,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * @version $Revision$
  */
 public class XMLChars implements LayoutFormatter {
-	Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
 
 	public String format(String fieldText) {
 

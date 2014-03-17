@@ -64,19 +64,6 @@ public class TXMLReader
         ready = true ;
       }
     }
-
-    catch ( SAXException sxe )
-    {
-      sxe.printStackTrace() ;
-    }
-    catch ( ParserConfigurationException pce )
-    {
-      pce.printStackTrace() ;
-    }
-    catch ( IOException ioe )
-    {
-      ioe.printStackTrace() ;
-    }
     catch (Exception oe)
     {
       oe.printStackTrace();

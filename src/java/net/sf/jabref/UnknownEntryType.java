@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import java.io.Writer;
+
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
  * during bibtex parsing. The only known information is the type name.
@@ -48,15 +50,8 @@ public class UnknownEntryType extends BibtexEntryType {
 	return "unknown";
     }
 
-    public String describeOptionalFields() {
-	return "unknown";
-    }
-
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
 	return true;
-    }
-
-    public void save(Writer out) {
     }
 
 }
