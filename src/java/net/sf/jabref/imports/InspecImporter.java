@@ -99,9 +99,8 @@ public class InspecImporter extends ImportFormat {
             h.clear();
 
             String[] fields = entry.split("__NEWFIELD__");
-            for (int j = 0; j < fields.length; j++) {
+            for (String s : fields) {
                 //System.out.println(fields[j]);
-                String s = fields[j];
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if (f3.equals("TI")) h.put("title", frest);

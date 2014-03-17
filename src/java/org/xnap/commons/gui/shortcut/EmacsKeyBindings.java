@@ -256,10 +256,10 @@ public class EmacsKeyBindings
             Keymap backup = JTextComponent.addKeymap
                     (JTC.getClass().getName(), null);
             Action[] bound = orig.getBoundActions();
-            for (int j = 0; j < bound.length; j++) {
-                KeyStroke[] strokes = orig.getKeyStrokesForAction(bound[j]);
+            for (Action aBound : bound) {
+                KeyStroke[] strokes = orig.getKeyStrokesForAction(aBound);
                 for (int k = 0; k < strokes.length; k++) {
-                    backup.addActionForKeyStroke(strokes[k], bound[j]);
+                    backup.addActionForKeyStroke(strokes[k], aBound);
                 }
             }
             backup.setDefaultAction(orig.getDefaultAction());
@@ -285,8 +285,8 @@ public class EmacsKeyBindings
                 for (Action aBound : bound) {
                     KeyStroke[] strokes =
                             backup.getKeyStrokesForAction(bound[i]);
-                    for (int k = 0; k < strokes.length; k++) {
-                        current.addActionForKeyStroke(strokes[k], aBound);
+                    for (KeyStroke stroke : strokes) {
+                        current.addActionForKeyStroke(stroke, aBound);
                     }
                 }
 				current.setDefaultAction(backup.getDefaultAction());

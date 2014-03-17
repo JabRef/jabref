@@ -247,8 +247,7 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (Iterator<String> i = metaData.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (String key : metaData.keySet()) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
             if (orderedData.size() >= 0) {
@@ -261,7 +260,7 @@ public class MetaData implements Iterable<String> {
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
-            
+
             out.write(sb.toString());
         }
         // write groups if present. skip this if only the root node exists 
@@ -358,10 +357,8 @@ public class MetaData implements Iterable<String> {
         
         // the parent label pattern of a BibTeX data base is the global pattern stored in the preferences
         labelPattern.setParent(Globals.prefs.getKeyPattern());
-        
-        Iterator<String> iterator = iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
+
+        for (String key : this) {
             if (key.startsWith(PREFIX_KEYPATTERN)) {
                 Vector<String> value = getData(key);
                 String type = key.substring(PREFIX_KEYPATTERN.length());

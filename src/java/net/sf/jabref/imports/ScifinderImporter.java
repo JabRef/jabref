@@ -93,7 +93,7 @@ public class ScifinderImporter extends ImportFormat {
         String Type = "";
         hm.clear(); // reset
         for (String field : fields)
-            if (field.indexOf(":") >= 0) {
+            if (field.contains(":")) {
                 String tmp[] = new String[2];
                 tmp[0] = field.substring(0, field.indexOf(":"));
                 tmp[1] = field.substring(field.indexOf(":") + 1).trim();

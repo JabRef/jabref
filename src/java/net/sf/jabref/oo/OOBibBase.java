@@ -888,14 +888,14 @@ public class OOBibBase {
             Matcher m = citePattern.matcher(name);
             if (m.find()) {
                 String[] keys = m.group(2).split(",");
-                for (int j = 0; j < keys.length; j++) {
-                    BibtexDatabase database = linkSourceBase.get(keys[j]);
+                for (String key : keys) {
+                    BibtexDatabase database = linkSourceBase.get(key);
                     BibtexEntry origEntry = null;
-                    if (database != null) origEntry = database.getEntryByKey(keys[j]);
+                    if (database != null) origEntry = database.getEntryByKey(key);
                     if (origEntry == null) {
-                        System.out.println("Bibtex key not found : '" + keys[j] + "'");
+                        System.out.println("Bibtex key not found : '" + key + "'");
                         System.out.println("Problem with reference mark: '" + name + "'");
-                        newList.put(new UndefinedBibtexEntry(keys[j]), null);
+                        newList.put(new UndefinedBibtexEntry(key), null);
                         //throw new BibtexEntryNotFoundException(keys[j], "");
                     } else {
                         BibtexEntry entry = adaptedEntries.get(origEntry);

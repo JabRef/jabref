@@ -209,13 +209,13 @@ public class IsiImporter extends ImportFormat {
             hm.clear();
 
             nextField:
-            for (int j = 0; j < fields.length; j++) {
+            for (String field : fields) {
                 // empty field don't do anything
-                if (fields[j].length() <= 2)
+                if (field.length() <= 2)
                     continue;
 
-                String beg = fields[j].substring(0, 2);
-                String value = fields[j].substring(3);
+                String beg = field.substring(0, 2);
+                String value = field.substring(3);
                 if (value.startsWith(" - ")) {
                     value = value.substring(3);
                 }
@@ -327,14 +327,13 @@ public class IsiImporter extends ImportFormat {
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<Object>();
-            for (Iterator<String> it = hm.keySet().iterator(); it.hasNext(); ) {
-                Object key = it.next();
+            for (String key : hm.keySet()) {
                 String content = hm.get(key);
                 if ((content == null) || (content.trim().length() == 0))
                     toRemove.add(key);
             }
-            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext(); ) {
-                hm.remove(iterator.next());
+            for (Object aToRemove : toRemove) {
+                hm.remove(aToRemove);
 
             }
 

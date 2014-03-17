@@ -2993,8 +2993,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         for (String anAll : all) {
             boolean found = false;
             inner:
-            for (int j = 0; j < subset.length; j++) {
-                if (subset[j].equals(anAll)) {
+            for (String aSubset : subset) {
+                if (aSubset.equals(anAll)) {
                     found = true;
                     break inner;
                 }

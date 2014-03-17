@@ -253,8 +253,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     ArrayList<String> secOpt = new ArrayList<String>();
                     for (String anOldOpt : oldOpt) {
                         boolean inPri = false;
-                        for (int k = 0; k < priOpt.length; k++) {
-                            if (priOpt[k].equals(anOldOpt)) {
+                        for (String aPriOpt : priOpt) {
+                            if (aPriOpt.equals(anOldOpt)) {
                                 inPri = true;
                                 break;
                             }

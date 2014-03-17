@@ -158,15 +158,14 @@ public class XMPUtil {
         			if (result.size() == 0) {
         				schemas = meta
         						.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-                        Iterator<XMPSchema> it = schemas.iterator();
-        				while (it.hasNext()) {
-        					XMPSchemaDublinCore dc = (XMPSchemaDublinCore) it.next();
-        
-        					BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
-        
-        					if (entry != null)
-        						result.add(entry);
-        				}
+                        for (XMPSchema schema : schemas) {
+                            XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
+
+                            BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
+
+                            if (entry != null)
+                                result.add(entry);
+                        }
         			}
 			}
 			if (result.size() == 0) {

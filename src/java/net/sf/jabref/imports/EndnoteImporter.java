@@ -106,9 +106,9 @@ public class EndnoteImporter extends ImportFormat {
             boolean IsEditedBook = false;
             String[] fields = entry.trim().substring(1).split("\n%");
             //String lastPrefix = "";
-            for (int j = 0; j < fields.length; j++) {
+            for (String field : fields) {
 
-                if (fields[j].length() < 3) continue;
+                if (field.length() < 3) continue;
 
         /*
            * Details of Refer format for Journal Article and Book:
@@ -123,9 +123,9 @@ public class EndnoteImporter extends ImportFormat {
            * Abstract %X Abstract Abstract Notes %O Notes Notes
            */
 
-                String prefix = fields[j].substring(0, 1);
+                String prefix = field.substring(0, 1);
 
-                String val = fields[j].substring(2);
+                String val = field.substring(2);
 
                 if (prefix.equals("A")) {
                     if (author.equals("")) author = val;

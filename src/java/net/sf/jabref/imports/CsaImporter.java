@@ -305,8 +305,8 @@ public class CsaImporter extends ImportFormat {
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
                     for (String type : types) {
-                        if ((type.indexOf("article") >= 0) ||
-                                (type.indexOf("journal article") >= 0)) {
+                        if ((type.contains("article")) ||
+                                (type.contains("journal article"))) {
                             Type = "article";
                             break;
                         } else if (type.equals("dissertation")) {

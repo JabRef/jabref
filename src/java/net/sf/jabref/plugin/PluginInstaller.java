@@ -476,7 +476,7 @@ public class PluginInstaller {
                         file);
                 for (Iterator<String> it = urls.keySet().iterator(); it.hasNext(); ) {
                     String loc = it.next();
-                    if (loc.indexOf(nav[0]) >= 0) {
+                    if (loc.contains(nav[0])) {
                         PluginDescriptor desc = urls.get(loc);
                         //System.out.println("Accounted for: "+desc.getId()+" "+desc.getVersion().toString());
                         if (!PluginCore.getManager().isPluginEnabled(urls.get(loc)))
@@ -568,7 +568,7 @@ public class PluginInstaller {
             VersionNumber oth = (VersionNumber)o;
            
             for (int i=0; i<Math.min(digits.size(), oth.digits.size()); i++) {
-                if (digits.get(i) != oth.digits.get(i))
+                if (!digits.get(i).equals(oth.digits.get(i)))
                     return oth.digits.get(i)-digits.get(i);
             }
             // All digits equal so far, and only one of the numbers has more digits.

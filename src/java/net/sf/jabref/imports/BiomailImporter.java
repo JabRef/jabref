@@ -121,15 +121,15 @@ public class BiomailImporter extends ImportFormat {
             String fullauthor = "";
             hm.clear();
 
-            for (int j = 0; j < fields.length; j++) {
-                System.out.println(">>>" + fields[j] + "<<<");
+            for (String field : fields) {
+                System.out.println(">>>" + field + "<<<");
 
                 //empty field don't do anything
-                if (fields[j].length() <= 2)
+                if (field.length() <= 2)
                     continue;
 
-                String beg = fields[j].substring(0, 6);
-                String value = fields[j].substring(6);
+                String beg = field.substring(0, 6);
+                String value = field.substring(6);
                 value = value.trim();
 
                 if (beg.equals("PT  - ")) {

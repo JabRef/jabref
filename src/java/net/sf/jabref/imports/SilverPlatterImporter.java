@@ -99,10 +99,10 @@ public class SilverPlatterImporter extends ImportFormat {
             h.clear();
             String[] fields = entry.split("__NEWFIELD__");
             fieldLoop:
-            for (int j = 0; j < fields.length; j++) {
-                if (fields[j].length() < 6) continue fieldLoop;
+            for (String field : fields) {
+                if (field.length() < 6) continue fieldLoop;
                 //System.out.println(">"+fields[j]+"<");
-                String s = fields[j];
+                String s = field;
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if (f3.equals("TI")) h.put("title", frest);

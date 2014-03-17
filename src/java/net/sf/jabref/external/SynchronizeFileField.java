@@ -155,8 +155,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     // We need to specify which directories to search in for Util.expandFilename:
                     String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<File>();
-                    for (int k = 0; k < dirsS.length; k++)
-                        dirs.add(new File(dirsS[k]));
+                    for (String dirs1 : dirsS) dirs.add(new File(dirs1));
 
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
@@ -233,8 +232,8 @@ public class SynchronizeFileField extends AbstractWorker {
                                     // Get the old list of types, add this one, and update the list in prefs:
                                     List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
                                     ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-                                    for (int k = 0; k < oldTypes.length; k++) {
-                                        fileTypes.add(oldTypes[k]);
+                                    for (ExternalFileType oldType : oldTypes) {
+                                        fileTypes.add(oldType);
                                     }
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);

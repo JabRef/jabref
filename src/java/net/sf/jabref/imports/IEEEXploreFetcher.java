@@ -273,13 +273,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		 	try {
 		 		BibtexDatabase dbase = parseBibtexDatabase(idSelected, includeAbstract);
 		 		Collection<BibtexEntry> items = dbase.getEntries();
-		 		Iterator<BibtexEntry> iter = items.iterator();
-		 		while (iter.hasNext()) {
-		 			BibtexEntry entry = iter.next();
-		 			dialog.addEntry(cleanup(entry));
-	                dialog.setProgress(parsed + unparseable, hits);
-	                parsed++;
-		 		}
+                for (BibtexEntry entry : items) {
+                    dialog.addEntry(cleanup(entry));
+                    dialog.setProgress(parsed + unparseable, hits);
+                    parsed++;
+                }
 		 	} catch (IOException e) {
 		 		e.printStackTrace();
 		 	}
@@ -318,10 +316,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 conn.getOutputStream());
 
 		String recordIds = "";
-		Iterator<String> iter = id.iterator();
-		while (iter.hasNext()) { 
-	    	recordIds += iter.next() + " ";
-		}
+        for (String anId : id) {
+            recordIds += anId + " ";
+        }
 		recordIds = recordIds.trim();
 		String citation = abs ? "citation-abstract" : "citation-only";
 		

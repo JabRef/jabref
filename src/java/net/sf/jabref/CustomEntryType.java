@@ -154,12 +154,12 @@ public class CustomEntryType extends BibtexEntryType {
             return false;
         for (String[] reqSet : reqSets) {
             boolean takesPart = false, oneSet = false;
-            for (int j = 0; j < reqSet.length; j++) {
+            for (String aReqSet : reqSet) {
                 // If this is the field we're looking for, note that the field is part of the set:
-                if (reqSet[j].equalsIgnoreCase(field))
+                if (aReqSet.equalsIgnoreCase(field))
                     takesPart = true;
                     // If it is a different field, check if it is set:
-                else if (BibtexDatabase.getResolvedField(reqSet[j], entry, database) != null)
+                else if (BibtexDatabase.getResolvedField(aReqSet, entry, database) != null)
                     oneSet = true;
             }
             // Ths the field is part of the set, and at least one other field is set, return true:

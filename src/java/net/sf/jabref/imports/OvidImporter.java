@@ -118,8 +118,8 @@ public class OvidImporter extends ImportFormat {
 
             // Check if this is the author field (due to a minor special treatment for this field):
             boolean isAuthor = fieldName.indexOf("Author") == 0
-                    && fieldName.indexOf("Author Keywords") == -1
-                    && fieldName.indexOf("Author e-mail") == -1;
+                    && !fieldName.contains("Author Keywords")
+                    && !fieldName.contains("Author e-mail");
 
             // Remove unnecessary dots at the end of lines, unless this is the author field,
             // in which case a dot at the end could be significant:
@@ -187,11 +187,11 @@ public class OvidImporter extends ImportFormat {
                 h.put("abstract", content);
 
             } else if (fieldName.equals("Publication Type")) {
-                if (content.indexOf("Book") >= 0)
+                if (content.contains("Book"))
                     h.put("entrytype", "book");
-                else if (content.indexOf("Journal") >= 0)
+                else if (content.contains("Journal"))
                     h.put("entrytype", "article");
-                else if (content.indexOf("Conference Paper") >= 0)
+                else if (content.contains("Conference Paper"))
                     h.put("entrytype", "inproceedings");
             }
         }

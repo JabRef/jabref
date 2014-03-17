@@ -235,14 +235,13 @@ public class RisImporter extends ImportFormat {
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<Object>();
-            for (Iterator<String> it = hm.keySet().iterator(); it.hasNext(); ) {
-                Object key = it.next();
+            for (String key : hm.keySet()) {
                 String content = hm.get(key);
                 if ((content == null) || (content.trim().length() == 0))
                     toRemove.add(key);
             }
-            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext(); ) {
-                hm.remove(iterator.next());
+            for (Object aToRemove : toRemove) {
+                hm.remove(aToRemove);
 
             }
 
