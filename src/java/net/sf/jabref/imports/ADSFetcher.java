@@ -147,7 +147,7 @@ public class ADSFetcher implements EntryFetcher {
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                    reader.getLocalName() == "abstract") {
+                        reader.getLocalName().equals("abstract")) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {

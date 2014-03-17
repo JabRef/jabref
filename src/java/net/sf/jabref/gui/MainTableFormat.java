@@ -166,7 +166,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      */
     public boolean isRankingColumn(int col) {
         if (iconCols.get(col) != null) {
-            if (iconCols.get(col)[0] == RANKING[0]){
+            if (iconCols.get(col)[0].equals(RANKING[0])){
                 return true;
             }
         }

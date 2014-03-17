@@ -108,7 +108,7 @@ public class OptionEvent {
 	    command = longOption;
 	}
 	else if ( shortOption != '\0' ) {
-	    command = new Character( shortOption ).toString();
+	    command = Character.toString(shortOption);
 	}
 	else {
 	    command = "Default";

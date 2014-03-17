@@ -460,15 +460,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	// clean up publication field
     	BibtexEntryType type = entry.getType();
     	String sourceField = "";
-		if (type.getName() == "Article") {
+		if (type.getName().equals("Article")) {
         	sourceField = "journal";
 			entry.clearField("booktitle");
-		} else if (type.getName() == "Inproceedings"){
+		} else if (type.getName().equals("Inproceedings")){
             sourceField = "booktitle";
 		}
         String fullName = entry.getField(sourceField);
         if (fullName != null) {
-	        if (type.getName() == "Article") {
+	        if (type.getName().equals("Article")) {
 	        	int ind = fullName.indexOf(": Accepted for future publication");
 				if (ind > 0) {
 					fullName = fullName.substring(0, ind);
@@ -482,7 +482,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        if (parts.length == 3) {
 					fullName += parts[2];
 				}
-			if(entry.getField("note") ==  "Early Access") {
+			if(entry.getField("note").equals("Early Access")) {
 					entry.setField("year", "to be published");
 					entry.clearField("month");
 					entry.clearField("pages");
@@ -519,7 +519,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 					fullName = postfix + " " + prefix;
 				}
 			}
-			if (type.getName() == "Article") {
+			if (type.getName().equals("Article")) {
 				fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 				
 				fullName = fullName.trim();
@@ -529,7 +529,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 						fullName = id;
 				}
 	        }
-			if (type.getName() == "Inproceedings") {
+			if (type.getName().equals("Inproceedings")) {
 	            Matcher m2 = proceedingPattern.matcher(fullName);
 				if (m2.find()) {
 					String prefix = m2.group(2); 

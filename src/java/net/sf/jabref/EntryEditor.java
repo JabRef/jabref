@@ -843,7 +843,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // Then set all fields that have been set by the user.
             for (String field : nu.getAllFields()){
-                if (entry.getField(field) != nu.getField(field)) {
+                if (!entry.getField(field).equals(nu.getField(field))) {
                     String toSet = nu.getField(field);
 
                     // Test if the field is legally set.

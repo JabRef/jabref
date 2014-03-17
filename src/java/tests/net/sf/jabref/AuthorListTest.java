@@ -23,9 +23,9 @@ public class AuthorListTest extends TestCase {
 
 		// Is not cached!
 		assertTrue(AuthorList
-			.fixAuthor_Natbib("John von Neumann and John Smith and Black Brown, Peter") == AuthorList
-			.fixAuthor_Natbib("John von Neumann" + (0 == 1 ? "" : " and ")
-				+ "John Smith and Black Brown, Peter"));
+                .fixAuthor_Natbib("John von Neumann and John Smith and Black Brown, Peter").equals(AuthorList
+                        .fixAuthor_Natbib("John von Neumann" + (0 == 1 ? "" : " and ")
+                                + "John Smith and Black Brown, Peter")));
 	}
 
 	public void testGetAuthorList() {
@@ -48,9 +48,9 @@ public class AuthorListTest extends TestCase {
 
 			// Check caching
 			assertTrue(AuthorList.fixAuthor_firstNameFirstCommas(
-				"John von Neumann and John Smith and Black Brown, Peter", true, false) == AuthorList
-				.fixAuthor_firstNameFirstCommas("John von Neumann" + (0 == 1 ? "" : " and ")
-					+ "John Smith and Black Brown, Peter", true, false));
+                    "John von Neumann and John Smith and Black Brown, Peter", true, false).equals(AuthorList
+                    .fixAuthor_firstNameFirstCommas("John von Neumann" + (0 == 1 ? "" : " and ")
+                            + "John Smith and Black Brown, Peter", true, false)));
 
 			assertEquals("John Smith and Peter Black Brown", AuthorList
 				.fixAuthor_firstNameFirstCommas("John Smith and Black Brown, Peter", false, false));
@@ -80,9 +80,9 @@ public class AuthorListTest extends TestCase {
 
 			// Check caching
 			assertTrue(AuthorList.fixAuthor_firstNameFirstCommas(
-				"John von Neumann and John Smith and Black Brown, Peter", true, true) == AuthorList
-				.fixAuthor_firstNameFirstCommas("John von Neumann" + (0 == 1 ? "" : " and ")
-					+ "John Smith and Black Brown, Peter", true, true));
+                    "John von Neumann and John Smith and Black Brown, Peter", true, true).equals(AuthorList
+                    .fixAuthor_firstNameFirstCommas("John von Neumann" + (0 == 1 ? "" : " and ")
+                            + "John Smith and Black Brown, Peter", true, true)));
 
 			assertEquals("John Smith and Peter Black Brown", AuthorList
 				.fixAuthor_firstNameFirstCommas("John Smith and Black Brown, Peter", false, true));
@@ -118,9 +118,9 @@ public class AuthorListTest extends TestCase {
 
 		// Check caching
 		assertTrue(AuthorList
-			.fixAuthor_firstNameFirst("John von Neumann and John Smith and Black Brown, Peter") == AuthorList
-			.fixAuthor_firstNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
-				+ "John Smith and Black Brown, Peter"));
+                .fixAuthor_firstNameFirst("John von Neumann and John Smith and Black Brown, Peter").equals(AuthorList
+                        .fixAuthor_firstNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
+                                + "John Smith and Black Brown, Peter")));
 
 	}
 
@@ -142,7 +142,7 @@ public class AuthorListTest extends TestCase {
 
 			// Check caching
 			assertEquals(a, b);
-			assertTrue(a == b);
+			assertTrue(a.equals(b));
 
 			assertEquals("Smith, John and Black Brown, Peter", AuthorList
 				.fixAuthor_lastNameFirstCommas("John Smith and Black Brown, Peter", false, false));
@@ -175,7 +175,7 @@ public class AuthorListTest extends TestCase {
 
 			// Check caching
 			assertEquals(a, b);
-			assertTrue(a == b);
+			assertTrue(a.equals(b));
 
 			assertEquals("Smith, John and Black Brown, Peter", AuthorList
 				.fixAuthor_lastNameFirstCommas("John Smith and Black Brown, Peter", false, true));
@@ -210,9 +210,9 @@ public class AuthorListTest extends TestCase {
 			.fixAuthor_lastNameFirst("von Last, Jr ,First"));
 
 		assertTrue(AuthorList
-			.fixAuthor_lastNameFirst("John von Neumann and John Smith and Black Brown, Peter") == AuthorList
-			.fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
-				+ "John Smith and Black Brown, Peter"));
+                .fixAuthor_lastNameFirst("John von Neumann and John Smith and Black Brown, Peter").equals(AuthorList
+                        .fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
+                                + "John Smith and Black Brown, Peter")));
 
 		// Test Abbreviation == false
 		assertEquals("Smith, John", AuthorList.fixAuthor_lastNameFirst("John Smith", false));
@@ -228,9 +228,9 @@ public class AuthorListTest extends TestCase {
 			"von Last, Jr ,First", false));
 
 		assertTrue(AuthorList.fixAuthor_lastNameFirst(
-			"John von Neumann and John Smith and Black Brown, Peter", false) == AuthorList
-			.fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
-				+ "John Smith and Black Brown, Peter", false));
+                "John von Neumann and John Smith and Black Brown, Peter", false).equals(AuthorList
+                .fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
+                        + "John Smith and Black Brown, Peter", false)));
 
 		// Test Abbreviate == true
 		assertEquals("Smith, J.", AuthorList.fixAuthor_lastNameFirst("John Smith", true));
@@ -246,9 +246,9 @@ public class AuthorListTest extends TestCase {
 			true));
 
 		assertTrue(AuthorList.fixAuthor_lastNameFirst(
-			"John von Neumann and John Smith and Black Brown, Peter", true) == AuthorList
-			.fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
-				+ "John Smith and Black Brown, Peter", true));
+                "John von Neumann and John Smith and Black Brown, Peter", true).equals(AuthorList
+                .fixAuthor_lastNameFirst("John von Neumann" + (0 == 1 ? "" : " and ")
+                        + "John Smith and Black Brown, Peter", true)));
 
 	}
 
@@ -260,9 +260,9 @@ public class AuthorListTest extends TestCase {
 			assertEquals("Smith", AuthorList.fixAuthor_lastNameOnlyCommas("Smith, Jr, John", false));
 
 			assertTrue(AuthorList.fixAuthor_lastNameOnlyCommas(
-				"John von Neumann and John Smith and Black Brown, Peter", false) == AuthorList
-				.fixAuthor_lastNameOnlyCommas("John von Neumann" + (0 == 1 ? "" : " and ")
-					+ "John Smith and Black Brown, Peter", false));
+                    "John von Neumann and John Smith and Black Brown, Peter", false).equals(AuthorList
+                    .fixAuthor_lastNameOnlyCommas("John von Neumann" + (0 == 1 ? "" : " and ")
+                            + "John Smith and Black Brown, Peter", false)));
 
 			assertEquals("von Neumann, Smith and Black Brown", AuthorList
 				.fixAuthor_lastNameOnlyCommas(
@@ -274,9 +274,9 @@ public class AuthorListTest extends TestCase {
 			assertEquals("Smith", AuthorList.fixAuthor_lastNameOnlyCommas("Smith, Jr, John", true));
 
 			assertTrue(AuthorList.fixAuthor_lastNameOnlyCommas(
-				"John von Neumann and John Smith and Black Brown, Peter", true) == AuthorList
-				.fixAuthor_lastNameOnlyCommas("John von Neumann" + (0 == 1 ? "" : " and ")
-					+ "John Smith and Black Brown, Peter", true));
+                    "John von Neumann and John Smith and Black Brown, Peter", true).equals(AuthorList
+                    .fixAuthor_lastNameOnlyCommas("John von Neumann" + (0 == 1 ? "" : " and ")
+                            + "John Smith and Black Brown, Peter", true)));
 
 			assertEquals("von Neumann, Smith, and Black Brown", AuthorList
 				.fixAuthor_lastNameOnlyCommas(
@@ -381,7 +381,7 @@ public class AuthorListTest extends TestCase {
 		// Test caching
 		AuthorList al = AuthorList
 			.getAuthorList("John von Neumann and John Smith and Black Brown, Peter");
-		assertTrue(al.getAuthorsNatbib() == al.getAuthorsNatbib());
+		assertTrue(al.getAuthorsNatbib().equals(al.getAuthorsNatbib()));
 	}
 
 	public void testGetAuthorsLastOnly() {
