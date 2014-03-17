@@ -17,7 +17,6 @@ public class AllTests {
 		suite.addTestSuite(AuthorLastFirstOxfordCommasTest.class);
 		suite.addTestSuite(AuthorFirstLastCommasTest.class);
 		suite.addTestSuite(NoSpaceBetweenAbbreviationsTest.class);
-		suite.addTestSuite(ResolvePDFTest.class);
 		suite.addTestSuite(DOICheckTest.class);
 		suite.addTestSuite(AuthorFirstAbbrLastCommasTest.class);
 		suite.addTestSuite(AuthorFirstLastOxfordCommasTest.class);
