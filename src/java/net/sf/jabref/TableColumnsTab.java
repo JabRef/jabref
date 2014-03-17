@@ -214,7 +214,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 			public void stateChanged(ChangeEvent event) {
 				boolean isEnabled = specialFieldsEnabled.isSelected();
 				rankingColumn.setEnabled(isEnabled);
-				compactRankingColumn.setEnabled(isEnabled?rankingColumn.isSelected():false);
+				compactRankingColumn.setEnabled(isEnabled && rankingColumn.isSelected());
 				qualityColumn.setEnabled(isEnabled);
 				priorityColumn.setEnabled(isEnabled);
 				relevanceColumn.setEnabled(isEnabled);
