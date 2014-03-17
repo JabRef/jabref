@@ -955,8 +955,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     sidePaneManager.show("search");
                     //boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(true);
-                    if (true)
-                      frame.getSearchManager().startSearch();
+                    frame.getSearchManager().startSearch();
                 }
             });
         

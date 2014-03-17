@@ -1191,40 +1191,38 @@ public class OOBibBase {
         XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
         xNamed.setName(name);
         // get XTextContent interface
-        if (true) {
 
-            XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, bookmark);
-            if (withText) {
-                position.setString(citText);
-                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, position);
+        XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, bookmark);
+        if (withText) {
+            position.setString(citText);
+            XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, position);
 
-                // Set language to [None]:
-                xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
-                if (style.isFormatCitations()) {
-                    String charStyle = style.getCitationCharacterFormat();
-                    try {
-                        xCursorProps.setPropertyValue("CharStyleName", charStyle);
-                    } catch (Throwable ex) {
-                        throw new UndefinedCharacterFormatException(charStyle);
-                    }
+            // Set language to [None]:
+            xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
+            if (style.isFormatCitations()) {
+                String charStyle = style.getCitationCharacterFormat();
+                try {
+                    xCursorProps.setPropertyValue("CharStyleName", charStyle);
+                } catch (Throwable ex) {
+                    throw new UndefinedCharacterFormatException(charStyle);
                 }
             }
-            else
-                position.setString("");
-
-            position.getText().insertTextContent(position, xTextContent, true);
-
-            // Check if we should italicize the "et al." string in citations:
-            boolean italicize = style.getBooleanCitProperty("ItalicEtAl");
-            if (italicize) {
-                String etAlString = style.getStringCitProperty("EtAlString");
-                int index = citText.indexOf(etAlString);
-                if (index >= 0) {
-                    italicizeOrBold(position, true, index, index+etAlString.length());
-                }
-            }
-
         }
+        else
+            position.setString("");
+
+        position.getText().insertTextContent(position, xTextContent, true);
+
+        // Check if we should italicize the "et al." string in citations:
+        boolean italicize = style.getBooleanCitProperty("ItalicEtAl");
+        if (italicize) {
+            String etAlString = style.getStringCitProperty("EtAlString");
+            int index = citText.indexOf(etAlString);
+            if (index >= 0) {
+                italicizeOrBold(position, true, index, index+etAlString.length());
+            }
+        }
+
         position.collapseToEnd();
 
     }
