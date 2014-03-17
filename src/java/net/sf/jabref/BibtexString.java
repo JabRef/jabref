@@ -123,7 +123,7 @@ public class BibtexString {
 	_content = content;
     }
 
-    public Object clone() {
+    public Object clone() throws CloneNotSupportedException {
       return new BibtexString(_id, _name, _content);
     }
 

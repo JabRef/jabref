@@ -50,7 +50,7 @@ public class SplWebClient {
 
     public static WebServiceStatus getMetaData(File file){
         try{
-            if(isWebServiceAvailable() == false){
+            if(!isWebServiceAvailable()){
                 if(isInternetAvailable()){
                     return  WebServiceStatus.WEBSERVICE_DOWN;
                 }
@@ -61,7 +61,7 @@ public class SplWebClient {
             if(isWebServiceOutDated()){
                 return  WebServiceStatus.OUTDATED;
             }
-            if(isMetaDataServiceAvailable() == false){
+            if(!isMetaDataServiceAvailable()){
                 return  WebServiceStatus.UNAVAILABLE;
             }
             FileInputStream fin = new FileInputStream(file);      
