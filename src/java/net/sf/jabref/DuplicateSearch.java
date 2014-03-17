@@ -74,7 +74,7 @@ public void run() {
          {
            duplicates.wait();
          }
-         catch (Exception e) {}
+         catch (Exception ignored) {}
       }
     } else  // duplicates found
     {

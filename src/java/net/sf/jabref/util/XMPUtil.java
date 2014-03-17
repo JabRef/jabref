@@ -311,7 +311,7 @@ public class XMPUtil {
 			Calendar c = null;
 			try {
 				c = DateConverter.toCalendar(date);
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 
 			}
 			if (c != null) {

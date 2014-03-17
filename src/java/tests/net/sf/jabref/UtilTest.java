@@ -152,7 +152,7 @@ public class UtilTest extends TestCase {
 		try {
 			Util.stripBrackets(null);
 			fail();
-		} catch(NullPointerException npe){
+		} catch(NullPointerException ignored){
 
 		}
 	}

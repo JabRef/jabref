@@ -300,7 +300,7 @@ public class GUIGlobals {
 				// This may be a resource outside of the jar file, so we try a general URL:
 				try {
 					url = new URL(path);
-				} catch (MalformedURLException e) {
+				} catch (MalformedURLException ignored) {
 				}
 				if (url == null)
 					System.err.println(Globals.lang("Could not find image file")+" '"+path+"'");

@@ -174,7 +174,7 @@ public class FieldTextMenu implements MouseListener
             if (myFieldName != null)
               myFieldName.paste(data);
       }
-      catch (Exception ex) {}
+      catch (Exception ignored) {}
     }
   }
 // ---------------------------------------------------------------------------
@@ -199,7 +199,7 @@ public class FieldTextMenu implements MouseListener
               ClipBoardManager.clipBoard.setClipboardContents(data);
         }
       }
-      catch (Exception ex) {}
+      catch (Exception ignored) {}
     }
   }
 

@@ -160,7 +160,7 @@ public class LabelPatternUtilTest extends TestCase {
         try {
             LabelPatternUtil.firstAuthor(null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
 
         }
     }
@@ -191,7 +191,7 @@ public class LabelPatternUtilTest extends TestCase {
         try {
             LabelPatternUtil.authIniN(null, 3);
             fail();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
 
         }
     }
@@ -208,7 +208,7 @@ public class LabelPatternUtilTest extends TestCase {
         try {
             LabelPatternUtil.firstPage(null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
 
         }
     }
@@ -225,7 +225,7 @@ public class LabelPatternUtilTest extends TestCase {
         try {
             LabelPatternUtil.lastPage(null);
             fail();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
 
         }
     }

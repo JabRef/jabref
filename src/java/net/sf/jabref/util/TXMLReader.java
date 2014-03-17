@@ -55,7 +55,7 @@ public class TXMLReader
         {
           stream = new FileInputStream( "src" +resPath ) ;
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
 
         }
@@ -152,7 +152,7 @@ public class TXMLReader
           {
             back = Integer.parseInt( data ) ;
           }
-          catch (Exception e) {}
+          catch (Exception ignored) {}
         }
       }
     }

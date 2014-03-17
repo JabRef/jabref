@@ -357,7 +357,7 @@ public class AboutPanel extends JComponent
               mutex.wait( sleepTime ) ;
             } while (!runMode) ;
           }
-          catch ( Exception e )
+          catch ( Exception ignored)
           {
           }
         }

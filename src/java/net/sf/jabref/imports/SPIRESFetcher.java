@@ -89,7 +89,7 @@ public class SPIRESFetcher implements EntryFetcher {
 			cmd = "eprint";
 		try {
 			key = URLEncoder.encode(key, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException ignored) {
 		}
 		StringBuffer sb = new StringBuffer("http://").append(spiresHost)
 				.append("/");

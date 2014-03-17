@@ -1029,7 +1029,7 @@ public class OOBibBase {
             Layout layout = style.getReferenceFormat(entry.getType().getName());
             try {
                 layout.setPostFormatter(OOUtil.postformatter);
-            } catch (NoSuchMethodError ex) {
+            } catch (NoSuchMethodError ignore) {
                 
             }
             OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry,

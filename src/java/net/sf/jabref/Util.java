@@ -950,7 +950,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		try {
 			link = URLDecoder.decode(link, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException ignored) {
 		}
 
 		/**
@@ -2774,7 +2774,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		try {
 			return Integer.parseInt(month) - 1;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException ignored) {
 		}
 		return -1;
 	}
@@ -2953,7 +2953,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             if (lockCheckCount++ == maxWaitCount) {
                 return false;
             }
-            try { Thread.sleep(500); } catch (InterruptedException ex) {}
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
         }
         return true;
     }

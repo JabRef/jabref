@@ -469,7 +469,7 @@ public class LayoutEntry {
                 }
                 results.add(f);
 				continue;
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			}
 
 			// Then check whether this is a user defined formatter

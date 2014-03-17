@@ -259,7 +259,7 @@ public class AuxSubGenerator
                 br.close() ;
           nestedAuxCounter++ ;
         }
-        catch ( IOException ioe )
+        catch ( IOException ignored)
         {}
       }
 

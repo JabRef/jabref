@@ -325,7 +325,7 @@ public class AuthorListTest extends TestCase {
 		try {
 			AuthorList.getAuthorList("").getAuthor(0);
 			fail();
-		} catch (Exception e) {
+		} catch (Exception ignored) {
 		}
 
 		AuthorList.Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John")

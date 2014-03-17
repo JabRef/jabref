@@ -26,7 +26,7 @@ public class TestUtils {
 		try {
 			String[] args = { "-p", " ", PATH_TO_TEST_BIBTEX };
 			JabRef.main(args);
-		} catch (ExitException e) {
+		} catch (ExitException ignored) {
 		} finally {
 			enableSystemExit();
 		}

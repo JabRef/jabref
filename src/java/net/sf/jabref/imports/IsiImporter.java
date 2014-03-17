@@ -371,7 +371,7 @@ public class IsiImporter extends ImportFormat {
 				if (number >= 1 && number <= 12) {
 					return "#" + Globals.MONTHS[number - 1] + "#";
 				}
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException ignored) {
 
 			}
 		}

@@ -41,7 +41,7 @@ public class BibtexParserTest extends TestCase {
 		try {
 			new BibtexParser(null);
 			fail("Should not accept null.");
-		} catch (NullPointerException npe) {
+		} catch (NullPointerException ignored) {
 
 		}
 	}

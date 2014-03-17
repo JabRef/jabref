@@ -143,7 +143,7 @@ fileNameLoop:
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } finally {
-                        try { in.close(); } catch (Exception f) {}
+                        try { in.close(); } catch (Exception ignored) {}
                     }
 
                     if ((localRes == null) || (localRes.size() == 0)) {
@@ -194,7 +194,7 @@ fileNameLoop:
 	                    res.add(entry);
 						continue fileNameLoop;
 					} finally {
-						try { in.close(); } catch (Exception f) {}
+						try { in.close(); } catch (Exception ignored) {}
 					}
 					
 					// import failed -> generate default entry

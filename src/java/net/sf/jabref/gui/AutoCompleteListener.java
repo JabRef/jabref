@@ -456,7 +456,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 	            res.append(upToCaret);
             }
             //Util.pr("AutoCompListener: "+res.toString());
-        } catch (BadLocationException ex) {
+        } catch (BadLocationException ignore) {
         }
 
         return res;

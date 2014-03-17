@@ -471,7 +471,7 @@ public class Globals {
         if (SHORTCUT_MASK == -1)
         try {
 			SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		} catch (Throwable t) {
+		} catch (Throwable ignored) {
 
 		}
 

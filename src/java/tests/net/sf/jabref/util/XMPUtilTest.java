@@ -1515,13 +1515,13 @@ public class XMPUtilTest extends TestCase {
 		try {
 			XMPUtil.readXMP("src/tests/encrypted.pdf");
 			fail();
-		} catch (EncryptionNotSupportedException e) {
+		} catch (EncryptionNotSupportedException ignored) {
 		}
 
 		try {
 			XMPUtil.writeXMP("src/tests/encrypted.pdf", t1BibtexEntry(), null);
 			fail();
-		} catch (EncryptionNotSupportedException e) {
+		} catch (EncryptionNotSupportedException ignored) {
 		}
 	}
 

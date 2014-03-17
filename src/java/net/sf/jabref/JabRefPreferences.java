@@ -785,7 +785,7 @@ public class JabRefPreferences {
             while ((rs = getNextUnit(rd)) != null) {
                 arr.add(rs);
             }
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
         String[] res = new String[arr.size()];
         for (int i = 0; i < res.length; i++) {

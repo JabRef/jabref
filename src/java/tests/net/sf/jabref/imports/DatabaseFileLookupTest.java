@@ -223,7 +223,7 @@ public class DatabaseFileLookupTest extends TestCase {
 				@SuppressWarnings("unchecked")
 				T instance = (T) constructor.newInstance(new Object[parameterTypes.length]);
 				return instance; 
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			}
 			/**
 			 * Creating proper instances for the parameter types.

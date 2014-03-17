@@ -141,7 +141,7 @@ public class URLDownload {
                 input.close();
                 output.close();
               }
-            catch (Exception e)
+            catch (Exception ignored)
               {
               }
           }
@@ -170,7 +170,7 @@ public class URLDownload {
                 input.close();
                 output.close();
               }
-            catch (Exception e)
+            catch (Exception ignored)
               {
               }
           }        

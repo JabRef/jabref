@@ -52,7 +52,7 @@ public class SearchManagerNoGUI {
                 Globals.prefs.getBoolean("regExpSearch"));
         try {
             rule1 = new SearchExpression(Globals.prefs, searchOptions);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         searchRules.addRule(rule1);

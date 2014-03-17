@@ -445,7 +445,6 @@ public class PluginInstaller {
                     if (in != null) in.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    return null;
                 }
         }
     }

@@ -1475,7 +1475,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("undo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -1489,7 +1489,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("redo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -1513,7 +1513,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             try {
                 panel.runCommand("save");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }

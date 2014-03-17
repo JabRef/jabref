@@ -445,7 +445,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     suppliedEncoding = sb.toString();
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
         return suppliedEncoding != null ? suppliedEncoding.trim() : null;
     }

@@ -59,7 +59,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             l.setPostFormatter(null);
         } catch (NoSuchMethodError ex) {
             postLayoutSupported = false;
-        } catch (Exception ex) {
+        } catch (Exception ignore) {
 
         }
 

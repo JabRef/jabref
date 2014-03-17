@@ -167,7 +167,7 @@ public class TestVM extends TestCase {
 			try {
 				vm.run(v);
 				fail();
-			} catch (VMException e) {
+			} catch (VMException ignored) {
 
 			}
 		}

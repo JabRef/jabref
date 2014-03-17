@@ -682,7 +682,7 @@ AboutAction aboutAction = new AboutAction();
             try {
               ( (JEditorPane) e.getSource()).setPage(e.getURL());
             }
-            catch (IOException ex) {}
+            catch (IOException ignored) {}
           }
         }
       });
@@ -2351,7 +2351,7 @@ class SaveSessionAction
               try {
                 basePanel().runCommand("save");
               }
-              catch (Throwable ex) {}
+              catch (Throwable ignored) {}
             }
           }
           if (baseAt(i).getFile() != null) {

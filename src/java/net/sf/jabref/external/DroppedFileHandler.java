@@ -260,7 +260,7 @@ public class DroppedFileHandler {
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
                     doLink(entry, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ex) {
+                } catch (KeyCollisionException ignored) {
 
                 }
             }
@@ -351,7 +351,7 @@ public class DroppedFileHandler {
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
                     doLink(entry, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ex) {
+                } catch (KeyCollisionException ignored) {
 
                 }
             }

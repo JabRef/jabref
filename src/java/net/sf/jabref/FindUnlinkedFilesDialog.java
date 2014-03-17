@@ -210,7 +210,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 				String[] dim = store.split(";");
 				dimension = new Dimension(new Integer(dim[0]), new Integer(dim[1]));
 			}
-			catch (Exception e) {
+			catch (Exception ignored) {
 			}
 		}
 		if (dimension != null) {
@@ -1138,7 +1138,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			checkbox.setSelected(node.getSelected());
 
             try { setIcon(fsv.getSystemIcon(userObject.file)); }
-            catch (Exception e) {}
+            catch (Exception ignored) {}
 			
 			newPanel.setBackground(nodeComponent.getBackground());
 			checkbox.setBackground(nodeComponent.getBackground());

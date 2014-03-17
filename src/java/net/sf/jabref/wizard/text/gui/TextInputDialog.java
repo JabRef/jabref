@@ -208,7 +208,7 @@ public class TextInputDialog
         {
           doc.insertString( 0, "", doc.getStyle( "regular" ) ) ;
         }
-        catch ( Exception e )
+        catch ( Exception ignored)
         {}
 
         testPanel = new OverlayPanel(textPane,
@@ -556,7 +556,7 @@ public class TextInputDialog
       String srcString = sw.getBuffer().toString() ;
       preview.setText( srcString ) ;
     }
-    catch ( IOException ex )
+    catch ( IOException ignored)
     {}
 
     fieldList.clearSelection() ;
@@ -607,7 +607,7 @@ public class TextInputDialog
         {
           doc.insertString( cPos, data, doc.getStyle( "regular" ) ) ;
         }
-        catch ( Exception ex )
+        catch ( Exception ignored)
         {}
       }
     }
@@ -642,7 +642,7 @@ public class TextInputDialog
           }
         }
       }
-      catch ( Exception ex )
+      catch ( Exception ignored)
       {}
     }
   }

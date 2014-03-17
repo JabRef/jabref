@@ -250,7 +250,7 @@ public class OptionMenu implements OptionListener {
 		    System.out.println( "Press enter to continue..." );
 		    try {
 			reader.readLine();
-		    } catch ( IOException e ) { }
+		    } catch ( IOException ignored) { }
 		}
 	    }
 	    else {

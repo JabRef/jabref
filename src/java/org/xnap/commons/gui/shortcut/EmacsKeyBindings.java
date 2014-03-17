@@ -566,7 +566,7 @@ public class EmacsKeyBindings
 					KillRing.getInstance().add(jtc.getText(start, end));
 					KillRing.getInstance().setCurrentTextComponent(jtc);
 				}
-				catch (Exception e) {
+				catch (Exception ignored) {
 				}
 			}
 		}

@@ -543,7 +543,7 @@ public class StringDialog extends JDialog {
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("undo");
-	    } catch (Throwable ex) {}
+	    } catch (Throwable ignored) {}
 	}
     }
 
@@ -556,7 +556,7 @@ public class StringDialog extends JDialog {
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("redo");
-	    } catch (Throwable ex) {}
+	    } catch (Throwable ignored) {}
 	}
     }
 

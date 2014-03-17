@@ -227,7 +227,7 @@ public class DuplicateResolverDialog extends JDialog {
       two.write(sw, new LatexFieldFormatter(), false);
       ta2.setText(sw.getBuffer().toString());
     }
-    catch (IOException ex) {
+    catch (IOException ignored) {
     }
   }
 

@@ -94,7 +94,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
                             if (undo.canUndo()) {
                                 undo.undo();
                             }
-                        } catch (CannotUndoException e) {
+                        } catch (CannotUndoException ignored) {
                         }
                     }
                 });
@@ -110,7 +110,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
                             if (undo.canRedo()) {
                                 undo.redo();
                             }
-                        } catch (CannotRedoException e) {
+                        } catch (CannotRedoException ignored) {
                         }
                     }
                 });

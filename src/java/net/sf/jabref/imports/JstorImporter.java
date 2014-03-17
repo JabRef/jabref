@@ -95,7 +95,7 @@ public class JstorImporter extends ImportFormat {
         ImportFormatReader.setIfNecessary(be, "abstract", fields[16]);
         ImportFormatReader.setIfNecessary(be, "keywords", fields[17]);
         ImportFormatReader.setIfNecessary(be, "copyright", fields[21]);
-        }catch (ArrayIndexOutOfBoundsException ex){
+        }catch (ArrayIndexOutOfBoundsException ignored){
         }
         bibitems.add(be);
     }
