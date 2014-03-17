@@ -3,6 +3,8 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "application"
 
+version = "2.11dev"
+
 repositories {
     mavenCentral()
 }
@@ -64,7 +66,7 @@ compileJava.dependsOn "generate"
 
 task generate(type: JavaExec) {
     main = "net.sf.jabref.plugin.util.CodeGenerator"
-    args "src/plugins/"
+    args = ["src/plugins/"]
     classpath = configurations.generateClasspath
 }
 
@@ -72,4 +74,13 @@ mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.11'
+}
+
+javadoc {
+    options {
+        // files are all encoded using UTF-8
+        encoding = 'UTF-8'
+        version = true
+        author = true
+    }
 }
