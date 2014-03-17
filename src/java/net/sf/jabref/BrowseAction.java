@@ -57,7 +57,7 @@ public class BrowseAction extends AbstractAction implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        String chosen = null;
+        String chosen;
         if (dir)
             chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);

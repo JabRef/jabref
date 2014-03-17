@@ -27,11 +27,9 @@ public class ArticleLabelRule extends DefaultLabelRule {
         String oldLabel = (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
         String newLabel = "" ;
 
-        String author="";
-
         //## to be done: i need to check if the key is unique else need to make another one with suffix
         try{
-            author=oldEntry.getField("author");
+            String author=oldEntry.getField("author");
             String[] tokens= author.split("\\band\\b");
             if( tokens.length > 0){ // if author is empty
                 if(tokens[0].indexOf(",") > 0)

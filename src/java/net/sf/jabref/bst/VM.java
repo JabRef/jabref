@@ -989,14 +989,10 @@ public class VM implements Warn {
 	 * that field variable is marked as missing for the entry.
 	 * 
 	 * We use null for the missing entry designator.
-	 * 
-	 * @param child
 	 */
 	private void read() {
 
-		Iterator<BstEntry> i = entries.iterator();
-		while (i.hasNext()) {
-			BstEntry e = i.next();
+        for(BstEntry e : entries) {
 
 			for (Map.Entry<String, String> mEntry : e.fields.entrySet()){
 				Object fieldValue = e.entry.getField(mEntry.getKey());
@@ -1005,9 +1001,7 @@ public class VM implements Warn {
 			}
 		}
 
-		i = entries.iterator();
-		while (i.hasNext()) {
-			BstEntry e = i.next();
+        for(BstEntry e : entries) {
 			if (!e.fields.containsKey("crossref")) {
 				e.fields.put("crossref", null);
 			}

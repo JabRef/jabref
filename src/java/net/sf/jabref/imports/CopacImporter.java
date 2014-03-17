@@ -162,9 +162,9 @@ public class CopacImporter extends ImportFormat {
 	}
 
 	void setOrAppend(BibtexEntry b, String field, String value, String separator) {
-		Object o = b.getField(field);
+		String o = b.getField(field);
 		if (o != null)
-			b.setField(field, (String) o + separator + value);
+			b.setField(field, o + separator + value);
 		else
 			b.setField(field, value);
 	}

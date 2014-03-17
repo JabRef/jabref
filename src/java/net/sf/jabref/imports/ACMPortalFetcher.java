@@ -233,7 +233,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private void parse(String text, int startIndex, int firstEntryNumber, Map<String,JLabel> entries) {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
-        String entry;
         while (getNextEntryURL(text, piv, entryNumber, entries)) {
             entryNumber++;
         }
@@ -241,22 +240,18 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     private String getEntryBibTeXURL(String fullCitation, boolean abs) {
-        String bibAddr = "";
        	String ID = "";
 
         // Get ID
         Matcher idMatcher = idPattern.matcher(fullCitation);
         if (idMatcher.find()) {
             ID = idMatcher.group(1);
-            //System.out.println("To fetch: " + bibAddr);
         }
         else {
             System.out.println("Did not find ID in: " + fullCitation);
             return null;
         }
 
-        // fetch bibtex record
-        //bibAddr = bibtexUrl + ID + bibtexUrlEnd;
         return ID;
 
     }

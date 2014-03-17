@@ -568,7 +568,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 	
         // clean up abstract
-        String abstr = (String) entry.getField("abstract");
+        String abstr = entry.getField("abstract");
         if (abstr != null) {
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
@@ -595,7 +595,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
         
         // Clean up url
-        String url = (String) entry.getField("url");
+        String url = entry.getField("url");
         if (url != null) {
             entry.setField("url","http://ieeexplore.ieee.org"+url.replace("tp=&",""));
         }

@@ -93,7 +93,7 @@ public class TagToMarkedTextStore
 			// iterate over all saved selections
             for (TMarkedStoreItem du2 : ll) {
                 if (du2 != null) {
-                    TMarkedStoreItem item = (TMarkedStoreItem) du2;
+                    TMarkedStoreItem item = du2;
                     doc.setCharacterAttributes(item.start, item.end
                             - item.start, doc.getStyle(style), true);
                 }

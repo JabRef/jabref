@@ -42,7 +42,7 @@ public class CitationManager {
     JDialog diag;
     EventList<CitEntry> list;
     JTable table;
-    EventTableModel tableModel;
+    EventTableModel<CitEntry> tableModel;
     JButton ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
 
@@ -59,7 +59,7 @@ public class CitationManager {
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel(list, new CitEntryFormat());
+        tableModel = new EventTableModel<CitEntry>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 

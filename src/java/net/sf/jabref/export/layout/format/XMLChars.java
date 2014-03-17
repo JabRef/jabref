@@ -38,7 +38,6 @@
 package net.sf.jabref.export.layout.format;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;

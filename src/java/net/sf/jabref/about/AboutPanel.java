@@ -144,7 +144,7 @@ public class AboutPanel extends JComponent
   private final void loadAboutText()
   {
     TextBlock block = null ;
-    AboutTextLine aLine = null ;
+    AboutTextLine aLine;
 
     int index = -3 ;
     FontMetrics fm = getFontMetrics(font3);
