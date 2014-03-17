@@ -102,7 +102,7 @@ public class DocumentsWrapper {
     	return simpleTypeElementBean.getValue();
     }
     
-    private List<Bean> sortAuthors(List<Bean> authors){
+    protected static List<Bean> sortAuthors(List<Bean> authors){
     	 boolean unsorted = true;
          Bean temp;
          
