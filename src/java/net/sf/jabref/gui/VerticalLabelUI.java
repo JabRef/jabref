@@ -71,17 +71,6 @@ public class VerticalLabelUI extends BasicLabelUI {
    }
 
    /**
-    * @see ComponentUI#createUI(javax.swing.JComponent) 
-    */
-   public static ComponentUI createUI(JComponent c) {
-      if (System.getSecurityManager() != null) {
-         return SAFE_VERTICAL_LABEL_UI;
-      } else {
-         return verticalLabelUI;
-      }
-   }
-
-   /**
     * Overridden to always return -1, since a vertical label does not have a
     * meaningful baseline.
     * 

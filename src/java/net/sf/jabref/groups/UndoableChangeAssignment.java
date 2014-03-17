@@ -49,12 +49,6 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         m_newAssignmentBackup = new HashSet<BibtexEntry>(currentAssignment);
     }
 
-    public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
-            Set<BibtexEntry> currentAssignment, GroupTreeNode node) {
-        this(previousAssignment, currentAssignment);
-        setEditedNode(node);
-    }
-
     /**
      * Sets the node of the group that was edited. If this node was not
      * specified at construction time, this method has to be called before this

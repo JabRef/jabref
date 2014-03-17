@@ -57,22 +57,8 @@ import java.util.Vector;
  */
 public class WSITools
 {
-    //~ Constructors ///////////////////////////////////////////////////////////
-
     private WSITools()
     {
-    }
-
-    //~ Methods ////////////////////////////////////////////////////////////////
-
-    /**
-     * @param  vcr  {@link java.util.Vector} of <tt>String</tt>
-     * @param  buf  Description of the Parameter
-     * @return      Description of the Return Value
-     */
-    public static boolean tokenize(Vector<String> vcr, String buf)
-    {
-        return tokenize(vcr, buf, " \t\n");
     }
 
     /**
@@ -96,44 +82,5 @@ public class WSITools
         return true;
     }
 
-    /**
-     * @param  vcr       {@link java.util.Vector} of <tt>String</tt>
-     * @param  s         Description of the Parameter
-     * @param  delimstr  Description of the Parameter
-     * @param  limit     Description of the Parameter
-     * @return           Description of the Return Value
-     */
-    public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
-        int limit)
-    {
-        System.out.println("Warning: tokenize \"" + s + "\"");
-        vcr.clear();
-        s = s + "\n";
-
-        int endpos = 0;
-        int matched = 0;
-
-        StringTokenizer st = new StringTokenizer(s, delimstr);
-
-        while (st.hasMoreTokens())
-        {
-            String tmp = st.nextToken();
-            vcr.add(tmp);
-
-            matched++;
-
-            if (matched == limit)
-            {
-                endpos = s.lastIndexOf(tmp);
-                vcr.add(s.substring(endpos + tmp.length()));
-
-                break;
-            }
-        }
-
-        return true;
-    }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////
+

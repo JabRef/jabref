@@ -32,27 +32,19 @@ import com.jgoodies.forms.layout.FormLayout;
 public class AdvancedTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    JabRefFrame _frame;
     HelpDialog helpDiag;
     HelpAction remoteHelp;
-    JPanel pan = new JPanel(),
-        lnf = new JPanel();
+    JPanel pan = new JPanel();
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
             useIEEEAbrv, biblatexMode;
     JTextField className, remoteServerPort;
-    JButton def1 = new JButton(Globals.lang("Default")),
-        def2 = new JButton(Globals.lang("Default"));
-    JPanel p1 = new JPanel(),
-        p2 = new JPanel();
+    JPanel p1 = new JPanel();
     String oldLnf = "";
     boolean oldUseDef, oldBiblMode=false, oldConvertToEquation,
             oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
     int oldPort = -1;
     
-    public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation"; 
-    public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern"; 
-	
     private JCheckBox useConvertToEquation, useCaseKeeperOnSearch, useUnitFormatterOnSearch;
 	
 
