@@ -267,17 +267,8 @@ public class FileActions {
             fw.close();
         } catch (Throwable ex) {
             ex.printStackTrace();
-            try {
-                session.cancel();
-                // repairAfterError(file, backup, INIT_OK);
-            } catch (IOException e) {
-                // Argh, another error? Can we do anything?
-                e.printStackTrace();
-                throw new SaveException(ex.getMessage() + "\n"
-                        + Globals.lang("Warning: could not complete file repair; your file may "
-                                + "have been corrupted. Error message") + ": " + e.getMessage());
-
-            }
+            session.cancel();
+            // repairAfterError(file, backup, INIT_OK);
             throw new SaveException(ex.getMessage(), exceptionCause);
         }
 
@@ -432,16 +423,8 @@ public class FileActions {
 
             fw.close();
         } catch (Throwable ex) {
-            try {
-                session.cancel();
-                //repairAfterError(file, backup, status);
-            } catch (IOException e) {
-                // Argh, another error? Can we do anything?
-                e.printStackTrace();
-                throw new SaveException(ex.getMessage() + "\n"
-                        + Globals.lang("Warning: could not complete file repair; your file may "
-                                + "have been corrupted. Error message") + ": " + e.getMessage());
-            }
+            session.cancel();
+            //repairAfterError(file, backup, status);
             throw new SaveException(ex.getMessage(), be);
         }
 

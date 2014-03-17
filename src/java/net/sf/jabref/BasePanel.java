@@ -1759,16 +1759,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           }
 
-        try {
-            if (commit) {
-                session.commit();
-                this.encoding = encoding; // Make sure to remember which encoding we used.
-            }
-            else
-                session.cancel();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (commit) {
+            session.commit();
+            this.encoding = encoding; // Make sure to remember which encoding we used.
         }
+        else
+            session.cancel();
 
         return commit;
     }

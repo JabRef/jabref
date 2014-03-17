@@ -313,16 +313,11 @@ public class JabRef {
             } else {
                 String[] keys = value.split(",");
                 for (String key : keys) {
-                    try {
-                        if (Globals.prefs.hasKey(key.trim())) {
-                            System.out.println(Globals.lang("Resetting preference key '%0'", key.trim()));
-                            Globals.prefs.clear(key.trim());
-                        } else {
-                            System.out.println(Globals.lang("Unknown preference key '%0'", key.trim()));
-                        }
-                    } catch (BackingStoreException e) {
-                        System.err.println(Globals.lang("Unable to clear preferences."));
-                        e.printStackTrace();
+                    if (Globals.prefs.hasKey(key.trim())) {
+                        System.out.println(Globals.lang("Resetting preference key '%0'", key.trim()));
+                        Globals.prefs.clear(key.trim());
+                    } else {
+                        System.out.println(Globals.lang("Unknown preference key '%0'", key.trim()));
                     }
                 }
             }

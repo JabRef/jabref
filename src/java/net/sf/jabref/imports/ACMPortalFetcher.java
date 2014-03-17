@@ -169,37 +169,33 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
             boolean sel = selection.get(id);
             if (sel) {
-                try {
-                    BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
-                    if (entry != null) {
-                        // Convert from HTML and optionally add curly brackets around key words to keep the case
-                        String title = entry.getField("title");
-                        
-                        if (title != null) {
-                            title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
-                            title = convertHTMLChars(title);
-                                        
-                            // Unit formatting
-                            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
-                                title = unitFormatter.format(title);
-                            }
-            
-                            // Case keeping
-                            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-                                title = caseKeeper.format(title);
-                            }
-                            entry.setField("title", title);
+                BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
+                if (entry != null) {
+                    // Convert from HTML and optionally add curly brackets around key words to keep the case
+                    String title = entry.getField("title");
+
+                    if (title != null) {
+                        title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
+                        title = convertHTMLChars(title);
+
+                        // Unit formatting
+                        if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                            title = unitFormatter.format(title);
                         }
-                        
-                        String abstr = entry.getField("abstract");
-                        if (abstr != null) {
-                            abstr = convertHTMLChars(abstr);
-                            entry.setField("abstract",abstr);
+
+                        // Case keeping
+                        if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                            title = caseKeeper.format(title);
                         }
-                        inspector.addEntry(entry);
+                        entry.setField("title", title);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                    String abstr = entry.getField("abstract");
+                    if (abstr != null) {
+                        abstr = convertHTMLChars(abstr);
+                        entry.setField("abstract",abstr);
+                    }
+                    inspector.addEntry(entry);
                 }
             }
         }
@@ -339,7 +335,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) throws IOException {
+    private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) {
         	try {
         	    URL url = new URL(startUrl+bibtexUrl+ID+bibtexUrlEnd);
     			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));

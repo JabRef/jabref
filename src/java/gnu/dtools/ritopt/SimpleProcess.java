@@ -124,8 +124,7 @@ public class SimpleProcess extends Process {
      */
 
     public SimpleProcess( Process process, InputStream processInput,
-			  PrintStream yourOutput, PrintStream yourError )
-                         throws IOException {
+			  PrintStream yourOutput, PrintStream yourError ) {
 	super();
 	this.process = process;
 	this.processInput = processInput;

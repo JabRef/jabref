@@ -295,8 +295,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.setEncoding(encoding);
             }
             else commit = false;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return commit;

@@ -114,19 +114,14 @@ public class SaveSession {
             throw new SaveException(Globals.lang("Save failed while committing changes")+": "+ex2.getMessage());
         } finally {
             if (useLockFile) {
-                try {
-                    deleteLockFile();
-                } catch (IOException ex) {
-                    System.err.println("Error when deleting lock file");
-                    ex.printStackTrace();
-                }
+                deleteLockFile();
             }
         }
 
         tmp.delete();
     }
 
-    public void cancel() throws IOException {
+    public void cancel() {
         tmp.delete();
     }
 
@@ -158,7 +153,7 @@ public class SaveSession {
      * @return true if the lock file existed, false otherwise.
      * @throws IOException if something goes wrong.
      */
-    private boolean deleteLockFile() throws IOException {
+    private boolean deleteLockFile() {
         File lock = new File(file.getPath()+LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;

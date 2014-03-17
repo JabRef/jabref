@@ -185,7 +185,7 @@ public class DatabaseFileLookupTest extends TestCase {
 		return (R) method.invoke(instance, params);
 	}
 
-	private static <T> T getInstanceFromType(Class<T> targetClass) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private static <T> T getInstanceFromType(Class<T> targetClass) throws IllegalArgumentException {
 		T instance = null;
 		try {
 			Constructor<? extends T> constructor;

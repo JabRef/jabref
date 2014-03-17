@@ -328,7 +328,7 @@ public class MSBibEntry {
 		if (bibtex.getField("edition") != null)
 			edition = bibtex.getField("edition");
 		
-		standardNumber = new String();
+		standardNumber = "";
 		if (bibtex.getField("isbn") != null) /* SM: 2010.10: lower case */
 			standardNumber += " ISBN: " + bibtex.getField("isbn"); /* SM: 2010.10: lower case */
 		if (bibtex.getField("issn") != null) /* SM: 2010.10: lower case */

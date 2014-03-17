@@ -156,7 +156,7 @@ public class JournalAbbreviations {
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
      * @param in
      */
-    public void readJournalList(Reader in) throws FileNotFoundException {
+    public void readJournalList(Reader in) {
         BufferedReader reader = new BufferedReader(in);
         try {
             String line;

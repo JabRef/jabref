@@ -100,18 +100,12 @@ public class DBLPFetcher implements EntryFetcher {
 	        // everything went smooth
 	        res = true;
 
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			status.showMessage(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
-			status.showMessage(e.getMessage());
-		} catch(DBLPParseException e) {
 			e.printStackTrace();
 			status.showMessage(e.getMessage());
 		}
 
-		return res;
+        return res;
 	}
 
 

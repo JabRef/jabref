@@ -96,7 +96,7 @@ public class StreamPrinter implements Runnable, Stoppable {
      * Starts the thread associated with this StreamPrinter.
      */
 
-    public void start() throws InterruptedException {
+    public void start() {
 	thread.start();
     }
 

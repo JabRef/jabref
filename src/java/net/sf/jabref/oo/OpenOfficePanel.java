@@ -185,7 +185,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     }
 
 
-    private void initPanel() throws Exception {
+    private void initPanel() {
 
         useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
         useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
@@ -872,17 +872,13 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         });
         clearConnectionSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    Globals.prefs.clear("ooPAth");
-                    Globals.prefs.clear("ooExecutablePath");
-                    Globals.prefs.clear("ooJarsPath");
-                    Globals.prefs.clear("connectToOO3");
-                    Globals.prefs.clear("ooUnoilPath");
-                    Globals.prefs.clear("ooJurtPath");
-                    frame.output(Globals.lang("Cleared connection settings."));
-                } catch (BackingStoreException ex) {
-                    ex.printStackTrace();
-                }
+                Globals.prefs.clear("ooPAth");
+                Globals.prefs.clear("ooExecutablePath");
+                Globals.prefs.clear("ooJarsPath");
+                Globals.prefs.clear("connectToOO3");
+                Globals.prefs.clear("ooUnoilPath");
+                Globals.prefs.clear("ooJurtPath");
+                frame.output(Globals.lang("Cleared connection settings."));
             }
         });
 

@@ -309,7 +309,7 @@ public class JabRefPreferences {
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
-                new Boolean(PersistenceTableColumnListener.DEFAULT_ENABLED));
+                Boolean.valueOf(PersistenceTableColumnListener.DEFAULT_ENABLED));
         defaults.put("xmpPrivacyFilters", "pdf;timestamp;keywords;owner;note;review");
         defaults.put("useXmpPrivacyFilter", Boolean.FALSE);
         defaults.put("numberColWidth", new Integer(GUIGlobals.NUMBER_COL_LENGTH));
@@ -933,7 +933,7 @@ public class JabRefPreferences {
         prefs.clear();
     }
 
-    public void clear(String key) throws BackingStoreException {
+    public void clear(String key) {
         prefs.remove(key);
     }
 

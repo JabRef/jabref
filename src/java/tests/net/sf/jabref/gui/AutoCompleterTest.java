@@ -44,7 +44,7 @@ public class AutoCompleterTest extends TestCase {
 
 	public void testDefaultAutoCompleter() {
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(OTHER_FIELD);
-		for (BibtexEntry entry : getDatabse().getEntries()) {
+		for (BibtexEntry entry : getDatabase().getEntries()) {
 			autoCompleter.addBibtexEntry(entry);
 		}
 		assertEquals("authentication", autoCompleter.complete("authentication")[0]);
@@ -60,7 +60,7 @@ public class AutoCompleterTest extends TestCase {
 
 	public void testCrossRefCompleter() {
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(CROSSREF_FIELD);
-		for (BibtexEntry entry : getDatabse().getEntries()) {
+		for (BibtexEntry entry : getDatabase().getEntries()) {
 			autoCompleter.addBibtexEntry(entry);
 		}
 		assertEquals("1102917", autoCompleter.complete("1102917")[0]);
@@ -73,7 +73,7 @@ public class AutoCompleterTest extends TestCase {
 
 	public void testEntireFieldCompleter() {
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(ENTIRE_FIELD);
-		for (BibtexEntry entry : getDatabse().getEntries()) {
+		for (BibtexEntry entry : getDatabase().getEntries()) {
 			autoCompleter.addBibtexEntry(entry);
 		}
 		assertEquals("Personal Ubiquitous Comput.", autoCompleter.complete("Personal Ubiquitous Comput.")[0]);
@@ -87,7 +87,7 @@ public class AutoCompleterTest extends TestCase {
 	public void testNameFieldCompleter() {
 		Globals.prefs = JabRefPreferences.getInstance();
 		AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AUTHOR_FIELD);
-		for (BibtexEntry entry : getDatabse().getEntries()) {
+		for (BibtexEntry entry : getDatabase().getEntries()) {
 			autoCompleter.addBibtexEntry(entry);
 		}
 		
@@ -174,7 +174,7 @@ public class AutoCompleterTest extends TestCase {
 		TestUtils.closeJabRef();
 	}
 
-	private BibtexDatabase getDatabse() {
+	private BibtexDatabase getDatabase() {
 		Globals.prefs = JabRefPreferences.getInstance();
 		File fileToLoad = new File(PATH_TO_TEST_BIBTEX);
 		ParserResult pr = JabRef.openBibFile(fileToLoad.getPath(), true);

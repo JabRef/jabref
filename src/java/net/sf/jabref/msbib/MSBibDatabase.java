@@ -65,7 +65,7 @@ public class MSBibDatabase {
         addEntries(bibtex, keySet);
     }
 
-    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream) {
     	entries = new HashSet<MSBibEntry>();	
     	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     	Document docin = null;
