@@ -619,8 +619,8 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
                 if ( writer != null )
                     writer.close();
             }
-            catch( IOException e ) {
-                throw new OptionProcessingException( e.getMessage() );
+            catch( IOException ignored ) {
+
             }
         }
     }
@@ -650,8 +650,8 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
                 if ( reader != null )
                     reader.close();
             }
-            catch( IOException e ) {
-                throw new OptionProcessingException( e.getMessage() );
+            catch( IOException ignored ) {
+                
             }
         }
     }
