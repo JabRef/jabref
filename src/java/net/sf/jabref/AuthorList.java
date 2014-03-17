@@ -1060,8 +1060,8 @@ public class AuthorList {
 					break;
 				}
 				i++;
-			};
-			return (level == 0);
+			}
+            return (level == 0);
 		}
 		
 		/**

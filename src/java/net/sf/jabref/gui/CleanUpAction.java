@@ -350,8 +350,8 @@ public class CleanUpAction extends AbstractWorker {
         		String newValue = Util.getDOI(doiFieldValue);
         		ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
         		bes.setField("doi", newValue);
-        	};
-        	if (Util.checkForPlainDOI(doiFieldValue)) {
+        	}
+            if (Util.checkForPlainDOI(doiFieldValue)) {
         		// DOI field seems to contain DOI
         		// cleanup note, url, ee field
         		// we do NOT copy values to the DOI field as the DOI field contains a DOI!

@@ -779,8 +779,8 @@ public class HTMLConverter implements LayoutFormatter {
         	text = text.replaceAll(character.toString(), unicodeSymbols.get(character));
         }
         return text;
-    };
-        
+    }
+
     public String format(String text) {
         if (text == null)
             return null;
