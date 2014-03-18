@@ -30,8 +30,6 @@ public class SysTray {
 
     private JabRefFrame frame;
     private TrayIcon icon;
-    private PopupMenu popup = new PopupMenu();
-    private MenuItem showWindow;
     private SystemTray tray = null;
 
     public SysTray(JabRefFrame frame) {
@@ -47,8 +45,9 @@ public class SysTray {
 
             }
         };
-        showWindow = new MenuItem(Globals.lang("Show"));
+        MenuItem showWindow = new MenuItem(Globals.lang("Show"));
         showWindow.addActionListener(showJabref);
+        PopupMenu popup = new PopupMenu();
         popup.add(showWindow);
         ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/JabRef-icon-48.png"));
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);

@@ -231,8 +231,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
 
-    private boolean suppressOutput = false;
-
     private HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
 
@@ -339,6 +337,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	}
 
     public void output(String s) {
+        boolean suppressOutput = false;
         if (!suppressOutput)
             frame.output(s);
     }

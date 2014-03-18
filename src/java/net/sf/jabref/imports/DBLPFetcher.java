@@ -31,9 +31,9 @@ import net.sf.jabref.OutputPrinter;
 public class DBLPFetcher implements EntryFetcher {
 
 
-    private final String URL_START = "http://www.dblp.org/search/api/";
-    private final String URL_PART1 = "?q=";
-    private final String URL_END   = "&h=1000&c=4&f=0&format=json";
+    private final static String URL_START = "http://www.dblp.org/search/api/";
+    private final static String URL_PART1 = "?q=";
+    private final static String URL_END   = "&h=1000&c=4&f=0&format=json";
 
 	private volatile boolean shouldContinue = false;
 	private String query;

@@ -110,8 +110,8 @@ public class Globals {
     // used at highlighting words at the editor 
     public static final String highlightColor = "#3399FF";
 
-	private static String resourcePrefix = "resource/JabRef", menuResourcePrefix = "resource/Menu",
-		integrityResourcePrefix = "resource/IntegrityMessage";
+	private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
+		INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
 	private static final String buildInfos = "/resource/build.properties";
 
@@ -325,9 +325,9 @@ public class Globals {
 
 	public static void setLanguage(String language, String country) {
         locale = new Locale(language, country);
-		messages = ResourceBundle.getBundle(resourcePrefix, locale, new EncodingControl("UTF-8"));
-		menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale, new EncodingControl("UTF-8"));
-		intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale, new EncodingControl("UTF-8"));
+		messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+		menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+		intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
         Locale.setDefault(locale);
 		javax.swing.JComponent.setDefaultLocale(locale);
 	}

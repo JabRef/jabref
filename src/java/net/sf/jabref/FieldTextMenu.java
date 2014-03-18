@@ -54,14 +54,14 @@ public class FieldTextMenu implements MouseListener
   private FieldEditor myFieldName ;
   private JPopupMenu inputMenu = new JPopupMenu() ;
   private CopyAction copyAct = new CopyAction() ;
-  private PasteAction pasteAct = new PasteAction() ;
 
-  public FieldTextMenu(FieldEditor fieldComponent)
+    public FieldTextMenu(FieldEditor fieldComponent)
   {
     myFieldName = fieldComponent ;
 
     // copy/paste Menu
-    inputMenu.add( pasteAct ) ;
+      PasteAction pasteAct = new PasteAction();
+      inputMenu.add(pasteAct) ;
     inputMenu.add( copyAct ) ;
     inputMenu.addSeparator();
     inputMenu.add(new ReplaceAction());

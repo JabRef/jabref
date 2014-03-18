@@ -33,14 +33,15 @@ import javax.swing.table.TableColumnModel;
 @SuppressWarnings("serial")
 class KeyBindingsDialog extends JDialog {
     private KeystrokeTable table;
-  private KeystrokeTableModel tableModel;
-  //JList list = new JList();
+    //JList list = new JList();
 
   // displays the key binding of the currently selected entry
   // currently not displayed as it does not get updated
   private JTextField keyTF = new JTextField();
 
-  private JButton ok, cancel, grabB, defB;
+  private JButton ok;
+    private JButton cancel;
+    private JButton defB;
   
   // stores the user-selected key bindings
   private final HashMap<String, String> bindHM;
@@ -82,7 +83,7 @@ class KeyBindingsDialog extends JDialog {
     Box buttonBox = new Box(BoxLayout.X_AXIS);
     ok = new JButton(Globals.lang("Ok"));
     cancel = new JButton(Globals.lang("Cancel"));
-    grabB = new JButton(Globals.lang("Grab"));
+      JButton grabB = new JButton(Globals.lang("Grab"));
     defB = new JButton(Globals.lang("Default"));
     grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
     buttonBox.add(grabB);
@@ -227,7 +228,7 @@ class KeyBindingsDialog extends JDialog {
    for (i=0; i<tableData.length; i++)
      sorted.put(tableData[i][0], tableData[i]);
 
-    tableModel = new KeystrokeTableModel(sorted);
+      KeystrokeTableModel tableModel = new KeystrokeTableModel(sorted);
     table.setModel(tableModel);
     
     // has to be done each time as the columnModel is dependend on the tableModel

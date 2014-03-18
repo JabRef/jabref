@@ -39,8 +39,6 @@ public class URLDownload {
     private String content = null;
     private String encoding = null;
 
-    private CookieHandler cm;
-
     /**
      * URL download to a string. After construction, call download() and then getStringContent().
      * @param _source The URL to download.
@@ -74,6 +72,7 @@ public class URLDownload {
     private void setCookieHandler() {
         try {
             // This should set up JabRef to receive cookies properly
+            CookieHandler cm;
             if ((cm = CookieHandler.getDefault()) == null) {
                 cm = new CookieHandlerImpl();
                 CookieHandler.setDefault(cm);

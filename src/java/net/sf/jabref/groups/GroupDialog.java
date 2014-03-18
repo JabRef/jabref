@@ -87,8 +87,7 @@ class GroupDialog extends JDialog {
                         Globals.lang("Regular Expression"));
         // for all types
         private JButton m_ok = new JButton(Globals.lang("Ok"));
-        private JButton m_cancel = new JButton(Globals.lang("Cancel"));
-        private JPanel m_optionsPanel = new JPanel();
+    private JPanel m_optionsPanel = new JPanel();
         private JLabel m_description = new JLabel() {
                 public Dimension getPreferredSize() {
                         Dimension d = super.getPreferredSize();
@@ -101,9 +100,7 @@ class GroupDialog extends JDialog {
 
         private boolean m_okPressed = false;
 
-        private final JabRefFrame m_parent;
-
-        private final BasePanel m_basePanel;
+    private final BasePanel m_basePanel;
 
         private AbstractGroup m_resultingGroup;
 
@@ -128,7 +125,7 @@ class GroupDialog extends JDialog {
                         AbstractGroup editedGroup) {
                 super(jabrefFrame, Globals.lang("Edit group"), true);
                 m_basePanel = basePanel;
-                m_parent = jabrefFrame;
+            JabRefFrame m_parent = jabrefFrame;
                 m_editedGroup = editedGroup;
 
                 // set default values (overwritten if editedGroup != null)
@@ -182,7 +179,8 @@ class GroupDialog extends JDialog {
                 ButtonBarBuilder builderBP = new ButtonBarBuilder();
                 builderBP.addGlue();
                 builderBP.addButton(m_ok);
-                builderBP.addButton(m_cancel);
+            JButton m_cancel = new JButton(Globals.lang("Cancel"));
+            builderBP.addButton(m_cancel);
                 builderBP.addGlue();
                 builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 

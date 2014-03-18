@@ -55,11 +55,8 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
 	private JDialog diag;
 	private JTable table;
-	private String dialogTitle;
-	private String dialogTopMessage;
-	private int tableSelectionModel;
 
-	// IMPORT
+    // IMPORT
 	public List<String> listOfDBs = new ArrayList<String>();
 	public boolean moreThanOne = false;
 	// EXPORT
@@ -90,12 +87,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 		}
 	}
 
-	private JButton importButton = new JButton(Globals.lang("Import"));
-	private JButton exportButton = new JButton(Globals.lang("Export"));
-	private JButton cancelButton = new JButton(Globals.lang("Cancel"));
-	private JButton removeButton = new JButton(Globals.lang("Remove Selected"));
-
-	public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
+    public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
 		this.dialogType = dialogType;
 
 		Vector<String> columns = new Vector<String>();
@@ -110,11 +102,14 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 		
 		table.setModel (model);
 
-		
-		if (dialogType.equals(DialogType.EXPORTER)){
-			dialogTitle = Globals.lang("SQL Database Exporter");
-			dialogTopMessage = Globals.lang("Select target SQL database:");
-			tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
+
+        String dialogTitle;
+        String dialogTopMessage;
+        int tableSelectionModel;
+        if (dialogType.equals(DialogType.EXPORTER)){
+            dialogTitle = Globals.lang("SQL Database Exporter");
+            dialogTopMessage = Globals.lang("Select target SQL database:");
+            tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
 			table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0)), "exportAction");
 			table.getActionMap().put("exportAction",new AbstractAction() {
 			    public void actionPerformed(ActionEvent e) {
@@ -158,15 +153,19 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
 		ButtonBarBuilder b = new ButtonBarBuilder();
 		b.addGlue();
-		if (dialogType.equals(DialogType.IMPORTER))
+        JButton importButton = new JButton(Globals.lang("Import"));
+        JButton exportButton = new JButton(Globals.lang("Export"));
+        if (dialogType.equals(DialogType.IMPORTER))
 			b.addButton(importButton);
 		else
 			b.addButton(exportButton);
 
 		b.addRelatedGap();
-		b.addButton(cancelButton);
+        JButton cancelButton = new JButton(Globals.lang("Cancel"));
+        b.addButton(cancelButton);
 		b.addRelatedGap();
-		b.addButton(removeButton);
+        JButton removeButton = new JButton(Globals.lang("Remove Selected"));
+        b.addButton(removeButton);
 
 		b.addGlue();
 		b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -176,38 +175,37 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 		table.addMouseListener(this);
 
 		importButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				importAction();
-			}
-		});
+            public void actionPerformed(ActionEvent arg0) {
+                importAction();
+            }
+        });
 
 		exportButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				exportAction();
-			}
-		});
+            public void actionPerformed(ActionEvent arg0) {
+                exportAction();
+            }
+        });
 
 		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				moreThanOne = false;
-				hasDBSelected = false;
-				diag.dispose();
-			}
-		});
+            public void actionPerformed(ActionEvent arg0) {
+                moreThanOne = false;
+                hasDBSelected = false;
+                diag.dispose();
+            }
+        });
 		removeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				moreThanOne = false;
-				hasDBSelected = true;
-				selectedInt = table.getSelectedRow();
-				selectedDB = (String) table.getValueAt(selectedInt, 0); 
-				int areYouSure = JOptionPane.showConfirmDialog(diag,"Are you sure you want to remove the already\nexistent SQL DBs?");
-				if (areYouSure == JOptionPane.YES_OPTION)
-				{
-					removeAction = true;
-					diag.dispose();
-				}
-			}
-		});
+            public void actionPerformed(ActionEvent arg0) {
+                moreThanOne = false;
+                hasDBSelected = true;
+                selectedInt = table.getSelectedRow();
+                selectedDB = (String) table.getValueAt(selectedInt, 0);
+                int areYouSure = JOptionPane.showConfirmDialog(diag, "Are you sure you want to remove the already\nexistent SQL DBs?");
+                if (areYouSure == JOptionPane.YES_OPTION) {
+                    removeAction = true;
+                    diag.dispose();
+                }
+            }
+        });
 		diag.setModal(true);
 		diag.setVisible(true);
 	}

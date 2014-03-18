@@ -28,17 +28,15 @@ import org.w3c.dom.*;
 public class TXMLReader
 {
   private Document config ; // XML data
-  private DocumentBuilderFactory factory ;
-  private DocumentBuilder builder ;
 
-  private boolean ready = false ;
+    private boolean ready = false ;
 
   public TXMLReader(String resPath)
   {
-    factory = DocumentBuilderFactory.newInstance() ;
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     try
     {
-      builder = factory.newDocumentBuilder() ;
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
       InputStream stream = null ;
       if (resPath != null)
@@ -60,7 +58,7 @@ public class TXMLReader
 
       if (stream != null)
       {
-        config = builder.parse( stream ) ;
+        config = builder.parse(stream) ;
         ready = true ;
       }
     }

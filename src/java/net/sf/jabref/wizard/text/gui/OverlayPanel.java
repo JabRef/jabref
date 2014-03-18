@@ -46,15 +46,12 @@ public class OverlayPanel extends JPanel
 {
 
   private JLabel label ;
-  private JComponent overlay ;
 
-  private JScrollPane scroller ;
-
-  public OverlayPanel(JComponent container, String text)
+    public OverlayPanel(JComponent container, String text)
   {
     OverlayLayout layout = new OverlayLayout(this) ;
     this.setLayout( layout );
-    overlay = container ;
+      JComponent overlay = container;
 
     label = new JLabel(text) ;
     label.setFont(new Font("dialog", Font.ITALIC, 18));
@@ -62,10 +59,10 @@ public class OverlayPanel extends JPanel
     label.setForeground( new Color(224, 220, 220) );
     label.setLocation(0, 0);
 
-     scroller = new JScrollPane( overlay ) ;
+      JScrollPane scroller = new JScrollPane(overlay);
      scroller.setLocation(0, 0);
 
-     scroller.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+     scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) ;
 
     add(label) ;
     add(scroller) ;

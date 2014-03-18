@@ -91,9 +91,7 @@ public class TextInputDialog
   private JList<String> fieldList ;
   private JRadioButton overRadio;
 
-    private OverlayPanel testPanel ;
-
-  private BibtexEntry entry ;
+    private BibtexEntry entry ;
 
   public JPopupMenu inputMenu = new JPopupMenu() ;
   private StyledDocument doc ; // content from inputPane
@@ -212,11 +210,11 @@ public class TextInputDialog
         catch ( Exception ignored)
         {}
 
-        testPanel = new OverlayPanel(textPane,
-                                     Globals.lang("Text_Input_Area") ) ;
+      OverlayPanel testPanel = new OverlayPanel(textPane,
+              Globals.lang("Text_Input_Area"));
 
-        testPanel.setPreferredSize( new Dimension( 450, 255) );
-        testPanel.setMaximumSize( new Dimension(450, Integer.MAX_VALUE) );
+        testPanel.setPreferredSize(new Dimension(450, 255));
+        testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
@@ -228,7 +226,7 @@ public class TextInputDialog
     //Add listener to components that can bring up popup menus.
     MouseListener popupListener = new PopupListener( inputMenu ) ;
     textPane.addMouseListener( popupListener );
-    testPanel.addMouseListener( popupListener );
+    testPanel.addMouseListener(popupListener);
 
     // Toolbar
     JToolBar toolBar = new JToolBar() ;
@@ -241,7 +239,7 @@ public class TextInputDialog
     JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
     leftPanel.add( toolBar, BorderLayout.NORTH ) ;
-    leftPanel.add( testPanel, BorderLayout.CENTER ) ;
+    leftPanel.add(testPanel, BorderLayout.CENTER ) ;
 
 
     // ----------------------------------------------------------------

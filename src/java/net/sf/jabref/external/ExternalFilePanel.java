@@ -62,9 +62,7 @@ public class ExternalFilePanel extends JPanel {
 
 	private static final long serialVersionUID = 3653290879640642718L;
 
-	private JButton browseBut, download, auto, xmp;
-
-	private EntryEditor entryEditor;
+    private EntryEditor entryEditor;
 
     private JabRefFrame frame;
 
@@ -94,36 +92,36 @@ public class ExternalFilePanel extends JPanel {
 
         setLayout(new GridLayout(2, 2));
 
-		browseBut = new JButton(Globals.lang("Browse"));
-		download = new JButton(Globals.lang("Download"));
-		auto = new JButton(Globals.lang("Auto"));
-		xmp = new JButton(Globals.lang("Write XMP"));
+        JButton browseBut = new JButton(Globals.lang("Browse"));
+        JButton download = new JButton(Globals.lang("Download"));
+        JButton auto = new JButton(Globals.lang("Auto"));
+        JButton xmp = new JButton(Globals.lang("Write XMP"));
 		xmp.setToolTipText(Globals.lang("Write BibtexEntry as XMP-metadata to PDF."));
 
 		browseBut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				browseFile(fieldName, editor);
-				// editor.setText(chosenValue);
-				entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
+                browseFile(fieldName, editor);
+                // editor.setText(chosenValue);
+                entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
+            }
+        });
 
 		download.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				downLoadFile(fieldName, editor, frame);
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
+                downLoadFile(fieldName, editor, frame);
+            }
+        });
 
 		auto.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				autoSetFile(fieldName, editor);
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
+                autoSetFile(fieldName, editor);
+            }
+        });
 		xmp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				pushXMP(fieldName, editor);
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
+                pushXMP(fieldName, editor);
+            }
+        });
 
 		add(browseBut);
 		add(download);

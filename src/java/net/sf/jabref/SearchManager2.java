@@ -62,7 +62,6 @@ public class SearchManager2 extends SidePaneComponent
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings"));
     private JButton escape = new JButton(Globals.lang("Clear"));
-    private JButton help = new JButton(GUIGlobals.getImage("help"));
     /** This button's text will be set later. */
     private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
@@ -71,7 +70,6 @@ public class SearchManager2 extends SidePaneComponent
     private JRadioButton increment, floatSearch, hideSearch, showResultsInDialog,
         searchAllBases;
     private JCheckBoxMenuItem select;
-    private ButtonGroup types = new ButtonGroup();
     private boolean incSearch = false, startedFloatSearch=false, startedFilterSearch=false;
 
     private int incSearchPos = -1; // To keep track of where we are in
@@ -111,7 +109,8 @@ public class SearchManager2 extends SidePaneComponent
     showResultsInDialog = new JRadioButton(Globals.lang("Show results in dialog"), true);
     searchAllBases = new JRadioButton(Globals.lang("Global search"),
             Globals.prefs.getBoolean("searchAllBases"));
-    types.add(increment);
+        ButtonGroup types = new ButtonGroup();
+        types.add(increment);
     types.add(floatSearch);
     types.add(hideSearch);
     types.add(showResultsInDialog);
@@ -225,7 +224,8 @@ public class SearchManager2 extends SidePaneComponent
             //search.setMargin(margin);
             escape.setMargin(margin);
             openset.setMargin(margin);
-            int butSize = help.getIcon().getIconHeight() + 5;
+        JButton help = new JButton(GUIGlobals.getImage("help"));
+        int butSize = help.getIcon().getIconHeight() + 5;
             Dimension butDim = new Dimension(butSize, butSize);
             help.setPreferredSize(butDim);
             help.setMinimumSize(butDim);

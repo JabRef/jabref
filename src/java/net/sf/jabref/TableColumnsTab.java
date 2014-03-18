@@ -45,17 +45,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
     private JRadioButton preferUrl, preferDoi;
-    private ButtonGroup preferUrlDoiGroup;
-    
-    private JCheckBox showOneLetterHeadingForIconColumns;
-    private boolean oldShowOneLetterHeadingForIconColumns;
 
-	/*** begin: special fields ***/
+    private JCheckBox showOneLetterHeadingForIconColumns;
+
+    /*** begin: special fields ***/
 	private JCheckBox specialFieldsEnabled, rankingColumn, compactRankingColumn, qualityColumn, priorityColumn, relevanceColumn;
 	private JRadioButton syncKeywords, writeSpecialFields;
 	private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldCompcatRankingColumn, oldQualityColumn, oldPriorityColumn, oldRelevanceColumn, oldSyncKeyWords, oldWriteSpecialFields;
-	private final JButton hlb; 
-	/*** end: special fields ***/
+
+    /*** end: special fields ***/
 
     class TableRow {
         String name;
@@ -188,7 +186,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
                 preferUrl = new JRadioButton(Globals.lang("Show URL first"));
                 preferDoi = new JRadioButton(Globals.lang("Show DOI first"));
-                preferUrlDoiGroup = new ButtonGroup();
+        ButtonGroup preferUrlDoiGroup = new ButtonGroup();
                 preferUrlDoiGroup.add(preferUrl);
 		preferUrlDoiGroup.add(preferDoi);
                 
@@ -204,7 +202,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		/*** begin: special table columns and special fields ***/
 
 		HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-	    hlb = new JButton(GUIGlobals.getImage("helpSmall"));
+        JButton hlb = new JButton(GUIGlobals.getImage("helpSmall"));
 	    hlb.setToolTipText(Globals.lang("Help on special fields"));
 	    hlb.addActionListener(help);
 		
@@ -331,8 +329,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 		
         /*** end: special fields ***/
-		
-		oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS);
+
+        boolean oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS);
 		showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
 		tableRows.clear();

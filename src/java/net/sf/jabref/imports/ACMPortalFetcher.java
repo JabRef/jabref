@@ -35,7 +35,6 @@ import net.sf.jabref.gui.FetcherPreviewDialog;
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
 	private ImportInspector dialog = null;
-	private OutputPrinter status;
     private final HTMLConverter htmlConverter = new HTMLConverter();
     final CaseKeeper caseKeeper = new CaseKeeper();
     final UnitFormatter unitFormatter = new UnitFormatter();
@@ -57,7 +56,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final int perPage = 20;
     private static final int MAX_FETCH = perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 200;
-    private int hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     
     // user settings
@@ -78,7 +76,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Pattern titlePattern = Pattern.compile("<A HREF=.*?\">([^<]*)</A>");
     private static final Pattern monthYearPattern = Pattern.compile("([A-Za-z]+ [0-9]{4})");
     private static final Pattern absPattern = Pattern.compile("<div .*?>(.*?)</div>");
-    private FetcherPreviewDialog preview;
 
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -98,13 +95,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview, OutputPrinter status) {
-        this.preview = preview;
-        this.status = status;
+        FetcherPreviewDialog preview1 = preview;
+        OutputPrinter status1 = status;
         this.terms = query;
         piv = 0;
         shouldContinue = true;
-        parsed = 0;
-        unparseable = 0;
+        int parsed = 0;
+        int unparseable = 0;
         acmOrGuide = acmButton.isSelected();
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
@@ -116,7 +113,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             String page = getResults(url);
 
-            hits = getNumberOfHits(page, "Found", hitsPattern);
+            int hits = getNumberOfHits(page, "Found", hitsPattern);
 
 			int index = page.indexOf("Found");
 			if (index >= 0) {
@@ -136,7 +133,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             hits = getNumberOfHits(page, "Results", maxHitsPattern);
 
-            for (int i=0; i<hits; i++) {
+            for (int i=0; i< hits; i++) {
                 parse(page, 0, firstEntry, previews);
                 //address = makeUrl(firstEntry);
                 firstEntry += perPage;

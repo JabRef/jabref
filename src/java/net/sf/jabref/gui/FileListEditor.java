@@ -60,14 +60,8 @@ public class FileListEditor extends JTable implements FieldEditor,
     private EntryEditor entryEditor;
     private JPanel panel;
     private FileListTableModel tableModel;
-    private JScrollPane sPane;
-    private JButton add, remove, up, down, auto, download;
+    private JButton auto;
     private JPopupMenu menu = new JPopupMenu();
-
-    private JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
-    private JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
-    private JMenuItem rename = new JMenuItem(Globals.lang("Move/Rename file"));
-    private JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -79,23 +73,23 @@ public class FileListEditor extends JTable implements FieldEditor,
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
-        sPane = new JScrollPane(this);
+        JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        add = new JButton(GUIGlobals.getImage("add"));
+        JButton add = new JButton(GUIGlobals.getImage("add"));
         add.setToolTipText(Globals.lang("New file link (INSERT)"));
-        remove = new JButton(GUIGlobals.getImage("remove"));
+        JButton remove = new JButton(GUIGlobals.getImage("remove"));
         remove.setToolTipText(Globals.lang("Remove file link (DELETE)"));
-        up = new JButton(GUIGlobals.getImage("up"));
+        JButton up = new JButton(GUIGlobals.getImage("up"));
 
-        down = new JButton(GUIGlobals.getImage("down"));
+        JButton down = new JButton(GUIGlobals.getImage("down"));
         auto = new JButton(Globals.lang("Auto"));
-        download = new JButton(Globals.lang("Download"));
-        add.setMargin(new Insets(0,0,0,0));
-        remove.setMargin(new Insets(0,0,0,0));
-        up.setMargin(new Insets(0,0,0,0));
-        down.setMargin(new Insets(0,0,0,0));
+        JButton download = new JButton(Globals.lang("Download"));
+        add.setMargin(new Insets(0, 0, 0, 0));
+        remove.setMargin(new Insets(0, 0, 0, 0));
+        up.setMargin(new Insets(0, 0, 0, 0));
+        down.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addEntry();
@@ -180,32 +174,36 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
+        JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
         menu.add(openLink);
         openLink.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 openSelectedFile();
             }
         });
-        
+
+        JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
         menu.add(openFolder);
         openFolder.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-		        int row = getSelectedRow();
-		        if (row >= 0) {
-		            FileListEntry entry = tableModel.getEntry(row);
-		            try {
-		            	Util.openFolderAndSelectFile(entry.getLink());
-		            } catch (IOException ex) {
-		                logger.fine(ex.getMessage());
-		            }
-		        }
-			}
-		});
-        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = getSelectedRow();
+                if (row >= 0) {
+                    FileListEntry entry = tableModel.getEntry(row);
+                    try {
+                        Util.openFolderAndSelectFile(entry.getLink());
+                    } catch (IOException ex) {
+                        logger.fine(ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        JMenuItem rename = new JMenuItem(Globals.lang("Move/Rename file"));
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
+        JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
     }

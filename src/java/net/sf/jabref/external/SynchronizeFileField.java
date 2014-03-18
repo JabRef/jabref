@@ -52,8 +52,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
     private boolean goOn = true, autoSet = true, checkExisting = true;
 
-    private int brokenLinks = 0, entriesChangedCount = 0;
-
     public SynchronizeFileField(BasePanel panel) {
         this.panel = panel;
     }
@@ -91,7 +89,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        brokenLinks = 0;
+        int brokenLinks = 0;
         final NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
         //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -278,6 +276,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (!goOn)
             return;
 
+        int entriesChangedCount = 0;
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
                 new String[]{fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
         panel.frame().setProgressBarVisible(false);

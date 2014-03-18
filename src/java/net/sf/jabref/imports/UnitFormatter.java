@@ -21,7 +21,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class UnitFormatter implements LayoutFormatter {
     
-    private String[] unitList = new String[] {
+    private static final String[] unitList = new String[] {
         "A",  // Ampere
         "Ah",  // Ampere hours
         "B", // Byte
@@ -63,7 +63,7 @@ public class UnitFormatter implements LayoutFormatter {
         "sr", // steradians
     };
     
-    private String[] unitPrefixList = new String[] {
+    private static final String[] unitPrefixList = new String[] {
         "y", // yocto
         "z", // zepto
         "a", // atto
@@ -88,10 +88,9 @@ public class UnitFormatter implements LayoutFormatter {
         "Y", // yotta
     };
     
-    private String[] unitCombinations;
+    private static final String[] unitCombinations;
     
-    public UnitFormatter() {
-	super();
+    static {
         int uLLength = unitList.length;
         int uPLLength = unitPrefixList.length;
         int uCLength = uLLength*uPLLength;
