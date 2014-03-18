@@ -72,15 +72,6 @@ dependencies {
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
 
-compileJava.dependsOn "generatePluginSource"
-compileJava.dependsOn "generateGrammarSource"
-
-task generatePluginSource(type: JavaExec) {
-    main = "net.sf.jabref.plugin.util.CodeGenerator"
-    args = ["src/plugins/"]
-    classpath = configurations.generateClasspath
-}
-
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
@@ -96,18 +87,41 @@ javadoc {
     }
 }
 
+// jabref specific tasks
+compileJava.dependsOn "generateSource"
+
+task generateSource(dependsOn: ["generatePluginSource", "generateGrammarSource"]) {
+    group = 'JabRef'
+    description = 'Generates all Java source files.'
+}
+
+task generatePluginSource(type: JavaExec) {
+    group = 'JabRef'
+    description = 'Generates _JabRefPlugin.java with JPF.'
+
+    ext.pluginsDir = "src/plugins"
+
+    inputs.dir file(ext.pluginsDir)
+    outputs.file file("src/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
+
+    main = "net.sf.jabref.plugin.util.CodeGenerator"
+    args = [ext.pluginsDir]
+    classpath = configurations.generateClasspath
+}
+
 task generateGrammarSource(type: JavaExec) {
-    def antlrSource = 'src/java/net/sf/jabref/bst'
-    def destinationDir = antlrSource
+    group = 'JabRef'
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
 
-    inputs.dir file(antlrSource)
-    outputs.dir file(destinationDir)
+    File antlrSource = file('src/java/net/sf/jabref/bst/Bst.g')
+    File destinationDir = antlrSource.parentFile
 
-    def grammars = fileTree(antlrSource).include('**/*.g')
+    inputs.file antlrSource
+    outputs.file destinationDir
 
     main = 'org.antlr.Tool'
     classpath = configurations.antlr3
-    args = ["-o", "${destinationDir}", grammars.files].flatten()
+    args = ["-o", destinationDir, antlrSource]
 }
 
 // git support in intellij idea
