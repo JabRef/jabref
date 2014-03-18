@@ -180,9 +180,7 @@ public class MetaData implements Iterable<String> {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
                     relDir = file.getParent();
                 } else {
-                    relDir = new StringBuffer(file.getParent()).
-                            append(System.getProperty("file.separator")).
-                            append(dir).toString();
+                    relDir = file.getParent() + System.getProperty("file.separator") + dir;
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:

@@ -131,9 +131,6 @@ public class Cookie {
   }
 
   public String toString() {
-    StringBuilder result = new StringBuilder(name);
-    result.append("=");
-    result.append(value);
-    return result.toString();
+      return name + "=" + value;
   }
 }

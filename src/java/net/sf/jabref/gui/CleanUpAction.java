@@ -387,12 +387,12 @@ public class CleanUpAction extends AbstractWorker {
 		String newValue = oldValue;
 		try {
                     int month = Integer.parseInt(newValue);
-                    newValue = new StringBuffer("#").append(Globals.MONTHS[month - 1]).append('#').toString();
+                    newValue = "#" + Globals.MONTHS[month - 1] + '#';
                 } catch (NumberFormatException e) {
                     // Much more liberal matching covering most known abbreviations etc.
                     String testString = newValue.substring(0, 3).toLowerCase();
                     if (Globals.MONTH_STRINGS.containsKey(testString)) {
-                        newValue = new StringBuffer("#").append(testString).append('#').toString();
+                        newValue = "#" + testString + '#';
         	}
     	}
     	if (!oldValue.equals(newValue)) {

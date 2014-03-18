@@ -825,13 +825,8 @@ public class JabRefPreferences {
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(String.valueOf(color.getRed()));
-        sb.append(':');
-        sb.append(String.valueOf(color.getGreen()));
-        sb.append(':');
-        sb.append(String.valueOf(color.getBlue()));
-        put(key, sb.toString());
+        String rgb = String.valueOf(color.getRed()) + ':' + String.valueOf(color.getGreen()) + ':' + String.valueOf(color.getBlue());
+        put(key, rgb);
     }
 
     /**

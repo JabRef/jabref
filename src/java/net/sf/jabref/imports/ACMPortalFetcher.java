@@ -254,8 +254,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private boolean getNextEntryURL(String allText, int startIndex, int entryNumber,
                                    Map<String,JLabel> entries) {
-        String toFind = new StringBuffer().append("<strong>")
-                .append(entryNumber).append("</strong><br>").toString();
+        String toFind = "<strong>" + entryNumber + "</strong><br>";
         int index = allText.indexOf(toFind, startIndex);
         int endIndex = allText.length();
 

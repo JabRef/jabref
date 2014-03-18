@@ -249,11 +249,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        StringBuilder sb = new StringBuilder(startUrl);
-        sb.append(terms.replaceAll(" ", "+"));
-        sb.append(endUrl);
-        sb.append(String.valueOf(startIndex));
-        return sb.toString();
+        return startUrl + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
     }
 
     

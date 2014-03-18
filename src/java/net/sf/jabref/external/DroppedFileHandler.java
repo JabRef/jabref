@@ -576,8 +576,7 @@ public class DroppedFileHandler {
         }
         toFile = new File(toFile).getName();
         
-        File destFile = new File(new StringBuffer(dirs[found]).append(System.getProperty("file.separator"))
-            .append(toFile).toString());
+        File destFile = new File(dirs[found] + System.getProperty("file.separator") + toFile);
         if (destFile.equals(new File(fileName))){
             // File is already in the correct position. Don't override!
             return true;

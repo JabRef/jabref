@@ -360,8 +360,7 @@ public class Pair<P, V> {
 	 * Debugging Output method using the toString method of P and V.
 	 */
 	public String toString() {
-		return new StringBuffer().append('<').append(p).append(',').append(v)
-			.append('>').toString();
+		return "<" + p + ',' + v + '>';
 	}
 
 	@Override
