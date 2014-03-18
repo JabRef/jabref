@@ -9,7 +9,7 @@ JabRef is a graphical application for managing bibliographical data.
 * Main git repository: https://github.com/JabRef/jabref
 
 This repository has been generated out of the old git repository at sourceforge.
-The folder  `jabref` of the old repository is now this repositry.
+The folder  `jabref` of the old repository is now this repository.
 Although that changed **all** git commit ids, the advantage is to have a clean separation between plugins, the homepage and the code of JabRef.
 
 ### Bug reports, suggestions, other feedback:

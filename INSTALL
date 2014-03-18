@@ -1,6 +1,16 @@
 Quick instructions, compiling JabRef from source
 ------------------------------------------------
 
+## NEW INSTRUCTIONS (Gradle)
+
+To compile JabRef from source, you need:
+
+* A Java compiler, supporting Java 1.6 and `JAVA_HOME` points to this JDK.
+
+To run it, just execute `gradlew run`. When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`.
+
+## OLD INSTRUCTIONS
+
 To compile JabRef from source, you need:
 
 * A Java compiler, supporting Java 1.5 or higher.
