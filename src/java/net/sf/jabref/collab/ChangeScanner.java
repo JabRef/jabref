@@ -502,64 +502,12 @@ public class ChangeScanner extends Thread {
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if (groupsTmp == null && groupsDisk == null)
             return;
-        if ((groupsTmp != null && groupsDisk == null)
-                || (groupsTmp == null && groupsDisk != null)) {
+        if ((groupsTmp != null && groupsDisk == null) || (groupsTmp == null)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }
         if (!groupsTmp.equals(groupsDisk)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
-
-//
-//        if (((vOnTmp == null) || (vOnTmp.size()==0)) && ((vOnDisk == null) || (vOnDisk.size()==0))) {
-//            // No groups defined in either the tmp or disk version.
-//            return;
-//        }
-//
-//        // To avoid checking for null all the time, make empty vectors to replace null refs. We clone
-//        // non-null vectors so we can remove the elements as we finish with them.
-//        if (vOnDisk == null)
-//            vOnDisk = new Vector(0);
-//        else
-//            vOnDisk = (Vector)vOnDisk.clone();
-//        if (vOnTmp == null)
-//            vOnTmp = new Vector(0);
-//        else
-//            vOnTmp = (Vector)vOnTmp.clone();
-//        if (vInMem == null)
-//            vInMem = new Vector(0);
-//        else
-//            vInMem = (Vector)vInMem.clone();
-//
-//        // If the tmp version has groups, iterate through these and compare with disk version:
-//        while (vOnTmp.size() >= 1) {
-//            AbstractGroup group = (AbstractGroup)vOnTmp.firstElement();
-//            vOnTmp.removeElementAt(0);
-//            int pos = GroupSelector.findGroupByName(vOnDisk,group.getName());
-//            if (pos == -1) {
-//                // Couldn't find the group.
-//                changes.add(new GroupAddOrRemove(group, false));
-//            } else {
-//                AbstractGroup diskGroup = (AbstractGroup)vOnDisk.elementAt(pos);
-//
-//                if (!diskGroup.equals(group)) {
-//                    // Group has changed.
-//                    changes.add(new GroupChange(inMem, group, diskGroup));
-//                }
-//
-//                // Remove this group, since it's been accounted for.
-//                vOnDisk.remove(pos);
-//            }
-//        }
-//
-//        // If there are entries left in the disk version, these must have been added.
-//        while (vOnDisk.size() >= 1) {
-//            AbstractGroup group = (AbstractGroup)vOnDisk.firstElement();
-//            vOnDisk.removeElementAt(0);
-//            changes.add(new GroupAddOrRemove(group, true));
-//        }
-        } else {
-            return;
         }
     }
 
