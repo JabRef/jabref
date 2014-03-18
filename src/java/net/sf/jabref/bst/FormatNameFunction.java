@@ -69,10 +69,10 @@ public class FormatNameFunction implements BstFunction {
 		
 		if (names != null){
 			AuthorList a = AuthorList.getAuthorList(names);
-			if (name.intValue() > a.size()){
+			if (name > a.size()){
 				throw new VMException("Author Out of Bounds. Number " + name + " invalid for " + names);
 			}
-			Author author = a.getAuthor(name.intValue() - 1);
+			Author author = a.getAuthor(name - 1);
 			
 			stack.push(BibtexNameFormatter.formatName(author, format, vm));
 		} else {

@@ -224,7 +224,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             TableEntry entry = entries.get(row);
-            entry.setWanted(((Boolean) value).booleanValue());
+            entry.setWanted((Boolean) value);
             entries.getReadWriteLock().writeLock().unlock();
         }
     }

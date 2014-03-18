@@ -426,7 +426,7 @@ public class VM implements Warn {
 				}
 
 				Object toExe;
-				if (((Integer) i).intValue() > 0) {
+				if ((Integer) i > 0) {
 					toExe = f2;
 				} else {
 					toExe = f1;
@@ -630,8 +630,8 @@ public class VM implements Warn {
 				Integer len = (Integer) o1;
 				Integer start = (Integer) o2;
 
-				int lenI = len.intValue();
-				int startI = start.intValue();
+				int lenI = len;
+				int startI = start;
 
 				if (lenI > Integer.MAX_VALUE / 2)
 					lenI = Integer.MAX_VALUE / 2;
@@ -839,7 +839,7 @@ public class VM implements Warn {
 						throw new VMException(
 							"First parameter to while has to return an integer but was " + i);
 					}
-					if (((Integer) i).intValue() <= 0) {
+					if ((Integer) i <= 0) {
 						break;
 					}
 					VM.this.executeInContext(f2, context);

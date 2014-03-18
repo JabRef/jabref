@@ -68,6 +68,6 @@ public class TextPrefixFunction implements BstFunction {
 			return;
 		}
 		
-		stack.push(BibtexTextPrefix.textPrefix(((Integer) o1).intValue(), (String) o2, vm));
+		stack.push(BibtexTextPrefix.textPrefix((Integer) o1, (String) o2, vm));
 	}
 }

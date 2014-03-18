@@ -410,7 +410,7 @@ public class AuthorList {
 				int index = tokens.size() - 2 * TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
 				if (index > 0) {
 					Character ch = (Character)tokens.elementAt(index);
-					if (ch.charValue() == '-')
+					if (ch == '-')
 						last_part_start -= TOKEN_GROUP_LENGTH;
 				}
 				first_part_end = last_part_start;

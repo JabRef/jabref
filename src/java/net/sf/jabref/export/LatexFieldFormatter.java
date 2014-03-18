@@ -268,8 +268,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         if ((right.size() > 0) && (left.size() == 0))
             throw new IllegalArgumentException
                     ("'}' character ends string prematurely.");
-        if ((right.size() > 0) && ((right.elementAt(0)).intValue()
-                < (left.elementAt(0)).intValue()))
+        if ((right.size() > 0) && (right.elementAt(0)
+                < left.elementAt(0)))
             throw new IllegalArgumentException
                     ("'}' character ends string prematurely.");
         if (left.size() != right.size())

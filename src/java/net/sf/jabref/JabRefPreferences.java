@@ -693,7 +693,7 @@ public class JabRefPreferences {
     }
 
     public boolean getBooleanDefault(String key) {
-        return ((Boolean) defaults.get(key)).booleanValue();
+        return (Boolean) defaults.get(key);
     }
 
     public double getDouble(String key) {
@@ -701,7 +701,7 @@ public class JabRefPreferences {
     }
 
     public double getDoubleDefault(String key) {
-        return ((Double) defaults.get(key)).doubleValue();
+        return (Double) defaults.get(key);
     }
 
     public int getInt(String key) {
@@ -709,7 +709,7 @@ public class JabRefPreferences {
     }
 
     public int getIntDefault(String key) {
-        return ((Integer) defaults.get(key)).intValue();
+        return (Integer) defaults.get(key);
     }
 
     public byte[] getByteArray(String key) {

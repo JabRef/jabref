@@ -542,7 +542,7 @@ public class BibtexDatabase {
         if (o == null)
             return 0;
         else
-            return ((Integer)o).intValue();
+            return (Integer) o;
 
     }
 
@@ -570,7 +570,7 @@ public class BibtexDatabase {
                 if((key == null) || key.equals("")) return;
                 if(allKeys.containsKey(key)){
                         Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-                        if(tI.intValue()==1)
+                        if(tI ==1)
                                 allKeys.remove( key);
                         else
                                 allKeys.put( key, (tI).intValue() - 1);//decrementInteger( tI ));

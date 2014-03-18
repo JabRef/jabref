@@ -247,7 +247,7 @@ public class ChangeScanner extends Thread {
             for (Iterator<Integer> it=notMatched.iterator(); it.hasNext();) {
 
                 Integer integ = it.next();
-                piv1 = integ.intValue();
+                piv1 = integ;
 
 
                 // These two variables will keep track of which entry most closely matches the

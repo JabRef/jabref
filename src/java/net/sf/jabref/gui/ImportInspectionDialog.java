@@ -1391,7 +1391,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             BibtexEntry entry = sortedList.get(row);
-            entry.setSearchHit(((Boolean) value).booleanValue());
+            entry.setSearchHit((Boolean) value);
             entries.getReadWriteLock().writeLock().unlock();
         }
     }
