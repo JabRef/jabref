@@ -181,7 +181,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                         brokenLinks++;
                     }
 
-                    continue;
                 }
             }
         }

@@ -2122,7 +2122,6 @@ public JabRefPreferences prefs() {
       for (BibtexEntry entry : bibentries){
         boolean dupli = false;
         // Check for duplicates among the current entries:
-          loop:
           for (String s : database.getKeySet()) {
               BibtexEntry existingEntry = database.getEntryById(s);
               if (DuplicateCheck.isDuplicate(entry, existingEntry
@@ -2140,7 +2139,7 @@ public JabRefPreferences prefs() {
                   } else if (res == DuplicateResolverDialog.BREAK) {
                       break mainLoop;
                   }
-                  break loop;
+                  break;
               }
           }
 

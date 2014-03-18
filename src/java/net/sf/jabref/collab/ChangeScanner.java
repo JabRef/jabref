@@ -217,7 +217,7 @@ public class ChangeScanner extends Thread {
             if (comp > 1) {
                 used.add(""+piv2);
                 piv2++;
-                continue mainLoop;
+                continue;
             }
 
             // No? Then check if another entry matches exactly.
@@ -345,15 +345,15 @@ public class ChangeScanner extends Thread {
     private BibtexEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
         double comp = -1;
         int found = 0;
-        loop: for (int i=0; i<neu.getEntryCount(); i++) {
+        for (int i = 0; i < neu.getEntryCount(); i++) {
             double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index),
-            neu.getEntryAt(i));
+                    neu.getEntryAt(i));
             if (res > comp) {
                 comp = res;
                 found = i;
             }
             if (comp > 1)
-                break loop;
+                break;
         }
         return neu.getEntryAt(found);
     }

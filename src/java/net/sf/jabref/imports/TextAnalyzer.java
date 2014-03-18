@@ -56,27 +56,26 @@ public class TextAnalyzer {
         // More than one four-digit numbers, so we look for one giving a reasonable year:
 
         int good = -1, yearFound = -1;
-        find: for (int i=0; i<cand.length; i++) {
-          int number = Integer.parseInt(cand[i].trim());
-          if (number == yearFound)
-            continue find;
-          if (number < 2500) {
-            if (good == -1) {
-              good = i;
-              yearFound = number;
-            } else {
-              // More than one found. Be a bit more specific.
-              if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
-                good = -1;
-                break find; // Give up, both seem good enough.
+          for (int i = 0; i < cand.length; i++) {
+              int number = Integer.parseInt(cand[i].trim());
+              if (number == yearFound)
+                  continue;
+              if (number < 2500) {
+                  if (good == -1) {
+                      good = i;
+                      yearFound = number;
+                  } else {
+                      // More than one found. Be a bit more specific.
+                      if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                          good = -1;
+                          break; // Give up, both seem good enough.
+                      } else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                          good = i;
+                          yearFound = number;
+                      }
+                  }
               }
-              else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
-                good = i;
-                yearFound = number;
-              }
-            }
           }
-        }
         if (good >= 0) {
           year = clean(cand[good]);
           int pos = text.indexOf(year);
@@ -96,16 +95,16 @@ public class TextAnalyzer {
         Util.pr("Guessing 'pages': '" + pages + "'");
       } else if (cand.length > 1) {
         int found = -1;
-        checkScope: for (int i=0; i<cand.length; i++) {
-          split = clean(cand[i].replaceAll("\\s", "")).split("-");
-               //   Util.pr("Pg: "+pages);
-          int first = Integer.parseInt(split[0]),
-              second = Integer.parseInt(split[1]);
-          if (second-first > 3) {
-            found = i;
-            break checkScope;
+          for (int i = 0; i < cand.length; i++) {
+              split = clean(cand[i].replaceAll("\\s", "")).split("-");
+              //   Util.pr("Pg: "+pages);
+              int first = Integer.parseInt(split[0]),
+                      second = Integer.parseInt(split[1]);
+              if (second - first > 3) {
+                  found = i;
+                  break;
+              }
           }
-        }
         if (found >= 0) {
           pages = clean(cand[found].replaceAll("-|( - )", "--"));
           int pos = text.indexOf(cand[found]);

@@ -116,49 +116,48 @@ public class SixpackImporter extends ImportFormat {
 
     String s = null;
 	BibtexEntry entry = null;
-	lines: while ((s = in.readLine()) != null){
-	    try{
-		s = s.replaceAll("<par>", ""); // What is <par> ????
-		String[] fields = s.split(SEPARATOR);
-		// Check type and create entry:
-		if (fields.length < 2)
-		    continue lines; // Avoid ArrayIndexOutOfBoundsException
-		BibtexEntryType typ = BibtexEntryType
-		    .getType(fields[1].toLowerCase());
-		if (typ == null){
-		    String type = "";
-		    if (fields[1].equals("Masterthesis")) type = "mastersthesis";
-		    if (fields[1].equals("PhD-Thesis")) type = "phdthesis";
-		    if (fields[1].equals("miscellaneous")) type = "misc";
-		    if (fields[1].equals("Conference")) type = "proceedings";
-		    typ = BibtexEntryType.getType(type.toLowerCase());
-		}
-		entry = new BibtexEntry(Util.createNeutralId(), typ);
-		String fld;
-		for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++){
-		    fld = fI.get(fieldDef[i]);
-		    if (fld != null){
-			if (fld.equals("author") || fld.equals("editor")) ImportFormatReader.setIfNecessary(entry,
-												      fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
-																			  " and "));
-			else if (fld.equals("pages")) ImportFormatReader.setIfNecessary(entry, fld, fields[i]
-							       .replaceAll("-", "--"));
-            else if (fld.equals("file")) {
-                String fieldName = "pdf"; // We set pdf as default.
-                if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz"))
-                    fieldName = "ps";
-                else if (fields[i].endsWith("html"))
-                    fieldName = "url";
-                ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
+        while ((s = in.readLine()) != null) {
+            try {
+                s = s.replaceAll("<par>", ""); // What is <par> ????
+                String[] fields = s.split(SEPARATOR);
+                // Check type and create entry:
+                if (fields.length < 2)
+                    continue; // Avoid ArrayIndexOutOfBoundsException
+                BibtexEntryType typ = BibtexEntryType
+                        .getType(fields[1].toLowerCase());
+                if (typ == null) {
+                    String type = "";
+                    if (fields[1].equals("Masterthesis")) type = "mastersthesis";
+                    if (fields[1].equals("PhD-Thesis")) type = "phdthesis";
+                    if (fields[1].equals("miscellaneous")) type = "misc";
+                    if (fields[1].equals("Conference")) type = "proceedings";
+                    typ = BibtexEntryType.getType(type.toLowerCase());
+                }
+                entry = new BibtexEntry(Util.createNeutralId(), typ);
+                String fld;
+                for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
+                    fld = fI.get(fieldDef[i]);
+                    if (fld != null) {
+                        if (fld.equals("author") || fld.equals("editor")) ImportFormatReader.setIfNecessary(entry,
+                                fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
+                                " and "));
+                        else if (fld.equals("pages")) ImportFormatReader.setIfNecessary(entry, fld, fields[i]
+                                .replaceAll("-", "--"));
+                        else if (fld.equals("file")) {
+                            String fieldName = "pdf"; // We set pdf as default.
+                            if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz"))
+                                fieldName = "ps";
+                            else if (fields[i].endsWith("html"))
+                                fieldName = "url";
+                            ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
+                        } else ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
+                    }
+                }
+                bibitems.add(entry);
+            } catch (NullPointerException ex) {
+                Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
             }
-			else ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
-		    }
-		}
-		bibitems.add(entry);
-	    }catch (NullPointerException ex){
-		Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
-	    }
-	}
+        }
 
 	return bibitems;
     }

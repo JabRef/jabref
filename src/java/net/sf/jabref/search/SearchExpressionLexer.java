@@ -64,82 +64,74 @@ public SearchExpressionLexer(LexerSharedInputState state) {
 
 public Token nextToken() throws TokenStreamException {
 	Token theRetToken=null;
-tryAgain:
-	for (;;) {
-		Token _token = null;
-		int _ttype = Token.INVALID_TYPE;
-		resetText();
-		try {   // for char stream error handling
-			try {   // for lexical error handling
-				switch ( LA(1)) {
-				case '\t':  case ' ':
-				{
-					mWS(true);
-					theRetToken=_returnToken;
-					break;
-				}
-				case '(':
-				{
-					mLPAREN(true);
-					theRetToken=_returnToken;
-					break;
-				}
-				case ')':
-				{
-					mRPAREN(true);
-					theRetToken=_returnToken;
-					break;
-				}
-				case '!':
-				{
-					mNEQUAL(true);
-					theRetToken=_returnToken;
-					break;
-				}
-				default:
-					if ((LA(1)=='=') && (LA(2)=='=')) {
-						mEEQUAL(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1)=='"') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
-						mSTRING(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1) == '=')) {
-						mEQUAL(true);
-						theRetToken=_returnToken;
-					}
-					else if ((LA(1) == '"')) {
-						mQUOTE(true);
-						theRetToken=_returnToken;
-					}
-					else if ((_tokenSet_0.member(LA(1)))) {
-						mFIELDTYPE(true);
-						theRetToken=_returnToken;
-					}
-				else {
-					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-				else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
-				}
-				}
-				if ( _returnToken==null ) continue tryAgain; // found SKIP token
-				_ttype = _returnToken.getType();
-				_returnToken.setType(_ttype);
-				return _returnToken;
-			}
-			catch (RecognitionException e) {
-				throw new TokenStreamRecognitionException(e);
-			}
-		}
-		catch (CharStreamException cse) {
-			if ( cse instanceof CharStreamIOException ) {
-				throw new TokenStreamIOException(((CharStreamIOException)cse).io);
-			}
-			else {
-				throw new TokenStreamException(cse.getMessage());
-			}
-		}
-	}
+    for (; ; ) {
+        Token _token = null;
+        int _ttype = Token.INVALID_TYPE;
+        resetText();
+        try {   // for char stream error handling
+            try {   // for lexical error handling
+                switch (LA(1)) {
+                    case '\t':
+                    case ' ': {
+                        mWS(true);
+                        theRetToken = _returnToken;
+                        break;
+                    }
+                    case '(': {
+                        mLPAREN(true);
+                        theRetToken = _returnToken;
+                        break;
+                    }
+                    case ')': {
+                        mRPAREN(true);
+                        theRetToken = _returnToken;
+                        break;
+                    }
+                    case '!': {
+                        mNEQUAL(true);
+                        theRetToken = _returnToken;
+                        break;
+                    }
+                    default:
+                        if ((LA(1) == '=') && (LA(2) == '=')) {
+                            mEEQUAL(true);
+                            theRetToken = _returnToken;
+                        } else if ((LA(1) == '"') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
+                            mSTRING(true);
+                            theRetToken = _returnToken;
+                        } else if ((LA(1) == '=')) {
+                            mEQUAL(true);
+                            theRetToken = _returnToken;
+                        } else if ((LA(1) == '"')) {
+                            mQUOTE(true);
+                            theRetToken = _returnToken;
+                        } else if ((_tokenSet_0.member(LA(1)))) {
+                            mFIELDTYPE(true);
+                            theRetToken = _returnToken;
+                        } else {
+                            if (LA(1) == EOF_CHAR) {
+                                uponEOF();
+                                _returnToken = makeToken(Token.EOF_TYPE);
+                            } else {
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+                            }
+                        }
+                }
+                if (_returnToken == null) continue; // found SKIP token
+                _ttype = _returnToken.getType();
+                _returnToken.setType(_ttype);
+                return _returnToken;
+            } catch (RecognitionException e) {
+                throw new TokenStreamRecognitionException(e);
+            }
+        } catch (CharStreamException cse) {
+            if (cse instanceof CharStreamIOException) {
+                throw new TokenStreamIOException(((CharStreamIOException) cse).io);
+            } else {
+                throw new TokenStreamException(cse.getMessage());
+            }
+        }
+    }
 }
 
 	public final void mWS(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
@@ -261,16 +253,14 @@ tryAgain:
 		mQUOTE(false);
 		text.setLength(_saveIndex);
 		{
-		_loop28:
-		do {
-			if ((_tokenSet_1.member(LA(1)))) {
-				matchNot('"');
-			}
-			else {
-				break _loop28;
-			}
-			
-		} while (true);
+            do {
+                if ((_tokenSet_1.member(LA(1)))) {
+                    matchNot('"');
+                } else {
+                    break;
+                }
+
+            } while (true);
 		}
 		_saveIndex=text.length();
 		mQUOTE(false);
@@ -305,17 +295,19 @@ tryAgain:
 		
 		{
 		int _cnt33=0;
-		_loop33:
-		do {
-			if ((_tokenSet_0.member(LA(1)))) {
-				mLETTER(false);
-			}
-			else {
-				if ( _cnt33>=1 ) { break _loop33; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());}
-			}
-			
-			_cnt33++;
-		} while (true);
+            do {
+                if ((_tokenSet_0.member(LA(1)))) {
+                    mLETTER(false);
+                } else {
+                    if (_cnt33 >= 1) {
+                        break;
+                    } else {
+                        throw new NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());
+                    }
+                }
+
+                _cnt33++;
+            } while (true);
 		}
 		_ttype = testLiteralsTable(_ttype);
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {

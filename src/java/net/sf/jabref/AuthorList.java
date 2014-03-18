@@ -362,35 +362,35 @@ public class AuthorList {
 		// First step: collect tokens in 'tokens' Vector and calculate indices
 		token_loop: while (true) {
 			int token = getToken();
-			cases: switch (token) {
-			case TOKEN_EOF:
-			case TOKEN_AND:
-				break token_loop;
-			case TOKEN_COMMA:
-				if (comma_first < 0)
-					comma_first = tokens.size();
-				else if (comma_second < 0)
-					comma_second = tokens.size();
-				break cases;
-			case TOKEN_WORD:
-				tokens.add(orig.substring(token_start, token_end));
-				tokens.add(orig.substring(token_start, token_abbr));
-				tokens.add(token_term);
-				tokens.add(token_case);
-				if (comma_first >= 0)
-					break cases;
-				if (last_start >= 0)
-					break cases;
-				if (von_start < 0) {
-					if (!token_case) {
-						von_start = tokens.size() - TOKEN_GROUP_LENGTH;
-						break cases;
-					}
-				} else if (last_start < 0 && token_case) {
-					last_start = tokens.size() - TOKEN_GROUP_LENGTH;
-					break cases;
-				}
-			}
+            switch (token) {
+                case TOKEN_EOF:
+                case TOKEN_AND:
+                    break token_loop;
+                case TOKEN_COMMA:
+                    if (comma_first < 0)
+                        comma_first = tokens.size();
+                    else if (comma_second < 0)
+                        comma_second = tokens.size();
+                    break;
+                case TOKEN_WORD:
+                    tokens.add(orig.substring(token_start, token_end));
+                    tokens.add(orig.substring(token_start, token_abbr));
+                    tokens.add(token_term);
+                    tokens.add(token_case);
+                    if (comma_first >= 0)
+                        break;
+                    if (last_start >= 0)
+                        break;
+                    if (von_start < 0) {
+                        if (!token_case) {
+                            von_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                            break;
+                        }
+                    } else if (last_start < 0 && token_case) {
+                        last_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                        break;
+                    }
+            }
 		}// end token_loop
 
         // Second step: split name into parts (here: calculate indices

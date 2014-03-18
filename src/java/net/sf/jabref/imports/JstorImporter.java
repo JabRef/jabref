@@ -67,38 +67,38 @@ public class JstorImporter extends ImportFormat {
     while ((s != null) && !s.startsWith("Item Type"))
         s = in.readLine();
 
-    mainloop: while ((s = in.readLine()) != null){
-        if (s.equals("")) continue;
-        if (s.startsWith("-----------------------------")) break mainloop;
-        String[] fields = s.split("\t");
-        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
-        try{
-        if (fields[0].equals("FLA")) be.setType(BibtexEntryType
-                            .getType("article"));
-        ImportFormatReader.setIfNecessary(be, "title", fields[2]);
-        ImportFormatReader.setIfNecessary(be, "author", AuthorList.fixAuthor_lastNameFirst(fields[4].replaceAll("; ", " and ")));
-        ImportFormatReader.setIfNecessary(be, "journal", fields[7]);
-        ImportFormatReader.setIfNecessary(be, "volume", fields[9]);
-        ImportFormatReader.setIfNecessary(be, "number", fields[10]);
-        String[] datefield = fields[12].split(" ");
-        ImportFormatReader.setIfNecessary(be, "year", datefield[datefield.length - 1]);
-        if (datefield.length > 1) {
-            if (datefield[0].endsWith(","))
-                datefield[0] = datefield[0].substring(0, datefield[0].length()-1);
-            ImportFormatReader.setIfNecessary(be, "month", datefield[0]);
+        while ((s = in.readLine()) != null) {
+            if (s.equals("")) continue;
+            if (s.startsWith("-----------------------------")) break;
+            String[] fields = s.split("\t");
+            BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+            try {
+                if (fields[0].equals("FLA")) be.setType(BibtexEntryType
+                        .getType("article"));
+                ImportFormatReader.setIfNecessary(be, "title", fields[2]);
+                ImportFormatReader.setIfNecessary(be, "author", AuthorList.fixAuthor_lastNameFirst(fields[4].replaceAll("; ", " and ")));
+                ImportFormatReader.setIfNecessary(be, "journal", fields[7]);
+                ImportFormatReader.setIfNecessary(be, "volume", fields[9]);
+                ImportFormatReader.setIfNecessary(be, "number", fields[10]);
+                String[] datefield = fields[12].split(" ");
+                ImportFormatReader.setIfNecessary(be, "year", datefield[datefield.length - 1]);
+                if (datefield.length > 1) {
+                    if (datefield[0].endsWith(","))
+                        datefield[0] = datefield[0].substring(0, datefield[0].length() - 1);
+                    ImportFormatReader.setIfNecessary(be, "month", datefield[0]);
+                }
+                //for (int i=0; i<fields.length; i++)
+                //  Util.pr(i+": "+fields[i]);
+                ImportFormatReader.setIfNecessary(be, "pages", fields[13].replaceAll("-", "--"));
+                ImportFormatReader.setIfNecessary(be, "url", fields[14]);
+                ImportFormatReader.setIfNecessary(be, "issn", fields[15]);
+                ImportFormatReader.setIfNecessary(be, "abstract", fields[16]);
+                ImportFormatReader.setIfNecessary(be, "keywords", fields[17]);
+                ImportFormatReader.setIfNecessary(be, "copyright", fields[21]);
+            } catch (ArrayIndexOutOfBoundsException ignored) {
+            }
+            bibitems.add(be);
         }
-        //for (int i=0; i<fields.length; i++)
-        //  Util.pr(i+": "+fields[i]);
-        ImportFormatReader.setIfNecessary(be, "pages", fields[13].replaceAll("-", "--"));
-        ImportFormatReader.setIfNecessary(be, "url", fields[14]);
-        ImportFormatReader.setIfNecessary(be, "issn", fields[15]);
-        ImportFormatReader.setIfNecessary(be, "abstract", fields[16]);
-        ImportFormatReader.setIfNecessary(be, "keywords", fields[17]);
-        ImportFormatReader.setIfNecessary(be, "copyright", fields[21]);
-        }catch (ArrayIndexOutOfBoundsException ignored){
-        }
-        bibitems.add(be);
-    }
 
     return bibitems;
 

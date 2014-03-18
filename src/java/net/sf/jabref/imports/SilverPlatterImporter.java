@@ -92,15 +92,13 @@ public class SilverPlatterImporter extends ImportFormat {
         String[] entries = sb.toString().split("__::__");
         String Type = "";
         HashMap<String, String> h = new HashMap<String, String>();
-        entryLoop:
         for (String entry : entries) {
-            if (entry.trim().length() < 6) continue entryLoop;
+            if (entry.trim().length() < 6) continue;
             //System.out.println("'"+entries[i]+"'");
             h.clear();
             String[] fields = entry.split("__NEWFIELD__");
-            fieldLoop:
             for (String field : fields) {
-                if (field.length() < 6) continue fieldLoop;
+                if (field.length() < 6) continue;
                 //System.out.println(">"+fields[j]+"<");
                 String s = field;
                 String f3 = s.substring(0, 2);

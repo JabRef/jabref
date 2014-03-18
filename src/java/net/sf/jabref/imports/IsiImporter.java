@@ -208,7 +208,6 @@ public class IsiImporter extends ImportFormat {
             String pages = "";
             hm.clear();
 
-            nextField:
             for (String field : fields) {
                 // empty field don't do anything
                 if (field.length() <= 2)
@@ -289,7 +288,6 @@ public class IsiImporter extends ImportFormat {
                     String month = parseMonth(value);
                     if (month != null) {
                         hm.put("month", month);
-                        continue nextField;
                     }
 
                 } else if (beg.equals("DT")) {
@@ -299,7 +297,6 @@ public class IsiImporter extends ImportFormat {
                     } else if (Type.startsWith("Article") || Type.startsWith("Journal")
                             || PT.equals("article")) {
                         Type = "article";
-                        continue;
                     } else {
                         Type = "misc";
                     }
@@ -309,7 +306,7 @@ public class IsiImporter extends ImportFormat {
                     // Preserve all other entries except
                     if (beg.equals("ER") || beg.equals("EF") || beg.equals("VR")
                             || beg.equals("FN"))
-                        continue nextField;
+                        continue;
                     hm.put(beg, value);
                 }
             }

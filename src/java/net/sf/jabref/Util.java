@@ -2990,11 +2990,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         ArrayList<String> al = new ArrayList<String>();
         for (String anAll : all) {
             boolean found = false;
-            inner:
             for (String aSubset : subset) {
                 if (aSubset.equals(anAll)) {
                     found = true;
-                    break inner;
+                    break;
                 }
             }
             if (!found) al.add(anAll);

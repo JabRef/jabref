@@ -856,7 +856,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     // First check if any entries have keys set already. If so, possibly remove
                     // them from consideration, or warn about overwriting keys.
-                    loop: for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                    for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
                         bes = i.next();
                         if (bes.getField(BibtexFields.KEY_FIELD) != null) {
                             if (Globals.prefs.getBoolean("avoidOverwritingKey"))
@@ -877,7 +877,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 }
                                 // No need to check more entries, because the user has already confirmed
                                 // that it's ok to overwrite keys:
-                                break loop;
+                                break;
                             }
                         }
                     }

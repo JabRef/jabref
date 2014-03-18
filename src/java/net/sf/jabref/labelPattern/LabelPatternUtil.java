@@ -811,7 +811,7 @@ public class LabelPatternUtil {
             // Check if it is ok:
             String word = current.toString().trim();
             if (word.length() == 0)
-                continue mainl;
+                continue;
             for(int _i=0; _i< Globals.SKIP_WORDS.length; _i++) {
                 if (word.equalsIgnoreCase(Globals.SKIP_WORDS[_i])) {
                     continue mainl;

@@ -838,13 +838,13 @@ public class OOBibBase {
         LinkedHashMap<BibtexEntry,BibtexDatabase> entries = new LinkedHashMap<BibtexEntry, BibtexDatabase>();
         for (String key : keys) {
             boolean found = false;
-            bases: for (BibtexDatabase database : databases) {
+            for (BibtexDatabase database : databases) {
                 BibtexEntry entry = database.getEntryByKey(key);
                 if (entry != null) {
                     entries.put(OOUtil.createAdaptedEntry(entry), database);
                     linkSourceBase.put(key, database);
                     found = true;
-                    break bases;
+                    break;
                 }
             }
 
@@ -1376,11 +1376,11 @@ public class OOBibBase {
                 removeReferenceMark(names[piv+1]);
                 ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
                 for (String key : keys) {
-                    bases: for (BibtexDatabase database : databases) {
+                    for (BibtexDatabase database : databases) {
                         BibtexEntry entry = database.getEntryByKey(key);
                         if (entry != null) {
                             entries.add(OOUtil.createAdaptedEntry(entry));
-                            break bases;
+                            break;
                         }
                     }
                 }
