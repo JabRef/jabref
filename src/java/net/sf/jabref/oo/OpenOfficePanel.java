@@ -612,7 +612,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     public static void addURL(URL[] u) throws IOException {
 		URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
-		Class sysclass = URLClassLoader.class;
+		Class<URLClassLoader> sysclass = URLClassLoader.class;
 
         try {
 			Method method = sysclass.getDeclaredMethod("addURL",parameters);

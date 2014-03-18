@@ -300,28 +300,28 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 	        	HashSet<String> clone;
 	        	
 	        	// Priority
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Priority.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Quality
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Quality.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Rank
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Rank.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Relevance
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Relevance.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
@@ -358,7 +358,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-	private void fillKeyWordList() {
+    @SuppressWarnings("unchecked")
+    private HashSet<String> createClone(HashSet<String> keywordsToAdd) {
+        return (HashSet<String>) keywordsToAdd.clone();
+    }
+
+    private void fillKeyWordList() {
         BasePanel bp = frame.basePanel();
         BibtexEntry[] entries = bp.getSelectedEntries();
 

@@ -85,7 +85,7 @@ public class EntryChange extends Change {
 public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
     @SuppressWarnings("unchecked")
     boolean allAccepted = true;
-    Enumeration<Change> e = children();
+    Enumeration<Change> e = (Enumeration<Change>) children();
     for (; e.hasMoreElements();) {
         Change c = e.nextElement();
         if (c.isAcceptable() && c.isAccepted())

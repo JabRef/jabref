@@ -193,10 +193,10 @@ class KeyBindingsDialog extends JDialog {
       // When the user release the mouse button and completes the selection,
       // getValueIsAdjusting() becomes false
       if (!evt.getValueIsAdjusting()) {
-        JList list = (JList) evt.getSource();
+        JList<?> list = (JList<?>) evt.getSource();
 
         // Get all selected items
-        List<Object> selected = list.getSelectedValuesList();
+        List<?> selected = list.getSelectedValuesList();
 
         // Iterate all selected items
           for (Object sel : selected) {

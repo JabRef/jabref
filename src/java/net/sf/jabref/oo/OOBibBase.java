@@ -156,10 +156,10 @@ public class OOBibBase {
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
             URLClassLoader cl = (URLClassLoader) loader;
-            Class sysclass = URLClassLoader.class;
+            Class<URLClassLoader> sysclass = URLClassLoader.class;
             try {
 
-                 Method method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
+                 Method method = sysclass.getDeclaredMethod("addURL", URL.class);
                  method.setAccessible(true);
                  method.invoke(cl, new File(pathToExecutable).toURI().toURL());
              } catch (Throwable t) {
