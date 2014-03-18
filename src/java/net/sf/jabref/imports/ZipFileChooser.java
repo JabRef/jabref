@@ -190,7 +190,7 @@ class ZipFileChooser extends JDialog {
         entries.add(entry); 
       }
     }
-    return entries.toArray(new ZipEntry[]{});
+    return entries.toArray(new ZipEntry[entries.size()]);
   }
   
   /**

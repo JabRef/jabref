@@ -503,7 +503,7 @@ public class LayoutEntry {
 			//throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
 		}
 
-		return results.toArray(new LayoutFormatter[] {});
+		return results.toArray(new LayoutFormatter[results.size()]);
 	}
 
 

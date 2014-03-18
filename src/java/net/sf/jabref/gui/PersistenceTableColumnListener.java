@@ -83,9 +83,9 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
 		// Finally, we store the new preferences.
 		Globals.prefs.putStringArray("columnNames",
-				storedColumns.toArray(new String[0]));
+                storedColumns.toArray(new String[storedColumns.size()]));
 		Globals.prefs.putStringArray("columnWidths",
-				columnsWidths.toArray(new String[0]));
+                columnsWidths.toArray(new String[columnsWidths.size()]));
 
 		// width of the number ("#") column
 		Globals.prefs.putInt("numberColWidth", ncWidth);

@@ -67,7 +67,7 @@ public class EntryEditorTab {
 	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
                           boolean addKeyField, String name) {
 		if (fields != null)
-			this.fields = fields.toArray(new String[0]);
+			this.fields = fields.toArray(new String[fields.size()]);
 		else
 			this.fields = new String[] {};
 

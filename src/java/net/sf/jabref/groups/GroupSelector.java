@@ -669,10 +669,10 @@ public class GroupSelector extends SidePaneComponent implements
         
         // If there are entries to remove
         if (!toRemove.isEmpty())
-            undoRemove = node.removeFromGroup(toRemove.toArray(new BibtexEntry[0]));
+            undoRemove = node.removeFromGroup(toRemove.toArray(new BibtexEntry[toRemove.size()]));
         // If there are entries to add
         if (!toAdd.isEmpty())
-            undoAdd = node.addToGroup(toAdd.toArray(new BibtexEntry[0]));
+            undoAdd = node.addToGroup(toAdd.toArray(new BibtexEntry[toAdd.size()]));
         
         // Remember undo information
         if (undoRemove != null) {

@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -68,7 +69,8 @@ public class WriteXMPAction extends AbstractWorker {
 
 		if (entries.length == 0) {
 
-			entries = database.getEntries().toArray(new BibtexEntry[]{});
+            Collection<BibtexEntry> var = database.getEntries();
+            entries = var.toArray(new BibtexEntry[var.size()]);
 
 			if (entries.length == 0) {
 

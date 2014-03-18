@@ -61,7 +61,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		Vector<String> v = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
 		v.add(BibtexFields.KEY_FIELD);
 		Collections.sort(v);
-		String[] allPlusKey = v.toArray(new String[0]);
+		String[] allPlusKey = v.toArray(new String[v.size()]);
 		priSort = new JComboBox<String>(allPlusKey);
 		secSort = new JComboBox<String>(allPlusKey);
 		terSort = new JComboBox<String>(allPlusKey);

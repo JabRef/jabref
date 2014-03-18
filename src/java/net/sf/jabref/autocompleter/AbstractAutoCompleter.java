@@ -89,13 +89,13 @@ public abstract class AbstractAutoCompleter {
 			for (String s: subset) {
 				res.addAll(_possibleStringsForSearchString.get(s));
 			}		
-			return res.toArray(new String[0]);
+			return res.toArray(new String[res.size()]);
 		} else {
 			// user typed in a mix of upper case and lower case,
 			// we assume user wants to have exact search
 			String ender = incrementLastCharacter(str);
 			SortedSet<String> subset = _index_casesensitive.subSet(str, ender);
-			return subset.toArray(new String[0]);
+			return subset.toArray(new String[subset.size()]);
 		}
 	}
 

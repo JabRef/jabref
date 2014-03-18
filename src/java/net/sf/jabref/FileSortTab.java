@@ -82,7 +82,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
-            String[] allPlusKey = v.toArray(new String[0]);
+            String[] allPlusKey = v.toArray(new String[v.size()]);
             savePriSort = new JComboBox<String>(allPlusKey);
             saveSecSort = new JComboBox<String>(allPlusKey);
             saveTerSort = new JComboBox<String>(allPlusKey);
@@ -194,7 +194,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
-            String[] allPlusKey = v.toArray(new String[0]);
+            String[] allPlusKey = v.toArray(new String[v.size()]);
             exportPriSort = new JComboBox<String>(allPlusKey);
             exportSecSort = new JComboBox<String>(allPlusKey);
             exportTerSort = new JComboBox<String>(allPlusKey);

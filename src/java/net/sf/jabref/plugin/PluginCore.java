@@ -167,7 +167,7 @@ public class PluginCore {
                         "\n" +
                         Globals.lang("At least the plug-in 'net.sf.jabref.core' should be there."));
             } else {
-                result.publishPlugins(plugins.toArray(new PluginLocation[] {}));
+                result.publishPlugins(plugins.toArray(new PluginLocation[plugins.size()]));
 
                 Collection<PluginDescriptor> descs = result.getRegistry()
                     .getPluginDescriptors();

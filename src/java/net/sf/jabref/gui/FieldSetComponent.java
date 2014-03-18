@@ -136,7 +136,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         con.gridwidth = 3;
         con.weightx = 1;
         if (preset != null) {
-            sel = new JComboBox<String>(preset.toArray(new String[0]));
+            sel = new JComboBox<String>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);

@@ -189,7 +189,7 @@ public class Globals {
                 encodings.add(ALL_ENCODING);
             }
         }
-		ENCODINGS = encodings.toArray(new String[0]);
+		ENCODINGS = encodings.toArray(new String[encodings.size()]);
         // Build a map for translating Java encoding names into common encoding names:
         ENCODING_NAMES_LOOKUP = new HashMap<String,String>();
         ENCODING_NAMES_LOOKUP.put("Cp1250", "windows-1250");
