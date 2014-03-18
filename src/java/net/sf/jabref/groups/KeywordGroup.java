@@ -42,8 +42,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 	 */
 	public KeywordGroup(String name, String searchField,
 			String searchExpression, boolean caseSensitive, boolean regExp,
-			int context) throws IllegalArgumentException,
-			PatternSyntaxException {
+			int context) throws IllegalArgumentException {
 		super(name, context);
 		m_searchField = searchField;
 		m_searchExpression = searchExpression;
@@ -53,8 +52,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 			compilePattern();
 	}
 
-	protected void compilePattern() throws IllegalArgumentException,
-			PatternSyntaxException {
+	protected void compilePattern() throws IllegalArgumentException {
 		m_pattern = m_caseSensitive ? Pattern.compile("\\b"+m_searchExpression+"\\b")
 				: Pattern.compile("\\b"+m_searchExpression+"\\b", Pattern.CASE_INSENSITIVE);
 	}

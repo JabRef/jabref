@@ -50,7 +50,7 @@ public class MSBibDatabase {
 		entries = new HashSet<MSBibEntry>();
 	}
 	
-	public MSBibDatabase(InputStream stream) throws IOException {
+	public MSBibDatabase(InputStream stream) {
 		importEntries(stream);
     }
 

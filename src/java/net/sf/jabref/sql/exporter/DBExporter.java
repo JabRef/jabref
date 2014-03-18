@@ -515,7 +515,7 @@ public abstract class DBExporter extends DBImporterExporter{
 
 	private String getDBName(Vector<Vector<String>> matrix,
 			DBStrings dbStrings, JabRefFrame frame, DBImportExportDialog dialogo)
-			throws SQLException, Exception {
+			throws Exception {
 		String dbName = "";
 		if (matrix.size() > 1) {
 			if (dialogo.hasDBSelected) {
@@ -553,7 +553,7 @@ public abstract class DBExporter extends DBImporterExporter{
 	}
 
 	private Vector<Vector<String>> createExistentDBNamesMatrix(
-			DBStrings dbStrings) throws SQLException, Exception {
+			DBStrings dbStrings) throws Exception {
 		ResultSet rs = SQLUtil.queryAllFromTable(this.connectToDB(dbStrings),
 				"jabref_database");
 		Vector<String> v;
@@ -571,8 +571,7 @@ public abstract class DBExporter extends DBImporterExporter{
 		return matrix;
 	}
 
-	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName)
-			throws SQLException {
+	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName) {
         return desiredName.trim().length() > 1 && !dbNames.contains(desiredName);
     }
 

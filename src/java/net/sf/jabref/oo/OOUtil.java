@@ -54,7 +54,7 @@ public class OOUtil {
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibtexEntry entry, BibtexDatabase database, String uniquefier)
-            throws UndefinedParagraphFormatException, Exception {
+            throws Exception {
 
         final String UNIQUEFIER_FIELD = "uniq";
 
@@ -84,7 +84,7 @@ public class OOUtil {
      * @throws Exception
      */
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-              String lText, String parStyle) throws UndefinedParagraphFormatException, Exception {
+              String lText, String parStyle) throws Exception {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
             XParagraphCursor.class, cursor);

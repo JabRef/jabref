@@ -432,7 +432,7 @@ public class LayoutEntry {
 	 * 
 	 */
 	public static LayoutFormatter[] getOptionalLayout(String formatterName,
-			String classPrefix) throws Exception {
+			String classPrefix) {
 
 		ArrayList<String[]> formatterStrings = Util
 				.parseMethodsCalls(formatterName);
