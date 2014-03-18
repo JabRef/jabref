@@ -316,7 +316,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 entries.put(link, preview);
                 return true;
 			} else {
-				System.out.printf("Citation Unmatched %d\n", entryNumber);
+				System.out.printf("Citation Unmatched %d%n", entryNumber);
 				System.out.printf(text);
                 return false;
 			}
