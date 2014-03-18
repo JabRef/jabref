@@ -174,8 +174,7 @@ public class PluginCore {
 
                 sb = new StringBuilder();
                 sb.append(Globals.lang("Found %0 plugin(s)", String
-                    .valueOf(descs.size())) +
-                    ":\n");
+                        .valueOf(descs.size()))).append(":\n");
 
                 for (PluginDescriptor p : result.getRegistry()
                     .getPluginDescriptors()) {
