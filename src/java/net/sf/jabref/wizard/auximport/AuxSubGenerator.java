@@ -189,8 +189,6 @@ public class AuxSubGenerator
         String line ;
         try
         {
-            if (br == null)
-                throw new IOException();
             line = br.readLine() ;
         }
         catch ( IOException ioe )
@@ -251,8 +249,7 @@ public class AuxSubGenerator
       {
         try
         {
-            if (br != null)
-                br.close() ;
+            br.close() ;
           nestedAuxCounter++ ;
         }
         catch ( IOException ignored)

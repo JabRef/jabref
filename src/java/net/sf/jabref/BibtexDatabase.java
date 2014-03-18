@@ -177,21 +177,18 @@ public class BibtexDatabase {
       int keyHash = key.hashCode() ; // key hash for better performance
 
       Set<String> keySet = _entries.keySet();
-      if (keySet != null)
-      {
-          for (String entrieID : keySet) {
-              BibtexEntry entry = getEntryById(entrieID);
-              if ((entry != null) && (entry.getCiteKey() != null)) {
-                  String citeKey = entry.getCiteKey();
-                  if (citeKey != null) {
-                      if (keyHash == citeKey.hashCode()) {
-                          back = entry;
-                      }
-                  }
-              }
-          }
-      }
-      return back ;
+        for (String entrieID : keySet) {
+            BibtexEntry entry = getEntryById(entrieID);
+            if ((entry != null) && (entry.getCiteKey() != null)) {
+                String citeKey = entry.getCiteKey();
+                if (citeKey != null) {
+                    if (keyHash == citeKey.hashCode()) {
+                        back = entry;
+                    }
+                }
+            }
+        }
+        return back ;
     }
 
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
@@ -620,8 +617,7 @@ public class BibtexDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if ((o == null) && (database != null) && database.followCrossrefs &&
-                !field.equals(BibtexFields.KEY_FIELD) && (database != null)) {
+        if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibtexFields.KEY_FIELD)) {
             Object crossRef = bibtex.getField("crossref");
             if (crossRef != null) {
                 BibtexEntry referred = database.getEntryByKey((String)crossRef);

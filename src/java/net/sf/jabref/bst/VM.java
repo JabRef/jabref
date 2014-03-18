@@ -885,19 +885,17 @@ public class VM implements Warn {
 			return false;
 
 		}
-		if (o2 instanceof Integer) {
-			if (context != null && context.integers.containsKey(name)) {
-				context.integers.put(name, (Integer) o2);
-				return true;
-			}
 
-			if (integers.containsKey(name)) {
-				integers.put(name, (Integer) o2);
-				return true;
-			}
-			return false;
-		}
-		return false;
+        if (context != null && context.integers.containsKey(name)) {
+            context.integers.put(name, (Integer) o2);
+            return true;
+        }
+
+        if (integers.containsKey(name)) {
+            integers.put(name, (Integer) o2);
+            return true;
+        }
+        return false;
 	}
 
 	CommonTree tree;

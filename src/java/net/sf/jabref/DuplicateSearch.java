@@ -48,7 +48,7 @@ public void run() {
   autoRemoveExactDuplicates = false;
   panel.output(Globals.lang("Searching for duplicates..."));
   Object[] keys = panel.database.getKeySet().toArray();
-  if ((keys == null) || (keys.length < 2))
+  if ((keys.length < 2))
     return;
   bes = new BibtexEntry[keys.length];
   for (int i=0; i<keys.length; i++)

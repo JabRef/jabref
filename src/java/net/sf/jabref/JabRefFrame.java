@@ -2113,7 +2113,6 @@ public JabRefPreferences prefs() {
     }
     else {
       // Import into current database.
-      boolean checkForDuplicates = true;
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
@@ -2123,31 +2122,29 @@ public JabRefPreferences prefs() {
       for (BibtexEntry entry : bibentries){
         boolean dupli = false;
         // Check for duplicates among the current entries:
-        if (checkForDuplicates) {
-            loop:
-            for (String s : database.getKeySet()) {
-                BibtexEntry existingEntry = database.getEntryById(s);
-                if (DuplicateCheck.isDuplicate(entry, existingEntry
-                )) {
-                    DuplicateResolverDialog drd = new DuplicateResolverDialog
-                            (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
-                    drd.setVisible(true);
-                    int res = drd.getSelected();
-                    if (res == DuplicateResolverDialog.KEEP_LOWER) {
-                        dupli = true;
-                    } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
-                        database.removeEntry(existingEntry.getId());
-                        ce.addEdit(new UndoableRemoveEntry
-                                (database, existingEntry, basePanel));
-                    } else if (res == DuplicateResolverDialog.BREAK) {
-                        break mainLoop;
-                    }
-                    break loop;
-                }
-            }
-        }
+          loop:
+          for (String s : database.getKeySet()) {
+              BibtexEntry existingEntry = database.getEntryById(s);
+              if (DuplicateCheck.isDuplicate(entry, existingEntry
+              )) {
+                  DuplicateResolverDialog drd = new DuplicateResolverDialog
+                          (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                  drd.setVisible(true);
+                  int res = drd.getSelected();
+                  if (res == DuplicateResolverDialog.KEEP_LOWER) {
+                      dupli = true;
+                  } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
+                      database.removeEntry(existingEntry.getId());
+                      ce.addEdit(new UndoableRemoveEntry
+                              (database, existingEntry, basePanel));
+                  } else if (res == DuplicateResolverDialog.BREAK) {
+                      break mainLoop;
+                  }
+                  break loop;
+              }
+          }
 
-        if (!dupli) {
+          if (!dupli) {
             try {
                 entry.setId(Util.createNeutralId());
                 database.insertEntry(entry);

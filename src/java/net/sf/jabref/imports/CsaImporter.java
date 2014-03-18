@@ -277,7 +277,7 @@ public class CsaImporter extends ImportFormat {
                     sb.append(str.substring(4)); // skip spaces
                 }
                 String fstr = sb.toString();
-                if (fstr == null || fstr.length() == 0) {
+                if (fstr.length() == 0) {
                     int line1 = line - 1;
                     throw new IOException("illegal empty field at line " +
                                           line1);
@@ -364,18 +364,14 @@ public class CsaImporter extends ImportFormat {
                     if (hm.get("year") != null) {
                         String oyear = hm.get("year");
                         if (!fstr.equals(oyear)) {
-                            StringBuffer note = new StringBuffer();
-                            note.append("Source Year: ");
-                            note.append(oyear);
-                            note.append(".");
-                            addNote(hm, note.toString());
+                            addNote(hm, "Source Year: " + oyear + ".");
 //			    System.out.println(fstr + " != " + oyear);
                         }
                     }
                 } else if (fabbr.equals("RL")) {
                     ftype = "url";
                     String[] lines = fstr.split(" ");
-                    StringBuffer urls = new StringBuffer();
+                    StringBuilder urls = new StringBuilder();
                     for (int ii = 0; ii < lines.length; ++ii) {
                         if (lines[ii].startsWith("[URL:"))
                             urls.append(lines[ii].substring(5));
@@ -404,7 +400,7 @@ public class CsaImporter extends ImportFormat {
 
                     // pages
                     pm = PAGES_PATTERN.matcher(fstr);
-                    StringBuffer pages = new StringBuffer();
+                    StringBuilder pages = new StringBuilder();
                     while (pm.find()) {
                         if (pages.length() > 0)
                             pages.append(",");
@@ -454,12 +450,7 @@ public class CsaImporter extends ImportFormat {
                 if (ftype != null) {
                     hm.put(ftype, fstr);
                 } else {
-                    StringBuffer val = new StringBuffer();
-                    val.append(fname);
-                    val.append(": ");
-                    val.append(fstr);
-                    val.append(".");
-                    addNote(hm, val.toString());
+                    addNote(hm, fname + ": " + fstr + ".");
                 }
             } else
                 str = readLine(in);

@@ -42,7 +42,7 @@ public class VersionHandling {
         final int number = groups.size() / 3;
         String name, field, regexp;
         for (int i = 0; i < number; ++i) {
-            field = groups.get(3 * i + 0);
+            field = groups.get(3 * i);
             name = groups.get(3 * i + 1);
             regexp = groups.get(3 * i + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
