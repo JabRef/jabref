@@ -3,14 +3,11 @@ package net.sf.jabref.bst;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Vector;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.bst.VM;
-import net.sf.jabref.bst.VMException;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.StackFunction;
 import net.sf.jabref.imports.BibtexParser;
@@ -155,8 +152,8 @@ public class TestVM extends TestCase {
 
 			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
-			assertEquals(new Integer(3), vm.getStack().pop());
-			assertEquals(new Integer(2), vm.getStack().pop());
+			assertEquals(3, vm.getStack().pop());
+			assertEquals(2, vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
 		}
 		{
@@ -180,7 +177,7 @@ public class TestVM extends TestCase {
 
 			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
-			assertEquals(new Integer(2), vm.getStack().pop());
+			assertEquals(2, vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
 		}
 		{
@@ -189,7 +186,7 @@ public class TestVM extends TestCase {
 
 			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
-			assertEquals(new Integer(1), vm.getStack().pop());
+			assertEquals(1, vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
 		}
 	}
@@ -315,14 +312,14 @@ public class TestVM extends TestCase {
 
 		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
-		assertEquals(new Integer(11), vm.getStack().pop());
-		assertEquals(new Integer(1), vm.getStack().pop());
-		assertEquals(new Integer(1), vm.getStack().pop());
-		assertEquals(new Integer(1), vm.getStack().pop());
-		assertEquals(new Integer(8), vm.getStack().pop());
-		assertEquals(new Integer(0), vm.getStack().pop());
-		assertEquals(new Integer(11), vm.getStack().pop());
-		assertEquals(new Integer(11), vm.getStack().pop());
+		assertEquals(11, vm.getStack().pop());
+		assertEquals(1, vm.getStack().pop());
+		assertEquals(1, vm.getStack().pop());
+		assertEquals(1, vm.getStack().pop());
+		assertEquals(8, vm.getStack().pop());
+		assertEquals(0, vm.getStack().pop());
+		assertEquals(11, vm.getStack().pop());
+		assertEquals(11, vm.getStack().pop());
 		assertEquals(0, vm.getStack().size());
 	}
 
@@ -342,7 +339,7 @@ public class TestVM extends TestCase {
 
 			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
-			assertEquals(new Integer(72), vm.getStack().pop());
+			assertEquals(72, vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
 		}
 		{
@@ -380,7 +377,7 @@ public class TestVM extends TestCase {
 		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
-		assertEquals(new Integer(Integer.MAX_VALUE), vm.getStack().pop());
+		assertEquals(Integer.MAX_VALUE, vm.getStack().pop());
 		assertTrue(vm.getStack().empty());
 	}
 
@@ -475,9 +472,9 @@ public class TestVM extends TestCase {
 		assertEquals(4, vm.getStack().size());
 
 		assertEquals("test", vm.getStack().pop());
-		assertEquals(new Integer(1), vm.getStack().pop());
+		assertEquals(1, vm.getStack().pop());
 		assertEquals("canh05", vm.getStack().pop());
-		assertEquals(new Integer(0), vm.getStack().pop());
+		assertEquals(0, vm.getStack().pop());
 	}
 
 	public void testFormatName() throws RecognitionException, IOException {
@@ -607,25 +604,19 @@ public class TestVM extends TestCase {
 		vm.run(v);
 
 		assertEquals(2, vm.getStack().size());
-		assertEquals(new Integer(3), vm.getStack().pop());
+		assertEquals(3, vm.getStack().pop());
 		assertEquals("Hallo", vm.getStack().pop());
 	}
 
-	public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
+	private static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
 		ParserResult result = BibtexParser.parse(new StringReader(s));
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 		return c.iterator().next();
 	}
 
-	public static String bibtexEntry2BibtexString(BibtexEntry e) throws IOException {
-		StringWriter sw = new StringWriter();
-		e.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
-		return sw.getBuffer().toString();
-	}
-
 	/* TEST DATA */
-	public String t1BibtexString() {
+	String t1BibtexString() {
 		return "@inproceedings{canh05,\n"
 			+ "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
 			+ "  title = {Effective work practices for floss development: A model and propositions},\n"
@@ -641,7 +632,7 @@ public class TestVM extends TestCase {
 		assertTrue(vm.run(v).contains("J.-P. Sartre"));
 	}
 
-	public BibtexEntry t1BibtexEntry() throws IOException {
+	BibtexEntry t1BibtexEntry() throws IOException {
 		return bibtexString2BibtexEntry(t1BibtexString());
 	}
 

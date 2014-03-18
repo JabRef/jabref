@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  */
 public class BibtexWidthTest extends TestCase {
 
-	public void assertBibtexWidth(final int i, final String string) {
+	void assertBibtexWidth(final int i, final String string) {
 		assertEquals(i, BibtexWidth.width(string, new Warn() {
 			public void warn(String s) {
 				fail("Should not Warn! Width should be " + i + " for " + string);

@@ -128,7 +128,7 @@ public class LayoutEntryTest extends TestCase
 		String containing = "<span style=\"background-color:#FF4500;\">Google</span>"; 
 		
 		// check
-		assertTrue(result.contains(containing));
+		assertTrue("Actual message: " + result, result.contains(containing));
 	}
 	
 	/**
@@ -196,9 +196,10 @@ public class LayoutEntryTest extends TestCase
 		
 		// define the highlighting settings
 		Globals.prefs.putBoolean("caseSensitiveSearch", false);
-		
+
+        String highlightColor = "#3399FF;";
 		String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
-		String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:#FF4500;\">study</span> of security on <span style=\"background-color:#FF4500;\">Android</span>: Google's new <span style=\"background-color:#FF4500;\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:#FF4500;\">android</span> google <span style=\"background-color:#FF4500;\">Open</span>-Source Devices</font>";
+		String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:" + highlightColor + "\">study</span> of security on <span style=\"background-color:" + highlightColor + "\">Android</span>: Google's new <span style=\"background-color:" + highlightColor +"\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:" + highlightColor + "\">android</span> google <span style=\"background-color:" + highlightColor + "\">Open</span>-Source Devices</font>";
 		
 		// check
 		assertEquals(expected, result);

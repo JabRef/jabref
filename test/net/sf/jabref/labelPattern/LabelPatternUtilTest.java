@@ -79,7 +79,7 @@ public class LabelPatternUtilTest extends TestCase {
     /**
      * Tests if checkLegalKey replaces Non-ASCII chars.
      * There are quite a few chars that should be replaced. Perhaps there is a better method than the current.
-     * @see net.sf.jabref.Util.checkLegalKey
+     * @see net.sf.jabref.Util#checkLegalKey(String)
      */
     public void testCheckLegalKey(){
     	// not tested/ not in hashmap UNICODE_CHARS:
