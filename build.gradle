@@ -27,6 +27,7 @@ sourceSets {
 
 configurations {
     generateClasspath
+    antlr3
 }
 
 dependencies {
@@ -49,7 +50,8 @@ dependencies {
     compile 'org.openoffice:ridl:3.2.1'
     compile 'org.openoffice:unoil:3.2.1'
 
-    compile 'org.antlr:antlr:3.4'
+    antlr3 'org.antlr:antlr:3.4'
+    compile 'org.antlr:antlr-runtime:3.4'
 
     compile 'mysql:mysql-connector-java:5.0.7'
     compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
@@ -70,9 +72,10 @@ dependencies {
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
 
-compileJava.dependsOn "generate"
+compileJava.dependsOn "generatePluginSource"
+compileJava.dependsOn "generateGrammarSource"
 
-task generate(type: JavaExec) {
+task generatePluginSource(type: JavaExec) {
     main = "net.sf.jabref.plugin.util.CodeGenerator"
     args = ["src/plugins/"]
     classpath = configurations.generateClasspath
@@ -90,5 +93,26 @@ javadoc {
         encoding = 'UTF-8'
         version = true
         author = true
+    }
+}
+
+task generateGrammarSource(type: JavaExec) {
+    def antlrSource = 'src/java/net/sf/jabref/bst'
+    def destinationDir = antlrSource
+
+    inputs.dir file(antlrSource)
+    outputs.dir file(destinationDir)
+
+    def grammars = fileTree(antlrSource).include('**/*.g')
+
+    main = 'org.antlr.Tool'
+    classpath = configurations.antlr3
+    args = ["-o", "${destinationDir}", grammars.files].flatten()
+}
+
+// git support in intellij idea
+idea.project.ipr {
+    withXml { provider ->
+        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
     }
 }
