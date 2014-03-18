@@ -3,6 +3,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "application"
 apply plugin: 'project-report'
+apply plugin: 'pmd'
 
 
 version = "2.11dev"
