@@ -165,7 +165,7 @@ public class SilverPlatterImporter extends ImportFormat {
                     frest = frest.trim();
                     if (frest.equals("Monograph")) Type = "book";
                     else if (frest.startsWith("Dissertation")) Type = "phdthesis";
-                    else if (frest.toLowerCase().indexOf("journal") >= 0) Type = "article";
+                    else if (frest.toLowerCase().contains("journal")) Type = "article";
                     else if (frest.equals("Contribution") || frest.equals("Chapter")) {
                         Type = "incollection";
                         // This entry type contains page numbers and booktitle in the

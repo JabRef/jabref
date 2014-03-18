@@ -258,8 +258,8 @@ public class EmacsKeyBindings
             Action[] bound = orig.getBoundActions();
             for (Action aBound : bound) {
                 KeyStroke[] strokes = orig.getKeyStrokesForAction(aBound);
-                for (int k = 0; k < strokes.length; k++) {
-                    backup.addActionForKeyStroke(strokes[k], aBound);
+                for (KeyStroke stroke : strokes) {
+                    backup.addActionForKeyStroke(stroke, aBound);
                 }
             }
             backup.setDefaultAction(orig.getDefaultAction());

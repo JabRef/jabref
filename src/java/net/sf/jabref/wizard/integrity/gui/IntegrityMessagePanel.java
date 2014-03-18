@@ -58,15 +58,14 @@ public class IntegrityMessagePanel
     implements ListSelectionListener, KeyListener, ActionListener
 
 {
-  private JList warnings ;
+  private JList<IntegrityMessage> warnings ;
   private HintListModel warningData ;
 
   private IntegrityCheck validChecker ;
 
   private JTextField content  ;
   private JButton applyButton ;
-  private JButton fixButton ;
-  private BasePanel basePanel;
+    private BasePanel basePanel;
 
   public IntegrityMessagePanel(BasePanel basePanel)
   {
@@ -75,7 +74,7 @@ public class IntegrityMessagePanel
 
   // JList --------------------------------------------------------------
     warningData = new HintListModel() ;
-    warnings = new JList( warningData ) ;
+    warnings = new JList<IntegrityMessage>( warningData ) ;
     warnings.setCellRenderer( new IntegrityListRenderer() );
     warnings.addListSelectionListener(this);
 
@@ -96,7 +95,7 @@ public class IntegrityMessagePanel
     applyButton = new JButton(Globals.lang("Apply")) ;
     applyButton.addActionListener(this) ;
     applyButton.setEnabled(false);
-    fixButton = new JButton(Globals.lang("Suggest")) ;
+      JButton fixButton = new JButton(Globals.lang("Suggest"));
     fixButton.setEnabled(false);
 
     fixPanel.add(label1) ;

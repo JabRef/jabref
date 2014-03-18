@@ -56,8 +56,8 @@ public class OOBibStyle implements Comparable {
     // reference layout mapped from entry type number:
     HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
 
-    HashMap properties = new HashMap();
-    HashMap citProperties = new HashMap();
+    HashMap<String,Object> properties = new HashMap<String,Object>();
+    HashMap<String,Object> citProperties = new HashMap<String,Object>();
 
     Pattern numPattern = Pattern.compile("-?\\d+");
 

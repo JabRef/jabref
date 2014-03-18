@@ -314,7 +314,7 @@ public class BibtexFields
   // --------------------------------------------------------------------------
   //  the "static area"
   // --------------------------------------------------------------------------
-  private static final BibtexSingleField getField( String name )
+  private static BibtexSingleField getField( String name )
   {
     if (name != null)
     {

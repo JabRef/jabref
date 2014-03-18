@@ -919,7 +919,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * @param insets
 	 *            Insets of the component. Can be <code>null</code>.
 	 */
-	private final static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill, Integer anchor,
+	private static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill, Integer anchor,
 			Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY, int ipadX, int ipadY) {
 		container.setLayout(layout);
 		GridBagConstraints constraints = new GridBagConstraints();

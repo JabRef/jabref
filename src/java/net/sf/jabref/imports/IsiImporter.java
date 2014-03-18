@@ -251,7 +251,7 @@ public class IsiImporter extends ImportFormat {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if (existingKeywords != null && existingKeywords.indexOf(value) == -1) {
+                    if (existingKeywords != null && !existingKeywords.contains(value)) {
                         existingKeywords += ", " + value;
                     } else {
                         existingKeywords = value;

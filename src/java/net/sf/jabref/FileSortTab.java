@@ -36,14 +36,12 @@ public class FileSortTab extends JPanel implements PrefsTab {
     private JRadioButton saveInOriginalOrder, saveInTableOrder, saveInSpecifiedOrder;
     private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
     private JTextField savePriField, saveSecField, saveTerField;
-    private JComboBox savePriSort, saveSecSort, saveTerSort;
-    private JPanel saveSpecPanel;
+    private JComboBox<String> savePriSort, saveSecSort, saveTerSort;
 
     private JRadioButton exportInOriginalOrder, exportInTableOrder, exportInSpecifiedOrder;
     private JCheckBox exportPriDesc, exportSecDesc, exportTerDesc;
     private JTextField exportPriField, exportSecField, exportTerField;
-    private JComboBox exportPriSort, exportSecSort, exportTerSort;
-    private JPanel exportSpecPanel;
+    private JComboBox<String> exportPriSort, exportSecSort, exportTerSort;
 
     public FileSortTab(JabRefFrame frame, JabRefPreferences prefs) {
         this._prefs = prefs;
@@ -84,10 +82,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
             ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
-            Object[] allPlusKey = v.toArray();
-            savePriSort = new JComboBox(allPlusKey);
-            saveSecSort = new JComboBox(allPlusKey);
-            saveTerSort = new JComboBox(allPlusKey);
+            String[] allPlusKey = v.toArray(new String[0]);
+            savePriSort = new JComboBox<String>(allPlusKey);
+            saveSecSort = new JComboBox<String>(allPlusKey);
+            saveTerSort = new JComboBox<String>(allPlusKey);
 
             savePriField = new JTextField(10);
             saveSecField = new JTextField(10);
@@ -159,7 +157,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             builder2.append(saveTerField);
             builder2.append(saveTerDesc);
 
-            saveSpecPanel = builder2.getPanel();
+            JPanel saveSpecPanel = builder2.getPanel();
             builder.append(saveSpecPanel);
             builder.nextLine();
         }
@@ -196,10 +194,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
             ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
-            Object[] allPlusKey = v.toArray();
-            exportPriSort = new JComboBox(allPlusKey);
-            exportSecSort = new JComboBox(allPlusKey);
-            exportTerSort = new JComboBox(allPlusKey);
+            String[] allPlusKey = v.toArray(new String[0]);
+            exportPriSort = new JComboBox<String>(allPlusKey);
+            exportSecSort = new JComboBox<String>(allPlusKey);
+            exportTerSort = new JComboBox<String>(allPlusKey);
 
             exportPriField = new JTextField(10);
             exportSecField = new JTextField(10);

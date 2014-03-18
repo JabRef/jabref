@@ -326,14 +326,14 @@ tryAgain:
 	}
 	
 	
-	private static final long[] mk_tokenSet_0() {
+	private static long[] mk_tokenSet_0() {
 		long[] data = new long[8];
 		data[0]=-2305846337813348872L;
 		for (int i = 1; i<=3; i++) { data[i]=-1L; }
 		return data;
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
-	private static final long[] mk_tokenSet_1() {
+	private static long[] mk_tokenSet_1() {
 		long[] data = new long[8];
 		data[0]=-17179869192L;
 		for (int i = 1; i<=3; i++) { data[i]=-1L; }

@@ -62,7 +62,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         labelPatternPanel.setValues(keypatterns);
 	}
 
-    private final void init() {
+    private void init() {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(labelPatternPanel, BorderLayout.CENTER);
 

@@ -141,7 +141,7 @@ public class AboutPanel extends JComponent
 
 // ----------------------------------------------------------------------------
 
-  private final void loadAboutText()
+  private void loadAboutText()
   {
     TextBlock block = null ;
     AboutTextLine aLine;

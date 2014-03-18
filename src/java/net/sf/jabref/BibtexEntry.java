@@ -98,7 +98,7 @@ public class BibtexEntry
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-	private static final String getFieldDisplayName(String field) {
+	private static String getFieldDisplayName(String field) {
         if (field.length() == 0) {
             // hard coded "UNKNOWN" is assigned to a field without any name
             field = "UNKNOWN";

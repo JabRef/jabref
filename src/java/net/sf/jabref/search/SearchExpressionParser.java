@@ -468,17 +468,17 @@ inputState.guessing--;
 		tokenTypeToASTClassMap=null;
 	}
 
-     private static final long[] mk_tokenSet_0() {
+     private static long[] mk_tokenSet_0() {
          long[] data = { 328768L, 0L};
          return data;
      }
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
-	private static final long[] mk_tokenSet_1() {
+	private static long[] mk_tokenSet_1() {
 		long[] data = { 357824L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
-	private static final long[] mk_tokenSet_2() {
+	private static long[] mk_tokenSet_2() {
 		long[] data = { 29056L, 0L};
 		return data;
 	}
