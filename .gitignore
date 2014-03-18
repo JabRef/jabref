@@ -12,3 +12,5 @@ out/
 *.ipr
 *.iml
 .settings/
+.classpath
+.project
