@@ -25,12 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -1239,9 +1234,7 @@ public class JabRefPreferences {
             return new CustomEntryType(Util.nCase(name), req, opt);
         }
         ArrayList<String> secOpt = new ArrayList<String>();
-        for (String anOpt : opt) {
-            secOpt.add(anOpt);
-        }
+        Collections.addAll(secOpt, opt);
         for (String aPriOpt : priOpt) {
             secOpt.remove(aPriOpt);
         }

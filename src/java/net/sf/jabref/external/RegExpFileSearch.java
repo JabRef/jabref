@@ -285,9 +285,7 @@ public class RegExpFileSearch {
             }
         });
         if (matches != null && (matches.length > 0))
-            for (File match : matches) {
-                res.add(match);
-            }
+            Collections.addAll(res, matches);
         return res;
     }
 

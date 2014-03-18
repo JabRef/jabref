@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -198,9 +199,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		tableRows.clear();
 		String[] names = JabRefPreferences.getInstance().getStringArray("xmpPrivacyFilters");
-        for (String name : names) {
-            tableRows.add(name);
-        }
+        Collections.addAll(tableRows, names);
 		rowCount = tableRows.size() + 5;
 
 		privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(

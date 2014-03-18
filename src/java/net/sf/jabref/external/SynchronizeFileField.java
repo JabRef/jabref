@@ -104,9 +104,7 @@ public class SynchronizeFileField extends AbstractWorker {
         // First we try to autoset fields
         if (autoSet) {
             Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
-            for (BibtexEntry aSel : sel) {
-                entries.add(aSel);
-            }
+            Collections.addAll(entries, sel);
 
             // Start the autosetting process:                
             Thread t = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
@@ -232,9 +230,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                     // Get the old list of types, add this one, and update the list in prefs:
                                     List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
                                     ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-                                    for (ExternalFileType oldType : oldTypes) {
-                                        fileTypes.add(oldType);
-                                    }
+                                    Collections.addAll(fileTypes, oldTypes);
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
                                     Globals.prefs.setExternalFileTypes(fileTypes);

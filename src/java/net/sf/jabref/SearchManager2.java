@@ -21,6 +21,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -363,9 +364,7 @@ public class SearchManager2 extends SidePaneComponent
 		// for now ... just seperate words by whitespace
 		String[] strings = t.split(" ");
 		ArrayList<String> words = new ArrayList<String>(strings.length);
-        for (String string : strings) {
-            words.add(string);
-        }
+        Collections.addAll(words, strings);
 		return words;
 	}
     /**

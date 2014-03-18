@@ -73,7 +73,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         while (tok.hasMoreTokens()) {
             entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
                     QUOTE_CHAR));
-            for (BibtexEntry entry : entries) m_entries.add(entry);
+            Collections.addAll(m_entries, entries);
         }
     }
 
@@ -94,7 +94,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             return null; // nothing to do
 
         HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(m_entries);
-        for (BibtexEntry entry : entries) m_entries.add(entry);
+        Collections.addAll(m_entries, entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }

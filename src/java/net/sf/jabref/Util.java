@@ -851,9 +851,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             // Get the old list of types, add this one, and update the list in prefs:
             List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
             ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-            for (ExternalFileType oldType : oldTypes) {
-                fileTypes.add(oldType);
-            }
+            Collections.addAll(fileTypes, oldTypes);
             fileTypes.add(newType);
             Collections.sort(fileTypes);
             Globals.prefs.setExternalFileTypes(fileTypes);

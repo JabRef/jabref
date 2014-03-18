@@ -20,10 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JDialog;
 import javax.swing.JProgressBar;
@@ -182,9 +179,7 @@ public class AccessLinksForEntries {
 
             ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
             BibtexEntry[] sel = panel.getSelectedEntries();
-            for (BibtexEntry bibtexEntry : sel) {
-                entries.add(bibtexEntry);
-            }
+            Collections.addAll(entries, sel);
             final List<FileListEntry> links =
                     AccessLinksForEntries.getExternalLinksForEntries(entries);
             for (FileListEntry entry : links) {

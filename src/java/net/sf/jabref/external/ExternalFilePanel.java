@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
@@ -445,9 +446,7 @@ public class ExternalFilePanel extends JPanel {
 				 */
 				LinkedList<String> list = new LinkedList<String>();
                 String[] dirs = metaData.getFileDirectory(fieldName);
-                for (String dir : dirs) {
-                    list.add(dir);
-                }
+                Collections.addAll(list, dirs);
 
 				String found = Util.findPdf(getEntry(), fieldName, list
 					.toArray(new String[list.size()]));// , off);

@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * This class is used to represent customized entry types.
@@ -33,8 +34,8 @@ public class CustomEntryType extends BibtexEntryType {
         name = name_;
         parseRequiredFields(req_);
         ArrayList<String> allOpt = new ArrayList<String>();
-        for (String anOpt_ : opt_) allOpt.add(anOpt_);
-        for (String anOpt2_ : opt2_) allOpt.add(anOpt2_);
+        Collections.addAll(allOpt, opt_);
+        Collections.addAll(allOpt, opt2_);
         opt = allOpt.toArray(new String[allOpt.size()]);
         priOpt = opt_;
     }
@@ -67,9 +68,7 @@ public class CustomEntryType extends BibtexEntryType {
         ArrayList<String[]> sets = new ArrayList<String[]>();
         for (String part : parts) {
             String[] subParts = part.split("/");
-            for (String subPart : subParts) {
-                fields.add(subPart);
-            }
+            Collections.addAll(fields, subParts);
             // Check if we have either/or fields:
             if (subParts.length > 1) {
                 sets.add(subParts);

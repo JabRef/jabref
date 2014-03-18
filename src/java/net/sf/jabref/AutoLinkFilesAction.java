@@ -3,6 +3,7 @@ package net.sf.jabref;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
@@ -22,9 +23,7 @@ public class AutoLinkFilesAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent event) {
         ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
-        for (BibtexEntry e: JabRef.jrf.basePanel().getSelectedEntries()) {
-            entries.add(e);
-        }
+        Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
         if (entries.isEmpty()) {
             JabRef.jrf.basePanel().output(Globals.lang("No entries selected."));
             return;

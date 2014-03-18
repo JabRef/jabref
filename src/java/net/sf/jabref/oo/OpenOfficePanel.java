@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -814,9 +815,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
-                for (BibtexEntry entry : entries) {
-                    el.add(entry);
-                }
+                Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
                 //wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/base/plain.bst"));
