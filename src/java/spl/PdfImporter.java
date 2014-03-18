@@ -403,8 +403,8 @@ fileNameLoop:
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
                 // mode which makes sure the selection will trigger display of the entry editor
                 // and adjustment of the splitter.
-                if (panel.getMode() != panel.SHOWING_EDITOR) {
-                    panel.setMode(panel.WILL_SHOW_EDITOR);
+                if (panel.getMode() != BasePanel.SHOWING_EDITOR) {
+                    panel.setMode(BasePanel.WILL_SHOW_EDITOR);
                 }
 
                 /*int row = entryTable.findEntry(be);

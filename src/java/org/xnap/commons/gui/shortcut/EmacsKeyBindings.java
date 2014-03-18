@@ -320,7 +320,7 @@ public class EmacsKeyBindings
             } else {
                 keybindings = EMACS_KEY_BINDINGS_BASE;
             }
-            JTC.loadKeymap(k, keybindings, actions);
+            JTextComponent.loadKeymap(k, keybindings, actions);
         }
     }
 

@@ -47,7 +47,7 @@ public class DocumentsWrapper {
             }
             if(xmlDocument.getAuthors() != null){
                 List<Bean> authors = xmlDocument.getAuthors().getCollection();
-                authors = this.sortAuthors(authors);
+                authors = sortAuthors(authors);
                 String value = "";
                 int i = 1;
                 for(Bean author : authors){
