@@ -329,7 +329,7 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
         update = 1
     else:
         update = 0
-    findNewKeysInJavaCode("resource/JabRef_en.properties", ".", update)
+    findNewKeysInJavaCode("resources/resource/JabRef_en.properties", ".", update)
     
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
     if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
@@ -337,17 +337,17 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
     else:
         changeFiles = 0
 
-    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resource"));
-    filesJabRef = ["resource/" + i for i in filesJabRef];
-    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resource"));
-    filesMenu = ["resource/" + i for i in filesMenu];
+    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resources/resource"));
+    filesJabRef = ["resources/resource/" + i for i in filesJabRef];
+    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resources/resource"));
+    filesMenu = ["resources/resource/" + i for i in filesMenu];
 
-    handleFileSet("resource/JabRef_en.properties", filesJabRef, changeFiles)
-    handleFileSet("resource/Menu_en.properties", filesMenu, changeFiles)
+    handleFileSet("resources/resource/JabRef_en.properties", filesJabRef, changeFiles)
+    handleFileSet("resources/resource/Menu_en.properties", filesMenu, changeFiles)
 
 elif (len(sys.argv) >= 2) and ((sys.argv[1] == "-d") or (sys.argv[1] == "-c")):
-    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resource"));
-    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resource")));
-    files = ["resource/" + i for i in files];
+    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir("resources/resource"));
+    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir("resources/resource")));
+    files = ["resources/resource/" + i for i in files];
     for file in files:
         lookForDuplicates(file, sys.argv[1] == "-d")
