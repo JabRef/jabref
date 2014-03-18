@@ -355,10 +355,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         // Sort the numbers:
         int[] lNum = new int[number.length];
-        for (int i = 0; i < lNum.length; i++) {
-            lNum[i] = number[i];
-
-        }
+        System.arraycopy(number, 0, lNum, 0, lNum.length);
         //Arrays.copyOf(number, number.length);
         Arrays.sort(lNum);
         StringBuilder sb = new StringBuilder(bracketBefore);

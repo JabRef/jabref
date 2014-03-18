@@ -344,9 +344,7 @@ public class PluginInstaller {
     public static void schedulePluginForDeletion(String filename) {
         String[] oldValues = Globals.prefs.getStringArray("deletePlugins");
         String[] newValues = oldValues == null ? new String[1] : new String[oldValues.length+1];
-        if (oldValues != null) for (int i=0; i<oldValues.length; i++) {
-            newValues[i] = oldValues[i];
-        }
+        if (oldValues != null) System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
         newValues[newValues.length-1] = filename;
         Globals.prefs.putStringArray("deletePlugins", newValues);
     }

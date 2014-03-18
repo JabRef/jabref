@@ -108,9 +108,7 @@ public class PushToEmacs implements PushToApplication {
         try {
         	String[] com = new String[addParams.length+2];
         	com[0] = command;
-        	for (int i=0; i<addParams.length; i++) {
-        		com[i+1] = addParams[i];
-        	}
+            System.arraycopy(addParams, 0, com, 1, addParams.length);
         	String prefix;        	
         	String suffix;
         	if (Globals.prefs.getBoolean(JabRefPreferences.EMACS_23)) {

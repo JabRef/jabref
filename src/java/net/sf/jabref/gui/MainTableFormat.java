@@ -273,9 +273,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         for (int i=0; i<colSettings.length; i++) {
             String[] fields = colSettings[i].split(COL_DEFINITION_FIELD_SEPARATOR);
             columns[i] = new String[fields.length];
-            for (int j = 0; j < fields.length; j++) {
-                columns[i][j] = fields[j];
-            }
+            System.arraycopy(fields, 0, columns[i], 0, fields.length);
         }
 
         // Read name format options:
