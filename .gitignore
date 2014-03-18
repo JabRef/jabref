@@ -11,3 +11,4 @@ out/
 *.iws
 *.ipr
 *.iml
+.settings/
