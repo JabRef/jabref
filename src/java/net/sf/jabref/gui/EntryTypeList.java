@@ -102,13 +102,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     }
     
     public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting()) {
-            return;
-        }
-        
-        
-        //
-        
+
     }
 
     public void enable(String typeName, boolean isChanged) {

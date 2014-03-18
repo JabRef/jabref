@@ -1042,7 +1042,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // menu.
             if (e.isPopupTrigger()) {
                 showPopup(e);
-                return;
             }
         }
 

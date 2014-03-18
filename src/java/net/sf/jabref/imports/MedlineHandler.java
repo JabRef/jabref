@@ -123,7 +123,6 @@ public class MedlineHandler extends DefaultHandler
         else if(localName.equals("Affiliation")){ inAffiliation=true; }
 
 
-		return;
     }
     String join(Object[] sa,String delim){
 		StringBuffer sb=new StringBuffer();

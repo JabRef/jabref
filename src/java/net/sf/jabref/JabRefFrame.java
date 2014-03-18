@@ -2360,7 +2360,6 @@ class SaveSessionAction
 
       if (filenames.size() == 0) {
         output(Globals.lang("Not saved (empty session)") + ".");
-        return;
       }
       else {
         String[] names = new String[filenames.size()];

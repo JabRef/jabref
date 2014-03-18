@@ -66,7 +66,6 @@ public class PushToLyx implements PushToApplication {
 
                 } catch (IOException excep) {
                     couldNotWrite = true;
-                    return;
                 }
             }
         });

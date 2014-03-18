@@ -505,10 +505,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   if ((bes != null) && (bes.length > 0)) {
 
                       boolean goOn = showDeleteConfirmationDialog(bes.length);
-                      if (!goOn) {
-                          return;
-                      }
-                      else {
+                      if (goOn) {
                           // Create a CompoundEdit to make the action undoable.
                           NamedCompound ce = new NamedCompound
                               (Globals.lang(bes.length > 1 ? "delete entries" : "delete entry"));
@@ -529,7 +526,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       }
 
 
-                          // Reselect the entry in the first prev. selected position:
+                      // Reselect the entry in the first prev. selected position:
                           /*if (row0 >= entryTable.getRowCount())
                               row0 = entryTable.getRowCount()-1;
                           if (row0 >= 0) {
@@ -1315,7 +1312,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 output(Globals.lang("Could not open link"));
                                 e.printStackTrace();
                             }
-                            return;
                         } else
                             output(Globals.lang("No url defined")+".");
                     }

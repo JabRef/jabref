@@ -742,7 +742,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
                             Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                    return;
                 }
                 catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();

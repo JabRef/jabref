@@ -92,7 +92,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             toSetIn = null;
             if (consumeEnterKey)
                 e.consume();
-            return;
         }
         // Cycle through alternative completions when user presses PGUP/PGDN:
         else if ((e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) && (toSetIn != null)) {
@@ -259,7 +258,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             } else {
             	lastBeginning = cWord.substring(0, cWord.length()-1).concat(Character.toString(ch));
             }
-            return;
         }
 
     }

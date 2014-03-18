@@ -561,7 +561,6 @@ class GroupDialog extends JDialog {
                 case AbstractGroup.INDEPENDENT:
                 default:
                         m_independentButton.setSelected(true);
-                        return;
                 }
         }
 

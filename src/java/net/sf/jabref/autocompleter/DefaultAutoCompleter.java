@@ -50,15 +50,13 @@ public class DefaultAutoCompleter extends AbstractAutoCompleter {
 	public void addBibtexEntry(BibtexEntry entry) {
 		if (entry != null) {
 			String fieldValue = entry.getField(_fieldName);
-			if (fieldValue == null) {
-				return;
-			} else {
+            if (fieldValue != null) {
 				StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
 				while (tok.hasMoreTokens()) {
 					String word = tok.nextToken();
 					addWordToIndex(word);
 				}
 			}
-		}
+        }
 	}
 }

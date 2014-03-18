@@ -289,8 +289,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 				groupSelector.concludeAssignment(undo, target, assignedEntries);
 			} else {
 				dtde.rejectDrop();
-				return;
-			}
+            }
 		} catch (IOException ioe) {
 			// ignore
 		} catch (UnsupportedFlavorException e) {

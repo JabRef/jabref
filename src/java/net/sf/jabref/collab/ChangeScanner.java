@@ -507,10 +507,8 @@ public class ChangeScanner extends Thread {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }
-        if (groupsTmp.equals(groupsDisk))
-            return;
-        changes.add(new GroupChange(groupsDisk, groupsTmp));
-        return;
+        if (!groupsTmp.equals(groupsDisk)) {
+            changes.add(new GroupChange(groupsDisk, groupsTmp));
 
 //
 //        if (((vOnTmp == null) || (vOnTmp.size()==0)) && ((vOnDisk == null) || (vOnDisk.size()==0))) {
@@ -560,6 +558,9 @@ public class ChangeScanner extends Thread {
 //            vOnDisk.removeElementAt(0);
 //            changes.add(new GroupAddOrRemove(group, true));
 //        }
+        } else {
+            return;
+        }
     }
 
 
