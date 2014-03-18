@@ -500,7 +500,7 @@ public class BibtexEntry
     /**
      * Returns a clone of this entry. Useful for copying.
      */
-    public Object clone() throws CloneNotSupportedException {
+    public Object clone() {
         BibtexEntry clone = new BibtexEntry(_id, _type);
         clone._fields = new HashMap<String, String>(_fields); 
         return clone;

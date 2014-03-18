@@ -396,8 +396,8 @@ public class BibtexDatabase {
     public BibtexEntry resolveForStrings(BibtexEntry entry, boolean inPlace) {
 		
     	if (!inPlace){
-    		entry = (BibtexEntry)entry.clone();
-    	}
+            entry = (BibtexEntry)entry.clone();
+        }
     	
     	for (Object field : entry.getAllFields()){
     		entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));

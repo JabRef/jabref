@@ -624,8 +624,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                             (database, be, BasePanel.this));
                                 } catch (KeyCollisionException ex) {
                                     Util.pr("KeyCollisionException... this shouldn't happen.");
-                                } catch (CloneNotSupportedException e) {
-                                    throw new RuntimeException("should not happen", e);
                                 }
                             }
                           ce.end();
