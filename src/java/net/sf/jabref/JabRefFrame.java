@@ -2547,7 +2547,7 @@ class SaveSessionAction
         }
 
         public void actionPerformed(ActionEvent e) {
-        	final JabRefPreferences prefs = JabRefPreferences.getInstance();
+        	JabRefPreferences.getInstance();
             if (bibtexKeyPatternDialog == null) {
                 // if no instance of BibtexKeyPatternDialog exists, create new one
             	bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, basePanel());

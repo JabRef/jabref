@@ -1005,7 +1005,6 @@ public class JabRefPreferences {
      */
     public void putKeyPattern(LabelPattern pattern) {
         keyPattern = pattern;
-        LabelPattern parent = pattern.getParent();
 
         // Store overridden definitions to Preferences.
         Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);

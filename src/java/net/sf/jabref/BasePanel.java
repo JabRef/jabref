@@ -943,8 +943,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         
         actions.put("mergeEntries", new BaseAction() {
             public void action() {
-                MergeEntriesDialog med = new MergeEntriesDialog(BasePanel.this);
-                
+                new MergeEntriesDialog(BasePanel.this);
             }
         });
 
