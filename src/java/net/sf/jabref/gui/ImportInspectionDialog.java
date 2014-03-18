@@ -872,7 +872,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         protected Boolean enable;
 
         public SelectionButton(boolean enable) {
-            this.enable = Boolean.valueOf(enable);
+            this.enable = enable;
         }
 
         public void actionPerformed(ActionEvent event) {
@@ -888,7 +888,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void actionPerformed(ActionEvent event) {
             for (int i = 0; i < glTable.getRowCount(); i++) {
                 if (glTable.getValueAt(i, DUPL_COL) != null) {
-                    glTable.setValueAt(Boolean.valueOf(false), i, 0);
+                    glTable.setValueAt(false, i, 0);
                 }
             }
             glTable.repaint();

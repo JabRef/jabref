@@ -125,8 +125,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 			 * 
 			 * http://sourceforge.net/tracker/index.php?func=detail&aid=1535044&group_id=92314&atid=600306
 			 */
-			f1 = new Integer(Util.getMonthNumber((String)f1));			
-			f2 = new Integer(Util.getMonthNumber((String)f2));
+			f1 = Util.getMonthNumber((String) f1);
+			f2 = Util.getMonthNumber((String) f2);
 		}
 
         if (isNumeric) {
@@ -151,12 +151,12 @@ public class FieldComparator implements Comparator<BibtexEntry> {
                 // The first one was parseable, but not the second one.
                 // This means we consider one < two
                 f1 = i1;
-                f2 = new Integer(i1.intValue()+1);
+                f2 = i1.intValue() + 1;
             } else if (i2 != null) {
                 // The second one was parseable, but not the first one.
                 // This means we consider one > two
                 f2 = i2;
-                f1 = new Integer(i2.intValue()+1);
+                f1 = i2.intValue() + 1;
             }
             // Else none of them were parseable, and we can fall back on comparing strings.    
         }

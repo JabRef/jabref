@@ -215,12 +215,12 @@ public class JSTORFetcher2 implements EntryFetcher {
         
         Matcher m = idPattern.matcher(cont);
 
-        if (m.find() && (ids.size() + 1 <= Integer.valueOf(refsRequested)) ) {
+        if (m.find() && (ids.size() + 1 <= refsRequested) ) {
             do {
                 ids.add(m.group(1));
                 cont = cont.substring(m.end());
                 m = idPattern.matcher(cont);
-            } while (m.find() && (ids.size() + 1 <= Integer.valueOf(refsRequested)));
+            } while (m.find() && (ids.size() + 1 <= refsRequested));
         } else if (entirePage.contains(noAccessIndicator)) {
             noAccessFound = true;
             return null;

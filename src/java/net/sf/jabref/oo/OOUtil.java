@@ -165,10 +165,10 @@ public class OOUtil {
             XPropertySet.class, cursor);
         if (bold)
             xCursorProps.setPropertyValue("CharWeight",
-                    new Float(com.sun.star.awt.FontWeight.BOLD));
+                    com.sun.star.awt.FontWeight.BOLD);
         else
             xCursorProps.setPropertyValue("CharWeight",
-                    new Float(com.sun.star.awt.FontWeight.NORMAL));
+                    com.sun.star.awt.FontWeight.NORMAL);
 
         if (italic)
             xCursorProps.setPropertyValue("CharPosture",

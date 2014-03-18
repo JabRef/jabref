@@ -680,7 +680,7 @@ public class JabRef {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
                         // zoomLevel not yet set, calculate it based on the first found font
-                        zoomLevel = new Double(fontSize) / new Double(font.getSize());
+                        zoomLevel = (double) fontSize / (double) font.getSize();
                     }
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);

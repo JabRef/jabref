@@ -223,7 +223,7 @@ public class TextAnalyzer {
 		}
 
 		public int compareTo(Substring other) {
-			return (new Integer(begin)).compareTo(new Integer(other.begin()));
+			return (new Integer(begin)).compareTo(other.begin());
 		}
 	}
 }

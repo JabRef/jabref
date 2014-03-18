@@ -87,9 +87,9 @@ public class VM implements Warn {
 		public void execute(BstEntry context);
 	}
 
-	public static final Integer FALSE = new Integer(0);
+	public static final Integer FALSE = 0;
 
-	public static final Integer TRUE = new Integer(1);
+	public static final Integer TRUE = 1;
 
 	private HashMap<String,BstFunction> buildInFunctions;
 
@@ -209,7 +209,7 @@ public class VM implements Warn {
 					throw new VMException("Can only compare two integers with +");
 				}
 
-				stack.push(new Integer(((Integer) o1).intValue() + ((Integer) o2).intValue()));
+				stack.push(((Integer) o1).intValue() + ((Integer) o2).intValue());
 			}
 		});
 
@@ -229,7 +229,7 @@ public class VM implements Warn {
 					throw new VMException("Can only subtract two integers with -");
 				}
 
-				stack.push(new Integer(((Integer) o1).intValue() - ((Integer) o2).intValue()));
+				stack.push(((Integer) o1).intValue() - ((Integer) o2).intValue());
 			}
 		});
 
@@ -347,7 +347,7 @@ public class VM implements Warn {
 
 				String s = (String) o1;
 
-				stack.push(new Integer(s.charAt(0)));
+				stack.push((int) s.charAt(0));
 			}
 		});
 
@@ -534,7 +534,7 @@ public class VM implements Warn {
 				}
 				String s = (String) o1;
 
-				stack.push(new Integer(AuthorList.getAuthorList(s).size()));
+				stack.push(AuthorList.getAuthorList(s).size());
 			}
 		});
 
@@ -763,7 +763,7 @@ public class VM implements Warn {
 						// incr(num_text_chars);
 						result++;
 				}
-				stack.push(new Integer(result));
+				stack.push(result);
 			}
 		});
 
@@ -973,8 +973,8 @@ public class VM implements Warn {
 		strings = new HashMap<String, String>();
 
 		integers = new HashMap<String, Integer>();
-		integers.put("entry.max$", new Integer(Integer.MAX_VALUE));
-		integers.put("global.max$", new Integer(Integer.MAX_VALUE));
+		integers.put("entry.max$", Integer.MAX_VALUE);
+		integers.put("global.max$", Integer.MAX_VALUE);
 
 		functions = new HashMap<String, BstFunction>();
 		functions.putAll(buildInFunctions);
@@ -1070,7 +1070,7 @@ public class VM implements Warn {
 				String name = t.getChild(i).getText();
 				
 				for (BstEntry entry : entries){
-					entry.integers.put(name, new Integer(0));
+					entry.integers.put(name, 0);
 				}
 			}
 		}
@@ -1163,7 +1163,7 @@ public class VM implements Warn {
 					}
 						break;
 					case BstParser.INTEGER:
-						push(new Integer(Integer.parseInt(c.getText().substring(1))));
+						push(Integer.parseInt(c.getText().substring(1)));
 						break;
 					case BstParser.QUOTED:
 						push(new Identifier(c.getText().substring(1)));
@@ -1248,7 +1248,7 @@ public class VM implements Warn {
 
 		for (int i = 0; i < t.getChildCount(); i++) {
 			String name = t.getChild(i).getText();
-			integers.put(name, new Integer(0));
+			integers.put(name, 0);
 		}
 	}
 

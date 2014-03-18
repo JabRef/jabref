@@ -45,7 +45,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 		if (!encoder.canEncode(str)) {
 			for (int i = 0; i < str.length(); i++) {
 				if (!encoder.canEncode(str.charAt(i)))
-					problemCharacters.add(new Character(str.charAt(i)));
+					problemCharacters.add(str.charAt(i));
 			}
 			couldEncodeAll = false;
 		}

@@ -260,9 +260,9 @@ public class LatexFieldFormatter implements FieldFormatter {
 
         // First we collect all occurences:
         while ((current = text.indexOf('{', current + 1)) != -1)
-            left.add(new Integer(current));
+            left.add(current);
         while ((current = text.indexOf('}', current + 1)) != -1)
-            right.add(new Integer(current));
+            right.add(current);
 
         // Then we throw an exception if the error criteria are met.
         if ((right.size() > 0) && (left.size() == 0))

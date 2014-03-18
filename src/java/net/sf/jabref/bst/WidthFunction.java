@@ -54,10 +54,10 @@ public class WidthFunction implements BstFunction {
 
 		if (!(o1 instanceof String)) {
 			vm.warn("A string is needed for change.case$");
-			stack.push(new Integer(0));
+			stack.push(0);
 			return;
 		}
 		
-		stack.push(new Integer(BibtexWidth.width((String) o1, vm)));
+		stack.push(BibtexWidth.width((String) o1, vm));
 	}
 }

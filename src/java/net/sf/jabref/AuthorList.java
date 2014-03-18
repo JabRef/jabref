@@ -375,8 +375,8 @@ public class AuthorList {
 			case TOKEN_WORD:
 				tokens.add(orig.substring(token_start, token_end));
 				tokens.add(orig.substring(token_start, token_abbr));
-				tokens.add(new Character(token_term));
-				tokens.add(Boolean.valueOf(token_case));
+				tokens.add(token_term);
+				tokens.add(token_case);
 				if (comma_first >= 0)
 					break cases;
 				if (last_start >= 0)

@@ -263,12 +263,12 @@ public class JabRefPreferences {
         defaults.put("lyxpipe", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
         defaults.put("vim", "vim");
         defaults.put("vimServer", "vim");
-        defaults.put("posX", new Integer(0));
-        defaults.put("posY", new Integer(0));
-        defaults.put("sizeX", new Integer(840));
-        defaults.put("sizeY", new Integer(680));
+        defaults.put("posX", 0);
+        defaults.put("posY", 0);
+        defaults.put("sizeX", 840);
+        defaults.put("sizeY", 680);
         defaults.put("windowMaximised", Boolean.FALSE);
-        defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
+        defaults.put("autoResizeMode", JTable.AUTO_RESIZE_ALL_COLUMNS);
         defaults.put("previewPanelHeight", 200);
         defaults.put("entryEditorHeight", 400);
         defaults.put("tableColorCodesOn", Boolean.TRUE);
@@ -308,24 +308,24 @@ public class JabRefPreferences {
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
-                Boolean.valueOf(PersistenceTableColumnListener.DEFAULT_ENABLED));
+                PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put("xmpPrivacyFilters", "pdf;timestamp;keywords;owner;note;review");
         defaults.put("useXmpPrivacyFilter", Boolean.FALSE);
-        defaults.put("numberColWidth", new Integer(GUIGlobals.NUMBER_COL_LENGTH));
+        defaults.put("numberColWidth", GUIGlobals.NUMBER_COL_LENGTH);
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
         defaults.put("importWorkingDirectory", System.getProperty("user.home"));
         defaults.put("fileWorkingDirectory", System.getProperty("user.home"));
         defaults.put("autoOpenForm", Boolean.TRUE);
-        defaults.put("entryTypeFormHeightFactor", new Integer(1));
-        defaults.put("entryTypeFormWidth", new Integer(1));
+        defaults.put("entryTypeFormHeightFactor", 1);
+        defaults.put("entryTypeFormWidth", 1);
         defaults.put("backup", Boolean.TRUE);
         defaults.put("openLastEdited", Boolean.TRUE);
         defaults.put("lastEdited", null);
-        defaults.put("stringsPosX", new Integer(0));
-        defaults.put("stringsPosY", new Integer(0));
-        defaults.put("stringsSizeX", new Integer(600));
-        defaults.put("stringsSizeY", new Integer(400));
+        defaults.put("stringsPosX", 0);
+        defaults.put("stringsPosY", 0);
+        defaults.put("stringsSizeX", 600);
+        defaults.put("stringsSizeY", 400);
         defaults.put("defaultShowSource", Boolean.FALSE);
         defaults.put("showSource", Boolean.TRUE);
         defaults.put("defaultAutoSort", Boolean.FALSE);
@@ -340,15 +340,15 @@ public class JabRefPreferences {
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("highLightWords", Boolean.TRUE);
-        defaults.put("searchPanePosX", new Integer(0));
-        defaults.put("searchPanePosY", new Integer(0));
+        defaults.put("searchPanePosX", 0);
+        defaults.put("searchPanePosY", 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, new Integer(2));
+        defaults.put(SHORTEST_TO_COMPLETE, 2);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
@@ -370,7 +370,7 @@ public class JabRefPreferences {
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
-        defaults.put("groupsVisibleRows", new Integer(8));
+        defaults.put("groupsVisibleRows", 8);
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
         defaults.put("memoryStickMode", Boolean.FALSE);
@@ -384,13 +384,13 @@ public class JabRefPreferences {
         defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
-        defaults.put("historySize", new Integer(8));
-        defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
-        defaults.put("fontSize", new Integer(12));
+        defaults.put("historySize", 8);
+        defaults.put("fontStyle", java.awt.Font.PLAIN);
+        defaults.put("fontSize", 12);
         defaults.put("overrideDefaultFonts", Boolean.FALSE);
         defaults.put("menuFontFamily", "Times");
-        defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
-        defaults.put("menuFontSize", new Integer(11));
+        defaults.put("menuFontStyle", java.awt.Font.PLAIN);
+        defaults.put("menuFontSize", 11);
         // Main table color settings:
         defaults.put("tableBackground", "255:255:255");
         defaults.put("tableReqFieldBackground", "230:235:255");
@@ -513,7 +513,7 @@ public class JabRefPreferences {
         defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
-        defaults.put("remoteServerPort", new Integer(6050));
+        defaults.put("remoteServerPort", 6050);
 
         defaults.put("personalJournalList", null);
         defaults.put("externalJournalLists", null);
@@ -528,12 +528,12 @@ public class JabRefPreferences {
         defaults.put("filechooserDisableRename", Boolean.TRUE);
 
         defaults.put("lastUsedExport", null);
-        defaults.put("sidePaneWidth", new Integer(-1));
+        defaults.put("sidePaneWidth", -1);
 
-        defaults.put("importInspectionDialogWidth", new Integer(650));
-        defaults.put("importInspectionDialogHeight", new Integer(650));
-        defaults.put("searchDialogWidth", new Integer(650));
-        defaults.put("searchDialogHeight", new Integer(500));
+        defaults.put("importInspectionDialogWidth", 650);
+        defaults.put("importInspectionDialogHeight", 650);
+        defaults.put("searchDialogWidth", 650);
+        defaults.put("searchDialogHeight", 500);
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");

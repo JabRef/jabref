@@ -236,7 +236,7 @@ public class ChangeScanner extends Thread {
             }
 
             // No? Add this entry to the list of nonmatched entries.
-            notMatched.add(new Integer(piv1));
+            notMatched.add(piv1);
         }
 
 

@@ -758,7 +758,7 @@ public class HTMLConverter implements LayoutFormatter {
                 if (aConversionList[0].length() >= 1) {
                     numSymbols.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]).intValue() > 128) {
-                        Character c = new Character((char) Integer.decode(aConversionList[0]).intValue());
+                        Character c = (char) Integer.decode(aConversionList[0]).intValue();
                         unicodeSymbols.put(c, aConversionList[2]);
                         // System.err.println(Integer.decode(conversionList[i][0]).toString() + ": " + c.toString() + ": "+ conversionList[i][2]);
                     }

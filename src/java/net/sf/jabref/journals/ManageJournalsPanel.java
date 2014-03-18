@@ -623,7 +623,7 @@ public class ManageJournalsPanel extends JPanel{
         public String getValue() { return tf.getText(); }
     }
 
-    class JournalEntry implements Comparable<JournalEntry> {
+    static class JournalEntry implements Comparable<JournalEntry> {
         String name, abbreviation;
         public JournalEntry(String name, String abbreviation) {
             this.name = name;

@@ -149,7 +149,7 @@ class ZipFileChooser extends JDialog {
       } else if (columnIndex == 1) {
         value = SimpleDateFormat.getDateTimeInstance().format(new Date(entry.getTime()));
       } else if (columnIndex == 2) {
-        value = new Long(entry.getSize());
+        value = entry.getSize();
       }
       return value;
     }
