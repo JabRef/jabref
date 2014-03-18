@@ -260,7 +260,7 @@ public class OOUtil {
         for (XTextDocument doc : list) {
             values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
         }
-        JList sel = new JList(values);
+        JList<String> sel = new JList<String>(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),

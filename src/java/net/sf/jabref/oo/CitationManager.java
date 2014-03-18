@@ -117,7 +117,7 @@ public class CitationManager {
         diag.setVisible(true);
     }
 
-    class CitEntry implements Comparable {
+    class CitEntry implements Comparable<CitEntry> {
         String refMarkName, pageInfo, keyString, context, origPageInfo;
         List<String> keys;
 
@@ -145,8 +145,7 @@ public class CitationManager {
             else return false;
         }
 
-        public int compareTo(Object o) {
-            CitEntry other = (CitEntry)o;
+        public int compareTo(CitEntry other) {
             return this.refMarkName.compareTo(other.refMarkName);
         }
     }

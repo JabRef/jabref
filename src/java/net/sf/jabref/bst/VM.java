@@ -250,7 +250,7 @@ public class VM implements Warn {
 					throw new VMException("Can only concatenate two String with *");
 				}
 
-				stack.push((String) o1 + (String) o2);
+				stack.push(o1.toString() + o2.toString());
 			}
 		});
 

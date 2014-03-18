@@ -20,7 +20,7 @@ import com.sun.star.awt.Point;
 /**
  *
  */
-public class ComparableMark implements Comparable {
+public class ComparableMark implements Comparable<ComparableMark> {
 
     String name;
     Point position;
@@ -30,8 +30,7 @@ public class ComparableMark implements Comparable {
         this.position = position;
     }
 
-    public int compareTo(Object o) {
-        ComparableMark other = (ComparableMark)o;
+    public int compareTo(ComparableMark other) {
         if (position.Y != other.position.Y)
             return position.Y-other.position.Y;
         else

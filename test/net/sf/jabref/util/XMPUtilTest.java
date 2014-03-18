@@ -754,9 +754,9 @@ public class XMPUtilTest extends TestCase {
 
 			XMPUtil.writeXMP(pdfFile, toSet, null);
 
-			List l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
-			BibtexEntry e = (BibtexEntry) l.get(0);
+			BibtexEntry e = l.get(0);
 
 			assertEquals(toSet, e);
 
@@ -783,7 +783,7 @@ public class XMPUtilTest extends TestCase {
 				meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE,
 						XMPSchemaBibtex.class);
 
-				List schemas = meta.getSchemas();
+				List<XMPSchema> schemas = meta.getSchemas();
 
 				assertEquals(4, schemas.size());
 
@@ -1198,10 +1198,10 @@ public class XMPUtilTest extends TestCase {
 								+ "  timestamp = {2006.05.29},\n"
 								+ "  url = {http://james.howison.name/publications.html}}"));
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 
 		XMPUtil.writeXMP(pdfFile, e, null);
 
@@ -1268,8 +1268,7 @@ public class XMPUtilTest extends TestCase {
 		} finally {
 			if (fileWriter != null)
 				fileWriter.close();
-			if (tempBib != null)
-				tempBib.delete();
+            tempBib.delete();
 		}
 	}
 
@@ -1390,8 +1389,7 @@ public class XMPUtilTest extends TestCase {
 			if (fileWriter != null)
 				fileWriter.close();
 
-			if (tempBib != null)
-				tempBib.delete();
+            tempBib.delete();
 		}
 	}
 
@@ -1444,8 +1442,7 @@ public class XMPUtilTest extends TestCase {
 			if (fileWriter != null)
 				fileWriter.close();
 
-			if (tempBib != null)
-				tempBib.delete();
+            tempBib.delete();
 		}
 	}
 
@@ -1619,7 +1616,7 @@ public class XMPUtilTest extends TestCase {
 	 */
 	public static String slurp(Reader reader) throws IOException {
 		char[] chars = new char[4092];
-		StringBuffer totalBuffer = new StringBuffer();
+		StringBuilder totalBuffer = new StringBuilder();
 		int bytesRead;
 		while ((bytesRead = reader.read(chars)) != -1) {
 			if (bytesRead == 4092) {

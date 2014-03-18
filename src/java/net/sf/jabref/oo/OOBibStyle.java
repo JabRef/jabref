@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
  *    operation is performed for each JabRef BibtexEntry.
  */
-public class OOBibStyle implements Comparable {
+public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
     String name = null;
@@ -288,7 +288,7 @@ public class OOBibStyle implements Comparable {
      * @param line The line containing the formatter names.
      * @throws IOException
      */
-    private void handlePropertiesLine(String line, HashMap map) throws IOException {
+    private void handlePropertiesLine(String line, HashMap<String, Object> map) throws IOException {
         int index = line.indexOf("=");
         if ((index > 0) && (index <= line.length()-1)) {
             String propertyName = line.substring(0, index).trim();
@@ -847,8 +847,7 @@ public class OOBibStyle implements Comparable {
         return properties.get(name);
     }
 
-    public int compareTo(Object o) {
-        OOBibStyle other = (OOBibStyle)o;
+    public int compareTo(OOBibStyle other) {
         return getName().compareTo(other.getName());
     }
 

@@ -39,7 +39,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		lastNamesOnly;
 
 	private JTextField priField, secField, terField, numericFields;
-	private JComboBox priSort, secSort, terSort;
+	private JComboBox<String> priSort, secSort, terSort;
 
 	/**
 	 * Customization of external program paths.
@@ -61,10 +61,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		Vector<String> v = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
 		v.add(BibtexFields.KEY_FIELD);
 		Collections.sort(v);
-		Object[] allPlusKey = v.toArray();
-		priSort = new JComboBox(allPlusKey);
-		secSort = new JComboBox(allPlusKey);
-		terSort = new JComboBox(allPlusKey);
+		String[] allPlusKey = v.toArray(new String[0]);
+		priSort = new JComboBox<String>(allPlusKey);
+		secSort = new JComboBox<String>(allPlusKey);
+		terSort = new JComboBox<String>(allPlusKey);
 
 		autoResizeMode = new JCheckBox(Globals.lang("Fit table horizontally on screen"));
 
