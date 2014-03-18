@@ -154,7 +154,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         con.insets = new Insets(0, 0, 2, 0);
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
-        con.weighty = 0;
         con.weighty = 1;
         con.insets = new Insets(1, 0, 1, 0);
         con.fill = GridBagConstraints.BOTH;
