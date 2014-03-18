@@ -25,7 +25,7 @@ options {
     public int apply(AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
 		this.bibtexEntry = bibtexEntry;
 		// specification of fields to search is done in the search expression itself
-		this.searchKeys = bibtexEntry.getAllFields();
+		this.searchKeys = bibtexEntry.getAllFields().toArray();
 		return tSearchExpression(ast) ? 1 : 0;
 	}
 }
