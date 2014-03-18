@@ -80,11 +80,10 @@ public class FromAuxDialog
     private JButton cancelButton = new JButton();
     private JButton parseButton = new JButton();
 
-    private JComboBox dbChooser = new JComboBox();
+    private JComboBox<String> dbChooser = new JComboBox<String>();
     private JTextField auxFileField;
-    private JButton browseAuxFileButton;
 
-    private JList notFoundList;
+    private JList<String> notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
@@ -189,9 +188,9 @@ public class FromAuxDialog
             dbChooser.setSelectedIndex(toSelect);
 
         auxFileField = new JTextField("", 25);
-        browseAuxFileButton = new JButton(Globals.lang("Browse"));
+        JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-        notFoundList = new JList();
+        notFoundList = new JList<String>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
@@ -305,7 +304,7 @@ public class FromAuxDialog
     /**
      * Action used to produce a "Browse" button for one of the text fields.
      */
-    class BrowseAction
+    static class BrowseAction
             extends AbstractAction {
         private JTextField comp;
         private JabRefFrame _frame;
@@ -317,8 +316,7 @@ public class FromAuxDialog
         }
 
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
-            chosen = FileDialogs.getNewFile(_frame,
+            String chosen = FileDialogs.getNewFile(_frame,
                     new File(comp.getText()),
                     ".aux",
                     JFileChooser.OPEN_DIALOG, false);

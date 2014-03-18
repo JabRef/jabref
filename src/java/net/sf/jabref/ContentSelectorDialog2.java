@@ -56,16 +56,16 @@ public class ContentSelectorDialog2 extends JDialog {
 	ok = new JButton(Globals.lang("Ok")),
 	cancel = new JButton(),
 	apply = new JButton(Globals.lang("Apply"));
-    DefaultListModel fieldListModel = new DefaultListModel(),
-	wordListModel = new DefaultListModel();
-    JList fieldList = new JList(fieldListModel),
-	wordList = new JList(wordListModel);
+    DefaultListModel<String> fieldListModel = new DefaultListModel<String>(),
+	wordListModel = new DefaultListModel<String>();
+    JList<String> fieldList = new JList<String>(fieldListModel),
+	wordList = new JList<String>(wordListModel);
     JTextField fieldNameField = new JTextField("", 20),
 	wordEditField = new JTextField("", 20);
     JScrollPane fPane = new JScrollPane(fieldList),
 	wPane = new JScrollPane(wordList);
 
-    HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
+    HashMap<String, DefaultListModel<String>> wordListModels = new HashMap<String, DefaultListModel<String>>();
     ArrayList<String> removedFields = new ArrayList<String>();
 
     /**
@@ -108,7 +108,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
 	wordList.addListSelectionListener(new ListSelectionListener() {
 		public void valueChanged(ListSelectionEvent e) {
-		    wordEditField.setText((String)wordList.getSelectedValue());
+		    wordEditField.setText(wordList.getSelectedValue());
 		    wordEditField.selectAll();
 		    new FocusRequester(wordEditField);
 		}
@@ -123,7 +123,7 @@ public class ContentSelectorDialog2 extends JDialog {
         wordEditFieldListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
-                String old = (String)wordList.getSelectedValue(),
+                String old = wordList.getSelectedValue(),
             	newVal = wordEditField.getText();
                 if (newVal.equals("") || newVal.equals(old)) {
                     return; // Empty string or no change.
@@ -166,7 +166,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
 	fieldList.addListSelectionListener(new ListSelectionListener() {
 		public void valueChanged(ListSelectionEvent e) {
-		    currentField = (String)fieldList.getSelectedValue();
+		    currentField = fieldList.getSelectedValue();
 		    fieldNameField.setText("");
 		    setupWordSelector();
 		}
@@ -233,7 +233,7 @@ public class ContentSelectorDialog2 extends JDialog {
 		    int index = fieldList.getSelectedIndex();
 		    if (index == -1)
 			return;
-		    String fieldName = (String)fieldListModel.get(index);
+		    String fieldName = fieldListModel.get(index);
 		    removedFields.add(fieldName);
 		    fieldListModel.remove(index);
 		    wordListModels.remove(fieldName);
@@ -385,7 +385,7 @@ public class ContentSelectorDialog2 extends JDialog {
 		if (wordListModel != null) {
 			wordList.setModel(wordListModel);
 		} else {
-			wordListModel = new DefaultListModel();
+			wordListModel = new DefaultListModel<String>();
 			wordList.setModel(wordListModel);
 			wordListModels.put(currentField, wordListModel);
 			// wordListModel.addElement(WORD_FIRSTLINE_TEXT);

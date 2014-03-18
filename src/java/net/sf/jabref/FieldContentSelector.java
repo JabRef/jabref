@@ -37,7 +37,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
-	JComboBox comboBox;
+	JComboBox<String> comboBox;
 
 	FieldEditor editor;
 
@@ -89,7 +89,7 @@ public class FieldContentSelector extends JComponent {
         this.action = action;
         this.delimiter = delimiter;
 
-		comboBox = new JComboBox() {
+		comboBox = new JComboBox<String>() {
 			public Dimension getPreferredSize() {
 				Dimension parents = super.getPreferredSize();
 				if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)

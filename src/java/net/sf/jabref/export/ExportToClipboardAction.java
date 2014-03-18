@@ -67,7 +67,7 @@ public class ExportToClipboardAction extends AbstractWorker {
 			piv++;
 		}
         
-        JList list = new JList(array);
+        JList<String> list = new JList<String>(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -121,7 +121,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             format.performExport(database, panel.metaData(),
                     tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());
             int s;
             while ((s = reader.read()) != -1) {
@@ -140,7 +140,6 @@ public class ExportToClipboardAction extends AbstractWorker {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             message = Globals.lang("Error exporting to clipboard");
-            return;
         } finally {
             // Clean up:
             if (tmp != null)

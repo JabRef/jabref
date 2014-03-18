@@ -45,7 +45,7 @@ public class DBConnectDialog extends JDialog {
     JLabel lblPassword       = new JLabel();
 
     // input fields
-    JComboBox cmbServerType = new JComboBox();
+    JComboBox<String> cmbServerType = new JComboBox<String>();
     JTextField txtServerHostname = new JTextField(40);
     JTextField txtDatabase = new JTextField(40);
     JTextField txtUsername = new JTextField(40);        
