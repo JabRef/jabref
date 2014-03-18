@@ -556,7 +556,7 @@ public class BibtexDatabase {
                 if(allKeys.containsKey(key)){
                         // warning
                         exists=true;
-                        allKeys.put( key, allKeys.get(key).intValue() + 1);// incrementInteger( allKeys.get(key)));
+                        allKeys.put( key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
                 }else
                         allKeys.put( key, 1);
                 return exists;
@@ -573,7 +573,7 @@ public class BibtexDatabase {
                         if(tI ==1)
                                 allKeys.remove( key);
                         else
-                                allKeys.put( key, (tI).intValue() - 1);//decrementInteger( tI ));
+                                allKeys.put( key, tI - 1);//decrementInteger( tI ));
                 }
     }
 

@@ -209,7 +209,7 @@ public class VM implements Warn {
 					throw new VMException("Can only compare two integers with +");
 				}
 
-				stack.push(((Integer) o1).intValue() + ((Integer) o2).intValue());
+				stack.push((Integer) o1 + (Integer) o2);
 			}
 		});
 
@@ -229,7 +229,7 @@ public class VM implements Warn {
 					throw new VMException("Can only subtract two integers with -");
 				}
 
-				stack.push(((Integer) o1).intValue() - ((Integer) o2).intValue());
+				stack.push((Integer) o1 - (Integer) o2);
 			}
 		});
 
