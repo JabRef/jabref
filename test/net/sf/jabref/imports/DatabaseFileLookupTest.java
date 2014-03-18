@@ -107,6 +107,7 @@ public class DatabaseFileLookupTest extends TestCase {
 		/**
 		 * Select all nodes manually.
 		 */
+        @SuppressWarnings("unchecked")
 		Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
 		while(enumeration.hasMoreElements()) {
 			CheckableTreeNode nextElement = enumeration.nextElement();
@@ -170,7 +171,7 @@ public class DatabaseFileLookupTest extends TestCase {
 	 *            Parameters for the invokation of the method.
 	 * @return The result of the method, that is invoked.
 	 */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
 	public static <R, T> R invokeMethod(String methodName, Class<T> targetClass, Object... params) throws Exception {
 		T instance = getInstanceFromType(targetClass);
 		if (instance == null) {
@@ -235,7 +236,6 @@ public class DatabaseFileLookupTest extends TestCase {
                 T instance = (T) constructor.newInstance(arguments);
                 return instance;
             } catch (Exception e) {
-                continue;
             }
         }
 		return null;
