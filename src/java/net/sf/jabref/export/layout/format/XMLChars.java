@@ -89,7 +89,7 @@ public class XMLChars implements LayoutFormatter {
 			 }
 		}
 		
-		StringBuffer buffer = new StringBuffer(fieldText.length() * 2);
+		StringBuilder buffer = new StringBuilder(fieldText.length() * 2);
 		
 		for (int i = 0; i < fieldText.length(); i++) {
 			int code = (fieldText.charAt(i));

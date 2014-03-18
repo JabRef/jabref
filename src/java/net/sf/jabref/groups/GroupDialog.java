@@ -498,7 +498,7 @@ class GroupDialog extends JDialog {
 
         protected String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sa.length; ++i) {
             if (i > 0)
                 sb.append("<br>");

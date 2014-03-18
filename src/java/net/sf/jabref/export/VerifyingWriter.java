@@ -56,7 +56,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 	}
 
 	public String getProblemCharacters() {
-		StringBuffer chars = new StringBuffer();
+		StringBuilder chars = new StringBuilder();
 		for (Character ch : problemCharacters) {
 			chars.append(ch.charValue());
 		}

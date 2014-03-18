@@ -509,7 +509,7 @@ public class AuthorList {
 	 * @return the result of concatenation.
 	 */
 	private String concatTokens(int start, int end, int offset, boolean dot_after) {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		// Here we always have start < end
 		res.append((String) tokens.get(start + offset));
 		if (dot_after)
@@ -662,7 +662,7 @@ public class AuthorList {
 		if (authorsNatbib != null)
 			return authorsNatbib;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastOnly());
 			if (size() == 2) {
@@ -704,7 +704,7 @@ public class AuthorList {
 		if (authorsLastOnly[abbrInt] != null)
 			return authorsLastOnly[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastOnly());
 			int i = 1;
@@ -759,7 +759,7 @@ public class AuthorList {
 		if (authorsLastFirst[abbrInt] != null)
 			return authorsLastFirst[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastFirst(abbreviate));
 			int i = 1;
@@ -803,7 +803,7 @@ public class AuthorList {
 		if (authorLastFirstAnds[abbrInt] != null)
 			return authorLastFirstAnds[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastFirst(abbreviate));
 			for (int i = 1; i < size(); i++) {
@@ -822,7 +822,7 @@ public class AuthorList {
 		if (authorsLastFirstFirstLast[abbrInt] != null)
 			return authorsLastFirstFirstLast[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
             res.append(getAuthor(0).getLastFirst(abbreviate));
 			for (int i = 1; i < size(); i++) {
@@ -870,7 +870,7 @@ public class AuthorList {
 		if (authorsFirstFirst[abbrInt] != null)
 			return authorsFirstFirst[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getFirstLast(abbr));
 			int i = 1;
@@ -923,7 +923,7 @@ public class AuthorList {
 		if (authorsFirstFirstAnds != null)
 			return authorsFirstFirstAnds;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getFirstLast(false));
 			for (int i = 1; i < size(); i++) {
@@ -953,7 +953,7 @@ public class AuthorList {
 		if (authorsAlph != null)
 			return authorsAlph;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getNameForAlphabetization());
 			for (int i = 1; i < size(); i++) {
@@ -1244,7 +1244,7 @@ public class AuthorList {
 		 *         are empty.
 		 */
 		public String getNameForAlphabetization() {
-			StringBuffer res = new StringBuffer();
+			StringBuilder res = new StringBuilder();
 			if (last_part != null)
 				res.append(last_part);
 			if (jr_part != null) {

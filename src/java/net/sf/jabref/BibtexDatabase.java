@@ -455,7 +455,7 @@ public class BibtexDatabase {
     private String resolveContent(String res, HashSet<String> usedIds) {
         //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
     if (res.matches(".*#[^#]+#.*")) {
-            StringBuffer newRes = new StringBuffer();
+            StringBuilder newRes = new StringBuilder();
             int piv = 0, next = 0;
             while ((next=res.indexOf("#", piv)) >= 0) {
 

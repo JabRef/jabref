@@ -47,7 +47,7 @@ public class AuthorOrgSci implements LayoutFormatter {
 			return fieldText;
 		}
 		Author first = a.getAuthor(0);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(first.getLastFirst(true));
 		for (int i = 1; i < a.size(); i++) {
 			sb.append(", ").append(a.getAuthor(i).getFirstLast(true));

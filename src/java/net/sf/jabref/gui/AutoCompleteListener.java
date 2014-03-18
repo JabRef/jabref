@@ -132,7 +132,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         String sno = lastCompletions[lastShownCompletion];
         toSetIn = sno.substring(lastBeginning.length()-1);
         
-        StringBuffer alltext = new StringBuffer(comp.getText());
+        StringBuilder alltext = new StringBuilder(comp.getText());
         
         int oldSelectionStart = comp.getSelectionStart();
         int oldSelectionEnd = comp.getSelectionEnd();
@@ -244,7 +244,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         		logger.finest("toSetIn: >" + toSetIn + "<");
         	}
         	
-            StringBuffer alltext = new StringBuffer(comp.getText());
+            StringBuilder alltext = new StringBuilder(comp.getText());
             int cp = comp.getCaretPosition();
             alltext.insert(cp, toSetIn);
             comp.setText(alltext.toString());

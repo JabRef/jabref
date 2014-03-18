@@ -41,7 +41,7 @@ public class BibtexPurify {
 	 */
 	public static String purify(String toPurify, Warn warn) {
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		char[] cs = toPurify.toCharArray();
 		int n = cs.length;

@@ -243,7 +243,7 @@ public class BiblioscapeImporter extends ImportFormat {
               + (country != null ? ", " + country : ""));
 
           if (comments.size() > 0){ // set comment if present
-            StringBuffer s = new StringBuffer();
+            StringBuilder s = new StringBuilder();
             for (int i = 0; i < comments.size(); ++i)
                 s.append(i > 0 ? "; " : "").append(comments.elementAt(i));
             hm.put("comment", s.toString());

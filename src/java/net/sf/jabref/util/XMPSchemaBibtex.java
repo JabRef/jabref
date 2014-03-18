@@ -307,7 +307,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 */
 	public static String getTextContent(Node node) {
 		boolean hasTextContent = false;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		NodeList nlist = node.getChildNodes();
 		for (int i = 0; i < nlist.getLength(); i++) {
 			Node child = nlist.item(i);

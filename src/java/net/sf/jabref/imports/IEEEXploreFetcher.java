@@ -249,7 +249,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        StringBuffer sb = new StringBuffer(startUrl);
+        StringBuilder sb = new StringBuilder(startUrl);
         sb.append(terms.replaceAll(" ", "+"));
         sb.append(endUrl);
         sb.append(String.valueOf(startIndex));
@@ -704,7 +704,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             Matcher authorMatcher = authorPattern.matcher(text);
             // System.out.println(text);
-            StringBuffer authorNames = new StringBuffer("");
+            StringBuilder authorNames = new StringBuilder("");
             int authorCount=0;
             while(authorMatcher.find()) {
                 if(authorCount >= 1) {

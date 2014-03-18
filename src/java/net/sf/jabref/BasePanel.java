@@ -992,7 +992,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output("None of the selected entries have BibTeX keys.");
                             return;
                         }
-                        StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+                        StringBuilder sb = new StringBuilder((String)keys.elementAt(0));
                         for (int i=1; i<keys.size(); i++) {
                             sb.append(',');
                             sb.append((String)keys.elementAt(i));
@@ -1030,7 +1030,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output("None of the selected entries have BibTeX keys.");
                             return;
                         }
-                        StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+                        StringBuilder sb = new StringBuilder((String)keys.elementAt(0));
                         for (int i=1; i<keys.size(); i++) {
                             sb.append(',');
                             sb.append((String)keys.elementAt(i));
@@ -1070,7 +1070,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 						  return;
 					  }
 					  
-            		  StringBuffer sb = new StringBuffer();
+            		  StringBuilder sb = new StringBuilder();
 
             		  int copied = 0;
                       // Collect all non-null keys.
@@ -2938,7 +2938,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A comma-separated list of the keys of the selected entries.
      */
     public String getKeysForSelection() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String citeKey = "";//, message = "";
         boolean first = true;
         for (BibtexEntry bes : mainTable.getSelected()){

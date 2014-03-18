@@ -214,7 +214,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        StringBuffer sb = new StringBuffer(startUrl).append(searchUrlPart);
+        StringBuilder sb = new StringBuilder(startUrl).append(searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
         sb.append("&start=").append(String.valueOf(startIndex));
         sb.append(searchUrlPartII);
@@ -424,7 +424,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     public String getResults(URL source) throws IOException {
         
         InputStream in = source.openStream();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);
@@ -446,7 +446,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      */
     public String getResultsFromFile(File f) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);

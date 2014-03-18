@@ -93,7 +93,7 @@ public class CsaImporter extends ImportFormat {
     // append to the "note" field
     private void addNote(HashMap<String, String> hm, String note) {
 
-        StringBuffer notebuf = new StringBuffer();
+        StringBuilder notebuf = new StringBuilder();
         if (hm.get("note") != null) {
             notebuf.append(hm.get("note"));
             notebuf.append("\n");
@@ -123,7 +123,7 @@ public class CsaImporter extends ImportFormat {
             return fstr;
         }
 
-        StringBuffer date = new StringBuffer();
+        StringBuilder date = new StringBuilder();
 
         String day = pm.group(1);
         if (day == null)

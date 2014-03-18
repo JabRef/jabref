@@ -96,7 +96,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         String name = group.getName();
         if (name.length() > MAX_DISPLAYED_LETTERS)
             name = name.substring(0, MAX_DISPLAYED_LETTERS-2)+"...";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<html>");
         if (red)
             sb.append("<font color=\"#FF0000\">");
