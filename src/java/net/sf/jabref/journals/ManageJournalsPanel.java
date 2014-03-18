@@ -178,8 +178,6 @@ public class ManageJournalsPanel extends JPanel{
                     old = new File(newNameTf.getText());
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
                 if (name != null) {
-                    if ((old != null) && (tableModel.getRowCount() > 0)) {
-                    }
                     newNameTf.setText(name);
                     newFile.setSelected(true);
                 }
@@ -192,8 +190,6 @@ public class ManageJournalsPanel extends JPanel{
                     old = new File(personalFile.getText());
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
                 if (name != null) {
-                    if ((old != null) && (tableModel.getRowCount() > 0)) {
-                    }
                     personalFile.setText(name);
                     oldFile.setSelected(true);
                     oldFile.setEnabled(true);
