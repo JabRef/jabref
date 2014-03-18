@@ -31,7 +31,7 @@ public class AutoCompleterTest extends TestCase {
 	private static final String CROSSREF_FIELD = "crossref";
 	private static final String ENTIRE_FIELD = "journal";
 
-	public static final String PATH_TO_TEST_BIBTEX = "src/tests/net/sf/jabref/bibtexFiles/test.bib";
+	public static final String PATH_TO_TEST_BIBTEX = "src/resources/tests/net/sf/jabref/bibtexFiles/test.bib";
 
 	public void testAutoCompleterFactory() {
 		Globals.prefs = JabRefPreferences.getInstance();

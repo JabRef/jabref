@@ -1514,13 +1514,13 @@ public class XMPUtilTest extends TestCase {
 		//			
 
 		try {
-			XMPUtil.readXMP("src/tests/encrypted.pdf");
+			XMPUtil.readXMP("src/resources/tests/encrypted.pdf");
 			fail();
 		} catch (EncryptionNotSupportedException ignored) {
 		}
 
 		try {
-			XMPUtil.writeXMP("src/tests/encrypted.pdf", t1BibtexEntry(), null);
+			XMPUtil.writeXMP("src/resources/tests/encrypted.pdf", t1BibtexEntry(), null);
 			fail();
 		} catch (EncryptionNotSupportedException ignored) {
 		}
@@ -1541,7 +1541,7 @@ public class XMPUtilTest extends TestCase {
 			IOException, TransformerException {
 
 		ParserResult result = BibtexParser.parse(new FileReader(
-				"src/tests/net/sf/jabref/util/twente.bib"));
+				"src/resources/tests/net/sf/jabref/util/twente.bib"));
 
 		assertEquals("Arvind", result.getDatabase().resolveForStrings(
 				"#Arvind#"));

@@ -100,7 +100,7 @@ public class PluginCore {
 
 
             List<File> directoriesToSearch = new LinkedList<File>();
-            directoriesToSearch.add(new File("./src/plugins"));
+            directoriesToSearch.add(new File("./src/resources/plugins"));
             directoriesToSearch.add(new File("./plugins"));
             directoriesToSearch.add(userPluginDir);
 
@@ -110,7 +110,7 @@ public class PluginCore {
             
                 if (!parent.getCanonicalFile().equals(
                     new File(".").getCanonicalFile())) {
-                    directoriesToSearch.add(new File(parent, "/src/plugins"));
+                    directoriesToSearch.add(new File(parent, "/src/resources/plugins"));
                     directoriesToSearch.add(new File(parent, "/plugins"));
                 }
             } catch (Exception e) {

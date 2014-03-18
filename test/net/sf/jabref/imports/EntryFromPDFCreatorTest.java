@@ -26,8 +26,8 @@ public class EntryFromPDFCreatorTest extends TestCase {
 
 		
 		entryCreator = new EntryFromPDFCreator();
-		existingPDF = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
-		notExistingPDF = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
+		existingPDF = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
+		notExistingPDF = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
 		
 	}
 

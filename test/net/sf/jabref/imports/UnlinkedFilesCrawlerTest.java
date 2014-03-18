@@ -24,10 +24,10 @@ public class UnlinkedFilesCrawlerTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		fileInDatabase = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfInDatabase.pdf");
-		fileNotInDatabase = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
+		fileInDatabase = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfInDatabase.pdf");
+		fileNotInDatabase = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
 		
-		existingFolder = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder");
+		existingFolder = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder");
 		notExistingFolder = new File("notexistingfolder");
 	}
 	

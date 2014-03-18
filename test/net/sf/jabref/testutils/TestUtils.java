@@ -12,7 +12,7 @@ import net.sf.jabref.JabRef;
  */
 public class TestUtils {
 
-	public static final String PATH_TO_TEST_BIBTEX = "src/tests/net/sf/jabref/bibtexFiles/test.bib";	
+	public static final String PATH_TO_TEST_BIBTEX = "src/resources/tests/net/sf/jabref/bibtexFiles/test.bib";
 
 	/**
 	 * Returns a full configured and initialized instance of JabRef. As long as

@@ -33,13 +33,13 @@ public class EntryFromFileCreatorManagerTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		existingFile = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfInDatabase.pdf");
-		notExistingFile = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
+		existingFile = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfInDatabase.pdf");
+		notExistingFile = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
 		
-		pdfNotInDatabase = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
+		pdfNotInDatabase = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
 
 		manager1 = new EntryFromFileCreatorManager();
-		ParserResult result = BibtexParser.parse(new FileReader("src/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
+		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
 		database = result.getDatabase();
 	}
 

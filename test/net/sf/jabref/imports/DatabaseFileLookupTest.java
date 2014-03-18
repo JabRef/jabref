@@ -51,14 +51,14 @@ public class DatabaseFileLookupTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		ParserResult result = BibtexParser.parse(new FileReader("src/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
+		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
 		database = result.getDatabase();
 		entries = database.getEntries();
 		
 		entry1 = database.getEntryByKey("entry1");
 		entry2 = database.getEntryByKey("entry2");
 		
-		pdfDirectory = new File("src/tests/net/sf/jabref/imports/unlinkedFilesTestFolder");
+		pdfDirectory = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder");
 		
 		fileInDatabase = new File(pdfDirectory.getPath() + File.separator + "pdfInDatabase.pdf");
 		fileNotInDatabase = new File(pdfDirectory.getPath() + File.separator + "pdfNotInDatabase.pdf");

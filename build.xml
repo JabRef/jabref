@@ -64,8 +64,8 @@
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
 	<property name="src.tests" value="test" />
-	<property name="plugin.dir" value="src/plugins/" />
-	<property name="txt.dir" value="src/txt" />
+	<property name="plugin.dir" value="src/resources/plugins/" />
+	<property name="txt.dir" value="src/resources/txt" />
 	<property name="java.dir" value="${src.dir}/java" />
 	<property name="osx.dir" value="${src.dir}/osx" />
 	<property name="win.installer.dir" value="${src.dir}/windows/nsis" />

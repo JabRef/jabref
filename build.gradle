@@ -15,7 +15,7 @@ sourceSets {
             srcDir "src/java"
         }
         resources {
-            srcDirs = ["src"]
+            srcDirs = ["src/resources"]
         }
     }
     test {
@@ -99,7 +99,7 @@ task generatePluginSource(type: JavaExec) {
     group = 'JabRef'
     description = 'Generates _JabRefPlugin.java with JPF.'
 
-    ext.pluginsDir = "src/plugins"
+    ext.pluginsDir = "src/resources/plugins"
 
     inputs.dir file(ext.pluginsDir)
     outputs.file file("src/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
