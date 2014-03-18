@@ -30,7 +30,7 @@ import net.sf.jabref.imports.*;
 public class SearchManagerNoGUI {
     private String searchTerm;
     private BibtexDatabase database, base=null;
-    Hashtable searchOptions = new Hashtable();
+    Hashtable<String,String> searchOptions = new Hashtable<String,String> ();
     
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;
@@ -61,10 +61,9 @@ public class SearchManagerNoGUI {
             return base;
         }
         
-        Collection entries = database.getEntries();
-        Vector matchEntries = new Vector();
-        for (Object entry1 : entries) {
-            BibtexEntry entry = (BibtexEntry) entry1;
+        Collection<BibtexEntry> entries = database.getEntries();
+        Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
+        for (BibtexEntry entry : entries) {
             boolean hit = searchRules.applyRule(searchOptions, entry) > 0;
             entry.setSearchHit(hit);
             if (hit) {
@@ -73,9 +72,8 @@ public class SearchManagerNoGUI {
             }
         }
         
-        if (matchEntries != null) {
-            base = ImportFormatReader.createDatabase(matchEntries);
-        }
+        base = ImportFormatReader.createDatabase(matchEntries);
+
         return base; 
     }//end getDBfromMatches()
     

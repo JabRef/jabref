@@ -112,7 +112,7 @@ public class ExportCustomizationDialog extends JDialog {
     help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
                                           "Help"));
 
-    EventTableModel tableModel = new EventTableModel(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
+    EventTableModel<String[]> tableModel = new EventTableModel<String[]>(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
     table = new JTable(tableModel);
     TableColumnModel cm = table.getColumnModel();
     cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
@@ -155,7 +155,7 @@ public class ExportCustomizationDialog extends JDialog {
     new FocusRequester(table);
   }
 
-  class ExportTableFormat implements TableFormat<String[]> {
+  static class ExportTableFormat implements TableFormat<String[]> {
 
       public Object getColumnValue(String[] strings, int i) {
           return strings[i];

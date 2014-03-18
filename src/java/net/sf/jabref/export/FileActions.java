@@ -380,18 +380,16 @@ public class FileActions {
             List<Comparator<BibtexEntry>> comparators = getSaveComparators(true);
 
             // Use glazed lists to get a sorted view of the entries:
-            BasicEventList entryList = new BasicEventList();
-            SortedList sorter = new SortedList(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
+            BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+            SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
 
             if ((bes != null) && (bes.length > 0)) {
-                for (BibtexEntry be1 : bes) {
-                    sorter.add(be1);
-                }
+                Collections.addAll(sorter, bes);
             }
 
             FieldFormatter ff = new LatexFieldFormatter();
 
-            for (BibtexEntry aSorter : (Iterable<BibtexEntry>) sorter) {
+            for (BibtexEntry aSorter : sorter) {
                 be = (aSorter);
 
                 // Check if we must write the type definition for this
@@ -484,8 +482,8 @@ public class FileActions {
 
         // Use glazed lists to get a sorted view of the entries:
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
-        BasicEventList entryList = new BasicEventList();
-        SortedList sorter = new SortedList(entryList, comparatorStack);
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+        SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, comparatorStack);
 
         if (keySet == null) {
             keySet = database.getKeySet();

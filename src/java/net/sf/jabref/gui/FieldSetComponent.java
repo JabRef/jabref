@@ -40,10 +40,10 @@ import net.sf.jabref.Util;
 public class FieldSetComponent extends JPanel implements ActionListener {
 
     protected Set<ActionListener> additionListeners = new HashSet<ActionListener>();
-    protected JList list;
+    protected JList<String> list;
     protected JScrollPane sp = null;
-    protected DefaultListModel listModel;
-    protected JComboBox sel;
+    protected DefaultListModel<String> listModel;
+    protected JComboBox<String> sel;
     protected JTextField input;
     protected JLabel title = null;
     protected JButton add, remove, up=null, down=null;
@@ -73,13 +73,13 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         this.forceLowerCase = forceLowerCase;                
         add = new JButton(Globals.lang(addText));
         remove = new JButton(Globals.lang(removeText));
-        listModel = new DefaultListModel();
+        listModel = new DefaultListModel<String>();
         if (title != null)
             this.title = new JLabel(title);
         
         for (String field : fields)
             listModel.addElement(field);
-        list = new JList(listModel);
+        list = new JList<String>(listModel);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         // Set up GUI:
         add.addActionListener(this);
@@ -136,7 +136,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         con.gridwidth = 3;
         con.weightx = 1;
         if (preset != null) {
-            sel = new JComboBox(preset.toArray());
+            sel = new JComboBox<String>(preset.toArray(new String[0]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);
@@ -192,7 +192,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     }
     
     public void setFields(List<String> fields) {
-        DefaultListModel newListModel = new DefaultListModel();
+        DefaultListModel<String> newListModel = new DefaultListModel<String>();
         for (String field : fields)
             newListModel.addElement(field);
         this.listModel = newListModel;
@@ -260,10 +260,9 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     /**
      * Return the current list.
      */
-    @SuppressWarnings("unchecked")
 	public List<String> getFields() {
-        Object[] o = listModel.toArray();
-        return (List)java.util.Arrays.asList(o);
+        String[] o = (String[]) listModel.toArray();
+        return java.util.Arrays.asList(o);
     }
     
     /**
@@ -297,7 +296,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         int oldIdx = list.getSelectedIndex();
         if  (oldIdx < 0)
             return;
-        Object o = listModel.get(oldIdx);
+        String o = listModel.get(oldIdx);
         // Compute the new index:
         int newInd = Math.max(0, Math.min(listModel.size()-1, oldIdx+dy));
         listModel.remove(oldIdx);

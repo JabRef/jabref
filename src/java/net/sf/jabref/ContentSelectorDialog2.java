@@ -302,7 +302,7 @@ public class ContentSelectorDialog2 extends JDialog {
         // For each field name, store the values:
         if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
             continue loop;
-        DefaultListModel lm = wordListModels.get(fieldName);
+        DefaultListModel<String> lm = wordListModels.get(fieldName);
         int start = 0;
         // Avoid storing the <new word> marker if it is there:
         if (lm.size() > 0)
@@ -401,9 +401,9 @@ public class ContentSelectorDialog2 extends JDialog {
 		}
 	}
 
-    private int findPos(DefaultListModel lm, String item) {
+    private int findPos(DefaultListModel<String> lm, String item) {
 	for (int i=0; i<lm.size(); i++) {
-	    String s = (String)lm.get(i);
+	    String s = lm.get(i);
 	    if (item.compareToIgnoreCase(s) < 0) { // item precedes s
 		return i;
 	    }

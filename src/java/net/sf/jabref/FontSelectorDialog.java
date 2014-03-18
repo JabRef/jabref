@@ -220,7 +220,7 @@ public class FontSelectorDialog extends JDialog {
                 sizeList.setSelectedValue(String.valueOf(font.getSize()),true);
                 sizeField.setText(String.valueOf(font.getSize()));
                 styleList.setSelectedIndex(font.getStyle());
-                styleField.setText((String)styleList.getSelectedValue());
+                styleField.setText(styleList.getSelectedValue());
 
                 ListHandler listHandler = new ListHandler();
                 familyList.addListSelectionListener(listHandler);
@@ -354,7 +354,7 @@ public class FontSelectorDialog extends JDialog {
                 }
         }
 
-        private JPanel createTextFieldAndListPanel(String label,JTextField textField, JList list){
+        private JPanel createTextFieldAndListPanel(String label,JTextField textField, JList<String> list){
                 GridBagLayout layout = new GridBagLayout();
                 JPanel panel = new JPanel(layout);
 

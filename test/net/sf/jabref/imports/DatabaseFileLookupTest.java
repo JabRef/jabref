@@ -107,9 +107,9 @@ public class DatabaseFileLookupTest extends TestCase {
 		/**
 		 * Select all nodes manually.
 		 */
-		Enumeration enumeration = treeNode.breadthFirstEnumeration();
+		Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
 		while(enumeration.hasMoreElements()) {
-			CheckableTreeNode nextElement = (CheckableTreeNode) enumeration.nextElement();
+			CheckableTreeNode nextElement = enumeration.nextElement();
 			nextElement.setSelected(true);
 		}
 		
@@ -122,12 +122,12 @@ public class DatabaseFileLookupTest extends TestCase {
 	
 	/**
 	 * Connector-Method for the private method
-	 * {@link FindUnlinkedFilesDialog#getFileListFromNode()} of the dialog
+	 * {@link FindUnlinkedFilesDialog#getFileListFromNode(net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode)} of the dialog
 	 * {@link FindUnlinkedFilesDialog}. <br>
 	 * <br>
 	 * This method uses <b>reflection</b> to get access to that method.
 	 * 
-	 * @see FindUnlinkedFilesDialog#getFileListFromNode()
+	 * @see FindUnlinkedFilesDialog#getFileListFromNode(net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode)
 	 */
 	private List<File> getFileListFromNode(CheckableTreeNode node) throws Exception {
 		return invokeMethod("getFileListFromNode", FindUnlinkedFilesDialog.class, node);

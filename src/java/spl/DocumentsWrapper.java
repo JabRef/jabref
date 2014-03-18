@@ -33,8 +33,8 @@ public class DocumentsWrapper {
         this.xmlDocuments = xmlDocuments;
     }
 
-    public List<Vector> getDocuments(){
-        List<Vector> documents = new ArrayList<Vector>();
+    public List<Vector<String>> getDocuments(){
+        List<Vector<String>> documents = new ArrayList<Vector<String>>();
         //List<XmlDocument> xmlDocuments = this.xmlDocuments.getDocuments();
         //for(XmlDocument xmlDocument : xmlDocuments){
         	Document xmlDocument = xmlDocuments;

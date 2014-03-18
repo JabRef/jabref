@@ -509,7 +509,7 @@ public class PluginInstaller {
     }
     
   
-    public static class NameAndVersion implements Comparable {
+    public static class NameAndVersion implements Comparable<NameAndVersion> {
         String name;
         VersionNumber version;
         int status = 0;
@@ -524,8 +524,7 @@ public class PluginInstaller {
             this.file = file;
         }
         
-        public int compareTo(Object o) {
-            NameAndVersion oth = (NameAndVersion)o;
+        public int compareTo(NameAndVersion oth) {
             if (!name.equals(oth.name))
                 return name.compareTo(oth.name);
             else {
@@ -547,7 +546,7 @@ public class PluginInstaller {
         }
     }
             
-    static class VersionNumber implements Comparable {
+    static class VersionNumber implements Comparable<VersionNumber> {
         public static final VersionNumber ZERO = new VersionNumber("0");
         List<Integer> digits;
         public VersionNumber(String number) {
@@ -564,9 +563,7 @@ public class PluginInstaller {
             }
         }
 
-        public int compareTo(Object o) {
-            VersionNumber oth = (VersionNumber)o;
-           
+        public int compareTo(VersionNumber oth) {
             for (int i=0; i<Math.min(digits.size(), oth.digits.size()); i++) {
                 if (!digits.get(i).equals(oth.digits.get(i)))
                     return oth.digits.get(i)-digits.get(i);
@@ -586,7 +583,7 @@ public class PluginInstaller {
             return sb.toString();
         }
         
-        public boolean equals(Object o) {
+        public boolean equals(VersionNumber o) {
             return compareTo(o) == 0;
         }
     }

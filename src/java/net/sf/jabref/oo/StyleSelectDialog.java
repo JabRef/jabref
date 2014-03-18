@@ -52,11 +52,11 @@ public class StyleSelectDialog {
 
     public static final String STYLE_FILE_EXTENSION = ".jstyle";
     private JabRefFrame frame;
-    private EventList<OOBibStyle> styles, sortedStyles;
+    private EventList<OOBibStyle> styles;
     private JDialog diag;
     private JTable table;
     private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
-    private EventTableModel tableModel;
+    private EventTableModel<OOBibStyle> tableModel;
     private EventSelectionModel<OOBibStyle> selectionModel;
     private JPopupMenu popup = new JPopupMenu();
     private JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
@@ -137,7 +137,7 @@ public class StyleSelectDialog {
                 if (i == -1)
                     return;
                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
-                String link = ((OOBibStyle)tableModel.getElementAt(i)).getFile().getPath();
+                String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
                     if (type != null)
                         Util.openExternalFileAnyFormat(new MetaData(), link, type);
@@ -154,7 +154,7 @@ public class StyleSelectDialog {
         diag = new JDialog(frame, Globals.lang("Styles"), true);
 
         styles = new BasicEventList<OOBibStyle>();
-        sortedStyles = new SortedList<OOBibStyle>(styles);
+        EventList<OOBibStyle> sortedStyles = new SortedList<OOBibStyle>(styles);
 
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
@@ -333,7 +333,7 @@ public class StyleSelectDialog {
         if (initSelection != null) {
             boolean found = false;
             for (int i=0; i < table.getRowCount(); i++) {
-                if (((OOBibStyle)tableModel.getElementAt(i)).getFile().getPath().
+                if (tableModel.getElementAt(i).getFile().getPath().
                         equals(initSelection)) {
                     table.setRowSelectionInterval(i,i);
                     found = true;
@@ -492,7 +492,7 @@ public class StyleSelectDialog {
             URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath) :
                     JabRef.class.getResource(OpenOfficePanel.defaultNumericalStylePath);
             BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream()));
-            String line = null;
+            String line;
             StringBuilder sb = new StringBuilder();
             while ((line = r.readLine()) != null) {
                 sb.append(line);
