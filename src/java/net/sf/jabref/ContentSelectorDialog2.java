@@ -317,7 +317,7 @@ public class ContentSelectorDialog2 extends JDialog {
             } else
                 data.clear();
             for (int wrd = start; wrd < lm.size(); wrd++) {
-                String word = (String) lm.get(wrd);
+                String word = lm.get(wrd);
                 data.add(word);
             }
             if (newField)
