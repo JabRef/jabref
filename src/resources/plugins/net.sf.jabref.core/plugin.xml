@@ -6,7 +6,7 @@
 	<attributes>
 		<!-- output the resulting code directly into the source directory -->
 		<attribute id="jpfcodegen">
-			<attribute id="targetDir" value="../../java/" />
+			<attribute id="targetDir" value="../../../java/" />
 		</attribute>
 
 	</attributes>
