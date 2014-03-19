@@ -1070,7 +1070,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals("Huey Duck", dcSchema.getContributors().get(0));
 			assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
 			assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-			assertEquals("Inproceedings", dcSchema.getTypes().get(0));
+			assertEquals("InProceedings", dcSchema.getTypes().get(0));
 			assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema
 					.getRelationships().get(0));
 			assertEquals("peanut", dcSchema.getSubjects().get(0));
@@ -1151,7 +1151,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals("Huey Duck", dcSchema.getContributors().get(0));
 			assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
 			assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-			assertEquals("Inproceedings", dcSchema.getTypes().get(0));
+			assertEquals("InProceedings", dcSchema.getTypes().get(0));
 			assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema
 					.getRelationships().get(0));
 			assertEquals("peanut", dcSchema.getSubjects().get(0));
