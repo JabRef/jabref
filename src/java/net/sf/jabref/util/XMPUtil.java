@@ -601,7 +601,7 @@ public class XMPUtil {
 		boolean useXmpPrivacyFilter =
 			prefs.getBoolean("useXmpPrivacyFilter");
 		// Fields for which not to write XMP data later on:
-		TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilters")));
+		TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
 		// Set all the values including key and entryType
 		

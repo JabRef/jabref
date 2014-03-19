@@ -1,9 +1,7 @@
 package net.sf.jabref.search;
 
 import junit.framework.TestCase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.search.BasicSearch;
 
 /**
@@ -12,6 +10,7 @@ import net.sf.jabref.search.BasicSearch;
 public class BasicSearchTest extends TestCase {
 
     public void testBasicSearchParsing() {
+        Globals.prefs = JabRefPreferences.getInstance();
 
         BibtexEntry be = makeBibtexEntry();
         BasicSearch bsCaseSensitive = new BasicSearch(true, false);

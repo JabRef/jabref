@@ -100,6 +100,8 @@ public class JabRefPreferences {
 
     private static final char[][] VALUE_DELIMITERS
             = new char[][]{{'"', '"'}, {'{', '}'}};
+    public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
+    public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
@@ -304,8 +306,8 @@ public class JabRefPreferences {
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
-        defaults.put("xmpPrivacyFilters", "pdf;timestamp;keywords;owner;note;review");
-        defaults.put("useXmpPrivacyFilter", Boolean.FALSE);
+        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
+        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put("numberColWidth", GUIGlobals.NUMBER_COL_LENGTH);
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
@@ -676,7 +678,9 @@ public class JabRefPreferences {
     }
 
     public String get(String key) {
-        return prefs.get(key, (String) defaults.get(key));
+        String result = prefs.get(key, (String) defaults.get(key));
+        //System.out.println("READ PREF [" + key + "]=" + result);
+        return result;
     }
 
     public String get(String key, String def) {
@@ -716,6 +720,7 @@ public class JabRefPreferences {
     }
 
     public void put(String key, String value) {
+        //System.out.println("WRITE PREF [" + key + "]=" + value);
         prefs.put(key, value);
     }
 
@@ -751,7 +756,7 @@ public class JabRefPreferences {
         }
 
         if (value.length > 0) {
-            StringBuffer linked = new StringBuffer();
+            StringBuilder linked = new StringBuilder();
             for (int i = 0; i < value.length - 1; i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(";");

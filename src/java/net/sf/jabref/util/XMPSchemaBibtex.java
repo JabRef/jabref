@@ -265,7 +265,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 		if (prefs.getBoolean("useXmpPrivacyFilter")) {
-			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilters")));
+			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 			fields.removeAll(filters);
 		}
 		

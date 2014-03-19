@@ -13,12 +13,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.xml.transform.TransformerException;
 
@@ -148,7 +143,8 @@ public class XMPUtilTest extends TestCase {
 				+ "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
 				+ "  title = {Effective work practices for floss development: A model and propositions},\n"
 				+ "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
-				+ "  year = {2005},\n" + "  owner = {oezbek},\n"
+				+ "  year = {2005},\n"
+                + "  owner = {oezbek},\n"
 				+ "  timestamp = {2006.05.29},\n"
 				+ "  url = {http://james.howison.name/publications.html}}\n";
 	}
@@ -264,7 +260,7 @@ public class XMPUtilTest extends TestCase {
 		prefs = JabRefPreferences.getInstance();
 
 		use = prefs.getBoolean("useXmpPrivacyFilter");
-		privacyFilters = prefs.getStringArray("xmpPrivacyFilters");
+		privacyFilters = prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS);
 
 		// The code assumes privacy filters to be off
 		prefs.putBoolean("useXmpPrivacyFilter", false);
@@ -283,7 +279,7 @@ public class XMPUtilTest extends TestCase {
 		pdfFile.delete();
 
 		prefs.putBoolean("useXmpPrivacyFilter", use);
-		prefs.putStringArray("xmpPrivacyFilter", privacyFilters);
+		prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
 	}
 
 	/**
@@ -347,37 +343,28 @@ public class XMPUtilTest extends TestCase {
 	 */
 	public void testPrivacyFilter() throws IOException, TransformerException {
 
-		{ // First set:
+		{
+            BibtexEntry e = t1BibtexEntry();
+
 			prefs.putBoolean("useXmpPrivacyFilter", true);
-			prefs.putStringArray("xmpPrivacyFilter",
-					new String[] { "author;title;note" });
+            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, new String[]{"author", "title", "note"});
 
-			BibtexEntry e = t1BibtexEntry();
-
-			XMPUtil.writeXMP(pdfFile, e, null);
+            XMPUtil.writeXMP(pdfFile, e, null);
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
 			BibtexEntry x = l.get(0);
 
-			Set<String> ts = x.getAllFields();
+            Set<String> expectedFields = new HashSet<String>(Arrays.asList("bibtexkey", "booktitle",
+                    "owner", "timestamp", "url", "year"));
 
-			assertEquals(8, ts.size());
-
-			ts.contains("bibtextype");
-			ts.contains("bibtexkey");
-			ts.contains("booktitle");
-			ts.contains("year");
-			ts.contains("owner");
-			ts.contains("timestamp");
-			ts.contains("year");
-			ts.contains("url");
+			assertEquals(expectedFields, x.getAllFields());
 		}
 		{ // First set:
 			prefs.putBoolean("useXmpPrivacyFilter", true);
 			prefs
 					.putStringArray(
-							"xmpPrivacyFilter",
+                            JabRefPreferences.XMP_PRIVACY_FILTERS,
 							new String[] { "author;title;note;booktitle;year;owner;timestamp" });
 
 			BibtexEntry e = t1BibtexEntry();

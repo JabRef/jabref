@@ -198,7 +198,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 	 */
 	public void setValues() {
 		tableRows.clear();
-		String[] names = JabRefPreferences.getInstance().getStringArray("xmpPrivacyFilters");
+		String[] names = JabRefPreferences.getInstance().getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS);
         Collections.addAll(tableRows, names);
 		rowCount = tableRows.size() + 5;
 
@@ -223,7 +223,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 		// table setup table. This needs to be done either if changes were made, or
         // if the checkbox is checked and no field values have been stored previously: 
         if (tableChanged ||
-                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey("xmpPrivacyFilters"))) {
+                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
 
 			// First we remove all rows with empty names.
 			for (int i = tableRows.size() - 1; i >= 0; i--) {
@@ -232,7 +232,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 			}
 
 			// Finally, we store the new preferences.
-			JabRefPreferences.getInstance().putStringArray("xmpPrivacyFilters",
+			JabRefPreferences.getInstance().putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS,
 				tableRows.toArray(new String[tableRows.size()]));
 		}
 
