@@ -5,8 +5,5 @@ jdk:
 before_install:
   - chmod +x gradlew
 
-install:
-  - TERM=dumb travis_retry ./gradlew assemble
-
 script:
-  - TERM=dumb ./gradlew check --stacktrace
+  - TERM=dumb ./gradlew assemble
