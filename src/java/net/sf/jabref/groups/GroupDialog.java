@@ -33,6 +33,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FieldContentSelector;
@@ -86,8 +87,7 @@ class GroupDialog extends JDialog {
                         Globals.lang("Regular Expression"));
         // for all types
         private JButton m_ok = new JButton(Globals.lang("Ok"));
-        private JButton m_cancel = new JButton(Globals.lang("Cancel"));
-        private JPanel m_optionsPanel = new JPanel();
+    private JPanel m_optionsPanel = new JPanel();
         private JLabel m_description = new JLabel() {
                 public Dimension getPreferredSize() {
                         Dimension d = super.getPreferredSize();
@@ -100,9 +100,7 @@ class GroupDialog extends JDialog {
 
         private boolean m_okPressed = false;
 
-        private final JabRefFrame m_parent;
-
-        private final BasePanel m_basePanel;
+    private final BasePanel m_basePanel;
 
         private AbstractGroup m_resultingGroup;
 
@@ -127,7 +125,7 @@ class GroupDialog extends JDialog {
                         AbstractGroup editedGroup) {
                 super(jabrefFrame, Globals.lang("Edit group"), true);
                 m_basePanel = basePanel;
-                m_parent = jabrefFrame;
+            JabRefFrame m_parent = jabrefFrame;
                 m_editedGroup = editedGroup;
 
                 // set default values (overwritten if editedGroup != null)
@@ -181,7 +179,8 @@ class GroupDialog extends JDialog {
                 ButtonBarBuilder builderBP = new ButtonBarBuilder();
                 builderBP.addGlue();
                 builderBP.addButton(m_ok);
-                builderBP.addButton(m_cancel);
+            JButton m_cancel = new JButton(Globals.lang("Cancel"));
+            builderBP.addButton(m_cancel);
                 builderBP.addGlue();
                 builderBP.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
@@ -193,7 +192,7 @@ class GroupDialog extends JDialog {
                                                 + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
                 DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
-                builderAll.setDefaultDialogBorder();
+                builderAll.border(Borders.DIALOG);
                 builderAll.appendSeparator(Globals.lang("General"));
                 builderAll.nextLine();
                 builderAll.nextLine();
@@ -497,7 +496,7 @@ class GroupDialog extends JDialog {
 
         protected String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sa.length; ++i) {
             if (i > 0)
                 sb.append("<br>");
@@ -560,7 +559,6 @@ class GroupDialog extends JDialog {
                 case AbstractGroup.INDEPENDENT:
                 default:
                         m_independentButton.setSelected(true);
-                        return;
                 }
         }
 

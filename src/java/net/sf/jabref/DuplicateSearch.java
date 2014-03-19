@@ -22,7 +22,6 @@
 package net.sf.jabref;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.SwingUtilities;
@@ -49,7 +48,7 @@ public void run() {
   autoRemoveExactDuplicates = false;
   panel.output(Globals.lang("Searching for duplicates..."));
   Object[] keys = panel.database.getKeySet().toArray();
-  if ((keys == null) || (keys.length < 2))
+  if ((keys.length < 2))
     return;
   bes = new BibtexEntry[keys.length];
   for (int i=0; i<keys.length; i++)
@@ -74,7 +73,7 @@ public void run() {
          {
            duplicates.wait();
          }
-         catch (Exception e) {}
+         catch (Exception ignored) {}
       }
     } else  // duplicates found
     {
@@ -123,8 +122,7 @@ public void run() {
         public void run() {
             // Now, do the actual removal:
             if (toRemove.size() > 0) {
-                for (Iterator<BibtexEntry> iterator = toRemove.iterator(); iterator.hasNext();) {
-                    BibtexEntry entry = iterator.next();
+                for (BibtexEntry entry : toRemove) {
                     panel.database.removeEntry(entry.getId());
                     ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
                 }

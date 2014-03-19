@@ -98,20 +98,20 @@ public class BibtexEntry
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-	private static final String getFieldDisplayName(String field) {
+	private static String getFieldDisplayName(String field) {
         if (field.length() == 0) {
             // hard coded "UNKNOWN" is assigned to a field without any name
             field = "UNKNOWN";
         }
 
         String suffix = "";
-		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
+		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
 			for (int i = maxFieldLength - field.length(); i > 0; i--)
 				suffix += " ";
 		}
 
 		String res;
-		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
+		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
 			if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
 				res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
 			} else {
@@ -357,8 +357,8 @@ public class BibtexEntry
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     protected boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
-        for (int i = 0; i < fields.length; i++) {
-            if (BibtexDatabase.getResolvedField(fields[i], this, database) == null) {
+        for (String field : fields) {
+            if (BibtexDatabase.getResolvedField(field, this, database) == null) {
                 return false;
             }
         }
@@ -367,9 +367,9 @@ public class BibtexEntry
     }
 
     protected boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
-        for (int i = 0; i < fields.length; i++) {
-            String value = BibtexDatabase.getResolvedField(fields[i], this, database);
-            if ((value != null) && value.length()>0) {
+        for (String field : fields) {
+            String value = BibtexDatabase.getResolvedField(field, this, database);
+            if ((value != null) && value.length() > 0) {
                 return true;
             }
         }
@@ -424,10 +424,10 @@ public class BibtexEntry
         String[] s = getRequiredFields();
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
-            for (int i=0; i<s.length; i++) {
-                if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten, false);
-                    written.put(s[i], null);
+            for (String value : s) {
+                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
+                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
+                    written.put(value, null);
                 }
             }
         }
@@ -437,11 +437,11 @@ public class BibtexEntry
         previous = false;
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
-            for (int i=0; i<s.length; i++) {
-                if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+            for (String value : s) {
+                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
                     //writeField(s[i], out, ff);
-                    hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten, hasWritten && first);
-                    written.put(s[i], null);
+                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, hasWritten && first);
+                    written.put(value, null);
                     first = false;
                     previous = true;
                 }

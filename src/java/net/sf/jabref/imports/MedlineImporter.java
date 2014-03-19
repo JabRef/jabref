@@ -65,7 +65,7 @@ public class MedlineImporter extends ImportFormat {
         int i=0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-			if (str.toLowerCase().indexOf("<pubmedarticle>") >= 0)
+			if (str.toLowerCase().contains("<pubmedarticle>"))
 				return true;
 
             i++;

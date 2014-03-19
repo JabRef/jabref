@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -28,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -136,7 +136,7 @@ public class CleanUpAction extends AbstractWorker {
 
 		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
-        builder.setDefaultDialogBorder();
+        builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
         builder.add(cleanUpHTML, cc.xyw(1,1,2));
         builder.add(cleanUpUnicode, cc.xyw(1,2,2));
@@ -350,8 +350,8 @@ public class CleanUpAction extends AbstractWorker {
         		String newValue = Util.getDOI(doiFieldValue);
         		ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
         		bes.setField("doi", newValue);
-        	};
-        	if (Util.checkForPlainDOI(doiFieldValue)) {
+        	}
+            if (Util.checkForPlainDOI(doiFieldValue)) {
         		// DOI field seems to contain DOI
         		// cleanup note, url, ee field
         		// we do NOT copy values to the DOI field as the DOI field contains a DOI!
@@ -387,12 +387,12 @@ public class CleanUpAction extends AbstractWorker {
 		String newValue = oldValue;
 		try {
                     int month = Integer.parseInt(newValue);
-                    newValue = new StringBuffer("#").append(Globals.MONTHS[month - 1]).append('#').toString();
+                    newValue = "#" + Globals.MONTHS[month - 1] + '#';
                 } catch (NumberFormatException e) {
                     // Much more liberal matching covering most known abbreviations etc.
                     String testString = newValue.substring(0, 3).toLowerCase();
                     if (Globals.MONTH_STRINGS.containsKey(testString)) {
-                        newValue = new StringBuffer("#").append(testString).append('#').toString();
+                        newValue = "#" + testString + '#';
         	}
     	}
     	if (!oldValue.equals(newValue)) {
@@ -561,18 +561,18 @@ public class CleanUpAction extends AbstractWorker {
 	 */
         private void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
         final String[] fields = {"title", "author", "abstract"};
-        for(int i=0;i<fields.length;i++) {
-            String oldValue = entry.getField(fields[i]);
-            if (oldValue == null) {
-                return;
+            for (String field : fields) {
+                String oldValue = entry.getField(field);
+                if (oldValue == null) {
+                    return;
+                }
+                final HTMLConverter htmlConverter = new HTMLConverter();
+                String newValue = htmlConverter.formatUnicode(oldValue);
+                if (!oldValue.equals(newValue)) {
+                    entry.setField(field, newValue);
+                    ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                }
             }
-            final HTMLConverter htmlConverter = new HTMLConverter();
-            String newValue = htmlConverter.formatUnicode(oldValue);
-            if (!oldValue.equals(newValue)) {
-                entry.setField(fields[i], newValue);
-                ce.addEdit(new UndoableFieldChange(entry, fields[i], oldValue, newValue));
-            }   
-        }
     }
 
 	/**

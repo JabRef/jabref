@@ -31,7 +31,6 @@ import java.io.File;
 public class AutoSaveManager {
     private JabRefFrame frame;
     private Timer t = null;
-    private TimerTask task = null;
 
     public AutoSaveManager(JabRefFrame frame) {
 
@@ -39,7 +38,7 @@ public class AutoSaveManager {
     }
 
     public void startAutoSaveTimer() {
-        task = new AutoSaveTask();
+        TimerTask task = new AutoSaveTask();
         t = new Timer();
         long interval = (long)(60000*Globals.prefs.getInt("autoSaveInterval"));
         t.scheduleAtFixedRate(task, interval, interval);

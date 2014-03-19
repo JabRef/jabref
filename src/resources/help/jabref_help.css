@@ -1,0 +1,42 @@
+/* CSS for JabRef */
+
+body { 
+	font-family: Arial, sans-serif; 
+	font-size: 12pt;
+	color: #393939;
+	margin: 0px;
+	padding: 20px 50px;
+}
+
+h1 { 	
+	font-size: 18pt; 
+	padding: 2px 5px; 
+	margin-top: 0px; 
+
+	color: #3D3C5E;
+	background-color: #D8D4EC; 
+
+	border-width: 1px;
+	border-style: solid;
+	border-color: #3D3C5E;
+
+}
+
+h2 { font-size: 14pt; margin-top: 15px ; margin-bottom: 5px; color: #3D3C5E; }
+h3 { font-size: 12pt; margin-top: 10px ; margin-bottom: 5px; }
+
+p { text-align: justify; margin-top: 0px; margin-bottom: 10px; line-height: 15pt; }
+
+code { font-family: Courier, monospace; font-size: 12pt; background-color: #f3f2fa; }
+
+ul, dl { margin-top: 0px; }
+li, dd { text-align: justify; margin-top: 0px; margin-bottom: 3px; } 
+
+ul { margin-left: 10px; }
+
+blockquote { background-color: #f3f2fa; padding: 5px; }
+
+a, a:visited { text-decoration: underline; color: #4f5f8f; }
+
+#aboutpage { text-align: center; }
+#logo { margin-bottom: 10px; }

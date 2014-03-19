@@ -15,7 +15,6 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -225,7 +224,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             TableEntry entry = entries.get(row);
-            entry.setWanted(((Boolean) value).booleanValue());
+            entry.setWanted((Boolean) value);
             entries.getReadWriteLock().writeLock().unlock();
         }
     }

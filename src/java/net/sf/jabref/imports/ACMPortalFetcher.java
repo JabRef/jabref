@@ -35,7 +35,6 @@ import net.sf.jabref.gui.FetcherPreviewDialog;
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
 	private ImportInspector dialog = null;
-	private OutputPrinter status;
     private final HTMLConverter htmlConverter = new HTMLConverter();
     final CaseKeeper caseKeeper = new CaseKeeper();
     final UnitFormatter unitFormatter = new UnitFormatter();
@@ -57,7 +56,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final int perPage = 20;
     private static final int MAX_FETCH = perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 200;
-    private int hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     
     // user settings
@@ -78,7 +76,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Pattern titlePattern = Pattern.compile("<A HREF=.*?\">([^<]*)</A>");
     private static final Pattern monthYearPattern = Pattern.compile("([A-Za-z]+ [0-9]{4})");
     private static final Pattern absPattern = Pattern.compile("<div .*?>(.*?)</div>");
-    private FetcherPreviewDialog preview;
 
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -98,13 +95,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview, OutputPrinter status) {
-        this.preview = preview;
-        this.status = status;
+        FetcherPreviewDialog preview1 = preview;
+        OutputPrinter status1 = status;
         this.terms = query;
         piv = 0;
         shouldContinue = true;
-        parsed = 0;
-        unparseable = 0;
+        int parsed = 0;
+        int unparseable = 0;
         acmOrGuide = acmButton.isSelected();
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
@@ -116,7 +113,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             String page = getResults(url);
 
-            hits = getNumberOfHits(page, "Found", hitsPattern);
+            int hits = getNumberOfHits(page, "Found", hitsPattern);
 
 			int index = page.indexOf("Found");
 			if (index >= 0) {
@@ -136,7 +133,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             hits = getNumberOfHits(page, "Results", maxHitsPattern);
 
-            for (int i=0; i<hits; i++) {
+            for (int i=0; i< hits; i++) {
                 parse(page, 0, firstEntry, previews);
                 //address = makeUrl(firstEntry);
                 firstEntry += perPage;
@@ -169,37 +166,33 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
             boolean sel = selection.get(id);
             if (sel) {
-                try {
-                    BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
-                    if (entry != null) {
-                        // Convert from HTML and optionally add curly brackets around key words to keep the case
-                        String title = (String) entry.getField("title");
-                        
-                        if (title != null) {
-                            title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
-                            title = convertHTMLChars(title);
-                                        
-                            // Unit formatting
-                            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
-                                title = unitFormatter.format(title);
-                            }
-            
-                            // Case keeping
-                            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
-                                title = caseKeeper.format(title);
-                            }
-                            entry.setField("title", title);
+                BibtexEntry entry = downloadEntryBibTeX(id, fetchAbstract);
+                if (entry != null) {
+                    // Convert from HTML and optionally add curly brackets around key words to keep the case
+                    String title = entry.getField("title");
+
+                    if (title != null) {
+                        title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#","#");
+                        title = convertHTMLChars(title);
+
+                        // Unit formatting
+                        if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                            title = unitFormatter.format(title);
                         }
-                        
-                        String abstr = (String) entry.getField("abstract");
-                        if (abstr != null) {
-                            abstr = convertHTMLChars(abstr);
-                            entry.setField("abstract",abstr);
+
+                        // Case keeping
+                        if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                            title = caseKeeper.format(title);
                         }
-                        inspector.addEntry(entry);
+                        entry.setField("title", title);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                    String abstr = entry.getField("abstract");
+                    if (abstr != null) {
+                        abstr = convertHTMLChars(abstr);
+                        entry.setField("abstract",abstr);
+                    }
+                    inspector.addEntry(entry);
                 }
             }
         }
@@ -218,7 +211,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        StringBuffer sb = new StringBuffer(startUrl).append(searchUrlPart);
+        StringBuilder sb = new StringBuilder(startUrl).append(searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
         sb.append("&start=").append(String.valueOf(startIndex));
         sb.append(searchUrlPartII);
@@ -237,7 +230,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private void parse(String text, int startIndex, int firstEntryNumber, Map<String,JLabel> entries) {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
-        String entry;
         while (getNextEntryURL(text, piv, entryNumber, entries)) {
             entryNumber++;
         }
@@ -245,30 +237,21 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     private String getEntryBibTeXURL(String fullCitation, boolean abs) {
-        String bibAddr = "";
-       	String ID = "";
-
         // Get ID
         Matcher idMatcher = idPattern.matcher(fullCitation);
         if (idMatcher.find()) {
-            ID = idMatcher.group(1);
-            //System.out.println("To fetch: " + bibAddr);
+            return idMatcher.group(1);
         }
         else {
             System.out.println("Did not find ID in: " + fullCitation);
             return null;
         }
 
-        // fetch bibtex record
-        //bibAddr = bibtexUrl + ID + bibtexUrlEnd;
-        return ID;
-
     }
 
     private boolean getNextEntryURL(String allText, int startIndex, int entryNumber,
                                    Map<String,JLabel> entries) {
-        String toFind = new StringBuffer().append("<strong>")
-                .append(entryNumber).append("</strong><br>").toString();
+        String toFind = "<strong>" + entryNumber + "</strong><br>";
         int index = allText.indexOf(toFind, startIndex);
         int endIndex = allText.length();
 
@@ -329,7 +312,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 entries.put(link, preview);
                 return true;
 			} else {
-				System.out.printf("Citation Unmatched %d\n", entryNumber);
+				System.out.printf("Citation Unmatched %d%n", entryNumber);
 				System.out.printf(text);
                 return false;
 			}
@@ -339,7 +322,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) throws IOException {
+    private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) {
         	try {
         	    URL url = new URL(startUrl+bibtexUrl+ID+bibtexUrlEnd);
     			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -437,7 +420,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     public String getResults(URL source) throws IOException {
         
         InputStream in = source.openStream();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);
@@ -459,7 +442,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      */
     public String getResultsFromFile(File f) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while(true) {
             int bytesRead = in.read(buffer);

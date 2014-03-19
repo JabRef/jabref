@@ -206,16 +206,16 @@ public class BiblioscapeImporter extends ImportFormat {
           for (int i = 1; i >= 0 && bibtexType.equals("misc"); --i){
             if (type[i] == null) continue;
             type[i] = type[i].toLowerCase();
-            if (type[i].indexOf("article") >= 0) bibtexType = "article";
-            else if (type[i].indexOf("journal") >= 0) bibtexType = "article";
-            else if (type[i].indexOf("book section") >= 0) bibtexType = "inbook";
-            else if (type[i].indexOf("book") >= 0) bibtexType = "book";
-            else if (type[i].indexOf("conference") >= 0) bibtexType = "inproceedings";
-            else if (type[i].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
-            else if (type[i].indexOf("report") >= 0) bibtexType = "techreport";
-            else if (type[i].indexOf("thesis") >= 0
-                && type[i].indexOf("master") >= 0) bibtexType = "mastersthesis";
-            else if (type[i].indexOf("thesis") >= 0) bibtexType = "phdthesis";
+            if (type[i].contains("article")) bibtexType = "article";
+            else if (type[i].contains("journal")) bibtexType = "article";
+            else if (type[i].contains("book section")) bibtexType = "inbook";
+            else if (type[i].contains("book")) bibtexType = "book";
+            else if (type[i].contains("conference")) bibtexType = "inproceedings";
+            else if (type[i].contains("proceedings")) bibtexType = "inproceedings";
+            else if (type[i].contains("report")) bibtexType = "techreport";
+            else if (type[i].contains("thesis")
+                && type[i].contains("master")) bibtexType = "mastersthesis";
+            else if (type[i].contains("thesis")) bibtexType = "phdthesis";
           }
 
           // depending on bibtexType, decide where to place the titleRT and
@@ -243,9 +243,9 @@ public class BiblioscapeImporter extends ImportFormat {
               + (country != null ? ", " + country : ""));
 
           if (comments.size() > 0){ // set comment if present
-            StringBuffer s = new StringBuffer();
+            StringBuilder s = new StringBuilder();
             for (int i = 0; i < comments.size(); ++i)
-                s.append(i > 0 ? "; " : "").append(comments.elementAt(i).toString());
+                s.append(i > 0 ? "; " : "").append(comments.elementAt(i));
             hm.put("comment", s.toString());
           }
           BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,

@@ -83,15 +83,13 @@ public class FileActions {
         // First, make a Map of all entries:
         HashMap<String, BibtexString> remaining = new HashMap<String, BibtexString>();
         int maxKeyLength = 0;
-        for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
-            BibtexString string = i.next();
+        for (BibtexString string : strings) {
             remaining.put(string.getName(), string);
             maxKeyLength = Math.max(maxKeyLength, string.getName().length());
         }
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
-            for (Iterator<BibtexString> i = strings.iterator(); i.hasNext();) {
-                BibtexString bs = i.next();
+            for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && bs.getType() == t) {
                     writeString(fw, bs, remaining, maxKeyLength);
                 }
@@ -255,9 +253,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (Iterator<String> i = types.keySet().iterator(); i
-                        .hasNext();) {
-                    BibtexEntryType type = types.get(i.next());
+                for (String s : types.keySet()) {
+                    BibtexEntryType type = types.get(s);
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         tp.save(fw);
@@ -270,17 +267,8 @@ public class FileActions {
             fw.close();
         } catch (Throwable ex) {
             ex.printStackTrace();
-            try {
-                session.cancel();
-                // repairAfterError(file, backup, INIT_OK);
-            } catch (IOException e) {
-                // Argh, another error? Can we do anything?
-                e.printStackTrace();
-                throw new SaveException(ex.getMessage() + "\n"
-                        + Globals.lang("Warning: could not complete file repair; your file may "
-                                + "have been corrupted. Error message") + ": " + e.getMessage());
-
-            }
+            session.cancel();
+            // repairAfterError(file, backup, INIT_OK);
             throw new SaveException(ex.getMessage(), exceptionCause);
         }
 
@@ -392,21 +380,19 @@ public class FileActions {
             List<Comparator<BibtexEntry>> comparators = getSaveComparators(true);
 
             // Use glazed lists to get a sorted view of the entries:
-            BasicEventList entryList = new BasicEventList();
-            SortedList sorter = new SortedList(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
+            BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+            SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
 
             if ((bes != null) && (bes.length > 0)) {
-                for (int i = 0; i < bes.length; i++) {
-                    sorter.add(bes[i]);
-                }
+                Collections.addAll(sorter, bes);
             }
 
             FieldFormatter ff = new LatexFieldFormatter();
 
-            for (Iterator<BibtexEntry> i = sorter.iterator(); i.hasNext();) {
-                be = (i.next());
+            for (BibtexEntry aSorter : sorter) {
+                be = (aSorter);
 
-        // Check if we must write the type definition for this
+                // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
                 BibtexEntryType tp = be.getType();
@@ -425,8 +411,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (Iterator<String> i = types.keySet().iterator(); i.hasNext();) {
-                    CustomEntryType tp = (CustomEntryType) types.get(i.next());
+                for (String s : types.keySet()) {
+                    CustomEntryType tp = (CustomEntryType) types.get(s);
                     tp.save(fw);
                     fw.write(Globals.NEWLINE);
                 }
@@ -435,16 +421,8 @@ public class FileActions {
 
             fw.close();
         } catch (Throwable ex) {
-            try {
-                session.cancel();
-                //repairAfterError(file, backup, status);
-            } catch (IOException e) {
-                // Argh, another error? Can we do anything?
-                e.printStackTrace();
-                throw new SaveException(ex.getMessage() + "\n"
-                        + Globals.lang("Warning: could not complete file repair; your file may "
-                                + "have been corrupted. Error message") + ": " + e.getMessage());
-            }
+            session.cancel();
+            //repairAfterError(file, backup, status);
             throw new SaveException(ex.getMessage(), be);
         }
 
@@ -504,8 +482,8 @@ public class FileActions {
 
         // Use glazed lists to get a sorted view of the entries:
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
-        BasicEventList entryList = new BasicEventList();
-        SortedList sorter = new SortedList(entryList, comparatorStack);
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+        SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, comparatorStack);
 
         if (keySet == null) {
             keySet = database.getKeySet();

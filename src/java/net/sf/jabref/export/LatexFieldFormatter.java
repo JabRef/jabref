@@ -55,8 +55,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         if (Globals.prefs.getBoolean("resolveStringsAllFields")) {
             // Resolve strings for all fields except some:
             String[] exceptions = Globals.prefs.getStringArray("doNotResolveStringsFor");
-            for (int i = 0; i < exceptions.length; i++) {
-                if (exceptions[i].equals(fieldName)) {
+            for (String exception : exceptions) {
+                if (exception.equals(fieldName)) {
                     resolveStrings = false;
                     break;
                 }
@@ -260,16 +260,16 @@ public class LatexFieldFormatter implements FieldFormatter {
 
         // First we collect all occurences:
         while ((current = text.indexOf('{', current + 1)) != -1)
-            left.add(new Integer(current));
+            left.add(current);
         while ((current = text.indexOf('}', current + 1)) != -1)
-            right.add(new Integer(current));
+            right.add(current);
 
         // Then we throw an exception if the error criteria are met.
         if ((right.size() > 0) && (left.size() == 0))
             throw new IllegalArgumentException
                     ("'}' character ends string prematurely.");
-        if ((right.size() > 0) && ((right.elementAt(0)).intValue()
-                < (left.elementAt(0)).intValue()))
+        if ((right.size() > 0) && (right.elementAt(0)
+                < left.elementAt(0)))
             throw new IllegalArgumentException
                     ("'}' character ends string prematurely.");
         if (left.size() != right.size())

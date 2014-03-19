@@ -18,7 +18,6 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -38,7 +37,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
-	JComboBox comboBox;
+	JComboBox<String> comboBox;
 
 	FieldEditor editor;
 
@@ -90,7 +89,7 @@ public class FieldContentSelector extends JComponent {
         this.action = action;
         this.delimiter = delimiter;
 
-		comboBox = new JComboBox() {
+		comboBox = new JComboBox<String>() {
 			public Dimension getPreferredSize() {
 				Dimension parents = super.getPreferredSize();
 				if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)
@@ -205,9 +204,7 @@ public class FieldContentSelector extends JComponent {
 		comboBox.addItem("");
 		Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
 		if (items != null) {
-			Iterator<String> i = items.iterator();
-			while (i.hasNext())
-				comboBox.addItem(i.next());
+            for (String item : items) comboBox.addItem(item);
 		}
 	}
 

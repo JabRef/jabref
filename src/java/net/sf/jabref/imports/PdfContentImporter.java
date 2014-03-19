@@ -111,32 +111,32 @@ public class PdfContentImporter extends ImportFormat {
 			String[] splitNames = names.split(",");
 			res = "";
 			boolean isFirst = true;
-			for (int i=0; i<splitNames.length; i++) {
-				String curName = removeNonLettersAtEnd(splitNames[i]);
-				if (curName.indexOf("and")==0) {
-					// skip possible ands between names
-					curName = curName.substring(3).trim();
-				} else {
-					int posAnd = curName.indexOf(" and "); 
-					if (posAnd>=0) {
-						String nameBefore = curName.substring(0, posAnd);
-						// cannot be first name as "," is contained in the string
-						res = res.concat(" and ").concat(removeNonLettersAtEnd(nameBefore));
-						curName = curName.substring(posAnd+5);
-					}
-				}
-					
-				if (!curName.equals("")) {
-					if (curName.equalsIgnoreCase("et al."))
-						curName = "others";
-					if (isFirst) {
-						isFirst = false;
-					} else {
-						res = res.concat(" and ");
-					}
-					res = res.concat(curName);
-				}
-			}
+            for (String splitName : splitNames) {
+                String curName = removeNonLettersAtEnd(splitName);
+                if (curName.indexOf("and") == 0) {
+                    // skip possible ands between names
+                    curName = curName.substring(3).trim();
+                } else {
+                    int posAnd = curName.indexOf(" and ");
+                    if (posAnd >= 0) {
+                        String nameBefore = curName.substring(0, posAnd);
+                        // cannot be first name as "," is contained in the string
+                        res = res.concat(" and ").concat(removeNonLettersAtEnd(nameBefore));
+                        curName = curName.substring(posAnd + 5);
+                    }
+                }
+
+                if (!curName.equals("")) {
+                    if (curName.equalsIgnoreCase("et al."))
+                        curName = "others";
+                    if (isFirst) {
+                        isFirst = false;
+                    } else {
+                        res = res.concat(" and ");
+                    }
+                    res = res.concat(curName);
+                }
+            }
 		} else {
 			// assumption: names separated by space
 			
@@ -449,7 +449,7 @@ public class PdfContentImporter extends ImportFormat {
 						}
 					}
 					
-					if ((publisher==null) && (curString.indexOf("IEEE")>=0)) {
+					if ((publisher==null) && (curString.contains("IEEE"))) {
 						// IEEE has the conference things at the end
 						publisher = "IEEE";
 

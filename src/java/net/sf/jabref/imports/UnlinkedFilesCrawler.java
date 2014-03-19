@@ -7,7 +7,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.FindUnlinkedFilesDialog.FileNodeWrapper;
 
@@ -80,21 +79,21 @@ public class UnlinkedFilesCrawler {
 		int filesCount = 0;
 
 		File[] subDirectories = directory.listFiles(directoryFilter);
-		for (int i = 0; i < subDirectories.length; i++) {
-			CheckableTreeNode subRoot = searchDirectory(subDirectories[i], ff, state, changeListener);
-			if (subRoot != null && subRoot.getChildCount() > 0) {
-				filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
-				root.add(subRoot);
-			}
-		}
+        for (File subDirectory : subDirectories) {
+            CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
+            if (subRoot != null && subRoot.getChildCount() > 0) {
+                filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
+                root.add(subRoot);
+            }
+        }
 
 		root.setUserObject(new FileNodeWrapper(directory, files.length + filesCount));
 
-		for (int i = 0; i < files.length; i++) {
-			root.add(new CheckableTreeNode(new FileNodeWrapper(files[i])));
-			if (changeListener != null)
-				changeListener.stateChanged(new ChangeEvent(this));
-		}
+        for (File file : files) {
+            root.add(new CheckableTreeNode(new FileNodeWrapper(file)));
+            if (changeListener != null)
+                changeListener.stateChanged(new ChangeEvent(this));
+        }
 
 		return root;
 	}

@@ -17,17 +17,14 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
@@ -37,7 +34,6 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -87,7 +83,7 @@ public class DroppedFileHandler {
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref","bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
-        builder.setDefaultDialogBorder();
+        builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
         
         builder.add(linkInPlace, cc.xyw(1, 1, 4));
@@ -251,16 +247,14 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
-
-            while (it.hasNext()) {
+            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = it.next();
+                    BibtexEntry entry = aXmpEntriesInFile;
                     entry.setId(Util.createNeutralId());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
                     doLink(entry, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ex) {
+                } catch (KeyCollisionException ignored) {
 
                 }
             }
@@ -342,16 +336,14 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
-
-            while (it.hasNext()) {
+            for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = it.next();
+                    BibtexEntry entry = aXmpEntriesInFile;
                     entry.setId(Util.createNeutralId());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     panel.getDatabase().insertEntry(entry);
                     doLink(entry, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ex) {
+                } catch (KeyCollisionException ignored) {
 
                 }
             }
@@ -584,8 +576,7 @@ public class DroppedFileHandler {
         }
         toFile = new File(toFile).getName();
         
-        File destFile = new File(new StringBuffer(dirs[found]).append(System.getProperty("file.separator"))
-            .append(toFile).toString());
+        File destFile = new File(dirs[found] + System.getProperty("file.separator") + toFile);
         if (destFile.equals(new File(fileName))){
             // File is already in the correct position. Don't override!
             return true;

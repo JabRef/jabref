@@ -37,11 +37,11 @@ public final class EntryEditorTabList {
         int i = 0;
         String name;
         String[] fields;
-        if (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME + 0)) {
+        if (Globals.prefs.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + 0)) {
             // The user has modified from the default values:
-            while (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME + i)) {
-                name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + i);
-                fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS + i).split(";");
+            while (Globals.prefs.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + i)) {
+                name = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + i);
+                fields = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i).split(";");
                 List<String> entry = Arrays.asList(fields);
                 names.add(name);
                 list.add(entry);
@@ -49,9 +49,9 @@ public final class EntryEditorTabList {
             }
         } else {
             // Nothing set, so we use the default values:
-            while (Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + "_def"+i) != null) {
-                name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + "_def" + i);
-                fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS + "_def" + i).split(";");
+            while (Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def"+i) != null) {
+                name = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+                fields = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i).split(";");
                 List<String> entry = Arrays.asList(fields);
                 names.add(name);
                 list.add(entry);

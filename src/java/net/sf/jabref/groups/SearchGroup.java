@@ -204,7 +204,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 	 *      net.sf.jabref.BibtexEntry)
 	 */
 	public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
-		return applyRule(searchOptions, entry) == 0 ? false : true;
+		return applyRule(searchOptions, entry) != 0;
 	}
 
 	public boolean contains(BibtexEntry entry) {

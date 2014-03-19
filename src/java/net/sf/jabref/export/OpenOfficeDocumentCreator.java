@@ -108,7 +108,6 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
             throw new Error(e);
         }
 
-        return;
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {

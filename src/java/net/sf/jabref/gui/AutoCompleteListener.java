@@ -24,7 +24,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,7 +92,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             toSetIn = null;
             if (consumeEnterKey)
                 e.consume();
-            return;
         }
         // Cycle through alternative completions when user presses PGUP/PGDN:
         else if ((e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) && (toSetIn != null)) {
@@ -133,7 +131,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         String sno = lastCompletions[lastShownCompletion];
         toSetIn = sno.substring(lastBeginning.length()-1);
         
-        StringBuffer alltext = new StringBuffer(comp.getText());
+        StringBuilder alltext = new StringBuilder(comp.getText());
         
         int oldSelectionStart = comp.getSelectionStart();
         int oldSelectionEnd = comp.getSelectionEnd();
@@ -144,7 +142,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         alltext.insert(startPos, sno.subSequence(0, lastBeginning.length()));
         
         // replace suffix with new suffix
-        int deletedChars = oldSelectionEnd - oldSelectionStart;
         alltext.delete(oldSelectionStart, oldSelectionEnd);
         //int cp = oldSelectionEnd - deletedChars;
         alltext.insert(oldSelectionStart, toSetIn.substring(1));
@@ -246,7 +243,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         		logger.finest("toSetIn: >" + toSetIn + "<");
         	}
         	
-            StringBuffer alltext = new StringBuffer(comp.getText());
+            StringBuilder alltext = new StringBuilder(comp.getText());
             int cp = comp.getCaretPosition();
             alltext.insert(cp, toSetIn);
             comp.setText(alltext.toString());
@@ -261,7 +258,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             } else {
             	lastBeginning = cWord.substring(0, cWord.length()-1).concat(Character.toString(ch));
             }
-            return;
         }
 
     }
@@ -456,7 +452,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 	            res.append(upToCaret);
             }
             //Util.pr("AutoCompListener: "+res.toString());
-        } catch (BadLocationException ex) {
+        } catch (BadLocationException ignore) {
         }
 
         return res;

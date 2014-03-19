@@ -18,7 +18,6 @@ package net.sf.jabref.undo;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
-import javax.swing.event.UndoableEditEvent;
 
 import net.sf.jabref.BasePanel;
 

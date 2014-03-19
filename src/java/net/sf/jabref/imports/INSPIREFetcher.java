@@ -48,7 +48,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class INSPIREFetcher implements EntryFetcher {
 
-	private static String inspireHost = "inspirebeta.net";
+	private static final String INSPIRE_HOST = "inspirebeta.net";
 
 	public INSPIREFetcher() {
 	}
@@ -72,7 +72,7 @@ public class INSPIREFetcher implements EntryFetcher {
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer("http://").append(inspireHost)
+		StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST)
 				.append("/");
 		sb.append("/search?ln=en&ln=en&p=find+");
 		//sb.append("spires/find/hep/www").append("?");
@@ -101,7 +101,7 @@ public class INSPIREFetcher implements EntryFetcher {
 			key = URLEncoder.encode(key, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 		}
-		StringBuffer sb = new StringBuffer("http://").append(inspireHost)
+		StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST)
 				.append("/");
 		sb.append("spires/find/hep/www").append("?");
 		sb.append("rawcmd=find+").append(cmd).append("+");
@@ -122,7 +122,7 @@ public class INSPIREFetcher implements EntryFetcher {
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer("http://").append(inspireHost)
+		StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST)
 				.append("/");
 		sb.append("spires/find/hep/www").append("?");
 		sb.append("rawcmd=find+eprint+");

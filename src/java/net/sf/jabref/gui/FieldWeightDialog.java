@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -81,10 +80,9 @@ public class FieldWeightDialog extends JDialog {
 
         // --------------
 
-        for (Iterator<String> i=fields.iterator(); i.hasNext();) {
-            String field = i.next();
+        for (String field : fields) {
             builder.append(field);
-            int weight = (int)(100*BibtexFields.getFieldWeight(field)/GUIGlobals.MAX_FIELD_WEIGHT) ;
+            int weight = (int) (100 * BibtexFields.getFieldWeight(field) / GUIGlobals.MAX_FIELD_WEIGHT);
             //System.out.println(weight);
             JSlider slider = new JSlider(0, 100, weight);//,);
             sliders.put(slider, new SliderInfo(field, weight));
@@ -119,12 +117,11 @@ public class FieldWeightDialog extends JDialog {
     }
 
     public void storeSettings() {
-        for (Iterator<JSlider> i=sliders.keySet().iterator(); i.hasNext();) {
-            JSlider slider = i.next();
+        for (JSlider slider : sliders.keySet()) {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = GUIGlobals.MAX_FIELD_WEIGHT*(slider.getValue())/100d;
+                double weight = GUIGlobals.MAX_FIELD_WEIGHT * (slider.getValue()) / 100d;
                 BibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }

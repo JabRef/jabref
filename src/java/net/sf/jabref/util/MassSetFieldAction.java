@@ -209,8 +209,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
                         overwrite.isSelected()));
             }
         } else {
-            for (int i = 0; i < fields.length; i++) {
-                ce.addEdit(Util.massSetField(entryList, fields[i],
+            for (String field1 : fields) {
+                ce.addEdit(Util.massSetField(entryList, field1,
                         set.isSelected() ? toSet : null,
                         overwrite.isSelected()));
             }

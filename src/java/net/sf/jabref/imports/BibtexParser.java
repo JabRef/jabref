@@ -442,32 +442,8 @@ public class BibtexParser {
         if ((c != '\n') && (c != '\r'))
             skipWhitespace();
 		String key = null;
-		boolean doAgain = true;
-		while (doAgain) {
-			doAgain = false;
-			try {
-				if (key != null)
-					key = key + parseKey();// parseTextToken(),
-				else
-					key = parseKey();
-			} catch (NoLabelException ex) {
-				// This exception will be thrown if the entry lacks a key
-				// altogether, like in "@article{ author = { ...".
-				// It will also be thrown if a key contains =.
-				c = (char) peek();
-				if (Character.isWhitespace(c) || (c == '{') || (c == '\"')) {
-					String fieldName = ex.getMessage().trim().toLowerCase();
-					String cont = parseFieldContent(fieldName);
-					result.setField(fieldName, cont);
-				} else {
-					if (key != null)
-						key = key + ex.getMessage() + "=";
-					else
-						key = ex.getMessage() + "=";
-					doAgain = true;
-				}
-			}
-		}
+
+        key = parseKey();
 
 		if ((key != null) && key.equals(""))
 			key = null;
@@ -798,7 +774,7 @@ public class BibtexParser {
 	/**
 	 * This method is used to parse the bibtex key for an entry.
 	 */
-	private String parseKey() throws IOException, NoLabelException {
+	private String parseKey() throws IOException {
 		StringBuffer token = new StringBuffer(20);
 
 		while (true) {

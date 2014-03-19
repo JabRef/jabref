@@ -163,14 +163,12 @@ public class ChangeScanner extends Thread {
         ArrayList<String> handledOnDisk = new ArrayList<String>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
-        for (Iterator i = inTemp.iterator(); i.hasNext();) {
-            String key = (String)i.next();
+        for (String key : inTemp) {
             // See if the key is missing in the disk database:
             Vector<String> vod = onDisk.getData(key);
             if (vod == null) {
                 mdc.insertMetaDataRemoval(key);
-            }
-            else {
+            } else {
                 // Both exist. Check if they are different:
                 Vector<String> vit = inTemp.getData(key);
                 if (!vod.equals(vit))
@@ -181,8 +179,7 @@ public class ChangeScanner extends Thread {
         }
 
         // See if there are unhandled keys in the disk database:
-        for (Iterator i = onDisk.iterator(); i.hasNext();) {
-            String key = (String)i.next();
+        for (String key : onDisk) {
             if (!handledOnDisk.contains(key)) {
                 mdc.insertMetaDataAddition(key, onDisk.getData(key));
             }
@@ -220,7 +217,7 @@ public class ChangeScanner extends Thread {
             if (comp > 1) {
                 used.add(""+piv2);
                 piv2++;
-                continue mainLoop;
+                continue;
             }
 
             // No? Then check if another entry matches exactly.
@@ -239,7 +236,7 @@ public class ChangeScanner extends Thread {
             }
 
             // No? Add this entry to the list of nonmatched entries.
-            notMatched.add(new Integer(piv1));
+            notMatched.add(piv1);
         }
 
 
@@ -250,7 +247,7 @@ public class ChangeScanner extends Thread {
             for (Iterator<Integer> it=notMatched.iterator(); it.hasNext();) {
 
                 Integer integ = it.next();
-                piv1 = integ.intValue();
+                piv1 = integ;
 
 
                 // These two variables will keep track of which entry most closely matches the
@@ -348,15 +345,15 @@ public class ChangeScanner extends Thread {
     private BibtexEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
         double comp = -1;
         int found = 0;
-        loop: for (int i=0; i<neu.getEntryCount(); i++) {
+        for (int i = 0; i < neu.getEntryCount(); i++) {
             double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index),
-            neu.getEntryAt(i));
+                    neu.getEntryAt(i));
             if (res > comp) {
                 comp = res;
                 found = i;
             }
             if (comp > 1)
-                break loop;
+                break;
         }
         return neu.getEntryAt(found);
     }
@@ -460,8 +457,7 @@ public class ChangeScanner extends Thread {
 
         if (notMatched.size() > 0) {
             // Still one or more non-matched strings. So they must have been removed.
-            for (Iterator<String> i = notMatched.iterator(); i.hasNext(); ) {
-                String nmId = i.next();
+            for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
                 BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                 if (mem != null) { // The removed string is not removed from the mem version.
@@ -473,8 +469,7 @@ public class ChangeScanner extends Thread {
 
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.
-        for (Iterator<String> i=onDisk.getStringKeySet().iterator(); i.hasNext();) {
-            String diskId = i.next();
+        for (String diskId : onDisk.getStringKeySet()) {
             if (!used.contains(diskId)) {
                 BibtexString disk = onDisk.getString(diskId);
                 //System.out.println(disk.getName());
@@ -487,8 +482,7 @@ public class ChangeScanner extends Thread {
     private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name))
             return null;
-        for (Iterator<String> i=base.getStringKeySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (String key : base.getStringKeySet()) {
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
                 used.add(key);
@@ -508,64 +502,13 @@ public class ChangeScanner extends Thread {
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if (groupsTmp == null && groupsDisk == null)
             return;
-        if ((groupsTmp != null && groupsDisk == null)
-                || (groupsTmp == null && groupsDisk != null)) {
+        if ((groupsTmp != null && groupsDisk == null) || (groupsTmp == null)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }
-        if (groupsTmp.equals(groupsDisk))
-            return;
-        changes.add(new GroupChange(groupsDisk, groupsTmp));
-        return;
-
-//
-//        if (((vOnTmp == null) || (vOnTmp.size()==0)) && ((vOnDisk == null) || (vOnDisk.size()==0))) {
-//            // No groups defined in either the tmp or disk version.
-//            return;
-//        }
-//
-//        // To avoid checking for null all the time, make empty vectors to replace null refs. We clone
-//        // non-null vectors so we can remove the elements as we finish with them.
-//        if (vOnDisk == null)
-//            vOnDisk = new Vector(0);
-//        else
-//            vOnDisk = (Vector)vOnDisk.clone();
-//        if (vOnTmp == null)
-//            vOnTmp = new Vector(0);
-//        else
-//            vOnTmp = (Vector)vOnTmp.clone();
-//        if (vInMem == null)
-//            vInMem = new Vector(0);
-//        else
-//            vInMem = (Vector)vInMem.clone();
-//
-//        // If the tmp version has groups, iterate through these and compare with disk version:
-//        while (vOnTmp.size() >= 1) {
-//            AbstractGroup group = (AbstractGroup)vOnTmp.firstElement();
-//            vOnTmp.removeElementAt(0);
-//            int pos = GroupSelector.findGroupByName(vOnDisk,group.getName());
-//            if (pos == -1) {
-//                // Couldn't find the group.
-//                changes.add(new GroupAddOrRemove(group, false));
-//            } else {
-//                AbstractGroup diskGroup = (AbstractGroup)vOnDisk.elementAt(pos);
-//
-//                if (!diskGroup.equals(group)) {
-//                    // Group has changed.
-//                    changes.add(new GroupChange(inMem, group, diskGroup));
-//                }
-//
-//                // Remove this group, since it's been accounted for.
-//                vOnDisk.remove(pos);
-//            }
-//        }
-//
-//        // If there are entries left in the disk version, these must have been added.
-//        while (vOnDisk.size() >= 1) {
-//            AbstractGroup group = (AbstractGroup)vOnDisk.firstElement();
-//            vOnDisk.removeElementAt(0);
-//            changes.add(new GroupAddOrRemove(group, true));
-//        }
+        if (!groupsTmp.equals(groupsDisk)) {
+            changes.add(new GroupChange(groupsDisk, groupsTmp));
+        }
     }
 
 

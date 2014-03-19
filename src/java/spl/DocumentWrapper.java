@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sciplore.beans.Abstract;
 import org.sciplore.beans.Author;
-import org.sciplore.beans.Authors;
 import org.sciplore.beans.Document;
 import org.sciplore.formatter.Bean;
 import org.sciplore.formatter.SimpleTypeElementBean;
@@ -61,7 +60,7 @@ public class DocumentWrapper {
    public String getAuthors(String seperator){
         if(this.hasAuthors()){
         	List<Bean> authors = xmlDocument.getAuthors().getCollection();
-            authors = this.sortAuthors(authors);
+            authors = DocumentsWrapper.sortAuthors(authors);
             String value = "";
             int i = 1;
             for(Bean author : authors){
@@ -241,32 +240,5 @@ public class DocumentWrapper {
     	if(simpleTypeElementBean.getValue() == null || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || simpleTypeElementBean.getValue().length() <= 0) return null;
     	return simpleTypeElementBean.getValue();
     }
-    
-    private List<Bean> sortAuthors(List<Bean> authors){
-   	 boolean unsorted = true;
-        Bean temp;
-        
-        while (unsorted){
-       	 unsorted = false;
-       	 for (int i = 0; i < authors.size() - 1; i++){
-       		 int rank = 99;
-       		 int otherRank = 99;
-       		 if(((Author)authors.get(i)).getRank() != null && !((Author)authors.get(i)).getRank().equalsIgnoreCase("null")){
-       			 rank = Integer.parseInt(((Author)authors.get(i)).getRank());
-       		 }        		 
-       		 if(((Author)authors.get(i + 1)).getRank() != null && !((Author)authors.get(i + 1)).getRank().equalsIgnoreCase("null")){
-       			 otherRank = Integer.parseInt(((Author)authors.get(i + 1)).getRank());
-       		 }       		 
-       		 
-       	 	 if (rank > otherRank) {                      
-                 temp       = authors.get(i);
-                 authors.set(i, authors.get(i + 1));
-                 authors.set(i + 1, temp);                 
-                 unsorted = true;
-              }          
-        	} 	 
-       } 
-   	
-   	return authors;
-   }
+
 }

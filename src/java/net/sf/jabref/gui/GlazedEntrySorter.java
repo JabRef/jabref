@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,11 +37,8 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
         list = new BasicEventList<BibtexEntry>();
         list.getReadWriteLock().writeLock().lock();
         Set<String> keySet = entries.keySet();
-        if (keySet != null) {
-            Iterator<String> i = keySet.iterator();
-            while (i.hasNext()) {
-                list.add(entries.get(i.next()));
-            }
+        for (String aKeySet : keySet) {
+            list.add(entries.get(aKeySet));
         }
 
         // Sort the list so it is ordered according to creation (or read) order

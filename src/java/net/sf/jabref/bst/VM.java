@@ -87,9 +87,9 @@ public class VM implements Warn {
 		public void execute(BstEntry context);
 	}
 
-	public static final Integer FALSE = new Integer(0);
+	public static final Integer FALSE = 0;
 
-	public static final Integer TRUE = new Integer(1);
+	public static final Integer TRUE = 1;
 
 	private HashMap<String,BstFunction> buildInFunctions;
 
@@ -209,7 +209,7 @@ public class VM implements Warn {
 					throw new VMException("Can only compare two integers with +");
 				}
 
-				stack.push(new Integer(((Integer) o1).intValue() + ((Integer) o2).intValue()));
+				stack.push((Integer) o1 + (Integer) o2);
 			}
 		});
 
@@ -229,7 +229,7 @@ public class VM implements Warn {
 					throw new VMException("Can only subtract two integers with -");
 				}
 
-				stack.push(new Integer(((Integer) o1).intValue() - ((Integer) o2).intValue()));
+				stack.push((Integer) o1 - (Integer) o2);
 			}
 		});
 
@@ -250,7 +250,7 @@ public class VM implements Warn {
 					throw new VMException("Can only concatenate two String with *");
 				}
 
-				stack.push(((String) o1) + ((String) o2));
+				stack.push(o1.toString() + o2.toString());
 			}
 		});
 
@@ -347,7 +347,7 @@ public class VM implements Warn {
 
 				String s = (String) o1;
 
-				stack.push(new Integer(s.charAt(0)));
+				stack.push((int) s.charAt(0));
 			}
 		});
 
@@ -426,7 +426,7 @@ public class VM implements Warn {
 				}
 
 				Object toExe;
-				if (((Integer) i).intValue() > 0) {
+				if ((Integer) i > 0) {
 					toExe = f2;
 				} else {
 					toExe = f1;
@@ -473,7 +473,7 @@ public class VM implements Warn {
 						"Can only transform an integer to an string using int.to.str$");
 				}
 
-				stack.push(((Integer) o1).toString());
+				stack.push(o1.toString());
 			}
 		});
 
@@ -534,7 +534,7 @@ public class VM implements Warn {
 				}
 				String s = (String) o1;
 
-				stack.push(new Integer(AuthorList.getAuthorList(s).size()));
+				stack.push(AuthorList.getAuthorList(s).size());
 			}
 		});
 
@@ -630,8 +630,8 @@ public class VM implements Warn {
 				Integer len = (Integer) o1;
 				Integer start = (Integer) o2;
 
-				int lenI = len.intValue();
-				int startI = start.intValue();
+				int lenI = len;
+				int startI = start;
 
 				if (lenI > Integer.MAX_VALUE / 2)
 					lenI = Integer.MAX_VALUE / 2;
@@ -763,7 +763,7 @@ public class VM implements Warn {
 						// incr(num_text_chars);
 						result++;
 				}
-				stack.push(new Integer(result));
+				stack.push(result);
 			}
 		});
 
@@ -839,7 +839,7 @@ public class VM implements Warn {
 						throw new VMException(
 							"First parameter to while has to return an integer but was " + i);
 					}
-					if (((Integer) i).intValue() <= 0) {
+					if ((Integer) i <= 0) {
 						break;
 					}
 					VM.this.executeInContext(f2, context);
@@ -885,19 +885,17 @@ public class VM implements Warn {
 			return false;
 
 		}
-		if (o2 instanceof Integer) {
-			if (context != null && context.integers.containsKey(name)) {
-				context.integers.put(name, (Integer) o2);
-				return true;
-			}
 
-			if (integers.containsKey(name)) {
-				integers.put(name, (Integer) o2);
-				return true;
-			}
-			return false;
-		}
-		return false;
+        if (context != null && context.integers.containsKey(name)) {
+            context.integers.put(name, (Integer) o2);
+            return true;
+        }
+
+        if (integers.containsKey(name)) {
+            integers.put(name, (Integer) o2);
+            return true;
+        }
+        return false;
 	}
 
 	CommonTree tree;
@@ -973,8 +971,8 @@ public class VM implements Warn {
 		strings = new HashMap<String, String>();
 
 		integers = new HashMap<String, Integer>();
-		integers.put("entry.max$", new Integer(Integer.MAX_VALUE));
-		integers.put("global.max$", new Integer(Integer.MAX_VALUE));
+		integers.put("entry.max$", Integer.MAX_VALUE);
+		integers.put("global.max$", Integer.MAX_VALUE);
 
 		functions = new HashMap<String, BstFunction>();
 		functions.putAll(buildInFunctions);
@@ -989,14 +987,10 @@ public class VM implements Warn {
 	 * that field variable is marked as missing for the entry.
 	 * 
 	 * We use null for the missing entry designator.
-	 * 
-	 * @param child
 	 */
 	private void read() {
 
-		Iterator<BstEntry> i = entries.iterator();
-		while (i.hasNext()) {
-			BstEntry e = i.next();
+        for(BstEntry e : entries) {
 
 			for (Map.Entry<String, String> mEntry : e.fields.entrySet()){
 				Object fieldValue = e.entry.getField(mEntry.getKey());
@@ -1005,9 +999,7 @@ public class VM implements Warn {
 			}
 		}
 
-		i = entries.iterator();
-		while (i.hasNext()) {
-			BstEntry e = i.next();
+        for(BstEntry e : entries) {
 			if (!e.fields.containsKey("crossref")) {
 				e.fields.put("crossref", null);
 			}
@@ -1076,7 +1068,7 @@ public class VM implements Warn {
 				String name = t.getChild(i).getText();
 				
 				for (BstEntry entry : entries){
-					entry.integers.put(name, new Integer(0));
+					entry.integers.put(name, 0);
 				}
 			}
 		}
@@ -1109,10 +1101,9 @@ public class VM implements Warn {
 	private void iterate(Tree child) {
 		BstFunction f = functions.get(child.getChild(0).getText());
 
-		Iterator<BstEntry> i = entries.iterator();
-		while (i.hasNext()) {
-			f.execute(i.next());
-		}
+        for (BstEntry entry : entries) {
+            f.execute(entry);
+        }
 	}
 
 	/**
@@ -1170,7 +1161,7 @@ public class VM implements Warn {
 					}
 						break;
 					case BstParser.INTEGER:
-						push(new Integer(Integer.parseInt(c.getText().substring(1))));
+						push(Integer.parseInt(c.getText().substring(1)));
 						break;
 					case BstParser.QUOTED:
 						push(new Identifier(c.getText().substring(1)));
@@ -1255,7 +1246,7 @@ public class VM implements Warn {
 
 		for (int i = 0; i < t.getChildCount(); i++) {
 			String name = t.getChild(i).getText();
-			integers.put(name, new Integer(0));
+			integers.put(name, 0);
 		}
 	}
 

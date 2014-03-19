@@ -50,15 +50,8 @@ public class UnknownEntryType extends BibtexEntryType {
 	return "unknown";
     }
 
-    public String describeOptionalFields() {
-	return "unknown";
-    }
-
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
 	return true;
-    }
-
-    public void save(Writer out) {
     }
 
 }

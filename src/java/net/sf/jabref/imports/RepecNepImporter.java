@@ -164,7 +164,7 @@ public class RepecNepImporter extends ImportFormat {
 
   private static Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
 
-  private final static Collection<String> recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL", "By"});
+  private final static Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
   
   private int line = 0;
   private String lastLine = "";
@@ -223,7 +223,7 @@ public class RepecNepImporter extends ImportFormat {
       startOfMessage += line;
       line = in.readLine();
     }
-    return startOfMessage.indexOf("NEP: New Economics Papers") >= 0 || startOfMessage.indexOf("nep.repec.org") >= 0;
+    return startOfMessage.contains("NEP: New Economics Papers") || startOfMessage.contains("nep.repec.org");
   }
 
   private boolean startsWithKeyword(Collection<String> keywords) {
@@ -365,9 +365,9 @@ public class RepecNepImporter extends ImportFormat {
         String content = readMultipleLines();
         String[] keywords = content.split("[,;]");
         String keywordStr = "";
-        for (int i = 0; i < keywords.length; i++) {
-          keywordStr += " '" + keywords[i].trim() + "'";
-        }
+          for (String keyword1 : keywords) {
+              keywordStr += " '" + keyword1.trim() + "'";
+          }
         be.setField("keywords", keywordStr.trim());
         
       // parse JEL field
@@ -391,7 +391,7 @@ public class RepecNepImporter extends ImportFormat {
         Calendar cal = new GregorianCalendar();              
         cal.setTime(date != null ? date : new Date());
         be.setField("year", "" + cal.get(Calendar.YEAR));
-        if (date != null && recognizedDateFormats[i-1].indexOf("MM") >= 0) {
+        if (date != null && recognizedDateFormats[i - 1].contains("MM")) {
           be.setField("month", "" + cal.get(Calendar.MONTH));
         }
         

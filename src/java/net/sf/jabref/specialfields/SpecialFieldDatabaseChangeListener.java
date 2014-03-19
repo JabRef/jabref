@@ -1,7 +1,5 @@
 package net.sf.jabref.specialfields;
 
-import javax.swing.SwingUtilities;
-
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.DatabaseChangeEvent;
 import net.sf.jabref.DatabaseChangeListener;

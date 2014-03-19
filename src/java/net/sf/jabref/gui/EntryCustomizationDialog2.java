@@ -67,8 +67,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         java.util.List<String> entryTypes = new ArrayList<String>();
-        for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
-            entryTypes.add(i.next());
+        for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+            entryTypes.add(s);
         }
 
         typeComp = new EntryTypeList(entryTypes);
@@ -180,9 +180,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                         opt = new ArrayList<String>();
                     List<String> opt2 = new ArrayList<String>();
                     if (of != null)
-                        for (int i=0; i<of.length; i++)
-                            if (!opt.contains(of[i]))
-                                opt2.add(of[i]);
+                        for (String anOf : of)
+                            if (!opt.contains(anOf))
+                                opt2.add(anOf);
                     optComp2.setFields(opt2);
                     optComp2.setEnabled(true);
                 }
@@ -213,8 +213,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         // Iterate over our map of required fields, and list those types if necessary:
 
         List<String> types = typeComp.getFields();
-        for (Iterator<String> i=reqLists.keySet().iterator(); i.hasNext();) {
-            String typeName = i.next();
+        for (String typeName : reqLists.keySet()) {
             if (!types.contains(typeName))
                 continue;
 
@@ -252,24 +251,23 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 if (biblatexMode) {
                     String[] priOpt = oldType.getPrimaryOptionalFields();
                     ArrayList<String> secOpt = new ArrayList<String>();
-                    for (int j = 0; j < oldOpt.length; j++) {
+                    for (String anOldOpt : oldOpt) {
                         boolean inPri = false;
-                        for (int k = 0; k < priOpt.length; k++) {
-                            if (priOpt[k].equals(oldOpt[j])) {
+                        for (String aPriOpt : priOpt) {
+                            if (aPriOpt.equals(anOldOpt)) {
                                 inPri = true;
                                 break;
                             }
                         }
                         if (!inPri)
-                            secOpt.add(oldOpt[j]);
+                            secOpt.add(anOldOpt);
                     }
                     String[] secOptArray = secOpt.toArray(new String[secOpt.size()]);
                     if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr) &&
                             equalArrays(secOptArray, opt2Str))
                         changesMade = false;
-                } else
-                    if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr))
-                        changesMade = false;
+                } else if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr))
+                    changesMade = false;
             }
 
             if (changesMade) {
@@ -285,8 +283,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
 
         Set<Object> toRemove = new HashSet<Object>();
-        for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (String o : BibtexEntryType.ALL_TYPES.keySet()) {
             if (!types.contains(o)) {
                 toRemove.add(o);
             }
@@ -294,8 +291,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
         // Remove those that should be removed:
         if (toRemove.size() > 0) {
-            for (Iterator<Object> i=toRemove.iterator(); i.hasNext();)
-                typeDeletion((String)i.next());
+            for (Object aToRemove : toRemove) typeDeletion((String) aToRemove);
         }
 
         updateTables();

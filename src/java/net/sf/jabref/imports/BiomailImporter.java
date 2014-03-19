@@ -77,7 +77,7 @@ public class BiomailImporter extends ImportFormat {
      */
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         BufferedReader in =
                 new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -109,11 +109,11 @@ public class BiomailImporter extends ImportFormat {
         // skip the first entry as it is either empty or has document header
         HashMap<String, String> hm = new HashMap<String, String>();
 
-        for (int i = 0; i < entries.length; i++) {
-            String[] fields = entries[i].split(" ## ");
+        for (String entry : entries) {
+            String[] fields = entry.split(" ## ");
 
             if (fields.length == 0)
-                fields = entries[i].split("\n");
+                fields = entry.split("\n");
 
             String Type = "";
             String pages = "";
@@ -121,15 +121,15 @@ public class BiomailImporter extends ImportFormat {
             String fullauthor = "";
             hm.clear();
 
-            for (int j = 0; j < fields.length; j++) {
-                System.out.println(">>>"+fields[j]+"<<<");
+            for (String field : fields) {
+                System.out.println(">>>" + field + "<<<");
 
                 //empty field don't do anything
-                if (fields[j].length() <= 2)
+                if (field.length() <= 2)
                     continue;
 
-                String beg = fields[j].substring(0, 6);
-                String value = fields[j].substring(6);
+                String beg = field.substring(0, 6);
+                String value = field.substring(6);
                 value = value.trim();
 
                 if (beg.equals("PT  - ")) {

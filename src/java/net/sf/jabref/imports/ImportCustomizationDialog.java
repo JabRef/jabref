@@ -51,16 +51,8 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class ImportCustomizationDialog extends JDialog {
 
   private final JabRefFrame frame;
-  private JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
-  private JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
-  private JButton showDescButton = new JButton(Globals.lang("Show description"));
-  private JButton removeButton = new JButton(Globals.lang("Remove"));
-  private JButton closeButton = new JButton(Globals.lang("Close"));
-  private JButton helpButton = new JButton(Globals.lang("Help"));
 
-  private JPanel buttons = new JPanel();
-  private JPanel mainPanel = new JPanel();
-  private JTable customImporterTable;
+    private JTable customImporterTable;
   private JabRefPreferences prefs = Globals.prefs;
   private ImportCustomizationDialog importCustomizationDialog;
 
@@ -118,99 +110,103 @@ public class ImportCustomizationDialog extends JDialog {
     this.importCustomizationDialog = this;
     frame = frame_;
 
-    addFromFolderButton.addActionListener(new ActionListener() {
-     public void actionPerformed(ActionEvent e) {
-       CustomImportList.Importer importer = prefs.customImports.new Importer();
-       importer.setBasePath( FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
-           Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false) );
-       String chosenFileStr = FileDialogs.getNewFile(frame, importer.getBasePath(), ".class",
-           Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
-       if (chosenFileStr != null) {
-         try {
-            importer.setClassName( pathToClass(importer.getBasePath(), new File(chosenFileStr)) );
-            importer.setName( importer.getInstance().getFormatName() );
-            importer.setCliId( importer.getInstance().getCLIId() );
-            addOrReplaceImporter(importer);
-            customImporterTable.revalidate();
-            customImporterTable.repaint();
-            frame.setUpImportMenus();
-         } catch (Exception exc) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", chosenFileStr));
-         } catch (NoClassDefFoundError exc) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
-         }
+      JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
+      addFromFolderButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              CustomImportList.Importer importer = prefs.customImports.new Importer();
+              importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
+                      Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
+              String chosenFileStr = FileDialogs.getNewFile(frame, importer.getBasePath(), ".class",
+                      Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
+              if (chosenFileStr != null) {
+                  try {
+                      importer.setClassName(pathToClass(importer.getBasePath(), new File(chosenFileStr)));
+                      importer.setName(importer.getInstance().getFormatName());
+                      importer.setCliId(importer.getInstance().getCLIId());
+                      addOrReplaceImporter(importer);
+                      customImporterTable.revalidate();
+                      customImporterTable.repaint();
+                      frame.setUpImportMenus();
+                  } catch (Exception exc) {
+                      JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", chosenFileStr));
+                  } catch (NoClassDefFoundError exc) {
+                      JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
+                  }
 
 
-       }
-      }
-    });
+              }
+          }
+      });
     addFromFolderButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
 
-    addFromJarButton.addActionListener(new ActionListener() {
-     public void actionPerformed(ActionEvent e) {
-       String basePath = FileDialogs.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
-           Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
-       ZipFile zipFile = null;
-       if (basePath != null) {
-         try {
-           zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
-         } catch (IOException exc) {
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
-                + "\n" + Globals.lang("Have you chosen the correct package path?"));
-           return;
-         } catch (NoClassDefFoundError exc) {
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", basePath)
-                + "\n" + Globals.lang("Have you chosen the correct package path?"));
-         }
-       }
+      JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
+      addFromJarButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              String basePath = FileDialogs.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
+                      Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+              ZipFile zipFile = null;
+              if (basePath != null) {
+                  try {
+                      zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
+                  } catch (IOException exc) {
+                      exc.printStackTrace();
+                      JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
+                              + "\n" + Globals.lang("Have you chosen the correct package path?"));
+                      return;
+                  } catch (NoClassDefFoundError exc) {
+                      exc.printStackTrace();
+                      JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", basePath)
+                              + "\n" + Globals.lang("Have you chosen the correct package path?"));
+                  }
+              }
 
-       if (zipFile != null) {
-         ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
-         zipFileChooser.setVisible(true);
-         customImporterTable.revalidate();
-         customImporterTable.repaint(10);
-         frame.setUpImportMenus();
-       }
+              if (zipFile != null) {
+                  ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
+                  zipFileChooser.setVisible(true);
+                  customImporterTable.revalidate();
+                  customImporterTable.repaint(10);
+                  frame.setUpImportMenus();
+              }
 
-      }
-    });
+          }
+      });
     addFromJarButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
 
-    showDescButton.addActionListener(new ActionListener() {
-     public void actionPerformed(ActionEvent e) {
-       int row = customImporterTable.getSelectedRow();
-       if (row != -1) {
-         CustomImportList.Importer importer = ((ImportTableModel)customImporterTable.getModel()).getImporter(row);
-         try {
-           ImportFormat importFormat = importer.getInstance();
-           JOptionPane.showMessageDialog(frame, importFormat.getDescription());
-         } catch (Exception exc) {
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
-         }
-       } else {
-         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
-       }
-     }
-    });
+      JButton showDescButton = new JButton(Globals.lang("Show description"));
+      showDescButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              int row = customImporterTable.getSelectedRow();
+              if (row != -1) {
+                  CustomImportList.Importer importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
+                  try {
+                      ImportFormat importFormat = importer.getInstance();
+                      JOptionPane.showMessageDialog(frame, importFormat.getDescription());
+                  } catch (Exception exc) {
+                      exc.printStackTrace();
+                      JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                  }
+              } else {
+                  JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
+              }
+          }
+      });
 
-    removeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        int row = customImporterTable.getSelectedRow();
-        if (row != -1) {
-          customImporterTable.removeRowSelectionInterval(row,row);
-          prefs.customImports.remove(((ImportTableModel)customImporterTable.getModel()).getImporter(row));
-          Globals.importFormatReader.resetImportFormats();
-          customImporterTable.revalidate();
-          customImporterTable.repaint();
-          frame.setUpImportMenus();
-        }  else {
-          JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
-        }
-      }
-    });
+      JButton removeButton = new JButton(Globals.lang("Remove"));
+      removeButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              int row = customImporterTable.getSelectedRow();
+              if (row != -1) {
+                  customImporterTable.removeRowSelectionInterval(row, row);
+                  prefs.customImports.remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
+                  Globals.importFormatReader.resetImportFormats();
+                  customImporterTable.revalidate();
+                  customImporterTable.repaint();
+                  frame.setUpImportMenus();
+              } else {
+                  JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
+              }
+          }
+      });
 
     AbstractAction closeAction = new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
@@ -218,10 +214,12 @@ public class ImportCustomizationDialog extends JDialog {
       }
     };
 
-    closeButton.addActionListener(closeAction);
+      JButton closeButton = new JButton(Globals.lang("Close"));
+      closeButton.addActionListener(closeAction);
 
-    helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp,
-                                          "Help"));
+      JButton helpButton = new JButton(Globals.lang("Help"));
+      helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp,
+              "Help"));
 
     ImportTableModel tableModel = new ImportTableModel();
     customImporterTable = new JTable(tableModel);
@@ -239,14 +237,16 @@ public class ImportCustomizationDialog extends JDialog {
     }
 
     // Key bindings:
-    ActionMap am = mainPanel.getActionMap();
+      JPanel mainPanel = new JPanel();
+      ActionMap am = mainPanel.getActionMap();
     InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     im.put(frame.prefs().getKey("Close dialog"), "close");
     am.put("close", closeAction);
     mainPanel.setLayout(new BorderLayout());
     mainPanel.add(sp, BorderLayout.CENTER);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+      JPanel buttons = new JPanel();
+      ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
     bb.addGlue();
     bb.addButton(addFromFolderButton);
     bb.addButton(addFromJarButton);
@@ -304,7 +304,7 @@ public class ImportCustomizationDialog extends JDialog {
     }
 
     public CustomImportList.Importer getImporter(int rowIndex) {
-      CustomImportList.Importer[] importers = Globals.prefs.customImports.toArray(new CustomImportList.Importer[] {});
+      CustomImportList.Importer[] importers = Globals.prefs.customImports.toArray(new CustomImportList.Importer[Globals.prefs.customImports.size()]);
       return importers[rowIndex];
     }
   }

@@ -48,19 +48,14 @@ public class ManagePluginsDialog {
 
     private JabRefFrame frame;
     private JDialog diag;
-    private SortedList<NameAndVersion> plugins, pluginsOther;
+    private SortedList<NameAndVersion> plugins;
     private JTable table, tableOther;
-    private TableFormat tableFormat, tableFormatOther;
-    private JButton close = new JButton(Globals.lang("Close")),
-            install = new JButton(Globals.lang("Install plugin")),
-            download = new JButton(Globals.lang("Download plugin")),
-            remove = new JButton(Globals.lang("Delete")),
-            help = new JButton(Globals.lang("Help"));
-    
-    
+
+
     public ManagePluginsDialog(JabRefFrame frame) {
         this.frame = frame;
         diag = new JDialog(frame, Globals.lang("Plugin manager"), false);
+        JButton help = new JButton(Globals.lang("Help"));
         help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.pluginHelp, "Help"));
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());
@@ -94,9 +89,13 @@ public class ManagePluginsDialog {
         
         ButtonBarBuilder b = new ButtonBarBuilder();
         b.addGlue();
+        JButton install = new JButton(Globals.lang("Install plugin"));
         b.addButton(install);
+        JButton download = new JButton(Globals.lang("Download plugin"));
         b.addButton(download);
+        JButton remove = new JButton(Globals.lang("Delete"));
         b.addButton(remove);
+        JButton close = new JButton(Globals.lang("Close"));
         b.addButton(close);
         b.addRelatedGap();
         b.addButton(help);
@@ -153,8 +152,8 @@ public class ManagePluginsDialog {
             if (reply != JOptionPane.YES_OPTION)
                 return;
             boolean success = true;
-            for (int i=0; i<sel.length; i++) {
-                PluginInstaller.NameAndVersion nav = plugins.get(sel[i]);
+            for (int aSel : sel) {
+                NameAndVersion nav = plugins.get(aSel);
                 success = PluginInstaller.deletePlugin(nav) & success;
             }
             if (!success) {
@@ -180,16 +179,16 @@ public class ManagePluginsDialog {
                 i.remove();
             }
         }
-        pluginsOther = new SortedList<NameAndVersion>(outsideUserDir);
-        tableFormatOther = new PluginTableFormat();
-        EventTableModel tableModel = new EventTableModel(pluginsOther, tableFormatOther);
+        SortedList<NameAndVersion> pluginsOther = new SortedList<NameAndVersion>(outsideUserDir);
+        TableFormat<NameAndVersion> tableFormatOther = new PluginTableFormat();
+        EventTableModel<NameAndVersion> tableModel = new EventTableModel<NameAndVersion>(pluginsOther, tableFormatOther);
         tableOther.setModel(tableModel);
         tableOther.getColumnModel().getColumn(0).setPreferredWidth(200);
         tableOther.getColumnModel().getColumn(1).setPreferredWidth(50);
         tableOther.getColumnModel().getColumn(2).setPreferredWidth(50);
 
-        tableFormat = new PluginTableFormat();
-        EventTableModel tableModelOther = new EventTableModel(plugins, tableFormat);
+        TableFormat<NameAndVersion> tableFormat = new PluginTableFormat();
+        EventTableModel<NameAndVersion> tableModelOther = new EventTableModel<NameAndVersion>(plugins, tableFormat);
         table.setModel(tableModelOther);
         table.getColumnModel().getColumn(0).setPreferredWidth(200);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
@@ -206,13 +205,11 @@ public class ManagePluginsDialog {
         if (filename == null)
             return;
         File f = new File(filename);
-        if (f != null) {
-            if (!f.exists()) {
-                JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+".",
-                        Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
-            } else {
-                installFromFile(f);
-            }
+        if (!f.exists()) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+".",
+                    Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
+        } else {
+            installFromFile(f);
         }
 
     }

@@ -265,7 +265,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 		if (prefs.getBoolean("useXmpPrivacyFilter")) {
-			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilters")));
+			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 			fields.removeAll(filters);
 		}
 		
@@ -307,7 +307,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 */
 	public static String getTextContent(Node node) {
 		boolean hasTextContent = false;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		NodeList nlist = node.getChildNodes();
 		for (int i = 0; i < nlist.getLength(); i++) {
 			Node child = nlist.item(i);

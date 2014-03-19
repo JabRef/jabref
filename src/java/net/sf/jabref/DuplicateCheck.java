@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * This class contains utility method for duplicate checking of entries.
@@ -83,20 +82,19 @@ public class DuplicateCheck {
     private static double[] compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
         double res = 0;
         double totWeights = 0.;
-        for (int i = 0; i < fields.length; i++) {
+        for (String field : fields) {
             // Util.pr(":"+compareSingleField(fields[i], one, two));
             double weight;
-            if (fieldWeights.containsKey(fields[i]))
-                weight = fieldWeights.get(fields[i]);
+            if (fieldWeights.containsKey(field))
+                weight = fieldWeights.get(field);
             else
                 weight = 1.0;
             totWeights += weight;
-            int result = compareSingleField(fields[i], one, two);
+            int result = compareSingleField(field, one, two);
             //System.out.println("Field: "+fields[i]+": "+result);
             if (result == Util.EQUAL) {
                 res += weight;
-            }
-            else if (result == Util.EMPTY_IN_BOTH)
+            } else if (result == Util.EMPTY_IN_BOTH)
                 totWeights -= weight;
         }
         if (totWeights > 0)
@@ -175,8 +173,7 @@ public class DuplicateCheck {
         allFields.addAll(two.getAllFields());
 
         int score = 0;
-        for (Iterator<String> fld = allFields.iterator(); fld.hasNext();) {
-            String field = fld.next();
+        for (String field : allFields) {
             Object en = one.getField(field), to = two.getField(field);
             if ((en != null) && (to != null) && (en.equals(to)))
                 score++;

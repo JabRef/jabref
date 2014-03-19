@@ -17,19 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import net.sf.jabref.Globals;
@@ -50,8 +38,6 @@ public class MetaDataListDialog extends JDialog {
     private JTable tableMetadata;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JScrollPane scrollPane;
-    private JPanel panelWait;
     private JLabel labelFetch;
     private JLabel iconLabel;
     private JButton blankButton;
@@ -148,7 +134,7 @@ public class MetaDataListDialog extends JDialog {
     }
 
     public void showDialog() {
-        SwingWorker worker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             public Void doInBackground() {
                 System.out.println("Starting Webclient...");
@@ -162,8 +148,8 @@ public class MetaDataListDialog extends JDialog {
                     xmlDocuments = SplWebClient.metadata;
                     if (xmlDocuments != null /*&& xmlDocuments.getDocuments() != null && xmlDocuments.getDocuments().size() > 0*/) {
                         DocumentsWrapper documents = new DocumentsWrapper(xmlDocuments);
-                        List<Vector> vectorList = documents.getDocuments();
-                        for (Vector vector : vectorList) {
+                        List<Vector<String>> vectorList = documents.getDocuments();
+                        for (Vector<String> vector : vectorList) {
                             tableModel.addRow(vector);
                         }
 
@@ -249,7 +235,7 @@ public class MetaDataListDialog extends JDialog {
 
 
         panelMetadata.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
-        scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
         tableMetadata.setAutoCreateRowSorter(false);
         tableMetadata.setEnabled(true);
@@ -257,15 +243,15 @@ public class MetaDataListDialog extends JDialog {
         tableMetadata.setShowVerticalLines(true);
         scrollPane.setViewportView(tableMetadata);
         panelMetadata.add(scrollPane, "scrollPane");
-        panelWait = new JPanel();
+        JPanel panelWait = new JPanel();
         panelWait.setLayout(new BorderLayout());
         panelWait.setBackground(new Color(-1));
         panelMetadata.add(panelWait, "panelWait");
         panelWait.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
         iconLabel = new JLabel();
         iconLabel.setBackground(new Color(-1));
-        iconLabel.setHorizontalAlignment(0);
-        iconLabel.setHorizontalTextPosition(11);
+        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        iconLabel.setHorizontalTextPosition(SwingConstants.TRAILING);
         iconLabel.setIcon(new ImageIcon(getClass().getResource("/spl/gui/ajax-loader.gif")));
         iconLabel.setText("");
         panelWait.add(iconLabel, BorderLayout.CENTER);
@@ -303,7 +289,7 @@ public class MetaDataListDialog extends JDialog {
         return contentPane;
     }
 
-    public class MyTableModel extends DefaultTableModel {
+    public static class MyTableModel extends DefaultTableModel {
 
         @Override
         public boolean isCellEditable(int row, int column) {

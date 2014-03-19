@@ -120,7 +120,6 @@ public class PushToVim implements PushToApplication {
                     if (sb.toString().trim().length() > 0) {
 			System.out.println(sb.toString());
                         couldNotConnect = true;
-                        return;
                     }
                 }
             };
@@ -130,7 +129,6 @@ public class PushToVim implements PushToApplication {
         }
         catch (IOException excep) {
             couldNotRunClient = true;
-            return;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

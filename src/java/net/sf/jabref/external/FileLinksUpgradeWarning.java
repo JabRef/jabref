@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.external;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.*;
@@ -148,8 +147,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      */
     public boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()){
-            for (int i = 0; i < fields.length; i++) {
-                if (entry.getField(fields[i]) != null)
+            for (String field : fields) {
+                if (entry.getField(field) != null)
                     return true;
             }
         }
@@ -184,13 +183,13 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             // Modify General fields if necessary:
             // If we don't find the file field, insert it at the bottom of the first tab:
             if (!showsFileInGenFields()) {
-                String gfs = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+"0");
+                String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS +"0");
                 //System.out.println(gfs);
                 StringBuffer sb = new StringBuffer(gfs);
                 if (gfs.length() > 0)
                     sb.append(";");
                 sb.append(GUIGlobals.FILE_FIELD);
-                Globals.prefs.put(Globals.prefs.CUSTOM_TAB_FIELDS+"0", sb.toString());
+                Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS +"0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
             }
@@ -203,8 +202,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         outer: for (int i=0; i<tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
-            for (Iterator<String> j=fields.iterator(); j.hasNext();) {
-                String field = j.next();
+            for (String field : fields) {
                 if (field.equals(GUIGlobals.FILE_FIELD)) {
                     found = true;
                     break outer;

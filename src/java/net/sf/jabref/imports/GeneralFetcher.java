@@ -55,7 +55,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
 			GUIGlobals.getImage("helpSmall")), reset = new JButton(
                                 Globals.lang("Reset"));
-    JComboBox fetcherChoice;
+    JComboBox<String> fetcherChoice;
     CardLayout optionsCards = new CardLayout();
     JPanel optionsPanel = new JPanel(optionsCards);
     JPanel optPanel = new JPanel(new BorderLayout());
@@ -84,7 +84,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-        fetcherChoice = new JComboBox(choices);
+        fetcherChoice = new JComboBox<String>(choices);
         int defaultFetcher = Globals.prefs.getInt("selectedFetcherIndex");
         if (defaultFetcher >= fetcherArray.length)
             defaultFetcher = 0;
@@ -154,7 +154,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         con.insets = new Insets(0, 0, 2, 0);
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
-        con.weighty = 0;
         con.weighty = 1;
         con.insets = new Insets(1, 0, 1, 0);
         con.fill = GridBagConstraints.BOTH;
@@ -310,7 +309,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         Globals.prefs.putBoolean("webSearchVisible", Boolean.TRUE);
     }
 
-    class EntryFetcherComparator implements Comparator<EntryFetcher> {
+    static class EntryFetcherComparator implements Comparator<EntryFetcher> {
         public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {
             return entryFetcher.getTitle().compareTo(entryFetcher1.getTitle());
         }

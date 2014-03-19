@@ -145,12 +145,8 @@ public class ImportFormatReader {
 
             result = importer.importEntries(stream, status);
         } finally {
-
-            try {
-                if (stream != null)
-                    stream.close();
-            } catch (IOException ex) {
-                throw ex;
+            if (stream != null) {
+                stream.close();
             }
         }
 
@@ -162,16 +158,14 @@ public class ImportFormatReader {
 
     BibtexDatabase database = new BibtexDatabase();
 
-    for (Iterator<BibtexEntry> i = bibentries.iterator(); i.hasNext();) {
-      BibtexEntry entry = i.next();
-
-      try {
-        entry.setId(Util.createNeutralId());
-        database.insertEntry(entry);
-      } catch (KeyCollisionException ex) {
-        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+      for (BibtexEntry entry : bibentries) {
+          try {
+              entry.setId(Util.createNeutralId());
+              database.insertEntry(entry);
+          } catch (KeyCollisionException ex) {
+              System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+          }
       }
-    }
 
     return database;
   }
@@ -261,7 +255,7 @@ public class ImportFormatReader {
       String[] authors = name.split(" and ");
       StringBuffer sb = new StringBuffer();
       for (int i=0; i<authors.length; i++) {
-          if (authors[i].indexOf(", ") >= 0) {
+          if (authors[i].contains(", ")) {
               String[] names = authors[i].split(", ");
               if (names.length > 0) {
                   sb.append(names[0]);

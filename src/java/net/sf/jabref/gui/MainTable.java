@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
@@ -115,7 +114,7 @@ public class MainTable extends JTable {
 
         this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
 
-        comparatorChooser = new MyTableComparatorChooser(this, sortedForTable,
+        comparatorChooser = this.createTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener =  new PersistenceTableColumnListener(this);
@@ -325,8 +324,7 @@ public class MainTable extends JTable {
     public List<Boolean> getCurrentSortOrder() {
         List<Boolean> order = new ArrayList<Boolean>();
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
-        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
-            int i = iterator.next();
+        for (Integer i : sortCols) {
             order.add(comparatorChooser.isColumnReverse(i));
         }
         return order;
@@ -335,8 +333,7 @@ public class MainTable extends JTable {
     public List<String> getCurrentSortFields() {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         List<String> fields = new ArrayList<String>();
-        for (Iterator<Integer> iterator = sortCols.iterator(); iterator.hasNext();) {
-            int i =  iterator.next();
+        for (Integer i : sortCols) {
             String name = tableFormat.getColumnType(i);
             if (name != null)
                 fields.add(name.toLowerCase());
@@ -658,19 +655,17 @@ public class MainTable extends JTable {
         }
     }
 
-    class MyTableComparatorChooser extends TableComparatorChooser<BibtexEntry> {
-        public MyTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
-                                        Object sortingStrategy) {
-            super(table, list, sortingStrategy);
-            // We need to reset the stack of sorted list each time sorting order
-            // changes, or the sorting breaks down:
-            addSortActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    //System.out.println("...");
-                    refreshSorting();
-                }
-            });
-        }
+    public TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
+                                                                            Object sortingStrategy) {
+        final TableComparatorChooser<BibtexEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
+        result.addSortActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // We need to reset the stack of sorted list each time sorting order
+                // changes, or the sorting breaks down:
+                refreshSorting();
+            }
+        });
+        return result;
     }
 
     /**
@@ -708,7 +703,7 @@ public class MainTable extends JTable {
         if (l.size() <= number)
             return -1;
         else
-            return (l.get(number)).intValue();
+            return l.get(number);
     }
     
     public PersistenceTableColumnListener getTableColumnListener() {

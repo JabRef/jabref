@@ -65,10 +65,10 @@ public class MedlineHandler extends DefaultHandler
 		if(localName.equals("PubmedArticle")){}
 		else if(localName.equals("ArticleTitle")){ inTitle=true; title="";}
 		else if(localName.equals("PubDate")){inPubDate=true;}
-		else if(localName.equals("Year") && inPubDate==true){inYear=true;}
-		else if( localName.equals("MedlineDate") && inPubDate==true){inMedlineDate=true;} // medline date does not have 4 digit dates instead it has multiyear etc
+		else if(localName.equals("Year") && inPubDate){inYear=true;}
+		else if( localName.equals("MedlineDate") && inPubDate){inMedlineDate=true;} // medline date does not have 4 digit dates instead it has multiyear etc
 		else if(localName.equals("MedlineTA")){inJournal=true;journal="";} //journal name
-		else if(localName.equals("Month") && inPubDate==true){inMonth=true;}
+		else if(localName.equals("Month") && inPubDate){inMonth=true;}
 		else if(localName.equals("Volume")){inVolume=true;}
         else if(localName.equals("Language")){inLanguage=true;}
         else if(localName.equals("PublicationStatus")){inPst=true;}
@@ -123,7 +123,6 @@ public class MedlineHandler extends DefaultHandler
         else if(localName.equals("Affiliation")){ inAffiliation=true; }
 
 
-		return;
     }
     String join(Object[] sa,String delim){
 		StringBuffer sb=new StringBuffer();

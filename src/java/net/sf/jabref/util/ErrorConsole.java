@@ -148,7 +148,7 @@ public class ErrorConsole  extends Handler {
             try {
                 super.write(buf, off, len);
                 out.write(buf, off, len);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         public void flush() {

@@ -85,31 +85,31 @@ public class MODSEntry {
 		LayoutFormatter chars = new XMLChars();
 		if (bibtex.getField("title") != null) {
 			if(CHARFORMAT)
-				title = chars.format(bibtex.getField("title").toString());
+				title = chars.format(bibtex.getField("title"));
 			else
-				title = bibtex.getField("title").toString();
+				title = bibtex.getField("title");
 		}
 		
 		if (bibtex.getField("publisher") != null) {
 			if(CHARFORMAT)
-				publisher = chars.format(bibtex.getField("publisher").toString());
+				publisher = chars.format(bibtex.getField("publisher"));
 			else
-				publisher = bibtex.getField("publisher").toString();
+				publisher = bibtex.getField("publisher");
 		}
 			
 		if (bibtex.getField("bibtexkey") != null)
-			id = bibtex.getField("bibtexkey").toString();
+			id = bibtex.getField("bibtexkey");
 		if (bibtex.getField("place") != null) {
 			if(CHARFORMAT)
-				place = chars.format(bibtex.getField("place").toString());
+				place = chars.format(bibtex.getField("place"));
 			else
-				place = bibtex.getField("place").toString();
+				place = bibtex.getField("place");
 		}
 			
 		date = getDate(bibtex);	
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
-			authors = getAuthors(bibtex.getField("author").toString());
+			authors = getAuthors(bibtex.getField("author"));
 		if (bibtex.getType() == BibtexEntryType.ARTICLE || 
 			bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
 		{
@@ -142,7 +142,7 @@ public class MODSEntry {
 		List<PersonName> result = new LinkedList<PersonName>();
 		LayoutFormatter chars = new XMLChars();
 		
-		if (authors.indexOf(" and ") == -1) {
+		if (!authors.contains(" and ")) {
 			if(CHARFORMAT)
 				result.add(new PersonName(chars.format(authors)));
 			else
@@ -151,11 +151,11 @@ public class MODSEntry {
         else
         {
             String[] names = authors.split(" and ");
-            for (int i=0; i<names.length; i++) {
-            	if(CHARFORMAT)
-            		result.add(new PersonName(chars.format(names[i])));
-            	else
-            		result.add(new PersonName(names[i]));
+            for (String name : names) {
+                if (CHARFORMAT)
+                    result.add(new PersonName(chars.format(name)));
+                else
+                    result.add(new PersonName(name));
             }
         }
 		return result;
@@ -165,9 +165,9 @@ public class MODSEntry {
 	protected String getDate(BibtexEntry bibtex) {
 		String result = "";
 		if (bibtex.getField("year") != null)
-			result += (bibtex.getField("year").toString());
+			result += (bibtex.getField("year"));
 		if (bibtex.getField("month") != null)
-			result += "-" + bibtex.getField("month").toString();
+			result += "-" + bibtex.getField("month");
 		
 		return result;
 	}
@@ -210,30 +210,29 @@ public class MODSEntry {
 		   		mods.appendChild(titleInfo);
 	   		}
 	   		if (authors != null) {
-	   			for(Iterator<PersonName> iter = authors.iterator(); iter.hasNext();) {
-	   				PersonName name = iter.next();
-	   				Element modsName = d.createElement("name");
-	   				modsName.setAttribute("type", "personal");
-	   				if (name.getSurname() != null) {
-	   					Element namePart = d.createElement("namePart");
-	   					namePart.setAttribute("type", "family");
-	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
-	   					modsName.appendChild(namePart);
-	   				}
-	   				if (name.getGivenNames() != null) {
-	   					Element namePart = d.createElement("namePart");
-	   					namePart.setAttribute("type", "given");
-	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
-	   					modsName.appendChild(namePart);
-	   				}
-	   				Element role = d.createElement("role");
-	   				Element roleTerm = d.createElement("roleTerm");
-	   				roleTerm.setAttribute("type", "text");
-	   				roleTerm.appendChild(d.createTextNode("author"));
-	   				role.appendChild(roleTerm);
-	   				modsName.appendChild(role);
-	   				mods.appendChild(modsName);
-	   			}
+                for (PersonName name : authors) {
+                    Element modsName = d.createElement("name");
+                    modsName.setAttribute("type", "personal");
+                    if (name.getSurname() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "family");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
+                        modsName.appendChild(namePart);
+                    }
+                    if (name.getGivenNames() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "given");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
+                        modsName.appendChild(namePart);
+                    }
+                    Element role = d.createElement("role");
+                    Element roleTerm = d.createElement("roleTerm");
+                    roleTerm.setAttribute("type", "text");
+                    roleTerm.appendChild(d.createTextNode("author"));
+                    role.appendChild(roleTerm);
+                    modsName.appendChild(role);
+                    mods.appendChild(modsName);
+                }
 	   		}
 	   		//publisher
 	   		Element originInfo = d.createElement("originInfo");

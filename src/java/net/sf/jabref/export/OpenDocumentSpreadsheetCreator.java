@@ -19,7 +19,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.Set;
 import java.util.zip.CRC32;
-import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -125,7 +124,6 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             throw new Error(e);
         }
 
-        return;
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {

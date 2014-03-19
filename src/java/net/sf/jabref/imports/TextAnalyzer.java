@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.imports;
 
-import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -57,27 +56,26 @@ public class TextAnalyzer {
         // More than one four-digit numbers, so we look for one giving a reasonable year:
 
         int good = -1, yearFound = -1;
-        find: for (int i=0; i<cand.length; i++) {
-          int number = Integer.parseInt(cand[i].trim());
-          if (number == yearFound)
-            continue find;
-          if (number < 2500) {
-            if (good == -1) {
-              good = i;
-              yearFound = number;
-            } else {
-              // More than one found. Be a bit more specific.
-              if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
-                good = -1;
-                break find; // Give up, both seem good enough.
+          for (int i = 0; i < cand.length; i++) {
+              int number = Integer.parseInt(cand[i].trim());
+              if (number == yearFound)
+                  continue;
+              if (number < 2500) {
+                  if (good == -1) {
+                      good = i;
+                      yearFound = number;
+                  } else {
+                      // More than one found. Be a bit more specific.
+                      if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                          good = -1;
+                          break; // Give up, both seem good enough.
+                      } else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                          good = i;
+                          yearFound = number;
+                      }
+                  }
               }
-              else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
-                good = i;
-                yearFound = number;
-              }
-            }
           }
-        }
         if (good >= 0) {
           year = clean(cand[good]);
           int pos = text.indexOf(year);
@@ -97,16 +95,16 @@ public class TextAnalyzer {
         Util.pr("Guessing 'pages': '" + pages + "'");
       } else if (cand.length > 1) {
         int found = -1;
-        checkScope: for (int i=0; i<cand.length; i++) {
-          split = clean(cand[i].replaceAll("\\s", "")).split("-");
-               //   Util.pr("Pg: "+pages);
-          int first = Integer.parseInt(split[0]),
-              second = Integer.parseInt(split[1]);
-          if (second-first > 3) {
-            found = i;
-            break checkScope;
+          for (int i = 0; i < cand.length; i++) {
+              split = clean(cand[i].replaceAll("\\s", "")).split("-");
+              //   Util.pr("Pg: "+pages);
+              int first = Integer.parseInt(split[0]),
+                      second = Integer.parseInt(split[1]);
+              if (second - first > 3) {
+                  found = i;
+                  break;
+              }
           }
-        }
         if (found >= 0) {
           pages = clean(cand[found].replaceAll("-|( - )", "--"));
           int pos = text.indexOf(cand[found]);
@@ -149,13 +147,13 @@ public class TextAnalyzer {
       Substring ss;
       Vector<String> free = new Vector<String>();
       int piv = 0;
-      for (Iterator<Substring> i=usedParts.iterator(); i.hasNext();) {
-        ss = i.next();
-        if (ss.begin()-piv > 10) {
-          Util.pr("... "+text.substring(piv, ss.begin()));
-          free.add(clean(text.substring(piv, ss.begin())));
-        }
-        piv = ss.end();
+      for (Substring usedPart : usedParts) {
+          ss = usedPart;
+          if (ss.begin() - piv > 10) {
+              Util.pr("... " + text.substring(piv, ss.begin()));
+              free.add(clean(text.substring(piv, ss.begin())));
+          }
+          piv = ss.end();
       }
       if (text.length()-piv > 10) {
         free.add(clean(text.substring(piv)));
@@ -224,7 +222,7 @@ public class TextAnalyzer {
 		}
 
 		public int compareTo(Substring other) {
-			return (new Integer(begin)).compareTo(new Integer(other.begin()));
+			return (new Integer(begin)).compareTo(other.begin());
 		}
 	}
 }

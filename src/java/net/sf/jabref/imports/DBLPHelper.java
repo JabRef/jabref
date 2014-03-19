@@ -64,8 +64,7 @@ public class DBLPHelper {
 	 *            page as String
 	 * @return list of BibtexEntry
 	 */
-	public List<BibtexEntry> getBibTexFromPage(final String page)
-			throws DBLPParseException {
+	public List<BibtexEntry> getBibTexFromPage(final String page) {
 		final List<BibtexEntry> bibtexList = new ArrayList<BibtexEntry>();
 		final String startPattern = "<pre>";
 		final String endPattern = "</pre>";

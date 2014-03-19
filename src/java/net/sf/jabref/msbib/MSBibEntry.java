@@ -16,7 +16,6 @@
 package net.sf.jabref.msbib;
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -297,84 +296,84 @@ public class MSBibEntry {
 		sourceType = getMSBibSourceType(bibtex);
 
 		if (bibtex.getField("bibtexkey") != null)
-			tag = bibtex.getField("bibtexkey").toString();
+			tag = bibtex.getField("bibtexkey");
 
 		if (bibtex.getField("language") != null)
-			LCID = getLCID(bibtex.getField("language").toString());
+			LCID = getLCID(bibtex.getField("language"));
 
 		if (bibtex.getField("title") != null)
-			title = bibtex.getField("title").toString();
+			title = bibtex.getField("title");
 		if (bibtex.getField("year") != null)
-			year = bibtex.getField("year").toString();
+			year = bibtex.getField("year");
 		if (bibtex.getField("month") != null)
-			month = bibtex.getField("month").toString();
+			month = bibtex.getField("month");
 		if (bibtex.getField(MSBIB+"day") != null)
-			day = bibtex.getField(MSBIB+"day").toString();
+			day = bibtex.getField(MSBIB + "day");
 
 		if (bibtex.getField(MSBIB+"shorttitle") != null)
-			shortTitle = bibtex.getField(MSBIB+"shorttitle").toString();
+			shortTitle = bibtex.getField(MSBIB + "shorttitle");
 		if (bibtex.getField("note") != null)
-			comments = bibtex.getField("note").toString();
+			comments = bibtex.getField("note");
 
 		if (bibtex.getField("pages") != null)
-			pages = new PageNumbers(bibtex.getField("pages").toString());
+			pages = new PageNumbers(bibtex.getField("pages"));
 
 		if (bibtex.getField("volume") != null)
-			volume = bibtex.getField("volume").toString();
+			volume = bibtex.getField("volume");
 
 		if (bibtex.getField(MSBIB+"numberofvolume") != null)
-			numberOfVolumes = bibtex.getField(MSBIB+"numberofvolume").toString();
+			numberOfVolumes = bibtex.getField(MSBIB + "numberofvolume");
 
 		if (bibtex.getField("edition") != null)
-			edition = bibtex.getField("edition").toString();
+			edition = bibtex.getField("edition");
 		
-		standardNumber = new String();
+		standardNumber = "";
 		if (bibtex.getField("isbn") != null) /* SM: 2010.10: lower case */
-			standardNumber += " ISBN: " + bibtex.getField("isbn").toString(); /* SM: 2010.10: lower case */
+			standardNumber += " ISBN: " + bibtex.getField("isbn"); /* SM: 2010.10: lower case */
 		if (bibtex.getField("issn") != null) /* SM: 2010.10: lower case */
-			standardNumber += " ISSN: "+ bibtex.getField("issn").toString(); /* SM: 2010.10: lower case */
+			standardNumber += " ISSN: "+ bibtex.getField("issn"); /* SM: 2010.10: lower case */
 		if (bibtex.getField("lccn") != null) /* SM: 2010.10: lower case */
-			standardNumber += " LCCN: "+ bibtex.getField("lccn").toString(); /* SM: 2010.10: lower case */
+			standardNumber += " LCCN: "+ bibtex.getField("lccn"); /* SM: 2010.10: lower case */
 		if (bibtex.getField("mrnumber") != null)
-			standardNumber += " MRN: "+ bibtex.getField("mrnumber").toString();
+			standardNumber += " MRN: "+ bibtex.getField("mrnumber");
 		/* SM: 2010.10 begin DOI support */	
 		if (bibtex.getField("doi") != null)
-			standardNumber += " DOI: "+ bibtex.getField("doi").toString();
+			standardNumber += " DOI: "+ bibtex.getField("doi");
 		/* SM: 2010.10 end DOI support */	
 		if(standardNumber.equals(""))
 			standardNumber = null;
 
 		if (bibtex.getField("publisher") != null)
-			publisher = bibtex.getField("publisher").toString();
+			publisher = bibtex.getField("publisher");
 
 		if (bibtex.getField("address") != null)
-			address = bibtex.getField("address").toString();
+			address = bibtex.getField("address");
 
 		if (bibtex.getField("booktitle") != null)
-			bookTitle = bibtex.getField("booktitle").toString();
+			bookTitle = bibtex.getField("booktitle");
 
 		if (bibtex.getField("chapter") != null)
-			chapterNumber = bibtex.getField("chapter").toString();
+			chapterNumber = bibtex.getField("chapter");
 
 		if (bibtex.getField("journal") != null)
-			journalName = bibtex.getField("journal").toString();
+			journalName = bibtex.getField("journal");
 
 		if (bibtex.getField("number") != null)
-			issue = bibtex.getField("number").toString();
+			issue = bibtex.getField("number");
 
 		if (bibtex.getField(MSBIB+"periodical") != null)
-			periodicalTitle = bibtex.getField(MSBIB+"periodical").toString();
+			periodicalTitle = bibtex.getField(MSBIB + "periodical");
 		
 		if (bibtex.getField("booktitle") != null)
-			conferenceName = bibtex.getField("booktitle").toString();
+			conferenceName = bibtex.getField("booktitle");
 		if (bibtex.getField("school") != null)
-			department = bibtex.getField("school").toString();
+			department = bibtex.getField("school");
 		if (bibtex.getField("institution") != null)
-			institution = bibtex.getField("institution").toString();
+			institution = bibtex.getField("institution");
 
 		/* SM: 2010.10 Modified for default source types */
 		if (bibtex.getField("type") != null)
-			thesisType = bibtex.getField("type").toString();
+			thesisType = bibtex.getField("type");
 		else
 		{
 			if (bibtex.getType().getName().equalsIgnoreCase("techreport"))
@@ -390,82 +389,82 @@ public class MSBibEntry {
 		}
 		
 		
-		if ( (sourceType.equals("InternetSite")==true || sourceType.equals("DocumentFromInternetSite")==true)
+		if ( (sourceType.equals("InternetSite") || sourceType.equals("DocumentFromInternetSite"))
 				&& bibtex.getField("title") != null)
-			internetSiteTitle = bibtex.getField("title").toString();
+			internetSiteTitle = bibtex.getField("title");
 		if (bibtex.getField(MSBIB+"accessed") != null)
-			dateAccessed = bibtex.getField(MSBIB+"accessed").toString();
+			dateAccessed = bibtex.getField(MSBIB + "accessed");
 		if (bibtex.getField("url") != null) /* SM: 2010.10: lower case */
-			url = bibtex.getField("url").toString(); /* SM: 2010.10: lower case */
+			url = bibtex.getField("url"); /* SM: 2010.10: lower case */
 		if (bibtex.getField(MSBIB+"productioncompany") != null)
-			productionCompany = bibtex.getField(MSBIB+"productioncompany").toString();
+			productionCompany = bibtex.getField(MSBIB + "productioncompany");
 		
-		if ( (sourceType.equals("ElectronicSource")==true 
-				|| sourceType.equals("Art")==true
-				|| sourceType.equals("Misc")==true)
+		if ( (sourceType.equals("ElectronicSource")
+				|| sourceType.equals("Art")
+				|| sourceType.equals("Misc"))
 				&& bibtex.getField("title") != null)
-			publicationTitle = bibtex.getField("title").toString();
+			publicationTitle = bibtex.getField("title");
 		if (bibtex.getField(MSBIB+"medium") != null)
-			medium = bibtex.getField(MSBIB+"medium").toString();
-		if (sourceType.equals("SoundRecording")==true && bibtex.getField("title") != null)
-			albumTitle = bibtex.getField("title").toString();
+			medium = bibtex.getField(MSBIB + "medium");
+		if (sourceType.equals("SoundRecording") && bibtex.getField("title") != null)
+			albumTitle = bibtex.getField("title");
 		if (bibtex.getField(MSBIB+"recordingnumber") != null)
-			recordingNumber = bibtex.getField(MSBIB+"recordingnumber").toString();
+			recordingNumber = bibtex.getField(MSBIB + "recordingnumber");
 		if (bibtex.getField(MSBIB+"theater") != null)
-			theater = bibtex.getField(MSBIB+"theater").toString();
+			theater = bibtex.getField(MSBIB + "theater");
 		if (bibtex.getField(MSBIB+"distributor") != null)
-			distributor = bibtex.getField(MSBIB+"distributor").toString();
-		if (sourceType.equals("Interview")==true && bibtex.getField("title") != null)
-			broadcastTitle = bibtex.getField("title").toString();
+			distributor = bibtex.getField(MSBIB + "distributor");
+		if (sourceType.equals("Interview") && bibtex.getField("title") != null)
+			broadcastTitle = bibtex.getField("title");
 		if (bibtex.getField(MSBIB+"broadcaster") != null)
-			broadcaster = bibtex.getField(MSBIB+"broadcaster").toString();
+			broadcaster = bibtex.getField(MSBIB + "broadcaster");
 		if (bibtex.getField(MSBIB+"station") != null)
-			station = bibtex.getField(MSBIB+"station").toString();
+			station = bibtex.getField(MSBIB + "station");
 		if (bibtex.getField(MSBIB+"type") != null)
-			type = bibtex.getField(MSBIB+"type").toString();
+			type = bibtex.getField(MSBIB + "type");
 		if (bibtex.getField(MSBIB+"patentnumber") != null)
-			patentNumber = bibtex.getField(MSBIB+"patentnumber").toString();
+			patentNumber = bibtex.getField(MSBIB + "patentnumber");
 		if (bibtex.getField(MSBIB+"court") != null)
-			court = bibtex.getField(MSBIB+"court").toString();
+			court = bibtex.getField(MSBIB + "court");
 		if (bibtex.getField(MSBIB+"reporter") != null)
-			reporter = bibtex.getField(MSBIB+"reporter").toString();
+			reporter = bibtex.getField(MSBIB + "reporter");
 		if (bibtex.getField(MSBIB+"casenumber") != null)
-			caseNumber = bibtex.getField(MSBIB+"casenumber").toString();
+			caseNumber = bibtex.getField(MSBIB + "casenumber");
 		if (bibtex.getField(MSBIB+"abbreviatedcasenumber") != null)
-			abbreviatedCaseNumber = bibtex.getField(MSBIB+"abbreviatedcasenumber").toString();
+			abbreviatedCaseNumber = bibtex.getField(MSBIB + "abbreviatedcasenumber");
 		
 		if (bibtex.getField("series") != null)
-			bibTex_Series = bibtex.getField("series").toString();
+			bibTex_Series = bibtex.getField("series");
 		if (bibtex.getField("abstract") != null)
-			bibTex_Abstract = bibtex.getField("abstract").toString();
+			bibTex_Abstract = bibtex.getField("abstract");
 		if (bibtex.getField("keywords") != null)
-			bibTex_KeyWords = bibtex.getField("keywords").toString();
+			bibTex_KeyWords = bibtex.getField("keywords");
 		if (bibtex.getField("crossref") != null)
-			bibTex_CrossRef = bibtex.getField("crossref").toString();
+			bibTex_CrossRef = bibtex.getField("crossref");
 		if (bibtex.getField("howpublished") != null)
-			bibTex_HowPublished = bibtex.getField("howpublished").toString();
+			bibTex_HowPublished = bibtex.getField("howpublished");
 		if (bibtex.getField("affiliation") != null)
-			bibTex_Affiliation = bibtex.getField("affiliation").toString();
+			bibTex_Affiliation = bibtex.getField("affiliation");
 		if (bibtex.getField("contents") != null)
-			bibTex_Contents = bibtex.getField("contents").toString();
+			bibTex_Contents = bibtex.getField("contents");
 		if (bibtex.getField("copyright") != null)
-			bibTex_Copyright = bibtex.getField("copyright").toString();
+			bibTex_Copyright = bibtex.getField("copyright");
 		if (bibtex.getField("price") != null)
-			bibTex_Price = bibtex.getField("price").toString();
+			bibTex_Price = bibtex.getField("price");
 		if (bibtex.getField("size") != null)
-			bibTex_Size = bibtex.getField("size").toString();
+			bibTex_Size = bibtex.getField("size");
 	 
 		/* SM: 2010.10 end intype, paper support */	
 		if (bibtex.getField("intype") != null)
-			bibTex_InType = bibtex.getField("intype").toString();
+			bibTex_InType = bibtex.getField("intype");
 		if (bibtex.getField("paper") != null)
-			bibTex_Paper = bibtex.getField("paper").toString();
+			bibTex_Paper = bibtex.getField("paper");
 
 		
 		if (bibtex.getField("author") != null)
-			authors = getAuthors(bibtex.getField("author").toString());
+			authors = getAuthors(bibtex.getField("author"));
         if (bibtex.getField("editor") != null)
-            editors = getAuthors(bibtex.getField("editor").toString());
+            editors = getAuthors(bibtex.getField("editor"));
         
 		if(FORMATXML)
 		{
@@ -570,16 +569,15 @@ public class MSBibEntry {
 	protected List<PersonName> getAuthors(String authors) {
 		List<PersonName> result = new LinkedList<PersonName>();
 		
-		if (authors.indexOf(" and ") == -1)
+		if (!authors.contains(" and "))
 		{
 				result.add(new PersonName(authors));
 		}
         else
         {
             String[] names = authors.split(" and ");
-            for (int i=0; i<names.length; i++)
-            {
-            		result.add(new PersonName(names[i]));
+            for (String name : names) {
+                result.add(new PersonName(name));
             }
         }
 		return result;
@@ -589,9 +587,9 @@ public class MSBibEntry {
 	protected String getDate(BibtexEntry bibtex) {
 		String result = "";
 		if (bibtex.getField("year") != null)
-			result += (bibtex.getField("year").toString());
+			result += (bibtex.getField("year"));
 		if (bibtex.getField("month") != null)
-			result += "-" + bibtex.getField("month").toString();
+			result += "-" + bibtex.getField("month");
 		
 		return result;
 	}
@@ -678,14 +676,13 @@ public class MSBibEntry {
 			return;
 		Element authorTop = d.createElement(bcol+entryName);
 		Element nameList = d.createElement(bcol+"NameList");
-		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = iter.next();
-			Element person = d.createElement(bcol+"Person");
-			addField(d, person,"Last",name.getSurname());
-			addField(d, person,"Middle",name.getMiddlename());
-			addField(d, person,"First",name.getFirstname());
-			nameList.appendChild(person);
-		}
+        for (PersonName name : authorsLst) {
+            Element person = d.createElement(bcol + "Person");
+            addField(d, person, "Last", name.getSurname());
+            addField(d, person, "Middle", name.getMiddlename());
+            addField(d, person, "First", name.getFirstname());
+            nameList.appendChild(person);
+        }
 		authorTop.appendChild(nameList);
 		
 		allAuthors.appendChild(authorTop);
@@ -870,13 +867,12 @@ public class MSBibEntry {
 			return;
 		String allAuthors = "";
 		boolean First = true;
-		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = iter.next();
-			if(First == false)
-				allAuthors += " and ";
-			allAuthors += name.getFullname();
-			First = false;
-		}
+        for (PersonName name : authorsLst) {
+            if (!First)
+                allAuthors += " and ";
+            allAuthors += name.getFullname();
+            First = false;
+        }
 		hm.put(type,allAuthors);
 	}
 

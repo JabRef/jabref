@@ -67,11 +67,7 @@ public class PushToLatexEditor implements PushToApplication {
         }
 
         try {
-            StringBuffer toSend = new StringBuffer("-i ")
-                    .append(Globals.prefs.get("citeCommandLed")).append("{")
-                    .append(keyString)
-                    .append("}");
-            Runtime.getRuntime().exec(led + " " + toSend.toString());
+            Runtime.getRuntime().exec(led + " " + "-i " + Globals.prefs.get("citeCommandLed") + "{" + keyString + "}");
 
         }
 

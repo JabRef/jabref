@@ -163,8 +163,8 @@ public class RemoteListener extends Thread {
                 return false;
             }
 
-            for (int i=0; i<args.length; i++) {
-                byte[] bytes = args[i].getBytes();
+            for (String arg : args) {
+                byte[] bytes = arg.getBytes();
                 out.write(bytes);
                 out.write('\n');
             }

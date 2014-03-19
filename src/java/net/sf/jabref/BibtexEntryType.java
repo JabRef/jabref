@@ -896,16 +896,14 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
     public boolean isRequired(String field) {
 	String[] req = getRequiredFields();
 	if (req == null) return false;
-	for (int i=0; i<req.length; i++)
-	    if (req[i].equals(field)) return true;
+        for (String aReq : req) if (aReq.equals(field)) return true;
 	return false;
     }
 
     public boolean isOptional(String field) {
 	String[] opt = getOptionalFields();
 	if (opt == null) return false;
-	for (int i=0; i<opt.length; i++)
-	    if (opt[i].equals(field)) return true;
+        for (String anOpt : opt) if (anOpt.equals(field)) return true;
 	return false;
     }
     

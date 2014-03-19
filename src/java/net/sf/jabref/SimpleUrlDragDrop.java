@@ -113,7 +113,6 @@ public class SimpleUrlDragDrop implements DropTargetListener {
             //insert URL
             editor.setText(url.toString());
             storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-            return;
         }catch (UnsupportedFlavorException nfe){
             // if not an URL
             JOptionPane.showMessageDialog((Component) editor, 

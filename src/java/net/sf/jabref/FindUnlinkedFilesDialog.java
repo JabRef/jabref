@@ -124,8 +124,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 	protected JTree tree;
 	protected JScrollPane scrollpaneTree;
-	protected JComboBox comboBoxFileTypeSelection;
-	protected JComboBox comboBoxEntryTypeSelection;
+	protected JComboBox<FileFilter> comboBoxFileTypeSelection;
+	protected JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
 	
 	private JProgressBar progressBarSearching;
 	private JProgressBar progressBarImporting;
@@ -136,17 +136,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	private Action actionUnselectAll;
 	private Action actionExpandTree;
 	private Action actionCollapseTree;
-	
-	private ActionListener actionListenerImportEntrys;
-	
-	private ComponentListener dialogPositionListener;
+
+    private ComponentListener dialogPositionListener;
 	
 	private int[] threadState = new int[] {1};
 	private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing = false;
 	
 	/**
 	 * For Unit-testing only. <i>Don't remove!</i> <br>
-	 * Used via reflection in {@link DatabaseFileLookupTest} to construct this
+	 * Used via reflection in {@link net.sf.jabref.imports.DatabaseFileLookup} to construct this
 	 * class.
 	 */
 	@SuppressWarnings("unused")
@@ -210,7 +208,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 				String[] dim = store.split(";");
 				dimension = new Dimension(new Integer(dim[0]), new Integer(dim[1]));
 			}
-			catch (Exception e) {
+			catch (Exception ignored) {
 			}
 		}
 		if (dimension != null) {
@@ -303,7 +301,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * Stores the working directory path for this view in the global
 	 * preferences.
 	 * 
-	 * @param A
+	 * @param lastSelectedDirectory
 	 *            directory that is used as the working directory in this view.
 	 */
 	private void storeLastSelectedDirectory(File lastSelectedDirectory) {
@@ -415,13 +413,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 */
 	private void disOrEnableAllElements(Container startContainer, boolean enable) {
 		Component[] children = startContainer.getComponents();
-		for (int i = 0; i < children.length; i++) {
-			Component child = children[i];
-			if (child instanceof Container) {
-				disOrEnableAllElements((Container) child, enable);
-			}
-			child.setEnabled(enable);
-		}
+        for (Component child : children) {
+            if (child instanceof Container) {
+                disOrEnableAllElements((Container) child, enable);
+            }
+            child.setEnabled(enable);
+        }
 	}
 
 	/**
@@ -504,7 +501,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * The import itself will run in a seperate thread, whilst this dialog will
 	 * be showing a progress bar, until the thread has finished its work. <br>
 	 * <br>
-	 * When the import has finished, the {@link #importFinishedHandler(List)} is
+	 * When the import has finished, the {@link #importFinishedHandler(int, java.util.List)} is
 	 * invoked.
 	 */
 	protected void startImport() {
@@ -565,7 +562,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		
 		if (errors != null && errors.size() > 0) {
 			
-			StringBuffer warningInfo = new StringBuffer();
+			StringBuilder warningInfo = new StringBuilder();
 			warningInfo.append("The import finished with warnings:\n");
 			warningInfo.append("There ");
 			warningInfo.append(errors.size() > 1 ? "were " : "was ");
@@ -641,11 +638,11 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		 * Actions on this button will start the import of all file of all
 		 * selected nodes in this dialogs tree view. <br>
 		 */
-		actionListenerImportEntrys =  new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				startImport();
-			}
-		};
+        ActionListener actionListenerImportEntrys = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startImport();
+            }
+        };
 		
 		buttonApply.addActionListener(actionListenerImportEntrys);
 		
@@ -920,7 +917,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	 * @param insets
 	 *            Insets of the component. Can be <code>null</code>.
 	 */
-	private final static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill, Integer anchor,
+	private static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill, Integer anchor,
 			Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY, int ipadX, int ipadY) {
 		container.setLayout(layout);
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -1011,7 +1008,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		for (FileFilter fileFilter : fileFilterList) {
 			vector.add(fileFilter);
 		}
-		comboBoxFileTypeSelection = new JComboBox(vector);
+		comboBoxFileTypeSelection = new JComboBox<FileFilter>(vector);
 		
 		comboBoxFileTypeSelection.setRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = 8503499454763947465L;
@@ -1046,7 +1043,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		while(iterator.hasNext()) {
 			list.add(new BibtexEntryTypeWrapper(iterator.next()));
 		}
-		comboBoxEntryTypeSelection = new JComboBox(list);
+		comboBoxEntryTypeSelection = new JComboBox<BibtexEntryTypeWrapper>(list);
 	}
 	
 	/**
@@ -1138,7 +1135,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 			checkbox.setSelected(node.getSelected());
 
             try { setIcon(fsv.getSystemIcon(userObject.file)); }
-            catch (Exception e) {}
+            catch (Exception ignored) {}
 			
 			newPanel.setBackground(nodeComponent.getBackground());
 			checkbox.setBackground(nodeComponent.getBackground());
@@ -1165,8 +1162,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		}
 
 		/**
-		 * @param directory
-		 * @param length
+		 * @param aDirectory
+		 * @param fileCount
 		 */
 		public FileNodeWrapper(File aDirectory, int fileCount) {
 			this.file = aDirectory;

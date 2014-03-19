@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.util;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -227,8 +226,8 @@ public class NameListNormalizer {
             // Name doesn't contain comma
             String[] parts = name.split(" +");
             boolean allNames = true;
-            for (int i = 0; i < parts.length; i++) {
-                m = singleName.matcher(parts[i]);
+            for (String part : parts) {
+                m = singleName.matcher(part);
                 if (!m.matches()) {
                     allNames = false;
                     break;

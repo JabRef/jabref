@@ -57,12 +57,11 @@ public class FileListEntryEditor {
             open = new JButton(Globals.lang("Open"));
 
 
-    JComboBox types;
+    JComboBox<ExternalFileType> types;
     JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
     JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
     ConfirmCloseFileListEntryEditor externalConfirm = null;
 
-    private AbstractAction okAction;
     private FileListEntry entry;
     private MetaData metaData;
     private boolean okPressed = false, okDisabledExternally = false,
@@ -75,25 +74,25 @@ public class FileListEntryEditor {
         this.entry = entry;
         this.metaData = metaData;
 
-        okAction = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    // If OK button is disabled, ignore this event:
-                    if (!ok.isEnabled())
+        AbstractAction okAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                // If OK button is disabled, ignore this event:
+                if (!ok.isEnabled())
+                    return;
+                // If necessary, ask the external confirm object whether we are ready to close.
+                if (externalConfirm != null) {
+                    // Construct an updated FileListEntry:
+                    FileListEntry testEntry = new FileListEntry("", "", null);
+                    storeSettings(testEntry);
+                    if (!externalConfirm.confirmClose(testEntry))
                         return;
-                    // If necessary, ask the external confirm object whether we are ready to close.
-                    if (externalConfirm != null) {
-                        // Construct an updated FileListEntry:
-                        FileListEntry testEntry = new FileListEntry("", "", null);
-                        storeSettings(testEntry);
-                        if (!externalConfirm.confirmClose(testEntry))
-                            return;
-                    }
-                    diag.dispose();
-                    storeSettings(FileListEntryEditor.this.entry);
-                    okPressed = true;
                 }
-            };
-        types = new JComboBox();
+                diag.dispose();
+                storeSettings(FileListEntryEditor.this.entry);
+                okPressed = true;
+            }
+        };
+        types = new JComboBox<ExternalFileType>();
         types.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (!okDisabledExternally)
@@ -266,7 +265,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<ExternalFileType>(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType))
@@ -287,13 +286,13 @@ public class FileListEntryEditor {
             entry.setLink(link.getText().trim());
         } else {
             boolean found = false;
-            for (int i=0; i<dirs.length; i++) {
-                String canPath = (new File(dirs[i])).getCanonicalPath();
+            for (String dir : dirs) {
+                String canPath = (new File(dir)).getCanonicalPath();
                 File fl = new File(link.getText().trim());
                 if (fl.isAbsolute()) {
                     String flPath = fl.getCanonicalPath();
                     if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                        String relFileName = fl.getCanonicalPath().substring(canPath.length()+1);
+                        String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
                         entry.setLink(relFileName);
                         found = true;
                         break;

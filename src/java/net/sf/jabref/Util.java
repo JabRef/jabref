@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -194,28 +193,28 @@ public class Util {
 		
 		String[] strings = content.split("#");
 		StringBuffer result = new StringBuffer();
-		for (int i = 0; i < strings.length; i++){
-			String s = strings[i].trim();
-			if (s.length() > 0){
-				char c = s.charAt(0);
-				// String reference or not?
-				if (c == '{' || c == '"'){
-					result.append(shaveString(strings[i]));	
-				} else {
-					// This part should normally be a string reference, but if it's
-					// a pure number, it is not.
-					String s2 = shaveString(s);
-					try {
-						Integer.parseInt(s2);
-						// If there's no exception, it's a number.
-						result.append(s2);
-					} catch (NumberFormatException ex) {
-						// otherwise append with hashes...
-						result.append("#").append(s2).append("#");
-					}
-				}
-			}
-		}
+        for (String string : strings) {
+            String s = string.trim();
+            if (s.length() > 0) {
+                char c = s.charAt(0);
+                // String reference or not?
+                if (c == '{' || c == '"') {
+                    result.append(shaveString(string));
+                } else {
+                    // This part should normally be a string reference, but if it's
+                    // a pure number, it is not.
+                    String s2 = shaveString(s);
+                    try {
+                        Integer.parseInt(s2);
+                        // If there's no exception, it's a number.
+                        result.append(s2);
+                    } catch (NumberFormatException ex) {
+                        // otherwise append with hashes...
+                        result.append("#").append(s2).append("#");
+                    }
+                }
+            }
+        }
 		return result.toString();
 	}
 
@@ -762,43 +761,35 @@ public class Util {
         // Check if we have arrived at a file type, and either an http link or an existing file:
 		if ((httpLink || file.exists()) && (fileType != null)) {
             // Open the file:
-			try {
-                String filePath = httpLink ? link : file.getPath();
-                if (Globals.ON_MAC) {
-                    // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-                    String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
-                            new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
-                            new String[] { "/usr/bin/open", filePath };
-					Runtime.getRuntime().exec(cmd);
-				} else if (Globals.ON_WIN) {
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                        // Application is specified. Use it:
-                        openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-                    } else
-                        openFileOnWindows(filePath, true);
-				} else {
-                    // Use the given app if specified, and the universal "xdg-open" otherwise:
-                    String[] openWith;
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
-                        openWith = fileType.getOpenWith().split(" ");
-                    else
-                        openWith = new String[] {"xdg-open"};
-                    
-                    String[] cmdArray = new String[openWith.length+1];
-                    System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-                    cmdArray[cmdArray.length-1] = filePath;
-                    Runtime.getRuntime().exec(cmdArray);
-				}
-                return true;
-            } catch (IOException e) {
-                throw e;
-                /*e.printStackTrace();
-				System.err.println("An error occured on the command: " + fileType.getOpenWith()
-					+ " #" + link);
-				System.err.println(e.getMessage());*/
-			}
+            String filePath = httpLink ? link : file.getPath();
+            if (Globals.ON_MAC) {
+                // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+                String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+                        new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
+                        new String[] { "/usr/bin/open", filePath };
+                Runtime.getRuntime().exec(cmd);
+            } else if (Globals.ON_WIN) {
+                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                    // Application is specified. Use it:
+                    openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+                } else
+                    openFileOnWindows(filePath, true);
+            } else {
+                // Use the given app if specified, and the universal "xdg-open" otherwise:
+                String[] openWith;
+                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+                    openWith = fileType.getOpenWith().split(" ");
+                else
+                    openWith = new String[] {"xdg-open"};
 
-		} else {
+                String[] cmdArray = new String[openWith.length+1];
+                System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+                cmdArray[cmdArray.length-1] = filePath;
+                Runtime.getRuntime().exec(cmdArray);
+            }
+            return true;
+
+        } else {
 
             return false;
             // No file matched the name, or we didn't know the file type.
@@ -860,9 +851,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             // Get the old list of types, add this one, and update the list in prefs:
             List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
             ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-            for (int i = 0; i < oldTypes.length; i++) {
-                fileTypes.add(oldTypes[i]);
-            }
+            Collections.addAll(fileTypes, oldTypes);
             fileTypes.add(newType);
             Collections.sort(fileTypes);
             Globals.prefs.setExternalFileTypes(fileTypes);
@@ -950,7 +939,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		try {
 			link = URLDecoder.decode(link, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException ignored) {
 		}
 
 		/**
@@ -1178,12 +1167,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	public static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
 		String file, boolean relative) {
 
-		for (int i = 0; i < directory.length; i++) {
-			String result = findFile(entry, database, directory[i], file, relative);
-			if (result != null) {
-				return result;
-			}
-		}
+        for (String aDirectory : directory) {
+            String result = findFile(entry, database, aDirectory, file, relative);
+            if (result != null) {
+                return result;
+            }
+        }
 		return null;
 	}
 
@@ -1430,14 +1419,14 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 					String restOfFileString = join(fileParts, "/", i + 1, fileParts.length);
 
-					for (int sub = 0; sub < subDirs.length; sub++) {
-						if (subDirs[sub].isDirectory()) {
-							String result = findFile(entry, database, subDirs[sub],
-								restOfFileString);
-							if (result != null)
-								return result;
-						}
-					}
+                    for (File subDir : subDirs) {
+                        if (subDir.isDirectory()) {
+                            String result = findFile(entry, database, subDir,
+                                    restOfFileString);
+                            if (result != null)
+                                return result;
+                        }
+                    }
 					return null;
 				}
 				// Do for all direct and indirect subdirs
@@ -1462,13 +1451,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 						toDo.addAll(Arrays.asList(subDirs));
 
-						for (int sub = 0; sub < subDirs.length; sub++) {
-							if (!subDirs[sub].isDirectory())
-								continue;
-							result = findFile(entry, database, subDirs[sub], restOfFileString);
-							if (result != null)
-								return result;
-						}
+                        for (File subDir : subDirs) {
+                            if (!subDir.isDirectory())
+                                continue;
+                            result = findFile(entry, database, subDir, restOfFileString);
+                            if (result != null)
+                                return result;
+                        }
 					}
 					// We already did the currentDirectory
 					return null;
@@ -1596,12 +1585,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<String>();
-        for (int i = 0; i < dir.length; i++)
-            if (!al.contains(dir[i]))
-                al.add(dir[i]);
-        for (int i = 0; i < fileDir.length; i++)
-            if (!al.contains(fileDir[i]))
-                al.add(fileDir[i]);
+        for (String aDir : dir)
+            if (!al.contains(aDir))
+                al.add(aDir);
+        for (String aFileDir : fileDir)
+            if (!al.contains(aFileDir))
+                al.add(aFileDir);
         String[] dirs = al.toArray(new String[al.size()]);
         return expandFilename(name, dirs);
 	}
@@ -1615,9 +1604,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 */
 	public static File expandFilename(String name, String[] dir) {
 
-		for (int i = 0; i < dir.length; i++) {
-            if (dir[i] != null) {
-                File result = expandFilename(name, dir[i]);
+        for (String aDir : dir) {
+            if (aDir != null) {
+                File result = expandFilename(name, aDir);
                 if (result != null) {
                     return result;
                 }
@@ -1717,7 +1706,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		if (!dir.endsWith(System.getProperty("file.separator")))
 			dir = dir.concat(System.getProperty("file.separator"));
 
-		if (longName.toString().startsWith(dir)) {
+		if (longName.startsWith(dir)) {
 			// result is based on original name, not on lower-cased name
 			String newName = fileName.toString().substring(dir.length());
 			return new File(newName);
@@ -1738,20 +1727,18 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		int numFiles = all.length;
 
-		for (int i = 0; i < numFiles; i++) {
-			File curFile = all[i];
+        for (File curFile : all) {
+            if (curFile.isFile()) {
+                String name = curFile.getName();
+                if (name.startsWith(key + ".") && off.accept(name))
+                    return curFile.getPath();
 
-			if (curFile.isFile()) {
-				String name = curFile.getName();
-				if (name.startsWith(key + ".") && off.accept(name))
-					return curFile.getPath();
-
-			} else if (curFile.isDirectory()) {
-				String found = findInDir(key, curFile.getPath(), off, count+1);
-				if (found != null)
-					return found;
-			}
-		}
+            } else if (curFile.isDirectory()) {
+                String found = findInDir(key, curFile.getPath(), off, count + 1);
+                if (found != null)
+                    return found;
+            }
+        }
 		return null;
 	}
 
@@ -1880,15 +1867,14 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			while ((el = in.read()) >= 0) {
 				out.write(el);
 			}
-		} catch (IOException ex) {
-			throw ex;
 		} finally {
 			if (out != null) {
 				out.flush();
 				out.close();
 			}
-			if (in != null)
-				in.close();
+			if (in != null) {
+                in.close();
+            }
 		}
 		return true;
 	}
@@ -1903,12 +1889,12 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		// Jabref 1.55 moves the abstract to its own tab.
 		String genFields = Globals.prefs.get("generalFields");
 		// pr(genFields+"\t"+genFields.indexOf("abstract"));
-		if (genFields.indexOf("abstract") >= 0) {
+		if (genFields.contains("abstract")) {
 			// pr(genFields+"\t"+genFields.indexOf("abstract"));
 			String newGen;
 			if (genFields.equals("abstract"))
 				newGen = "";
-			else if (genFields.indexOf(";abstract;") >= 0) {
+			else if (genFields.contains(";abstract;")) {
 				newGen = genFields.replaceAll(";abstract;", ";");
 			} else if (genFields.indexOf("abstract;") == 0) {
 				newGen = genFields.replaceAll("abstract;", "");
@@ -1951,18 +1937,18 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                 tableModel.setContent(oldFileContent);
             }
             int oldRowCount = tableModel.getRowCount();
-            for (int j = 0; j < fields.length; j++) {
-                String o = entry.getField(fields[j]);
+            for (String field : fields) {
+                String o = entry.getField(field);
                 if (o != null) {
                     String s = o;
                     if (s.trim().length() > 0) {
                         File f = new File(s);
                         FileListEntry flEntry = new FileListEntry(f.getName(), s,
-                                Globals.prefs.getExternalFileTypeByExt(fields[j]));
+                                Globals.prefs.getExternalFileTypeByExt(field));
                         tableModel.addEntry(tableModel.getRowCount(), flEntry);
-                        
-                        entry.clearField(fields[j]);
-                        ce.addEdit(new UndoableFieldChange(entry, fields[j], o, null));
+
+                        entry.clearField(field);
+                        ce.addEdit(new UndoableFieldChange(entry, field, o, null));
                     }
                 }
             }
@@ -2106,10 +2092,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		// by adding the words to a set, they are automatically sorted
 		TreeSet<String> set = new TreeSet<String>(words);
 		StringBuffer sb = new StringBuffer();
-		for (Iterator<String> i = set.iterator(); i.hasNext();) {
-			sb.append(i.next());
-			sb.append(", ");
-		}
+        for (String aSet : set) {
+            sb.append(aSet);
+            sb.append(", ");
+        }
 		if (sb.length() > 2)
 			sb.delete(sb.length() - 2, sb.length());
 		String result = sb.toString();
@@ -2135,20 +2121,20 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries,
 		BibtexDatabase db, Component parent) {
 		Vector<String> affectedFields = new Vector<String>();
-		for (int k = 0; k < groups.length; ++k) {
-			if (groups[k] instanceof KeywordGroup) {
-				KeywordGroup kg = (KeywordGroup) groups[k];
-				String field = kg.getSearchField().toLowerCase();
-				if (field.equals("keywords"))
-					continue; // this is not undesired
-				for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
-					if (field.equals(BibtexFields.getFieldName(i))) {
-						affectedFields.add(field);
-						break;
-					}
-				}
-			}
-		}
+        for (AbstractGroup group : groups) {
+            if (group instanceof KeywordGroup) {
+                KeywordGroup kg = (KeywordGroup) group;
+                String field = kg.getSearchField().toLowerCase();
+                if (field.equals("keywords"))
+                    continue; // this is not undesired
+                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
+                    if (field.equals(BibtexFields.getFieldName(i))) {
+                        affectedFields.add(field);
+                        break;
+                    }
+                }
+            }
+        }
 		if (affectedFields.size() == 0)
 			return true; // no side effects
 
@@ -2242,10 +2228,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 			buf.append((char) c);
 
 			// Check if we are entering an escape sequence:
-			if ((c == '\\') && !escaped)
-				escaped = true;
-			else
-				escaped = false;
+            escaped = (c == '\\') && !escaped;
 
 		}
 		// Check if we have an unclosed brace:
@@ -2557,11 +2540,11 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		}
 		owners.remove(Globals.prefs.get("defaultOwner"));
 		StringBuffer sb = new StringBuffer();
-		for (Iterator<Object> i = owners.iterator(); i.hasNext();) {
-			sb.append('[');
-			sb.append(i.next().toString());
-			sb.append(']');
-		}
+        for (Object owner : owners) {
+            sb.append('[');
+            sb.append(owner.toString());
+            sb.append(']');
+        }
 		String newVal = sb.toString();
 		if (newVal.length() == 0)
 			newVal = null;
@@ -2778,7 +2761,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
 		try {
 			return Integer.parseInt(month) - 1;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException ignored) {
 		}
 		return -1;
 	}
@@ -2957,7 +2940,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
             if (lockCheckCount++ == maxWaitCount) {
                 return false;
             }
-            try { Thread.sleep(500); } catch (InterruptedException ex) {}
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
         }
         return true;
     }
@@ -3005,15 +2988,15 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
      */
     public static String[] getRemainder(String[] all, String[] subset) {
         ArrayList<String> al = new ArrayList<String>();
-        for (int i = 0; i < all.length; i++) {
+        for (String anAll : all) {
             boolean found = false;
-            inner: for (int j = 0; j < subset.length; j++) {
-                if (subset[j].equals(all[i])) {
+            for (String aSubset : subset) {
+                if (aSubset.equals(anAll)) {
                     found = true;
-                    break inner;
+                    break;
                 }
             }
-            if (!found) al.add(all[i]);
+            if (!found) al.add(anAll);
         }
         return al.toArray(new String[al.size()]);
     }
@@ -3312,14 +3295,13 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                 // determine directories to search in
                 ArrayList<File> dirs = new ArrayList<File>();
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-                for (int i=0; i<dirsS.length; i++) {
-                    dirs.add(new File(dirsS[i]));
+                for (String dirs1 : dirsS) {
+                    dirs.add(new File(dirs1));
                 }
 
                 // determine extensions
                 Collection<String> extensions = new ArrayList<String>();
-                for (int i = 0; i < types.length; i++) {
-                    final ExternalFileType type = types[i];
+                for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
                 // Run the search operation:
@@ -3335,8 +3317,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                 boolean foundAny = false;
 
                 // Iterate over the entries:
-                for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
-                    BibtexEntry anEntry = i.next();
+                for (BibtexEntry anEntry : result.keySet()) {
                     FileListTableModel tableModel;
                     String oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
                     if (singleTableModel == null) {
@@ -3344,7 +3325,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                         if (oldVal != null)
                             tableModel.setContent(oldVal);
                     } else {
-                        assert(entries.size() == 1);
+                        assert (entries.size() == 1);
                         tableModel = singleTableModel;
                     }
                     List<File> files = result.get(anEntry);
@@ -3364,9 +3345,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                             foundAny = true;
                             ExternalFileType type;
                             int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < f.getPath().length()-1)) {
+                            if ((index >= 0) && (index < f.getPath().length() - 1)) {
                                 type = Globals.prefs.getExternalFileTypeByExt
-                                    (f.getPath().substring(index+1).toLowerCase());
+                                        (f.getPath().substring(index + 1).toLowerCase());
                             } else {
                                 type = new UnknownExternalFileType("");
                             }

@@ -47,71 +47,51 @@ public class Layout
         LayoutEntry le;
         String blockStart = null;
 
-        for (int i = 0; i < parsedEntries.size(); i++)
-        {
-            si = parsedEntries.get(i);
+        for (StringInt parsedEntry : parsedEntries) {
+            si = parsedEntry;
 
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT)
-            {
-            }
-            else if (si.i == LayoutHelper.IS_SIMPLE_FIELD)
-            {
-            }
-            else if (si.i == LayoutHelper.IS_FIELD_START)
-            {
+            if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
+            } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            } else if (si.i == LayoutHelper.IS_FIELD_START) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
-            }
-            else if (si.i == LayoutHelper.IS_FIELD_END)
-            {
-                if (blockStart != null && blockEntries != null){
-                    if (blockStart.equals(si.s))
-                    {
+            } else if (si.i == LayoutHelper.IS_FIELD_END) {
+                if (blockStart != null && blockEntries != null) {
+                    if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
-                    }
-                    else
-                    {
-                        System.out.println(blockStart+"\n"+si.s);
+                    } else {
+                        System.out.println(blockStart + "\n" + si.s);
                         System.out.println(
-                            "Nested field entries are not implemented !!!");
+                                "Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
-            }
-            else if (si.i == LayoutHelper.IS_GROUP_START)
-            {
+            } else if (si.i == LayoutHelper.IS_GROUP_START) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
-            }
-            else if (si.i == LayoutHelper.IS_GROUP_END)
-            {
+            } else if (si.i == LayoutHelper.IS_GROUP_END) {
                 if (blockStart != null && blockEntries != null) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix,
-                            LayoutHelper.IS_GROUP_START);
+                                LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
                         System.out
-                            .println("Nested field entries are not implemented !!!");
+                                .println("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
+            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
             }
-            else if (si.i == LayoutHelper.IS_OPTION_FIELD)
-            {
-            }
-            
-            if (blockEntries == null)
-            {
+
+            if (blockEntries == null) {
                 tmpEntries.add(new LayoutEntry(si, classPrefix));
-            }
-            else
-            {
+            } else {
                 blockEntries.add(si);
             }
         }
@@ -131,8 +111,7 @@ public class Layout
     }
 
     public void setPostFormatter(LayoutFormatter formatter) {
-        for (int i = 0; i < layoutEntries.length; i++) {
-            LayoutEntry layoutEntry = layoutEntries[i];
+        for (LayoutEntry layoutEntry : layoutEntries) {
             layoutEntry.setPostFormatter(formatter);
         }
     }
@@ -151,9 +130,8 @@ public class Layout
     {
         StringBuffer sb = new StringBuffer(100);
 
-        for (int i = 0; i < layoutEntries.length; i++)
-        {
-            String fieldText = layoutEntries[i].doLayout(bibtex, database, wordsToHighlight);
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            String fieldText = layoutEntry.doLayout(bibtex, database, wordsToHighlight);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the
@@ -161,7 +139,7 @@ public class Layout
             // no side effects.
             if (fieldText == null)
                 fieldText = "";
-            
+
             sb.append(fieldText);
         }
 
@@ -181,32 +159,25 @@ public class Layout
         String fieldText;
         boolean previousSkipped = false;
 
-        for (int i = 0; i < layoutEntries.length; i++)
-        {
-            fieldText = layoutEntries[i].doLayout(database, encoding);
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            fieldText = layoutEntry.doLayout(database, encoding);
 
-            if (fieldText == null) 
-            {
+            if (fieldText == null) {
                 fieldText = "";
-                if (previousSkipped)
-                {
+                if (previousSkipped) {
                     int eol = 0;
 
                     while ((eol < fieldText.length()) &&
                             ((fieldText.charAt(eol) == '\n') ||
-                            (fieldText.charAt(eol) == '\r')))
-                    {
+                                    (fieldText.charAt(eol) == '\r'))) {
                         eol++;
                     }
 
-                    if (eol < fieldText.length())
-                    {
+                    if (eol < fieldText.length()) {
                         sb.append(fieldText.substring(eol));
                     }
                 }
-            }
-            else
-            {
+            } else {
                 sb.append(fieldText);
             }
 

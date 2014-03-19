@@ -67,14 +67,12 @@ public class LayoutHelper {
 
         StringInt si;
 
-        for (int i = 0; i < parsedEntries.size(); i++)
-        {
-            si = parsedEntries.get(i);
+        for (StringInt parsedEntry : parsedEntries) {
+            si = parsedEntry;
 
             if ((si.i == IS_SIMPLE_FIELD) || (si.i == IS_FIELD_START) ||
                     (si.i == IS_FIELD_END) || (si.i == IS_GROUP_START) ||
-                    (si.i == IS_GROUP_END))
-            {
+                    (si.i == IS_GROUP_END)) {
                 si.s = si.s.trim().toLowerCase();
             }
         }
@@ -259,9 +257,7 @@ public class LayoutHelper {
                 }
             }
             else if (c == '"') {
-                if (!inQuotes)
-                    inQuotes = true;
-                else inQuotes = false;
+                inQuotes = !inQuotes;
 
                 if (buffer == null)
                     buffer = new StringBuffer(100);

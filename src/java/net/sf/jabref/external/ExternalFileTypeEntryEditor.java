@@ -205,7 +205,7 @@ public class ExternalFileTypeEntryEditor {
         mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWith());
         icon.setIcon(entry.getIcon());
-        if (true && (application.getText().length() == 0))
+        if ((application.getText().length() == 0))
             useDefault.setSelected(true);
         else
             other.setSelected(true);

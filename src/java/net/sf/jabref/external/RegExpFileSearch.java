@@ -235,10 +235,10 @@ public class RegExpFileSearch {
                     File[] subDirs = directory.listFiles();
                     if (subDirs != null) {
                         String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
-                        for (int sub = 0; sub < subDirs.length; sub++) {
-                            if (subDirs[sub].isDirectory()) {
-                                res.addAll(findFile(entry, database, subDirs[sub],
-                                    restOfFileString, extensionRegExp));
+                        for (File subDir : subDirs) {
+                            if (subDir.isDirectory()) {
+                                res.addAll(findFile(entry, database, subDir,
+                                        restOfFileString, extensionRegExp));
                             }
                         }
                     }
@@ -259,10 +259,10 @@ public class RegExpFileSearch {
 
                         toDo.addAll(Arrays.asList(subDirs));
 
-                        for (int sub = 0; sub < subDirs.length; sub++) {
-                            if (!subDirs[sub].isDirectory())
+                        for (File subDir : subDirs) {
+                            if (!subDir.isDirectory())
                                 continue;
-                            res.addAll(findFile(entry, database, subDirs[sub], restOfFileString,
+                            res.addAll(findFile(entry, database, subDir, restOfFileString,
                                     extensionRegExp));
                         }
                     }
@@ -285,10 +285,7 @@ public class RegExpFileSearch {
             }
         });
         if (matches != null && (matches.length > 0))
-            for (int i = 0; i < matches.length; i++) {
-                File match = matches[i];
-                res.add(match);
-            }
+            Collections.addAll(res, matches);
         return res;
     }
 

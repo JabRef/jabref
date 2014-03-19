@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
@@ -682,7 +681,7 @@ AboutAction aboutAction = new AboutAction();
             try {
               ( (JEditorPane) e.getSource()).setPage(e.getURL());
             }
-            catch (IOException ex) {}
+            catch (IOException ignored) {}
           }
         }
       });
@@ -1389,8 +1388,8 @@ public JabRefPreferences prefs() {
       mb.add(view);
 
       bibtex.add(newEntryAction);
-      for (int i = 0; i < newSpecificEntryAction.length; i++) {
-          newSpec.add(newSpecificEntryAction[i]);
+      for (NewEntryAction aNewSpecificEntryAction : newSpecificEntryAction) {
+          newSpec.add(aNewSpecificEntryAction);
       }
       bibtex.add(newSpec);
       bibtex.add(plainTextImport);
@@ -1654,20 +1653,20 @@ public JabRefPreferences prefs() {
   
     protected void initActions() {
         openDatabaseOnlyActions = new LinkedList<Object>();
-        openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
-            mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
-            redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
-            selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-            makeKeyAction, normalSearch,
-            incrementalSearch, replaceAll, importMenu, exportMenu,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
+                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
+                redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
+                selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
+                makeKeyAction, normalSearch,
+                incrementalSearch, replaceAll, importMenu, exportMenu,
 			/* openSpires wasn't being supported so no point in supporting
 			 * openInspire */
                 openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/ togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-            highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
-            closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
-            toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-            abbreviateMedline, unabbreviate, exportAll, exportSelected,
-            importCurrent, saveAll, dbConnect, dbExport, focusTable}));
+                highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
+                abbreviateMedline, unabbreviate, exportAll, exportSelected,
+                importCurrent, saveAll, dbConnect, dbExport, focusTable));
         
         openDatabaseOnlyActions.addAll(fetcherActions);
 
@@ -1675,7 +1674,7 @@ public JabRefPreferences prefs() {
 
         severalDatabasesOnlyActions = new LinkedList<Object>();
         severalDatabasesOnlyActions.addAll(Arrays
-            .asList(new Action[] { nextTab, prevTab, sortTabs }));
+            .asList(nextTab, prevTab, sortTabs));
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
@@ -2114,7 +2113,6 @@ public JabRefPreferences prefs() {
     }
     else {
       // Import into current database.
-      boolean checkForDuplicates = true;
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
@@ -2124,32 +2122,28 @@ public JabRefPreferences prefs() {
       for (BibtexEntry entry : bibentries){
         boolean dupli = false;
         // Check for duplicates among the current entries:
-        if (checkForDuplicates) {
-            loop: for (Iterator<String> i2=database.getKeySet().iterator();
-                       i2.hasNext();) {
-                BibtexEntry existingEntry = database.getEntryById(i2.next());
-                if (DuplicateCheck.isDuplicate(entry, existingEntry
-                )) {
-                    DuplicateResolverDialog drd = new DuplicateResolverDialog
-                        (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
-                    drd.setVisible(true);
-                    int res = drd.getSelected();
-                    if (res == DuplicateResolverDialog.KEEP_LOWER)   {
-                        dupli = true;
-                    }
-                    else if (res == DuplicateResolverDialog.KEEP_UPPER) {
-                        database.removeEntry(existingEntry.getId());
-                        ce.addEdit(new UndoableRemoveEntry
-                                   (database, existingEntry, basePanel));
-                    } else if (res == DuplicateResolverDialog.BREAK) {
-                        break mainLoop;
-                    }
-                    break loop;
-                }
-            }
-        }
+          for (String s : database.getKeySet()) {
+              BibtexEntry existingEntry = database.getEntryById(s);
+              if (DuplicateCheck.isDuplicate(entry, existingEntry
+              )) {
+                  DuplicateResolverDialog drd = new DuplicateResolverDialog
+                          (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                  drd.setVisible(true);
+                  int res = drd.getSelected();
+                  if (res == DuplicateResolverDialog.KEEP_LOWER) {
+                      dupli = true;
+                  } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
+                      database.removeEntry(existingEntry.getId());
+                      ce.addEdit(new UndoableRemoveEntry
+                              (database, existingEntry, basePanel));
+                  } else if (res == DuplicateResolverDialog.BREAK) {
+                      break mainLoop;
+                  }
+                  break;
+              }
+          }
 
-        if (!dupli) {
+          if (!dupli) {
             try {
                 entry.setId(Util.createNeutralId());
                 database.insertEntry(entry);
@@ -2351,7 +2345,7 @@ class SaveSessionAction
               try {
                 basePanel().runCommand("save");
               }
-              catch (Throwable ex) {}
+              catch (Throwable ignored) {}
             }
           }
           if (baseAt(i).getFile() != null) {
@@ -2362,7 +2356,6 @@ class SaveSessionAction
 
       if (filenames.size() == 0) {
         output(Globals.lang("Not saved (empty session)") + ".");
-        return;
       }
       else {
         String[] names = new String[filenames.size()];
@@ -2549,7 +2542,7 @@ class SaveSessionAction
         }
 
         public void actionPerformed(ActionEvent e) {
-        	final JabRefPreferences prefs = JabRefPreferences.getInstance();
+        	JabRefPreferences.getInstance();
             if (bibtexKeyPatternDialog == null) {
                 // if no instance of BibtexKeyPatternDialog exists, create new one
             	bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, basePanel());

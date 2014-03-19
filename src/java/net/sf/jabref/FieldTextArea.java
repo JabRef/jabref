@@ -16,20 +16,12 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.SearchTextListener;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Document;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.CannotUndoException;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea. Used for

@@ -21,7 +21,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class UnitFormatter implements LayoutFormatter {
     
-    private String[] unitList = new String[] {
+    private static final String[] unitList = new String[] {
         "A",  // Ampere
         "Ah",  // Ampere hours
         "B", // Byte
@@ -63,7 +63,7 @@ public class UnitFormatter implements LayoutFormatter {
         "sr", // steradians
     };
     
-    private String[] unitPrefixList = new String[] {
+    private static final String[] unitPrefixList = new String[] {
         "y", // yocto
         "z", // zepto
         "a", // atto
@@ -88,10 +88,9 @@ public class UnitFormatter implements LayoutFormatter {
         "Y", // yotta
     };
     
-    private String[] unitCombinations;
+    private static final String[] unitCombinations;
     
-    public UnitFormatter() {
-	super();
+    static {
         int uLLength = unitList.length;
         int uPLLength = unitPrefixList.length;
         int uCLength = uLLength*uPLLength;
@@ -118,13 +117,13 @@ public class UnitFormatter implements LayoutFormatter {
         text = text.replaceAll("([0-9,\\.]+) ([Bb][Ii][Tt])","$1~$2");
         
         // For each word in the list
-	for (int i = 0; i < listOfWords.length; i++) {
+        for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
-	    text = text.replaceAll("([0-9])("+listOfWords[i]+")","$1\\{$2\\}"); // Only add brackets to keep case
-            text = text.replaceAll("([0-9])-("+listOfWords[i]+")","$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
-            text = text.replaceAll("([0-9]) ("+listOfWords[i]+")","$1~\\{$2\\}"); // Replace space with a hard space
-            
-	}
+            text = text.replaceAll("([0-9])(" + listOfWord + ")", "$1\\{$2\\}"); // Only add brackets to keep case
+            text = text.replaceAll("([0-9])-(" + listOfWord + ")", "$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
+            text = text.replaceAll("([0-9]) (" + listOfWord + ")", "$1~\\{$2\\}"); // Replace space with a hard space
+
+        }
         
         return text;
     }

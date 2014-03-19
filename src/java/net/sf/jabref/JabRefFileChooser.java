@@ -96,9 +96,9 @@ class JabRefUI extends MetalFileChooserUI {
         public void mouseEntered(MouseEvent e) {
             //System.out.println("mouse entered");
             MouseListener [] l = list.getMouseListeners();
-            for (int i = 0; i < l.length; i++) {
-                if (l[i] instanceof MetalFileChooserUI.SingleClickListener) {
-                    list.removeMouseListener(l[i]);
+            for (MouseListener aL : l) {
+                if (aL instanceof SingleClickListener) {
+                    list.removeMouseListener(aL);
                 }
             }
             super.mouseEntered(e);

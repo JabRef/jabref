@@ -85,7 +85,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         if (selected.length > 0)
             changesMade = true;
         for (int i=0; i<selected.length; i++) {
-            String typeName = (String)listModel.get(selected[selected.length-1-i]);
+            String typeName = listModel.get(selected[selected.length-1-i]);
             BibtexEntryType type = BibtexEntryType.getType(typeName);
             
             // If it is a custom entry type, we can remove it. If type == null, it means
@@ -102,13 +102,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     }
     
     public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting()) {
-            return;
-        }
-        
-        
-        //
-        
+
     }
 
     public void enable(String typeName, boolean isChanged) {

@@ -100,7 +100,7 @@ public class PluginCore {
 
 
             List<File> directoriesToSearch = new LinkedList<File>();
-            directoriesToSearch.add(new File("./src/plugins"));
+            directoriesToSearch.add(new File("./src/resources/plugins"));
             directoriesToSearch.add(new File("./plugins"));
             directoriesToSearch.add(userPluginDir);
 
@@ -110,7 +110,7 @@ public class PluginCore {
             
                 if (!parent.getCanonicalFile().equals(
                     new File(".").getCanonicalFile())) {
-                    directoriesToSearch.add(new File(parent, "/src/plugins"));
+                    directoriesToSearch.add(new File(parent, "/src/resources/plugins"));
                     directoriesToSearch.add(new File(parent, "/plugins"));
                 }
             } catch (Exception e) {
@@ -167,15 +167,14 @@ public class PluginCore {
                         "\n" +
                         Globals.lang("At least the plug-in 'net.sf.jabref.core' should be there."));
             } else {
-                result.publishPlugins(plugins.toArray(new PluginLocation[] {}));
+                result.publishPlugins(plugins.toArray(new PluginLocation[plugins.size()]));
 
                 Collection<PluginDescriptor> descs = result.getRegistry()
                     .getPluginDescriptors();
 
                 sb = new StringBuilder();
                 sb.append(Globals.lang("Found %0 plugin(s)", String
-                    .valueOf(descs.size())) +
-                    ":\n");
+                        .valueOf(descs.size()))).append(":\n");
 
                 for (PluginDescriptor p : result.getRegistry()
                     .getPluginDescriptors()) {

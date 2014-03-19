@@ -22,7 +22,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +42,7 @@ import java.util.regex.Pattern;
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
  *    operation is performed for each JabRef BibtexEntry.
  */
-public class OOBibStyle implements Comparable {
+public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
     String name = null;
@@ -57,8 +56,8 @@ public class OOBibStyle implements Comparable {
     // reference layout mapped from entry type number:
     HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
 
-    HashMap properties = new HashMap();
-    HashMap citProperties = new HashMap();
+    HashMap<String,Object> properties = new HashMap<String,Object>();
+    HashMap<String,Object> citProperties = new HashMap<String,Object>();
 
     Pattern numPattern = Pattern.compile("-?\\d+");
 
@@ -191,10 +190,10 @@ public class OOBibStyle implements Comparable {
         String[] lines = sb.toString().split("\n");
         int mode = NONE;
 
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            if ((line.length() > 0) && (line.charAt(line.length()-1) == '\r'))
-                line = line.substring(0, line.length()-1);
+        for (String line1 : lines) {
+            String line = line1;
+            if ((line.length() > 0) && (line.charAt(line.length() - 1) == '\r'))
+                line = line.substring(0, line.length() - 1);
             // Check for empty line or comment:
             if ((line.trim().length() == 0) || (line.charAt(0) == '#'))
                 continue;
@@ -202,20 +201,16 @@ public class OOBibStyle implements Comparable {
             if (line.equals(NAME_MARK)) {
                 mode = NAME;
                 continue;
-            }
-            else if (line.equals(LAYOUT_MRK)) {
+            } else if (line.equals(LAYOUT_MRK)) {
                 mode = LAYOUT;
                 continue;
-            }
-            else if (line.equals(PROPERTIES_MARK)) {
+            } else if (line.equals(PROPERTIES_MARK)) {
                 mode = PROPERTIES;
                 continue;
-            }
-            else if (line.equals(CITATION_MARK)) {
+            } else if (line.equals(CITATION_MARK)) {
                 mode = CITATION;
                 continue;
-            }
-            else if (line.equals(JOURNALS_MARK)) {
+            } else if (line.equals(JOURNALS_MARK)) {
                 mode = JOURNALS;
                 continue;
             }
@@ -261,7 +256,7 @@ public class OOBibStyle implements Comparable {
      * @param line The string containing the structure description.
      * @throws IOException
      */
-    private void handleStructureLine(String line) throws IOException {
+    private void handleStructureLine(String line) {
         int index = line.indexOf("=");
         if ((index > 0) && (index < line.length()-1)) {
             String formatString = line.substring(index+1);
@@ -293,7 +288,7 @@ public class OOBibStyle implements Comparable {
      * @param line The line containing the formatter names.
      * @throws IOException
      */
-    private void handlePropertiesLine(String line, HashMap map) throws IOException {
+    private void handlePropertiesLine(String line, HashMap<String, Object> map) {
         int index = line.indexOf("=");
         if ((index > 0) && (index <= line.length()-1)) {
             String propertyName = line.substring(0, index).trim();
@@ -317,7 +312,7 @@ public class OOBibStyle implements Comparable {
      * @param line
      * @throws IOException
      */
-    private void handleJournalsLine(String line) throws IOException {
+    private void handleJournalsLine(String line) {
         if (line.trim().length() > 0)
             journals.add(line.trim());
     }
@@ -360,10 +355,7 @@ public class OOBibStyle implements Comparable {
         }
         // Sort the numbers:
         int[] lNum = new int[number.length];
-        for (int i = 0; i < lNum.length; i++) {
-            lNum[i] = number[i];
-
-        }
+        System.arraycopy(number, 0, lNum, 0, lNum.length);
         //Arrays.copyOf(number, number.length);
         Arrays.sort(lNum);
         StringBuilder sb = new StringBuilder(bracketBefore);
@@ -720,8 +712,7 @@ public class OOBibStyle implements Comparable {
      */
     public String getCitationMarkerField(BibtexEntry entry, BibtexDatabase database, String field) {
         String[] fields = field.split("/");
-        for (int i = 0; i < fields.length; i++) {
-            String s = fields[i];
+        for (String s : fields) {
             String content = BibtexDatabase.getResolvedField(s, entry, database);
             if ((content != null) && (content.trim().length() > 0)) {
                 if (fieldFormatter != null)
@@ -853,8 +844,7 @@ public class OOBibStyle implements Comparable {
         return properties.get(name);
     }
 
-    public int compareTo(Object o) {
-        OOBibStyle other = (OOBibStyle)o;
+    public int compareTo(OOBibStyle other) {
         return getName().compareTo(other.getName());
     }
 

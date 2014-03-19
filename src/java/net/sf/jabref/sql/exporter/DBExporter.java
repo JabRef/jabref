@@ -26,7 +26,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -250,9 +249,9 @@ public abstract class DBExporter extends DBImporterExporter{
 				String insert = "INSERT INTO entry_types (label, " + fieldStr
 						+ ") VALUES (";
 				query = insert + "'" + val.getName().toLowerCase() + "'";
-				for (int i = 0; i < fieldRequirement.size(); i++) {
-					query = query + ", '" + fieldRequirement.get(i) + "'";
-				}
+                for (String aFieldRequirement : fieldRequirement) {
+                    query = query + ", '" + aFieldRequirement + "'";
+                }
 				query = query + ");";
 			} else {
 				String[] update = fieldStr.split(",");
@@ -368,12 +367,11 @@ public abstract class DBExporter extends DBImporterExporter{
 		if (quantidade == 0) {
 			String[] typeNames = new String[] { AllEntriesGroup.ID,
 					ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID };
-			for (int i = 0; i < typeNames.length; i++) {
-				String typeName = typeNames[i];
-				String insert = "INSERT INTO group_types (label) VALUES ('"
-						+ typeName + "');";
-				SQLUtil.processQuery(out, insert);
-			}
+            for (String typeName : typeNames) {
+                String insert = "INSERT INTO group_types (label) VALUES ('"
+                        + typeName + "');";
+                SQLUtil.processQuery(out, insert);
+            }
 		}
 	}
 
@@ -403,15 +401,13 @@ public abstract class DBExporter extends DBImporterExporter{
 					+ "'" + database_id + "');";
 			SQLUtil.processQuery(out, dml);
 		}
-		Iterator<String> it = database.getStringKeySet().iterator();
-		while (it.hasNext()) {
-			String key = it.next();
-			BibtexString string = database.getString(key);
-			String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
-					+ "', " + "'" + Util.quote(string.getContent(), "'", '\\')
-					+ "', " + "'" + database_id + "'" + ");";
-			SQLUtil.processQuery(out, dml);
-		}
+        for (String key : database.getStringKeySet()) {
+            BibtexString string = database.getString(key);
+            String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
+                    + "', " + "'" + Util.quote(string.getContent(), "'", '\\')
+                    + "', " + "'" + database_id + "'" + ");";
+            SQLUtil.processQuery(out, dml);
+        }
 	}
 
 	/**
@@ -519,7 +515,7 @@ public abstract class DBExporter extends DBImporterExporter{
 
 	private String getDBName(Vector<Vector<String>> matrix,
 			DBStrings dbStrings, JabRefFrame frame, DBImportExportDialog dialogo)
-			throws SQLException, Exception {
+			throws Exception {
 		String dbName = "";
 		if (matrix.size() > 1) {
 			if (dialogo.hasDBSelected) {
@@ -557,7 +553,7 @@ public abstract class DBExporter extends DBImporterExporter{
 	}
 
 	private Vector<Vector<String>> createExistentDBNamesMatrix(
-			DBStrings dbStrings) throws SQLException, Exception {
+			DBStrings dbStrings) throws Exception {
 		ResultSet rs = SQLUtil.queryAllFromTable(this.connectToDB(dbStrings),
 				"jabref_database");
 		Vector<String> v;
@@ -575,14 +571,9 @@ public abstract class DBExporter extends DBImporterExporter{
 		return matrix;
 	}
 
-	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName)
-			throws SQLException {
-		if (desiredName.trim().length() <= 1)
-			return false;
-		if (dbNames.contains(desiredName))
-			return false;
-		return true;
-	}
+	private boolean isValidDBName(ArrayList<String> dbNames, String desiredName) {
+        return desiredName.trim().length() > 1 && !dbNames.contains(desiredName);
+    }
 
 
 	/**

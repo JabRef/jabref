@@ -34,9 +34,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.prefs.BackingStoreException;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -59,7 +59,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             l.setPostFormatter(null);
         } catch (NoSuchMethodError ex) {
             postLayoutSupported = false;
-        } catch (Exception ex) {
+        } catch (Exception ignore) {
 
         }
 
@@ -157,7 +157,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
 
     public void init(JabRefFrame frame, SidePaneManager manager) {
-        this.frame = frame;
+        OpenOfficePanel.frame = frame;
         this.manager = manager;
         comp = new OOPanel(manager, GUIGlobals.getIconUrl("openoffice"), Globals.lang("OpenOffice"));
         try {
@@ -185,7 +185,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     }
 
 
-    private void initPanel() throws Exception {
+    private void initPanel() {
 
         useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
         useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
@@ -612,13 +612,12 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     public static void addURL(URL[] u) throws IOException {
 		URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
-		Class sysclass = URLClassLoader.class;
+		Class<URLClassLoader> sysclass = URLClassLoader.class;
 
         try {
 			Method method = sysclass.getDeclaredMethod("addURL",parameters);
 			method.setAccessible(true);
-            for (int i=0; i<u.length; i++)
-                method.invoke(sysloader, u[i]);
+            for (URL anU : u) method.invoke(sysloader, anU);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			throw new IOException("Error, could not add URL to system classloader");
@@ -744,7 +743,6 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
                             Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                    return;
                 }
                 catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
@@ -780,8 +778,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (panel != null) {
                 BibtexEntry[] e = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
-                for (int i = 0; i < e.length; i++) {
-                    entries.put(e[i], database);
+                for (BibtexEntry anE : e) {
+                    entries.put(anE, database);
                 }
 
                 ooBase.insertFullReferenceAtViewCursor(entries, style, "Default");
@@ -817,9 +815,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
                 ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
-                for (int i = 0; i < entries.length; i++) {
-                    el.add(entries[i]);
-                }
+                Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
                 //wrapper.loadBstFile(new File("/home/usr/share/texmf-tetex/bibtex/bst/base/plain.bst"));
@@ -873,17 +869,13 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         });
         clearConnectionSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    Globals.prefs.clear("ooPAth");
-                    Globals.prefs.clear("ooExecutablePath");
-                    Globals.prefs.clear("ooJarsPath");
-                    Globals.prefs.clear("connectToOO3");
-                    Globals.prefs.clear("ooUnoilPath");
-                    Globals.prefs.clear("ooJurtPath");
-                    frame.output(Globals.lang("Cleared connection settings."));
-                } catch (BackingStoreException ex) {
-                    ex.printStackTrace();
-                }
+                Globals.prefs.clear("ooPAth");
+                Globals.prefs.clear("ooExecutablePath");
+                Globals.prefs.clear("ooJarsPath");
+                Globals.prefs.clear("connectToOO3");
+                Globals.prefs.clear("ooUnoilPath");
+                Globals.prefs.clear("ooJurtPath");
+                frame.output(Globals.lang("Cleared connection settings."));
             }
         });
 

@@ -254,10 +254,7 @@ public class IntegrityCheck
       if ( Character.isDigit(ch))
       {
         digitCounter++ ;
-        if (digitCounter == 4)
-          fourDigitsBlock = true ;
-        else
-          fourDigitsBlock = false ;
+          fourDigitsBlock = digitCounter == 4;
       } else
       {
         if (fourDigitsBlock)

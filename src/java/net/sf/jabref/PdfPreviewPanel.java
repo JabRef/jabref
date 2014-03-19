@@ -36,8 +36,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 
 public class PdfPreviewPanel extends JPanel {
 
-	private PDDocument document = null;
-	private JLabel picLabel;
+    private JLabel picLabel;
     private final MetaData metaData;
 	
 	public PdfPreviewPanel(MetaData metaData) {
@@ -55,8 +54,9 @@ public class PdfPreviewPanel extends JPanel {
 			e.printStackTrace();
 			return;
 		}
-		
-		try {
+
+        PDDocument document = null;
+        try {
 			document = PDDocument.load(input);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

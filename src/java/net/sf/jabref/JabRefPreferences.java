@@ -25,13 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -106,6 +100,8 @@ public class JabRefPreferences {
 
     private static final char[][] VALUE_DELIMITERS
             = new char[][]{{'"', '"'}, {'{', '}'}};
+    public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
+    public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
@@ -264,12 +260,12 @@ public class JabRefPreferences {
         defaults.put("lyxpipe", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
         defaults.put("vim", "vim");
         defaults.put("vimServer", "vim");
-        defaults.put("posX", new Integer(0));
-        defaults.put("posY", new Integer(0));
-        defaults.put("sizeX", new Integer(840));
-        defaults.put("sizeY", new Integer(680));
+        defaults.put("posX", 0);
+        defaults.put("posY", 0);
+        defaults.put("sizeX", 840);
+        defaults.put("sizeY", 680);
         defaults.put("windowMaximised", Boolean.FALSE);
-        defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_ALL_COLUMNS));
+        defaults.put("autoResizeMode", JTable.AUTO_RESIZE_ALL_COLUMNS);
         defaults.put("previewPanelHeight", 200);
         defaults.put("entryEditorHeight", 400);
         defaults.put("tableColorCodesOn", Boolean.TRUE);
@@ -309,24 +305,24 @@ public class JabRefPreferences {
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
-                new Boolean(PersistenceTableColumnListener.DEFAULT_ENABLED));
-        defaults.put("xmpPrivacyFilters", "pdf;timestamp;keywords;owner;note;review");
-        defaults.put("useXmpPrivacyFilter", Boolean.FALSE);
-        defaults.put("numberColWidth", new Integer(GUIGlobals.NUMBER_COL_LENGTH));
+                PersistenceTableColumnListener.DEFAULT_ENABLED);
+        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
+        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
+        defaults.put("numberColWidth", GUIGlobals.NUMBER_COL_LENGTH);
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
         defaults.put("importWorkingDirectory", System.getProperty("user.home"));
         defaults.put("fileWorkingDirectory", System.getProperty("user.home"));
         defaults.put("autoOpenForm", Boolean.TRUE);
-        defaults.put("entryTypeFormHeightFactor", new Integer(1));
-        defaults.put("entryTypeFormWidth", new Integer(1));
+        defaults.put("entryTypeFormHeightFactor", 1);
+        defaults.put("entryTypeFormWidth", 1);
         defaults.put("backup", Boolean.TRUE);
         defaults.put("openLastEdited", Boolean.TRUE);
         defaults.put("lastEdited", null);
-        defaults.put("stringsPosX", new Integer(0));
-        defaults.put("stringsPosY", new Integer(0));
-        defaults.put("stringsSizeX", new Integer(600));
-        defaults.put("stringsSizeY", new Integer(400));
+        defaults.put("stringsPosX", 0);
+        defaults.put("stringsPosY", 0);
+        defaults.put("stringsSizeX", 600);
+        defaults.put("stringsSizeY", 400);
         defaults.put("defaultShowSource", Boolean.FALSE);
         defaults.put("showSource", Boolean.TRUE);
         defaults.put("defaultAutoSort", Boolean.FALSE);
@@ -341,15 +337,15 @@ public class JabRefPreferences {
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("highLightWords", Boolean.TRUE);
-        defaults.put("searchPanePosX", new Integer(0));
-        defaults.put("searchPanePosY", new Integer(0));
+        defaults.put("searchPanePosX", 0);
+        defaults.put("searchPanePosY", 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, new Integer(2));
+        defaults.put(SHORTEST_TO_COMPLETE, 2);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
@@ -371,7 +367,7 @@ public class JabRefPreferences {
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
-        defaults.put("groupsVisibleRows", new Integer(8));
+        defaults.put("groupsVisibleRows", 8);
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
         defaults.put("memoryStickMode", Boolean.FALSE);
@@ -385,13 +381,13 @@ public class JabRefPreferences {
         defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
-        defaults.put("historySize", new Integer(8));
-        defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
-        defaults.put("fontSize", new Integer(12));
+        defaults.put("historySize", 8);
+        defaults.put("fontStyle", java.awt.Font.PLAIN);
+        defaults.put("fontSize", 12);
         defaults.put("overrideDefaultFonts", Boolean.FALSE);
         defaults.put("menuFontFamily", "Times");
-        defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
-        defaults.put("menuFontSize", new Integer(11));
+        defaults.put("menuFontStyle", java.awt.Font.PLAIN);
+        defaults.put("menuFontSize", 11);
         // Main table color settings:
         defaults.put("tableBackground", "255:255:255");
         defaults.put("tableReqFieldBackground", "230:235:255");
@@ -514,7 +510,7 @@ public class JabRefPreferences {
         defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
-        defaults.put("remoteServerPort", new Integer(6050));
+        defaults.put("remoteServerPort", 6050);
 
         defaults.put("personalJournalList", null);
         defaults.put("externalJournalLists", null);
@@ -529,12 +525,12 @@ public class JabRefPreferences {
         defaults.put("filechooserDisableRename", Boolean.TRUE);
 
         defaults.put("lastUsedExport", null);
-        defaults.put("sidePaneWidth", new Integer(-1));
+        defaults.put("sidePaneWidth", -1);
 
-        defaults.put("importInspectionDialogWidth", new Integer(650));
-        defaults.put("importInspectionDialogHeight", new Integer(650));
-        defaults.put("searchDialogWidth", new Integer(650));
-        defaults.put("searchDialogHeight", new Integer(500));
+        defaults.put("importInspectionDialogWidth", 650);
+        defaults.put("importInspectionDialogHeight", 650);
+        defaults.put("searchDialogWidth", 650);
+        defaults.put("searchDialogHeight", 500);
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
@@ -647,16 +643,16 @@ public class JabRefPreferences {
         String fieldString = get("putBracesAroundCapitals");
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
-            for (int i = 0; i < fields.length; i++) {
-                putBracesAroundCapitalsFields.add(fields[i].trim());
+            for (String field : fields) {
+                putBracesAroundCapitalsFields.add(field.trim());
             }
         }
         nonWrappableFields.clear();
         fieldString = get("nonWrappableFields");
         if (fieldString.length() > 0) {
             String[] fields = fieldString.split(";");
-            for (int i = 0; i < fields.length; i++) {
-                nonWrappableFields.add(fields[i].trim());
+            for (String field : fields) {
+                nonWrappableFields.add(field.trim());
             }
         }
 
@@ -682,7 +678,9 @@ public class JabRefPreferences {
     }
 
     public String get(String key) {
-        return prefs.get(key, (String) defaults.get(key));
+        String result = prefs.get(key, (String) defaults.get(key));
+        //System.out.println("READ PREF [" + key + "]=" + result);
+        return result;
     }
 
     public String get(String key, String def) {
@@ -694,7 +692,7 @@ public class JabRefPreferences {
     }
 
     public boolean getBooleanDefault(String key) {
-        return ((Boolean) defaults.get(key)).booleanValue();
+        return (Boolean) defaults.get(key);
     }
 
     public double getDouble(String key) {
@@ -702,7 +700,7 @@ public class JabRefPreferences {
     }
 
     public double getDoubleDefault(String key) {
-        return ((Double) defaults.get(key)).doubleValue();
+        return (Double) defaults.get(key);
     }
 
     public int getInt(String key) {
@@ -710,7 +708,7 @@ public class JabRefPreferences {
     }
 
     public int getIntDefault(String key) {
-        return ((Integer) defaults.get(key)).intValue();
+        return (Integer) defaults.get(key);
     }
 
     public byte[] getByteArray(String key) {
@@ -722,6 +720,7 @@ public class JabRefPreferences {
     }
 
     public void put(String key, String value) {
+        //System.out.println("WRITE PREF [" + key + "]=" + value);
         prefs.put(key, value);
     }
 
@@ -757,7 +756,7 @@ public class JabRefPreferences {
         }
 
         if (value.length > 0) {
-            StringBuffer linked = new StringBuffer();
+            StringBuilder linked = new StringBuilder();
             for (int i = 0; i < value.length - 1; i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(";");
@@ -785,7 +784,7 @@ public class JabRefPreferences {
             while ((rs = getNextUnit(rd)) != null) {
                 arr.add(rs);
             }
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
         String[] res = new String[arr.size()];
         for (int i = 0; i < res.length; i++) {
@@ -831,13 +830,8 @@ public class JabRefPreferences {
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(String.valueOf(color.getRed()));
-        sb.append(':');
-        sb.append(String.valueOf(color.getGreen()));
-        sb.append(':');
-        sb.append(String.valueOf(color.getBlue()));
-        put(key, sb.toString());
+        String rgb = String.valueOf(color.getRed()) + ':' + String.valueOf(color.getGreen()) + ':' + String.valueOf(color.getBlue());
+        put(key, rgb);
     }
 
     /**
@@ -933,7 +927,7 @@ public class JabRefPreferences {
         prefs.clear();
     }
 
-    public void clear(String key) throws BackingStoreException {
+    public void clear(String key) {
         prefs.remove(key);
     }
 
@@ -965,9 +959,7 @@ public class JabRefPreferences {
             String[] bindNames = new String[newBindings.size()],
                     bindings = new String[newBindings.size()];
             int index = 0;
-            for (Iterator<String> i = newBindings.keySet().iterator();
-                    i.hasNext();) {
-                String nm = i.next();
+            for (String nm : newBindings.keySet()) {
                 String bnd = newBindings.get(nm);
                 bindNames[index] = nm;
                 bindings[index] = bnd;
@@ -991,8 +983,8 @@ public class JabRefPreferences {
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
-                for (int i = 0; i < keys.length; i++) {
-                    keyPattern.addLabelPattern(keys[i], pre.get(keys[i], null));
+                for (String key : keys) {
+                    keyPattern.addLabelPattern(key, pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
@@ -1008,7 +1000,6 @@ public class JabRefPreferences {
      */
     public void putKeyPattern(LabelPattern pattern) {
         keyPattern = pattern;
-        LabelPattern parent = pattern.getParent();
 
         // Store overridden definitions to Preferences.
         Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);
@@ -1243,11 +1234,9 @@ public class JabRefPreferences {
             return new CustomEntryType(Util.nCase(name), req, opt);
         }
         ArrayList<String> secOpt = new ArrayList<String>();
-        for (int i = 0; i < opt.length; i++) {
-            secOpt.add(opt[i]);
-        }
-        for (int i = 0; i < priOpt.length; i++) {
-            secOpt.remove(priOpt[i]);
+        Collections.addAll(secOpt, opt);
+        for (String aPriOpt : priOpt) {
+            secOpt.remove(aPriOpt);
         }
         return new CustomEntryType(Util.nCase(name), req, priOpt,
                 secOpt.toArray(new String[secOpt.size()]));
@@ -1282,8 +1271,7 @@ public class JabRefPreferences {
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:
-        for (Iterator<ExternalFileType> iterator = list.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : list) {
             type.setOpenWith("");
         }
 
@@ -1301,8 +1289,7 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByName(String name) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if (type.getName().equals(name)) {
                 return type;
             }
@@ -1318,8 +1305,7 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
             }
@@ -1336,8 +1322,7 @@ public class JabRefPreferences {
     public ExternalFileType getExternalFileTypeForName(String filename) {
         int longestFound = -1;
         ExternalFileType foundType = null;
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getExtension() != null) && filename.toLowerCase().
                     endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
@@ -1357,8 +1342,7 @@ public class JabRefPreferences {
      * type "text/html", a valid file type is guaranteed to be returned.
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
-        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : externalFileTypes) {
             if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
                 return type;
             }
@@ -1384,8 +1368,7 @@ public class JabRefPreferences {
         List<ExternalFileType> unchanged = new ArrayList<ExternalFileType>();
 
         externalFileTypes.clear();
-        for (Iterator<ExternalFileType> iterator = types.iterator(); iterator.hasNext();) {
-            ExternalFileType type = iterator.next();
+        for (ExternalFileType type : types) {
             externalFileTypes.add(type);
 
             // See if we can find a type with matching name in the default type list:
@@ -1446,12 +1429,12 @@ public class JabRefPreferences {
         }
         // Read the prefs information for file types:
         String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
-        for (int i = 0; i < vals.length; i++) {
-            if ((vals[i].length == 2) && (vals[i][1].equals(FILE_TYPE_REMOVED_FLAG))) {
+        for (String[] val : vals) {
+            if ((val.length == 2) && (val[1].equals(FILE_TYPE_REMOVED_FLAG))) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {
-                    if (type.getName().equals(vals[i][0])) {
+                    if (type.getName().equals(val[0])) {
                         toRemove = type;
                         break;
                     }
@@ -1462,7 +1445,7 @@ public class JabRefPreferences {
                 }
             } else {
                 // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = new ExternalFileType(vals[i]);
+                ExternalFileType type = new ExternalFileType(val);
                 // Check if there is a default type with the same name. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;

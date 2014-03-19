@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
+
 import gnu.dtools.ritopt.BooleanOption;
 import gnu.dtools.ritopt.Options;
 import gnu.dtools.ritopt.StringOption;
@@ -311,17 +312,12 @@ public class JabRef {
                 }
             } else {
                 String[] keys = value.split(",");
-                for (int i=0; i<keys.length; i++) {
-                    try {
-                        if (Globals.prefs.hasKey(keys[i].trim())) {
-                            System.out.println(Globals.lang("Resetting preference key '%0'", keys[i].trim()));
-                            Globals.prefs.clear(keys[i].trim());
-                        } else {
-                            System.out.println(Globals.lang("Unknown preference key '%0'", keys[i].trim()));
-                        }
-                    } catch (BackingStoreException e) {
-                        System.err.println(Globals.lang("Unable to clear preferences."));
-                        e.printStackTrace();
+                for (String key : keys) {
+                    if (Globals.prefs.hasKey(key.trim())) {
+                        System.out.println(Globals.lang("Resetting preference key '%0'", key.trim()));
+                        Globals.prefs.clear(key.trim());
+                    } else {
+                        System.out.println(Globals.lang("Unknown preference key '%0'", key.trim()));
                     }
                 }
             }
@@ -344,14 +340,14 @@ public class JabRef {
         Vector<ParserResult> loaded = new Vector<ParserResult>();
         Vector<String> toImport = new Vector<String>();
         if (!blank.isInvoked() && (leftOver.length > 0))  {
-            for (int i = 0; i < leftOver.length; i++) {
+            for (String aLeftOver : leftOver) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // bib files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
-                boolean bibExtension = leftOver[i].toLowerCase().endsWith("bib");
+                boolean bibExtension = aLeftOver.toLowerCase().endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension)
-                    pr = openBibFile(leftOver[i], false);
+                    pr = openBibFile(aLeftOver, false);
 
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     // We will try to import this file. Normally we
@@ -361,16 +357,15 @@ public class JabRef {
                     // This will enable easy integration with web browers that can
                     // open a reference file in JabRef.
                     if (initialStartup) {
-                        toImport.add(leftOver[i]);
+                        toImport.add(aLeftOver);
                     } else {
-                        ParserResult res = importToOpenBase(leftOver[i]);
+                        ParserResult res = importToOpenBase(aLeftOver);
                         if (res != null)
                             loaded.add(res);
                         else
                             loaded.add(ParserResult.INVALID_FORMAT);
                     }
-                }
-                else if (pr != ParserResult.FILE_LOCKED)
+                } else if (pr != ParserResult.FILE_LOCKED)
                     loaded.add(pr);
 
             }
@@ -405,7 +400,7 @@ public class JabRef {
                 String searchTerm = data[0].replace("\\$"," "); //enables blanks within the search term:
                                                                 //? stands for a blank
                 ParserResult pr =
-                    (ParserResult) loaded.elementAt(loaded.size() - 1);
+                        loaded.elementAt(loaded.size() - 1);
                 BibtexDatabase dataBase = pr.getDatabase();
                 SearchManagerNoGUI smng = new SearchManagerNoGUI(searchTerm, dataBase);
                 BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
@@ -685,7 +680,7 @@ public class JabRef {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
                         // zoomLevel not yet set, calculate it based on the first found font
-                        zoomLevel = new Double(fontSize) / new Double(font.getSize());
+                        zoomLevel = (double) fontSize / (double) font.getSize();
                     }
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
@@ -733,26 +728,25 @@ public class JabRef {
             if (!blank.isInvoked() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
                 // How to handle errors in the databases to open?
                 String[] names = Globals.prefs.getStringArray("lastEdited");
-                lastEdLoop: 
-                for (int i = 0; i < names.length; i++) {
-                    File fileToOpen = new File(names[i]);
+                lastEdLoop:
+                for (String name : names) {
+                    File fileToOpen = new File(name);
 
                     for (int j = 0; j < loaded.size(); j++) {
                         ParserResult pr = loaded.elementAt(j);
 
-                        if ((pr.getFile() != null) &&pr.getFile().equals(fileToOpen))
+                        if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen))
                             continue lastEdLoop;
                     }
 
                     if (fileToOpen.exists()) {
-                        ParserResult pr = openBibFile(names[i], false);
+                        ParserResult pr = openBibFile(name, false);
 
                         if (pr != null) {
 
                             if (pr == ParserResult.INVALID_FORMAT) {
-                                System.out.println(Globals.lang("Error opening file")+" '"+fileToOpen.getPath()+"'");
-                            }
-                            else if (pr != ParserResult.FILE_LOCKED)
+                                System.out.println(Globals.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
+                            } else if (pr != ParserResult.FILE_LOCKED)
                                 loaded.add(pr);
 
                         }
@@ -959,8 +953,7 @@ public class JabRef {
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();
-                for (int i=0; i<warn.length; i++)
-                    System.out.println(Globals.lang("Warning")+": "+warn[i]);
+                for (String aWarn : warn) System.out.println(Globals.lang("Warning") + ": " + aWarn);
 
             }
             return pr;

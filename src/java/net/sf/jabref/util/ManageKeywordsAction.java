@@ -40,8 +40,6 @@ import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -62,7 +60,6 @@ import net.sf.jabref.undo.NamedCompound;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.sun.star.bridge.oleautomation.Date;
 
 /**
  * An Action for launching mass field.
@@ -80,14 +77,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     // keyword to add
     private JTextField keyword;
 
-    private DefaultListModel keywordListModel;
-    private JList keywordList;
-    private JScrollPane kPane;
-    
-	private JRadioButton intersectKeywords, mergeKeywords;
+    private DefaultListModel<String> keywordListModel;
+    private JList<String> keywordList;
 
-    private JButton ok, cancel, add, remove;
-	private boolean cancelled;
+    private JRadioButton intersectKeywords, mergeKeywords;
+
+    private boolean cancelled;
 
 	private TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
 	
@@ -99,17 +94,17 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private void createDialog() {
         keyword = new JTextField();
 
-        keywordListModel = new DefaultListModel();
-        keywordList = new JList(keywordListModel);
+        keywordListModel = new DefaultListModel<String>();
+        keywordList = new JList<String>(keywordListModel);
         keywordList.setVisibleRowCount(8);
-        kPane = new JScrollPane(keywordList);
+        JScrollPane kPane = new JScrollPane(keywordList);
 
         diag = new JDialog(frame, Globals.lang("Manage keywords"), true);
 
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
-        add = new JButton(Globals.lang("Add"));
-        remove = new JButton(Globals.lang("Remove"));
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton add = new JButton(Globals.lang("Add"));
+        JButton remove = new JButton(Globals.lang("Remove"));
         
         keywordList.setVisibleRowCount(10);
         
@@ -150,7 +145,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         ok.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 cancelled = false;
                 diag.dispose();
             }
@@ -175,7 +170,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 					keywordListModel.addElement(text);
 				} else {
 					int idx = 0;
-                    String element = (String)keywordListModel.getElementAt(idx);
+                    String element = keywordListModel.getElementAt(idx);
 					while ((idx < keywordListModel.size()) &&
                             (element.compareTo(text) < 0)) {
 						idx++;
@@ -199,11 +194,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             public void actionPerformed(ActionEvent arg0) {
 				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                Object[] values = keywordList.getSelectedValues();
-				List<String> selectedValuesList = new ArrayList<String>();
-                for (int i=0; i<values.length; i++)
-                    selectedValuesList.add((String)values[i]);
-				for (String val: selectedValuesList) {
+                List<String> values = keywordList.getSelectedValuesList();
+
+				for (String val: values) {
 					keywordListModel.removeElement(val);
 				}
 			}
@@ -277,8 +270,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-        for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
-        	String keyword = (String)keywords.nextElement();
+        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
+        	String keyword = keywords.nextElement();
         	userSelectedKeywords.add(keyword);
         	if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
         		keywordsToAdd.add(keyword);
@@ -307,28 +300,28 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 	        	HashSet<String> clone;
 	        	
 	        	// Priority
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Priority.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Quality
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Quality.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Rank
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Rank.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
 	        	}
 	        	
 	        	// Relevance
-	        	clone = (HashSet<String>) keywordsToAdd.clone();
+	        	clone = createClone(keywordsToAdd);
 	        	clone.retainAll(Relevance.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
@@ -365,7 +358,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-	private void fillKeyWordList() {
+    @SuppressWarnings("unchecked")
+    private HashSet<String> createClone(HashSet<String> keywordsToAdd) {
+        return (HashSet<String>) keywordsToAdd.clone();
+    }
+
+    private void fillKeyWordList() {
         BasePanel bp = frame.basePanel();
         BibtexEntry[] entries = bp.getSelectedEntries();
 

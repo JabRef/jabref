@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
 
 import org.sciplore.beans.Author;
 import org.sciplore.beans.Document;
@@ -51,7 +50,7 @@ public class SplWebClient {
 
     public static WebServiceStatus getMetaData(File file){
         try{
-            if(isWebServiceAvailable() == false){
+            if(!isWebServiceAvailable()){
                 if(isInternetAvailable()){
                     return  WebServiceStatus.WEBSERVICE_DOWN;
                 }
@@ -62,7 +61,7 @@ public class SplWebClient {
             if(isWebServiceOutDated()){
                 return  WebServiceStatus.OUTDATED;
             }
-            if(isMetaDataServiceAvailable() == false){
+            if(!isMetaDataServiceAvailable()){
                 return  WebServiceStatus.UNAVAILABLE;
             }
             FileInputStream fin = new FileInputStream(file);      

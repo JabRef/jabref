@@ -18,7 +18,6 @@ package net.sf.jabref;
 import java.lang.Integer;
 import java.lang.Math;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -31,7 +30,7 @@ import net.sf.jabref.imports.*;
 public class SearchManagerNoGUI {
     private String searchTerm;
     private BibtexDatabase database, base=null;
-    Hashtable searchOptions = new Hashtable();
+    Hashtable<String,String> searchOptions = new Hashtable<String,String> ();
     
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;
@@ -52,7 +51,7 @@ public class SearchManagerNoGUI {
                 Globals.prefs.getBoolean("regExpSearch"));
         try {
             rule1 = new SearchExpression(Globals.prefs, searchOptions);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         searchRules.addRule(rule1);
@@ -62,28 +61,24 @@ public class SearchManagerNoGUI {
             return base;
         }
         
-        Collection entries = database.getEntries();
-        Vector matchEntries = new Vector();
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
+        Collection<BibtexEntry> entries = database.getEntries();
+        Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
+        for (BibtexEntry entry : entries) {
             boolean hit = searchRules.applyRule(searchOptions, entry) > 0;
             entry.setSearchHit(hit);
-            if(hit) {
+            if (hit) {
                 hits++;
                 matchEntries.add(entry);
             }
         }
         
-        if (matchEntries != null) {
-            base = ImportFormatReader.createDatabase(matchEntries);
-        }
+        base = ImportFormatReader.createDatabase(matchEntries);
+
         return base; 
     }//end getDBfromMatches()
     
     private boolean specifiedYears() {
-        if (searchTerm.matches("year=[0-9]{4}-[0-9]{4}"))
-            return true;
-        return false;
+        return searchTerm.matches("year=[0-9]{4}-[0-9]{4}");
     }
     
     private String fieldYear() {

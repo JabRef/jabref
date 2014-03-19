@@ -74,8 +74,8 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
 	public static SpecialFieldUpdateListener getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new SpecialFieldUpdateListener();
-		};
-		return INSTANCE;
+		}
+        return INSTANCE;
 	}
 
 }

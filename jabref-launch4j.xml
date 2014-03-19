@@ -12,7 +12,7 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>./src/images/JabRef.ico</icon>
+  <icon>./src/resources/images/JabRef.ico</icon>
   <jre>
     <path></path>
     <minVersion>1.6.0</minVersion>

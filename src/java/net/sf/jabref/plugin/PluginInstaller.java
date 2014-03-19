@@ -27,16 +27,13 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.*;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.jar.JarFile;
 
 import org.java.plugin.registry.PluginDescriptor;
-import org.java.plugin.registry.PluginRegistry;
 import org.java.plugin.registry.ManifestProcessingException;
 import org.java.plugin.registry.ManifestInfo;
-import org.java.plugin.registry.xml.PluginRegistryImpl;
 
 /**
  *
@@ -209,8 +206,7 @@ public class PluginInstaller {
         boolean success = true;
         VersionNumber num = new VersionNumber(nav[1]);
         Map<VersionNumber, File> versions = getInstalledVersions(nav[0]);
-        for (Iterator<VersionNumber> iterator = versions.keySet().iterator(); iterator.hasNext();) {
-            VersionNumber versionNumber = iterator.next();
+        for (VersionNumber versionNumber : versions.keySet()) {
             if (num.compareTo(versionNumber) < 0) {
                 String vnString = versionNumber.equals(VersionNumber.ZERO) ? null : versionNumber.toString();
                 File file = versions.get(versionNumber);//buildFileName(nav[0], vnString);
@@ -289,15 +285,20 @@ public class PluginInstaller {
             ex.printStackTrace();
             return UNABLE_TO_COPY_FILE;
         } finally {
-            if (in != null) try {
-                in.close();
-            } catch (IOException ex) {
-                return UNABLE_TO_COPY_FILE;
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                    // UNABLE_TO_COPY_FILE;
+                }
             }
-            if (out != null) try {
-                out.close();
-            } catch (IOException ex) {
-                return UNABLE_TO_COPY_FILE;
+
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ignore) {
+                    // UNABLE_TO_COPY_FILE;
+                }
             }
         }
         return SUCCESS;
@@ -319,9 +320,8 @@ public class PluginInstaller {
             }
         });
         Map<VersionNumber, File> versions = new TreeMap<VersionNumber, File>();
-        for (int i = 0; i < files.length; i++) {
-            String file = files[i];
-            File f = new File(PluginCore.userPluginDir,file);
+        for (String file : files) {
+            File f = new File(PluginCore.userPluginDir, file);
             String[] nav = getNameAndVersion(f);
             if (nav != null) {
                 if (nav[0].equals(pluginName)) {
@@ -329,7 +329,7 @@ public class PluginInstaller {
                     versions.put(vn, f);
                 }
             }
-                
+
         }
 
         return versions;
@@ -344,9 +344,7 @@ public class PluginInstaller {
     public static void schedulePluginForDeletion(String filename) {
         String[] oldValues = Globals.prefs.getStringArray("deletePlugins");
         String[] newValues = oldValues == null ? new String[1] : new String[oldValues.length+1];
-        if (oldValues != null) for (int i=0; i<oldValues.length; i++) {
-            newValues[i] = oldValues[i];
-        }
+        if (oldValues != null) System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
         newValues[newValues.length-1] = filename;
         Globals.prefs.putStringArray("deletePlugins", newValues);
     }
@@ -357,15 +355,13 @@ public class PluginInstaller {
      * @param filenames An array of names of the files to be deleted.
      */
     public static void deletePluginsOnStartup(String[] filenames) {
-        for (int i = 0; i < filenames.length; i++) {
-            String s = filenames[i];
+        for (String s : filenames) {
             File f = new File(s);
             if (f.getParentFile().equals(PluginCore.userPluginDir)) {
-            //if (s.startsWith(PluginCore.userPluginDir.getPath())) {
+                //if (s.startsWith(PluginCore.userPluginDir.getPath())) {
                 boolean success = f.delete();
-            }
-            else
-                System.out.println("File outside of user plugin dir: "+s);
+            } else
+                System.out.println("File outside of user plugin dir: " + s);
         }
     }
 
@@ -440,7 +436,6 @@ public class PluginInstaller {
                     if (in != null) in.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    return null;
                 }
         }
     }
@@ -469,17 +464,17 @@ public class PluginInstaller {
                 urls.put(desc.getId(), desc);
             }
         }
-        
-        for (int i=0; i<files.length; i++) {
-            File file = new File(PluginCore.userPluginDir, files[i]);
+
+        for (String file1 : files) {
+            File file = new File(PluginCore.userPluginDir, file1);
             String[] nav = getNameAndVersion(file);
             if (nav != null) {
                 VersionNumber vn = nav[1] != null ? new VersionNumber(nav[1]) : null;
                 NameAndVersion nameAndVersion = new NameAndVersion(nav[0], vn, true,
                         file);
-                for (Iterator<String> it = urls.keySet().iterator(); it.hasNext();) {
+                for (Iterator<String> it = urls.keySet().iterator(); it.hasNext(); ) {
                     String loc = it.next();
-                    if (loc.indexOf(nav[0]) >= 0) {
+                    if (loc.contains(nav[0])) {
                         PluginDescriptor desc = urls.get(loc);
                         //System.out.println("Accounted for: "+desc.getId()+" "+desc.getVersion().toString());
                         if (!PluginCore.getManager().isPluginEnabled(urls.get(loc)))
@@ -496,7 +491,7 @@ public class PluginInstaller {
         for (String url : urls.keySet()) {
             PluginDescriptor desc = urls.get(url);
             File location =  new File(desc.getLocation().getFile());
-            if (location.getPath().indexOf(PluginCore.userPluginDir.getPath()) >= 0)
+            if (location.getPath().contains(PluginCore.userPluginDir.getPath()))
                 continue; // This must be a loaded user dir plugin that's been deleted.
             //System.out.println("File: "+desc.getLocation().getFile());
             NameAndVersion nameAndVersion = new NameAndVersion(desc.getId(),
@@ -512,7 +507,7 @@ public class PluginInstaller {
     }
     
   
-    public static class NameAndVersion implements Comparable {
+    public static class NameAndVersion implements Comparable<NameAndVersion> {
         String name;
         VersionNumber version;
         int status = 0;
@@ -527,8 +522,7 @@ public class PluginInstaller {
             this.file = file;
         }
         
-        public int compareTo(Object o) {
-            NameAndVersion oth = (NameAndVersion)o;
+        public int compareTo(NameAndVersion oth) {
             if (!name.equals(oth.name))
                 return name.compareTo(oth.name);
             else {
@@ -550,15 +544,15 @@ public class PluginInstaller {
         }
     }
             
-    static class VersionNumber implements Comparable {
+    static class VersionNumber implements Comparable<VersionNumber> {
         public static final VersionNumber ZERO = new VersionNumber("0");
         List<Integer> digits;
         public VersionNumber(String number) {
             digits = new ArrayList<Integer>();
             String[] elms = number.split("\\.");
-            for (int i = 0; i < elms.length; i++) {
+            for (String elm : elms) {
                 try {
-                    int num = Integer.parseInt(elms[i]);
+                    int num = Integer.parseInt(elm);
                     digits.add(num);
                 } catch (NumberFormatException ex) {
                     // Do nothing
@@ -567,11 +561,9 @@ public class PluginInstaller {
             }
         }
 
-        public int compareTo(Object o) {
-            VersionNumber oth = (VersionNumber)o;
-           
+        public int compareTo(VersionNumber oth) {
             for (int i=0; i<Math.min(digits.size(), oth.digits.size()); i++) {
-                if (digits.get(i) != oth.digits.get(i))
+                if (!digits.get(i).equals(oth.digits.get(i)))
                     return oth.digits.get(i)-digits.get(i);
             }
             // All digits equal so far, and only one of the numbers has more digits.
@@ -589,7 +581,7 @@ public class PluginInstaller {
             return sb.toString();
         }
         
-        public boolean equals(Object o) {
+        public boolean equals(VersionNumber o) {
             return compareTo(o) == 0;
         }
     }

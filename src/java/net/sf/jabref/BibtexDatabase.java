@@ -45,7 +45,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -178,27 +177,18 @@ public class BibtexDatabase {
       int keyHash = key.hashCode() ; // key hash for better performance
 
       Set<String> keySet = _entries.keySet();
-      if (keySet != null)
-      {
-          Iterator<String> it = keySet.iterator();
-          while(it.hasNext())
-          {
-            String entrieID = it.next() ;
-            BibtexEntry entry = getEntryById(entrieID) ;
-            if ((entry != null) && (entry.getCiteKey() != null))
-            {
-              String citeKey = entry.getCiteKey() ;
-              if (citeKey != null)
-              {
-                if (keyHash == citeKey.hashCode() )
-                {
-                  back = entry ;
+        for (String entrieID : keySet) {
+            BibtexEntry entry = getEntryById(entrieID);
+            if ((entry != null) && (entry.getCiteKey() != null)) {
+                String citeKey = entry.getCiteKey();
+                if (citeKey != null) {
+                    if (keyHash == citeKey.hashCode()) {
+                        back = entry;
+                    }
                 }
-              }
             }
-          }
-      }
-      return back ;
+        }
+        return back ;
     }
 
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
@@ -403,11 +393,11 @@ public class BibtexDatabase {
     public BibtexEntry resolveForStrings(BibtexEntry entry, boolean inPlace) {
 		
     	if (!inPlace){
-    		entry = (BibtexEntry)entry.clone();
-    	}
+            entry = (BibtexEntry)entry.clone();
+        }
     	
     	for (Object field : entry.getAllFields()){
-    		entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString()).toString()));
+    		entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
     	}
     	
     	return entry;
@@ -462,7 +452,7 @@ public class BibtexDatabase {
     private String resolveContent(String res, HashSet<String> usedIds) {
         //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
     if (res.matches(".*#[^#]+#.*")) {
-            StringBuffer newRes = new StringBuffer();
+            StringBuilder newRes = new StringBuilder();
             int piv = 0, next = 0;
             while ((next=res.indexOf("#", piv)) >= 0) {
 
@@ -532,7 +522,7 @@ public class BibtexDatabase {
                 duplicate = addKeyToSet( newKey );
             }
         }
-        if(duplicate==true && issueWarning==true){
+        if(duplicate && issueWarning){
             JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
                                           Globals.lang("Duplicate Key Warning"),
                                           JOptionPane.WARNING_MESSAGE);//, options);
@@ -549,7 +539,7 @@ public class BibtexDatabase {
         if (o == null)
             return 0;
         else
-            return ((Integer)o).intValue();
+            return (Integer) o;
 
     }
 
@@ -563,9 +553,9 @@ public class BibtexDatabase {
                 if(allKeys.containsKey(key)){
                         // warning
                         exists=true;
-                        allKeys.put( key, new Integer( allKeys.get(key).intValue() + 1));// incrementInteger( allKeys.get(key)));
+                        allKeys.put( key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
                 }else
-                        allKeys.put( key, new Integer(1));
+                        allKeys.put( key, 1);
                 return exists;
     }
     
@@ -577,10 +567,10 @@ public class BibtexDatabase {
                 if((key == null) || key.equals("")) return;
                 if(allKeys.containsKey(key)){
                         Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-                        if(tI.intValue()==1)
+                        if(tI ==1)
                                 allKeys.remove( key);
                         else
-                                allKeys.put( key, new Integer( (tI).intValue() - 1));//decrementInteger( tI ));
+                                allKeys.put( key, tI - 1);//decrementInteger( tI ));
                 }
     }
 
@@ -627,8 +617,7 @@ public class BibtexDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if ((o == null) && (database != null) && database.followCrossrefs &&
-                !field.equals(BibtexFields.KEY_FIELD) && (database != null)) {
+        if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibtexFields.KEY_FIELD)) {
             Object crossRef = bibtex.getField("crossref");
             if (crossRef != null) {
                 BibtexEntry referred = database.getEntryByKey((String)crossRef);

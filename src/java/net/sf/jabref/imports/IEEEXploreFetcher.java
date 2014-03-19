@@ -156,28 +156,28 @@ public class IEEEXploreFetcher implements EntryFetcher {
         	URL url = new URL(searchUrl);
         	String page = getResults(url);
             
-            if (page.indexOf("You have entered an invalid search") >= 0) {
+            if (page.contains("You have entered an invalid search")) {
                 status.showMessage(Globals.lang("You have entered an invalid search '%0'.",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             
-            if (page.indexOf("Bad request") >= 0) {
+            if (page.contains("Bad request")) {
             	status.showMessage(Globals.lang("Bad Request '%0'.",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             
-            if (page.indexOf("No results were found.") >= 0) {
+            if (page.contains("No results were found.")) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         terms),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
                         
-            if (page.indexOf("Error Page") >= 0) {
+            if (page.contains("Error Page")) {
                 status.showMessage(Globals.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
@@ -249,11 +249,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        StringBuffer sb = new StringBuffer(startUrl);
-        sb.append(terms.replaceAll(" ", "+"));
-        sb.append(endUrl);
-        sb.append(String.valueOf(startIndex));
-        return sb.toString();
+        return startUrl + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
     }
 
     
@@ -273,13 +269,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		 	try {
 		 		BibtexDatabase dbase = parseBibtexDatabase(idSelected, includeAbstract);
 		 		Collection<BibtexEntry> items = dbase.getEntries();
-		 		Iterator<BibtexEntry> iter = items.iterator();
-		 		while (iter.hasNext()) {
-		 			BibtexEntry entry = iter.next();
-		 			dialog.addEntry(cleanup(entry));
-	                dialog.setProgress(parsed + unparseable, hits);
-	                parsed++;
-		 		}
+                for (BibtexEntry entry : items) {
+                    dialog.addEntry(cleanup(entry));
+                    dialog.setProgress(parsed + unparseable, hits);
+                    parsed++;
+                }
 		 	} catch (IOException e) {
 		 		e.printStackTrace();
 		 	}
@@ -318,10 +312,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 conn.getOutputStream());
 
 		String recordIds = "";
-		Iterator<String> iter = id.iterator();
-		while (iter.hasNext()) { 
-	    	recordIds += iter.next() + " ";
-		}
+        for (String anId : id) {
+            recordIds += anId + " ";
+        }
 		recordIds = recordIds.trim();
 		String citation = abs ? "citation-abstract" : "citation-only";
 		
@@ -338,7 +331,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             int bytesRead = bufr.read(buffer);
             if(bytesRead == -1) break;
             for (int i=0; i<bytesRead; i++)
-                sb.append((char)buffer[i]);
+                sb.append(buffer[i]);
         }
         System.out.println(sb.toString());
         
@@ -352,7 +345,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     		return null;
     	
         // clean up title
-        String title = (String)entry.getField("title");
+        String title = entry.getField("title");
         if (title != null) {
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
@@ -410,7 +403,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 	    }
 	}*/
     	// clean up month
-    	String month = (String)entry.getField("month");
+    	String month = entry.getField("month");
     	if ((month != null) && (month.length() > 0)) {
 	    	month = month.replaceAll("\\.", "");
 	    	month = month.toLowerCase();
@@ -460,15 +453,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     	// clean up publication field
     	BibtexEntryType type = entry.getType();
     	String sourceField = "";
-		if (type.getName() == "Article") {
+		if (type.getName().equals("Article")) {
         	sourceField = "journal";
 			entry.clearField("booktitle");
-		} else if (type.getName() == "Inproceedings"){
+		} else if (type.getName().equals("Inproceedings")){
             sourceField = "booktitle";
 		}
         String fullName = entry.getField(sourceField);
         if (fullName != null) {
-	        if (type.getName() == "Article") {
+	        if (type.getName().equals("Article")) {
 	        	int ind = fullName.indexOf(": Accepted for future publication");
 				if (ind > 0) {
 					fullName = fullName.substring(0, ind);
@@ -482,7 +475,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 		        if (parts.length == 3) {
 					fullName += parts[2];
 				}
-			if(entry.getField("note") ==  "Early Access") {
+			if(entry.getField("note").equals("Early Access")) {
 					entry.setField("year", "to be published");
 					entry.clearField("month");
 					entry.clearField("pages");
@@ -512,14 +505,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
 						abrv = parts[1];
 					}
 				}
-				if (prefix.matches(abrvPattern) == false) {
+				if (!prefix.matches(abrvPattern)) {
 					fullName = prefix + " " + postfix + " " + abrv;
 					fullName = fullName.trim();
 				} else {
 					fullName = postfix + " " + prefix;
 				}
 			}
-			if (type.getName() == "Article") {
+			if (type.getName().equals("Article")) {
 				fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 				
 				fullName = fullName.trim();
@@ -529,12 +522,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
 						fullName = id;
 				}
 	        }
-			if (type.getName() == "Inproceedings") {
+			if (type.getName().equals("Inproceedings")) {
 	            Matcher m2 = proceedingPattern.matcher(fullName);
 				if (m2.find()) {
 					String prefix = m2.group(2); 
 					String postfix = m2.group(1).replaceAll("\\.$", "");
-					if (prefix.matches(abrvPattern) == false) {
+					if (!prefix.matches(abrvPattern)) {
 						String abrv = "";
 					
 						String[] parts = postfix.split("\\. ", 2);
@@ -561,14 +554,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
 				String year = entry.getField("year");
 				fullName = fullName.replaceAll(", " + year + "\\.?", "");
 				
-	        	if (fullName.contains("Abstract") == false && fullName.contains("Summaries") == false && fullName.contains("Conference Record") == false)
+	        	if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record"))
 	        		fullName = "Proc. " + fullName;
 	        }
 			entry.setField(sourceField, fullName);
         }
 	
         // clean up abstract
-        String abstr = (String) entry.getField("abstract");
+        String abstr = entry.getField("abstract");
         if (abstr != null) {
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
@@ -595,7 +588,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
         
         // Clean up url
-        String url = (String) entry.getField("url");
+        String url = entry.getField("url");
         if (url != null) {
             entry.setField("url","http://ieeexplore.ieee.org"+url.replace("tp=&",""));
         }
@@ -707,7 +700,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             
             Matcher authorMatcher = authorPattern.matcher(text);
             // System.out.println(text);
-            StringBuffer authorNames = new StringBuffer("");
+            StringBuilder authorNames = new StringBuilder("");
             int authorCount=0;
             while(authorMatcher.find()) {
                 if(authorCount >= 1) {

@@ -20,11 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JDialog;
 import javax.swing.JProgressBar;
@@ -57,13 +53,12 @@ public class AccessLinksForEntries {
     public static List<FileListEntry> getExternalLinksForEntries(List<BibtexEntry> entries) {
         List<FileListEntry> files = new ArrayList<FileListEntry>();
         FileListTableModel model = new FileListTableModel();
-        for (Iterator<BibtexEntry> iterator = entries.iterator(); iterator.hasNext();) {
-            BibtexEntry entry = iterator.next();
+        for (BibtexEntry entry : entries) {
             String links = entry.getField(GUIGlobals.FILE_FIELD);
             if (links == null)
                 continue;
             model.setContent(links);
-            for (int i=0; i<model.getRowCount(); i++)
+            for (int i = 0; i < model.getRowCount(); i++)
                 files.add(model.getEntry(i));
         }
         return files;
@@ -103,15 +98,14 @@ public class AccessLinksForEntries {
 
         int i=0;
 
-        for (Iterator<FileListEntry> iterator = files.iterator(); iterator.hasNext();) {
-            FileListEntry entry = iterator.next();
+        for (FileListEntry entry : files) {
             File file = new File(entry.getLink());
 
             // We try to check the extension for the file:
             String name = file.getName();
             int pos = name.lastIndexOf('.');
             String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
-                .trim().toLowerCase() : null;
+                    .trim().toLowerCase() : null;
 
             // Find the default directory for this field type, if any:
             String[] dir = metaData.getFileDirectory(extension);
@@ -119,10 +113,8 @@ public class AccessLinksForEntries {
             String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
             // Include the directory of the bib file:
             ArrayList<String> al = new ArrayList<String>();
-            for (int i2 = 0; i2 < dir.length; i2++)
-                if (!al.contains(dir[i2])) al.add(dir[i2]);
-            for (int i2 = 0; i2 < fileDir.length; i2++)
-                if (!al.contains(fileDir[i2])) al.add(fileDir[i2]);
+            for (String aDir : dir) if (!al.contains(aDir)) al.add(aDir);
+            for (String aFileDir : fileDir) if (!al.contains(aFileDir)) al.add(aFileDir);
 
             String[] dirs = al.toArray(new String[al.size()]);
             File tmp = Util.expandFilename(entry.getLink(), dirs);
@@ -133,8 +125,7 @@ public class AccessLinksForEntries {
             if (file.exists()) {
                 if (fileNames.contains(name)) {
                     // Oops, a file of that name already exists....
-                }
-                else {
+                } else {
                     fileNames.add(name);
                     File destination = new File(toDir, name);
 
@@ -146,12 +137,11 @@ public class AccessLinksForEntries {
                             // Delete the original file if requested:
                             if (deleteOriginalFiles)
                                 file.delete();
-                            
+
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
-                    }
-                    else {
+                    } else {
                         // Destination and source is the same. Do nothing.
                     }
                     // Update progress bar:
@@ -164,10 +154,9 @@ public class AccessLinksForEntries {
                         }
                     });
                 }
-            }
-            else {
+            } else {
                 // The link could not be resolved to an existing file.
-                
+
             }
         }
 
@@ -190,14 +179,10 @@ public class AccessLinksForEntries {
 
             ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
             BibtexEntry[] sel = panel.getSelectedEntries();
-            for (int i = 0; i < sel.length; i++) {
-                BibtexEntry bibtexEntry = sel[i];
-                entries.add(bibtexEntry);
-            }
+            Collections.addAll(entries, sel);
             final List<FileListEntry> links =
                     AccessLinksForEntries.getExternalLinksForEntries(entries);
-            for (Iterator<FileListEntry> iterator = links.iterator(); iterator.hasNext();) {
-                FileListEntry entry = iterator.next();
+            for (FileListEntry entry : links) {
                 System.out.println("Link: " + entry.getLink());
             }
 

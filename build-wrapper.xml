@@ -1,0 +1,3 @@
+<project default="test">
+    <include file="build.xml" as="antTargets"/>
+</project>

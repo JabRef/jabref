@@ -32,8 +32,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
     private JCheckBox colorCodes, overrideFonts;//, useCustomIconTheme;
-    private GridBagLayout gbl = new GridBagLayout();
-    private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
@@ -65,7 +63,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
                         "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.setLeadingColumnOffset(2);
+        builder.leadingColumnOffset(2);
         JLabel lab;
         builder.appendSeparator(Globals.lang("General"));
         JPanel p1 = new JPanel();
@@ -81,6 +79,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         //builder.nextLine();
         builder.append(colorCodes);
         builder.nextLine();
+        JButton fontButton = new JButton(Globals.lang("Set table font"));
         builder.append(fontButton);
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Table and entry editor colors"));
@@ -102,7 +101,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         sort = new JPanel(),
         namesp = new JPanel(),
             iconCol = new JPanel();
-    upper.setLayout(gbl);
+        GridBagLayout gbl = new GridBagLayout();
+        upper.setLayout(gbl);
     sort.setLayout(gbl);
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
@@ -116,14 +116,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     fontButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            Font f=new FontSelectorDialog
-                (null, GUIGlobals.CURRENTFONT).getSelectedFont();
-            if(f==null)
-                return;
-            else
+            Font f = new FontSelectorDialog
+                    (null, GUIGlobals.CURRENTFONT).getSelectedFont();
+            if (f != null) {
                 font = f;
+            }
         }
-        });
+    });
     /*menuFontButton.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
              Font f=new FontSelectorDialog

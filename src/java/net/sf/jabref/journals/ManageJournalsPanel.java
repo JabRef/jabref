@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -179,8 +178,6 @@ public class ManageJournalsPanel extends JPanel{
                     old = new File(newNameTf.getText());
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
                 if (name != null) {
-                    if ((old != null) && (tableModel.getRowCount() > 0)) {
-                    }
                     newNameTf.setText(name);
                     newFile.setSelected(true);
                 }
@@ -193,8 +190,6 @@ public class ManageJournalsPanel extends JPanel{
                     old = new File(personalFile.getText());
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
                 if (name != null) {
-                    if ((old != null) && (tableModel.getRowCount() > 0)) {
-                    }
                     personalFile.setText(name);
                     oldFile.setSelected(true);
                     oldFile.setEnabled(true);
@@ -263,8 +258,7 @@ public class ManageJournalsPanel extends JPanel{
     private void buildExternalsPanel() {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("fill:pref:grow",""));
-        for (Iterator<ExternalFileEntry> i=externals.iterator(); i.hasNext();) {
-            ExternalFileEntry efe = i.next();
+        for (ExternalFileEntry efe : externals) {
             builder.append(efe.getPanel());
             builder.nextLine();
         }
@@ -293,8 +287,8 @@ public class ManageJournalsPanel extends JPanel{
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
-            for (int i=0; i<externalFiles.length; i++) {
-                ExternalFileEntry efe = new ExternalFileEntry(externalFiles[i]);
+            for (String externalFile : externalFiles) {
+                ExternalFileEntry efe = new ExternalFileEntry(externalFile);
                 externals.add(efe);
 
             }
@@ -361,8 +355,7 @@ public class ManageJournalsPanel extends JPanel{
             FileWriter fw = null;
             try {
                 fw = new FileWriter(f, false);
-                for (Iterator<JournalEntry> i=tableModel.getJournals().iterator(); i.hasNext();) {
-                    JournalEntry entry = i.next();
+                for (JournalEntry entry : tableModel.getJournals()) {
                     fw.write(entry.name);
                     fw.write(" = ");
                     fw.write(entry.abbreviation);
@@ -389,8 +382,7 @@ public class ManageJournalsPanel extends JPanel{
 
         // Store the list of external files set up:
         ArrayList<String> extFiles = new ArrayList<String>();
-        for (Iterator<ExternalFileEntry> i=externals.iterator(); i.hasNext();) {
-            ExternalFileEntry efe = i.next();
+        for (ExternalFileEntry efe : externals) {
             if (!efe.getValue().equals("")) {
                 extFiles.add(efe.getValue());
             }
@@ -631,7 +623,7 @@ public class ManageJournalsPanel extends JPanel{
         public String getValue() { return tf.getText(); }
     }
 
-    class JournalEntry implements Comparable<JournalEntry> {
+    static class JournalEntry implements Comparable<JournalEntry> {
         String name, abbreviation;
         public JournalEntry(String name, String abbreviation) {
             this.name = name;

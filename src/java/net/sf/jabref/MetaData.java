@@ -21,7 +21,6 @@ import java.util.*;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.VersionHandling;
 import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 import net.sf.jabref.sql.DBStrings;
 
@@ -68,7 +67,7 @@ public class MetaData implements Iterable<String> {
             }
             if (key.equals("groupsversion")) {
                 if (orderedData.size() >= 1)
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString());
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
             } else if (key.equals("groupstree")) {
                 groupsTreePresent = true;
                 treeGroupsData = orderedData; // save for later user
@@ -179,11 +178,9 @@ public class MetaData implements Iterable<String> {
                 String relDir;
                 if (dir.equals(".")) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = file.getParent().toString(); 
+                    relDir = file.getParent();
                 } else {
-                    relDir = new StringBuffer(file.getParent()).
-                            append(System.getProperty("file.separator")).
-                            append(dir).toString();
+                    relDir = file.getParent() + System.getProperty("file.separator") + dir;
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
@@ -248,8 +245,7 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (Iterator<String> i = metaData.keySet().iterator(); i.hasNext();) {
-            String key = i.next();
+        for (String key : metaData.keySet()) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
             if (orderedData.size() >= 0) {
@@ -262,7 +258,7 @@ public class MetaData implements Iterable<String> {
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
-            
+
             out.write(sb.toString());
         }
         // write groups if present. skip this if only the root node exists 
@@ -359,10 +355,8 @@ public class MetaData implements Iterable<String> {
         
         // the parent label pattern of a BibTeX data base is the global pattern stored in the preferences
         labelPattern.setParent(Globals.prefs.getKeyPattern());
-        
-        Iterator<String> iterator = iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
+
+        for (String key : this) {
             if (key.startsWith(PREFIX_KEYPATTERN)) {
                 Vector<String> value = getData(key);
                 String type = key.substring(PREFIX_KEYPATTERN.length());

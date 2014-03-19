@@ -65,8 +65,8 @@ public class AddToGroupAction extends AbstractAction {
                 node = e.nextElement();
                 if (!node.getGroup().supportsRemove())
                     continue;
-                for (int i = 0; i < entries.length; ++i) {
-                    if (node.getGroup().contains(entries[i]))
+                for (BibtexEntry entry : entries) {
+                    if (node.getGroup().contains(entry))
                         removeGroupsNodes.add(node);
                 }
             }

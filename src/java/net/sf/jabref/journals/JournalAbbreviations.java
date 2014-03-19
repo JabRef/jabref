@@ -30,7 +30,6 @@ import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.*;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.util.CaseChanger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -156,7 +155,7 @@ public class JournalAbbreviations {
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
      * @param in
      */
-    public void readJournalList(Reader in) throws FileNotFoundException {
+    public void readJournalList(Reader in) {
         BufferedReader reader = new BufferedReader(in);
         try {
             String line;

@@ -6,10 +6,6 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.undo.UndoableFieldChange;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 /**
  * Created by IntelliJ IDEA.
  * User: alver

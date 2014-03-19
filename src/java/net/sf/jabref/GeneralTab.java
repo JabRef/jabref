@@ -48,9 +48,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JTextField defOwnerField, timeStampFormat, timeStampField;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
-    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
-    encodings = new JComboBox(Globals.ENCODINGS);
-    private HelpAction ownerHelp, timeStampHelp;
+    private JComboBox<String> language = new JComboBox<String>(GUIGlobals.LANGUAGES.keySet().toArray(new String[0])),
+    encodings = new JComboBox<String>(Globals.ENCODINGS);
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
@@ -91,9 +90,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
-        ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
+        HelpAction ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
                 "Help", GUIGlobals.getIconUrl("helpSmall"));
-        timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
+        HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
         inspectionWarnDupli = new JCheckBox(Globals.lang("Warn about unresolved duplicates when closing inspection window"));
 
@@ -267,8 +266,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
-            _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString());
-            Globals.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString(), "");
+            _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
+            Globals.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()), "");
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:

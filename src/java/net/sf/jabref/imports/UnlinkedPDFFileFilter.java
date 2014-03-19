@@ -33,4 +33,4 @@ public class UnlinkedPDFFileFilter implements FileFilter {
             return !lookup.lookupDatabase(pathname);
         return false;
     }
-};
+}

@@ -46,20 +46,17 @@ public class IncrementalSearcher {
 			/*Globals.logger("Searching field '"+fields[i].toString()
 				       +"' for '"
 				       +pattern.toString()+"'.");*/
-			if (bibtexEntry.getField(field.toString()) != null) {
+			if (bibtexEntry.getField(field) != null) {
 			    if (prefs.getBoolean("caseSensitiveSearch")) {
-				if (bibtexEntry.getField(field.toString())
-				    .toString().indexOf(searchString) > -1)
+				if (bibtexEntry.getField(field).contains(searchString))
 				    found = true;
 			    } else {
-				if (bibtexEntry.getField(field.toString())
-				    .toString().toLowerCase()
-				    .indexOf(searchString.toLowerCase()) > -1)
+				if (bibtexEntry.getField(field).toLowerCase().contains(searchString.toLowerCase()))
 				    found = true;
 			    }
 			    
 			    if (found) {
-				hitInField = field.toString();
+				hitInField = field;
 				return true;
 			    }
 			}

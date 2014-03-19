@@ -60,7 +60,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
 
         StringBuffer sb = new StringBuffer(100);
 
-        if (fieldText.indexOf(" and ") == -1)
+        if (!fieldText.contains(" and "))
         {
           singleAuthor(sb, fieldText, 1);
         }

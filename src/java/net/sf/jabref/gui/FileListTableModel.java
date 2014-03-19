@@ -262,13 +262,8 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private String encodeEntry(FileListEntry entry) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(encodeString(entry.getDescription()));
-        sb.append(':');
-        sb.append(encodeString(entry.getLink()));
-        sb.append(':');
-        sb.append(encodeString(entry.getType() != null ? entry.getType().getName() : ""));
-        return sb.toString();
+        String type = entry.getType() != null ? entry.getType().getName() : "";
+        return encodeString(entry.getDescription()) + ':' + encodeString(entry.getLink()) + ':' + encodeString(type);
     }
 
     private String encodeString(String s) {
@@ -284,8 +279,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     public void print() {
         System.out.println("----");
-        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry fileListEntry = iterator.next();
+        for (FileListEntry fileListEntry : list) {
             System.out.println(fileListEntry);
         }
         System.out.println("----");

@@ -16,7 +16,6 @@
 package net.sf.jabref;
 
 import java.util.Comparator;
-import java.util.regex.Pattern;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
 
@@ -64,7 +63,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
                     textPre = pre.getContent().toLowerCase();
 
             // If that is the case, reverse the order found:
-            if (textPre.indexOf("#" + namePost + "#") >= 0) {
+            if (textPre.contains("#" + namePost + "#")) {
                 res = -res;
             }
 

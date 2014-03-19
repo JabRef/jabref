@@ -94,36 +94,36 @@ public class InspecImporter extends ImportFormat {
         String[] entries = sb.toString().split("__::__");
         String Type = "";
         HashMap<String, String> h = new HashMap<String, String>();
-        for (int i = 0; i < entries.length; i++){
-            if (entries[i].indexOf("Record") != 0) continue;
+        for (String entry : entries) {
+            if (entry.indexOf("Record") != 0) continue;
             h.clear();
 
-            String[] fields = entries[i].split("__NEWFIELD__");
-            for (int j = 0; j < fields.length; j++){
+            String[] fields = entry.split("__NEWFIELD__");
+            for (String s : fields) {
                 //System.out.println(fields[j]);
-                String s = fields[j];
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if (f3.equals("TI")) h.put("title", frest);
                 else if (f3.equals("PY")) h.put("year", frest);
                 else if (f3.equals("AU")) h.put("author",
-                                                AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
-                                                        ";", " and ")));
+                        AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
+                                ";", " and "))
+                );
                 else if (f3.equals("AB")) h.put("abstract", frest);
                 else if (f3.equals("ID")) h.put("keywords", frest);
-                else if (f3.equals("SO")){
+                else if (f3.equals("SO")) {
                     int m = frest.indexOf(".");
-                    if (m >= 0){
+                    if (m >= 0) {
                         String jr = frest.substring(0, m);
                         h.put("journal", jr.replaceAll("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(";");
-                        if (m >= 5){
+                        if (m >= 5) {
                             String yr = frest.substring(m - 5, m);
                             h.put("year", yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(":");
-                            if (m >= 0){
+                            if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
                                 h.put("pages", pg);
                                 h.put("volume", frest.substring(1, m));
@@ -131,16 +131,16 @@ public class InspecImporter extends ImportFormat {
                         }
                     }
 
-                }else if (f3.equals("RT")){
+                } else if (f3.equals("RT")) {
                     frest = frest.trim();
                     if (frest.equals("Journal-Paper")) Type = "article";
                     else if (frest.equals("Conference-Paper")
-                             || frest.equals("Conference-Paper; Journal-Paper")) Type = "inproceedings";
+                            || frest.equals("Conference-Paper; Journal-Paper")) Type = "inproceedings";
                     else Type = frest.replaceAll(" ", "");
                 }
             }
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
-                                            .getEntryType(Type)); // id assumes an existing database so don't
+                    .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);
 

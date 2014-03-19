@@ -93,7 +93,7 @@ public class CsaImporter extends ImportFormat {
     // append to the "note" field
     private void addNote(HashMap<String, String> hm, String note) {
 
-        StringBuffer notebuf = new StringBuffer();
+        StringBuilder notebuf = new StringBuilder();
         if (hm.get("note") != null) {
             notebuf.append(hm.get("note"));
             notebuf.append("\n");
@@ -123,7 +123,7 @@ public class CsaImporter extends ImportFormat {
             return fstr;
         }
 
-        StringBuffer date = new StringBuffer();
+        StringBuilder date = new StringBuilder();
 
         String day = pm.group(1);
         if (day == null)
@@ -277,7 +277,7 @@ public class CsaImporter extends ImportFormat {
                     sb.append(str.substring(4)); // skip spaces
                 }
                 String fstr = sb.toString();
-                if (fstr == null || fstr.length() == 0) {
+                if (fstr.length() == 0) {
                     int line1 = line - 1;
                     throw new IOException("illegal empty field at line " +
                                           line1);
@@ -290,12 +290,12 @@ public class CsaImporter extends ImportFormat {
                 // check for start of new record
                 if (fabbr.equals("DN") &&
                     fname.equalsIgnoreCase("Database Name")) {
-                    if (first == false) {
+                    if (!first) {
                         throw new IOException("format error at line " + fline +
                                               ": DN out of order");
                     }
                     first = false;
-                } else if (first == true) {
+                } else if (first) {
                     throw new IOException("format error at line " + fline +
                                               ": missing DN");
                 }
@@ -304,23 +304,23 @@ public class CsaImporter extends ImportFormat {
                     Type = null;
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
-                    for (int ii = 0; ii < types.length; ++ii) {
-                        if ((types[ii].indexOf("article")>=0) ||
-                            (types[ii].indexOf("journal article")>=0)) {
+                    for (String type : types) {
+                        if ((type.contains("article")) ||
+                                (type.contains("journal article"))) {
                             Type = "article";
                             break;
-                        } else if (types[ii].equals("dissertation")) {
+                        } else if (type.equals("dissertation")) {
                             Type = "phdthesis";
                             break;
-                        } else if (types[ii].equals("conference")) {
+                        } else if (type.equals("conference")) {
                             Type = "inproceedings";
                             break;
-                        } else if (types[ii].equals("book monograph") &&
-                                   Type == null) {
+                        } else if (type.equals("book monograph") &&
+                                Type == null) {
                             Type = "book";
                             break;
-                        } else if (types[ii].equals("report") &&
-                                   Type == null) {
+                        } else if (type.equals("report") &&
+                                Type == null) {
                             Type = "techreport";
                             break;
                         }
@@ -338,7 +338,7 @@ public class CsaImporter extends ImportFormat {
                     ftype = "affiliation";
                 else if (fabbr.equals("AU")) {
                     ftype = "author";
-                    if (fstr.indexOf(";") >= 0)
+                    if (fstr.contains(";"))
                         fstr = fstr.replaceAll("; ", " and ");
                 }
                 else if (fabbr.equals("CA"))
@@ -364,18 +364,14 @@ public class CsaImporter extends ImportFormat {
                     if (hm.get("year") != null) {
                         String oyear = hm.get("year");
                         if (!fstr.equals(oyear)) {
-                            StringBuffer note = new StringBuffer();
-                            note.append("Source Year: ");
-                            note.append(oyear);
-                            note.append(".");
-                            addNote(hm, note.toString());
+                            addNote(hm, "Source Year: " + oyear + ".");
 //			    System.out.println(fstr + " != " + oyear);
                         }
                     }
                 } else if (fabbr.equals("RL")) {
                     ftype = "url";
                     String[] lines = fstr.split(" ");
-                    StringBuffer urls = new StringBuffer();
+                    StringBuilder urls = new StringBuilder();
                     for (int ii = 0; ii < lines.length; ++ii) {
                         if (lines[ii].startsWith("[URL:"))
                             urls.append(lines[ii].substring(5));
@@ -404,7 +400,7 @@ public class CsaImporter extends ImportFormat {
 
                     // pages
                     pm = PAGES_PATTERN.matcher(fstr);
-                    StringBuffer pages = new StringBuffer();
+                    StringBuilder pages = new StringBuilder();
                     while (pm.find()) {
                         if (pages.length() > 0)
                             pages.append(",");
@@ -454,12 +450,7 @@ public class CsaImporter extends ImportFormat {
                 if (ftype != null) {
                     hm.put(ftype, fstr);
                 } else {
-                    StringBuffer val = new StringBuffer();
-                    val.append(fname);
-                    val.append(": ");
-                    val.append(fstr);
-                    val.append(".");
-                    addNote(hm, val.toString());
+                    addNote(hm, fname + ": " + fstr + ".");
                 }
             } else
                 str = readLine(in);

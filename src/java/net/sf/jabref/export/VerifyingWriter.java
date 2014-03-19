@@ -45,7 +45,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 		if (!encoder.canEncode(str)) {
 			for (int i = 0; i < str.length(); i++) {
 				if (!encoder.canEncode(str.charAt(i)))
-					problemCharacters.add(new Character(str.charAt(i)));
+					problemCharacters.add(str.charAt(i));
 			}
 			couldEncodeAll = false;
 		}
@@ -56,7 +56,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 	}
 
 	public String getProblemCharacters() {
-		StringBuffer chars = new StringBuffer();
+		StringBuilder chars = new StringBuilder();
 		for (Character ch : problemCharacters) {
 			chars.append(ch.charValue());
 		}

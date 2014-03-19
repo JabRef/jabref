@@ -166,7 +166,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      */
     public boolean isRankingColumn(int col) {
         if (iconCols.get(col) != null) {
-            if (iconCols.get(col)[0] == RANKING[0]){
+            if (iconCols.get(col)[0].equals(RANKING[0])){
                 return true;
             }
         }
@@ -230,8 +230,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 }
             }
 
-            for (int i = 0; i < nameCols.length; i++) {
-                if ((col - padleft == nameCols[i][0]) && (nameCols[i][1] == j)) {
+            for (int[] nameCol : nameCols) {
+                if ((col - padleft == nameCol[0]) && (nameCol[1] == j)) {
                     return formatName(o);
                 }
             }
@@ -273,9 +273,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         for (int i=0; i<colSettings.length; i++) {
             String[] fields = colSettings[i].split(COL_DEFINITION_FIELD_SEPARATOR);
             columns[i] = new String[fields.length];
-            for (int j = 0; j < fields.length; j++) {
-                columns[i][j] = fields[j];
-            }
+            System.arraycopy(fields, 0, columns[i], 0, fields.length);
         }
 
         // Read name format options:

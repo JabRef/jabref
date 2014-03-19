@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.net;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.imports.ImportFormatReader;
 
 import java.awt.Component;
@@ -39,8 +38,6 @@ public class URLDownload {
     private String mimeType = null;
     private String content = null;
     private String encoding = null;
-
-    private CookieHandler cm;
 
     /**
      * URL download to a string. After construction, call download() and then getStringContent().
@@ -75,6 +72,7 @@ public class URLDownload {
     private void setCookieHandler() {
         try {
             // This should set up JabRef to receive cookies properly
+            CookieHandler cm;
             if ((cm = CookieHandler.getDefault()) == null) {
                 cm = new CookieHandlerImpl();
                 CookieHandler.setDefault(cm);
@@ -141,7 +139,7 @@ public class URLDownload {
                 input.close();
                 output.close();
               }
-            catch (Exception e)
+            catch (Exception ignored)
               {
               }
           }
@@ -170,7 +168,7 @@ public class URLDownload {
                 input.close();
                 output.close();
               }
-            catch (Exception e)
+            catch (Exception ignored)
               {
               }
           }        

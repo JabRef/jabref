@@ -18,7 +18,6 @@ package net.sf.jabref.mods;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
-import net.sf.jabref.export.layout.format.XMLChars;
 
 import net.sf.jabref.AuthorList;
 
@@ -126,11 +125,11 @@ public class PersonName {
     public String getFullname()
     {
     	String fullName = "";
-    	if(givenName != null && givenName != "")
+    	if(givenName != null && !givenName.equals(""))
     		fullName += givenName + " "; 
-    	if(middleName != null && middleName != "")
+    	if(middleName != null && !middleName.equals(""))
     		fullName += middleName + " ";
-    	if(surname != null && surname != "")
+    	if(surname != null && !surname.equals(""))
     		fullName += surname;
     	
     	return fullName.trim();

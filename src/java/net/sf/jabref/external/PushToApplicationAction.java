@@ -63,13 +63,13 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
 
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys())
-            for (int i=0; i<entries.length; i++) {
-                if ((entries[i].getCiteKey() == null) || (entries[i].getCiteKey().trim().length() == 0)) {
+            for (BibtexEntry entry : entries) {
+                if ((entry.getCiteKey() == null) || (entry.getCiteKey().trim().length() == 0)) {
                     JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires all selected entries to have BibTex keys defined."),
-                        (String)getValue(NAME), JOptionPane.ERROR_MESSAGE);
+                            (String) getValue(NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-        }
+            }
 
         // All set, call the operation in a new thread:
         Thread t = new Thread(this);
@@ -93,8 +93,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         StringBuffer result = new StringBuffer();
         String citeKey = "";//, message = "";
         boolean first = true;
-        for (int i=0; i<entries.length; i++) {
-            BibtexEntry bes = entries[i];
+        for (BibtexEntry bes : entries) {
             citeKey = bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
             if (citeKey == null || citeKey.equals(""))

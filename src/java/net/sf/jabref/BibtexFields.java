@@ -30,6 +30,7 @@
 
 package net.sf.jabref ;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
@@ -254,9 +255,7 @@ public class BibtexFields
             return;
         // Build a Set of field names for the fields that should be sorted numerically:
         HashSet<String> nF = new HashSet<String>();
-        for (int i = 0; i < numFields.length; i++) {
-            nF.add(numFields[i]);
-        }
+        Collections.addAll(nF, numFields);
         // Look through all registered fields, and activate numeric sorting if necessary:
         for (String fieldName : runtime.fieldSet.keySet()) {
             BibtexSingleField field = runtime.fieldSet.get(fieldName);
@@ -314,7 +313,7 @@ public class BibtexFields
   // --------------------------------------------------------------------------
   //  the "static area"
   // --------------------------------------------------------------------------
-  private static final BibtexSingleField getField( String name )
+  private static BibtexSingleField getField( String name )
   {
     if (name != null)
     {
@@ -615,10 +614,8 @@ public class BibtexFields
 
     private boolean isSet( int flagID )
     {
-      if ( (flag & flagID) == flagID)
-        return true ;
+        return (flag & flagID) == flagID;
 
-      return false ;
     }
 
     // -----------------------------------------------------------------------

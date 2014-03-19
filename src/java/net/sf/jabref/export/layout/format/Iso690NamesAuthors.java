@@ -23,7 +23,6 @@
 
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.*;
 import net.sf.jabref.export.layout.*;
 /**
  *

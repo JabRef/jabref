@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -142,10 +141,10 @@ public class AboutPanel extends JComponent
 
 // ----------------------------------------------------------------------------
 
-  private final void loadAboutText()
+  private void loadAboutText()
   {
     TextBlock block = null ;
-    AboutTextLine aLine = null ;
+    AboutTextLine aLine;
 
     int index = -3 ;
     FontMetrics fm = getFontMetrics(font3);
@@ -357,7 +356,7 @@ public class AboutPanel extends JComponent
               mutex.wait( sleepTime ) ;
             } while (!runMode) ;
           }
-          catch ( Exception e )
+          catch ( Exception ignored)
           {
           }
         }

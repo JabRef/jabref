@@ -90,7 +90,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                             if (undo.canUndo()) {
                                 undo.undo();
                             }
-                        } catch (CannotUndoException e) {
+                        } catch (CannotUndoException ignored) {
                         }
                     }
                 });
@@ -106,7 +106,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                             if (undo.canRedo()) {
                                 undo.redo();
                             }
-                        } catch (CannotRedoException e) {
+                        } catch (CannotRedoException ignored) {
                         }
                     }
                 });

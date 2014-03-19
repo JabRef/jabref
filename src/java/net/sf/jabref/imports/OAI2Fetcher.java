@@ -219,7 +219,7 @@ public class OAI2Fetcher implements EntryFetcher {
             
             /* Correct line breaks and spacing */
             for (String name : be.getAllFields()){
-                be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name).toString()));
+                be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
             }
             
             if (key.matches("\\d\\d\\d\\d\\..*")){

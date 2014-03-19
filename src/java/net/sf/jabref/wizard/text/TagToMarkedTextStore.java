@@ -35,7 +35,6 @@ package net.sf.jabref.wizard.text ;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 import javax.swing.text.StyledDocument;
 
@@ -92,15 +91,13 @@ public class TagToMarkedTextStore
 
 		if (ll != null) {
 			// iterate over all saved selections
-			for (ListIterator<TMarkedStoreItem> lIt = ll.listIterator(); lIt
-				.hasNext();) {
-				Object du2 = lIt.next();
-				if (du2 != null) {
-					TMarkedStoreItem item = (TMarkedStoreItem) du2;
-					doc.setCharacterAttributes(item.start, item.end
-						- item.start, doc.getStyle(style), true);
-				}
-			}
+            for (TMarkedStoreItem du2 : ll) {
+                if (du2 != null) {
+                    TMarkedStoreItem item = du2;
+                    doc.setCharacterAttributes(item.start, item.end
+                            - item.start, doc.getStyle(style), true);
+                }
+            }
 		}
 	}
 

@@ -30,18 +30,16 @@ import antlr.collections.AST;
 public class SearchExpression implements SearchRule {
 	private SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
 	private AST ast = null;
-	private JabRefPreferences prefs = null;
 
-	public SearchExpression(JabRefPreferences prefs, Hashtable<String, String> searchOptions)
+    public SearchExpression(JabRefPreferences prefs, Hashtable<String, String> searchOptions)
 		throws TokenStreamException, RecognitionException,
 		PatternSyntaxException {
-		this.prefs = prefs;
-		// parse search expression
+        // parse search expression
 		SearchExpressionParser parser = new SearchExpressionParser(
 			new SearchExpressionLexer(new StringReader(searchOptions.elements()
 				.nextElement()))); // supports only single entry
-		parser.caseSensitive = this.prefs.getBoolean("caseSensitiveSearch");
-		parser.regex = this.prefs.getBoolean("regExpSearch");
+		parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
+		parser.regex = prefs.getBoolean("regExpSearch");
 		parser.searchExpression(); // this is the "global" rule
 		ast = parser.getAST(); // remember abstract syntax tree
 	}

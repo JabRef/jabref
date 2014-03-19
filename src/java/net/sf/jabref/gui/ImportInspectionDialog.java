@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -443,8 +442,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     public List<BibtexEntry> getSelectedEntries() {
         List<BibtexEntry> selected = new ArrayList<BibtexEntry>();
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = i.next();
+        for (BibtexEntry entry : entries) {
             if (entry.isSearchHit())
                 selected.add(entry);
         }
@@ -518,8 +516,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Iterate over the entries, add them to the database we are working
         // with,
         // and generate unique keys:
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = i.next();
+        for (BibtexEntry entry : entries) {
             // if (newDatabase) {
             try {
                 entry.setId(Util.createNeutralId());
@@ -537,8 +534,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // added yet. They only needed to be in it while we generated the keys,
         // to keep
         // control over key uniqueness.
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = i.next();
+        for (BibtexEntry entry : entries) {
             database.removeEntry(entry.getId());
         }
         entries.getReadWriteLock().writeLock().lock();
@@ -600,8 +596,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void actionPerformed(ActionEvent event) {
 
             selectionModel.getSelected().getReadWriteLock().writeLock().lock();
-            for (Iterator<BibtexEntry> i = selectionModel.getSelected().iterator(); i.hasNext();) {
-                BibtexEntry entry = i.next();
+            for (BibtexEntry entry : selectionModel.getSelected()) {
                 // We store the groups this entry should be added to in a Set in
                 // the Map:
                 Set<GroupTreeNode> groups = groupAdditions.get(entry);
@@ -629,9 +624,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // see if there
             // are unresolved duplicates, and warn if yes.
             if (Globals.prefs.getBoolean("warnAboutDuplicatesInInspection")) {
-                for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
+                for (BibtexEntry entry : entries) {
 
-                    BibtexEntry entry = i.next();
                     // Only check entries that are to be imported. Keep status
                     // is indicated
                     // through the search hit status of the entry:
@@ -643,10 +637,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
-                            Globals.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
-                            Globals.lang("Disable this confirmation dialog"), false);
+                                Globals.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
+                                Globals.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
-                            cbm, Globals.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
+                                cbm, Globals.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
                         if (cbm.isSelected())
                             Globals.prefs.putBoolean("warnAboutDuplicatesInInspection", false);
                         if (answer == JOptionPane.NO_OPTION)
@@ -662,8 +656,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // See if we should remove any old entries for duplicate resolving:
             if (entriesToDelete.size() > 0) {
-                for (Iterator<BibtexEntry> i = entriesToDelete.iterator(); i.hasNext();) {
-                    BibtexEntry entry = i.next();
+                for (BibtexEntry entry : entriesToDelete) {
                     ce.addEdit(new UndoableRemoveEntry(panel.database(), entry, panel));
                     panel.database().removeEntry(entry.getId());
                 }
@@ -701,8 +694,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         Util.unmarkEntry(entry, true, panel.database(), ce);
                     }
 
-                for (Iterator<BibtexEntry> i = selected.iterator(); i.hasNext();) {
-                    BibtexEntry entry = i.next();
+                for (BibtexEntry entry : selected) {
                     // entry.clone();
 
                     // Remove settings to group/search hit status:
@@ -719,10 +711,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             // user if a key should be generated
                             // immediately.
                             int answer = JOptionPane
-                                .showConfirmDialog(
-                                    ImportInspectionDialog.this,
-                                    Globals.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                                    Globals.lang("Add to group"), JOptionPane.YES_NO_OPTION);
+                                    .showConfirmDialog(
+                                            ImportInspectionDialog.this,
+                                            Globals.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                            Globals.lang("Add to group"), JOptionPane.YES_NO_OPTION);
                             if (answer == JOptionPane.YES_OPTION) {
                                 generateKeys(false);
                             } else
@@ -731,12 +723,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                         // If the key existed, or exists now, go ahead:
                         if (entry.getField(BibtexFields.KEY_FIELD) != null) {
-                            for (Iterator<GroupTreeNode> i2 = groups.iterator(); i2.hasNext();) {
-                                GroupTreeNode node = i2.next();
+                            for (GroupTreeNode node : groups) {
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:
                                     AbstractUndoableEdit undo = node.getGroup().add(
-                                        new BibtexEntry[] { entry });
+                                            new BibtexEntry[]{entry});
                                     if (undo instanceof UndoableChangeAssignment)
                                         ((UndoableChangeAssignment) undo).setEditedNode(node);
                                     ce.addEdit(undo);
@@ -881,7 +872,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         protected Boolean enable;
 
         public SelectionButton(boolean enable) {
-            this.enable = Boolean.valueOf(enable);
+            this.enable = enable;
         }
 
         public void actionPerformed(ActionEvent event) {
@@ -897,7 +888,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void actionPerformed(ActionEvent event) {
             for (int i = 0; i < glTable.getRowCount(); i++) {
                 if (glTable.getValueAt(i, DUPL_COL) != null) {
-                    glTable.setValueAt(Boolean.valueOf(false), i, 0);
+                    glTable.setValueAt(false, i, 0);
                 }
             }
             glTable.repaint();
@@ -1051,7 +1042,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // menu.
             if (e.isPopupTrigger()) {
                 showPopup(e);
-                return;
             }
         }
 
@@ -1400,7 +1390,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // editable:
             entries.getReadWriteLock().writeLock().lock();
             BibtexEntry entry = sortedList.get(row);
-            entry.setSearchHit(((Boolean) value).booleanValue());
+            entry.setSearchHit((Boolean) value);
             entries.getReadWriteLock().writeLock().unlock();
         }
     }

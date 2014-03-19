@@ -20,12 +20,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
-import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.ActionMap;
@@ -34,9 +31,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
@@ -57,7 +51,7 @@ public class EntryEditorTab {
 
 	private String[] fields;
 
-	private EntryEditor parent;
+	EntryEditor parent;
 
 	private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
@@ -73,7 +67,7 @@ public class EntryEditorTab {
 	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
                           boolean addKeyField, String name) {
 		if (fields != null)
-			this.fields = fields.toArray(new String[0]);
+			this.fields = fields.toArray(new String[fields.size()]);
 		else
 			this.fields = new String[] {};
 
@@ -121,7 +115,7 @@ public class EntryEditorTab {
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
         String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < fields.length; i++) {
+        for (String field : fields) {
             sb.append("fill:pref:grow, ");
         }
         if (addKeyField)
@@ -273,14 +267,12 @@ public class EntryEditorTab {
 	public void setEntry(BibtexEntry entry) {
 		try {
 			updating = true;
-			Iterator<FieldEditor> i = editors.values().iterator();
-			while (i.hasNext()) {
-				FieldEditor editor = i.next();
-				Object content = entry.getField(editor.getFieldName());
+            for (FieldEditor editor : editors.values()) {
+                Object content = entry.getField(editor.getFieldName());
                 String toSet = (content == null) ? "" : content.toString();
                 if (!toSet.equals(editor.getText()))
-				    editor.setText(toSet);
-			}
+                    editor.setText(toSet);
+            }
 			this.entry = entry;
 		} finally {
 			updating = false;
@@ -296,24 +288,21 @@ public class EntryEditorTab {
 	}
 
 	public void validateAllFields() {
-		for (Iterator<String> i = editors.keySet().iterator(); i.hasNext();) {
-			String field = i.next();
-			FieldEditor ed = editors.get(field);
+        for (String field : editors.keySet()) {
+            FieldEditor ed = editors.get(field);
             ed.updateFontColor();
-			ed.setEnabled(true);
-			if (((Component) ed).hasFocus())
-				ed.setActiveBackgroundColor();
-			else
-				ed.setValidBackgroundColor();
-		}
+            ed.setEnabled(true);
+            if (((Component) ed).hasFocus())
+                ed.setActiveBackgroundColor();
+            else
+                ed.setValidBackgroundColor();
+        }
 	}
 
 	public void setEnabled(boolean enabled) {
-		Iterator<FieldEditor> i = editors.values().iterator();
-		while (i.hasNext()) {
-			FieldEditor editor = i.next();
-			editor.setEnabled(enabled);
-		}
+        for (FieldEditor editor : editors.values()) {
+            editor.setEnabled(enabled);
+        }
 	}
 
 	public Component getPane() {
@@ -385,87 +374,6 @@ public class EntryEditorTab {
 
     }
 
-	/*
-	 * Focus listener that fires the storeFieldAction when a FieldTextArea loses
-	 * focus, and makes the vertical scroll view follow up.
-	 * 
-	 * TODO: It would be nice to test this thoroughly.
-	 */
-	FocusListener fieldListener = new FocusListener() {
-	
-		JTextComponent c;
+	FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
-		DocumentListener d;
-
-		public void focusGained(FocusEvent e) {
-
-			synchronized (this){
-				if (c != null) {
-					c.getDocument().removeDocumentListener(d);
-					c = null;
-					d = null;
-				}
-
-				if (e.getSource() instanceof JTextComponent) {
-
-					c = (JTextComponent) e.getSource();
-					/**
-					 * [ 1553552 ] Not properly detecting changes to flag as
-					 * changed
-					 */
-					d = new DocumentListener() {
-
-						void fire(DocumentEvent e) {
-							if (c.isFocusOwner()) {
-								markIfModified((FieldEditor) c);
-							}
-						}
-
-						public void changedUpdate(DocumentEvent e) {
-							fire(e);
-						}
-
-						public void insertUpdate(DocumentEvent e) {
-							fire(e);
-						}
-
-						public void removeUpdate(DocumentEvent e) {
-							fire(e);
-						}
-					};
-					c.getDocument().addDocumentListener(d);
-
-					/**
-					 * Makes the vertical scroll panel view follow the focus
-					 */
-					Component cScrollPane = c.getParent().getParent();
-					if (cScrollPane instanceof JScrollPane) {
-    					JScrollPane componentPane = (JScrollPane) cScrollPane;
-    					Component cPane = componentPane.getParent();
-    					if (cPane instanceof JPanel) {
-        					JPanel panel = (JPanel) cPane;
-        					Rectangle bounds = componentPane.getBounds();
-        					panel.scrollRectToVisible(bounds);
-    					}
-					}
-
-				}
-			}
-
-			setActive((FieldEditor) e.getSource());
-
-		}
-
-		public void focusLost(FocusEvent e) {
-            synchronized (this) {
-				if (c != null) {
-					c.getDocument().removeDocumentListener(d);
-					c = null;
-					d = null;
-				}
-			}
-			if (!e.isTemporary())
-				parent.updateField(e.getSource());
-		}
-	};
 }

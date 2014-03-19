@@ -63,9 +63,9 @@
 
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
-	<property name="src.tests" value="src/java/tests" />
-	<property name="plugin.dir" value="src/plugins/" />
-	<property name="txt.dir" value="src/txt" />
+	<property name="src.tests" value="test" />
+	<property name="plugin.dir" value="src/resources/plugins/" />
+	<property name="txt.dir" value="src/resources/txt" />
 	<property name="java.dir" value="${src.dir}/java" />
 	<property name="osx.dir" value="${src.dir}/osx" />
 	<property name="win.installer.dir" value="${src.dir}/windows/nsis" />
@@ -106,6 +106,8 @@
         <include name="jgoodies-common-1.4.0.jar" />
 		<include name="jgoodies-looks-2.5.2.jar" />
 		<include name="jgoodies-forms-1.6.0.jar" />
+        <include name="jgoodies/jgoodies-uif-lite.jar" />
+        <include name="ritopt/ritopt-0.2.1-bin.jar" />
 		<include name="jayatana-1.2.4.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
@@ -605,45 +607,6 @@ version=${jabref.version}</echo>
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets
 	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
-
-	<target name="profile" depends="jars" description="Profile JabRef">
-		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-
-		<nbprofiledirect>
-			<classpath refid="classpath" />
-		</nbprofiledirect>
-
-		<property environment="env" />
-		<java fork="true" classname="net.sf.jabref.JabRef" dir="${build.dir}" jvm="${profiler.info.jvm}">
-			<jvmarg value="${profiler.info.jvmargs.agent}" />
-			<jvmarg line="${profiler.info.jvmargs}" />
-			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
-			<classpath refid="classpath" />
-		</java>
-	</target>
-
-	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        What's about the software design ?!;-)
-    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-
-	<target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
-		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
-			<classpath>
-				<pathelement path="${classpath}" />
-				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-				<fileset dir="${buildlib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-		<jalopy fileformat="unix" convention="${src.dir}/java/jalopy.format.convention.xml" history="file" historymethod="adler32" loglevel="error" threads="2" classpathref="classpath" backup="bak">
-			<fileset dir="${src.dir}">
-				<include name="java/net/sf/jabref/**/*.java" />
-			</fileset>
-		</jalopy>
-	</target>
 
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 

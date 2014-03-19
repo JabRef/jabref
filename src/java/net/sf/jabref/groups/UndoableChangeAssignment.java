@@ -16,7 +16,6 @@
 package net.sf.jabref.groups;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -84,8 +83,8 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (Iterator<BibtexEntry> it = m_previousAssignmentBackup.iterator(); it.hasNext();)
-            group.addEntry(it.next());
+        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup)
+            group.addEntry(aM_previousAssignmentBackup);
     }
 
     public void redo() {
@@ -93,7 +92,6 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (Iterator<BibtexEntry> it = m_newAssignmentBackup.iterator(); it.hasNext();)
-            group.addEntry(it.next());
+        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) group.addEntry(aM_newAssignmentBackup);
     }
 }

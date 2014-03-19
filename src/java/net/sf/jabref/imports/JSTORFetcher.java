@@ -209,7 +209,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @return cookie value referenced by the key. null if key not found
      * @throws IOException
      */
-    public static String getCookie(String name, URLConnection conn) throws IOException {
+    public static String getCookie(String name, URLConnection conn) {
 
         for (int i = 0;; i++) {
             String headerName = conn.getHeaderFieldKey(i);

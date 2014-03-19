@@ -17,7 +17,6 @@ package net.sf.jabref.oo;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -26,7 +25,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.gui.FileListEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,7 +42,7 @@ public class CitationManager {
     JDialog diag;
     EventList<CitEntry> list;
     JTable table;
-    EventTableModel tableModel;
+    EventTableModel<CitEntry> tableModel;
     JButton ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
 
@@ -55,14 +53,13 @@ public class CitationManager {
         list = new BasicEventList<CitEntry>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
-        for (int i=0; i<names.length; i++) {
-            String name = names[i];
+        for (String name : names) {
             List<String> keys = ooBase.parseRefMarkName(name);
             list.add(new CitEntry(name, keys,
-                    "<html>..."+ooBase.getCitationContext(nameAccess, name, 30, 30, true)+"...</html>",
+                    "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel(list, new CitEntryFormat());
+        tableModel = new EventTableModel<CitEntry>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -120,7 +117,7 @@ public class CitationManager {
         diag.setVisible(true);
     }
 
-    class CitEntry implements Comparable {
+    class CitEntry implements Comparable<CitEntry> {
         String refMarkName, pageInfo, keyString, context, origPageInfo;
         List<String> keys;
 
@@ -148,8 +145,7 @@ public class CitationManager {
             else return false;
         }
 
-        public int compareTo(Object o) {
-            CitEntry other = (CitEntry)o;
+        public int compareTo(CitEntry other) {
             return this.refMarkName.compareTo(other.refMarkName);
         }
     }

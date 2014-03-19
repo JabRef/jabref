@@ -118,14 +118,13 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     public void setArgument(String arg) {
         String[] parts = parseArgument(arg);
-        for (int i = 0; i < parts.length; i++) {
-            int index = parts[i].indexOf("=");
+        for (String part : parts) {
+            int index = part.indexOf("=");
             if (index > 0) {
-                String key = parts[i].substring(0, index);
-                String value = parts[i].substring(index+1);
+                String key = part.substring(0, index);
+                String value = part.substring(index + 1);
                 handleArgument(key, value);
-            }
-            else handleArgument(parts[i], "");
+            } else handleArgument(part, "");
 
         }
     }

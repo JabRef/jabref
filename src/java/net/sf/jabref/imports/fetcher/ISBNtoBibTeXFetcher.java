@@ -72,9 +72,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
 
         InputStream source;
@@ -98,7 +95,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
         if(entry != null)  {
             // Optionally add curly brackets around key words to keep the case
-            String title = (String)entry.getField("title");
+            String title = entry.getField("title");
             if (title != null) {           
                 // Unit formatting
                 if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {

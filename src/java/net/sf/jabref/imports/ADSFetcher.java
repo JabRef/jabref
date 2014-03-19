@@ -23,7 +23,6 @@
 
 package net.sf.jabref.imports;
 
-import java.util.Set;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -147,7 +146,7 @@ public class ADSFetcher implements EntryFetcher {
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                    reader.getLocalName() == "abstract") {
+                        reader.getLocalName().equals("abstract")) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {

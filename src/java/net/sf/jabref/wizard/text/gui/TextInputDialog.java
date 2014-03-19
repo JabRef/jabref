@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.*;
@@ -87,12 +88,10 @@ public class TextInputDialog
   private JPanel rawPanel = new JPanel() ;
   private JPanel sourcePanel = new JPanel() ;
   private IntegrityMessagePanel warnPanel;
-  private JList fieldList ;
-  private JRadioButton overRadio, appRadio ;
+  private JList<String> fieldList ;
+  private JRadioButton overRadio;
 
-  private OverlayPanel testPanel ;
-
-  private BibtexEntry entry ;
+    private BibtexEntry entry ;
 
   public JPopupMenu inputMenu = new JPopupMenu() ;
   private StyledDocument doc ; // content from inputPane
@@ -208,14 +207,14 @@ public class TextInputDialog
         {
           doc.insertString( 0, "", doc.getStyle( "regular" ) ) ;
         }
-        catch ( Exception e )
+        catch ( Exception ignored)
         {}
 
-        testPanel = new OverlayPanel(textPane,
-                                     Globals.lang("Text_Input_Area") ) ;
+      OverlayPanel testPanel = new OverlayPanel(textPane,
+              Globals.lang("Text_Input_Area"));
 
-        testPanel.setPreferredSize( new Dimension( 450, 255) );
-        testPanel.setMaximumSize( new Dimension(450, Integer.MAX_VALUE) );
+        testPanel.setPreferredSize(new Dimension(450, 255));
+        testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
@@ -227,7 +226,7 @@ public class TextInputDialog
     //Add listener to components that can bring up popup menus.
     MouseListener popupListener = new PopupListener( inputMenu ) ;
     textPane.addMouseListener( popupListener );
-    testPanel.addMouseListener( popupListener );
+    testPanel.addMouseListener(popupListener);
 
     // Toolbar
     JToolBar toolBar = new JToolBar() ;
@@ -240,7 +239,7 @@ public class TextInputDialog
     JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
     leftPanel.add( toolBar, BorderLayout.NORTH ) ;
-    leftPanel.add( testPanel, BorderLayout.CENTER ) ;
+    leftPanel.add(testPanel, BorderLayout.CENTER ) ;
 
 
     // ----------------------------------------------------------------
@@ -264,7 +263,7 @@ public class TextInputDialog
     //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
     inputPanel.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
-    fieldList = new JList( getAllFields() ) ;
+    fieldList = new JList<String>( getAllFields() ) ;
     fieldList.setCellRenderer( new SimpleCellRenderer( fieldList.getFont() ) ) ;
     ListSelectionModel listSelectionModel = fieldList.getSelectionModel() ;
     listSelectionModel.setSelectionMode( ListSelectionModel.SINGLE_SELECTION ) ;
@@ -287,10 +286,10 @@ public class TextInputDialog
     
 
     // Radio buttons
-    appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
-    appRadio.setToolTipText( Globals.lang( "append_the_selected_text_to_bibtex_key") ) ;
-    appRadio.setMnemonic( KeyEvent.VK_A ) ;
-    appRadio.setSelected( true ) ;
+      JRadioButton appRadio = new JRadioButton(Globals.lang("Append"));
+    appRadio.setToolTipText(Globals.lang("append_the_selected_text_to_bibtex_key")) ;
+    appRadio.setMnemonic(KeyEvent.VK_A) ;
+    appRadio.setSelected(true) ;
 
     overRadio = new JRadioButton( Globals.lang( "Override" ) ) ;
     overRadio.setToolTipText( Globals.lang( "override_the_bibtex_key_by_the_selected_text") ) ;
@@ -299,11 +298,11 @@ public class TextInputDialog
 
     //Group the radio buttons.
     ButtonGroup group = new ButtonGroup() ;
-    group.add( appRadio ) ;
+    group.add(appRadio) ;
     group.add( overRadio ) ;
 
     JPanel radioPanel = new JPanel( new GridLayout( 0, 1 ) ) ;
-    radioPanel.add( appRadio ) ;
+    radioPanel.add(appRadio) ;
     radioPanel.add( overRadio ) ;
 
     // insert sub components
@@ -332,8 +331,6 @@ public class TextInputDialog
     // ----------------------------------------------------------------------
     rawPanel.add( leftPanel, BorderLayout.CENTER ) ;
     rawPanel.add( inputPanel, BorderLayout.EAST ) ;
-
-    boolean loaded = false ;
 
     JLabel desc = new JLabel("<html><h3>"+Globals.lang("Plain text import")+"</h3><p>"
             +Globals.lang("This is a simple copy and paste dialog. First load or paste some text into "
@@ -426,7 +423,7 @@ public class TextInputDialog
 // ---------------------------------------------------------------------------
   private void insertTextForTag()
   {
-    String type = ( String ) fieldList.getSelectedValue() ;
+    String type = fieldList.getSelectedValue() ;
     if ( type != null )
     {
       String txt = textPane.getSelectedText() ;
@@ -547,7 +544,7 @@ public class TextInputDialog
 
 // ---------------------------------------------------------------------------
   // update the bibtex source view and available List
-  private final void updateSourceView()
+  private void updateSourceView()
   {
     StringWriter sw = new StringWriter( 200 ) ;
     try
@@ -556,28 +553,24 @@ public class TextInputDialog
       String srcString = sw.getBuffer().toString() ;
       preview.setText( srcString ) ;
     }
-    catch ( IOException ex )
+    catch ( IOException ignored)
     {}
 
     fieldList.clearSelection() ;
   }
 
 // ---------------------------------------------------------------------------
-  private final String[] getAllFields()
+  private String[] getAllFields()
   {
       ArrayList<String> f = new ArrayList<String>();
       String[] req = entry.getRequiredFields();
       String[] opt = entry.getOptionalFields();
       String[] allFields = BibtexFields.getAllFieldNames();
-      for (int i=0; i<req.length; i++) {
-          f.add(req[i]);
-      }
-      for (int i=0; i<opt.length; i++) {
-          f.add(opt[i]);
-      }
-      for (int i=0; i<allFields.length; i++) {
-          if (!f.contains(allFields[i]))
-              f.add(allFields[i]);
+      Collections.addAll(f, req);
+      Collections.addAll(f, opt);
+      for (String allField : allFields) {
+          if (!f.contains(allField))
+              f.add(allField);
       }
       return f.toArray(new String[f.size()]);
    }
@@ -607,7 +600,7 @@ public class TextInputDialog
         {
           doc.insertString( cPos, data, doc.getStyle( "regular" ) ) ;
         }
-        catch ( Exception ex )
+        catch ( Exception ignored)
         {}
       }
     }
@@ -626,8 +619,7 @@ public class TextInputDialog
     {
       try
       {
-        String chosen = null ;
-        chosen = FileDialogs.getNewFile( _frame, null, null,
+        String chosen = FileDialogs.getNewFile( _frame, null, null,
                                      ".txt",
                                      JFileChooser.OPEN_DIALOG, false ) ;
         if ( chosen != null )
@@ -642,7 +634,7 @@ public class TextInputDialog
           }
         }
       }
-      catch ( Exception ex )
+      catch ( Exception ignored)
       {}
     }
   }
@@ -698,12 +690,11 @@ public class TextInputDialog
 //            System.out.println( "Event for index" + index ) ;
           if ( lastIndex > -1 )
           {
-            String tag1 = fieldList.getModel().getElementAt( lastIndex ).
-                toString() ;
+            String tag1 = fieldList.getModel().getElementAt( lastIndex ) ;
             marked.setStyleForTag( tag1, "used", doc ) ;
           }
 
-          String tag2 = fieldList.getModel().getElementAt( index ).toString() ;
+          String tag2 = fieldList.getModel().getElementAt( index ) ;
           marked.setStyleForTag( tag2, "marked", doc ) ;
 
           lastIndex = index ;

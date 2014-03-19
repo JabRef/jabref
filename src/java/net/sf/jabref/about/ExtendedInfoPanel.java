@@ -38,14 +38,11 @@ import net.sf.jabref.Globals;
 
 public class ExtendedInfoPanel extends JPanel implements AnimationListener, ActionListener
 {
-  private JEditorPane textPane ;
-  private JScrollPane scroller ;
-  private CardLayout cards ;
+    private CardLayout cards ;
 
   private JButton close ;
-  private JButton license ;
 
-  private AboutPanel about ;
+    private AboutPanel about ;
   private JPanel infoPanel ;
 
   private boolean animationIsRunning = true ;
@@ -61,9 +58,9 @@ public class ExtendedInfoPanel extends JPanel implements AnimationListener, Acti
     about.addAnimationListener(this);
 
     // scrallable html infos
-    textPane = new JEditorPane() ;
+      JEditorPane textPane = new JEditorPane();
 
-    textPane.setEditable( false ) ;
+    textPane.setEditable(false) ;
 //    URL helpURL = getClass().getResource( "/help/About.html" ) ;
     // try to load about.html for the locale language
     URL helpURL = getClass().getResource( GUIGlobals.getLocaleHelpPath() + GUIGlobals.aboutPage) ;
@@ -77,7 +74,7 @@ public class ExtendedInfoPanel extends JPanel implements AnimationListener, Acti
     {
       try
       {
-        textPane.setPage( helpURL ) ;
+        textPane.setPage(helpURL) ;
       }
       catch ( IOException e )
       {
@@ -89,8 +86,8 @@ public class ExtendedInfoPanel extends JPanel implements AnimationListener, Acti
       System.err.println( "Couldn't find file: About.html" ) ;
     }
 
-    scroller = new JScrollPane(textPane) ; //, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) ;
-    scroller.setPreferredSize( about.getSize());
+      JScrollPane scroller = new JScrollPane(textPane);
+    scroller.setPreferredSize(about.getSize());
 
     // overlapped animated/scrollable area
     infoPanel = new JPanel() ;
@@ -112,10 +109,10 @@ public class ExtendedInfoPanel extends JPanel implements AnimationListener, Acti
     close.setActionCommand( "close" ) ;
     close.setFocusable( false ) ;
 
-    license = new JButton( Globals.lang("License") ) ;
-    license.addActionListener( this ) ;
-    license.setActionCommand( "license" ) ;
-    license.setFocusable( false ) ;
+      JButton license = new JButton(Globals.lang("License"));
+    license.addActionListener(this) ;
+    license.setActionCommand("license") ;
+    license.setFocusable(false) ;
 
     buttonPanel.add( close ) ;
 //    buttonPanel.add( license ) ;

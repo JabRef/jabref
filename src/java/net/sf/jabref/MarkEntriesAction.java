@@ -63,8 +63,8 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         BibtexEntry[] bes = panel.getSelectedEntries();
         besLength = bes.length;
 
-        for (int i=0; i<bes.length; i++) {
-            Util.markEntry(bes[i], level+1, false, ce);
+        for (BibtexEntry be : bes) {
+            Util.markEntry(be, level + 1, false, ce);
         }
         ce.end();
         panel.undoManager.addEdit(ce);

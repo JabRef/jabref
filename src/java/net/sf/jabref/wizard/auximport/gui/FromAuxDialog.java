@@ -36,16 +36,9 @@
 package net.sf.jabref.wizard.auximport.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -55,7 +48,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -64,16 +56,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
@@ -92,11 +80,10 @@ public class FromAuxDialog
     private JButton cancelButton = new JButton();
     private JButton parseButton = new JButton();
 
-    private JComboBox dbChooser = new JComboBox();
+    private JComboBox<String> dbChooser = new JComboBox<String>();
     private JTextField auxFileField;
-    private JButton browseAuxFileButton;
 
-    private JList notFoundList;
+    private JList<String> notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
@@ -201,9 +188,9 @@ public class FromAuxDialog
             dbChooser.setSelectedIndex(toSelect);
 
         auxFileField = new JTextField("", 25);
-        browseAuxFileButton = new JButton(Globals.lang("Browse"));
+        JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-        notFoundList = new JList();
+        notFoundList = new JList<String>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
@@ -317,7 +304,7 @@ public class FromAuxDialog
     /**
      * Action used to produce a "Browse" button for one of the text fields.
      */
-    class BrowseAction
+    static class BrowseAction
             extends AbstractAction {
         private JTextField comp;
         private JabRefFrame _frame;
@@ -329,8 +316,7 @@ public class FromAuxDialog
         }
 
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
-            chosen = FileDialogs.getNewFile(_frame,
+            String chosen = FileDialogs.getNewFile(_frame,
                     new File(comp.getText()),
                     ".aux",
                     JFileChooser.OPEN_DIALOG, false);

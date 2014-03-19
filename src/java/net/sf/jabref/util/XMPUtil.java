@@ -21,6 +21,7 @@ import java.util.*;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
+import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
@@ -29,6 +30,7 @@ import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
 import org.apache.jempbox.xmp.XMPSchemaDublinCore;
+import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -116,7 +118,7 @@ public class XMPUtil {
 	 * Try to read the given BibTexEntry from the XMP-stream of the given
 	 * inputstream containing a PDF-file.
 	 * 
-	 * @param file
+	 * @param inputStream
 	 *            The inputstream to read from.
 	 * 
 	 * @throws IOException
@@ -145,27 +147,25 @@ public class XMPUtil {
 
         			List<XMPSchema> schemas = meta
         					.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-        
-        			Iterator<XMPSchema> it = schemas.iterator();
-        			while (it.hasNext()) {
-        				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
-        
-        				result.add(bib.getBibtexEntry());
-        			}
+
+                for (XMPSchema schema : schemas) {
+                    XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
+
+                    result.add(bib.getBibtexEntry());
+                }
         
         			// If we did not find anything have a look if a Dublin Core exists
         			if (result.size() == 0) {
         				schemas = meta
         						.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-        				it = schemas.iterator();
-        				while (it.hasNext()) {
-        					XMPSchemaDublinCore dc = (XMPSchemaDublinCore) it.next();
-        
-        					BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
-        
-        					if (entry != null)
-        						result.add(entry);
-        				}
+                        for (XMPSchema schema : schemas) {
+                            XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
+
+                            BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
+
+                            if (entry != null)
+                                result.add(entry);
+                        }
         			}
 			}
 			if (result.size() == 0) {
@@ -223,21 +223,20 @@ public class XMPUtil {
 			entry.setField("abstract", s);
 
 		COSDictionary dict = di.getDictionary();
-		Iterator it = dict.keyList().iterator();
-		while (it.hasNext()) {
-			String key = ((COSName) it.next()).getName();
-			if (key.startsWith("bibtex/")) {
-				String value = dict.getString(key);
-				key = key.substring("bibtex/".length());
-				if (key.equals("entrytype")) {
-					BibtexEntryType type = BibtexEntryType
-							.getStandardType(value);
-					if (type != null)
-						entry.setType(type);
-				} else
-					entry.setField(key, value);
-			}
-		}
+        for (Map.Entry<COSName,COSBase> o : dict.entrySet()) {
+            String key = o.getKey().getName();
+            if (key.startsWith("bibtex/")) {
+                String value = dict.getString(key);
+                key = key.substring("bibtex/".length());
+                if (key.equals("entrytype")) {
+                    BibtexEntryType type = BibtexEntryType
+                            .getStandardType(value);
+                    if (type != null)
+                        entry.setType(type);
+                } else
+                    entry.setField(key, value);
+            }
+        }
 
 		// Return null if no values were found
 		return (entry.getAllFields().size() > 0 ? entry : null);
@@ -253,7 +252,7 @@ public class XMPUtil {
 	 * The BibtexEntry is build by mapping individual fields in the dublin core
 	 * (like creator, title, subject) to fields in a bibtex entry.
 	 * 
-	 * @param di
+	 * @param dcSchema
 	 *            The document information from which to build a BibtexEntry.
 	 * 
 	 * @return The bibtex entry found in the document information.
@@ -267,9 +266,9 @@ public class XMPUtil {
 		/**
 		 * Contributor -> Editor
 		 */
-		List contributors = dcSchema.getContributors();
+		List<String> contributors = dcSchema.getContributors();
 		if (contributors != null) {
-			Iterator it = contributors.iterator();
+			Iterator<String> it = contributors.iterator();
 			StringBuffer sb = null;
 			while (it.hasNext()) {
 				if (sb != null) {
@@ -286,9 +285,9 @@ public class XMPUtil {
 		/**
 		 * Author -> Creator
 		 */
-		List creators = dcSchema.getCreators();
+		List<String> creators = dcSchema.getCreators();
 		if (creators != null) {
-			Iterator it = creators.iterator();
+			Iterator<String> it = creators.iterator();
 			StringBuffer sb = null;
 			while (it.hasNext()) {
 				if (sb != null) {
@@ -305,13 +304,13 @@ public class XMPUtil {
 		/**
 		 * Year + Month -> Date
 		 */
-		List dates = dcSchema.getSequenceList("dc:date");
+		List<String> dates = dcSchema.getSequenceList("dc:date");
 		if (dates != null && dates.size() > 0) {
-			String date = ((String) dates.get(0)).trim();
+			String date = dates.get(0).trim();
 			Calendar c = null;
 			try {
 				c = DateConverter.toCalendar(date);
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 
 			}
 			if (c != null) {
@@ -340,9 +339,9 @@ public class XMPUtil {
 		/**
 		 * Publisher -> Publisher
 		 */
-		List publishers = dcSchema.getPublishers();
+		List<String> publishers = dcSchema.getPublishers();
 		if (publishers != null) {
-			Iterator it = dcSchema.getPublishers().iterator();
+			Iterator<String> it = dcSchema.getPublishers().iterator();
 			StringBuffer sb = null;
 			while (it.hasNext()) {
 				if (sb != null) {
@@ -362,19 +361,17 @@ public class XMPUtil {
 		 * We abuse the relationship attribute to store all other values in the
 		 * bibtex document
 		 */
-		List relationships = dcSchema.getRelationships();
+		List<String> relationships = dcSchema.getRelationships();
 		if (relationships != null) {
-			Iterator it = relationships.iterator();
-			while (it.hasNext()) {
-				s = (String) it.next();
-				if (s.startsWith("bibtex/")) {
-					s = s.substring("bibtex/".length());
-					int i = s.indexOf('/');
-					if (i != -1) {
-						entry.setField(s.substring(0, i), s.substring(i + 1));
-					}
-				}
-			}
+            for (String r : relationships) {
+                if (r.startsWith("bibtex/")) {
+                    r = r.substring("bibtex/".length());
+                    int i = r.indexOf('/');
+                    if (i != -1) {
+                        entry.setField(r.substring(0, i), r.substring(i + 1));
+                    }
+                }
+            }
 		}
 
 		/**
@@ -394,9 +391,9 @@ public class XMPUtil {
 		/**
 		 * Subject -> Keywords
 		 */
-		List subjects = dcSchema.getSubjects();
+		List<String> subjects = dcSchema.getSubjects();
 		if (subjects != null) {
-			Iterator it = subjects.iterator();
+			Iterator<String> it = subjects.iterator();
 			StringBuffer sb = null;
 			while (it.hasNext()) {
 				if (sb != null) {
@@ -420,9 +417,9 @@ public class XMPUtil {
 		/**
 		 * Type -> Type
 		 */
-		List l = dcSchema.getTypes();
+		List<String> l = dcSchema.getTypes();
 		if (l != null && l.size() > 0) {
-			s = (String) l.get(0);
+			s = l.get(0);
 			if (s != null) {
 				BibtexEntryType type = BibtexEntryType.getStandardType(s);
 				if (type != null)
@@ -481,7 +478,7 @@ public class XMPUtil {
 	 * @throws IOException
 	 *             Thrown if an IOException occured while writing to the stream.
 	 * 
-	 * @see #toXMP(Collection, OutputStream) if you don't need strings to be
+	 * @see #toXMP(java.util.Collection, net.sf.jabref.BibtexDatabase) if you don't need strings to be
 	 *      resolved.
 	 */
 	public static void toXMP(Collection<BibtexEntry> bibtexEntries,
@@ -493,13 +490,11 @@ public class XMPUtil {
 
 		XMPMetadata x = new XMPMetadata();
 
-		Iterator<BibtexEntry> it = bibtexEntries.iterator();
-		while (it.hasNext()) {
-			BibtexEntry e = it.next();
-			XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
-			x.addSchema(schema);
-			schema.setBibtexEntry(e);
-		}
+        for (BibtexEntry e : bibtexEntries) {
+            XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
+            x.addSchema(schema);
+            schema.setBibtexEntry(e);
+        }
 
 		x.save(outputStream);
 	}
@@ -606,7 +601,7 @@ public class XMPUtil {
 		boolean useXmpPrivacyFilter =
 			prefs.getBoolean("useXmpPrivacyFilter");
 		// Fields for which not to write XMP data later on:
-		TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilters")));
+		TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
 		// Set all the values including key and entryType
 		
@@ -617,7 +612,7 @@ public class XMPUtil {
 			}
 
 			if (field.equals("editor")) {
-				String o = entry.getField(field.toString()).toString();
+				String authors = entry.getField(field);
 
 				/**
 				 * Editor -> Contributor
@@ -634,7 +629,6 @@ public class XMPUtil {
 				 * Bibtex-Fields used: editor
 				 */
 
-				String authors = o.toString();
 				AuthorList list = AuthorList.getAuthorList(authors);
 
 				int n = list.size();
@@ -668,8 +662,7 @@ public class XMPUtil {
 			 * Bibtex-Fields used: author
 			 */
 			if (field.equals("author")) {
-				String o = entry.getField(field.toString()).toString();
-				String authors = o.toString();
+				String authors = entry.getField(field);
 				AuthorList list = AuthorList.getAuthorList(authors);
 
 				int n = list.size();
@@ -721,8 +714,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: abstract
 			 */
 			if (field.equals("abstract")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setDescription(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setDescription(o);
 				continue;
 			}
 
@@ -740,8 +733,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("doi")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setIdentifier(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setIdentifier(o);
 				continue;
 			}
 
@@ -768,8 +761,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("publisher")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.addPublisher(o.toString());
+				String o = entry.getField(field);
+				dcSchema.addPublisher(o);
 				continue;
 			}
 
@@ -806,11 +799,11 @@ public class XMPUtil {
 			 * Bibtex-Fields used: doi
 			 */
 			if (field.equals("keywords")) {
-				String o = entry.getField(field.toString()).toString();
-				String[] keywords = o.toString().split(",");
-				for (int i = 0; i < keywords.length; i++) {
-					dcSchema.addSubject(keywords[i].trim());
-				}
+				String o = entry.getField(field);
+				String[] keywords = o.split(",");
+                for (String keyword : keywords) {
+                    dcSchema.addSubject(keyword.trim());
+                }
 				continue;
 			}
 
@@ -830,8 +823,8 @@ public class XMPUtil {
 			 * Bibtex-Fields used: title
 			 */
 			if (field.equals("title")) {
-				String o = entry.getField(field.toString()).toString();
-				dcSchema.setTitle(o.toString());
+				String o = entry.getField(field);
+				dcSchema.setTitle(o);
 				continue;
 			}
 
@@ -852,8 +845,8 @@ public class XMPUtil {
 			 * All others (including the bibtex key) get packaged in the
 			 * relation attribute
 			 */
-			String o = entry.getField(field.toString()).toString();
-			dcSchema.addRelation("bibtex/" + field.toString() + "/" + o);
+			String o = entry.getField(field);
+			dcSchema.addRelation("bibtex/" + field + "/" + o);
 		}
 
 		/**
@@ -946,13 +939,11 @@ public class XMPUtil {
 		}
 
 		// Remove all current Dublin-Core schemas
-		List schemas = meta
+		List<XMPSchema> schemas = meta
 				.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-		Iterator it = schemas.iterator();
-		while (it.hasNext()) {
-			XMPSchema bib = (XMPSchema) it.next();
-			bib.getElement().getParentNode().removeChild(bib.getElement());
-		}
+        for (XMPSchema schema : schemas) {
+            schema.getElement().getParentNode().removeChild(schema.getElement());
+        }
 
 		for (BibtexEntry entry : entries) {
 			XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
@@ -997,16 +988,16 @@ public class XMPUtil {
 
 		for (String field : fields){
 			if (field.equals("author")) {
-				di.setAuthor(entry.getField("author").toString());
+				di.setAuthor(entry.getField("author"));
 			} else if (field.equals("title")) {
-				di.setTitle(entry.getField("title").toString());
+				di.setTitle(entry.getField("title"));
 			} else if (field.equals("keywords")) {
-				di.setKeywords(entry.getField("keywords").toString());
+				di.setKeywords(entry.getField("keywords"));
 			} else if (field.equals("abstract")) {
-				di.setSubject(entry.getField("abstract").toString());
+				di.setSubject(entry.getField("abstract"));
 			} else {
-				di.setCustomMetadataValue("bibtex/" + field.toString(),
-						entry.getField(field.toString()).toString());
+				di.setCustomMetadataValue("bibtex/" + field,
+                        entry.getField(field));
 			}
 		}
 		di
@@ -1041,11 +1032,11 @@ public class XMPUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void writeXMP(File file,
-			Collection<BibtexEntry> bibtexEntries, BibtexDatabase databasee,
+			Collection<BibtexEntry> bibtexEntries, BibtexDatabase database,
 			boolean writePDFInfo) throws IOException, TransformerException {
 
-		if (databasee != null)
-			bibtexEntries = databasee.resolveForStrings(bibtexEntries, false);
+		if (database != null)
+			bibtexEntries = database.resolveForStrings(bibtexEntries, false);
 
 		PDDocument document = null;
 
@@ -1076,21 +1067,18 @@ public class XMPUtil {
 					XMPSchemaBibtex.class);
 
 			// Remove all current Bibtex-schemas
-			List schemas = meta
+			List<XMPSchema> schemas = meta
 					.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-			Iterator it = schemas.iterator();
-			while (it.hasNext()) {
-				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
-				bib.getElement().getParentNode().removeChild(bib.getElement());
-			}
+            for (XMPSchema schema : schemas) {
+                XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
+                bib.getElement().getParentNode().removeChild(bib.getElement());
+            }
 
-			it = bibtexEntries.iterator();
-			while (it.hasNext()) {
-				BibtexEntry e = (BibtexEntry) it.next();
-				XMPSchemaBibtex bibtex = new XMPSchemaBibtex(meta);
-				meta.addSchema(bibtex);
-				bibtex.setBibtexEntry(e, null);
-			}
+            for (BibtexEntry e : bibtexEntries) {
+                XMPSchemaBibtex bibtex = new XMPSchemaBibtex(meta);
+                meta.addSchema(bibtex);
+                bibtex.setBibtexEntry(e, null);
+            }
 
 			// Save to stream and then input that stream to the PDF
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -1179,14 +1167,12 @@ public class XMPUtil {
 				// Read from pdf and write as BibTex
 				List<BibtexEntry> l = XMPUtil.readXMP(new File(args[0]));
 
-				Iterator<BibtexEntry> it = l.iterator();
-				while (it.hasNext()) {
-					BibtexEntry e = it.next();
-					StringWriter sw = new StringWriter();
-					e.write(sw, new net.sf.jabref.export.LatexFieldFormatter(),
-							false);
-					System.out.println(sw.getBuffer().toString());
-				}
+                for (BibtexEntry e : l) {
+                    StringWriter sw = new StringWriter();
+                    e.write(sw, new LatexFieldFormatter(),
+                            false);
+                    System.out.println(sw.getBuffer().toString());
+                }
 
 			} else if (args[0].endsWith(".bib")) {
 				// Read from bib and write as XMP

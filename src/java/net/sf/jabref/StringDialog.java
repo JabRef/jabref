@@ -220,21 +220,21 @@ public class StringDialog extends JDialog {
 	                // which might now be outside
 	    if (col == 0) {
 		// Change name of string.
-		if (!((String)value).equals(((BibtexString)strings[row]).getName())) {
+		if (!value.equals(((BibtexString) strings[row]).getName())) {
 		    if (base.hasStringLabel((String)value))
 			JOptionPane.showMessageDialog(parent,
 						      Globals.lang("A string with that label "
 								   +"already exists"),
 						      Globals.lang("Label"),
 						      JOptionPane.ERROR_MESSAGE);
-                      else if (((String)value).indexOf(" ") >= 0) {
+                      else if (((String) value).contains(" ")) {
                         JOptionPane.showMessageDialog
                             (parent,
                              Globals.lang("The label of the string can not contain spaces."),
                              Globals.lang("Label"),
                              JOptionPane.ERROR_MESSAGE);
                       }
-                      else if (((String)value).indexOf("#") >= 0) {
+                      else if (((String) value).contains("#")) {
                         JOptionPane.showMessageDialog
                             (parent,
                             Globals.lang("The label of the string can not contain the '#' character."),
@@ -264,7 +264,7 @@ public class StringDialog extends JDialog {
 		// Change content of string.
 		BibtexString subject = (BibtexString)strings[row];
 
-		if (!((String)value).equals(subject.getContent())) {
+		if (!value.equals(subject.getContent())) {
                     try {
                         (new LatexFieldFormatter()).format((String)value, "__dummy");
                     } catch (IllegalArgumentException ex) {
@@ -365,7 +365,7 @@ public class StringDialog extends JDialog {
 		     JOptionPane.ERROR_MESSAGE);
 		return;
 	    }
-            if (name.indexOf("#") >= 0) {
+            if (name.contains("#")) {
              JOptionPane.showMessageDialog
                  (parent,
                   Globals.lang("The label of the string can not contain the '#' character."),
@@ -373,7 +373,7 @@ public class StringDialog extends JDialog {
                   JOptionPane.ERROR_MESSAGE);
              return;
            }           
-           if (name.indexOf(" ") >= 0) {
+           if (name.contains(" ")) {
              JOptionPane.showMessageDialog
                  (parent,
                   Globals.lang("The label of the string can not contain spaces."),
@@ -543,7 +543,7 @@ public class StringDialog extends JDialog {
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("undo");
-	    } catch (Throwable ex) {}
+	    } catch (Throwable ignored) {}
 	}
     }
 
@@ -556,7 +556,7 @@ public class StringDialog extends JDialog {
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("redo");
-	    } catch (Throwable ex) {}
+	    } catch (Throwable ignored) {}
 	}
     }
 

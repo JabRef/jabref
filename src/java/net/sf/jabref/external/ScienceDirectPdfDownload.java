@@ -31,7 +31,7 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
     }
 
     public boolean supportsSite(URL url) {
-        return url.getHost().toLowerCase().indexOf("www.sciencedirect.com") != -1;
+        return url.getHost().toLowerCase().contains("www.sciencedirect.com");
     }
 
 

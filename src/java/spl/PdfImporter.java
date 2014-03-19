@@ -143,7 +143,7 @@ fileNameLoop:
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } finally {
-                        try { in.close(); } catch (Exception f) {}
+                        try { in.close(); } catch (Exception ignored) {}
                     }
 
                     if ((localRes == null) || (localRes.size() == 0)) {
@@ -194,7 +194,7 @@ fileNameLoop:
 	                    res.add(entry);
 						continue fileNameLoop;
 					} finally {
-						try { in.close(); } catch (Exception f) {}
+						try { in.close(); } catch (Exception ignored) {}
 					}
 					
 					// import failed -> generate default entry
@@ -403,8 +403,8 @@ fileNameLoop:
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
                 // mode which makes sure the selection will trigger display of the entry editor
                 // and adjustment of the splitter.
-                if (panel.getMode() != panel.SHOWING_EDITOR) {
-                    panel.setMode(panel.WILL_SHOW_EDITOR);
+                if (panel.getMode() != BasePanel.SHOWING_EDITOR) {
+                    panel.setMode(BasePanel.WILL_SHOW_EDITOR);
                 }
 
                 /*int row = entryTable.findEntry(be);
@@ -447,12 +447,7 @@ fileNameLoop:
     }
 
     private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile){
-        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0)) {
-            return false;
-        }
-        else{
-            return true;
-        }
+        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0));
     }
 
     public MainTable getEntryTable() {

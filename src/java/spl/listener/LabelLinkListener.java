@@ -3,16 +3,11 @@ package spl.listener;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
-import spl.Tools;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Created by IntelliJ IDEA.

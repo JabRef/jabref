@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.mods;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -52,11 +51,11 @@ public class MODSDatabase {
 
     private void addEntries(BibtexDatabase database, Set<String> keySet) {
         entries = new HashSet<MODSEntry>();
-        for(Iterator<String> iter = keySet.iterator(); iter.hasNext(); ) {
-			BibtexEntry entry = database.getEntryById(iter.next());
-			MODSEntry newMods = new MODSEntry(entry);
-			entries.add(newMods);
-		}
+        for (String aKeySet : keySet) {
+            BibtexEntry entry = database.getEntryById(aKeySet);
+            MODSEntry newMods = new MODSEntry(entry);
+            entries.add(newMods);
+        }
 	}
 	public Document getDOMrepresentation() {
 		Document result = null;
@@ -69,12 +68,11 @@ public class MODSDatabase {
 	   		modsCollection.setAttribute("xmlns", "http://www.loc.gov/mods/v3");
 	   		modsCollection.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 	   		modsCollection.setAttribute("xsi:schemaLocation", "http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
-	   		
-	   		for(Iterator<MODSEntry> iter = entries.iterator(); iter.hasNext(); ) {
-	   			MODSEntry entry = iter.next();
-	   			Node node = entry.getDOMrepresentation(result);
-	   			modsCollection.appendChild(node);
-	   		}
+
+            for (MODSEntry entry : entries) {
+                Node node = entry.getDOMrepresentation(result);
+                modsCollection.appendChild(node);
+            }
 	   		
 	   		result.appendChild(modsCollection);	   		
 	   	}

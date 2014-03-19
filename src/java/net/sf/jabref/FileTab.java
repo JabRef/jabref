@@ -37,27 +37,26 @@ public class FileTab extends JPanel implements PrefsTab {
 
     private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
             promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
-    private JComboBox valueDelimiter;
+    private JComboBox<String> valueDelimiter;
     private JRadioButton
         resolveStringsStandard, resolveStringsAll;
     private JTextField bracesAroundCapitalsFields, nonWrappableFields,
             doNotResolveStringsFor;
     private JSpinner autoSaveInterval;
     private boolean origAutoSaveSetting = false;
-    private HelpAction autosaveHelp;
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
         _frame = frame;
 
-        autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, "Help",
+        HelpAction autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox(new String[]{
+        valueDelimiter = new JComboBox<String>(new String[]{
                 Globals.lang("Quotes") + ": \", \"",
                 Globals.lang("Curly Brackets") + ": {, }" });
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));

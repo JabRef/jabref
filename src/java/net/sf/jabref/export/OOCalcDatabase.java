@@ -51,7 +51,7 @@ public class OOCalcDatabase {
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList entryList = new BasicEventList();
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null)

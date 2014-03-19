@@ -24,8 +24,6 @@ public class EntrySorter implements DatabaseChangeListener {
     Comparator<BibtexEntry> comp;
     String[] idArray;
     BibtexEntry[] entryArray;
-    //static BibtexEntry[] DUMMY = new BibtexEntry[0];
-    private boolean outdated = false;
     private boolean changed = false;
 
     public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
@@ -33,15 +31,12 @@ public class EntrySorter implements DatabaseChangeListener {
         set = new ArrayList<BibtexEntry>();
         this.comp = comp;
         Set<String> keySet = entries.keySet();
-	    if (keySet != null) {
-    	    Iterator<String> i = keySet.iterator();
-    	    while (i.hasNext()) {
-    		    set.add(entries.get(i.next()));
-            }
-            //Collections.sort(set, comp);
-            changed = true;
-            index();
-	    }
+        for (String aKeySet : keySet) {
+            set.add(entries.get(aKeySet));
+        }
+        //Collections.sort(set, comp);
+        changed = true;
+        index();
     }
 
     public void index() {
@@ -73,18 +68,18 @@ public class EntrySorter implements DatabaseChangeListener {
             idArray = new String[count];
             entryArray = new BibtexEntry[count];
 	        int piv = 0;
-	        for (Iterator<BibtexEntry> i=set.iterator(); i.hasNext();) {
-	            //        for (int i=0; i<idArray.length; i++) {
-    	        BibtexEntry entry = i.next();
-    	        idArray[piv] = entry.getId();
-    	        entryArray[piv] = entry;
-    	        piv++;
+            for (BibtexEntry entry : set) {
+                //        for (int i=0; i<idArray.length; i++) {
+                idArray[piv] = entry.getId();
+                entryArray[piv] = entry;
+                piv++;
             }
         }
     }
 
     public boolean isOutdated() {
-	return outdated;
+        boolean outdated = false;
+        return outdated;
     }
 
     public String getIdAt(int pos) {

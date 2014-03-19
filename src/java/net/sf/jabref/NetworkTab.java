@@ -15,7 +15,6 @@
 package net.sf.jabref;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;

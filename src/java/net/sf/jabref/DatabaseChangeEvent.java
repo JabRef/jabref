@@ -18,7 +18,7 @@ package net.sf.jabref;
 
 public class DatabaseChangeEvent {
 
-    public enum ChangeType {ADDED_ENTRY, REMOVED_ENTRY, CHANGED_ENTRY, CHANGING_ENTRY};
+    public enum ChangeType {ADDED_ENTRY, REMOVED_ENTRY, CHANGED_ENTRY, CHANGING_ENTRY}
 
     private BibtexEntry entry;
     private ChangeType type;

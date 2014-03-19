@@ -55,7 +55,6 @@ class ReplaceStringDialog extends JDialog {
         field = new JRadioButton(Globals.lang("Limit to fields")+":", false);
     ButtonGroup bg = new ButtonGroup();
     private boolean ok_pressed = false;
-    private JabRefFrame parent;
     String[] flds = null;
     String s1, s2;
 
@@ -64,7 +63,6 @@ class ReplaceStringDialog extends JDialog {
 
     public ReplaceStringDialog(JabRefFrame parent_) {
         super(parent_, Globals.lang("Replace string"), true);
-        parent = parent_;
 
         bg.add(allFi);
         bg.add(field);
@@ -92,7 +90,7 @@ class ReplaceStringDialog extends JDialog {
         // Key bindings:
         ActionMap am = settings.getActionMap();
         InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs.getKey("Close dialog"), "close");
+        im.put(parent_.prefs.getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
@@ -183,7 +181,7 @@ class ReplaceStringDialog extends JDialog {
         pack();
         //setSize(400, 170);
 
-        Util.placeDialog(this, parent);
+        Util.placeDialog(this, parent_);
     }
 
     public boolean okPressed() { return ok_pressed; }
@@ -205,9 +203,9 @@ class ReplaceStringDialog extends JDialog {
                     counter += replaceField(be, s, ce);
             }
         } else {
-            for (int i=0; i<flds.length; i++) {
-                if (!flds[i].equals(BibtexFields.KEY_FIELD))
-                    counter += replaceField(be, flds[i], ce);
+            for (String fld : flds) {
+                if (!fld.equals(BibtexFields.KEY_FIELD))
+                    counter += replaceField(be, fld, ce);
             }
 
         }

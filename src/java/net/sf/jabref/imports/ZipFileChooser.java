@@ -149,16 +149,13 @@ class ZipFileChooser extends JDialog {
       } else if (columnIndex == 1) {
         value = SimpleDateFormat.getDateTimeInstance().format(new Date(entry.getTime()));
       } else if (columnIndex == 2) {
-        value = new Long(entry.getSize());
+        value = entry.getSize();
       }
       return value;
     }
   }
 
-  private JButton okButton = new JButton(Globals.lang("Ok"));
-  private JButton cancelButton = new JButton(Globals.lang("Cancel"));
-
-  /** table of Zip entries */
+    /** table of Zip entries */
   private JTable table;
   /** shortcut to preferences */
   private JabRefPreferences prefs = Globals.prefs;
@@ -190,7 +187,7 @@ class ZipFileChooser extends JDialog {
         entries.add(entry); 
       }
     }
-    return entries.toArray(new ZipEntry[]{});
+    return entries.toArray(new ZipEntry[entries.size()]);
   }
   
   /**
@@ -207,38 +204,40 @@ class ZipFileChooser extends JDialog {
     this.zipFileChooser = this;
     
     // cancel: no entry is selected
-    cancelButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        dispose();
-      }
-    });
+      JButton cancelButton = new JButton(Globals.lang("Cancel"));
+      cancelButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              dispose();
+          }
+      });
 
     // ok: get selected class and check if it is instantiable as an importer
-    okButton.addActionListener(new ActionListener() {
-     public void actionPerformed(ActionEvent e) {
-       int row = table.getSelectedRow();
-       if (row != -1) {
-         ZipFileChooserTableModel model = (ZipFileChooserTableModel)table.getModel();
-         ZipEntry tempZipEntry = model.getZipEntry(row);
-         CustomImportList.Importer importer = prefs.customImports.new Importer();
-         importer.setBasePath(model.getZipFile().getName());
-         String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
-         importer.setClassName(className);
-         try {
-           ImportFormat importFormat = importer.getInstance();
-           importer.setName(importFormat.getFormatName());
-           importer.setCliId(importFormat.getCLIId());
-           importCustomizationDialog.addOrReplaceImporter(importer);
-           dispose();
-         } catch (Exception exc) {           
-           exc.printStackTrace();
-           JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
-         }
-       } else {
-         JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Please select an importer."));
-       }
-     }
-    });
+      JButton okButton = new JButton(Globals.lang("Ok"));
+      okButton.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              int row = table.getSelectedRow();
+              if (row != -1) {
+                  ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
+                  ZipEntry tempZipEntry = model.getZipEntry(row);
+                  CustomImportList.Importer importer = prefs.customImports.new Importer();
+                  importer.setBasePath(model.getZipFile().getName());
+                  String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replaceAll("/", ".");
+                  importer.setClassName(className);
+                  try {
+                      ImportFormat importFormat = importer.getInstance();
+                      importer.setName(importFormat.getFormatName());
+                      importer.setCliId(importFormat.getCLIId());
+                      importCustomizationDialog.addOrReplaceImporter(importer);
+                      dispose();
+                  } catch (Exception exc) {
+                      exc.printStackTrace();
+                      JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                  }
+              } else {
+                  JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Please select an importer."));
+              }
+          }
+      });
     
 
     ZipFileChooserTableModel tableModel = new ZipFileChooserTableModel( zipFile, getSelectableZipEntries(zipFile) );

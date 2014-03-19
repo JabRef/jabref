@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -68,7 +69,8 @@ public class WriteXMPAction extends AbstractWorker {
 
 		if (entries.length == 0) {
 
-			entries = database.getEntries().toArray(new BibtexEntry[]{});
+            Collection<BibtexEntry> var = database.getEntries();
+            entries = var.toArray(new BibtexEntry[var.size()]);
 
 			if (entries.length == 0) {
 
@@ -105,9 +107,7 @@ public class WriteXMPAction extends AbstractWorker {
 		if (!goOn)
 			return;
 
-		for (int i = 0; i < entries.length; i++) {
-
-			BibtexEntry entry = entries[i];
+        for (BibtexEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
             List<File> files = new ArrayList<File>();
@@ -125,9 +125,9 @@ public class WriteXMPAction extends AbstractWorker {
             if (field != null) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(field);
-                for (int j=0; j<tm.getRowCount(); j++) {
+                for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.getType()!=null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
+                    if ((flEntry.getType() != null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
                         f = Util.expandFilename(flEntry.getLink(), dirs);
                         if (f != null)
                             files.add(f);
@@ -137,16 +137,15 @@ public class WriteXMPAction extends AbstractWorker {
 
             optDiag.progressArea.append(entry.getCiteKey() + "\n");
 
-			if (files.size() == 0) {
-				skipped++;
-				optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
-			}
-            else for (File file : files) {
+            if (files.size() == 0) {
+                skipped++;
+                optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
+            } else for (File file : files) {
                 if (!file.exists()) {
                     skipped++;
-				    optDiag.progressArea.append("  " + Globals.lang("Skipped - PDF does not exist")
-					    + ":\n");
-				    optDiag.progressArea.append("    " + file.getPath() + "\n");
+                    optDiag.progressArea.append("  " + Globals.lang("Skipped - PDF does not exist")
+                            + ":\n");
+                    optDiag.progressArea.append("    " + file.getPath() + "\n");
 
 
                 } else {
@@ -156,19 +155,19 @@ public class WriteXMPAction extends AbstractWorker {
                         entriesChanged++;
                     } catch (Exception e) {
                         optDiag.progressArea.append("  " + Globals.lang("Error while writing") + " '"
-                            + file.getPath() + "':\n");
+                                + file.getPath() + "':\n");
                         optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
                         errors++;
                     }
                 }
             }
 
-            if (optDiag.canceled){
+            if (optDiag.canceled) {
                 optDiag.progressArea.append("\n"
-                    + Globals.lang("Operation canceled.\n"));
+                        + Globals.lang("Operation canceled.\n"));
                 break;
             }
-		}
+        }
 		optDiag.progressArea.append("\n"
 			+ Globals.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
 				.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));

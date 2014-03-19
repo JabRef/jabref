@@ -18,11 +18,8 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -36,14 +33,15 @@ import javax.swing.table.TableColumnModel;
 @SuppressWarnings("serial")
 class KeyBindingsDialog extends JDialog {
     private KeystrokeTable table;
-  private KeystrokeTableModel tableModel;
-  //JList list = new JList();
+    //JList list = new JList();
 
   // displays the key binding of the currently selected entry
   // currently not displayed as it does not get updated
   private JTextField keyTF = new JTextField();
 
-  private JButton ok, cancel, grabB, defB;
+  private JButton ok;
+    private JButton cancel;
+    private JButton defB;
   
   // stores the user-selected key bindings
   private final HashMap<String, String> bindHM;
@@ -85,7 +83,7 @@ class KeyBindingsDialog extends JDialog {
     Box buttonBox = new Box(BoxLayout.X_AXIS);
     ok = new JButton(Globals.lang("Ok"));
     cancel = new JButton(Globals.lang("Cancel"));
-    grabB = new JButton(Globals.lang("Grab"));
+      JButton grabB = new JButton(Globals.lang("Grab"));
     defB = new JButton(Globals.lang("Default"));
     grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
     buttonBox.add(grabB);
@@ -196,16 +194,15 @@ class KeyBindingsDialog extends JDialog {
       // When the user release the mouse button and completes the selection,
       // getValueIsAdjusting() becomes false
       if (!evt.getValueIsAdjusting()) {
-        JList list = (JList) evt.getSource();
+        JList<?> list = (JList<?>) evt.getSource();
 
         // Get all selected items
-        Object[] selected = list.getSelectedValues();
+        List<?> selected = list.getSelectedValuesList();
 
         // Iterate all selected items
-        for (int i = 0; i < selected.length; i++) {
-          Object sel = selected[i];
-          keyTF.setText( bindHM.get(sel));
-        }
+          for (Object sel : selected) {
+              keyTF.setText(bindHM.get(sel));
+          }
       }
     }
   }
@@ -231,7 +228,7 @@ class KeyBindingsDialog extends JDialog {
    for (i=0; i<tableData.length; i++)
      sorted.put(tableData[i][0], tableData[i]);
 
-    tableModel = new KeystrokeTableModel(sorted);
+      KeystrokeTableModel tableModel = new KeystrokeTableModel(sorted);
     table.setModel(tableModel);
     
     // has to be done each time as the columnModel is dependend on the tableModel
@@ -319,8 +316,7 @@ class KeyBindingsDialog extends JDialog {
                 setList();
             }
         } else {
-            for (int i=0; i<selected.length; i++) {
-                int row = selected[i];
+            for (int row : selected) {
                 String name = (String) table.getValueAt(row, 0);
                 String newKey = setToDefault(name);
                 keyTF.setText(newKey);

@@ -31,7 +31,6 @@ public class PushToLyx implements PushToApplication {
 
     private boolean couldNotFindPipe=false;
     private boolean couldNotWrite=false;
-    private String message = "";
 
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
@@ -66,7 +65,6 @@ public class PushToLyx implements PushToApplication {
 
                 } catch (IOException excep) {
                     couldNotWrite = true;
-                    return;
                 }
             }
         });
@@ -112,6 +110,7 @@ public class PushToLyx implements PushToApplication {
                     ".in");
         } else {
 
+            String message = "";
             panel.output(Globals.lang("Pushed the citations for the following rows to") + " Lyx: " +
                     message);
         }

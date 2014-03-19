@@ -1,0 +1,190 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "application"
+apply plugin: 'project-report'
+apply plugin: 'pmd'
+
+
+version = "2.11dev"
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/java"
+        }
+        resources {
+            srcDirs = ["src/resources"]
+        }
+    }
+    test {
+        java {
+            srcDir "test"
+        }
+    }
+}
+
+configurations {
+    generateClasspath
+    antlr3
+    antlr2
+}
+
+dependencies {
+
+    // jgoodies
+    compile 'com.jgoodies:jgoodies-common:1.4.0'
+    compile 'com.jgoodies:jgoodies-forms:1.6.0'
+    compile 'com.jgoodies:jgoodies-looks:2.5.2'
+    compile fileTree(dir: 'lib/jgoodies/', includes: ['*.jar']) // instead of having the source code inside
+
+    compile 'org.apache.pdfbox:pdfbox:1.7.1'
+    compile 'org.apache.pdfbox:fontbox:1.7.1'
+    compile 'org.apache.pdfbox:jempbox:1.7.1'
+
+    // option parser
+    compile fileTree(dir: 'lib/ritopt/', includes: ['*.jar']) // instead of having the source code inside
+
+    compile 'org.openoffice:juh:3.2.1'
+    compile 'org.openoffice:jurt:3.2.1'
+    compile 'org.openoffice:ridl:3.2.1'
+    compile 'org.openoffice:unoil:3.2.1'
+
+    antlr2 'antlr:antlr:2.7.7'
+    antlr3 'org.antlr:antlr:3.4'
+    compile 'org.antlr:antlr-runtime:3.4'
+
+    compile 'mysql:mysql-connector-java:5.0.7'
+    compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
+
+    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'jayatana-1.2.4.jar', 'microba.jar', 'spin.jar'])
+
+    // not available in maven repository
+    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'commons-logging.jar', 'JPFCodeGenerator-rt.jar'])
+
+    compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
+    compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
+
+    compile 'junit:junit:3.8.2'
+
+    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
+}
+
+// use ant targets with prefix antTargets.XXXXX
+ant.importBuild "build-wrapper.xml"
+
+sourceCompatibility = 1.6
+mainClassName = "net.sf.jabref.JabRefMain"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
+javadoc {
+    options {
+        // files are all encoded using UTF-8
+        encoding = 'UTF-8'
+        version = true
+        author = true
+    }
+}
+
+// jabref specific tasks
+compileJava.dependsOn "generateSource"
+
+task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchTreeParserSource"]) {
+    group = 'JabRef'
+    description = 'Generates all Java source files.'
+}
+
+task generatePluginSource(type: JavaExec) {
+    group = 'JabRef'
+    description = 'Generates _JabRefPlugin.java with JPF.'
+
+    ext.pluginsDir = "src/resources/plugins"
+
+    inputs.dir file(ext.pluginsDir)
+    outputs.file file("src/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
+
+    main = "net.sf.jabref.plugin.util.CodeGenerator"
+    args = [ext.pluginsDir]
+    classpath = configurations.generateClasspath
+}
+
+task generateBstGrammarSource(type: JavaExec) {
+    group = 'JabRef'
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
+
+    File antlrSource = file('src/java/net/sf/jabref/bst/Bst.g')
+
+    inputs.file antlrSource
+    outputs.file file('src/java/net/sf/jabref/bst/BstLexer.java')
+    outputs.file file('src/java/net/sf/jabref/bst/BstParser.java')
+
+    main = 'org.antlr.Tool'
+    classpath = configurations.antlr3
+    args = ["-o", antlrSource.parentFile, antlrSource]
+}
+
+task generateSearchLexerSource(type: JavaExec) {
+    group = 'JabRef'
+    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+
+    File antlrSource = file('src/java/net/sf/jabref/search/Lexer.g')
+
+    inputs.file antlrSource
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexer.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexer.smap')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.txt')
+
+    main = 'antlr.Tool'
+    classpath = configurations.antlr2
+    args = ["-o", antlrSource.parentFile, antlrSource]
+}
+
+task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
+    group = 'JabRef'
+    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+
+    File antlrSource = file('src/java/net/sf/jabref/search/Parser.g')
+
+    inputs.file antlrSource
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParser.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParser.smap')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.txt')
+
+    main = 'antlr.Tool'
+    classpath = configurations.antlr2
+    args = ["-o", antlrSource.parentFile, antlrSource]
+}
+
+task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
+    group = 'JabRef'
+    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+
+    File antlrSource = file('src/java/net/sf/jabref/search/TreeParser.g')
+    File destinationDir = antlrSource.parentFile
+
+    inputs.file antlrSource
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParser.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParser.smap')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.java')
+    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.txt')
+
+    main = 'antlr.Tool'
+    classpath = configurations.antlr2
+    args = ["-o", destinationDir, antlrSource]
+}
+
+// git support in intellij idea
+idea.project.ipr {
+    withXml { provider ->
+        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+    }
+}

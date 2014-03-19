@@ -91,7 +91,7 @@ public class LargeHTMLEditorKit extends HTMLEditorKit {
                 if (scale == null) {
                     return GUIGlobals.zoomLevel;
                 } else {
-                    return scale.doubleValue();
+                    return scale;
                 }
             }
 

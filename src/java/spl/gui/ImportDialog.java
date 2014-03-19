@@ -5,16 +5,13 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportSettingsTab;
-import net.sf.jabref.JabRefPreferences;
 import spl.listener.LabelLinkListener;
 import spl.localization.LocalizationSupport;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ResourceBundle;
 
 public class ImportDialog extends JDialog {
 	public final static int NOMETA = 0;
@@ -25,38 +22,28 @@ public class ImportDialog extends JDialog {
 	public final static int UPDATEEMPTYFIELDS = 5;
 	
     private JPanel contentPane;
-    private JLabel labelSubHeadline;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JCheckBox checkBoxDoNotShowAgain;
    	private JCheckBox useDefaultPDFImportStyle;
     private JRadioButton radioButtonXmp;
 	private JRadioButton radioButtonPDFcontent;
     private JRadioButton radioButtonMrDlib;
     private JRadioButton radioButtonNoMeta;
-    private JLabel labelHeadline;
-    private JLabel labelFileName;
     private JRadioButton radioButtononlyAttachPDF;
     private JRadioButton radioButtonUpdateEmptyFields;
-    private JLabel labelMrDlib1;
-    private JLabel labelMrDlib2;
     private int result;
-    private String fileName;
-    // indicates whether the drop target is a row in the table or whether other kinds of imports are used
-    private Boolean targetIsARow;
-    
+
     public ImportDialog(boolean targetIsARow, String fileName) {
-        this.targetIsARow = targetIsARow;
+        Boolean targetIsARow1 = targetIsARow;
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
         panel3.setBackground(new Color(-1643275));
-        labelHeadline = new JLabel(Globals.lang("Import_Metadata_from:"));
+        JLabel labelHeadline = new JLabel(Globals.lang("Import_Metadata_from:"));
         labelHeadline.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
-        labelSubHeadline = new JLabel(Globals.lang("Choose_the_source_for_the_metadata_import"));
+        JLabel labelSubHeadline = new JLabel(Globals.lang("Choose_the_source_for_the_metadata_import"));
         labelSubHeadline.setFont(new Font(labelSubHeadline.getFont().getName(), labelSubHeadline.getFont().getStyle(), 13));
-        labelFileName = new JLabel();
+        JLabel labelFileName = new JLabel();
         labelFileName.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
         JPanel headLinePanel = new JPanel();
         headLinePanel.add(labelHeadline);
@@ -75,14 +62,14 @@ public class ImportDialog extends JDialog {
         radioButtonMrDlib = new JRadioButton(Globals.lang("Create_entry_based_on_data_fetched_from"));
         radioButtononlyAttachPDF = new JRadioButton(Globals.lang("Only_attach_PDF"));
         radioButtonUpdateEmptyFields = new JRadioButton(Globals.lang("Update_empty_fields_with_data_fetched_from"));
-        labelMrDlib1 = new JLabel("Mr._dLib");
+        JLabel labelMrDlib1 = new JLabel("Mr._dLib");
         labelMrDlib1.setFont(new Font(labelMrDlib1.getFont().getName(), Font.BOLD, 13));
         labelMrDlib1.setForeground(new Color(-16776961));
-        labelMrDlib2 = new JLabel("Mr._dLib");
+        JLabel labelMrDlib2 = new JLabel("Mr._dLib");
         labelMrDlib2.setFont(new Font(labelMrDlib1.getFont().getName(), Font.BOLD, 13));
         labelMrDlib2.setForeground(new Color(-16776961));
-        buttonOK = new JButton(Globals.lang("Ok"));
-        buttonCancel = new JButton(Globals.lang("Cancel"));
+        JButton buttonOK = new JButton(Globals.lang("Ok"));
+        JButton buttonCancel = new JButton(Globals.lang("Cancel"));
         checkBoxDoNotShowAgain = new JCheckBox(Globals.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Globals.lang("Always use this PDF import style (and do not ask for each import)"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow",""));
@@ -111,20 +98,20 @@ public class ImportDialog extends JDialog {
         contentPane.add(b.getPanel(), BorderLayout.CENTER);
         contentPane.add(bb.getPanel(), BorderLayout.SOUTH);
 
-        if (!this.targetIsARow) {
+        if (!targetIsARow1) {
             this.radioButtononlyAttachPDF.setEnabled(false);
             this.radioButtonUpdateEmptyFields.setEnabled(false);
-            this.labelMrDlib2.setEnabled(false);
+            labelMrDlib2.setEnabled(false);
         }
-        this.fileName = fileName;
-        String name = new File(this.fileName).getName();
+        String fileName1 = fileName;
+        String name = new File(fileName1).getName();
         if (name.length() < 34) {
-            this.labelFileName.setText(name);
+            labelFileName.setText(name);
         } else {
-            this.labelFileName.setText(new File(this.fileName).getName().substring(0, 33) + "...");
+            labelFileName.setText(new File(fileName1).getName().substring(0, 33) + "...");
         }
-        this.labelMrDlib1.addMouseListener(new LabelLinkListener(this.labelMrDlib1, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));
-        this.labelMrDlib2.addMouseListener(new LabelLinkListener(this.labelMrDlib2, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));
+        labelMrDlib1.addMouseListener(new LabelLinkListener(labelMrDlib1, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));
+        labelMrDlib2.addMouseListener(new LabelLinkListener(labelMrDlib2, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));
         this.setTitle(LocalizationSupport.message("Import_Metadata_From_PDF"));
 
         setModal(true);

@@ -23,7 +23,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
@@ -31,9 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.EntryContainer;
-import net.sf.jabref.EntryEditor;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -148,8 +145,8 @@ public class FileListEditorTransferHandler extends TransferHandler {
         // all supported flavors failed
         System.err.println("can't transfer input: ");
         DataFlavor inflavs[] = t.getTransferDataFlavors();
-        for (int i = 0; i < inflavs.length; i++) {
-            System.out.println("  " + inflavs[i].toString());
+        for (DataFlavor inflav : inflavs) {
+            System.out.println("  " + inflav.toString());
         }
 
         return false;
@@ -165,10 +162,9 @@ public class FileListEditorTransferHandler extends TransferHandler {
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
 
         // accept this if any input flavor matches any of our supported flavors
-        for (int i = 0; i < transferFlavors.length; i++) {
-            DataFlavor inflav = transferFlavors[i];
+        for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor))
                 return true;
         }
 

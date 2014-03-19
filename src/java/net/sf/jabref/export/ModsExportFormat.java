@@ -61,6 +61,5 @@ class ModsExportFormat extends ExportFormat {
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
-        return;
     }
 }

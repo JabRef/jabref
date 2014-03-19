@@ -152,9 +152,9 @@ public abstract class AbstractGroup {
 	 *         otherwise.
 	 */
 	public boolean containsAny(BibtexEntry[] entries) {
-		for (int i = 0; i < entries.length; ++i)
-			if (contains(entries[i]))
-				return true;
+        for (BibtexEntry entry : entries)
+            if (contains(entry))
+                return true;
 		return false;
 	}
 
@@ -163,9 +163,9 @@ public abstract class AbstractGroup {
 	 *         otherwise.
 	 */
 	public boolean containsAll(BibtexEntry[] entries) {
-		for (int i = 0; i < entries.length; ++i)
-			if (!contains(entries[i]))
-				return false;
+        for (BibtexEntry entry : entries)
+            if (!contains(entry))
+                return false;
 		return true;
 	}
 

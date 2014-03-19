@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
-import java.util.Iterator;
 
 /**
  * Utility methods for processing OO Writer documents.
@@ -55,12 +54,12 @@ public class OOUtil {
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibtexEntry entry, BibtexDatabase database, String uniquefier)
-            throws UndefinedParagraphFormatException, Exception {
+            throws Exception {
 
         final String UNIQUEFIER_FIELD = "uniq";
 
         // Backup the value of the uniq field, just in case the entry already has it:
-        String oldUniqVal = (String)entry.getField(UNIQUEFIER_FIELD);
+        String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
 
         // Set the uniq field with the supplied uniquefier:
         entry.setField(UNIQUEFIER_FIELD, uniquefier);
@@ -85,11 +84,11 @@ public class OOUtil {
      * @throws Exception
      */
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-              String lText, String parStyle) throws UndefinedParagraphFormatException, Exception {
+              String lText, String parStyle) throws Exception {
 
-        XParagraphCursor parCursor = (XParagraphCursor)UnoRuntime.queryInterface(
+        XParagraphCursor parCursor = UnoRuntime.queryInterface(
             XParagraphCursor.class, cursor);
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
             XPropertySet.class, parCursor);
 
         try {
@@ -162,14 +161,14 @@ public class OOUtil {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
-        XPropertySet xCursorProps = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet xCursorProps = UnoRuntime.queryInterface(
             XPropertySet.class, cursor);
         if (bold)
             xCursorProps.setPropertyValue("CharWeight",
-                    new Float(com.sun.star.awt.FontWeight.BOLD));
+                    com.sun.star.awt.FontWeight.BOLD);
         else
             xCursorProps.setPropertyValue("CharWeight",
-                    new Float(com.sun.star.awt.FontWeight.NORMAL));
+                    com.sun.star.awt.FontWeight.NORMAL);
 
         if (italic)
             xCursorProps.setPropertyValue("CharPosture",
@@ -223,11 +222,11 @@ public class OOUtil {
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
                                                    String parStyle) throws Exception {
         text.insertString(cursor, string, true);
-        XParagraphCursor parCursor = (XParagraphCursor)UnoRuntime.queryInterface(
+        XParagraphCursor parCursor = UnoRuntime.queryInterface(
             XParagraphCursor.class, cursor);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
             XPropertySet.class, parCursor);
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
@@ -241,29 +240,27 @@ public class OOUtil {
 
 
     public static Object getProperty(Object o, String property) throws Exception {
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
     }
 
     public static void listProperties(Object o) throws Exception {
-        XPropertySet props = (XPropertySet) UnoRuntime.queryInterface(
+        XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         Property[] pr = props.getPropertySetInfo().getProperties();
-        for (int i = 0; i < pr.length; i++) {
-            Property property1 = pr[i];
-            System.out.println(property1.Name+" : "+props.getPropertyValue(property1.Name));
+        for (Property property1 : pr) {
+            System.out.println(property1.Name + " : " + props.getPropertyValue(property1.Name));
         }
     }
 
     public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {
         String[] values = new String[list.size()];
         int ii=0;
-        for (Iterator<XTextDocument> iterator = list.iterator(); iterator.hasNext();) {
-            XTextDocument doc = iterator.next();
+        for (XTextDocument doc : list) {
             values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
         }
-        JList sel = new JList(values);
+        JList<String> sel = new JList<String>(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),

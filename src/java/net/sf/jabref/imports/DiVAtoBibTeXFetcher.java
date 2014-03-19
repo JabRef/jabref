@@ -96,7 +96,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
-            String title = (String)entry.getField("title");
+            String title = entry.getField("title");
             if (title != null) {                           
                 // Unit formatting
                 if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
@@ -110,7 +110,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.setField("title", title);
             }
             
-            String institution = (String) entry.getField("institution");
+            String institution = entry.getField("institution");
             if (institution!=null) {
                 institution = htmlConverter.formatUnicode(institution);
                 entry.setField("institution",institution);

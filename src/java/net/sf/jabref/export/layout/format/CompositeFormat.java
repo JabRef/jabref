@@ -46,9 +46,9 @@ public class CompositeFormat implements LayoutFormatter {
 
 	public String format(String fieldText) {
 		if (formatters != null) {
-			for (int i = 0; i < formatters.length; i++) {
-				fieldText = formatters[i].format(fieldText);
-			}
+            for (LayoutFormatter formatter : formatters) {
+                fieldText = formatter.format(fieldText);
+            }
 		}
 		return fieldText;
 	}

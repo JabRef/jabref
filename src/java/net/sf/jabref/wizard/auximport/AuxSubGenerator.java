@@ -57,7 +57,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -190,8 +189,6 @@ public class AuxSubGenerator
         String line ;
         try
         {
-            if (br == null)
-                throw new IOException();
             line = br.readLine() ;
         }
         catch ( IOException ioe )
@@ -217,16 +214,13 @@ public class AuxSubGenerator
               if ( keys != null )
               {
                 int keyCount = keys.length ;
-                for ( int t = 0 ; t < keyCount ; t++ )
-                {
-                  String dummyStr = keys[t] ;
-                  if ( dummyStr != null )
-                  {
-                    // delete all unnecessary blanks and save key into an set
-                    mySet.add( dummyStr.trim() ) ;
+                  for (String dummyStr : keys) {
+                      if (dummyStr != null) {
+                          // delete all unnecessary blanks and save key into an set
+                          mySet.add(dummyStr.trim());
 //                System.out.println("found " +str +" in AUX") ;
+                      }
                   }
-                }
               }
             }
           }
@@ -255,11 +249,10 @@ public class AuxSubGenerator
       {
         try
         {
-            if (br != null)
-                br.close() ;
+            br.close() ;
           nestedAuxCounter++ ;
         }
-        catch ( IOException ioe )
+        catch ( IOException ignored)
         {}
       }
 
@@ -279,40 +272,34 @@ public class AuxSubGenerator
     auxDB = new BibtexDatabase() ;
     notFoundList.clear();
 
-    Iterator<String> it = mySet.iterator() ;
-
-    // forall bibtex keys (found in aux-file) try to find an equivalent
+      // forall bibtex keys (found in aux-file) try to find an equivalent
     // entry into reference database
-    while (it.hasNext())
-    {
-      String str = it.next() ;
-      BibtexEntry entry = db.getEntryByKey(str);
+      for (String str : mySet) {
+          BibtexEntry entry = db.getEntryByKey(str);
 
-      if (entry == null)
-      {
-        notFoundList.add(str) ;
-      } else
-      {
-          insertEntry(auxDB, entry);
-          // Check if the entry we just found references another entry which
-          // we don't already have in our list of entries to include. If so,
-          // pull in that entry as well:
-          String crossref = entry.getField("crossref");
-          if ((crossref != null) && (!mySet.contains(crossref))) {
-              BibtexEntry refEntry = db.getEntryByKey(crossref);
-              /**
-               * [ 1717849 ] Patch for aux import by Kai Eckert
-               */
-              if (refEntry == null) {
-                  notFoundList.add(crossref);
-              } else {
-                  insertEntry(auxDB, refEntry);
-                  crossreferencedEntriesCount++;
+          if (entry == null) {
+              notFoundList.add(str);
+          } else {
+              insertEntry(auxDB, entry);
+              // Check if the entry we just found references another entry which
+              // we don't already have in our list of entries to include. If so,
+              // pull in that entry as well:
+              String crossref = entry.getField("crossref");
+              if ((crossref != null) && (!mySet.contains(crossref))) {
+                  BibtexEntry refEntry = db.getEntryByKey(crossref);
+                  /**
+                   * [ 1717849 ] Patch for aux import by Kai Eckert
+                   */
+                  if (refEntry == null) {
+                      notFoundList.add(crossref);
+                  } else {
+                      insertEntry(auxDB, refEntry);
+                      crossreferencedEntriesCount++;
+                  }
               }
-          }
 
+          }
       }
-    }
 
 
       // If we have inserted any entries, make sure to copy the source database's preamble and

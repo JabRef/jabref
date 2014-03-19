@@ -69,8 +69,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 		for (int i = 0; i < columnCount; i++) {
 			final String name = mainTable.getColumnName(i);
             if (name == null || name.equals("")) {
-				continue;
-			} else if (name.equals("#")) { // TODO: get "#" from prefs?
+            } else if (name.equals("#")) { // TODO: get "#" from prefs?
 				ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
 
 			} else {
@@ -83,9 +82,9 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
 		// Finally, we store the new preferences.
 		Globals.prefs.putStringArray("columnNames",
-				storedColumns.toArray(new String[0]));
+                storedColumns.toArray(new String[storedColumns.size()]));
 		Globals.prefs.putStringArray("columnWidths",
-				columnsWidths.toArray(new String[0]));
+                columnsWidths.toArray(new String[columnsWidths.size()]));
 
 		// width of the number ("#") column
 		Globals.prefs.putInt("numberColWidth", ncWidth);

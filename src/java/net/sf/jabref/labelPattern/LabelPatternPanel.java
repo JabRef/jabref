@@ -24,14 +24,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -164,9 +161,7 @@ public class LabelPatternPanel  extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // reset all fields
-                Iterator<String> i=textFields.keySet().iterator();
-                while (i.hasNext()) {
-                    String s = i.next();
+                for (String s : textFields.keySet()) {
                     JTextField tf = textFields.get(s);
                     tf.setText("");
                 }
@@ -231,10 +226,9 @@ public class LabelPatternPanel  extends JPanel {
         LabelPattern keypatterns = new LabelPattern();
         
         // each entry type
-        Iterator<String> i=textFields.keySet().iterator();
-        while (i.hasNext()) {
-            String s = i.next(),
-                text = textFields.get(s).getText();
+        for (String s1 : textFields.keySet()) {
+            String s = s1,
+                    text = textFields.get(s).getText();
             if (!"".equals(text.trim()))
                 keypatterns.addLabelPattern(s, text);
         }
@@ -254,8 +248,7 @@ public class LabelPatternPanel  extends JPanel {
      * @param keypatterns the LabelPattern to use as initial value
      */
     public void setValues(LabelPattern keypatterns) {
-        for (Iterator<String> i=textFields.keySet().iterator(); i.hasNext();) {
-            String name = i.next();
+        for (String name : textFields.keySet()) {
             JTextField tf = textFields.get(name);
             setValue(tf, name, keypatterns);
         }
@@ -272,7 +265,7 @@ public class LabelPatternPanel  extends JPanel {
             tf.setText("");
         else {
             //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
-            tf.setText(keypatterns.getValue(fieldName).get(0).toString());
+            tf.setText(keypatterns.getValue(fieldName).get(0));
         }
     }
 

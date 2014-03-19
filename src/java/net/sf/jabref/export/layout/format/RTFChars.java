@@ -53,7 +53,7 @@ public class RTFChars implements LayoutFormatter {
 
             char c = field.charAt(i);
 
-            System.out.println("Char: '"+((char)c)+"'");
+            System.out.println("Char: '"+ c +"'");
 
             if (escaped && (c == '\\')) {
 				sb.append('\\');
@@ -67,7 +67,7 @@ public class RTFChars implements LayoutFormatter {
 			} else if (!incommand && (c == '{' || c == '}')) {
 				// Swallow the brace.
 			} else if (Character.isLetter(c)
-				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + c) >= 0)) {
+				|| (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
 				escaped = false;
 				if (!incommand){
 					sb.append(c);
@@ -75,7 +75,7 @@ public class RTFChars implements LayoutFormatter {
 					// Else we are in a command, and should not keep the letter.
 					currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
+						&& (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
 						// This indicates that we are in a command of the type
 						// \^o or \~{n}
 						if (i >= field.length() - 1)
@@ -166,14 +166,12 @@ public class RTFChars implements LayoutFormatter {
 		char[] chars = sb.toString().toCharArray();
 		sb = new StringBuffer();
 
-		for (int i = 0; i < chars.length; i++) {
-			char c = chars[i];
-
-			if (c < 128) 
-				sb.append(c);
-			 else
-				sb.append("\\u").append((long) c).append('?');
-		}
+        for (char c : chars) {
+            if (c < 128)
+                sb.append(c);
+            else
+                sb.append("\\u").append((long) c).append('?');
+        }
 
 		return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''","{\\\\rdblquote}");
 	}

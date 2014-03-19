@@ -39,7 +39,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     MetaData metaData;
     BasePanel panel = null;
-    JComboBox encoding;
+    JComboBox<String> encoding;
     JButton ok, cancel;
     JTextField fileDir = new JTextField(40),
 	fileDirIndv = new JTextField(40),
@@ -51,7 +51,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), true);
-        encoding = new JComboBox(Globals.ENCODINGS);
+        encoding = new JComboBox<String>(Globals.ENCODINGS);
         ok = new JButton(Globals.lang("Ok"));
         cancel = new JButton(Globals.lang("Cancel"));
         init(parent);

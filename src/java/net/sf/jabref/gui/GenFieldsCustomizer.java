@@ -74,7 +74,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
   }
 
-  private void jbInit() throws Exception {
+  private void jbInit() {
       ok.setText(Globals.lang("Ok"));
     ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
     cancel.setText(Globals.lang("Cancel"));
@@ -150,11 +150,11 @@ public class GenFieldsCustomizer extends JDialog {
               return;
           }
 
-          Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME + i), parts[0]);
-          Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
+          Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_NAME + i), parts[0]);
+          Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
       }
-      Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_NAME, i);
-      Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_FIELDS, i);
+      Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
+      Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
       Globals.prefs.updateEntryEditorTabList();
       /*
     String delimStr = fieldsArea.getText().replaceAll("\\s+","")
@@ -197,10 +197,10 @@ public class GenFieldsCustomizer extends JDialog {
         String name = null, fields = null;
         int i = 0;
         while ((name = (String) Globals.prefs.defaults.get
-                (Globals.prefs.CUSTOM_TAB_NAME + "_def" + i)) != null) {
+                (JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)) != null) {
             sb.append(name);
             fields = (String) Globals.prefs.defaults.get
-                    (Globals.prefs.CUSTOM_TAB_FIELDS + "_def" + i);
+                    (JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i);
             sb.append(":");
             sb.append(fields);
             sb.append("\n");

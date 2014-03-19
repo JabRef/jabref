@@ -24,7 +24,7 @@ import java.util.List;
  */
 public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatter {
 
-    private static char SEPARATOR = ',';
+    private static final char SEPARATOR = ',';
 
     /**
      * Parse an argument string and return the parts of the argument. The parts are

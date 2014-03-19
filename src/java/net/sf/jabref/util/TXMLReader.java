@@ -18,30 +18,25 @@
 package net.sf.jabref.util ;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 public class TXMLReader
 {
   private Document config ; // XML data
-  private DocumentBuilderFactory factory ;
-  private DocumentBuilder builder ;
 
-  private boolean ready = false ;
+    private boolean ready = false ;
 
   public TXMLReader(String resPath)
   {
-    factory = DocumentBuilderFactory.newInstance() ;
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     try
     {
-      builder = factory.newDocumentBuilder() ;
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
       InputStream stream = null ;
       if (resPath != null)
@@ -55,7 +50,7 @@ public class TXMLReader
         {
           stream = new FileInputStream( "src" +resPath ) ;
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
 
         }
@@ -63,22 +58,9 @@ public class TXMLReader
 
       if (stream != null)
       {
-        config = builder.parse( stream ) ;
+        config = builder.parse(stream) ;
         ready = true ;
       }
-    }
-
-    catch ( SAXException sxe )
-    {
-      sxe.printStackTrace() ;
-    }
-    catch ( ParserConfigurationException pce )
-    {
-      pce.printStackTrace() ;
-    }
-    catch ( IOException ioe )
-    {
-      ioe.printStackTrace() ;
     }
     catch (Exception oe)
     {
@@ -152,7 +134,7 @@ public class TXMLReader
           {
             back = Integer.parseInt( data ) ;
           }
-          catch (Exception e) {}
+          catch (Exception ignored) {}
         }
       }
     }

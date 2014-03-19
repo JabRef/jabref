@@ -18,7 +18,6 @@ package net.sf.jabref.imports;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +31,9 @@ import net.sf.jabref.OutputPrinter;
 public class DBLPFetcher implements EntryFetcher {
 
 
-    private final String URL_START = "http://www.dblp.org/search/api/";
-    private final String URL_PART1 = "?q=";
-    private final String URL_END   = "&h=1000&c=4&f=0&format=json";
+    private final static String URL_START = "http://www.dblp.org/search/api/";
+    private final static String URL_PART1 = "?q=";
+    private final static String URL_END   = "&h=1000&c=4&f=0&format=json";
 
 	private volatile boolean shouldContinue = false;
 	private String query;
@@ -100,18 +99,12 @@ public class DBLPFetcher implements EntryFetcher {
 	        // everything went smooth
 	        res = true;
 
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			status.showMessage(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
-			status.showMessage(e.getMessage());
-		} catch(DBLPParseException e) {
 			e.printStackTrace();
 			status.showMessage(e.getMessage());
 		}
 
-		return res;
+        return res;
 	}
 
 

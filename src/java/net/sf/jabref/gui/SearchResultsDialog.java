@@ -284,7 +284,6 @@ public class SearchResultsDialog {
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
-                return;
             }
         }
 

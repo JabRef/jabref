@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -367,8 +366,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         Component[] comps = tlb.getComponents();
 
-        for (int i = 0; i < comps.length; i++)
-            ((JComponent) comps[i]).setOpaque(false);
+        for (Component comp : comps) ((JComponent) comp).setOpaque(false);
 
         leftPan.add(tlb, BorderLayout.SOUTH);
         add(leftPan, BorderLayout.WEST);
@@ -680,8 +678,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Sets the enabled status of all text fields of the entry editor.
      */
     public void setEnabled(boolean enabled) {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEnabled(enabled);
             }
@@ -831,11 +828,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             for (String field : entry.getAllFields()){
-                if (BibtexFields.isDisplayableField(field.toString())) {
-                    if (nu.getField(field.toString()) == null) {
-                        compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
-                            .getField(field.toString()), null));
-                        entry.clearField(field.toString());
+                if (BibtexFields.isDisplayableField(field)) {
+                    if (nu.getField(field) == null) {
+                        compound.addEdit(new UndoableFieldChange(entry, field, entry
+                            .getField(field), null));
+                        entry.clearField(field);
                         anyChanged = true;
                     }
                 }
@@ -843,15 +840,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // Then set all fields that have been set by the user.
             for (String field : nu.getAllFields()){
-                if (entry.getField(field.toString()) != nu.getField(field.toString())) {
-                    String toSet = nu.getField(field.toString());
+                if (!entry.getField(field).equals(nu.getField(field))) {
+                    String toSet = nu.getField(field);
 
                     // Test if the field is legally set.
-                    (new LatexFieldFormatter()).format(toSet, field.toString());
+                    (new LatexFieldFormatter()).format(toSet, field);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
-                        .getField(field.toString()), toSet));
-                    entry.setField(field.toString(), toSet);
+                    compound.addEdit(new UndoableFieldChange(entry, field, entry
+                        .getField(field), toSet));
+                    entry.setField(field, toSet);
                     anyChanged = true;
                 }
             }
@@ -941,8 +938,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void setField(String fieldName, String newFieldData) {
 
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).updateField(fieldName, newFieldData);
             }
@@ -954,8 +950,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Sets all the text areas according to the shown entry.
      */
     public void updateAllFields() {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEntry(entry);
             }
@@ -966,8 +961,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Removes the "invalid field" color from all text areas.
      */
     public void validateAllFields() {
-        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).validateAllFields();
             }
@@ -976,8 +970,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void updateAllContentSelectors() {
         if (contentSelectors.size() > 0) {
-            for (Iterator<FieldContentSelector> i = contentSelectors.iterator(); i.hasNext();)
-                i.next().rebuildComboBox();
+            for (FieldContentSelector contentSelector : contentSelectors) contentSelector.rebuildComboBox();
         }
     }
 
@@ -1235,16 +1228,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // We check if the field has changed, since we don't want to
                 // mark the base as changed unless we have a real change.
                 if (toSet == null) {
-                    if (entry.getField(fe.getFieldName()) == null)
-                        set = false;
-                    else
-                        set = true;
+                    set = entry.getField(fe.getFieldName()) != null;
                 } else {
-                    if ((entry.getField(fe.getFieldName()) != null)
-                        && toSet.equals(entry.getField(fe.getFieldName()).toString()))
-                        set = false;
-                    else
-                        set = true;
+                    set = !((entry.getField(fe.getFieldName()) != null)
+                            && toSet.equals(entry.getField(fe.getFieldName())));
                 }
 
                 if (set) {
@@ -1481,7 +1468,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("undo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -1495,7 +1482,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("redo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -1519,7 +1506,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             try {
                 panel.runCommand("save");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }

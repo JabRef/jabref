@@ -68,7 +68,7 @@ public class GUIGlobals {
 	aboutSize = new Dimension(600, 265),
 	searchPaneSize = new Dimension(430, 70),
 	searchFieldSize = new Dimension(215, 25);
-	public static Double zoomLevel = new Double(1.0);
+	public static Double zoomLevel = 1.0;
 
 	// Divider size for BaseFrame split pane. 0 means non-resizable.
 	public static final int
@@ -300,7 +300,7 @@ public class GUIGlobals {
 				// This may be a resource outside of the jar file, so we try a general URL:
 				try {
 					url = new URL(path);
-				} catch (MalformedURLException e) {
+				} catch (MalformedURLException ignored) {
 				}
 				if (url == null)
 					System.err.println(Globals.lang("Could not find image file")+" '"+path+"'");
@@ -348,17 +348,15 @@ public class GUIGlobals {
 			while ((c = in.read()) != -1)
 				buffer.append((char)c);
 			String[] lines = buffer.toString().split("\n");
-			for (int i=0; i<lines.length; i++) {
-				String line = lines[i].trim();
-				int index = line.indexOf("=");
-				if (index >= 0) {
-					String key = line.substring(0, index).trim();
-					String value = prefix+line.substring(index+1).trim();
-					map.put(key, value);
-				}
-			}
-		} catch (IOException ex) {
-			throw ex;
+            for (String line1 : lines) {
+                String line = line1.trim();
+                int index = line.indexOf("=");
+                if (index >= 0) {
+                    String key = line.substring(0, index).trim();
+                    String value = prefix + line.substring(index + 1).trim();
+                    map.put(key, value);
+                }
+            }
 		} finally {
 			try {
 				if (in != null) in.close();

@@ -100,7 +100,7 @@ public class AutosaveStartupPrompter implements Runnable {
             if ((pr != null) && !pr.isInvalid()) {
                 if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
-                    StringBuffer wrn = new StringBuffer();
+                    StringBuilder wrn = new StringBuilder();
                     for (int j = 0; j<wrns.length; j++)
                         wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
                     if (wrn.length() > 0)

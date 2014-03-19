@@ -38,7 +38,6 @@
 package net.sf.jabref.export.layout.format;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -50,7 +49,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * @version $Revision$
  */
 public class XMLChars implements LayoutFormatter {
-	Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
 
 	public String format(String fieldText) {
 
@@ -91,7 +89,7 @@ public class XMLChars implements LayoutFormatter {
 			 }
 		}
 		
-		StringBuffer buffer = new StringBuffer(fieldText.length() * 2);
+		StringBuilder buffer = new StringBuilder(fieldText.length() * 2);
 		
 		for (int i = 0; i < fieldText.length(); i++) {
 			int code = (fieldText.charAt(i));

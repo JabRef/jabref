@@ -992,11 +992,12 @@ public class CaseKeeperList {
    
    public CaseKeeperList () {
    
-   };
-   /* Return all lists concatenated
-    * Can be done faster once deciding on Java 6.0
-    * see: http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
-    */
+   }
+
+    /* Return all lists concatenated
+     * Can be done faster once deciding on Java 6.0
+     * see: http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
+     */
     public String[] getAll() {
         int lengh = 0;
         for (String[] array : allLists) {

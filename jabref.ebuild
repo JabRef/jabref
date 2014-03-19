@@ -63,7 +63,7 @@ src_install() {
 
         #are not builded? Investigate why
         #use doc && java-pkg_dojavadoc build/docs/API
-        dodoc src/txt/README
+        dodoc src/resources/txt/README
 
         java-pkg_dolauncher ${PN} \
                 --main net.sf.jabref.JabRef
@@ -73,7 +73,7 @@ src_install() {
 
         java-pkg_register-optional-dependency jdbc-mysql
 
-        newicon src/images/JabRef-icon-48.png JabRef-icon.png || die
+        newicon src/resources/images/JabRef-icon-48.png JabRef-icon.png || die
         make_desktop_entry ${PN} JabRef JabRef-icon Office
         echo "MimeType=text/x-bibtex;" >> "${D}/usr/share/applications/${PN}-${PN}.desktop"
 }

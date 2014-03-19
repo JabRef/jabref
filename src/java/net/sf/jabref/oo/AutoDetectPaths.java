@@ -131,8 +131,7 @@ public class AutoDetectPaths extends AbstractWorker {
         else if (Globals.ON_MAC) {
             File rootDir = new File("/Applications");
             File[] files = rootDir.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
+            for (File file : files) {
                 if (file.isDirectory() && file.getName().equals("OpenOffice.org.app")) {
                     rootDir = file;
                     //System.out.println("Setting starting dir to: "+file.getPath());
@@ -275,8 +274,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 return file.isDirectory();
             }
         });
-        for (int i = 0; i < dirs.length; i++) {
-            File dir = dirs[i];
+        for (File dir : dirs) {
             if (dir.getName().toLowerCase().equals("program files"))
                 dirList.add(dir);
             else if (dir.getName().toLowerCase().equals("program files (x86)"))
@@ -314,15 +312,14 @@ public class AutoDetectPaths extends AbstractWorker {
         if (files == null)
             return null;
         File result = null;
-        for (int i=0; i<files.length; i++) {
+        for (File file : files) {
             if (fileSearchCancelled)
                 return null;
-            if (files[i].isDirectory()) {
-                result = findFileDir(files[i], filename);
+            if (file.isDirectory()) {
+                result = findFileDir(file, filename);
                 if (result != null)
                     break;
-            }
-            else if (files[i].getName().equals(filename)) {
+            } else if (file.getName().equals(filename)) {
                 result = startDir;
                 break;
             }

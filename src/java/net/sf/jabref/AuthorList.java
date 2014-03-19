@@ -362,35 +362,35 @@ public class AuthorList {
 		// First step: collect tokens in 'tokens' Vector and calculate indices
 		token_loop: while (true) {
 			int token = getToken();
-			cases: switch (token) {
-			case TOKEN_EOF:
-			case TOKEN_AND:
-				break token_loop;
-			case TOKEN_COMMA:
-				if (comma_first < 0)
-					comma_first = tokens.size();
-				else if (comma_second < 0)
-					comma_second = tokens.size();
-				break cases;
-			case TOKEN_WORD:
-				tokens.add(orig.substring(token_start, token_end));
-				tokens.add(orig.substring(token_start, token_abbr));
-				tokens.add(new Character(token_term));
-				tokens.add(Boolean.valueOf(token_case));
-				if (comma_first >= 0)
-					break cases;
-				if (last_start >= 0)
-					break cases;
-				if (von_start < 0) {
-					if (!token_case) {
-						von_start = tokens.size() - TOKEN_GROUP_LENGTH;
-						break cases;
-					}
-				} else if (last_start < 0 && token_case) {
-					last_start = tokens.size() - TOKEN_GROUP_LENGTH;
-					break cases;
-				}
-			}
+            switch (token) {
+                case TOKEN_EOF:
+                case TOKEN_AND:
+                    break token_loop;
+                case TOKEN_COMMA:
+                    if (comma_first < 0)
+                        comma_first = tokens.size();
+                    else if (comma_second < 0)
+                        comma_second = tokens.size();
+                    break;
+                case TOKEN_WORD:
+                    tokens.add(orig.substring(token_start, token_end));
+                    tokens.add(orig.substring(token_start, token_abbr));
+                    tokens.add(token_term);
+                    tokens.add(token_case);
+                    if (comma_first >= 0)
+                        break;
+                    if (last_start >= 0)
+                        break;
+                    if (von_start < 0) {
+                        if (!token_case) {
+                            von_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                            break;
+                        }
+                    } else if (last_start < 0 && token_case) {
+                        last_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                        break;
+                    }
+            }
 		}// end token_loop
 
         // Second step: split name into parts (here: calculate indices
@@ -410,7 +410,7 @@ public class AuthorList {
 				int index = tokens.size() - 2 * TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
 				if (index > 0) {
 					Character ch = (Character)tokens.elementAt(index);
-					if (ch.charValue() == '-')
+					if (ch == '-')
 						last_part_start -= TOKEN_GROUP_LENGTH;
 				}
 				first_part_end = last_part_start;
@@ -509,7 +509,7 @@ public class AuthorList {
 	 * @return the result of concatenation.
 	 */
 	private String concatTokens(int start, int end, int offset, boolean dot_after) {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		// Here we always have start < end
 		res.append((String) tokens.get(start + offset));
 		if (dot_after)
@@ -662,7 +662,7 @@ public class AuthorList {
 		if (authorsNatbib != null)
 			return authorsNatbib;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastOnly());
 			if (size() == 2) {
@@ -704,7 +704,7 @@ public class AuthorList {
 		if (authorsLastOnly[abbrInt] != null)
 			return authorsLastOnly[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastOnly());
 			int i = 1;
@@ -759,7 +759,7 @@ public class AuthorList {
 		if (authorsLastFirst[abbrInt] != null)
 			return authorsLastFirst[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastFirst(abbreviate));
 			int i = 1;
@@ -803,7 +803,7 @@ public class AuthorList {
 		if (authorLastFirstAnds[abbrInt] != null)
 			return authorLastFirstAnds[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getLastFirst(abbreviate));
 			for (int i = 1; i < size(); i++) {
@@ -822,7 +822,7 @@ public class AuthorList {
 		if (authorsLastFirstFirstLast[abbrInt] != null)
 			return authorsLastFirstFirstLast[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
             res.append(getAuthor(0).getLastFirst(abbreviate));
 			for (int i = 1; i < size(); i++) {
@@ -870,7 +870,7 @@ public class AuthorList {
 		if (authorsFirstFirst[abbrInt] != null)
 			return authorsFirstFirst[abbrInt];
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getFirstLast(abbr));
 			int i = 1;
@@ -923,7 +923,7 @@ public class AuthorList {
 		if (authorsFirstFirstAnds != null)
 			return authorsFirstFirstAnds;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getFirstLast(false));
 			for (int i = 1; i < size(); i++) {
@@ -953,7 +953,7 @@ public class AuthorList {
 		if (authorsAlph != null)
 			return authorsAlph;
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		if (size() > 0) {
 			res.append(getAuthor(0).getNameForAlphabetization());
 			for (int i = 1; i < size(); i++) {
@@ -1060,8 +1060,8 @@ public class AuthorList {
 					break;
 				}
 				i++;
-			};
-			return (level == 0);
+			}
+            return (level == 0);
 		}
 		
 		/**
@@ -1244,7 +1244,7 @@ public class AuthorList {
 		 *         are empty.
 		 */
 		public String getNameForAlphabetization() {
-			StringBuffer res = new StringBuffer();
+			StringBuilder res = new StringBuilder();
 			if (last_part != null)
 				res.append(last_part);
 			if (jr_part != null) {

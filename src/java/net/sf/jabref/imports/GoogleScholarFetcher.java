@@ -18,7 +18,6 @@ package net.sf.jabref.imports;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.util.NameListNormalizer;
 
 import javax.swing.*;
 import java.io.*;
@@ -284,7 +283,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     // Clean up some remaining HTML code from Elsevier(?) papers
                     // Search for: Poincare algebra
                     // to see an example
-                    String title = (String) entry.getField("title");
+                    String title = entry.getField("title");
                     if (title != null) {
                         String newtitle = title.replaceAll("<.?i>([^<]*)</i>","$1");
                         if(!newtitle.equals(title)) {

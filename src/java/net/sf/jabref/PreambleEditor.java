@@ -141,16 +141,10 @@ public class PreambleEditor extends JDialog {
             // We check if the field has changed, since we don't want to mark the
             // base as changed unless we have a real change.
             if (toSet == null) {
-                if (base.getPreamble() == null)
-                    set = false;
-                else
-                    set = true;
+                set = base.getPreamble() != null;
             } else {
-                if ((base.getPreamble() != null)
-                        && toSet.equals(base.getPreamble()))
-                    set = false;
-                else
-                    set = true;
+                set = !((base.getPreamble() != null)
+                        && toSet.equals(base.getPreamble()));
             }
 
             if (set) {
@@ -183,7 +177,7 @@ public class PreambleEditor extends JDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("undo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -199,7 +193,7 @@ public class PreambleEditor extends JDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("redo");
-            } catch (Throwable ex) {
+            } catch (Throwable ignored) {
             }
         }
     }

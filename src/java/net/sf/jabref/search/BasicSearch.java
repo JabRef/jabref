@@ -110,7 +110,7 @@ public class BasicSearch implements SearchRule {
                     if (!regExp) {
                         String s = words.get(j);
                         matchFound[index] = matchFound[index]
-                            || (fieldContent.indexOf(s) >= 0);
+                            || (fieldContent.contains(s));
                     } else {
                         if (fieldContent != null) {
                             Matcher m = pattern[j].matcher
@@ -125,8 +125,8 @@ public class BasicSearch implements SearchRule {
             }
 
         }
-        for (int i = 0; i < matchFound.length; i++) {
-            if (!matchFound[i])
+        for (boolean aMatchFound : matchFound) {
+            if (!aMatchFound)
                 return 0; // Didn't match all words.
         }
         return 1; // Matched all words.
