@@ -150,14 +150,6 @@
         <fileset refid="ooFileset" />
 	</path>
 
-	<!-- Classpath for running the code generator -->
-	<path id="codegenerator">
-		<pathelement location="${lib.dir}/plugin/JPFCodeGenerator.jar" />
-		<pathelement location="${lib.dir}/plugin/jpf.jar" />
-		<pathelement location="${lib.dir}/plugin/jpf-boot.jar" />
-		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
-	</path>
-
 	<target name="run" depends="build">
 		<java classname="net.sf.jabref.JabRefMain" fork="true">
 			<classpath refid="classpath" />
@@ -173,24 +165,8 @@
 		</java>
 	</target>
 
-	<!-- Only rerun the code generator if plug-in xml or jars are newer than generated java file. -->
-	<uptodate property="needsNoRegenerate" targetfile="${java.dir}/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java">
-		<srcfiles dir=".">
-			<include name="${plugin.dir}/**/plugin.xml" />
-			<include name="${lib.dir}/plugin/*.jar" />
-		</srcfiles>
-	</uptodate>
-
-	<!-- Run the JPF Code Generator -->
-	<target name="generate" unless="needsNoRegenerate">
-		<java classname="net.sf.jabref.plugin.util.CodeGenerator" fork="true">
-			<arg value="${plugin.dir}" />
-			<classpath refid="codegenerator" />
-		</java>
-	</target>
-
 	<!-- Compiles project -->
-	<target name="compile" depends="generate">
+	<target name="compile">
 		<mkdir dir="${build.classes}" />
 		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
