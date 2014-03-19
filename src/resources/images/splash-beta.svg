@@ -23,9 +23,9 @@
    version="1.1">
   <sodipodi:namedview
      inkscape:window-y="-3"
-     inkscape:window-x="46"
-     inkscape:window-height="1180"
-     inkscape:window-width="1872"
+     inkscape:window-x="33"
+     inkscape:window-height="880"
+     inkscape:window-width="1512"
      inkscape:current-layer="layer2"
      inkscape:document-units="px"
      inkscape:cy="225.8697"
@@ -44,186 +44,7 @@
      fit-margin-right="0"
      fit-margin-bottom="0" />
   <defs
-     id="defs2140">
-    <inkscape:perspective
-       id="perspective2595"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       sodipodi:type="inkscape:persp3d" />
-    <linearGradient
-       id="linearGradient2974">
-      <stop
-         id="stop2976"
-         offset="0"
-         style="stop-color:#505b77;stop-opacity:1;" />
-      <stop
-         id="stop2978"
-         offset="1"
-         style="stop-color:#596a97;stop-opacity:1;" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient2883">
-      <stop
-         id="stop2885"
-         offset="0"
-         style="stop-color:#c5c1c1;stop-opacity:1;" />
-      <stop
-         id="stop2887"
-         offset="1"
-         style="stop-color:white;stop-opacity:1;" />
-    </linearGradient>
-    <pattern
-       inkscape:collect="always"
-       xlink:href="#pattern9048"
-       id="pattern9054"
-       patternTransform="translate(316.0000,1046.362)" />
-    <marker
-       inkscape:stockid="Arrow2Send"
-       orient="auto"
-       refY="0"
-       refX="0"
-       id="Arrow2Send"
-       style="overflow:visible">
-      <path
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cccc"
-         id="path3046"
-         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
-         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-         transform="matrix(-0.3,0,0,-0.3,1.5,0)" />
-    </marker>
-    <pattern
-       patternUnits="userSpaceOnUse"
-       width="572.00000"
-       height="428.00000"
-       patternTransform="translate(231.0000,284.3622)"
-       id="pattern9048">
-      <image
-         transform="translate(-231.0000,-284.3622)"
-         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
-         inkscape:export-ydpi="90.000000"
-         inkscape:export-xdpi="90.000000"
-         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
-         y="284.36218"
-         x="231.00000"
-         width="572.00000"
-         height="428.00000"
-         id="image9050"
-         xlink:href="/auto.anoa/home/olenz/projects/software/jabref/src/resources/src/images/behandlet.png"
-         sodipodi:absref="/auto.anoa/home/olenz/projects/software/jabref/src/resources/src/images/behandlet.png" />
-    </pattern>
-    <radialGradient
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(-0.799579,-0.05606082,0.06979161,-1.00875,436.7358,677.9388)"
-       r="135.88548"
-       fy="330.36218"
-       fx="255.5"
-       cy="330.36218"
-       cx="255.5"
-       id="radialGradient2889"
-       xlink:href="#linearGradient2883"
-       inkscape:collect="always" />
-    <linearGradient
-       gradientUnits="userSpaceOnUse"
-       y2="351.89935"
-       x2="602.17139"
-       y1="351.89935"
-       x1="443.79153"
-       id="linearGradient2909"
-       xlink:href="#linearGradient2883"
-       inkscape:collect="always" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2883-8"
-       id="linearGradient2909-2"
-       x1="443.79153"
-       y1="351.89935"
-       x2="602.17139"
-       y2="351.89935"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2883-8"
-       id="radialGradient2889-0"
-       cx="255.5"
-       cy="330.36218"
-       fx="255.5"
-       fy="330.36218"
-       r="135.88548"
-       gradientTransform="matrix(-0.799579,-0.05606082,0.06979161,-1.00875,436.7358,677.9388)"
-       gradientUnits="userSpaceOnUse" />
-    <pattern
-       id="pattern9048-9"
-       patternTransform="translate(231.0000,284.3622)"
-       height="428.00000"
-       width="572.00000"
-       patternUnits="userSpaceOnUse">
-      <image
-         id="image9050-5"
-         height="428.00000"
-         width="572.00000"
-         x="231.00000"
-         y="284.36218"
-         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
-         inkscape:export-xdpi="90.000000"
-         inkscape:export-ydpi="90.000000"
-         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
-         transform="translate(-231.0000,-284.3622)"
-         xlink:href="/auto.anoa/home/olenz/projects/software/jabref/src/src/images/behandlet.png"
-         sodipodi:absref="/auto.anoa/home/olenz/projects/software/jabref/src/src/images/behandlet.png" />
-    </pattern>
-    <marker
-       style="overflow:visible"
-       id="Arrow2Send-6"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Arrow2Send">
-      <path
-         transform="matrix(-0.3,0,0,-0.3,1.5,0)"
-         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
-         id="path3046-6"
-         sodipodi:nodetypes="cccc"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <pattern
-       patternTransform="translate(316.0000,1046.362)"
-       id="pattern9054-1"
-       xlink:href="#pattern9048-9"
-       inkscape:collect="always" />
-    <linearGradient
-       id="linearGradient2883-8">
-      <stop
-         style="stop-color:#c5c1c1;stop-opacity:1;"
-         offset="0"
-         id="stop2885-3" />
-      <stop
-         style="stop-color:white;stop-opacity:1;"
-         offset="1"
-         id="stop2887-1" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient2974-4">
-      <stop
-         style="stop-color:#505b77;stop-opacity:1;"
-         offset="0"
-         id="stop2976-8" />
-      <stop
-         style="stop-color:#596a97;stop-opacity:1;"
-         offset="1"
-         id="stop2978-3" />
-    </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective2595-3" />
-  </defs>
+     id="defs2140" />
   <metadata
      id="metadata2143">
     <rdf:RDF>
@@ -232,7 +53,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -242,14 +63,14 @@
      inkscape:label="release splash"
      style="display:inline">
     <image
-       sodipodi:absref="/auto.anoa/home/olenz/projects/software/jabref/src/src/images/splash-release.svg"
+       sodipodi:absref="/home/olenz/projects/software/jabref/src/src/resources/images/splash-release.svg"
        xlink:href="splash-release.svg"
-       width="576"
-       height="432"
-       id="image3653"
-       x="-0.89468384"
+       style="display:inline"
        y="-0.86970043"
-       style="display:inline" />
+       x="-0.89468384"
+       id="image3653"
+       height="432"
+       width="576" />
   </g>
   <g
      transform="translate(-77.5,-170.36218)"
