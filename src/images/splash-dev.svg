@@ -79,18 +79,18 @@
        width="572.00000"
        patternUnits="userSpaceOnUse">
       <image
-         sodipodi:absref="/auto.anoa/home/olenz/projects/software/jabref/src/src/images/behandlet.png"
+         sodipodi:absref="/home/olenz/projects/software/jabref/src/src/images/behandlet.png"
          xlink:href="behandlet.png"
-         transform="translate(-231.0000,-284.3622)"
-         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
-         inkscape:export-ydpi="90.000000"
-         inkscape:export-xdpi="90.000000"
-         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
-         y="284.36218"
-         x="231.00000"
-         width="572.00000"
+         id="image9050"
          height="428.00000"
-         id="image9050" />
+         width="572.00000"
+         x="231.00000"
+         y="284.36218"
+         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
+         inkscape:export-xdpi="90.000000"
+         inkscape:export-ydpi="90.000000"
+         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
+         transform="translate(-231.0000,-284.3622)" />
     </pattern>
     <radialGradient
        inkscape:collect="always"
@@ -136,14 +136,14 @@
        r="135.88548" />
   </defs>
   <sodipodi:namedview
-     inkscape:window-y="-3"
-     inkscape:window-x="46"
-     inkscape:window-height="1180"
-     inkscape:window-width="1872"
-     inkscape:current-layer="svg2138"
+     inkscape:window-y="0"
+     inkscape:window-x="35"
+     inkscape:window-height="873"
+     inkscape:window-width="752"
+     inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="225.8697"
-     inkscape:cx="22.10531"
+     inkscape:cy="305.8697"
+     inkscape:cx="342.10531"
      inkscape:zoom="1"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -152,7 +152,7 @@
      pagecolor="#ffffff"
      id="base"
      showgrid="false"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -174,12 +174,13 @@
      id="layer2"
      inkscape:label="Release splash">
     <image
-       y="0"
-       x="1"
-       id="image3381"
-       xlink:href="file:///auto.anoa/home/olenz/projects/software/jabref/src/src/images/splash.png"
+       sodipodi:absref="/home/olenz/projects/software/jabref/src/src/images/splash-release.svg"
+       xlink:href="splash-release.svg"
+       width="576"
        height="432"
-       width="576" />
+       id="image3381"
+       x="1"
+       y="0" />
   </g>
   <g
      id="layer1"
@@ -204,7 +205,7 @@
          style="font-size:85.91455841px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:#ff6600;stroke-width:2.8878212;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Bitstream Vera Sans">dev</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:29.93491554px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       style="font-size:20.00000002px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold;font-stretch:normal;font-variant:normal"
        x="510.92224"
        y="226.16539"
        id="text3244"
@@ -214,23 +215,23 @@
          x="510.92224"
          y="226.16539"
          id="tspan3252"
-         style="font-size:23.9479332px;text-align:center;text-anchor:middle;fill:#ff0000">This is a</tspan><tspan
+         style="font-size:20.00000002px;text-align:center;text-anchor:middle;fill:#ff0000;-inkscape-font-specification:Bitstream Vera Sans Bold;font-family:Bitstream Vera Sans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">This is a</tspan><tspan
          sodipodi:role="line"
          x="510.92224"
          y="256.10031"
          id="tspan3256"
-         style="font-size:23.9479332px;text-align:center;text-anchor:middle;fill:#ff0000"><tspan
-   style="font-weight:bold;-inkscape-font-specification:Sans Bold"
+         style="font-size:20.00000002px;text-align:center;text-anchor:middle;fill:#ff0000;-inkscape-font-specification:Bitstream Vera Sans Bold;font-family:Bitstream Vera Sans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal"><tspan
+   style="font-weight:bold;-inkscape-font-specification:Bitstream Vera Sans Bold;font-family:Bitstream Vera Sans;font-style:normal;font-stretch:normal;font-variant:normal;font-size:20.00000002px"
    id="tspan3266">development version</tspan>.</tspan><tspan
          sodipodi:role="line"
          x="510.92224"
          y="286.03522"
          id="tspan3258"
-         style="font-size:23.9479332px;text-align:center;text-anchor:middle;fill:#ff0000">Features may</tspan><tspan
+         style="font-size:20.00000002px;text-align:center;text-anchor:middle;fill:#ff0000;-inkscape-font-specification:Bitstream Vera Sans Bold;font-family:Bitstream Vera Sans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">Features may</tspan><tspan
          sodipodi:role="line"
          x="510.92224"
          y="315.97015"
          id="tspan3260"
-         style="font-size:23.9479332px;text-align:center;text-anchor:middle;fill:#ff0000">not work as expected.</tspan></text>
+         style="font-size:20.00000002px;text-align:center;text-anchor:middle;fill:#ff0000;-inkscape-font-specification:Bitstream Vera Sans Bold;font-family:Bitstream Vera Sans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">not work as expected.</tspan></text>
   </g>
 </svg>
