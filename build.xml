@@ -44,7 +44,7 @@
 
 	<!-- Set the properties for intermediate directory -->
 	<property name="build.jar" value="JabRef-${jabref.version}.jar" />
-	<property name="build.dir" value="build" />
+	<property name="build.dir" value="buildant" />
 	<property name="build.classes" value="${build.dir}/classes" />
 	<property name="build.tmp" value="${build.dir}/tmp" />
 	<property name="build.osx" value="${build.dir}/classes/osxadapter" />
@@ -58,11 +58,9 @@
 	<property name="build.extension-javadocs" value="${build.extensions}/API" />
 	<property name="build.extension-layout" value="${build.extensions}/layout" />
 	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
-	<property name="build.tests" value="${build.dir}/tests" />
 
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
-	<property name="src.tests" value="test" />
 	<property name="resources.dir" value="src/resources" />
 	<property name="plugin.dir" value="${resources.dir}/plugins/" />
 	<property name="txt.dir" value="." />
@@ -76,7 +74,6 @@
 	<property name="layout.dir" value="${resources.dir}/resource/layout" />
 	<property name="lib.dir" value="lib" />
 	<property name="buildlib.dir" value="buildlib" />
-	<property name="tests.dir" value="${resources.dir}/tests" />
 
 	<property name="osxbin.dir" value="osx" />
 
@@ -161,12 +158,6 @@
 		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
 	</path>
 
-	<!-- Classpath for tests -->
-	<path id="classpathTest">
-		<path refid="classpath" />
-		<pathelement location="${buildlib.dir}/junit.jar" />
-	</path>
-
 	<target name="run" depends="build">
 		<java classname="net.sf.jabref.JabRefMain" fork="true">
 			<classpath refid="classpath" />
@@ -198,28 +189,17 @@
 		</java>
 	</target>
 
-	<!-- Compiles project excluding tests -->
+	<!-- Compiles project -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
 		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
-			<exclude name="tests/**" />
 			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
 		</javac>
 		<javac debug="off" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
 			<include name="**/JabRefMain.java" />
-		</javac>
-	</target>
-
-	<!-- Compiles project including tests -->
-	<target name="compiletest">
-		<mkdir dir="${build.classes}" />
-		<javac debug="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
-			<src path="${java.dir}" />
-			<include name="tests/**" />
-			<classpath refid="classpathTest" />
 		</javac>
 	</target>
 
@@ -346,17 +326,6 @@
 			<include name="meta.xml" />
 		</replace>
 
-	</target>
-
-	<!-- Prepare for testing -->
-	<target name="buildtest" depends="build, compiletest" description="Build project for testing">
-
-		<mkdir dir="${build.tests}" />
-		<copy todir="${build.tests}">
-			<fileset dir="${tests.dir}">
-				<include name="**" />
-			</fileset>
-		</copy>
 	</target>
 
 	<!-- generate and save some build infos !!! necessary for dynamic build infos !!! -->
@@ -593,13 +562,6 @@ version=${jabref.version}</echo>
 	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
 		<delete dir="${win.installer.dir}/dist" />
 
-	</target>
-
-	<target name="test" depends="buildtest" description="Runs all unit tests">
-		<java fork="yes" classname="junit.textui.TestRunner" failonerror="true">
-			<arg value="tests.net.sf.jabref.AllTests" />
-			<classpath refid="classpathTest" />
-		</java>
 	</target>
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
