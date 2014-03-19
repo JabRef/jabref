@@ -51,7 +51,6 @@
 	<property name="build.lib" value="${build.dir}/lib" />
 	<property name="build.win" value="${build.dir}/windows" />
 	<property name="build.images" value="${build.dir}/images" />
-	<property name="build.fonts" value="${build.dir}/images/font" />
 	<property name="build.resource" value="${build.dir}/resource" />
 	<property name="build.help" value="${build.dir}/help" />
 	<property name="build.javadocs" value="${build.dir}/docs/API" />
@@ -64,21 +63,20 @@
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
 	<property name="src.tests" value="test" />
-	<property name="plugin.dir" value="src/resources/plugins/" />
-	<property name="txt.dir" value="src/resources/txt" />
+	<property name="resources.dir" value="src/resources" />
+	<property name="plugin.dir" value="${resources.dir}/plugins/" />
+	<property name="txt.dir" value="." />
 	<property name="java.dir" value="${src.dir}/java" />
-	<property name="osx.dir" value="${src.dir}/osx" />
-	<property name="win.installer.dir" value="${src.dir}/windows/nsis" />
-	<property name="resource.dir" value="${src.dir}/resource" />
-	<property name="bin.dir" value="${src.dir}/scripts" />
-	<property name="images.dir" value="${src.dir}/images" />
-	<property name="fonts.dir" value="${src.dir}/images/font" />
-	<property name="help.dir" value="${src.dir}/help" />
-	<property name="extensions.dir" value="${src.dir}/extensions" />
-	<property name="layout.dir" value="${src.dir}/resource/layout" />
+	<property name="osx.dir" value="${resources.dir}/osx" />
+	<property name="win.installer.dir" value="${resources.dir}/windows/nsis" />
+	<property name="resource.dir" value="${resources.dir}/resource" />
+	<property name="images.dir" value="${resources.dir}/images" />
+	<property name="help.dir" value="${resources.dir}/help" />
+	<property name="extensions.dir" value="${resources.dir}/extensions" />
+	<property name="layout.dir" value="${resources.dir}/resource/layout" />
 	<property name="lib.dir" value="lib" />
 	<property name="buildlib.dir" value="buildlib" />
-	<property name="tests.dir" value="${src.dir}/tests" />
+	<property name="tests.dir" value="${resources.dir}/tests" />
 
 	<property name="osxbin.dir" value="osx" />
 
