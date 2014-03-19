@@ -105,13 +105,13 @@ public class BibtexEntry
         }
 
         String suffix = "";
-		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
+		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
 			for (int i = maxFieldLength - field.length(); i > 0; i--)
 				suffix += " ";
 		}
 
 		String res;
-		if (JabRef.jrf.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
+		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
 			if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
 				res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
 			} else {
