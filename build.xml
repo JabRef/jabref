@@ -53,18 +53,16 @@
 	<property name="build.images" value="${build.dir}/images" />
 	<property name="build.resource" value="${build.dir}/resource" />
 	<property name="build.help" value="${build.dir}/help" />
-	<property name="build.javadocs" value="${build.dir}/docs/API" />
 	<property name="build.extensions" value="${build.dir}/extensions" />
 	<property name="build.extension-javadocs" value="${build.extensions}/API" />
 	<property name="build.extension-layout" value="${build.extensions}/layout" />
 	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
 
 	<!-- Set the properties for source directories -->
-	<property name="src.dir" value="src" />
 	<property name="resources.dir" value="src/resources" />
 	<property name="plugin.dir" value="${resources.dir}/plugins/" />
 	<property name="txt.dir" value="." />
-	<property name="java.dir" value="${src.dir}/java" />
+	<property name="java.dir" value="src/java" />
 	<property name="osx.dir" value="${resources.dir}/osx" />
 	<property name="win.installer.dir" value="${resources.dir}/windows/nsis" />
 	<property name="resource.dir" value="${resources.dir}/resource" />
@@ -194,7 +192,6 @@
 
 		<mkdir dir="${build.tmp}" />
 		<jar destfile="${build.lib}/${build.jar}" >
-        <!--<jar destfile="${build.lib}/JabRef-${revision}.jar" manifest="${src.dir}/MANIFEST.MF">-->
 
 			<fileset dir="${build.classes}" />
 			<fileset dir="${build.tmp}" />
