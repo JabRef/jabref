@@ -192,14 +192,9 @@
 	<!-- Compiles project -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
+		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
-			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
-		</javac>
-		<javac debug="off" deprecation="on" destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
-			<src path="${java.dir}" />
-			<include name="**/JabRefMain.java" />
 		</javac>
 	</target>
 
@@ -207,7 +202,7 @@
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
 
-		<javac srcdir="${osx.dir}" debug="off" destdir="${build.classes}" target="1.6">
+		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.6">
 		</javac>
 	</target>
 
@@ -234,7 +229,7 @@
 			</fileset>
 
 			<!-- Add Plugins -->
-			<fileset dir="${src.dir}">
+			<fileset dir="${resources.dir}">
 				<include name="plugins/**" />
 			</fileset>
              <!-- Done by MrDlib -->
