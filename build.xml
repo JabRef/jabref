@@ -209,7 +209,7 @@
 				<include name="plugins/**" />
 			</fileset>
              <!-- Done by MrDlib -->
-            <fileset dir ="${java.dir}">
+            <fileset dir="${java.dir}">
                 <include name="spl/localization/spljabref.properties"/>
                 <include name="spl/gui/ajax-loader.gif"/>
                 <include name="spl/gui/mrdlib header.png"/>
@@ -314,23 +314,6 @@
 		<echo file="${resource.dir}/build.properties">builddate=${TODAY}
 build=${build.number}
 version=${jabref.version}</echo>
-	</target>
-
-
-	<!-- Creates all docs -->
-	<target name="docs" depends="javadocs" description="Generates all the documentation" />
-
-	<!-- Creates javadocs -->
-	<target name="javadocs" depends="compile" description="Generates the javadocs">
-		<mkdir dir="${build.javadocs}" />
-		<javadoc sourcepath="${java.dir}" destdir="${build.javadocs}" author="true" version="true" windowtitle="JabRef API" link="http://docs.oracle.com/javase/6/docs/api/">
-
-			<fileset dir="${java.dir}" defaultexcludes="yes">
-				<include name="**/*.java" />
-			</fileset>
-
-			<classpath refid="classpath" />
-		</javadoc>
 	</target>
 
 	<!-- Creates javadocs for the extensions -->
