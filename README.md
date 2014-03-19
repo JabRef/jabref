@@ -7,6 +7,7 @@ JabRef is a graphical application for managing bibliographical data.
 * Homepage: http://jabref.sourceforge.net/
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
+* CI Server: https://travis-ci.org/JabRef/jabref
 
 This repository has been generated out of the old git repository at sourceforge.
 The folder  `jabref` of the old repository is now this repository.
