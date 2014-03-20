@@ -84,6 +84,16 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.11'
 }
 
+compileJava {
+    // files are all encoded using UTF-8
+    options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    // files are all encoded using UTF-8
+    options.encoding = 'UTF-8'
+}
+
 javadoc {
     options {
         // files are all encoded using UTF-8
