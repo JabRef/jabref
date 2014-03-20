@@ -20,10 +20,6 @@ public class CopacImporterTest extends TestCase {
 		}
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
 	public void testIsRecognizedFormat() throws IOException {
 
         CopacImporter importer = new CopacImporter();
