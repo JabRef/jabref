@@ -109,4 +109,31 @@ appear in your chosen languages.
 
 
 ## Building JabRef from source:
-Please see the [INSTALL](INSTALL) file for instructions for building from source.
+
+To compile JabRef from source, you need:
+
+* A Java compiler, supporting Java 1.6 and `JAVA_HOME` points to this JDK.
+
+To run it, just execute `gradlew run`.
+When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
+and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` project files.
+
+## Release Process
+
+Replace `ANY_ANT_TARGET` with the Ant Target of your choice, and the system will build your binaries.
+
+`gradlew generateSource antTargets.ANY_ANT_TARGET`
+
+To compile, use the command `gradlew generateSource antTargets.jars`.
+After the build is finished, you can find the executable jar file
+named `JabRef-$VERSION.jar` (where $VERSION is the current version of the
+source tree) in the `build/lib` directory. Enjoy!
+
+On Mac OS X you should include the targets osx and osxjar,
+making the correct command `gradlew generateSource antTargets.compile antTargets.unjarlib antTargets.osx antTargets.jars antTargets.osxjar`.
+After the build is finished, you will find the OS X application
+`JabRef.app` in the `build/lib` directory along with the executable
+jar.
+
+
+
