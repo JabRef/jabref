@@ -132,7 +132,7 @@ public class JournalAbbreviations {
                 return null;
         }
         s = (String)o;
-        return s;//caseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
+        return s;//caseChanger.changeCase(s, CaseChangers.UPPER_EACH_FIRST);
     }
 
     public void readJournalList(String resourceFileName) {

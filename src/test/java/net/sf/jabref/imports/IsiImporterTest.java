@@ -222,7 +222,7 @@ public class IsiImporterTest extends TestCase {
 		assertEquals("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation", b
 			.getField("title"));
 
-		assertEquals("Journal Of Physics-Condensed Matter", a.getField("journal"));
+		assertEquals("Journal Of Physics-condensed Matter", a.getField("journal"));
 	}
 
 	public void testIsiAuthorsConvert() {

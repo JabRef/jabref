@@ -43,35 +43,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class CaseChangeMenu extends JMenu implements ActionListener{
-    static CaseChanger cc = new CaseChanger();
-    JMenuItem changeCaseItems[];
+public class CaseChangeMenu extends JMenu {
     private JTextComponent parent;
 
     public CaseChangeMenu(JTextComponent opener){
         /* case */
         super(Globals.lang("Change case"));
         parent = opener;
-        int m = CaseChanger.getNumModes();
-        changeCaseItems = new JMenuItem[m];
-        for (int i=0;i<m;i++){
-            changeCaseItems[i]=new JMenuItem(Globals.lang(CaseChanger.getModeName(i)));
-            changeCaseItems[i].addActionListener(this);
-            this.add(changeCaseItems[i]);
+
+        // create menu items, one for each case changer
+        for(final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
+            JMenuItem menuItem = new JMenuItem(Globals.lang(caseChanger.getName()));
+            menuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    parent.setText(caseChanger.changeCase(parent.getText()));
+                }
+            });
+            this.add(menuItem);
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
-        Object source = (e.getSource());
-        for(int i=0, m=CaseChanger.getNumModes(); i<m; i++){
-            if(source == changeCaseItems[i]){
-                caseChange(i);
-                break;
-            }
-        }
-    }
-
-    private void caseChange(int mode){
-        parent.setText(CaseChanger.changeCase(parent.getText(), mode));
-    }
 }

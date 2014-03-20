@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +29,7 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
-import net.sf.jabref.util.CaseChanger;
+import net.sf.jabref.util.CaseChangers;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -144,7 +143,7 @@ public class IsiImporter extends ImportFormat {
 
                 String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
-                    s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST, true);
+                    s = CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase(s);
                     map.put(aSubsup, s);
                 }
             }
@@ -432,7 +431,7 @@ public class IsiImporter extends ImportFormat {
 
 	public static String isiAuthorsConvert(String authors) {
 		String[] s = isiAuthorsConvert(authors.split(" and |;"));
-		return Util.join(s, " and ", 0, s.length);
+		return Util.join(s, " and ");
 	}
 
 }

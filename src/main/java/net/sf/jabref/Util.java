@@ -1560,6 +1560,10 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		return sb.append(strings[to - 1]).toString();
 	}
 
+    public static String join(String[] strings, String separator) {
+        return join(strings, separator, 0, strings.length);
+    }
+
    /**
     * Converts a relative filename to an absolute one, if necessary. Returns
     * null if the file does not exist.<br/>

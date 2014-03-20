@@ -4,7 +4,7 @@ import net.sf.jabref.bst.BibtexCaseChanger;
 import net.sf.jabref.bst.Warn;
 import junit.framework.TestCase;
 
-public class BibtexCaseChangerTest extends TestCase {
+public class BibtexCaseChangersTest extends TestCase {
 
 	public void testChangeCase() {
 
