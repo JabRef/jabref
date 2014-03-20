@@ -17,7 +17,7 @@ public class BibtexDatabaseTest extends TestCase {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void testResolveStrings() throws FileNotFoundException, IOException{
+	public void testResolveStrings() throws IOException{
 		
 		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/twente.bib"));
 		

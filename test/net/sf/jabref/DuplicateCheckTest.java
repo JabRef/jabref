@@ -1,10 +1,6 @@
 package net.sf.jabref;
 
 import junit.framework.TestCase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.Util;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,8 +11,11 @@ import net.sf.jabref.Util;
  */
 public class DuplicateCheckTest extends TestCase {
 
-    public void testDuplicateDetection() {
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
+    public void testDuplicateDetection() {
         BibtexEntry one = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
 
         BibtexEntry two = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);

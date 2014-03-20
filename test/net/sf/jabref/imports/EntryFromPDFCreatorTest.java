@@ -6,7 +6,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.imports.EntryFromPDFCreator;
 
 /**
  * 
@@ -21,7 +20,7 @@ public class EntryFromPDFCreatorTest extends TestCase {
 	private File notExistingPDF;
 
 	protected void setUp() throws Exception {
-		// externalFileTypes are needed for the EntryFromPDFCreator      
+		// externalFileTypes are needed for the EntryFromPDFCreator
 		JabRefPreferences.getInstance().updateExternalFileTypes();
 
 		
