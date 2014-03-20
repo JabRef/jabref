@@ -19,7 +19,7 @@ import org.antlr.runtime.RecognitionException;
 public class TestVM extends TestCase {
 
 	public void testAbbrv() throws RecognitionException, IOException {
-		VM vm = new VM(new File("src/resources/tests/net/sf/jabref/bst/abbrv.bst"));
+		VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
 		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 		
@@ -626,7 +626,7 @@ public class TestVM extends TestCase {
 	}
 
 	public void testHypthenatedName() throws RecognitionException, IOException {
-		VM vm = new VM(new File("src/resources/tests/net/sf/jabref/bst/abbrv.bst"));
+		VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
 		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
 		assertTrue(vm.run(v).contains("J.-P. Sartre"));

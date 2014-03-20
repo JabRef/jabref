@@ -19,7 +19,7 @@ public class BibtexDatabaseTest extends TestCase {
 	 */
 	public void testResolveStrings() throws IOException{
 		
-		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/twente.bib"));
+		ParserResult result = BibtexParser.parse(new FileReader("src/test/resources/net/sf/jabref/util/twente.bib"));
 		
 		BibtexDatabase db = result.getDatabase();
 		

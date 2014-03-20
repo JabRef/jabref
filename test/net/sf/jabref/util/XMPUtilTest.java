@@ -50,7 +50,9 @@ import org.apache.pdfbox.util.XMLUtil;
  */
 public class XMPUtilTest extends TestCase {
 
-	/**
+    public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/esources/encrypted.pdf";
+
+    /**
 	 * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
 	 * 
 	 * @param bibtex
@@ -1498,13 +1500,13 @@ public class XMPUtilTest extends TestCase {
 		//			
 
 		try {
-			XMPUtil.readXMP("src/resources/tests/encrypted.pdf");
+			XMPUtil.readXMP(SRC_TEST_ESOURCES_ENCRYPTED_PDF);
 			fail();
 		} catch (EncryptionNotSupportedException ignored) {
 		}
 
 		try {
-			XMPUtil.writeXMP("src/resources/tests/encrypted.pdf", t1BibtexEntry(), null);
+			XMPUtil.writeXMP(SRC_TEST_ESOURCES_ENCRYPTED_PDF, t1BibtexEntry(), null);
 			fail();
 		} catch (EncryptionNotSupportedException ignored) {
 		}
@@ -1525,7 +1527,7 @@ public class XMPUtilTest extends TestCase {
 			IOException, TransformerException {
 
 		ParserResult result = BibtexParser.parse(new FileReader(
-				"src/resources/tests/net/sf/jabref/util/twente.bib"));
+				"src/test/resources/net/sf/jabref/util/twente.bib"));
 
 		assertEquals("Arvind", result.getDatabase().resolveForStrings(
 				"#Arvind#"));
