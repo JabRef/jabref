@@ -50,7 +50,7 @@ import org.apache.pdfbox.util.XMLUtil;
  */
 public class XMPUtilTest extends TestCase {
 
-    public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/esources/encrypted.pdf";
+    public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
 
     /**
 	 * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
