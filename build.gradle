@@ -21,14 +21,6 @@ sourceSets {
             srcDirs = ["src/resources"]
         }
     }
-    test {
-        java {
-            srcDir "test"
-        }
-        resources {
-            srcDirs = ["src/test/resources"]
-        }
-    }
 }
 
 configurations {
