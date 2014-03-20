@@ -130,7 +130,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
                     sb.append(Globals.lang("Finished writing XMP-metadata. Wrote to %0 file(s).",
                             String.valueOf(written)));
                     if (error > 0)
-                        sb.append(" " + Globals.lang("Error writing to %0 file(s).", String.valueOf(error)));
+                        sb.append(" ").append(Globals.lang("Error writing to %0 file(s).", String.valueOf(error)));
                     message = sb.toString();
                 }
             }

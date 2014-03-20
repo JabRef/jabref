@@ -199,7 +199,7 @@ public class NameListNormalizer {
                 // Multiple parts. Add all of them, and add a dot if they are single letter parts:
                 for (int i=0; i<fParts.length; i++) {
                     if (fParts[i].length() == 1)
-                        sb.append(fParts[i]+".");
+                        sb.append(fParts[i]).append(".");
                     else sb.append(fParts[i]);
                     if (i < fParts.length-1)
                         sb.append(" ");
@@ -240,7 +240,7 @@ public class NameListNormalizer {
                 if (parts.length > 1) {
                     sb.append(",");
                     for (int i = 0; i < parts.length-1; i++) {
-                        sb.append(" "+parts[i]);
+                        sb.append(" ").append(parts[i]);
                         if (parts[i].length() == 1)
                             sb.append(".");
                     }

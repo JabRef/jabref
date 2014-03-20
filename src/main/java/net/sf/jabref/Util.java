@@ -1987,7 +1987,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	public static String quoteForHTML(String s) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < s.length(); ++i) {
-			sb.append("&#" + (int) s.charAt(i) + ";");
+			sb.append("&#").append((int) s.charAt(i)).append(";");
 		}
 		return sb.toString();
 	}
