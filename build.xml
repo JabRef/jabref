@@ -130,7 +130,6 @@
     <!-- Done by MrDlib -->
     <fileset id="splJars" dir="${lib.dir}">
         <include name="spl/**/*.jar" />
-        <include name="spl/*.jar" />
     </fileset>
 	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
 	        <exclude name="services/**/*" />
@@ -142,7 +141,6 @@
 		<pathelement path="${build.classes}" />
 		<pathelement path="${build.dir}" />
         <!-- Done by MrDlib -->
-        <pathelement path="${lib.dir}/spl" />
         <fileset refid="splJars" />
         <!-- Done by MrDlib -->
 		<fileset refid="jarsFileset" />
@@ -206,16 +204,6 @@
 			<!-- Add Plugins -->
 			<fileset dir="${resources.dir}">
 				<include name="plugins/**" />
-			</fileset>
-             <!-- Done by MrDlib -->
-            <fileset dir="${java.dir}">
-                <include name="spl/localization/spljabref.properties"/>
-                <include name="spl/gui/ajax-loader.gif"/>
-                <include name="spl/gui/mrdlib header.png"/>
-            </fileset>
-            <!-- Done by MrDlib -->
-			<fileset dir="${lib.dir}">
-				<include name="EndNote.zip" />
 			</fileset>
 			<fileset dir="${txt.dir}">
 				<include name="gpl2.txt" />
