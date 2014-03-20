@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
-
 /**
  * Testing Util.findFile for finding files based on regular expressions.
  * 
@@ -105,7 +102,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 				.getAbsolutePath());
 
 			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[0] });
-			assertEquals(null, fullPath);
+			assertNull(fullPath);
 
 			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[1] });
 			assertTrue(fullPath.exists());
@@ -134,7 +131,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 				.getAbsolutePath());
 
 			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[0] });
-			assertEquals(null, fullPath);
+			assertNull(fullPath);
 
 			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[1] });
 			assertTrue(fullPath.exists());
@@ -151,7 +148,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 			+ "/test/", "[bibtexkey].pdf", true));
 
 		// Not found
-		assertEqualPaths(null, Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+		assertNull(Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
 			"Not there [bibtexkey].pdf", true));
 
 		// Test current dir

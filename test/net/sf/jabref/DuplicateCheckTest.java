@@ -24,6 +24,7 @@ public class DuplicateCheckTest extends TestCase {
         two.setField("author", "Billy Bob");
         assertTrue(DuplicateCheck.isDuplicate(one, two));
 
+        //TODO algorithm things bob and joyce is the same with high accuracy
         two.setField("author", "James Joyce");
         assertFalse(DuplicateCheck.isDuplicate(one, two));
 

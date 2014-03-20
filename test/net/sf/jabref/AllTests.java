@@ -9,7 +9,6 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for test.net.sf.jabref");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(BibtexDatabaseTest.class);
-		suite.addTestSuite(JabRefTestCase.class);
 		suite.addTestSuite(UtilFindFileTest.class);
 		suite.addTestSuite(AuthorListTest.class);
 		suite.addTestSuite(FileBasedTestCase.class);

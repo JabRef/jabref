@@ -9,8 +9,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.util.XMPSchemaBibtex;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -19,9 +19,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import net.sf.jabref.FileBasedTestCase;
-import net.sf.jabref.JabRefTestCase;
 
-public class XMPSchemaBibtexTest extends JabRefTestCase {
+public class XMPSchemaBibtexTest extends TestCase {
+
+    public void assertEquals(BibtexEntry e, BibtexEntry x){
+        assertEquals(e.getCiteKey(), x.getCiteKey());
+        assertEquals(e.getType(), x.getType());
+
+        assertEquals(e.getAllFields().size(), x.getAllFields().size());
+
+        for (String name : e.getAllFields()){
+            assertEquals(e.getField(name), x.getField(name));
+        }
+    }
 
 	protected void setUp() throws Exception {
 		super.setUp();
