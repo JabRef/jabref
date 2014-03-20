@@ -17,9 +17,7 @@ Although that changed **all** git commit ids, the advantage is to have a clean s
 We are thankful for any bug reports or other feedback. If there are
 features you want included in JabRef, tell us!
 
-The github tracker is the main bug tracker.
-
-However, the "old" trackers at sourceforge still remain intact.
+The "old" trackers at sourceforge still remain intact:
 
 * Bugs: https://sourceforge.net/p/jabref/bugs/
 * Feature Requests: https://sourceforge.net/p/jabref/feature-requests/
