@@ -8,6 +8,7 @@ src/resources/windows/nsis/dist/
 jabref-launch4j.tmp
 user.properties
 out/
+buildant/
 *.iws
 *.ipr
 *.iml
