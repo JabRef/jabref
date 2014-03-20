@@ -38,10 +38,6 @@ public class LayoutTest extends TestCase {
 			+ "\\~n\n" + "\\'i\n" + "\\i\n" + "\\i}\n" + "}\n";
 	}
 
-	public BibtexEntry t1BibtexEntry() throws IOException {
-		return bibtexString2BibtexEntry(t1BibtexString());
-	}
-
 	public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
 		ParserResult result = BibtexParser.parse(new StringReader(s));
 		Collection<BibtexEntry> c = result.getDatabase().getEntries();
@@ -54,10 +50,8 @@ public class LayoutTest extends TestCase {
 		BibtexEntry be = bibtexString2BibtexEntry(entry);
 		StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
 		Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-		StringBuffer sb = new StringBuffer();
-		sb.append(layout.doLayout(be, null));
 
-		return sb.toString();
+        return layout.doLayout(be, null);
 	}
 
 	public void testLayoutBibtextype() throws Exception {

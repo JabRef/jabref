@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
 import junit.framework.TestCase;
 
 /**
@@ -82,10 +80,8 @@ public class LayoutEntryTest extends TestCase
 	{
 		StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
 		Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-		StringBuffer sb = new StringBuffer();
-		sb.append(layout.doLayout(entry, null, wordsToHighlight));
 
-		return sb.toString();
+        return layout.doLayout(entry, null, wordsToHighlight);
 	}
 	
 	/*************************/
@@ -125,7 +121,7 @@ public class LayoutEntryTest extends TestCase
 		Globals.prefs.putBoolean("caseSensitiveSearch", false);
 		
 		String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
-		String containing = "<span style=\"background-color:#FF4500;\">Google</span>"; 
+		String containing = "<span style=\"background-color:#3399FF;\">Google</span>";
 		
 		// check
 		assertTrue("Actual message: " + result, result.contains(containing));
@@ -149,8 +145,8 @@ public class LayoutEntryTest extends TestCase
 		
 		String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
 		
-		String containing = "<span style=\"background-color:#FF4500;\">Android</span>"; 
-		String containing2 = "<span style=\"background-color:#FF4500;\">study</span>";
+		String containing = "<span style=\"background-color:#3399FF;\">Android</span>";
+		String containing2 = "<span style=\"background-color:#3399FF;\">study</span>";
 		
 		// check
 		assertTrue(result.contains(containing));
@@ -174,7 +170,7 @@ public class LayoutEntryTest extends TestCase
 		Globals.prefs.putBoolean("caseSensitiveSearch", true);
 		
 		String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
-		String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#FF4500;\">google</span> Open-Source Devices</font>";
+		String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#3399FF;\">google</span> Open-Source Devices</font>";
 		
 		// check
 		assertEquals(expected, result);

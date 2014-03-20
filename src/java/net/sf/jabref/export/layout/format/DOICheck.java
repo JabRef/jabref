@@ -38,8 +38,8 @@ public class DOICheck implements LayoutFormatter {
 		if (fieldText.trim().isEmpty()) {
 		    return "";
 		}
-		
-		if (Util.checkForDOIwithHTTPprefix(fieldText)) {
+
+            if (Util.checkForDOIwithHTTPprefix(fieldText)) {
 		    return fieldText;
 		} else {
 		    return Globals.DOI_LOOKUP_PREFIX.concat(Util.getDOI(fieldText));

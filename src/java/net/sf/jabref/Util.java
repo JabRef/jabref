@@ -3045,8 +3045,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     public static boolean checkForDOIwithHTTPprefix(String check) {
     	if (check == null)
     		return false;
-    	else
-    		return check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
+
+    	return check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
 	}
     
     /**
@@ -3057,8 +3057,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     public static boolean checkForPlainDOI(String check) {
     	if (check == null)
     		return false;
-    	else
-    		return check.matches(".*" + REGEXP_PLAINDOI + ".*");
+
+    	return check.matches(".*" + REGEXP_PLAINDOI + ".*");
     }
        
     /**
@@ -3092,9 +3092,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
     /**
      * 
      * @param fileName
-     * @param fileType
      * @param destFilename
-     * @param edits
      * @return
      */
     public static boolean renameFile(String fileName, String destFilename)
@@ -3217,7 +3215,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
                 in = new InputStreamReader(source.getInputStream());
             }
             
-	    StringBuffer sb = new StringBuffer();
+	    StringBuilder sb = new StringBuilder();
 	    while(true) {
 	        int byteRead = in.read();
 	        if(byteRead == -1) break;
