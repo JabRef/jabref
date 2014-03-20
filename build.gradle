@@ -12,17 +12,6 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir "src/java"
-        }
-        resources {
-            srcDirs = ["src/resources"]
-        }
-    }
-}
-
 configurations {
     generateClasspath
     antlr3
@@ -110,10 +99,10 @@ task generatePluginSource(type: JavaExec) {
     group = 'JabRef'
     description = 'Generates _JabRefPlugin.java with JPF.'
 
-    ext.pluginsDir = "src/resources/plugins"
+    ext.pluginsDir = "src/main/resources/plugins"
 
     inputs.dir file(ext.pluginsDir)
-    outputs.file file("src/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
+    outputs.file file("src/main/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
 
     main = "net.sf.jabref.plugin.util.CodeGenerator"
     args = [ext.pluginsDir]
@@ -124,11 +113,11 @@ task generateBstGrammarSource(type: JavaExec) {
     group = 'JabRef'
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
 
-    File antlrSource = file('src/java/net/sf/jabref/bst/Bst.g')
+    File antlrSource = file('src/main/java/net/sf/jabref/bst/Bst.g')
 
     inputs.file antlrSource
-    outputs.file file('src/java/net/sf/jabref/bst/BstLexer.java')
-    outputs.file file('src/java/net/sf/jabref/bst/BstParser.java')
+    outputs.file file('src/main/java/net/sf/jabref/bst/BstLexer.java')
+    outputs.file file('src/main/java/net/sf/jabref/bst/BstParser.java')
 
     main = 'org.antlr.Tool'
     classpath = configurations.antlr3
@@ -139,13 +128,13 @@ task generateSearchLexerSource(type: JavaExec) {
     group = 'JabRef'
     description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
 
-    File antlrSource = file('src/java/net/sf/jabref/search/Lexer.g')
+    File antlrSource = file('src/main/java/net/sf/jabref/search/Lexer.g')
 
     inputs.file antlrSource
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexer.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexer.smap')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.txt')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexer.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexer.smap')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.txt')
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2
@@ -156,13 +145,13 @@ task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerS
     group = 'JabRef'
     description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
 
-    File antlrSource = file('src/java/net/sf/jabref/search/Parser.g')
+    File antlrSource = file('src/main/java/net/sf/jabref/search/Parser.g')
 
     inputs.file antlrSource
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParser.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParser.smap')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.txt')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParser.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParser.smap')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.txt')
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2
@@ -173,14 +162,14 @@ task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchPa
     group = 'JabRef'
     description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
 
-    File antlrSource = file('src/java/net/sf/jabref/search/TreeParser.g')
+    File antlrSource = file('src/main/java/net/sf/jabref/search/TreeParser.g')
     File destinationDir = antlrSource.parentFile
 
     inputs.file antlrSource
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParser.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParser.smap')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.java')
-    outputs.file file('src/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.txt')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParser.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParser.smap')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.java')
+    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.txt')
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2

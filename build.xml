@@ -59,10 +59,10 @@
 	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
 
 	<!-- Set the properties for source directories -->
-	<property name="resources.dir" value="src/resources" />
+	<property name="resources.dir" value="src/main/resources" />
 	<property name="plugin.dir" value="${resources.dir}/plugins/" />
 	<property name="txt.dir" value="." />
-	<property name="java.dir" value="src/java" />
+	<property name="java.dir" value="src/main/java" />
 	<property name="osx.dir" value="${resources.dir}/osx" />
 	<property name="win.installer.dir" value="${resources.dir}/windows/nsis" />
 	<property name="resource.dir" value="${resources.dir}/resource" />
