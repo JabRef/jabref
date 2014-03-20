@@ -20,17 +20,7 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name
 	 */
 	public void testOneAuthorSimpleName() {
-		String name = "Lastname, Name";
-		
-		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
-		
-		String result = ab.format(name);
-		
-		//Expected Results:
-		String expectedResult = "Lastname, N.";
-
-		//Verifies the functionality:				
-		Assert.assertEquals("Abbreviator Test", result, expectedResult);
+        assertEquals("Abbreviator Test", "Lastname, N.", abbreviate("Lastname, Name"));
 	}
 
 	/**
@@ -39,17 +29,7 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name Middlename
 	 */
 	public void testOneAuthorCommonName() {
-		String name = "Lastname, Name Middlename";
-		
-		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
-		
-		String result = ab.format(name);
-		
-		//Expected Results:
-		String expectedResult = "Lastname, N. M.";
-		
-		//Verifies the functionality:				
-		Assert.assertEquals("Abbreviator Test", result, expectedResult);
+		assertEquals("Abbreviator Test", "Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
 	}
 
 	/**
@@ -58,17 +38,10 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name Middlename
 	 */
 	public void testTwoAuthorsCommonName() {
-		String name = "Lastname, Name Middlename and Sobrenome, Nome Nomedomeio";
-		
-		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
-		
-		String result = ab.format(name);
-		
-		//Expected Results:
+        String result = abbreviate("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
 		String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
-		
-		//Verifies the functionality:				
-		Assert.assertEquals("Abbreviator Test", result, expectedResult);
+
+		assertEquals("Abbreviator Test", expectedResult, result);
 	}
 
 
@@ -77,20 +50,15 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
 	 */
 	public void testJrAuthor(){
-		String name = "Other, Jr., Anthony N.";
-		assertEquals("Other, A. N.", abbreviate(name));
+        assertEquals("Other, A. N.", abbreviate("Other, Jr., Anthony N."));
 	}
 
 	public void testFormat() {
-
-		LayoutFormatter a = new AuthorLastFirstAbbreviator();
-		
-		assertEquals("", a.format(""));
-		assertEquals("Someone, V. S.", a.format("Someone, Van Something"));
-		assertEquals("Smith, J.", a.format("Smith, John"));
+		assertEquals("", abbreviate(""));
+		assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
+		assertEquals("Smith, J.", abbreviate("Smith, John"));
 		assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
-				a.format("von Neumann, John and Smith, John and Black Brown, Peter"));
-		
+                abbreviate("von Neumann, John and Smith, John and Black Brown, Peter"));
 	}
 	
 	protected String abbreviate(String name) {

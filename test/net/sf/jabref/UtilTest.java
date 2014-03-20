@@ -11,7 +11,6 @@ import javax.swing.JDialog;
 import javax.swing.JWindow;
 
 import junit.framework.TestCase;
-import net.sf.jabref.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 

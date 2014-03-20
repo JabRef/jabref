@@ -35,6 +35,5 @@ public class AuthorAbbreviator implements LayoutFormatter {
 	public String format(String fieldText) {
         AuthorList list = AuthorList.getAuthorList(fieldText);
         return list.getAuthorsLastFirstAnds(true);
-        
 	}
 }
