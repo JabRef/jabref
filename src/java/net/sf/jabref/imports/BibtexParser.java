@@ -65,9 +65,7 @@ public class BibtexParser {
 
 	private BibtexDatabase _db;
 
-	private HashMap<String, String> _meta;
-	
-	private HashMap<String, BibtexEntryType> entryTypes;
+    private HashMap<String, BibtexEntryType> entryTypes;
 
 	private boolean _eof = false;
 
@@ -185,7 +183,7 @@ public class BibtexParser {
 
 	private String skipAndRecordWhitespace(int j) throws IOException {
 		int c;
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		if (j != ' ')
 			sb.append((char) j);
 		while (true) {
@@ -229,7 +227,7 @@ public class BibtexParser {
 			return _pr;
 
         _db = new BibtexDatabase(); // Bibtex related contents.
-		_meta = new HashMap<String, String>(); // Metadata in comments for Bibkeeper.
+        HashMap<String, String> meta = new HashMap<String, String>();
 		entryTypes = new HashMap<String, BibtexEntryType>(); // To store custem entry types parsed.
 		_pr = new ParserResult(_db, null, entryTypes);
 
@@ -239,9 +237,6 @@ public class BibtexParser {
         if (versionNum != null) {
             _pr.setJabrefVersion(versionNum);
             setMajorMinorVersions();
-        }
-        else {
-            // No version number found. However, we have only
         }
 
         skipWhitespace();
@@ -307,7 +302,7 @@ public class BibtexParser {
 							int pos = rest.indexOf(':');
 
 							if (pos > 0)
-								_meta.put(rest.substring(0, pos), rest.substring(pos + 1));
+								meta.put(rest.substring(0, pos), rest.substring(pos + 1));
 							// We remove all line breaks in the metadata - these
 							// will have been inserted
 							// to prevent too long lines when the file was
@@ -380,7 +375,7 @@ public class BibtexParser {
 			checkEntryTypes(_pr);
 
             // Instantiate meta data:
-            _pr.setMetaData(new MetaData(_meta, _db));
+            _pr.setMetaData(new MetaData(meta, _db));
 
 			return _pr;
 		} catch (KeyCollisionException kce) {
@@ -441,9 +436,7 @@ public class BibtexParser {
         int c = peek();
         if ((c != '\n') && (c != '\r'))
             skipWhitespace();
-		String key = null;
-
-        key = parseKey();
+		String key = parseKey();
 
 		if ((key != null) && key.equals(""))
 			key = null;
@@ -506,7 +499,7 @@ public class BibtexParser {
 
 	private String parseFieldContent(String key) throws IOException {
 		skipWhitespace();
-		StringBuffer value = new StringBuffer();
+		StringBuilder value = new StringBuilder();
 		int c = '.';
 
 		while (((c = peek()) != ',') && (c != '}') && (c != ')')) {
@@ -630,7 +623,7 @@ public class BibtexParser {
 	 * numbers outside brackets.
 	 */
 	private String parseTextToken() throws IOException {
-		StringBuffer token = new StringBuffer(20);
+		StringBuilder token = new StringBuilder(20);
 
 		while (true) {
 			int c = read();
@@ -775,7 +768,7 @@ public class BibtexParser {
 	 * This method is used to parse the bibtex key for an entry.
 	 */
 	private String parseKey() throws IOException {
-		StringBuffer token = new StringBuffer(20);
+		StringBuilder token = new StringBuilder(20);
 
 		while (true) {
 			int c = read();
@@ -1005,7 +998,7 @@ public class BibtexParser {
      * @throws IOException
      */
     private String readJabRefVersionNumber() throws IOException {
-        StringBuffer headerText = new StringBuffer();
+        StringBuilder headerText = new StringBuilder();
         
         boolean keepon = true;
         int piv = 0;
