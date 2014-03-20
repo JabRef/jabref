@@ -3,14 +3,11 @@ package net.sf.jabref.imports;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.TestUtils;
 
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.SidePaneManager;
-import net.sf.jabref.imports.ACMPortalFetcher;
-import net.sf.jabref.imports.GeneralFetcher;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;

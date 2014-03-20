@@ -8,10 +8,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.EntryFromFileCreator;
-import net.sf.jabref.imports.EntryFromFileCreatorManager;
-import net.sf.jabref.imports.ParserResult;
 
 /**
  * 
@@ -20,47 +16,27 @@ import net.sf.jabref.imports.ParserResult;
  */
 public class EntryFromFileCreatorManagerTest extends TestCase {
 	
-	private BibtexDatabase database;
-
-	private File existingFile;
-	private File notExistingFile;
-	
-	private File pdfNotInDatabase;
-	
-	EntryFromFileCreatorManager manager1;
-	EntryFromFileCreatorManager manager2;
-
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		existingFile = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfInDatabase.pdf");
-		notExistingFile = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
-		
-		pdfNotInDatabase = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
-
-		manager1 = new EntryFromFileCreatorManager();
-		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
-		database = result.getDatabase();
-	}
-
 	public void testGetCreator() throws Exception {
-		
-		EntryFromFileCreator creator = manager1.getEntryCreator(notExistingFile);
+        EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
+		EntryFromFileCreator creator = manager.getEntryCreator(ImportDataTest.NOT_EXISTING_PDF);
 		assertNull(creator);
 		
-		creator = manager1.getEntryCreator(existingFile);
+		creator = manager.getEntryCreator(ImportDataTest.FILE_IN_DATABASE);
 		assertNotNull(creator);
-		assertTrue(creator.accept(existingFile));
+		assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
 	}
 
 	public void testAddEntrysFromFiles() throws Exception {
+        ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
+        BibtexDatabase database = result.getDatabase();
+
 		List<File> files = new ArrayList<File>();
 
-		files.add(pdfNotInDatabase);
-		files.add(notExistingFile);
+		files.add(ImportDataTest.FILE_NOT_IN_DATABASE);
+		files.add(ImportDataTest.NOT_EXISTING_PDF);
 
-		manager2 = new EntryFromFileCreatorManager();
-		List<String> errors = manager2.addEntrysFromFiles(files, database, null, true);
+        EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
+		List<String> errors = manager.addEntrysFromFiles(files, database, null, true);
 		
 		/**
 		 * One file doesn't exist, so adding it as an entry should lead to an

@@ -14,38 +14,27 @@ import net.sf.jabref.JabRefPreferences;
  */
 public class EntryFromPDFCreatorTest extends TestCase {
 
-	private EntryFromPDFCreator entryCreator;
-	
-	private File existingPDF;
-	private File notExistingPDF;
+	private EntryFromPDFCreator entryCreator = new EntryFromPDFCreator();
 
 	protected void setUp() throws Exception {
 		// externalFileTypes are needed for the EntryFromPDFCreator
 		JabRefPreferences.getInstance().updateExternalFileTypes();
-
-		
-		entryCreator = new EntryFromPDFCreator();
-		existingPDF = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
-		notExistingPDF = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
-		
 	}
 
 	public void testPDFFileFilter() {
-
-		Assert.assertEquals(true, entryCreator.accept(new File("aPDF.pdf")));
-		Assert.assertEquals(true, entryCreator.accept(new File("aPDF.PDF")));
-		Assert.assertEquals(false, entryCreator.accept(new File("foo.jpg")));
+		Assert.assertTrue(entryCreator.accept(new File("aPDF.pdf")));
+		Assert.assertTrue(entryCreator.accept(new File("aPDF.PDF")));
+		Assert.assertFalse(entryCreator.accept(new File("foo.jpg")));
 	}
 
 	public void testCreationOfEntry() {
-		
-		BibtexEntry entry = entryCreator.createEntry(notExistingPDF, false);
+		BibtexEntry entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
 		assertNull(entry);
 
-		entry = entryCreator.createEntry(existingPDF, false);
+		entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
 		Assert.assertNotNull(entry);
 		Assert.assertTrue(entry.getField("file").endsWith(":PDF"));
-		Assert.assertEquals(existingPDF.getName(), entry.getField("title"));
+		Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
 
 	}
 } 

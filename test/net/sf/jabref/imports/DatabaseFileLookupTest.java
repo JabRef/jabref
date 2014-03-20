@@ -21,10 +21,6 @@ import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.EntryFromPDFCreator;
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.imports.UnlinkedFilesCrawler;
 
 /**
  * 
@@ -39,11 +35,6 @@ public class DatabaseFileLookupTest extends TestCase {
 
 	private BibtexEntry entry1;
 	private BibtexEntry entry2;
-	
-	private File pdfDirectory;
-
-	private File fileInDatabase;
-	private File fileNotInDatabase;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -51,18 +42,12 @@ public class DatabaseFileLookupTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		ParserResult result = BibtexParser.parse(new FileReader("src/resources/tests/net/sf/jabref/util/unlinkedFilesTestBib.bib"));
+		ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
 		database = result.getDatabase();
 		entries = database.getEntries();
 		
 		entry1 = database.getEntryByKey("entry1");
 		entry2 = database.getEntryByKey("entry2");
-		
-		pdfDirectory = new File("src/resources/tests/net/sf/jabref/imports/unlinkedFilesTestFolder");
-		
-		fileInDatabase = new File(pdfDirectory.getPath() + File.separator + "pdfInDatabase.pdf");
-		fileNotInDatabase = new File(pdfDirectory.getPath() + File.separator + "pdfNotInDatabase.pdf");
-		
 	}
 	
 	/**
@@ -73,13 +58,6 @@ public class DatabaseFileLookupTest extends TestCase {
 		assertEquals(2, entries.size());
 		assertNotNull(entry1);
 		assertNotNull(entry2);
-		
-		assertTrue(pdfDirectory.exists());
-		assertTrue(pdfDirectory.isDirectory());
-		assertTrue(fileInDatabase.exists());
-		assertTrue(fileInDatabase.isFile());
-		assertTrue(fileNotInDatabase.exists());
-		assertTrue(fileNotInDatabase.isFile());
 	}
 	
 	public void testInsertTestData() throws Exception {
@@ -87,7 +65,7 @@ public class DatabaseFileLookupTest extends TestCase {
 		entry1 = new BibtexEntry();
 		JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
 		ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");
-		FileListEntry fileListEntry = new FileListEntry("", fileInDatabase.getAbsolutePath(), fileType);
+		FileListEntry fileListEntry = new FileListEntry("", ImportDataTest.FILE_IN_DATABASE.getAbsolutePath(), fileType);
 
 		FileListTableModel model = new FileListTableModel();
 		model.addEntry(0, fileListEntry);
@@ -99,7 +77,7 @@ public class DatabaseFileLookupTest extends TestCase {
 		// #################### SETUP END ##################### //
 		
 		UnlinkedFilesCrawler crawler = new UnlinkedFilesCrawler(database);
-		CheckableTreeNode treeNode = crawler.searchDirectory(pdfDirectory, new EntryFromPDFCreator());
+		CheckableTreeNode treeNode = crawler.searchDirectory(ImportDataTest.EXISTING_FOLDER, new EntryFromPDFCreator());
 		
 		assertNotNull(treeNode);
 		
@@ -117,8 +95,8 @@ public class DatabaseFileLookupTest extends TestCase {
 		List<File> resultList = getFileListFromNode(treeNode);
 		
 		assertFalse(resultList.isEmpty());
-		assertTrue(resultList.contains(fileNotInDatabase));
-		assertFalse(resultList.contains(fileInDatabase));
+		assertTrue(resultList.contains(ImportDataTest.FILE_NOT_IN_DATABASE));
+		assertFalse(resultList.contains(ImportDataTest.FILE_IN_DATABASE));
 	}
 	
 	/**
@@ -186,7 +164,7 @@ public class DatabaseFileLookupTest extends TestCase {
 	}
 
 	private static <T> T getInstanceFromType(Class<T> targetClass) throws IllegalArgumentException {
-		T instance = null;
+		T instance;
 		try {
 			Constructor<? extends T> constructor;
 			constructor = targetClass.getDeclaredConstructor();
@@ -235,7 +213,7 @@ public class DatabaseFileLookupTest extends TestCase {
                 @SuppressWarnings("unchecked")
                 T instance = (T) constructor.newInstance(arguments);
                 return instance;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 		return null;

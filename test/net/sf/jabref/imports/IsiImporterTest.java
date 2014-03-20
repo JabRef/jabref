@@ -10,7 +10,6 @@ import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinterToNull;
-import net.sf.jabref.imports.IsiImporter;
 
 /**
  * Test cases for the IsiImporter

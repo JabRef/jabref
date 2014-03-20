@@ -17,7 +17,7 @@ public class UnlinkedFilesTestSuite {
 		suite.addTestSuite(DatabaseFileLookupTest.class);
 		suite.addTestSuite(EntryFromFileCreatorManagerTest.class);
 		suite.addTestSuite(EntryFromPDFCreatorTest.class);
-		suite.addTestSuite(UnlinkedFilesCrawlerTest.class);
+		suite.addTestSuite(ImportDataTest.class);
 		return suite;
 	}
 
