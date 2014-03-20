@@ -12,6 +12,14 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", "src/main/antlr2", "src/main/antlr3"]
+        }
+    }
+}
+
 configurations {
     generateClasspath
     antlr3
@@ -102,7 +110,7 @@ task generatePluginSource(type: JavaExec) {
     ext.pluginsDir = "src/main/resources/plugins"
 
     inputs.dir file(ext.pluginsDir)
-    outputs.file file("src/main/java/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
+    outputs.file file("src/main/gen/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
 
     main = "net.sf.jabref.plugin.util.CodeGenerator"
     args = [ext.pluginsDir]
@@ -113,63 +121,83 @@ task generateBstGrammarSource(type: JavaExec) {
     group = 'JabRef'
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
 
-    File antlrSource = file('src/main/java/net/sf/jabref/bst/Bst.g')
+    File antlrSource = file('src/main/antlr3/net/sf/jabref/bst/Bst.g')
 
     inputs.file antlrSource
-    outputs.file file('src/main/java/net/sf/jabref/bst/BstLexer.java')
-    outputs.file file('src/main/java/net/sf/jabref/bst/BstParser.java')
+    outputs.file file('src/main/gen/net/sf/jabref/bst/BstLexer.java')
+    outputs.file file('src/main/gen/net/sf/jabref/bst/BstParser.java')
 
     main = 'org.antlr.Tool'
     classpath = configurations.antlr3
-    args = ["-o", antlrSource.parentFile, antlrSource]
+    args = ["-o", file('src/main/gen/net/sf/jabref/bst/'), antlrSource]
 }
 
 task generateSearchLexerSource(type: JavaExec) {
-    group = 'JabRef'
-    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+    String grammarFile = "Lexer"
 
-    File antlrSource = file('src/main/java/net/sf/jabref/search/Lexer.g')
+    group = 'JabRef'
+    description = "Generates java files for ${grammarFile}.g antlr2."
+
+    String packagePath = "net/sf/jabref/search"
+    File antlr2Path = file("src/main/antlr2")
+    File genPath = file("src/main/gen")
+
+    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
+    File destinationDir = file("$genPath/$packagePath")
 
     inputs.file antlrSource
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexer.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexer.smap')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionLexerTokenTypes.txt')
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2
-    args = ["-o", antlrSource.parentFile, antlrSource]
+    args = ["-o", destinationDir, antlrSource]
 }
 
 task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
-    group = 'JabRef'
-    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+    String grammarFile = "Parser"
 
-    File antlrSource = file('src/main/java/net/sf/jabref/search/Parser.g')
+    group = 'JabRef'
+    description = "Generates java files for ${grammarFile}.g antlr2."
+
+    String packagePath = "net/sf/jabref/search"
+    File antlr2Path = file("src/main/antlr2")
+    File genPath = file("src/main/gen")
+
+    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
+    File destinationDir = file("$genPath/$packagePath")
 
     inputs.file antlrSource
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParser.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParser.smap')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionParserTokenTypes.txt')
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2
-    args = ["-o", antlrSource.parentFile, antlrSource]
+    args = ["-o", destinationDir, antlrSource]
 }
 
 task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
-    group = 'JabRef'
-    description = 'Generates BstLexer.java and BstParser.java from the TreeParser.g grammar file using antlr.'
+    String grammarFile = "TreeParser"
 
-    File antlrSource = file('src/main/java/net/sf/jabref/search/TreeParser.g')
-    File destinationDir = antlrSource.parentFile
+    group = 'JabRef'
+    description = "Generates java files for ${grammarFile}.g antlr2."
+
+    String packagePath = "net/sf/jabref/search"
+    File antlr2Path = file("src/main/antlr2")
+    File genPath = file("src/main/gen")
+
+    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
+    File destinationDir = file("$genPath/$packagePath")
 
     inputs.file antlrSource
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParser.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParser.smap')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.java')
-    outputs.file file('src/main/java/net/sf/jabref/search/SearchExpressionTreeParserTokenTypes.txt')
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
+    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
 
     main = 'antlr.Tool'
     classpath = configurations.antlr2

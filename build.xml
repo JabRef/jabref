@@ -63,6 +63,7 @@
 	<property name="plugin.dir" value="${resources.dir}/plugins/" />
 	<property name="txt.dir" value="." />
 	<property name="java.dir" value="src/main/java" />
+    <property name="gen.dir" value="src/main/gen" />
 	<property name="osx.dir" value="${resources.dir}/osx" />
 	<property name="win.installer.dir" value="${resources.dir}/windows/nsis" />
 	<property name="resource.dir" value="${resources.dir}/resource" />
@@ -168,6 +169,7 @@
 		<mkdir dir="${build.classes}" />
 		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
+            <src path="${gen.dir}" />
 			<classpath refid="classpath" />
 		</javac>
 	</target>

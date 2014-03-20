@@ -1,8 +1,0 @@
-SearchExpressionLexer.java
-SearchExpressionParser.java
-SearchExpressionTreeParser.java
-SearchExpressionLexerTokenTypes.java
-SearchExpressionParserTokenTypes.java
-SearchExpressionTreeParserTokenTypes.java
-*.smap
-*.txt
