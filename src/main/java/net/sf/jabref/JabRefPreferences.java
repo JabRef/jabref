@@ -103,6 +103,8 @@ public class JabRefPreferences {
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
+    public static final String NEWLINE = "newline";
+
     public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
 
     Preferences prefs;
@@ -302,6 +304,8 @@ public class JabRefPreferences {
         defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
+        defaults.put(NEWLINE, System.getProperty("line.separator"));
+        
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,

@@ -37,7 +37,7 @@ public class FileTab extends JPanel implements PrefsTab {
 
     private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
             promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
-    private JComboBox<String> valueDelimiter;
+    private JComboBox<String> valueDelimiter, newlineSeparator;
     private JRadioButton
         resolveStringsStandard, resolveStringsAll;
     private JTextField bracesAroundCapitalsFields, nonWrappableFields,
@@ -67,6 +67,9 @@ public class FileTab extends JPanel implements PrefsTab {
         ButtonGroup bg = new ButtonGroup();
         bg.add(resolveStringsAll);
         bg.add(resolveStringsStandard);
+        
+        // This is sort of a quick hack
+        newlineSeparator = new JComboBox<String>(new String[] {"CR", "CR/LF", "LF"});
 
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
@@ -108,6 +111,12 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(resolveStringsAll);
         builder.append(doNotResolveStringsFor);
         builder.nextLine();
+        
+        JLabel lab = new JLabel(Globals.lang("Newline separator") + ":");
+        builder.append(lab);
+        builder.append(newlineSeparator);
+        builder.nextLine();
+        
         builder.appendSeparator(Globals.lang("Autosave"));
         builder.append(autoSave, 1);
         JButton hlp = new JButton(autosaveHelp);
@@ -150,6 +159,16 @@ public class FileTab extends JPanel implements PrefsTab {
     public void setValues() {
         openLast.setSelected(_prefs.getBoolean("openLastEdited"));
         backup.setSelected(_prefs.getBoolean("backup"));
+
+        String newline = _prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
+        if ("\r".equals(newline)) {
+            newlineSeparator.setSelectedIndex(0);
+        } else if ("\n".equals(newline)) {
+            newlineSeparator.setSelectedIndex(2);
+        } else {
+            // fallback: windows standard
+            newlineSeparator.setSelectedIndex(1);
+        }
         
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
@@ -170,6 +189,22 @@ public class FileTab extends JPanel implements PrefsTab {
     }
 
     public void storeSettings() {
+        String newline;
+        switch (newlineSeparator.getSelectedIndex()) {
+        case 0:
+            newline = "\r";
+            break;
+        case 2:
+            newline = "\n";
+            break;
+        default:
+            newline = "\r\n";
+        }
+        _prefs.put(net.sf.jabref.JabRefPreferences.NEWLINE, newline);
+        // we also have to change Globals variable as globals is not a getter, but a constant
+        Globals.NEWLINE = newline;
+        Globals.NEWLINE_LENGTH = newline.length();
+
         _prefs.putBoolean("backup", backup.isSelected());
         _prefs.putBoolean("openLastEdited", openLast.isSelected());
         _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());

@@ -241,8 +241,9 @@ public class Globals {
 
 	public static SidePaneManager sidePaneManager;
 
-	public static final String NEWLINE = System.getProperty("line.separator");
-    public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
+	// will be overridden in initialization due to feature #857
+	public static String NEWLINE = System.getProperty("line.separator");
+    public static int NEWLINE_LENGTH = NEWLINE.length();
 
     // Instantiate logger:
     private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
