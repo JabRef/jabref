@@ -1,3 +1,6 @@
+2.11
+    - Change default behaviour to be more non-invasive: timestamps and owners are NOT set by default per entry.
+
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.

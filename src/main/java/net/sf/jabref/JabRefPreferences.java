@@ -431,7 +431,7 @@ public class JabRefPreferences {
 
         defaults.put(SHOWONELETTERHEADINGFORICONCOLUMNS, Boolean.FALSE);
 
-        defaults.put("useOwner", Boolean.TRUE);
+        defaults.put("useOwner", Boolean.FALSE);
         defaults.put("overwriteOwner", Boolean.FALSE);
         defaults.put("allowTableEditing", Boolean.FALSE);
         defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
@@ -497,7 +497,7 @@ public class JabRefPreferences {
         defaults.put("markImportedEntries", Boolean.TRUE);
         defaults.put("unmarkAllEntriesBeforeImporting", Boolean.TRUE);
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
-        defaults.put("useTimeStamp", Boolean.TRUE);
+        defaults.put("useTimeStamp", Boolean.FALSE);
         defaults.put("overwriteTimeStamp", Boolean.FALSE);
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
