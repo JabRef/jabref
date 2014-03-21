@@ -116,22 +116,22 @@ public class CaseChangers {
         }
     }
 
-    public static class UpperEachFirstSkippingSmallerWordsCaseChanger implements CaseChanger {
+    public static class TitleCaseChanger implements CaseChanger {
 
         private final static Set<String> notToCapitalize;
 
         static {
             Set<String> smallerWords = new HashSet<String>();
-            smallerWords.add("of");
-            smallerWords.add("and");
-            smallerWords.add("the");
+
+            smallerWords.addAll(Arrays.asList("a", "an", "the", "and", "but", "or", "for", "nor", "as", "at", "by", "for",
+                    "from", "in", "into", "near", "of", "on", "onto", "to", "with"));
 
             // unmodifiable for thread safety
             notToCapitalize = Collections.unmodifiableSet(smallerWords);
         }
 
         public String getName() {
-            return "Upper Each First and of the Skipped";
+            return "Title";
         }
 
         public String changeCase(String input) {
@@ -143,7 +143,8 @@ public class CaseChangers {
                 String word = words[i];
                 // first word is Always capitalized
                 boolean alwaysCapitalizeFirstWord = i == 0;
-                if (alwaysCapitalizeFirstWord)
+                boolean alwaysCapitalizeLastWord = i == words.length - 1;
+                if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord)
                     result[i] = Util.nCase(word);
                 else if (notToCapitalize.contains(word))
                     result[i] = word;
@@ -160,9 +161,7 @@ public class CaseChangers {
     public final static UpperCaseChanger UPPER = new UpperCaseChanger();
     public final static UpperFirstCaseChanger UPPER_FIRST = new UpperFirstCaseChanger();
     public final static UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
+    public final static TitleCaseChanger TITLE = new TitleCaseChanger();
 
-    public final static List<CaseChanger> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST);
-
-    // special one used only for imports
-    public final static UpperEachFirstSkippingSmallerWordsCaseChanger UPPER_EACH_FIRST_SKIP_SMALL_WORDS = new UpperEachFirstSkippingSmallerWordsCaseChanger();
+    public final static List<CaseChanger> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST, TITLE);
 }

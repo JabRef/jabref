@@ -9,7 +9,7 @@ public class CaseChangersTest extends TestCase {
 		assertEquals("UPPER", CaseChangers.UPPER.getName());
 		assertEquals("Upper first", CaseChangers.UPPER_FIRST.getName());
 		assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.getName());
-        assertEquals("Upper Each First and of the Skipped", CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.getName());
+        assertEquals("Title", CaseChangers.TITLE.getName());
 	}
 
     public void testChangeCaseLower() {
@@ -34,10 +34,10 @@ public class CaseChangersTest extends TestCase {
 		assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.changeCase("upper each First"));
 	}
 
-    public void testChangeCaseUpperEachFirstSkipSmallerWords() {
-        assertEquals("", CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase(""));
-        assertEquals("Upper Each First and", CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase("upper each First and"));
-        assertEquals("Upper Each First and", CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase("upper each First aNd"));
-        assertEquals("Upper Each First and", CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase("upper each First AND"));
+    public void testChangeCaseTitle() {
+        assertEquals("", CaseChangers.TITLE.changeCase(""));
+        assertEquals("Upper Each First", CaseChangers.TITLE.changeCase("upper each first"));
+        assertEquals("An Upper Each First And", CaseChangers.TITLE.changeCase("an upper each first and"));
+        assertEquals("An Upper Each of the and First And", CaseChangers.TITLE.changeCase("an upper each of the and first and"));
     }
 }

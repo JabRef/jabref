@@ -143,7 +143,7 @@ public class IsiImporter extends ImportFormat {
 
                 String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
-                    s = CaseChangers.UPPER_EACH_FIRST_SKIP_SMALL_WORDS.changeCase(s);
+                    s = CaseChangers.TITLE.changeCase(s);
                     map.put(aSubsup, s);
                 }
             }
