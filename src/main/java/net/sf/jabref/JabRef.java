@@ -18,10 +18,6 @@ package net.sf.jabref;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
 
-import gnu.dtools.ritopt.BooleanOption;
-import gnu.dtools.ritopt.Options;
-import gnu.dtools.ritopt.StringOption;
-
 import java.awt.Font;
 import java.awt.Frame;
 import java.io.File;
@@ -68,18 +64,13 @@ public class JabRef {
 	public static JabRef singleton;
     public static RemoteListener remoteListener = null;
     public static JabRefFrame jrf;
-    public Options options;
     public static Frame splashScreen = null;
 
     boolean graphicFailure = false;
 
-    StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase,
-            fetcherEngine, exportMatches, defPrefs;
-    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
-
-    private final static String exportMatchesSyntax = "[".concat(Globals.lang("field")).concat("]").concat("searchTerm").concat(",").concat("outputFile").concat(": ").concat(Globals.lang("file")).concat("[,").concat(Globals.lang("exportFormat")).concat("]");
 
     public static final int MAX_DIALOG_WARNINGS = 10;
+    private JabRefCLI cli;
 
     public static void main(String[] args) {
         new JabRef(args);
@@ -197,76 +188,20 @@ public class JabRef {
 		openWindow(processArguments(args, true));
 	}
     
-    private void setupOptions() {
 
-        importFile = new StringOption("");
-        exportFile = new StringOption("");
-        helpO = new BooleanOption();
-        disableGui = new BooleanOption();
-        disableSplash = new BooleanOption();
-        blank = new BooleanOption();
-        loadSess = new BooleanOption();
-        showVersion = new BooleanOption();
-        exportPrefs = new StringOption("jabref_prefs.xml");
-        importPrefs = new StringOption("jabref_prefs.xml");
-        defPrefs = new StringOption("");
-        auxImExport = new StringOption("");
-        importToOpenBase = new StringOption("");
-        fetcherEngine = new StringOption("");
-    	exportMatches = new StringOption(""); 
-
-        options = new Options("JabRef "); // Create an options repository.
-        options.setVersion(GUIGlobals.version);
-
-        importFile.setDescription("imopoepuoeu"); //Globals.lang);
-        options.register("version", 'v',
-                Globals.lang("Display version"), showVersion);
-        options.register("nogui", 'n',
-            Globals.lang("No GUI. Only process command line options."), disableGui);
-        options.register("nosplash", 's',
-                Globals.lang("Do not show splash window at startup"), disableSplash);
-        options.register("import", 'i',
-            Globals.lang("Import file") + ": " + Globals.lang("filename")
-            + "[,import format]", importFile);
-        options.register("output", 'o',
-            Globals.lang("Output or export file") + ": " + Globals.lang("filename")
-            + "[,export format]", exportFile);
-        options.register("help", 'h',
-            Globals.lang("Display help on command line options"), helpO);
-        options.register("loads", 'l', Globals.lang("Load session"), loadSess);
-        options.register("prexp", 'x', Globals.lang("Export preferences to file"),
-            exportPrefs);
-        options.register("primp", 'p', Globals.lang("Import preferences from file"),
-            importPrefs);
-        options.register("prdef", 'd', Globals.lang("Reset preferences (key1,key2,... or 'all')"),
-            defPrefs);
-        options.register("aux", 'a',
-            Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
-            auxImExport);
-        options.register("blank", 'b', Globals.lang("Do not open any files at startup"), blank);
-
-        options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
-
-        options.register("fetch", 'f', Globals.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\""), fetcherEngine);
-
-        options.register("exportMatches", 'm', exportMatchesSyntax, exportMatches); 
-
-        options.setUseMenu(false);
-    }
 
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 
-        setupOptions();
-        String[] leftOver = options.process(args);
+        cli = new JabRefCLI(args);
 
-        if (initialStartup && showVersion.isInvoked()) {
-            options.displayVersion();
-            disableGui.setInvoked(true);
+        if (initialStartup && cli.isShowVersion()) {
+            cli.options.displayVersion();
+            cli.disableGui.setInvoked(true);
         }
 
-        if (initialStartup && helpO.isInvoked()) {
+        if (initialStartup && cli.isHelp()) {
             System.out.println("jabref [options] [bibtex-file]\n");
-            System.out.println(options.getHelp());
+            System.out.println(cli.getHelp());
 
             String importFormats = Globals.importFormatReader.getImportFormatList();
             System.out.println(Globals.lang("Available import formats") + ":\n"
@@ -278,13 +213,13 @@ public class JabRef {
             System.exit(0);
         }
         
-        boolean commandmode = disableGui.isInvoked() || fetcherEngine.isInvoked();
+        boolean commandmode = cli.isDisableGui() || cli.fetcherEngine.isInvoked();
         
         // First we quickly scan the command line parameters for any that signal
         // that the GUI
         // should not be opened. This is used to decide whether we should show the
         // splash screen or not.
-        if (initialStartup && !commandmode && !disableSplash.isInvoked()) {
+        if (initialStartup && !commandmode && !cli.isDisableSplash()) {
             try {
                 splashScreen = SplashScreen.splash();
             } catch (Throwable ex) {
@@ -295,8 +230,8 @@ public class JabRef {
         }
 
         // Check if we should reset all preferences to default values:
-        if (defPrefs.isInvoked()) {
-            String value = defPrefs.getStringValue();
+        if (cli.defPrefs.isInvoked()) {
+            String value = cli.defPrefs.getStringValue();
             if (value.trim().equals("all")) {
                 try {
                     System.out.println(Globals.lang("Setting all preferences to default values."));
@@ -320,9 +255,9 @@ public class JabRef {
         }
 
         // Check if we should import preferences from a file:
-        if (importPrefs.isInvoked()) {
+        if (cli.importPrefs.isInvoked()) {
             try {
-                Globals.prefs.importPreferences(importPrefs.getStringValue());
+                Globals.prefs.importPreferences(cli.importPrefs.getStringValue());
                 BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
             }
@@ -334,8 +269,8 @@ public class JabRef {
         // Vector to put imported/loaded database(s) in.
         Vector<ParserResult> loaded = new Vector<ParserResult>();
         Vector<String> toImport = new Vector<String>();
-        if (!blank.isInvoked() && (leftOver.length > 0))  {
-            for (String aLeftOver : leftOver) {
+        if (!cli.isBlank() && (cli.getLeftOver().length > 0))  {
+            for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // bib files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
@@ -366,8 +301,8 @@ public class JabRef {
             }
         }
 
-        if (!blank.isInvoked() && importFile.isInvoked()) {
-            toImport.add(importFile.getStringValue());
+        if (!cli.isBlank() && cli.importFile.isInvoked()) {
+            toImport.add(cli.importFile.getStringValue());
         }
 
         for (String filenameString : toImport) {
@@ -376,22 +311,22 @@ public class JabRef {
 				loaded.add(pr);
 		}
 
-        if (!blank.isInvoked() && importToOpenBase.isInvoked()) {
-            ParserResult res = importToOpenBase(importToOpenBase.getStringValue());
+        if (!cli.isBlank() && cli.importToOpenBase.isInvoked()) {
+            ParserResult res = importToOpenBase(cli.importToOpenBase.getStringValue());
             if (res != null)
                 loaded.add(res);
         }
 
-        if (!blank.isInvoked() && fetcherEngine.isInvoked()) {
-            ParserResult res = fetch(fetcherEngine.getStringValue());
+        if (!cli.isBlank() && cli.fetcherEngine.isInvoked()) {
+            ParserResult res = fetch(cli.fetcherEngine.getStringValue());
             if (res != null)
                 loaded.add(res);
         }
 
 
-        if(exportMatches.isInvoked()) {
+        if(cli.exportMatches.isInvoked()) {
             if (loaded.size() > 0) {
-                String[] data = exportMatches.getStringValue().split(",");
+                String[] data = cli.exportMatches.getStringValue().split(",");
                 String searchTerm = data[0].replace("\\$"," "); //enables blanks within the search term:
                                                                 //? stands for a blank
                 ParserResult pr =
@@ -418,7 +353,7 @@ public class JabRef {
 		                	break;
 		                }
 		                default:{
-		                	System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + exportMatchesSyntax);
+		                	System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.exportMatchesSyntax);
 		                	System.exit(0);
 		                }
 	                } //end switch
@@ -446,9 +381,9 @@ public class JabRef {
         } //end exportMatches invoked 
 
 
-        if (exportFile.isInvoked()) {
+        if (cli.exportFile.isInvoked()) {
             if (loaded.size() > 0) {
-                String[] data = exportFile.getStringValue().split(",");
+                String[] data = cli.exportFile.getStringValue().split(",");
 
                 if (data.length == 1) {
                     // This signals that the latest import should be stored in BibTeX
@@ -515,21 +450,21 @@ public class JabRef {
 
         //Util.pr(": Finished export");
 
-        if (exportPrefs.isInvoked()) {
+        if (cli.exportPrefs.isInvoked()) {
             try {
-                Globals.prefs.exportPreferences(exportPrefs.getStringValue());
+                Globals.prefs.exportPreferences(cli.exportPrefs.getStringValue());
             } catch (IOException ex) {
                 Util.pr(ex.getMessage());
             }
         }
 
 
-        if (!blank.isInvoked() && auxImExport.isInvoked()) {
+        if (!cli.isBlank() && cli.auxImExport.isInvoked()) {
             boolean usageMsg = false;
 
             if (loaded.size() > 0) // bibtex file loaded
              {
-                String[] data = auxImExport.getStringValue().split(",");
+                String[] data = cli.auxImExport.getStringValue().split(",");
 
                 if (data.length == 2) {
                     ParserResult pr = loaded.firstElement();
@@ -688,7 +623,7 @@ public class JabRef {
     }
 
 	public void openWindow(Vector<ParserResult> loaded) {
-        if (!graphicFailure && !disableGui.isInvoked()) {
+        if (!graphicFailure && !cli.isDisableGui()) {
             // Call the method performCompatibilityUpdate(), which does any
             // necessary changes for users with a preference set from an older
             // Jabref version.
@@ -720,7 +655,7 @@ public class JabRef {
 
 
             // If the option is enabled, open the last edited databases, if any.
-            if (!blank.isInvoked() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
+            if (!cli.isBlank() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
                 // How to handle errors in the databases to open?
                 String[] names = Globals.prefs.getStringArray("lastEdited");
                 lastEdLoop:
@@ -793,7 +728,7 @@ public class JabRef {
                 first = false;
             }
 
-            if (loadSess.isInvoked())
+            if (cli.isLoadSession())
                 jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(
                         jrf, 0, ""));
 
