@@ -47,7 +47,7 @@
 	<property name="build.dir" value="buildant" />
 	<property name="build.classes" value="${build.dir}/classes" />
 	<property name="build.tmp" value="${build.dir}/tmp" />
-	<property name="build.osx" value="${build.dir}/classes/osxadapter" />
+	<property name="build.classes.osx" value="${build.dir}/classes/osxadapter" />
 	<property name="build.lib" value="${build.dir}/lib" />
 	<property name="build.win" value="${build.dir}/windows" />
 	<property name="build.images" value="${build.dir}/images" />
@@ -182,8 +182,8 @@
 
 	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
 	<target name="non_osx">
-		<mkdir dir="${build.osx}" />
-		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.osx}" />
+		<mkdir dir="${build.classes.osx}" />
+		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.classes.osx}" />
 	</target>
 
 	<!-- Jars up project -->
