@@ -286,7 +286,7 @@ public class FileActions {
              * 2. current table sort order
              * 3. ordered by specified order
              */
-            // This case should never behit as SaveSettings() is never called if InOriginalOrder is true
+            // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
             assert isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             assert !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
 
