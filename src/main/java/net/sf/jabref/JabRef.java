@@ -188,16 +188,6 @@ public class JabRef {
 				e.printStackTrace();
 			}
 		}
-
-		/*
-		 * Make sure of a proper cleanup when quitting (e.g. deleting temporary
-		 * files).
-		 * 
-		 * CO 2007-07-12: Since this is deprecated, commented out:
-		 * 
-		 * System.runFinalizersOnExit(true);
-		 * 
-		 */
 		
 		openWindow(processArguments(args, true));
 	}
