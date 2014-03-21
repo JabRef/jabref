@@ -1648,7 +1648,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //(new Thread() {
       //  public void run() {
           if (actions.get(command) == null)
-            Util.pr("No action defined for'" + command + "'");
+            Util.pr("No action defined for '" + command + "'");
             else {
         Object o = actions.get(command);
         try {
