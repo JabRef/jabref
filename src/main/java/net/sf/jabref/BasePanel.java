@@ -1269,6 +1269,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
+        actions.put("openFolder", new BaseAction() {
+            public void action() {
+                (new Thread() {
+                    public void run() {
+                        BibtexEntry[] bes = mainTable.getSelectedEntries();
+                        List<File> files = Util.getListOfLinkedFiles(bes, metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+                        for (File f: files) {
+                            try {
+                                Util.openFolderAndSelectFile(f.getAbsolutePath());
+                            } catch (IOException e) {
+                                logger.fine(e.getMessage());
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
 
         actions.put("openUrl", new BaseAction() {
             public void action() {
