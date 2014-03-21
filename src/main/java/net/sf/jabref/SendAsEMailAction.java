@@ -22,11 +22,10 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -65,41 +64,34 @@ public class SendAsEMailAction extends AbstractWorker {
 		StringWriter sw = new StringWriter();
 		BibtexEntry[] bes = panel.getSelectedEntries();
 
+		// write the entries using sw, which is used later to form the email content
 		LatexFieldFormatter ff = new LatexFieldFormatter();
+		for (BibtexEntry entry: bes) {
+		    try {
+                entry.write(sw, ff, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+		}
 
 		ArrayList<String> attachments = new ArrayList<String>();
 		
 		// open folders is needed to indirectly support email programs, which cannot handle
 		//   the unofficial "mailto:attachment" property 
 		boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
-		
-		for (BibtexEntry entry : bes) {
-			try {
-				entry.write(sw, ff, true);
-                FileListTableModel tm = new FileListTableModel();
-                tm.setContent(entry.getField("file"));
-                for (int i=0; i< tm.getRowCount(); i++) {
-                	FileListEntry flEntry = tm.getEntry(i);
-                	
-                	File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
-                	if (f != null) {
-                		// file exists
-                		attachments.add(f.getPath());
-                		if (openFolders) {
-                			try {
-                				Util.openFolderAndSelectFile(f.getAbsolutePath());
-                			} catch (IOException e) {
-                				logger.fine(e.getMessage());
-                			}
-                		}
-                   	}
-                }
-			} catch (Exception e) {
-				e.printStackTrace();
-				message = Globals.lang("Error creating email");
-				return;
-			}
+
+		List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+		for (File f: fileList) {
+		    attachments.add(f.getPath());
+            if (openFolders) {
+               try {
+                   Util.openFolderAndSelectFile(f.getAbsolutePath());
+               } catch (IOException e) {
+                   logger.fine(e.getMessage());
+               }
+           }
 		}
+		
 		
 		String mailTo = "?Body=".concat(sw.getBuffer().toString());
         mailTo = mailTo.concat("&Subject=");

@@ -3469,5 +3469,30 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 
         Runtime.getRuntime().exec(cmd);
     }
+
+    /**
+     * Returns the list of linked files. The files have the absolute filename
+     * 
+     * @param bes list of BibTeX entries
+     * @param fileDirs list of directories to try for expansion
+     * 
+     * @return list of files. May be empty
+     */
+    public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String[] fileDirs) {
+        ArrayList<File> res = new ArrayList<File>();
+        for (BibtexEntry entry : bes) {
+            FileListTableModel tm = new FileListTableModel();
+            tm.setContent(entry.getField("file"));
+            for (int i=0; i< tm.getRowCount(); i++) {
+                FileListEntry flEntry = tm.getEntry(i);
+                
+                File f = Util.expandFilename(flEntry.getLink(), fileDirs);
+                if (f != null) {
+                    res.add(f);
+                }
+            }
+        }
+        return res;
+    }
 }
 
