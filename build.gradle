@@ -6,6 +6,24 @@ apply plugin: 'project-report'
 apply plugin: 'pmd'
 
 
+// enables fatjar, the creation of a jar with all dependencies bundled inside
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
+    }
+}
+apply plugin: 'fatjar'
+fatJar {
+    classifier 'fat'
+    manifest {
+        attributes 'Main-Class': "net.sf.jabref.JabRefMain"
+    }
+}
+
+
 version = "2.11dev"
 
 repositories {
