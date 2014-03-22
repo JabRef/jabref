@@ -16,10 +16,12 @@
 package net.sf.jabref;
 
 import java.awt.*;
+
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 /**
  * Preference tab for file sorting options.
  */
+@SuppressWarnings("serial")
 public class FileSortTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
