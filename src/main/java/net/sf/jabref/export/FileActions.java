@@ -337,7 +337,6 @@ public class FileActions {
      *
      * @return A List containing warnings, if any.
      */
-    @SuppressWarnings("unchecked")
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
             File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding) throws SaveException {
 
