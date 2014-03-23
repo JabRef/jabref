@@ -5,6 +5,7 @@ nbproject/private/
 src/main/resources/resource/build.properties
 src/main/resources/windows/nsis/dist/
 .gradle
+hs_err*.log
 jabref-launch4j.tmp
 user.properties
 out/
