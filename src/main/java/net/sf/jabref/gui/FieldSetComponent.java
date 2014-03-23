@@ -21,11 +21,24 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
@@ -261,8 +274,12 @@ public class FieldSetComponent extends JPanel implements ActionListener {
      * Return the current list.
      */
 	public List<String> getFields() {
-        String[] o = (String[]) listModel.toArray();
-        return java.util.Arrays.asList(o);
+		ArrayList<String> res = new ArrayList<String>(listModel.getSize());
+		Enumeration<String> elements = listModel.elements();
+		while (elements.hasMoreElements()) {
+			res.add(elements.nextElement());
+		}
+		return res;
     }
     
     /**
