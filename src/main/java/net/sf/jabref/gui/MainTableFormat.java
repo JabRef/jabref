@@ -35,6 +35,12 @@ import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 /**
  * Class defining the contents and column headers of the main table.
@@ -173,6 +179,23 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return false;
     }
 
+    private Object modifyIconForMultipleLinks(JLabel label) {
+        Icon icon = label.getIcon();
+        BufferedImage bufImg = new BufferedImage(
+            icon.getIconWidth(),
+            icon.getIconHeight(),
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bufImg.createGraphics();
+        // paint the Icon to the BufferedImage.
+        icon.paintIcon(null, g, 0,0);
+        // add the letter "m" in the bottom right corner
+        g.setColor(Color.BLACK);
+        g.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 12));
+        g.drawString("m",bufImg.getWidth() - g.getFontMetrics().stringWidth("m"),bufImg.getHeight());
+        g.dispose();
+        return new JLabel(new ImageIcon(bufImg));
+    }
+    
     public Object getColumnValue(BibtexEntry be, int col) {
         Object o = null;
         String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
@@ -183,15 +206,20 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         else if (iconType != null) {
             int hasField = -1;
-            for (int i = iconType.length - 1; i >= 0; i--)
-                if (hasField(be, iconType[i]))
-                    hasField = i;
+
+            int[] fieldCount = hasField(be,iconType);
+            hasField=fieldCount[0];
+
             if (hasField < 0)
                 return null;
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
             if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
                 o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
+
+            if(fieldCount[1]>1) {
+                o = modifyIconForMultipleLinks((JLabel)o);
+            }
 
             // Handle priority column special
             // Extra handling because the icon depends on a FieldValue
@@ -210,6 +238,10 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 }
             } else {
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
+
+                if(fieldCount[1]>1) {
+                    o = modifyIconForMultipleLinks((JLabel)o);
+                }
             }
         } else {
             String[] fld = columns[col - padleft];
@@ -265,6 +297,51 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return ((be != null) && (be.getField(field) != null));
     }
 
+    public int[] hasField(BibtexEntry be, String[] field) {
+        // If the entry has a nonzero value in any of the
+        // 'search' fields, returns the smallest index for which it does. 
+        // Otherwise returns -1. When field indicates one or more file types,
+        // returns the index of the first present file type.
+        if(be==null||field==null||field.length<1) {
+            return new int[] {-1,-1};
+        }
+        int hasField=-1;
+        if(!field[0].equals(GUIGlobals.FILE_FIELD)) {
+            for (int i = field.length - 1; i >= 0; i--) {
+                if (hasField(be, field[i])) {
+                    hasField = i;
+                }
+            }
+            return new int[] {hasField,-1};
+        }
+        else {
+            // We use a FileListTableModel to parse the field content:
+            Object o = be.getField(GUIGlobals.FILE_FIELD);
+            FileListTableModel fileList = new FileListTableModel();
+            fileList.setContent((String)o);
+            if(field.length==1) {
+                if(fileList.getRowCount()==0) {
+                    return new int[] {-1,-1};
+                }
+                else {
+                    return new int[] {0,fileList.getRowCount()};
+                }
+            }
+            int lastLinkPosition=-1, countLinks = 0;
+            for (int i = 1; i < field.length; i++) {
+                // Count the number of links of correct type.
+                for (int j=0; j<fileList.getRowCount(); j++) {
+                    FileListEntry flEntry = fileList.getEntry(j);
+                    if(flEntry.getType().toString().equals(field[i])) {
+                        lastLinkPosition=i;
+                        countLinks++;
+                    }
+                }
+            }
+            return new int[] {lastLinkPosition,countLinks};
+        }
+    }
+
     public void updateTableFormat() {
 
         // Read table columns from prefs:
@@ -317,6 +394,13 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             
         if (Globals.prefs.getBoolean("arxivColumn"))
             iconCols.put(coln++, ARXIV);
+
+        if (Globals.prefs.getBoolean("extraFileColumns")) {
+            String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
+            for(int i=0;i<desiredColumns.length;i++) {
+                iconCols.put(coln++, new String[] {GUIGlobals.FILE_FIELD,desiredColumns[i]});
+            }
+        }
 
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();

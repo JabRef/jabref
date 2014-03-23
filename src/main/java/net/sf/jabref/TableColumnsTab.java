@@ -33,6 +33,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.external.ExternalFileType;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
@@ -44,6 +45,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JabRefFrame frame;
 
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
+
+    private JCheckBox extraFileColumns;
+    private JList listOfFileColumns;
+
     private JRadioButton preferUrl, preferDoi;
 
     private JCheckBox showOneLetterHeadingForIconColumns;
@@ -199,6 +204,22 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		});
 		arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
 
+		extraFileColumns = new JCheckBox(Globals.lang("Show Extra columns"));
+                extraFileColumns.addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent arg0) {
+                                listOfFileColumns.setEnabled(extraFileColumns.isSelected());
+                        }
+                });
+                ExternalFileType[] fileTypes = Globals.prefs.getExternalFileTypeSelection();
+                String[] fileTypeNames = new String[fileTypes.length];
+                for(int i=0;i<fileTypes.length;i++) {
+                    fileTypeNames[i]=fileTypes[i].getName();
+                }
+                listOfFileColumns = new JList(fileTypeNames);
+                JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
+                listOfFileColumns.setVisibleRowCount(3);
+
 		/*** begin: special table columns and special fields ***/
 
 		HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
@@ -266,6 +287,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		specialTableColumnsBuilder.add(preferDoi, cc.xy(6, 5));	
 		specialTableColumnsBuilder.add(arxivColumn, cc.xyw(5, 6, 2));	
 
+		specialTableColumnsBuilder.add(extraFileColumns, cc.xyw(5, 7, 2));	
+		specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, cc.xywh(5, 8, 2, 3));	
+
 		builder.append(specialTableColumnsBuilder.getPanel());
 		builder.nextLine();
 
@@ -299,6 +323,26 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                preferDoi.setSelected(_prefs.getBoolean("preferUrlDoi"));
         fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
+
+        extraFileColumns.setSelected(_prefs.getBoolean("extraFileColumns"));
+        if(extraFileColumns.isSelected()) {
+            String[] desiredColumns = _prefs.getStringArray("listOfFileColumns");
+            int listSize = listOfFileColumns.getModel().getSize();
+            int[] indicesToSelect = new int[listSize];
+            for(int i=0;i<listSize;i++) {
+                indicesToSelect[i]=listSize+1;
+                for(int j=0;j<desiredColumns.length;j++) {
+                    if(listOfFileColumns.getModel().getElementAt(i).equals(desiredColumns[j])) {
+                        indicesToSelect[i]=i;
+                        break;
+                    }
+                }
+            }
+            listOfFileColumns.setSelectedIndices(indicesToSelect);
+        }
+        else {
+            listOfFileColumns.setSelectedIndices(new int[] {});
+        }
 
         /*** begin: special fields ***/
 
@@ -562,6 +606,19 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
 		_prefs.putBoolean("preferUrlDoi", preferDoi.isSelected());
 		_prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
+
+		_prefs.putBoolean("extraFileColumns", extraFileColumns.isSelected());
+                if(extraFileColumns.isSelected()&&!listOfFileColumns.isSelectionEmpty()) {
+                    String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
+                    for(int i=0;i<selections.length;i++) {
+                        selections[i]=listOfFileColumns.getModel().getElementAt(
+                                listOfFileColumns.getSelectedIndices()[i]).toString();
+                    }
+                    _prefs.putStringArray("listOfFileColumns", selections);
+                }
+                else {
+                    _prefs.putStringArray("listOfFileColumns", new String[] {});
+                }
 		
 		_prefs.putBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS, showOneLetterHeadingForIconColumns.isSelected());
 

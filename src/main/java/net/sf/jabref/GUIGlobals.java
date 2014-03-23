@@ -28,6 +28,8 @@ import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import javax.swing.SwingConstants;
+import net.sf.jabref.external.ExternalFileType;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 import net.sf.jabref.specialfields.Priority;
@@ -411,6 +413,12 @@ public class GUIGlobals {
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
         tableIcons.put(GUIGlobals.FILE_FIELD, lab);
+
+        for(ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
+            lab = new JLabel(fileType.getIcon());
+            lab.setToolTipText(Globals.lang("Open "+fileType.getName()+" file"));
+            tableIcons.put(fileType.getName(), lab);
+        }
         
         lab = new JLabel(Relevance.getInstance().getRepresentingIcon());
         lab.setToolTipText(Relevance.getInstance().getToolTip());
