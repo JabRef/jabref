@@ -91,7 +91,7 @@ public abstract class DBExporter extends DBImporterExporter{
 			final MetaData metaData, Set<String> keySet, Object out,
 			String dbName) throws Exception {
 
-		List<BibtexEntry> entries = FileActions.getSortedEntries(database,
+		List<BibtexEntry> entries = FileActions.getSortedEntries(database, metaData,
 				keySet, false);
 		GroupTreeNode gtn = metaData.getGroups();
 

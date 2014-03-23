@@ -5,6 +5,7 @@
     - Feature 847: Adds title case as a case changer
     - Feature 841: Support for multiple file columns (by noravanq)
     - Fix for bug 1176: automatic bibtexkey generation for authors containing/ending with and in their name
+    - Saving order of entries can now be configured per database
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
