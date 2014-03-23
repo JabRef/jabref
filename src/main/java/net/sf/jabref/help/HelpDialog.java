@@ -46,9 +46,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 
 	private ForwardAction forward = new ForwardAction();
 
-	private ContentsAction contents = new ContentsAction();
-
-	// Initializes, but does not show the help dialog.
+    // Initializes, but does not show the help dialog.
 	public HelpDialog(JabRefFrame bf) {
 		super(bf, Globals.lang("JabRef help"), false);
 		frame = bf;
@@ -60,7 +58,8 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 		tlb.add(back);
 		tlb.add(forward);
 		tlb.addSeparator();
-		tlb.add(contents);
+        ContentsAction contents = new ContentsAction();
+        tlb.add(contents);
 		tlb.setFloatable(false);
 
 		// Make ESC close dialog, and set shortkeys for back and forward.

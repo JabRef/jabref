@@ -33,11 +33,11 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class HelpAction extends MnemonicAwareAction {
 
-	protected HelpDialog diag;
+	private HelpDialog diag;
 
-    protected Class resourceOwner = null;
+    private Class resourceOwner = null;
 
-	protected String helpFile;
+	private String helpFile;
 
 	public HelpAction(HelpDialog diag, String helpFile) {
 		super(GUIGlobals.getImage("help"));
