@@ -54,7 +54,7 @@ public class TagToMarkedTextStore
     tagMap = new HashMap<String, LinkedList<TMarkedStoreItem>>(10) ;
   }
 
-  /** appends a selection propertie for tag */
+  /** appends a selection property for tag */
 	public void appendPosition(String tag, int start, int end) {
 		LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
 		if (ll == null) {
@@ -91,9 +91,8 @@ public class TagToMarkedTextStore
 
 		if (ll != null) {
 			// iterate over all saved selections
-            for (TMarkedStoreItem du2 : ll) {
-                if (du2 != null) {
-                    TMarkedStoreItem item = du2;
+            for (TMarkedStoreItem item : ll) {
+                if (item != null) {
                     doc.setCharacterAttributes(item.start, item.end
                             - item.start, doc.getStyle(style), true);
                 }

@@ -26,70 +26,48 @@
  */
 
 // created by : r.nagel 04.11.2004
-//
-// function : supports an underlying text for jcomponents
-//
-// modified :
-//
 
-
-package net.sf.jabref.wizard.text.gui ;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
+package net.sf.jabref.wizard.text.gui;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class OverlayPanel extends JPanel
-{
+/**
+ * Supports an underlying text for JComponent
+ */
+public class OverlayPanel extends JPanel {
 
-  private JLabel label ;
+    private JLabel label;
 
-    public OverlayPanel(JComponent container, String text)
-  {
-    OverlayLayout layout = new OverlayLayout(this) ;
-    this.setLayout( layout );
-      JComponent overlay = container;
+    public OverlayPanel(JComponent overlay, String text) {
+        OverlayLayout layout = new OverlayLayout(this);
+        this.setLayout(layout);
 
-    label = new JLabel(text) ;
-    label.setFont(new Font("dialog", Font.ITALIC, 18));
-//    label.setForeground(Color.lightGray);
-    label.setForeground( new Color(224, 220, 220) );
-    label.setLocation(0, 0);
+        label = new JLabel(text);
+        label.setFont(new Font("dialog", Font.ITALIC, 18));
+        label.setForeground(new Color(224, 220, 220));
+        label.setLocation(0, 0);
 
-      JScrollPane scroller = new JScrollPane(overlay);
-     scroller.setLocation(0, 0);
+        JScrollPane scroller = new JScrollPane(overlay);
+        scroller.setLocation(0, 0);
+        scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-     scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS) ;
-
-    add(label) ;
-    add(scroller) ;
-  }
-
-  public void paint(Graphics g)
-  {
-    int len = label.getWidth() ;
-
-    Dimension dim = this.getSize() ;
-    if ((dim.height > 25) && (dim.width > len+10))
-    {
-      int x = (dim.width-len) / 2 ;
-      int y = dim.height / 2 ;
-
-      label.setLocation(x, y) ;
+        add(label);
+        add(scroller);
     }
 
-    super.paint(g);
-  }
+    public void paint(Graphics g) {
+        int len = label.getWidth();
 
-/*
-  // it doesn't work well
-  public void addMouseListener(MouseListener listener)
-  {
-    overlay.addMouseListener(listener);
-    super.addMouseListener(listener);
-  }
-*/
+        Dimension dim = this.getSize();
+        if ((dim.height > 25) && (dim.width > len + 10)) {
+            int x = (dim.width - len) / 2;
+            int y = dim.height / 2;
+
+            label.setLocation(x, y);
+        }
+
+        super.paint(g);
+    }
+
 }

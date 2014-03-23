@@ -135,7 +135,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
 
     /**
      * Sets the DEFAULT PATTERN for this label pattern
-     * @param pattern the pattern to store
+     * @param labelPattern the pattern to store
      */
     public void setDefaultValue(String labelPattern) {
         ArrayList<String> split = LabelPatternUtil.split(labelPattern);
