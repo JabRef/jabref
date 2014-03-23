@@ -3,6 +3,7 @@
     - "Open Folder" works again
     - newline separator can now be configured globally
     - Feature 847: Adds title case as a case changer
+    - Feature 841: Support for multiple file columns (by noravanq)
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
