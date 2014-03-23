@@ -156,21 +156,20 @@ public class DatabasePropertiesDialog extends JDialog {
         Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual")); // File dir setting
         Vector<String> fileDIL = metaData.getData(Globals.prefs.get("userFileDirInd_Legacy")); // Legacy file dir setting for backward comp.
         if (fileDI == null) {
-	    oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
-	    if (fileDIL == null)
-		fileDirIndv.setText("");
-	    else {
-		// Insert path from legacy setting if possible
-		// Better be a little careful about how many entries the Vector has:
-		if (fileDIL.size() >= 1)
-		    fileDirIndv.setText((fileDIL.get(0)).trim());
-	    }
-	}
-	else {
+			oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
+			if (fileDIL == null)
+				fileDirIndv.setText("");
+			else {
+				// Insert path from legacy setting if possible
+				// Better be a little careful about how many entries the Vector has:
+				if (fileDIL.size() >= 1)
+					fileDirIndv.setText((fileDIL.get(0)).trim());
+			}
+		} else {
             // Better be a little careful about how many entries the Vector has:
             if (fileDI.size() >= 1)
                 fileDirIndv.setText((fileDI.get(0)).trim());
-	    oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
+			oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
         Vector<String> pdfD = metaData.getData("pdfDirectory");
@@ -219,9 +218,9 @@ public class DatabasePropertiesDialog extends JDialog {
         }
         else
             metaData.remove(Globals.prefs.get("userFileDir"));
-	// Repeat for individual file dir - reuse 'text' and 'dir' vars
-	dir = new Vector<String>(1);
-	text = fileDirIndv.getText().trim();
+		// Repeat for individual file dir - reuse 'text' and 'dir' vars
+		dir = new Vector<String>(1);
+		text = fileDirIndv.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
