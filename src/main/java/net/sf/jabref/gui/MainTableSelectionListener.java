@@ -35,6 +35,7 @@ import net.sf.jabref.EntryEditor;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
@@ -42,6 +43,9 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -301,6 +305,14 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 return;
             final String fieldName = iconType[hasField];
 
+            //If this is a file link field with specified file types,
+            //we should also pass the types.
+            String[] fileTypes={};
+            if(hasField==0&&iconType[hasField].equals(GUIGlobals.FILE_FIELD)&&iconType.length>1) {
+                fileTypes=iconType;
+            }
+            final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
+
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
             (new Thread() {
                 public void run() {
@@ -320,9 +332,33 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                             // We use a FileListTableModel to parse the field content:
                             FileListTableModel fileList = new FileListTableModel();
                             fileList.setContent((String)link);
-                            // If there are one or more links, open the first one:
-                            if (fileList.getRowCount() > 0) {
-                                FileListEntry flEntry = fileList.getEntry(0);
+
+                            FileListEntry flEntry=null;
+                            // If there are one or more links of the correct type,
+                            // open the first one:
+                            if(listOfFileTypes.size()>0) {
+                                for(int i=0;i<fileList.getRowCount();i++) {
+                                    flEntry = fileList.getEntry(i);
+                                    boolean correctType=false;
+                                    for(int j=0;j<listOfFileTypes.size();j++) {
+                                        if(flEntry.getType().toString().equals(listOfFileTypes.get(j))) {
+                                            correctType=true;
+                                        }
+                                    }
+                                    if(correctType) {
+                                        break;
+                                    }
+                                    flEntry=null;
+                                }
+                            }
+                            //If there are no file types specified, consider all files.
+                            else if(fileList.getRowCount()>0) {
+                                flEntry=fileList.getEntry(0);
+                            }
+                            if(flEntry!=null) {
+//                            if (fileList.getRowCount() > 0) {
+//                                FileListEntry flEntry = fileList.getEntry(0);
+
                                 ExternalFileMenuItem item = new ExternalFileMenuItem
                                         (panel.frame(), entry, "",
                                         flEntry.getLink(), flEntry.getType().getIcon(),
@@ -403,6 +439,20 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             // If there are one or more links, open the first one:
             for (int i=0; i<fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
+
+                //If file types are specified, ignore files of other types.
+                if(iconType.length>1) {
+                    boolean correctType=false;
+                    for(int j=1;j<iconType.length;j++) {
+                        if(flEntry.getType().toString().equals(iconType[j])) {
+                            correctType=true;
+                        }
+                    }
+                    if(!correctType) {
+                        continue;
+                    }
+                }
+
                 String description = flEntry.getDescription();
                 if ((description == null) || (description.trim().length() == 0))
                     description = flEntry.getLink();
