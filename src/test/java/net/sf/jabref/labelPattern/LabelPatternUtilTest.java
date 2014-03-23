@@ -12,6 +12,12 @@ public class LabelPatternUtilTest extends TestCase {
     	LabelPatternUtil.setDataBase(new BibtexDatabase());
     }
 
+
+    public void testAndInAuthorName() {
+        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}, year={2000}}");
+        assertEquals("Holland", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth")));
+    }
+
     /**
      * Test for https://sourceforge.net/forum/message.php?msg_id=4498555
      * Test the Labelmaker and all kind of accents

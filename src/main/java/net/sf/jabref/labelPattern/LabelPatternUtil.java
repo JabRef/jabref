@@ -66,11 +66,12 @@ public class LabelPatternUtil {
         String token = "";
         for (int p=0; p<content.length(); p++) {
             if (b == 0) {
-                if (and.equals("") && content.charAt(p) == 'a'
-                        || and.equals("a") && content.charAt(p) == 'n'
-                        || and.equals("an") && content.charAt(p) == 'd') {
+                if (and.equals("") && content.charAt(p) == ' '
+                        || and.equals(" ") && content.charAt(p) == 'a'
+                        || and.equals(" a") && content.charAt(p) == 'n'
+                        || and.equals(" an") && content.charAt(p) == 'd') {
                     and += content.charAt(p);
-                } else if (and.equals("and") && content.charAt(p) == ' ') {
+                } else if (and.equals(" and") && content.charAt(p) == ' ') {
                     and = "";
                     tokens.add(token.trim());
                     token = "";
@@ -92,7 +93,7 @@ public class LabelPatternUtil {
             if (i>0)
                 normalized.append(" and ");
 
-            normalized.append(isInsitution(tokens.get(i))
+            normalized.append(isInstitution(tokens.get(i))
                     ? generateInstitutionKey(tokens.get(i))
                             : removeDiacritics(tokens.get(i)));
         }
@@ -157,7 +158,7 @@ public class LabelPatternUtil {
      * @param author Author or editor.
      * @return True if the author or editor is an institution.
      */
-    private static boolean isInsitution(String author) {
+    private static boolean isInstitution(String author) {
         Author a = AuthorList.getAuthorList(author).getAuthor(0);
         return author.charAt(0) == '{'
                 && author.charAt(author.length()-1) == '}';
