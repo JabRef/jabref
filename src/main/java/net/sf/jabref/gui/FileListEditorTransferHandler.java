@@ -50,7 +50,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
 	 * 
 	 * @param frame
 	 * @param entryContainer
-	 * @param transferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
+	 * @param textTransferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
 	 */
     public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
     	this.frame = frame;
@@ -156,9 +156,8 @@ public class FileListEditorTransferHandler extends TransferHandler {
      * This method is called to query whether the transfer can be imported.
      *
      * Will return true for urls, strings, javaFileLists
-     *
-     * @override
      */
+    @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
 
         // accept this if any input flavor matches any of our supported flavors

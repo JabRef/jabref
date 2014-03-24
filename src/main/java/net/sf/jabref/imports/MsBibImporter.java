@@ -71,8 +71,6 @@ public class MsBibImporter extends ImportFormat {
 
     /**
 	 * String used to identify this import filter on the command line.
-	 * 
-	 * @override
 	 * @return "msbib"
 	 */
 	public String getCLIid() {

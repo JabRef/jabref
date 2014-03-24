@@ -66,7 +66,7 @@ public final class EntryFromFileCreatorManager {
 	 * Returns a EntryFromFileCreator object that is capable of creating a
 	 * BibtexEntry for the given File.
 	 * 
-	 * @param pdfFile
+	 * @param file the pdf file
 	 * @return null if there is no EntryFromFileCreator for this File.
 	 */
 	public EntryFromFileCreator getEntryCreator(File file) {
@@ -205,8 +205,7 @@ public final class EntryFromFileCreatorManager {
 	/**
 	 * Returns a list of all {@link FileFilter} instances (i.e.
 	 * {@link EntryFromFileCreator}, plus the file filter that comes with the
-	 * {@link #getFileFilter()} method, plus the {@link EntryFromAnyFileCreator}
-	 * file filter.
+	 * {@link #getFileFilter()} method.
 	 * 
 	 * @return A List of all known possible file filters.
 	 */

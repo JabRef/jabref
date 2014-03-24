@@ -90,9 +90,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 
 	/**
 	 * Overriden to indicate which types of drags are supported (only LINK).
-	 * 
-	 * @override
 	 */
+    @Override
 	public int getSourceActions(JComponent c) {
 		return DnDConstants.ACTION_LINK;
 	}
@@ -213,9 +212,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * This method is called to query whether the transfer can be imported.
 	 * 
 	 * Will return true for urls, strings, javaFileLists
-	 * 
-	 * @override
 	 */
+    @Override
 	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
 		if (!DROP_ALLOWED)
 			return false;

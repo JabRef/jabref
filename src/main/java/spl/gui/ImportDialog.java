@@ -223,9 +223,6 @@ public class ImportDialog extends JDialog {
         return result;
     }
 
-    /**
-     * @noinspection ALL
-     */
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }

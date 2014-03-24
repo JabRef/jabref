@@ -51,8 +51,8 @@ public class Pair<P, V> {
 	/**
 	 * Constructor that sets the given p and v values.
 	 * 
-	 * @param p
-	 * @param v
+	 * @param p first element
+	 * @param v second element
 	 */
 	public Pair(P p, V v) {
 		this.p = p;
@@ -62,10 +62,6 @@ public class Pair<P, V> {
 	/**
 	 * Returns a comparator that compares by p.
 	 * 
-	 * @param <V>
-	 *            The V type is not important for this method.
-	 * @param
-	 *            <P>
 	 *            The P type of the pair needs to be comparable.
 	 * @return A comparator for the p in a pair.
 	 */
@@ -81,11 +77,6 @@ public class Pair<P, V> {
 	 * Given a comparator for p elements, returns a Comparator for pairs which
 	 * uses this given comparator to make the comparison.
 	 * 
-	 * @param <V>
-	 *            The V-Type of the Pair.
-	 * @param
-	 *            <P>
-	 *            The P-Type of the Pair.
 	 * @param comp
 	 *            A comparator which will be wrapped so that it can be used to
 	 *            compare
@@ -117,9 +108,6 @@ public class Pair<P, V> {
 	/**
 	 * Returns a list of pairs with P and V being switched.
 	 * 
-	 * @param
-	 * <P>
-	 * @param <V>
 	 * @param list
 	 * @return
 	 */
@@ -148,9 +136,6 @@ public class Pair<P, V> {
 	 * result == [(3, [&quot;Hallo&quot;, &quot;Adios&quot;]), (4, [&quot;Bye&quot;])]
 	 * </pre>
 	 * 
-	 * @param
-	 * <P>
-	 * @param <V>
 	 * @param list
 	 * @return
 	 */
@@ -211,11 +196,6 @@ public class Pair<P, V> {
 	 * Given a comparator for v elements, returns a Comparator for pairs which
 	 * uses this given comparator to make the comparison.
 	 * 
-	 * @param
-	 * <P>
-	 * The P-Type of the Pair.
-	 * @param <V>
-	 *            The V-Type of the Pair.
 	 * @param vComp
 	 *            A comparator which will be wrapped so that it can be used to
 	 *            compare
@@ -235,9 +215,6 @@ public class Pair<P, V> {
 	 * Takes a list of P and list of V and returns a list of Pair<P,V>. If the
 	 * lengths of the lists differ missing values are padded by null.
 	 * 
-	 * @param
-	 * <P>
-	 * @param <V>
 	 * @param ps
 	 * @param vs
 	 * @return
@@ -262,9 +239,6 @@ public class Pair<P, V> {
 	/**
 	 * Unzips the given pair list by returning a list of the p values.
 	 * 
-	 * @param
-	 * <P>
-	 * @param <V>
 	 * @param list
 	 * @return
 	 */
@@ -281,7 +255,6 @@ public class Pair<P, V> {
 	/**
 	 * Unzips the given pair by return a list of the v values.
 	 * 
-	 * @param <V>
 	 * @param list
 	 * @return
 	 */

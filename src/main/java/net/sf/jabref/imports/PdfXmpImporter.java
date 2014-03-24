@@ -47,9 +47,8 @@ public class PdfXmpImporter extends ImportFormat {
 	/**
 	 * Returns whether the given stream contains data that is a.) a pdf and b.)
 	 * contains at least one BibtexEntry.
-	 * 
-	 * @override
 	 */
+    @Override
 	public boolean isRecognizedFormat(InputStream in) throws IOException {
 		return XMPUtil.hasMetadata(in);
 	}
@@ -57,7 +56,6 @@ public class PdfXmpImporter extends ImportFormat {
 	/**
 	 * String used to identify this import filter on the command line.
 	 * 
-	 * @override
 	 * @return "xmp"
 	 */
 	public String getCLIid() {

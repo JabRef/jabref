@@ -50,7 +50,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	/**
 	 * Create schema from an existing XML element.
 	 * 
-	 * @param element
+	 * @param e
 	 *            The existing XML element.
 	 */
 	public XMPSchemaBibtex(Element e, String namespace) {
@@ -62,20 +62,20 @@ public class XMPSchemaBibtex extends XMPSchema {
 	}
 
 	/**
+     * Uses XMPSchema methods
 	 * 
 	 * @param field
 	 * @return
-	 * @derived Uses XMPSchema methods
 	 */
 	public List<String> getPersonList(String field) {
 		return getSequenceList(field);
 	}
 
 	/**
-	 * 
+	 * Uses XMPSchema methods
+     *
 	 * @param field
 	 * @param value
-	 * @derived Uses XMPSchema methods
 	 */
 	public void setPersonList(String field, String value) {
 		AuthorList list = AuthorList.getAuthorList(value);
