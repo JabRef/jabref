@@ -517,6 +517,44 @@ public class Util {
 		return names.split(delimiter);
 	}
 
+    /**
+     * Creates a substring from a text
+     *
+     * @param text
+     * @param i
+     * @param terminateOnEndBraceOnly
+     * @return
+     */
+    public static String getPart(String text, int i, boolean terminateOnEndBraceOnly) {
+        char c;
+        int count = 0;
+
+        StringBuffer part = new StringBuffer();
+
+        // advance to first char and skip whitespace
+        i++;
+        while (i < text.length() && Character.isWhitespace(text.charAt(i))){
+            i++;
+        }
+
+        // then grab whathever is the first token (counting braces)
+        while (i < text.length()){
+            c = text.charAt(i);
+            if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
+                i--; // end argument and leave whitespace for further
+                // processing
+                break;
+            }
+            if (c == '}' && --count < 0)
+                break;
+            else if (c == '{')
+                count++;
+            part.append(c);
+            i++;
+        }
+        return part.toString();
+    }
+
 	/**
 	 * Open a http/pdf/ps viewer for the given link string.
 	 */

@@ -16,6 +16,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 import java.util.HashMap;
@@ -284,9 +285,9 @@ public class FormatChars implements LayoutFormatter {
 						// System.out.println("next: "+(char)c);
 						String combody;
 						if (c == '{') {
-							IntAndString part = getPart(field, i, false);
-							i += part.i;
-							combody = part.s;
+							String part = Util.getPart(field, i, false);
+							i += part.length();
+							combody = part;
 						} else {
 							combody = field.substring(i, i + 1);
 							// System.out.println("... "+combody);
@@ -329,9 +330,9 @@ public class FormatChars implements LayoutFormatter {
 					String command = currentCommand.toString();
                                                 
                     if (c == '{') {
-						IntAndString part = getPart(field, i, true);
-						i += part.i;
-						argument = part.s;
+						String part = Util.getPart(field, i, true);
+						i += part.length();
+						argument = part;
 						if (argument != null) {
 							// handle common case of general latex command
 							Object result = CHARS.get(command + argument);
@@ -390,44 +391,4 @@ public class FormatChars implements LayoutFormatter {
 		return sb.toString();
 	}
 
-	private IntAndString getPart(String text, int i, boolean terminateOnEndBraceOnly) {
-		char c;
-		int count = 0;
-		
-		StringBuffer part = new StringBuffer();
-		
-		// advance to first char and skip wihitespace
-		i++;
-		while (i < text.length() && Character.isWhitespace(text.charAt(i))){
-			i++;
-		}
-		
-		// then grab whathever is the first token (counting braces)
-		while (i < text.length()){
-			c = text.charAt(i);
-			if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
-				i--; // end argument and leave whitespace for further
-					 // processing
-				break;
-			}
-			if (c == '}' && --count < 0)
-				break;
-			else if (c == '{')
-				count++;
-			part.append(c);
-			i++;
-		}
-		return new IntAndString(part.length(), format(part.toString()));
-	}
-
-	private class IntAndString {
-		public int i;
-
-		String s;
-
-		public IntAndString(int i, String s) {
-			this.i = i;
-			this.s = s;
-		}
-	}
 }
