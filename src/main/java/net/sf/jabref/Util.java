@@ -568,34 +568,9 @@ public class Util {
 			try {
                 link = sanitizeUrl(link);
                 ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
-				if (Globals.ON_MAC) {
+                openExternalFilePlatformIndependent(fileType, link);
 
-                    String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
-                            new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), link } :
-                            new String[] { "/usr/bin/open", link };
-					Runtime.getRuntime().exec(cmd);
-				} else if (Globals.ON_WIN) {
-
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                        // Application is specified. Use it:
-                        openFileWithApplicationOnWindows(link, fileType.getOpenWith());
-                    } else
-                        openFileOnWindows(link, true);
-				} else {
-                    // Use the given app if specified, and the universal "xdg-open" otherwise:
-                    String[] openWith;
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
-                        openWith = fileType.getOpenWith().split(" ");
-                    else
-                        openWith = new String[] {"xdg-open"};
-
-                    String[] cmd = new String[openWith.length+1];
-                    System.arraycopy(openWith, 0, cmd, 0, openWith.length);
-                    cmd[cmd.length-1] = link;
-                    Runtime.getRuntime().exec(cmd);
-				}
-
-			} catch (IOException e) {
+            } catch (IOException e) {
                 System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
 			}
@@ -760,31 +735,7 @@ public class Util {
 		if ((httpLink || file.exists()) && (fileType != null)) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
-            if (Globals.ON_MAC) {
-                // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-                String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
-                        new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
-                        new String[] { "/usr/bin/open", filePath };
-                Runtime.getRuntime().exec(cmd);
-            } else if (Globals.ON_WIN) {
-                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                    // Application is specified. Use it:
-                    openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-                } else
-                    openFileOnWindows(filePath, true);
-            } else {
-                // Use the given app if specified, and the universal "xdg-open" otherwise:
-                String[] openWith;
-                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
-                    openWith = fileType.getOpenWith().split(" ");
-                else
-                    openWith = new String[] {"xdg-open"};
-
-                String[] cmdArray = new String[openWith.length+1];
-                System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-                cmdArray[cmdArray.length-1] = filePath;
-                Runtime.getRuntime().exec(cmdArray);
-            }
+            openExternalFilePlatformIndependent(fileType, filePath);
             return true;
 
         } else {
@@ -795,6 +746,34 @@ public class Util {
 		}
 
 
+    }
+
+    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
+        if (Globals.ON_MAC) {
+            // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+            String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+                    new String[] { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath } :
+                    new String[] { "/usr/bin/open", filePath };
+            Runtime.getRuntime().exec(cmd);
+        } else if (Globals.ON_WIN) {
+            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                // Application is specified. Use it:
+                openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+            } else
+                openFileOnWindows(filePath, true);
+        } else {
+            // Use the given app if specified, and the universal "xdg-open" otherwise:
+            String[] openWith;
+            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+                openWith = fileType.getOpenWith().split(" ");
+            else
+                openWith = new String[] {"xdg-open"};
+
+            String[] cmdArray = new String[openWith.length+1];
+            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+            cmdArray[cmdArray.length-1] = filePath;
+            Runtime.getRuntime().exec(cmdArray);
+        }
     }
 
 
