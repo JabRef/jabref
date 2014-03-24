@@ -47,7 +47,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
 
     private JCheckBox extraFileColumns;
-    private JList listOfFileColumns;
+    private JList<String> listOfFileColumns;
 
     private JRadioButton preferUrl, preferDoi;
 
@@ -216,7 +216,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 for(int i=0;i<fileTypes.length;i++) {
                     fileTypeNames[i]=fileTypes[i].getName();
                 }
-                listOfFileColumns = new JList(fileTypeNames);
+                listOfFileColumns = new JList<String>(fileTypeNames);
                 JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
                 listOfFileColumns.setVisibleRowCount(3);
 
