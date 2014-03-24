@@ -126,8 +126,6 @@ import java.util.WeakHashMap;
  * 'first-part'="Heinrich-{\"{U}}bel Kurt", and its abbreviation is "H.-{\"{U}}.
  * K."
  * </ol>
- * 
- * @see tests.net.sf.jabref.AuthorListTest Testcases for this class.
  */
 public class AuthorList {
 
@@ -692,7 +690,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see http://en.wikipedia.org/wiki/Serial_comma For an detailed
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
 	 *      explaination about the Oxford comma.
 	 * 
 	 * @return formatted list of authors.
@@ -746,7 +744,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see http://en.wikipedia.org/wiki/Serial_comma For an detailed
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
 	 *      explaination about the Oxford comma.
 	 * 
 	 * @return formatted list of authors.
@@ -856,7 +854,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see http://en.wikipedia.org/wiki/Serial_comma For an detailed
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
 	 *      explaination about the Oxford comma.
 	 * 
 	 * @return formatted list of authors.
