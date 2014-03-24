@@ -43,14 +43,14 @@ import net.sf.jabref.Util;
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
  * 
- * <p>{@link http://www.repec.org RePEc} (Research Papers in Economics) 
+ * <p><a href="http://www.repec.org">RePEc (Research Papers in Economics)</a>
  * is a collaborative effort of over 100 volunteers in 49 countries 
  * to enhance the dissemination of research in economics. The heart of 
  * the project is a decentralized database of working papers, journal 
  * articles and software components. All RePEc material is freely available.</p>
  * At the time of writing RePEc holds over 300.000 items.</p>
  * 
- * <p>{@link http://nep.repec.org NEP} (New Economic Papers) is an announcement 
+ * <p><a href="http://nep.repec.org">NEP (New Economic Papers)</a> is an announcement
  * service which filters information on new additions to RePEc into edited 
  * reports. The goal is to provide subscribers with up-to-date information 
  * to the research literature.</p>
@@ -157,7 +157,7 @@ import net.sf.jabref.Util;
  * </pre>
  * </p>
  * 
- * @see http://nep.repec.org
+ * @see <a href="http://nep.repec.org">NEP</a>
  * @author andreas_sf at rudert-home dot de
  */
 public class RepecNepImporter extends ImportFormat {

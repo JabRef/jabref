@@ -84,7 +84,8 @@ public class CreateBibORDFAuthors implements LayoutFormatter
 
     /**
      * @param sb
-     * @param fieldText
+     * @param author
+     * @param position
      */
     protected void singleAuthor(StringBuffer sb, String author, int position) {
         sb.append("<bibo:contribution>\n");

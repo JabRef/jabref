@@ -43,8 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @author S M Mahbub Murshed
- * @email udvranto@yahoo.com
+ * @author S M Mahbub Murshed (udvranto@yahoo.com)
  *
  * @version 2.0.0
  * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
