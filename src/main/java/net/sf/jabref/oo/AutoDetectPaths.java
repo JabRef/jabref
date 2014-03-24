@@ -181,19 +181,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled)
                 return false;
             if ((inUsr != null) && (inOpt == null)) {
-                Globals.prefs.put("ooExecutablePath", new File(inUsr, "soffice.bin").getPath());
-                File unoil = findFileDir(new File(usrRoot), "unoil.jar");
-                if (fileSearchCancelled)
-                    return false;
-                File jurt = findFileDir(new File(usrRoot), "jurt.jar");
-                if (fileSearchCancelled)
-                    return false;
-                if ((unoil != null) && (jurt != null)) {
-                    Globals.prefs.put("ooUnoilPath", unoil.getPath());
-                    Globals.prefs.put("ooJurtPath", jurt.getPath());
-                    return true;
-                }
-                else return false;
+                return setupPreferencesForOO(usrRoot, inUsr);
             }
             else if ((inOpt != null) && (inUsr == null)) {
                 Globals.prefs.put("ooExecutablePath", new File(inOpt, "soffice.bin").getPath());
@@ -222,34 +210,10 @@ public class AutoDetectPaths extends AbstractWorker {
                     return false;
                 else {
                     if (optRB.isSelected()) {
-                        Globals.prefs.put("ooExecutablePath", new File(inOpt, "soffice.bin").getPath());
-                        File unoil = findFileDir(new File("/opt"), "unoil.jar");
-                        if (fileSearchCancelled)
-                            return false;
-                        File jurt = findFileDir(new File("/opt"), "jurt.jar");
-                        if (fileSearchCancelled)
-                            return false;
-                        if ((unoil != null) && (jurt != null)) {
-                            Globals.prefs.put("ooUnoilPath", unoil.getPath());
-                            Globals.prefs.put("ooJurtPath", jurt.getPath());
-                            return true;
-                        }
-                        else return false;
+                        return setupPreferencesForOO("/opt", inOpt);
                     }
                     else {
-                        Globals.prefs.put("ooExecutablePath", new File(inUsr, "soffice.bin").getPath());
-                        File unoil = findFileDir(new File(usrRoot), "unoil.jar");
-                        if (fileSearchCancelled)
-                            return false;
-                        File jurt = findFileDir(new File(usrRoot), "jurt.jar");
-                        if (fileSearchCancelled)
-                            return false;
-                        if ((unoil != null) && (jurt != null)) {
-                            Globals.prefs.put("ooUnoilPath", unoil.getPath());
-                            Globals.prefs.put("ooJurtPath", jurt.getPath());
-                            return true;
-                        }
-                        else return false;
+                        return setupPreferencesForOO(usrRoot, inUsr);
                     }
 
                 }
@@ -258,6 +222,22 @@ public class AutoDetectPaths extends AbstractWorker {
         }
 
 
+    }
+
+    private boolean setupPreferencesForOO(String usrRoot, File inUsr) {
+        Globals.prefs.put("ooExecutablePath", new File(inUsr, "soffice.bin").getPath());
+        File unoil = findFileDir(new File(usrRoot), "unoil.jar");
+        if (fileSearchCancelled)
+            return false;
+        File jurt = findFileDir(new File(usrRoot), "jurt.jar");
+        if (fileSearchCancelled)
+            return false;
+        if ((unoil != null) && (jurt != null)) {
+            Globals.prefs.put("ooUnoilPath", unoil.getPath());
+            Globals.prefs.put("ooJurtPath", jurt.getPath());
+            return true;
+        }
+        else return false;
     }
 
     /**

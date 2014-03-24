@@ -2867,7 +2867,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
         return res;
     }
 
-    private static String encodeString(String s) {
+    public static String encodeString(String s) {
         if (s == null)
             return null;
         StringBuilder sb = new StringBuilder();

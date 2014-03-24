@@ -24,6 +24,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 
@@ -263,18 +264,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     private String encodeEntry(FileListEntry entry) {
         String type = entry.getType() != null ? entry.getType().getName() : "";
-        return encodeString(entry.getDescription()) + ':' + encodeString(entry.getLink()) + ':' + encodeString(type);
-    }
-
-    private String encodeString(String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i=0; i<s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\'))
-                sb.append('\\');
-            sb.append(c);
-        }
-        return sb.toString();
+        return Util.encodeString(entry.getDescription()) + ':' + Util.encodeString(entry.getLink()) + ':' + Util.encodeString(type);
     }
 
     public void print() {
