@@ -53,7 +53,7 @@ import java.util.Vector;
  *
  * @author     wegnerj
  * @license GPL
- * @cvsversion    $Revision$, $Date$
+ * @version    $Revision$, $Date$
  */
 public class WSITools
 {

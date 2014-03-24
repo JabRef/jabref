@@ -47,7 +47,7 @@ public class DBLPHelper {
 
 	/**
 	 *
-	 * @param a
+	 * @param query
 	 *            string with the user query
 	 * @return a string with the user query, but compatible with dblp.org
 	 */
@@ -60,7 +60,7 @@ public class DBLPHelper {
 	 * information. After that, it will convert it into a BibtexEntry and return
 	 * it (them).
 	 *
-	 * @param html
+	 * @param page
 	 *            page as String
 	 * @return list of BibtexEntry
 	 */
@@ -97,9 +97,7 @@ public class DBLPHelper {
 	}
 
 	private String cleanEntry(final String bibEntry) {
-		String retStr = bibEntry
-				.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
-		return retStr;
+        return bibEntry.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
 	}
 
 }

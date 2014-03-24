@@ -425,10 +425,8 @@ public class Util {
 
 	/**
 	 * Returns a HashMap containing all words used in the database in the given
-	 * field type. Characters in
+	 * field type. Characters in <code>remove</code> are not included.
 	 * 
-	 * @param remove
-	 *            are not included.
 	 * @param db
 	 *            a <code>BibtexDatabase</code> value
 	 * @param field
@@ -1673,8 +1671,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 	 * 
 	 * This method works correctly only if dirs are sorted decent in their length
 	 * i.e. /home/user/literature/important before /home/user/literature 
-	 * 
-	 * @param dirs: directories to check. 
+	 *
+     * @param fileName the file name to be shortened
+	 * @param dirs directories to check.
 	 */
 	public static File shortenFileName(File fileName, String[] dirs) {
 		if (fileName == null || fileName.length() == 0)

@@ -56,7 +56,6 @@ public interface IExportFormat {
 	 *            (may be null) A Set containing the IDs of all entries that
 	 *            should be exported. If null, all entries will be exported.
 	 * @throws Exception
-	 * @see #performExport(BibtexDatabase, Set, Writer)
 	 */
 	void performExport(BibtexDatabase database, MetaData metaData,
                        String file, String encoding,

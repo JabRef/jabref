@@ -49,7 +49,7 @@ package net.sf.jabref.export.layout;
  *
  * @author     wegnerj
  * @license GPL
- * @cvsversion    $Revision$, $Date$
+ * @version    $Revision$, $Date$
  */
 public class StringInt implements java.io.Serializable
 {
@@ -78,8 +78,8 @@ public class StringInt implements java.io.Serializable
     /**
      *  Constructor for the StringString object
      *
-     * @param  _s1  Description of the Parameter
-     * @param  _s2  Description of the Parameter
+     * @param  _s  Description of the Parameter
+     * @param  _i  Description of the Parameter
      */
     public StringInt(String _s, int _i)
     {

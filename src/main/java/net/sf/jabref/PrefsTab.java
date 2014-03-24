@@ -45,7 +45,7 @@ public interface PrefsTab {
     public void storeSettings();
 
     /**
-     * This method is called before the {@ling storeSettings()} method, 
+     * This method is called before the {@link #storeSettings()} method,
      * to check if there are illegal settings in the tab, or if is ready
      * to be closed.
      * If the tab is *not* ready, it should display a message to the user 
