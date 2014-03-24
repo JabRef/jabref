@@ -40,11 +40,7 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.IExportFormat;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
-import net.sf.jabref.imports.AutosaveStartupPrompter;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.ImportInspectionCommandLine;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.imports.*;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstaller;
 import net.sf.jabref.plugin.SidePanePlugin;
@@ -52,7 +48,6 @@ import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
-import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 /**
@@ -921,7 +916,7 @@ public class JabRef {
                 System.out.println(Globals.lang("Importing in unknown format")
                         + ": " + data[0]);
 
-                Pair<String, ParserResult>  importResult;
+                ImportFormatReader.UnknownFormatImport  importResult;
                 if (Globals.ON_WIN) {
             	  importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
                 }
@@ -932,9 +927,9 @@ public class JabRef {
             	
             	if (importResult != null){
             		System.out.println(Globals.lang("Format used") + ": "
-                        + importResult.p);
+                        + importResult.format);
             		
-            		return importResult.v;
+            		return importResult.parserResult;
             	} else {
             		System.out.println(Globals.lang(
                                 "Could not find a suitable import format."));

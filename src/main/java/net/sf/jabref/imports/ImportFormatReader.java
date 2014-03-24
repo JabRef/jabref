@@ -16,7 +16,6 @@
 package net.sf.jabref.imports;
 
 import java.io.*;
-import net.sf.jabref.util.Pair;
 import java.util.*;
 
 import net.sf.jabref.*;
@@ -381,6 +380,16 @@ public class ImportFormatReader {
     }
   }
 
+  public static class UnknownFormatImport {
+      public String format;
+      public ParserResult parserResult;
+
+      public UnknownFormatImport(String format, ParserResult parserResult) {
+          this.format = format;
+          this.parserResult = parserResult;
+      }
+  }
+
   /**
 	 * Tries to import a file by iterating through the available import filters,
 	 * and keeping the import that seems most promising.
@@ -389,7 +398,7 @@ public class ImportFormatReader {
 	 * 
 	 * @throws IOException 
 	 */
-	public Pair<String, ParserResult> importUnknownFormat(String filename) {
+	public UnknownFormatImport importUnknownFormat(String filename) {
 
 		// we don't use a provided OutputPrinter (such as the JabRef frame),
 		// as we don't want to see any outputs from failed importers:
@@ -429,9 +438,7 @@ public class ImportFormatReader {
         if (bestResult != null) {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
-            Pair<String, ParserResult> result =
-                    new Pair<String, ParserResult>(bestFormatName, parserResult);
-            return result;
+            return new UnknownFormatImport(bestFormatName, parserResult);
         }
 
       // Finally, if all else fails, see if it is a BibTeX file:
@@ -441,8 +448,7 @@ public class ImportFormatReader {
           if ((pr.getDatabase().getEntryCount() > 0)
                   || (pr.getDatabase().getStringCount() > 0)) {
               pr.setFile(new File(filename));
-
-              return new Pair<String, ParserResult>(BIBTEX_FORMAT, pr);
+              return new UnknownFormatImport(BIBTEX_FORMAT, pr);
           }
       } catch (Throwable ex) {
           return null;

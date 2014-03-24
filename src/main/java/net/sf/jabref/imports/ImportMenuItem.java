@@ -34,7 +34,6 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
-import net.sf.jabref.util.Pair;
 
 /* 
  * TODO: could separate the "menu item" functionality from the importing functionality
@@ -85,7 +84,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 
     class MyWorker extends AbstractWorker {
-        String[] filenames = null, formatName = null;
+        String[] filenames = null;
         ParserResult bibtexResult = null; // Contains the merged import results
         boolean fileOk = false;
 
@@ -109,7 +108,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 return;
 
             // We import all files and collect their results:
-			List<Pair<String, ParserResult>> imports = new ArrayList<Pair<String, ParserResult>>();
+			List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
 			for (String filename : filenames) {
 				try {
 					if (importer != null) {
@@ -118,7 +117,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 							Globals.importFormatReader.importFromFile(importer,
 								filename, frame));
 
-						imports.add(new Pair<String, ParserResult>(importer
+						imports.add(new ImportFormatReader.UnknownFormatImport(importer
 							.getFormatName(), pr));
 					} else {
 						// Unknown format:
@@ -145,9 +144,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             
             
             /* show parserwarnings, if any. */
-			for (Pair<String, ParserResult> p : imports) {
+			for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
-                    ParserResult pr = p.v;
+                    ParserResult pr = p.parserResult;
                     if (pr.hasWarnings()) {
                         if (Globals.prefs
                                 .getBoolean("displayKeyWarningDialogAtStartup")
@@ -273,17 +272,17 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         }
     }
 
-    public ParserResult mergeImportResults(List<Pair<String, ParserResult>> imports) {
+    public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibtexDatabase database = new BibtexDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
-        for (Pair<String, ParserResult> importResult : imports){
+        for (ImportFormatReader.UnknownFormatImport importResult : imports){
             if (importResult == null)
                 continue;
-            if (importResult.p.equals(ImportFormatReader.BIBTEX_FORMAT)){
+            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)){
         	    // Bibtex result. We must merge it into our main base.
-                ParserResult pr = importResult.v;
+                ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
                         || ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0));
@@ -309,7 +308,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
             } else {
             	
-            	ParserResult pr = importResult.v;
+            	ParserResult pr = importResult.parserResult;
 				Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
 				anythingUseful = anythingUseful | (entries.size() > 0);
