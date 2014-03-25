@@ -74,7 +74,7 @@ public abstract class DBExporter extends DBImporterExporter{
 	/**
 	 * Method for the exportDatabase methods.
 	 * 
-	 * @param dbtype
+	 * @param database
 	 *            The DBTYPE of the database
 	 * @param database
 	 *            The BibtexDatabase to export
@@ -273,7 +273,7 @@ public abstract class DBExporter extends DBImporterExporter{
 	 *            The current GroupTreeNode in the GroupsTree
 	 * @param parentID
 	 *            The integer ID associated with the cursors's parent node
-	 * @param ID
+	 * @param currentID
 	 *            The integer value to associate with the cursor
 	 * @param out
 	 *            The output (PrintStream or Connection) object to which the DML

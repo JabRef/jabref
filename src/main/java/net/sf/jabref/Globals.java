@@ -54,7 +54,7 @@ public class Globals {
 	/**
 	 * {@link Control} class allowing properties bundles to be in different encodings.
 	 * 
-	 * @see http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle
+	 * @see <a href="http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle">utf-8 and property files</a>
 	 */
 	private static class EncodingControl extends Control {
 		private final String encoding;

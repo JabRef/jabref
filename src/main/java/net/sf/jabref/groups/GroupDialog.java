@@ -115,7 +115,7 @@ class GroupDialog extends JDialog {
          *
          * @param jabrefFrame
          *            The parent frame.
-         * @param defaultField
+         * @param basePanel
          *            The default grouping field.
          * @param editedGroup
          *            The group being edited, or null if a new group is to be
