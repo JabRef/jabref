@@ -641,7 +641,7 @@ public class GroupSelector extends SidePaneComponent implements
     
     /**
      * 
-     * @param deletion != addition
+     * @param node deletion != addition
      */
     private void updateGroupContent(GroupTreeNode node) {
         BibtexEntry[] entries = panel.getSelectedEntries();

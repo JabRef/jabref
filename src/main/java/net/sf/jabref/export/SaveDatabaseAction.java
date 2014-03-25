@@ -377,7 +377,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     /**
      * Query whether the last operation was successful.
      *
-     * @returns true if the last Save/SaveAs operation completed successfully, false otherwise.
+     * @return true if the last Save/SaveAs operation completed successfully, false otherwise.
      */
     public boolean isSuccess() {
         return success;
@@ -386,7 +386,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     /**
      * Query whether the last operation was cancelled.
      *
-     * @returns true if the last Save/SaveAs operation was cancelled from the file dialog or from another 
+     * @return true if the last Save/SaveAs operation was cancelled from the file dialog or from another
      * query dialog, false otherwise.
      */
     public boolean isCancelled() {

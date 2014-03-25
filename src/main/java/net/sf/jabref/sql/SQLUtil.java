@@ -274,9 +274,8 @@ public class SQLUtil {
 	 * String. To be used when it is certain that only one String (single cell)
 	 * will be returned from the DB
 	 * 
-	 * @param out
-	 *            The output (PrintStream or Connection) object to which the DML
-	 *            should be sent
+	 * @param conn
+	 *            The Connection object to which the DML should be sent
 	 * @param query
 	 *            The query statements to be processed
 	 * @return String with the result returned from the database

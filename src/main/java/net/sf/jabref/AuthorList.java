@@ -690,8 +690,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
-	 *      explaination about the Oxford comma.
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
 	 * 
 	 * @return formatted list of authors.
 	 */
@@ -744,8 +743,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
-	 *      explaination about the Oxford comma.
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
 	 * 
 	 * @return formatted list of authors.
 	 */
@@ -854,8 +852,7 @@ public class AuthorList {
 	 * @param oxfordComma
 	 *            Whether to put a comma before the and at the end.
 	 * 
-	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma</a> for an detailed
-	 *      explaination about the Oxford comma.
+	 * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
 	 * 
 	 * @return formatted list of authors.
 	 */

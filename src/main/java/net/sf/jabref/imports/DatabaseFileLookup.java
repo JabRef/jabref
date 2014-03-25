@@ -60,7 +60,7 @@ public class DatabaseFileLookup {
 	 * <br>
 	 * For the matching, the absolute file paths will be used.
 	 * 
-	 * @param file
+	 * @param aFile
 	 *            A {@link File} Object.
 	 * @return <code>true</code>, if the file Object is stored in at least one
 	 *         entry in the database, otherwise <code>false</code>.
