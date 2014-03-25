@@ -14,7 +14,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 package net.sf.jabref.msbib;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -28,18 +27,18 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 /**
- * @author S M Mahbub Murshed (udvranto@yahoo.com)
- *
- * @version 2.0.0
- * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
- * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
- * 
  * Date: May 15, 2007; May 03, 2007
- * 
+ *
  * History:
  * May 03, 2007 - Added suport for export
  * May 15, 2007 - Added suport for import
+ *
+ * @author S M Mahbub Murshed (udvranto@yahoo.com)
+ * @version 2.0.0
+ * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
+ * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
  */
 public class MSBibDatabase {
 	protected Set<MSBibEntry> entries;

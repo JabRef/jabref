@@ -43,14 +43,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @author S M Mahbub Murshed (udvranto@yahoo.com)
- *
- * @version 2.0.0
- * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
- * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
- * 
  * Date: May 15, 2007; May 03, 2007
- * 
+ *
  * History
  * May 03, 2007 - Added export functionality
  * May 15, 2007 - Added import functionality
@@ -60,6 +54,11 @@ import org.w3c.dom.NodeList;
  *				  the exception is caught and LCID is set to zero.
  * Jan 06, 2012 - Changed the XML element ConferenceName to present
  * 				  the Booktitle instead of the organization field content
+ *
+ * @author S M Mahbub Murshed (udvranto@yahoo.com)
+ * @version 2.0.0
+ * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
+ * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
  */
 public class MSBibEntry {
 	protected String sourceType = "Misc";
