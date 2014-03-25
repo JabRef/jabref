@@ -131,7 +131,7 @@ public class SpecialFieldsUtils {
 	/**
 	 * updates field values according to keywords
 	 * 
-	 * @param nc indicates the undo named compound. May be null
+	 * @param ce indicates the undo named compound. May be null
 	 */
 	public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
 		if (be.getField("keywords") == null)

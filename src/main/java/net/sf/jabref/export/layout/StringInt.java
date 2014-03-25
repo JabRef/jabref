@@ -48,7 +48,6 @@ package net.sf.jabref.export.layout;
  * String and integer value.
  *
  * @author     wegnerj
- * @license GPL
  * @version    $Revision$, $Date$
  */
 public class StringInt implements java.io.Serializable

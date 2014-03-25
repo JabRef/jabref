@@ -52,7 +52,6 @@ import java.util.Vector;
  * JabRef helper methods.
  *
  * @author     wegnerj
- * @license GPL
  * @version    $Revision$, $Date$
  */
 public class WSITools
