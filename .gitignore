@@ -11,6 +11,7 @@ user.properties
 out/
 buildant/
 *.iws
+.idea/
 *.ipr
 *.iml
 .settings/
