@@ -3,6 +3,7 @@ package net.sf.jabref.labelPattern;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Util;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 
@@ -14,8 +15,14 @@ public class LabelPatternUtilTest extends TestCase {
 
 
     public void testAndInAuthorName() {
-        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}, year={2000}}");
+        BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
         assertEquals("Holland", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth")));
+    }
+
+    public void testAndAuthorNames() {
+        String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
+        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+        assertEquals("HerlandHaugeHelgeland", Util.checkLegalKey(LabelPatternUtil.makeLabel(entry, "authors3")));
     }
 
     /**
