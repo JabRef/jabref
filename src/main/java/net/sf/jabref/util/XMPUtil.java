@@ -996,7 +996,20 @@ public class XMPUtil {
 		for (String field : fields){
 
 			if (useXmpPrivacyFilter && filters.contains(field)) {
-				continue;
+                            // erase field instead of adding it
+                            if (field.equals("author")) {
+				di.setAuthor(null);
+                            } else if (field.equals("title")) {
+				di.setTitle(null);
+                            } else if (field.equals("keywords")) {
+				di.setKeywords(null);
+                            } else if (field.equals("abstract")) {
+				di.setSubject(null);
+                            } else {
+				di.setCustomMetadataValue("bibtex/" + field,
+                                                          null);
+                            }
+                            continue;
 			}
 
 			if (field.equals("author")) {
