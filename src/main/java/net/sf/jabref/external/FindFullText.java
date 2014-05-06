@@ -51,6 +51,7 @@ public class FindFullText {
     public FindFullText() {
         finders.add(new ScienceDirectPdfDownload());
         finders.add(new SpringerLinkPdfDownload());
+        finders.add(new ACSPdfDownload());
     }
 
     public FindResult findFullText(BibtexEntry entry) {
