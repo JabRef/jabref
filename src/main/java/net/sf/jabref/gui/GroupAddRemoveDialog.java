@@ -10,10 +10,14 @@ import net.sf.jabref.groups.*;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,14 +57,43 @@ public class GroupAddRemoveDialog extends BaseAction {
         tree = new JTree(groups);
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
         tree.setVisibleRowCount(22);
-        tree.setPreferredSize(new Dimension(200, tree.getPreferredSize().height));
+        
+//        tree.setPreferredSize(new Dimension(200, tree.getPreferredSize().height));
+//      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly. 
         //tree.setSelectionModel(new VetoableTreeSelectionModel());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(new SelectionListener());
+        
+        
+        
+        //STA add expand and collapse all buttons
+        JButton jbExpandAll = new JButton("Expand All");
+        
+        jbExpandAll.addActionListener(new ActionListener() {
+            
+            
+            public void actionPerformed(ActionEvent e) {
+                expandAll(tree, true);
+            }
+
+        });
+
+        JButton jbCollapseAll = new JButton("Collapse All");
+        jbCollapseAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                expandAll(tree, false);
+            }
+        });
+        //END add expand and collapse all buttons
+            
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
+        
+        bb.addButton(jbExpandAll);
+        bb.addButton(jbCollapseAll);
+        
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
@@ -76,6 +109,7 @@ public class GroupAddRemoveDialog extends BaseAction {
             }
         });
         ok.setEnabled(false);
+        
 
         JScrollPane sp = new JScrollPane(tree);
 
@@ -90,12 +124,46 @@ public class GroupAddRemoveDialog extends BaseAction {
         });
 
         diag.getContentPane().add(sp, BorderLayout.CENTER);
+        
+
+
+        
+        
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
         diag.setLocationRelativeTo(panel.frame());
         diag.setVisible(true);
 
 
+    }
+    // If "expand" is true, all nodes in the tree area expanded
+    // otherwise all nodes in the tree are collapsed:
+    public void expandAll(final JTree tree, final boolean expand) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                TreeNode root = ((TreeNode) tree.getModel().getRoot());
+                // walk through the tree, beginning at the root:
+                expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
+                tree.requestFocusInWindow();
+            }
+        });
+    }
+    private void expandAll(final JTree tree, final TreePath parent, final boolean expand) {
+        // walk through the children:
+        TreeNode node = (TreeNode) parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration e = node.children(); e.hasMoreElements();) {
+                TreeNode n = (TreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                expandAll(tree, path, expand);
+            }
+        }
+        // "expand" / "collapse" occurs from bottom to top:
+        if (expand) {
+            tree.expandPath(parent);
+        } else {
+            tree.collapsePath(parent);
+        }
     }
 
     class SelectionListener implements TreeSelectionListener {
