@@ -16,6 +16,11 @@
 package net.sf.jabref;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -44,6 +49,13 @@ public class FileTab extends JPanel implements PrefsTab {
             doNotResolveStringsFor;
     private JSpinner autoSaveInterval;
     private boolean origAutoSaveSetting = false;
+    
+    //for LWang_AdjustableFieldOrder 
+//    private JRadioButton sortFieldInAlphabetaOrder,unSortFieldStyle,orderAsUserDefined;
+    private ButtonGroup bgFieldOrderStyle;
+//    int fieldOrderStyle;
+    private JTextField userDefinedFieldOrder;
+    
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
@@ -67,6 +79,18 @@ public class FileTab extends JPanel implements PrefsTab {
         ButtonGroup bg = new ButtonGroup();
         bg.add(resolveStringsAll);
         bg.add(resolveStringsStandard);
+        
+        //for LWang_AdjustableFieldOrder
+//        ButtonGroup bgFieldOrderStyle=new ButtonGroup();
+//        sortFieldInAlphabetaOrder = new JRadioButton(Globals.lang("Sort fields in alphabeta order (as ver >= 2.10)"));
+//        unSortFieldStyle = new JRadioButton(Globals.lang("Do not sort fields (as ver<=2.9.2)"));
+//        orderAsUserDefined= new JRadioButton(Globals.lang("Save fields as user defined order"));
+//        bgFieldOrderStyle.add(sortFieldInAlphabetaOrder);
+//        bgFieldOrderStyle.add(unSortFieldStyle);
+//        bgFieldOrderStyle.add(orderAsUserDefined);
+        
+        userDefinedFieldOrder=new JTextField(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
+        
         
         // This is sort of a quick hack
         newlineSeparator = new JComboBox<String>(new String[] {"CR", "CR/LF", "LF"});
@@ -149,12 +173,89 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(includeEmptyFields);
         builder.append(new JPanel());
         builder.nextLine();
+        
+        //for LWang_AdjustableFieldOrder
+        String [] _rbs0={"Sort fields in alphabeta order (as ver 2.10)", "Sort fields in old fasion (as ver 2.9.2)","Save fields as user defined order"};
+        ArrayList<String> _rbs = new ArrayList<String>();
+        for (String _rb:_rbs0){
+            _rbs.add(Globals.lang(_rb));
+        }
+        bgFieldOrderStyle=createRadioBg(_rbs);
+        userDefinedFieldOrder=new JTextField(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
+        createAdFieldOrderBg(builder, bgFieldOrderStyle, userDefinedFieldOrder);
+//        builder.append(sortFieldInAlphabetaOrder);
+//        builder.nextLine();
+//        builder.append(unSortFieldStyle);
+//        builder.nextLine();
+//        builder.append(orderAsUserDefined);
+//        builder.append(userDefinedFieldOrder);
+//        builder.nextLine();
+        
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
         add(pan, BorderLayout.CENTER);
     }
+    
+    private ButtonGroup createRadioBg(Iterable<String> radioButtonLabels){
+        ButtonGroup _bg=new ButtonGroup();
+        for (String _s: radioButtonLabels){
+            JRadioButton _rb=new JRadioButton(_s);
+            _bg.add(_rb);
+            
+        }
+        return _bg;
+    }
+    
+    private int getBgValue(ButtonGroup bg){
+        int _i=0;
+        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();){
+            if (_it.nextElement().isSelected()){
+                return _i;
+            }
+            _i++;
+            
+        }
+        return 0;
+        
+    }
+    private void setBgSelected(ButtonGroup bg,int x){
+        int _i=0;
+        
+        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();){
+            if (_i==x){
+                _it.nextElement().setSelected(true);
+                
+            } else {
+                _it.nextElement().setSelected(false);
+                
+            }
+            _i++;
+            
+        }
+        
+    }
+    
+    
+//    private void setValueFieldOrderStyle(){
+//        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
+//    }
+    
+    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup bg, JTextField jtf){
+        //for LWang_AdjustableFieldOrder
+
+        
+        
+        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();){
+            builder.append(_it.nextElement());
+            builder.nextLine();
+        }
+        builder.append(jtf);
+        builder.nextLine();
+    }
+    
+    
 
     public void setValues() {
         openLast.setSelected(_prefs.getBoolean("openLastEdited"));
@@ -186,6 +287,11 @@ public class FileTab extends JPanel implements PrefsTab {
         includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
         camelCase.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
         sameColumn.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
+        
+        //for LWang_AdjustableFieldOrder
+        setBgSelected(bgFieldOrderStyle, _prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE));
+        userDefinedFieldOrder.setText(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER));
+        
     }
 
     public void storeSettings() {
@@ -218,6 +324,12 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
         doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
+        
+        //for LWang_AdjustableFieldOrder
+        _prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE,getBgValue(bgFieldOrderStyle));
+        _prefs.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER,userDefinedFieldOrder.getText().trim());
+        
+        
         boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
             _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
@@ -248,4 +360,6 @@ public class FileTab extends JPanel implements PrefsTab {
 	public String getTabName() {
 		return Globals.lang("File");
 	}
+
+
 }

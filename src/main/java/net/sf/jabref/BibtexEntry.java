@@ -158,6 +158,12 @@ public class BibtexEntry
     {
         return _type.getRequiredFields();
     }
+    
+    public String[] getUserDefinedFields()
+    {
+        
+        return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
+    }
 
     /**
      * Returns an set containing the names of all fields that are
@@ -409,6 +415,127 @@ public class BibtexEntry
      * isDisplayableField(String).
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
+        switch (Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE)) {
+        case 0:
+            writeSorted(out, ff, write);
+            break;
+        case 1:
+            writeUnsorted(out, ff, write);
+        case 2:
+            writeUserOrder(out,ff,write);
+        }
+        
+        
+    }
+    
+    
+    /** old style ver<=2.9.2, write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
+     * @param out
+     * @param ff A formatter to filter field contents before writing
+     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
+     * @throws IOException
+     */
+    private void writeUserOrder(Writer out, FieldFormatter ff, boolean write) throws IOException {
+     // Write header with type and bibtex-key.
+        out.write("@"+_type.getName()+"{");
+
+        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
+        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
+        HashMap<String, String> written = new HashMap<String, String>();
+        written.put(BibtexFields.KEY_FIELD, null);
+        boolean hasWritten = false;
+        
+     // Write user defined fields first.
+        String[] s = getUserDefinedFields();
+        if (s != null) {
+            //do not sort, write as it is.
+            for (String value : s) {
+                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
+                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
+                    written.put(value, null);
+                }
+            }
+        }
+        
+        // Then write remaining fields in alphabetic order.
+        boolean first = true, previous = true;
+        previous = false;
+        //STA get remaining fields
+        TreeSet<String> remainingFields = new TreeSet<String>();
+        for (String key : _fields.keySet()){
+            //iterate through all fields
+            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
+                               BibtexFields.isDisplayableField(key));
+            //find the ones has not been written.
+            if (!written.containsKey(key) && writeIt)
+                       remainingFields.add(key);
+        }
+        //END get remaining fields
+        
+        first = previous;
+        for (String field: remainingFields) {
+            hasWritten = hasWritten | writeField(field, out, ff, hasWritten, hasWritten && first);
+            first = false;
+        }
+
+        // Finally, end the entry.
+        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
+        
+    }
+    
+    /** old style ver<=2.9.2, write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
+     * @param out
+     * @param ff A formatter to filter field contents before writing
+     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
+     * @throws IOException
+     */
+    private void writeUnsorted(Writer out, FieldFormatter ff, boolean write) throws IOException {
+        // Write header with type and bibtex-key.
+        out.write("@"+_type.getName().toUpperCase(Locale.US)+"{");
+
+        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
+        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
+        HashMap<String, String> written = new HashMap<String, String>();
+        written.put(BibtexFields.KEY_FIELD, null);
+        boolean hasWritten = false;
+        // Write required fields first.
+        String[] s = getRequiredFields();
+        if (s != null) for (int i=0; i<s.length; i++) {
+            hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten,false);
+            written.put(s[i], null);
+        }
+        // Then optional fields.
+        s = getOptionalFields();
+        if (s != null) for (int i=0; i<s.length; i++) {
+            if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+                //writeField(s[i], out, ff);
+                hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten,false);
+                written.put(s[i], null);
+            }
+        }
+        // Then write remaining fields in alphabetic order.
+        TreeSet<String> remainingFields = new TreeSet<String>();
+        for (String key : _fields.keySet()){
+            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
+                               BibtexFields.isDisplayableField(key));
+            if (!written.containsKey(key) && writeIt)
+                       remainingFields.add(key);
+        }
+        for (String field: remainingFields)
+            hasWritten = hasWritten | writeField(field, out, ff, hasWritten,false);
+
+        // Finally, end the entry.
+        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
+    }
+    
+    /**
+     * new style ver>=2.10, sort the field for requiredFields, optionalFields and other fields separately
+     * @param out
+     * @param ff A formatter to filter field contents before writing
+     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
+     * @throws IOException
+     */
+    private void writeSorted(Writer out, FieldFormatter ff, boolean write) throws IOException {
         // Write header with type and bibtex-key.
         out.write("@"+_type.getName()+"{");
 

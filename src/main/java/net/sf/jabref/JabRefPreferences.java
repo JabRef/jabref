@@ -92,7 +92,10 @@ public class JabRefPreferences {
             EXPORT_SECONDARY_SORT_FIELD = "exportSecSort",
             EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending",
             EXPORT_TERTIARY_SORT_FIELD = "exportTerSort",
-            EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
+            EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending",
+            WRITEFIELD_SORTSTYLE = "writefieldSortStyle",
+            WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
+    
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -515,6 +518,12 @@ public class JabRefPreferences {
         // behavior of JabRef before 2.10: both: false
         defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
         defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
+        
+        //behavior of JabRef before LWang_AdjustableFieldOrder 1
+        //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
+        defaults.put(WRITEFIELD_SORTSTYLE, 0);
+        defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
+        
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", 6050);
