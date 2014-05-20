@@ -8,6 +8,7 @@
     - Saving order of entries can now be configured per database
     - Improved XMP Privacy (pull request #8)
     - Support FindFullText with ACS DOIs (pull request #9)
+    - Fixes groups and adds optional 2.9.2 save ordering (pull request #10)
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
