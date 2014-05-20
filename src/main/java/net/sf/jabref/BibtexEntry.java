@@ -421,8 +421,10 @@ public class BibtexEntry
             break;
         case 1:
             writeUnsorted(out, ff, write);
+            break;
         case 2:
             writeUserOrder(out,ff,write);
+            break;
         }
         
         
