@@ -91,7 +91,7 @@ sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '1.12'
 }
 
 compileJava {
