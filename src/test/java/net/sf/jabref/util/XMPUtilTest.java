@@ -532,7 +532,7 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(1, l.size());
 		BibtexEntry x = l.get(0);
 
-		assertEquals(e, x);
+		assertEqualsBibtexEntry(e, x);
 	}
 
 	/**
@@ -580,7 +580,7 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(1, l.size());
 		BibtexEntry e = l.get(0);
 
-		assertEquals(t2BibtexEntry(), e);
+		assertEqualsBibtexEntry(t2BibtexEntry(), e);
 	}
 
 	public void testEmpty() throws Exception {
@@ -658,7 +658,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals(1, l.size());
 			BibtexEntry e = l.get(0);
 
-			assertEquals(t1BibtexEntry(), e);
+			assertEqualsBibtexEntry(t1BibtexEntry(), e);
 
 			// This is what we really want to test: Is the rest of the
 			// descriptions still there?
@@ -747,7 +747,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals(1, l.size());
 			BibtexEntry e = l.get(0);
 
-			assertEquals(toSet, e);
+			assertEqualsBibtexEntry(toSet, e);
 
 			// This is what we really want to test: Is the rest of the
 			// descriptions still there?
@@ -863,10 +863,10 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(1, l.size());
 		BibtexEntry x = l.get(0);
 
-		assertEquals(e, x);
+		assertEqualsBibtexEntry(e, x);
 	}
 
-	public void assertEquals(BibtexEntry expected, BibtexEntry actual) {
+	public void assertEqualsBibtexEntry(BibtexEntry expected, BibtexEntry actual) {
 		assertEquals(expected.getCiteKey(), actual.getCiteKey());
 		assertEquals(expected.getType(), actual.getType());
 
@@ -978,8 +978,8 @@ public class XMPUtilTest extends TestCase {
 			b = tmp;
 		}
 
-		assertEquals(t2BibtexEntry(), a);
-		assertEquals(t3BibtexEntry(), b);
+		assertEqualsBibtexEntry(t2BibtexEntry(), a);
+		assertEqualsBibtexEntry(t3BibtexEntry(), b);
 	}
 
 	/**
@@ -1009,8 +1009,8 @@ public class XMPUtilTest extends TestCase {
 			b = tmp;
 		}
 
-		assertEquals(t2BibtexEntry(), a);
-		assertEquals(t3BibtexEntry(), b);
+		assertEqualsBibtexEntry(t2BibtexEntry(), a);
+		assertEqualsBibtexEntry(t3BibtexEntry(), b);
 	}
 
 	public void testReadWriteDC() throws IOException, TransformerException {
@@ -1039,7 +1039,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals("peanut,butter,jelly", document
 					.getDocumentInformation().getKeywords());
 
-			assertEquals(t3BibtexEntry(), XMPUtil
+			assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
 					.getBibtexEntryFromDocumentInformation(document
 							.getDocumentInformation()));
 
@@ -1084,7 +1084,7 @@ public class XMPUtilTest extends TestCase {
 			 */
 			assertEquals(4, dcSchema.getRelationships().size());
 
-			assertEquals(t3BibtexEntry(), XMPUtil
+			assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
 					.getBibtexEntryFromDublinCore(dcSchema));
 
 		} finally {
@@ -1120,7 +1120,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals("peanut,butter,jelly", document
 					.getDocumentInformation().getKeywords());
 
-			assertEquals(t3BibtexEntry(), XMPUtil
+			assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
 					.getBibtexEntryFromDocumentInformation(document
 							.getDocumentInformation()));
 
@@ -1165,7 +1165,7 @@ public class XMPUtilTest extends TestCase {
 			 */
 			assertEquals(4, dcSchema.getRelationships().size());
 
-			assertEquals(t3BibtexEntry(), XMPUtil
+			assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
 					.getBibtexEntryFromDublinCore(dcSchema));
 
 		} finally {
@@ -1252,7 +1252,7 @@ public class XMPUtilTest extends TestCase {
 
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 			assertEquals(1, l.size());
-			assertEquals(t1BibtexEntry(), l.get(0));
+			assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
 		} finally {
 			if (fileWriter != null)
@@ -1288,7 +1288,7 @@ public class XMPUtilTest extends TestCase {
 			assertEquals(1, c.size());
 			BibtexEntry x = c.iterator().next();
 
-			assertEquals(e, x);
+			assertEqualsBibtexEntry(e, x);
 		}
 		{
 			// Write XMP to file
@@ -1326,7 +1326,7 @@ public class XMPUtilTest extends TestCase {
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 			assertEquals(1, l.size());
 
-			assertEquals(t1BibtexEntry(), l.get(0));
+			assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 		}
 	}
 
@@ -1359,7 +1359,7 @@ public class XMPUtilTest extends TestCase {
 				// PDF should be annotated:
 				List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 				assertEquals(1, l.size());
-				assertEquals(t1BibtexEntry(), l.get(0));
+				assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 			}
 			{ // Now try OezbekC06
 				ByteArrayOutputStream s = new ByteArrayOutputStream();
@@ -1372,7 +1372,7 @@ public class XMPUtilTest extends TestCase {
 				// PDF should be annotated:
 				List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
 				assertEquals(1, l.size());
-				assertEquals(t2BibtexEntry(), l.get(0));
+				assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
 			}
 		} finally {
 			if (fileWriter != null)
@@ -1424,8 +1424,8 @@ public class XMPUtilTest extends TestCase {
 			// Writing and reading will resolve strings!
 			t3.setField("month", "July");
 
-			assertEquals(t1, a);
-			assertEquals(t3, b);
+			assertEqualsBibtexEntry(t1, a);
+			assertEqualsBibtexEntry(t3, b);
 
 		} finally {
 			if (fileWriter != null)

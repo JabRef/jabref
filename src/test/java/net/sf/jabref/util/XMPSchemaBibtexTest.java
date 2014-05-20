@@ -22,7 +22,7 @@ import net.sf.jabref.FileBasedTestCase;
 
 public class XMPSchemaBibtexTest extends TestCase {
 
-    public void assertEquals(BibtexEntry e, BibtexEntry x){
+    public void assertEqualsBibtexEntry(BibtexEntry e, BibtexEntry x){
         assertEquals(e.getCiteKey(), x.getCiteKey());
         assertEquals(e.getType(), x.getType());
 
@@ -247,7 +247,7 @@ public class XMPSchemaBibtexTest extends TestCase {
 
 		BibtexEntry e2 = bibtex.getBibtexEntry();
 
-		assertEquals(e, e2);
+		assertEqualsBibtexEntry(e, e2);
 	}
 
 	public void testGetTextContent() throws IOException {
