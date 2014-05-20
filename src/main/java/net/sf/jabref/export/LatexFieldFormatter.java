@@ -20,6 +20,7 @@ import java.util.Vector;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 
 public class LatexFieldFormatter implements FieldFormatter {
@@ -87,13 +88,13 @@ public class LatexFieldFormatter implements FieldFormatter {
             sb = new StringBuffer(
                     Globals.prefs.getValueDelimiters(0) + "");
             // No formatting at all for these fields, to allow custom formatting?
-            //if (Globals.prefs.getBoolean("preserveFieldFormatting"))
-            //  sb.append(text);
-            //else
-            // currently, we do not do any more wrapping
-            //if (!Globals.prefs.isNonWrappableField(fieldName))
-            //    sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
-            //else
+//            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
+//              sb.append(text);
+//            else
+//             currently, we do not do any more wrapping
+            if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD)&&!Globals.prefs.isNonWrappableField(fieldName))
+                sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
+            else
                 sb.append(text);
 
             sb.append(Globals.prefs.getValueDelimiters(1));
@@ -155,11 +156,11 @@ public class LatexFieldFormatter implements FieldFormatter {
         }
 
         // currently, we do not add newlines and new formatting
-        //if (!Globals.prefs.isNonWrappableField(fieldName)) {
-            // introduce a line break to be read at the parser
-            // the old code called Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH), but that lead to ugly .tex
-            // alternative: return sb.toString().replaceAll(Globals.NEWLINE, Globals.NEWLINE + Globals.NEWLINE);
-        //} else
+        if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD)&&!Globals.prefs.isNonWrappableField(fieldName)) {
+//             introduce a line break to be read at the parser
+             return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+             
+        } else
             return sb.toString();
 
 

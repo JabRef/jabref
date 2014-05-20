@@ -94,7 +94,8 @@ public class JabRefPreferences {
             EXPORT_TERTIARY_SORT_FIELD = "exportTerSort",
             EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending",
             WRITEFIELD_SORTSTYLE = "writefieldSortStyle",
-            WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
+            WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder",
+            WRITEFIELD_WRAPFIELD="wrapFieldLine";
     
 
     // This String is used in the encoded list in prefs of external file type
@@ -523,7 +524,7 @@ public class JabRefPreferences {
         //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
         defaults.put(WRITEFIELD_SORTSTYLE, 0);
         defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
-        
+        defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", 6050);

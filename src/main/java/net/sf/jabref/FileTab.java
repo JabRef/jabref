@@ -56,6 +56,7 @@ public class FileTab extends JPanel implements PrefsTab {
 //    int fieldOrderStyle;
     private JTextField userDefinedFieldOrder;
     
+    private JCheckBox wrapFieldLine;
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
@@ -174,6 +175,10 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(new JPanel());
         builder.nextLine();
         
+        
+        wrapFieldLine = new JCheckBox(Globals.lang("Wrap fields as ver 2.9.2"));
+        builder.append(wrapFieldLine);
+        builder.nextLine();
         //for LWang_AdjustableFieldOrder
         String [] _rbs0={"Sort fields in alphabeta order (as ver 2.10)", "Sort fields in old fasion (as ver 2.9.2)","Save fields as user defined order"};
         ArrayList<String> _rbs = new ArrayList<String>();
@@ -272,6 +277,7 @@ public class FileTab extends JPanel implements PrefsTab {
         }
         
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
+        wrapFieldLine.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
         resolveStringsAll.setSelected(_prefs.getBoolean("resolveStringsAllFields"));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
@@ -328,6 +334,7 @@ public class FileTab extends JPanel implements PrefsTab {
         //for LWang_AdjustableFieldOrder
         _prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE,getBgValue(bgFieldOrderStyle));
         _prefs.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER,userDefinedFieldOrder.getText().trim());
+        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD,wrapFieldLine.isSelected());
         
         
         boolean updateSpecialFields = false;
