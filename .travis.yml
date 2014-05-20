@@ -8,4 +8,4 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - TERM=dumb ./gradlew build
+  - TERM=dumb ./gradlew test
