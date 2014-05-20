@@ -23,6 +23,11 @@ fatJar {
     }
 }
 
+test {
+    testLogging {
+        exceptionFormat "full" // default is "short"
+    }
+}
 
 version = "2.11dev"
 
