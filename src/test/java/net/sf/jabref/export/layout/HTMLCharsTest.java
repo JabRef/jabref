@@ -1,49 +1,52 @@
 package net.sf.jabref.export.layout;
 
-import junit.framework.TestCase;
-import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.HTMLChars;
+import org.junit.Test;
 
-public class HTMLCharsTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-	public void testBasicFormat() {
+public class HTMLCharsTest {
 
-		LayoutFormatter layout = new HTMLChars();
+    @Test
+    public void testBasicFormat() {
 
-		assertEquals("", layout.format(""));
+        LayoutFormatter layout = new HTMLChars();
 
-		assertEquals("hallo", layout.format("hallo"));
+        assertEquals("", layout.format(""));
 
-		assertEquals("Réflexions sur le timing de la quantité", layout
-			.format("Réflexions sur le timing de la quantité"));
+        assertEquals("hallo", layout.format("hallo"));
 
-		assertEquals("h&aacute;llo", layout.format("h\\'allo"));
+        assertEquals("Réflexions sur le timing de la quantité", layout
+                .format("Réflexions sur le timing de la quantité"));
 
-		assertEquals("&#305; &#305;", layout.format("\\i \\i"));
-		assertEquals("&#305;", layout.format("\\i"));
-		assertEquals("&#305;", layout.format("\\{i}"));
-		assertEquals("&#305;&#305;", layout.format("\\i\\i"));
+        assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
-		assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
+        assertEquals("&#305; &#305;", layout.format("\\i \\i"));
+        assertEquals("&#305;", layout.format("\\i"));
+        assertEquals("&#305;", layout.format("\\{i}"));
+        assertEquals("&#305;&#305;", layout.format("\\i\\i"));
 
-		assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
-	}
+        assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
 
-	public void testLaTeXHighlighting() {
+        assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
+    }
 
-		LayoutFormatter layout = new HTMLChars();
+    @Test
+    public void testLaTeXHighlighting() {
 
-		assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
-		assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
+        LayoutFormatter layout = new HTMLChars();
 
-		assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
-		assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
+        assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
+        assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
 
-		assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
-		assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
-	}
+        assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
+        assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
+
+        assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
+        assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
+    }
 
 	/*
-	 * Is missing a lot of test cases for the individual chars...
+     * Is missing a lot of test cases for the individual chars...
 	 */
 }

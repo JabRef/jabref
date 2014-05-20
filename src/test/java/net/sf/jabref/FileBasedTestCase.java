@@ -1,229 +1,225 @@
 package net.sf.jabref;
 
+import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.imports.ParserResult;
+import org.junit.After;
+import org.junit.Before;
+
 import java.io.File;
 import java.io.StringReader;
 
-import junit.framework.TestCase;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
+import static org.junit.Assert.*;
 
 /**
  * A base class for Testing in JabRef that comes along with some useful
  * functions.
  */
-public class FileBasedTestCase extends TestCase {
+public class FileBasedTestCase {
 
-	/**
-	 * Will check if two paths are the same.
-	 */
-	public static void assertEqualPaths(String path1, String path2) {
-		assertNotNull(path1);
+    /**
+     * Will check if two paths are the same.
+     */
+    public static void assertEqualPaths(String path1, String path2) {
+        assertNotNull(path1);
         assertNotNull(path2);
-		assertEquals(path1.replaceAll("\\\\", "/"), path2.replaceAll("\\\\", "/"));
-	}
+        assertEquals(path1.replaceAll("\\\\", "/"), path2.replaceAll("\\\\", "/"));
+    }
 
-	/**
-	 * Creates a temp directory in the System temp directory.
-	 * 
-	 * Taken from
-	 * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-	 * 
-	 * Author: jfbriere
-	 * 
-	 * @return returns null if directory could not created.
-	 */
-	public static File createTempDir(String prefix) {
-		return createTempDir(prefix, null);
-	}
+    /**
+     * Creates a temp directory in the System temp directory.
+     * <p/>
+     * Taken from
+     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
+     * <p/>
+     * Author: jfbriere
+     *
+     * @return returns null if directory could not created.
+     */
+    public static File createTempDir(String prefix) {
+        return createTempDir(prefix, null);
+    }
 
-	/**
-	 * Creates a temp directory in a given directory.
-	 * 
-	 * Taken from
-	 * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-	 * 
-	 * Author: jfbriere
-	 * 
-	 * @param directory
-	 *            MayBeNull - null indicates that the system tmp directory
-	 *            should be used.
-	 * 
-	 * @return returns null if directory could not created.
-	 */
-	public static File createTempDir(String prefix, File directory) {
-		try {
-			File tempFile = File.createTempFile(prefix, "", directory);
+    /**
+     * Creates a temp directory in a given directory.
+     * <p/>
+     * Taken from
+     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
+     * <p/>
+     * Author: jfbriere
+     *
+     * @param directory MayBeNull - null indicates that the system tmp directory
+     *                  should be used.
+     * @return returns null if directory could not created.
+     */
+    public static File createTempDir(String prefix, File directory) {
+        try {
+            File tempFile = File.createTempFile(prefix, "", directory);
 
-			if (!tempFile.delete())
-				return null;
-			if (!tempFile.mkdir())
-				return null;
+            if (!tempFile.delete())
+                return null;
+            if (!tempFile.mkdir())
+                return null;
 
-			return tempFile;
+            return tempFile;
 
-		} catch (Exception e) {
-			return null;
-		}
-	}
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	/**
-	 * Deletes a directory or file
-	 * 
-	 * Taken from
-	 * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-	 * 
-	 * Author: jfbriere
-	 * 
-	 * @param file
-	 */
-	public static void deleteRecursive(File file) {
-		if (file.isDirectory()) {
-			File[] fileArray = file.listFiles();
+    /**
+     * Deletes a directory or file
+     * <p/>
+     * Taken from
+     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
+     * <p/>
+     * Author: jfbriere
+     *
+     * @param file
+     */
+    public static void deleteRecursive(File file) {
+        if (file.isDirectory()) {
+            File[] fileArray = file.listFiles();
 
-			if (fileArray != null)
+            if (fileArray != null)
                 for (File aFileArray : fileArray) deleteRecursive(aFileArray);
-		}
-		file.delete();
-	}
+        }
+        file.delete();
+    }
 
-	static BibtexDatabase database;
+    static BibtexDatabase database;
 
-	static BibtexEntry entry;
+    static BibtexEntry entry;
 
-	File root;
+    File root;
 
-	private String oldPdfDirectory;
+    private String oldPdfDirectory;
 
-	private boolean oldUseRegExp;
-	
-	private boolean oldAutoLinkExcatKeyOnly;
+    private boolean oldUseRegExp;
 
-	public static BibtexEntry getBibtexEntry() {
+    private boolean oldAutoLinkExcatKeyOnly;
 
-		if (database == null) {
+    public static BibtexEntry getBibtexEntry() {
 
-			StringReader reader = new StringReader(
-				"@ARTICLE{HipKro03,\n"
-					+ "  author = {Eric von Hippel and Georg von Krogh},\n"
-					+ "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
-					+ "  journal = {Organization Science},\n"
-					+ "  year = {2003},\n"
-					+ "  volume = {14},\n"
-					+ "  pages = {209--223},\n"
-					+ "  number = {2},\n"
-					+ "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
-					+ "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
-					+ "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}");
+        if (database == null) {
 
-			BibtexParser parser = new BibtexParser(reader);
-			ParserResult result = null;
-			try {
-				result = parser.parse();
-			} catch (Exception e) {
-				fail();
-			}
-			database = result.getDatabase();
-			entry = database.getEntriesByKey("HipKro03")[0];
-		}
-		return entry;
-	}
+            StringReader reader = new StringReader(
+                    "@ARTICLE{HipKro03,\n"
+                            + "  author = {Eric von Hippel and Georg von Krogh},\n"
+                            + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
+                            + "  journal = {Organization Science},\n"
+                            + "  year = {2003},\n"
+                            + "  volume = {14},\n"
+                            + "  pages = {209--223},\n"
+                            + "  number = {2},\n"
+                            + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
+                            + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
+                            + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}"
+            );
 
-	public void setUp() throws Exception {
+            BibtexParser parser = new BibtexParser(reader);
+            ParserResult result = null;
+            try {
+                result = parser.parse();
+            } catch (Exception e) {
+                fail();
+            }
+            database = result.getDatabase();
+            entry = database.getEntriesByKey("HipKro03")[0];
+        }
+        return entry;
+    }
 
-		Globals.prefs = JabRefPreferences.getInstance();
-		oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
-		oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-		oldPdfDirectory = Globals.prefs.get("pdfDirectory");
+    @Before
+    public void setUp() throws Exception {
 
-		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
-		Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
-		
-		getBibtexEntry();
-		assertNotNull(database);
-		assertNotNull(entry);
+        Globals.prefs = JabRefPreferences.getInstance();
+        oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
+        oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        oldPdfDirectory = Globals.prefs.get("pdfDirectory");
 
-		// Create file structure
-		try {
-			root = createTempDir("UtilFindFileTest");
+        Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
+        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
 
-			Globals.prefs.put("pdfDirectory", root.getPath());
-		
-			File subDir1 = new File(root, "Organization Science");
-			subDir1.mkdir();
+        getBibtexEntry();
+        assertNotNull(database);
+        assertNotNull(entry);
 
-			File pdf1 = new File(subDir1, "HipKro03 - Hello.pdf");
-			pdf1.createNewFile();
+        // Create file structure
+        try {
+            root = createTempDir("UtilFindFileTest");
 
-			File pdf1a = new File(root, "HipKro03 - Hello.pdf");
-			pdf1a.createNewFile();
+            Globals.prefs.put("pdfDirectory", root.getPath());
 
-			File subDir2 = new File(root, "pdfs");
-			subDir2.mkdir();
+            File subDir1 = new File(root, "Organization Science");
+            subDir1.mkdir();
 
-			File subsubDir1 = new File(subDir2, "sub");
-			subsubDir1.mkdir();
+            File pdf1 = new File(subDir1, "HipKro03 - Hello.pdf");
+            pdf1.createNewFile();
 
-			File pdf2 = new File(subsubDir1, "HipKro03-sub.pdf");
-			pdf2.createNewFile();
+            File pdf1a = new File(root, "HipKro03 - Hello.pdf");
+            pdf1a.createNewFile();
 
-			File dir2002 = new File(root, "2002");
-			dir2002.mkdir();
+            File subDir2 = new File(root, "pdfs");
+            subDir2.mkdir();
 
-			File dir2003 = new File(root, "2003");
-			dir2003.mkdir();
+            File subsubDir1 = new File(subDir2, "sub");
+            subsubDir1.mkdir();
 
-			File pdf3 = new File(dir2003, "Paper by HipKro03.pdf");
-			pdf3.createNewFile();
+            File pdf2 = new File(subsubDir1, "HipKro03-sub.pdf");
+            pdf2.createNewFile();
 
-			File dirTest = new File(root, "test");
-			dirTest.mkdir();
+            File dir2002 = new File(root, "2002");
+            dir2002.mkdir();
 
-			File pdf4 = new File(dirTest, "HipKro03.pdf");
-			pdf4.createNewFile();
+            File dir2003 = new File(root, "2003");
+            dir2003.mkdir();
 
-			File pdf5 = new File(dirTest, ".TEST");
-			pdf5.createNewFile();
+            File pdf3 = new File(dir2003, "Paper by HipKro03.pdf");
+            pdf3.createNewFile();
 
-			File pdf6 = new File(dirTest, "TEST[");
-			pdf6.createNewFile();
+            File dirTest = new File(root, "test");
+            dirTest.mkdir();
 
-			File pdf7 = new File(dirTest, "TE.ST");
-			pdf7.createNewFile();
+            File pdf4 = new File(dirTest, "HipKro03.pdf");
+            pdf4.createNewFile();
 
-			File foo = new File(dirTest, "foo.dat");
-			foo.createNewFile();
-			
-			File graphicsDir = new File(root, "graphicsDir");
-			graphicsDir.mkdir();
-			
-			File graphicsSubDir = new File(graphicsDir, "subDir");
-			graphicsSubDir.mkdir();
-			
-			File jpg = new File(graphicsSubDir, "HipKro03test.jpg");
-			jpg.createNewFile();
+            File pdf5 = new File(dirTest, ".TEST");
+            pdf5.createNewFile();
 
-			File png = new File(graphicsSubDir, "HipKro03test.png");
-			png.createNewFile();
-			
-		} catch (Exception e) {
-			throw new RuntimeException();
-		}
-	}
+            File pdf6 = new File(dirTest, "TEST[");
+            pdf6.createNewFile();
 
-	public void tearDown() {
-		deleteRecursive(root);
-		Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
-		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
-		Globals.prefs.put("pdfDirectory", oldPdfDirectory);
-		// TODO: This is not a great way to do this, sure ;-)
-	}
-	
-	public void testVoid(){
-		// to remove warning
-	}
-	
+            File pdf7 = new File(dirTest, "TE.ST");
+            pdf7.createNewFile();
+
+            File foo = new File(dirTest, "foo.dat");
+            foo.createNewFile();
+
+            File graphicsDir = new File(root, "graphicsDir");
+            graphicsDir.mkdir();
+
+            File graphicsSubDir = new File(graphicsDir, "subDir");
+            graphicsSubDir.mkdir();
+
+            File jpg = new File(graphicsSubDir, "HipKro03test.jpg");
+            jpg.createNewFile();
+
+            File png = new File(graphicsSubDir, "HipKro03test.png");
+            png.createNewFile();
+
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @After
+    public void tearDown() {
+        deleteRecursive(root);
+        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
+        Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
+        Globals.prefs.put("pdfDirectory", oldPdfDirectory);
+        // TODO: This is not a great way to do this, sure ;-)
+    }
+
 }

@@ -24,40 +24,40 @@
  */
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorFirstLastCommas;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- *
  */
-public class AuthorFirstLastCommasTest extends TestCase {
+public class AuthorFirstLastCommasTest {
 
-	/**
-	 * Test method for {@link net.sf.jabref.export.layout.format.AuthorFirstLastCommas#format(java.lang.String)}.
-	 */
-	public void testFormat() {
-		LayoutFormatter a = new AuthorFirstLastCommas();
+    /**
+     * Test method for {@link net.sf.jabref.export.layout.format.AuthorFirstLastCommas#format(java.lang.String)}.
+     */
+    @Test
+    public void testFormat() {
+        LayoutFormatter a = new AuthorFirstLastCommas();
 
-		// Empty case
-		assertEquals("", a.format(""));
+        // Empty case
+        assertEquals("", a.format(""));
 
-		// Single Names
-		assertEquals("Van Something Someone", a.format("Someone, Van Something"));
+        // Single Names
+        assertEquals("Van Something Someone", a.format("Someone, Van Something"));
 
-		// Two names
-		assertEquals("John von Neumann and Peter Black Brown", a
-			.format("John von Neumann and Peter Black Brown"));
+        // Two names
+        assertEquals("John von Neumann and Peter Black Brown", a
+                .format("John von Neumann and Peter Black Brown"));
 
-		// Three names
-		assertEquals("John von Neumann, John Smith and Peter Black Brown", a
-			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        // Three names
+        assertEquals("John von Neumann, John Smith and Peter Black Brown", a
+                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-		assertEquals("John von Neumann, John Smith and Peter Black Brown", a
-			.format("John von Neumann and John Smith and Black Brown, Peter"));
-	}
+        assertEquals("John von Neumann, John Smith and Peter Black Brown", a
+                .format("John von Neumann and John Smith and Black Brown, Peter"));
+    }
 
 }

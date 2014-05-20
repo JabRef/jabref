@@ -1,14 +1,16 @@
 package net.sf.jabref.search;
 
-import junit.framework.TestCase;
 import net.sf.jabref.*;
-import net.sf.jabref.search.BasicSearch;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test case for BasicSearch.
  */
-public class BasicSearchTest extends TestCase {
+public class BasicSearchTest {
 
+    @Test
     public void testBasicSearchParsing() {
         Globals.prefs = JabRefPreferences.getInstance();
 
@@ -19,7 +21,7 @@ public class BasicSearchTest extends TestCase {
         BasicSearch bsCaseInsensitiveRegexp = new BasicSearch(false, true);
 
         String query = "marine 2001 shields";
-        
+
         assertEquals(0, bsCaseSensitive.applyRule(query, be));
         assertEquals(1, bsCaseInsensitive.applyRule(query, be));
         assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
@@ -39,19 +41,19 @@ public class BasicSearchTest extends TestCase {
         assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
         assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
 
-        
+
     }
 
     public BibtexEntry makeBibtexEntry() {
-		BibtexEntry e = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.INCOLLECTION);
-		e.setField("title", "Marine finfish larviculture in Europe");
-		e.setField("bibtexkey", "shields01");
-		e.setField("year", "2001");
-		e
-			.setField(
-				"author",
-				"Kevin Shields");
-		return e;
-	}
+        BibtexEntry e = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.INCOLLECTION);
+        e.setField("title", "Marine finfish larviculture in Europe");
+        e.setField("bibtexkey", "shields01");
+        e.setField("year", "2001");
+        e
+                .setField(
+                        "author",
+                        "Kevin Shields");
+        return e;
+    }
 }
 

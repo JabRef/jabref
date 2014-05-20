@@ -1,272 +1,269 @@
 package net.sf.jabref.util;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.FileBasedTestCase;
+import org.apache.jempbox.impl.XMLUtil;
+import org.apache.jempbox.xmp.XMPMetadata;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
-import net.sf.jabref.BibtexEntry;
+public class XMPSchemaBibtexTest {
 
-import org.apache.jempbox.impl.XMLUtil;
-import org.apache.jempbox.xmp.XMPMetadata;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import net.sf.jabref.FileBasedTestCase;
-
-public class XMPSchemaBibtexTest extends TestCase {
-
-    public void assertEqualsBibtexEntry(BibtexEntry e, BibtexEntry x){
+    public void assertEqualsBibtexEntry(BibtexEntry e, BibtexEntry x) {
         assertEquals(e.getCiteKey(), x.getCiteKey());
         assertEquals(e.getType(), x.getType());
 
         assertEquals(e.getAllFields().size(), x.getAllFields().size());
 
-        for (String name : e.getAllFields()){
+        for (String name : e.getAllFields()) {
             assertEquals(e.getField(name), x.getField(name));
         }
     }
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    @Test
+    public void testXMPSchemaBibtexXMPMetadata() throws IOException {
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-	public void testXMPSchemaBibtexXMPMetadata() throws IOException {
+        assertNotNull(bibtex.getElement());
+        assertEquals("rdf:Description", bibtex.getElement().getTagName());
 
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+    }
 
-		assertNotNull(bibtex.getElement());
-		assertEquals("rdf:Description", bibtex.getElement().getTagName());
+    @Test
+    public void testXMPSchemaBibtexElement()
+            throws ParserConfigurationException {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+                .newInstance();
+        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+        Element e = builder.newDocument().createElement("rdf:Description");
 
-	}
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e, "bibtex");
 
-	public void testXMPSchemaBibtexElement()
-		throws ParserConfigurationException {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-			.newInstance();
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Element e = builder.newDocument().createElement("rdf:Description");
+        assertEquals(e, bibtex.getElement());
+        assertEquals("rdf:Description", bibtex.getElement().getTagName());
+    }
 
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e, "bibtex");
+    @Test
+    public void testGetSetPersonList() throws IOException {
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-		assertEquals(e, bibtex.getElement());
-		assertEquals("rdf:Description", bibtex.getElement().getTagName());
-	}
+        bibtex.setPersonList("author", "Tom DeMarco and Kent Beck");
 
-	public void testGetSetPersonList() throws IOException {
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+        Element e = bibtex.getElement();
 
-		bibtex.setPersonList("author", "Tom DeMarco and Kent Beck");
+        NodeList l1 = e.getElementsByTagName("bibtex:author");
+        assertEquals(1, l1.getLength());
 
-		Element e = bibtex.getElement();
+        NodeList l = e.getElementsByTagName("rdf:li");
 
-		NodeList l1 = e.getElementsByTagName("bibtex:author");
-		assertEquals(1, l1.getLength());
+        assertEquals(2, l.getLength());
 
-		NodeList l = e.getElementsByTagName("rdf:li");
+        assertEquals("Tom DeMarco", XMLUtil
+                .getStringValue(((Element) l.item(0))));
+        assertEquals("Kent Beck", XMLUtil.getStringValue(((Element) l.item(1))));
 
-		assertEquals(2, l.getLength());
+        List<String> authors = bibtex.getPersonList("author");
+        assertEquals(2, authors.size());
 
-		assertEquals("Tom DeMarco", XMLUtil
-			.getStringValue(((Element) l.item(0))));
-		assertEquals("Kent Beck", XMLUtil.getStringValue(((Element) l.item(1))));
+        assertEquals("Tom DeMarco", authors.get(0));
+        assertEquals("Kent Beck", authors.get(1));
+    }
 
-		List<String> authors = bibtex.getPersonList("author");
-		assertEquals(2, authors.size());
+    @Test
+    public void testSetGetTextPropertyString() throws IOException {
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-		assertEquals("Tom DeMarco", authors.get(0));
-		assertEquals("Kent Beck", authors.get(1));
-	}
+        bibtex.setTextProperty("title",
+                "The advanced Flux-Compensation for Delawney-Separation");
 
-	public void testSetGetTextPropertyString() throws IOException {
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+        Element e = bibtex.getElement();
+        assertEquals("The advanced Flux-Compensation for Delawney-Separation",
+                e.getAttribute("bibtex:title"));
 
-		bibtex.setTextProperty("title",
-			"The advanced Flux-Compensation for Delawney-Separation");
+        assertEquals("The advanced Flux-Compensation for Delawney-Separation",
+                bibtex.getTextProperty("title"));
 
-		Element e = bibtex.getElement();
-		assertEquals("The advanced Flux-Compensation for Delawney-Separation",
-			e.getAttribute("bibtex:title"));
+        bibtex.setTextProperty("title",
+                "The advanced Flux-Correlation for Delawney-Separation");
 
-		assertEquals("The advanced Flux-Compensation for Delawney-Separation",
-			bibtex.getTextProperty("title"));
+        e = bibtex.getElement();
+        assertEquals("The advanced Flux-Correlation for Delawney-Separation", e
+                .getAttribute("bibtex:title"));
 
-		bibtex.setTextProperty("title",
-			"The advanced Flux-Correlation for Delawney-Separation");
+        assertEquals("The advanced Flux-Correlation for Delawney-Separation",
+                bibtex.getTextProperty("title"));
 
-		e = bibtex.getElement();
-		assertEquals("The advanced Flux-Correlation for Delawney-Separation", e
-			.getAttribute("bibtex:title"));
+        bibtex
+                .setTextProperty(
+                        "abstract",
+                        "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.");
+        assertEquals(
+                "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.",
+                bibtex.getTextProperty("abstract"));
+    }
 
-		assertEquals("The advanced Flux-Correlation for Delawney-Separation",
-			bibtex.getTextProperty("title"));
+    @Test
+    public void testSetGetBagListString() throws IOException {
 
-		bibtex
-			.setTextProperty(
-				"abstract",
-				"   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.");
-		assertEquals(
-			"   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.",
-			bibtex.getTextProperty("abstract"));
-	}
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-	public void testSetGetBagListString() throws IOException {
+        bibtex.addBagValue("author", "Tom DeMarco");
+        bibtex.addBagValue("author", "Kent Beck");
+        {
 
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+            List<String> l = bibtex.getBagList("author");
 
-		bibtex.addBagValue("author", "Tom DeMarco");
-		bibtex.addBagValue("author", "Kent Beck");
-		{
+            assertEquals(2, l.size());
 
-			List<String> l = bibtex.getBagList("author");
+            assertTrue(l.get(0).equals("Tom DeMarco")
+                    || l.get(1).equals("Tom DeMarco"));
+            assertTrue(l.get(0).equals("Kent Beck")
+                    || l.get(1).equals("Kent Beck"));
+        }
+        {
+            bibtex.removeBagValue("author", "Kent Beck");
+            List<String> l = bibtex.getBagList("author");
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
+        }
+        { // Already removed
+            bibtex.removeBagValue("author", "Kent Beck");
+            List<String> l = bibtex.getBagList("author");
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
+        }
+        { // Duplicates allowed!
+            bibtex.addBagValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getBagList("author");
+            assertEquals(2, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
+            assertTrue(l.get(1).equals("Tom DeMarco"));
+        }
+        { // Removes both
+            bibtex.removeBagValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getBagList("author");
+            assertEquals(0, l.size());
+        }
+    }
 
-			assertEquals(2, l.size());
+    @Test
+    public void testGetSequenceListString() throws IOException {
 
-			assertTrue(l.get(0).equals("Tom DeMarco")
-				|| l.get(1).equals("Tom DeMarco"));
-			assertTrue(l.get(0).equals("Kent Beck")
-				|| l.get(1).equals("Kent Beck"));
-		}
-		{
-			bibtex.removeBagValue("author", "Kent Beck");
-			List<String> l = bibtex.getBagList("author");
-			assertEquals(1, l.size());
-			assertTrue(l.get(0).equals("Tom DeMarco"));
-		}
-		{ // Already removed
-			bibtex.removeBagValue("author", "Kent Beck");
-			List<String> l = bibtex.getBagList("author");
-			assertEquals(1, l.size());
-			assertTrue(l.get(0).equals("Tom DeMarco"));
-		}
-		{ // Duplicates allowed!
-			bibtex.addBagValue("author", "Tom DeMarco");
-			List<String> l = bibtex.getBagList("author");
-			assertEquals(2, l.size());
-			assertTrue(l.get(0).equals("Tom DeMarco"));
-			assertTrue(l.get(1).equals("Tom DeMarco"));
-		}
-		{ // Removes both
-			bibtex.removeBagValue("author", "Tom DeMarco");
-			List<String> l = bibtex.getBagList("author");
-			assertEquals(0, l.size());
-		}
-	}
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-	public void testGetSequenceListString() throws IOException {
+        bibtex.addSequenceValue("author", "Tom DeMarco");
+        bibtex.addSequenceValue("author", "Kent Beck");
+        {
 
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+            List<String> l = bibtex.getSequenceList("author");
 
-		bibtex.addSequenceValue("author", "Tom DeMarco");
-		bibtex.addSequenceValue("author", "Kent Beck");
-		{
+            assertEquals(2, l.size());
 
-			List<String> l = bibtex.getSequenceList("author");
+            assertEquals("Tom DeMarco", l.get(0));
+            assertEquals("Kent Beck", l.get(1));
+        }
+        {
+            bibtex.removeSequenceValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getSequenceList("author");
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
+        }
+        { // Already removed
+            bibtex.removeSequenceValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getSequenceList("author");
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
+        }
+        { // Duplicates allowed!
+            bibtex.addSequenceValue("author", "Kent Beck");
+            List<String> l = bibtex.getSequenceList("author");
+            assertEquals(2, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
+            assertTrue(l.get(1).equals("Kent Beck"));
+        }
+        { // Remvoes all
+            bibtex.removeSequenceValue("author", "Kent Beck");
+            List<String> l = bibtex.getSequenceList("author");
+            assertEquals(0, l.size());
+        }
+    }
 
-			assertEquals(2, l.size());
+    @Test
+    public void testGetAllProperties() throws IOException {
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-			assertEquals("Tom DeMarco", l.get(0));
-			assertEquals("Kent Beck", l.get(1));
-		}
-		{
-			bibtex.removeSequenceValue("author", "Tom DeMarco");
-			List<String> l = bibtex.getSequenceList("author");
-			assertEquals(1, l.size());
-			assertTrue(l.get(0).equals("Kent Beck"));
-		}
-		{ // Already removed
-			bibtex.removeSequenceValue("author", "Tom DeMarco");
-			List<String> l = bibtex.getSequenceList("author");
-			assertEquals(1, l.size());
-			assertTrue(l.get(0).equals("Kent Beck"));
-		}
-		{ // Duplicates allowed!
-			bibtex.addSequenceValue("author", "Kent Beck");
-			List<String> l = bibtex.getSequenceList("author");
-			assertEquals(2, l.size());
-			assertTrue(l.get(0).equals("Kent Beck"));
-			assertTrue(l.get(1).equals("Kent Beck"));
-		}
-		{ // Remvoes all
-			bibtex.removeSequenceValue("author", "Kent Beck");
-			List<String> l = bibtex.getSequenceList("author");
-			assertEquals(0, l.size());
-		}
-	}
+        bibtex.setTextProperty("title", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextProperty("abstract", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextProperty("review", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextProperty("note", "BlaBla Ta Ta\nHello World");
+        bibtex.setPersonList("author", "Mouse, Mickey and Bond, James");
 
-	public void testSetRemoveGetSequenceDateListString() {
-		// We don't use this...
-	}
+        Map<String, String> s = XMPSchemaBibtex.getAllProperties(bibtex,
+                "bibtex");
 
-	public void testGetAllProperties() throws IOException {
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+        assertEquals(5, s.size());
+        assertTrue(s.containsKey("title"));
+        assertTrue(s.containsKey("author"));
 
-		bibtex.setTextProperty("title", "BlaBla Ta Ta\nHello World");
-		bibtex.setTextProperty("abstract", "BlaBla Ta Ta\nHello World");
-		bibtex.setTextProperty("review", "BlaBla Ta Ta\nHello World");
-		bibtex.setTextProperty("note", "BlaBla Ta Ta\nHello World");
-		bibtex.setPersonList("author", "Mouse, Mickey and Bond, James");
+        assertEquals("BlaBla Ta Ta Hello World", s.get("title"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("abstract"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("review"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("note"));
+        assertEquals("Mickey Mouse and James Bond", s.get("author"));
+    }
 
-		Map<String, String> s = XMPSchemaBibtex.getAllProperties(bibtex,
-			"bibtex");
+    @Test
+    public void testSetBibtexEntry() throws IOException {
 
-		assertEquals(5, s.size());
-		assertTrue(s.containsKey("title"));
-		assertTrue(s.containsKey("author"));
+        XMPMetadata xmp = new XMPMetadata();
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-		assertEquals("BlaBla Ta Ta Hello World", s.get("title"));
-		assertEquals("BlaBla Ta Ta\nHello World", s.get("abstract"));
-		assertEquals("BlaBla Ta Ta\nHello World", s.get("review"));
-		assertEquals("BlaBla Ta Ta\nHello World", s.get("note"));
-		assertEquals("Mickey Mouse and James Bond", s.get("author"));
-	}
+        BibtexEntry e = FileBasedTestCase.getBibtexEntry();
+        bibtex.setBibtexEntry(e, null);
 
-	public void testSetBibtexEntry() throws IOException {
+        BibtexEntry e2 = bibtex.getBibtexEntry();
 
-		XMPMetadata xmp = new XMPMetadata();
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+        assertEqualsBibtexEntry(e, e2);
+    }
 
-		BibtexEntry e = FileBasedTestCase.getBibtexEntry();
-		bibtex.setBibtexEntry(e, null);
+    @Test
+    public void testGetTextContent() throws IOException {
+        String bibtexString = "<bibtex:year>2003</bibtex:year>\n"
+                + "<bibtex:title>\n   "
+                + "Beach sand convolution by surf-wave optimzation\n"
+                + "</bibtex:title>\n"
+                + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
 
-		BibtexEntry e2 = bibtex.getBibtexEntry();
+        bibtexString = XMPUtilTest.bibtexXPacket(XMPUtilTest
+                .bibtexDescription(bibtexString));
 
-		assertEqualsBibtexEntry(e, e2);
-	}
+        Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
+                .getBytes()));
 
-	public void testGetTextContent() throws IOException {
-		String bibtexString = "<bibtex:year>2003</bibtex:year>\n"
-			+ "<bibtex:title>\n   "
-			+ "Beach sand convolution by surf-wave optimzation\n"
-			+ "</bibtex:title>\n"
-			+ "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
+        assertEquals("Beach sand convolution by surf-wave optimzation",
+                XMPSchemaBibtex.getTextContent(
+                        d.getElementsByTagName("bibtex:title").item(0)).trim()
+        );
 
-		bibtexString = XMPUtilTest.bibtexXPacket(XMPUtilTest
-			.bibtexDescription(bibtexString));
-
-		Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
-			.getBytes()));
-
-		assertEquals("Beach sand convolution by surf-wave optimzation",
-			XMPSchemaBibtex.getTextContent(
-				d.getElementsByTagName("bibtex:title").item(0)).trim());
-
-	}
+    }
 
 }

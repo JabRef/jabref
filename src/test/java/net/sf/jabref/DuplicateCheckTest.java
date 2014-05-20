@@ -1,6 +1,11 @@
 package net.sf.jabref;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,12 +14,14 @@ import junit.framework.TestCase;
  * Time: 7:04:25 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DuplicateCheckTest extends TestCase {
+public class DuplicateCheckTest {
 
+    @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
+    @Test @Ignore
     public void testDuplicateDetection() {
         BibtexEntry one = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
 

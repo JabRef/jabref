@@ -25,37 +25,37 @@
  */
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorFirstAbbrLastCommas;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- *
  */
-public class AuthorFirstAbbrLastCommasTest extends TestCase {
+public class AuthorFirstAbbrLastCommasTest {
 
-	public void testFormat() {
-		LayoutFormatter a = new AuthorFirstAbbrLastCommas();
+    @Test
+    public void testFormat() {
+        LayoutFormatter a = new AuthorFirstAbbrLastCommas();
 
-		// Empty case
-		assertEquals("", a.format(""));
+        // Empty case
+        assertEquals("", a.format(""));
 
-		// Single Names
-		assertEquals("V. S. Someone", a.format("Someone, Van Something"));
+        // Single Names
+        assertEquals("V. S. Someone", a.format("Someone, Van Something"));
 
-		// Two names
-		assertEquals("J. von Neumann and P. Black Brown", a
-			.format("John von Neumann and Black Brown, Peter"));
+        // Two names
+        assertEquals("J. von Neumann and P. Black Brown", a
+                .format("John von Neumann and Black Brown, Peter"));
 
-		// Three names
-		assertEquals("J. von Neumann, J. Smith and P. Black Brown", a
-			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        // Three names
+        assertEquals("J. von Neumann, J. Smith and P. Black Brown", a
+                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-		assertEquals("J. von Neumann, J. Smith and P. Black Brown", a
-			.format("John von Neumann and John Smith and Black Brown, Peter"));
-	}
+        assertEquals("J. von Neumann, J. Smith and P. Black Brown", a
+                .format("John von Neumann and John Smith and Black Brown, Peter"));
+    }
 
 }

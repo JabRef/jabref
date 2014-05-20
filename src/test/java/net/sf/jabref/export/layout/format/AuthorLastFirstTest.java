@@ -1,30 +1,32 @@
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorLastFirst;
+import org.junit.Test;
 
-public class AuthorLastFirstTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-	public void testFormat() {
-		LayoutFormatter a = new AuthorLastFirst();
+public class AuthorLastFirstTest {
 
-		// Empty case
-		assertEquals("", a.format(""));
+    @Test
+    public void testFormat() {
+        LayoutFormatter a = new AuthorLastFirst();
 
-		// Single Names
-		assertEquals("Someone, Van Something", a.format("Van Something Someone"));
+        // Empty case
+        assertEquals("", a.format(""));
 
-		// Two names
-		assertEquals("von Neumann, John and Black Brown, Peter", a
-			.format("John von Neumann and Black Brown, Peter"));
+        // Single Names
+        assertEquals("Someone, Van Something", a.format("Van Something Someone"));
 
-		// Three names
-		assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", a
-			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        // Two names
+        assertEquals("von Neumann, John and Black Brown, Peter", a
+                .format("John von Neumann and Black Brown, Peter"));
 
-		assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", a
-			.format("John von Neumann and John Smith and Black Brown, Peter"));
-	}
+        // Three names
+        assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", a
+                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
+
+        assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", a
+                .format("John von Neumann and John Smith and Black Brown, Peter"));
+    }
 
 }

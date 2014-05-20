@@ -1,22 +1,27 @@
 package net.sf.jabref.util;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class CaseChangersTest extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-	public void testNumberOfModes() {
-		assertEquals("lower", CaseChangers.LOWER.getName());
-		assertEquals("UPPER", CaseChangers.UPPER.getName());
-		assertEquals("Upper first", CaseChangers.UPPER_FIRST.getName());
-		assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.getName());
+public class CaseChangersTest {
+
+    @Test
+    public void testNumberOfModes() {
+        assertEquals("lower", CaseChangers.LOWER.getName());
+        assertEquals("UPPER", CaseChangers.UPPER.getName());
+        assertEquals("Upper first", CaseChangers.UPPER_FIRST.getName());
+        assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.getName());
         assertEquals("Title", CaseChangers.TITLE.getName());
-	}
+    }
 
+    @Test
     public void testChangeCaseLower() {
         assertEquals("", CaseChangers.LOWER.changeCase(""));
         assertEquals("lower", CaseChangers.LOWER.changeCase("LOWER"));
     }
 
+    @Test
     public void testChangeCaseUpper() {
         assertEquals("", CaseChangers.UPPER.changeCase(""));
         assertEquals("LOWER", CaseChangers.UPPER.changeCase("LOWER"));
@@ -24,16 +29,19 @@ public class CaseChangersTest extends TestCase {
         assertEquals("UPPER", CaseChangers.UPPER.changeCase("UPPER"));
     }
 
+    @Test
     public void testChangeCaseUpperFirst() {
         assertEquals("", CaseChangers.UPPER_FIRST.changeCase(""));
         assertEquals("Upper first", CaseChangers.UPPER_FIRST.changeCase("upper First"));
     }
 
-	public void testChangeCaseUpperEachFirst() {
-		assertEquals("", CaseChangers.UPPER_EACH_FIRST.changeCase(""));
-		assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.changeCase("upper each First"));
-	}
+    @Test
+    public void testChangeCaseUpperEachFirst() {
+        assertEquals("", CaseChangers.UPPER_EACH_FIRST.changeCase(""));
+        assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.changeCase("upper each First"));
+    }
 
+    @Test
     public void testChangeCaseTitle() {
         assertEquals("", CaseChangers.TITLE.changeCase(""));
         assertEquals("Upper Each First", CaseChangers.TITLE.changeCase("upper each first"));

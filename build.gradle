@@ -79,7 +79,7 @@ dependencies {
     compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
     compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
 
-    compile 'junit:junit:3.8.2'
+    compile 'junit:junit:4.11'
 
     generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
 }

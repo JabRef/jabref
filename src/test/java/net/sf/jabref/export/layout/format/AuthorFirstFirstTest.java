@@ -24,25 +24,26 @@
  */
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.TestCase;
-import net.sf.jabref.export.layout.format.AuthorFirstFirst;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- * 
  */
-public class AuthorFirstFirstTest extends TestCase {
+public class AuthorFirstFirstTest {
 
-	/**
-	 * Test method for
-	 * {@link net.sf.jabref.export.layout.format.AuthorFirstFirst#format(java.lang.String)}.
-	 */
-	public void testFormat() {
-		assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
-			new AuthorFirstFirst()
-				.format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
-	}
+    /**
+     * Test method for
+     * {@link net.sf.jabref.export.layout.format.AuthorFirstFirst#format(java.lang.String)}.
+     */
+    @Test
+    public void testFormat() {
+        assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
+                new AuthorFirstFirst()
+                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter")
+        );
+    }
 
 }

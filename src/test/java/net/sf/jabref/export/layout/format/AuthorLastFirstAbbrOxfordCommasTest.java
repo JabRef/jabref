@@ -24,40 +24,40 @@
  */
 package net.sf.jabref.export.layout.format;
 
-import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorLastFirstAbbrOxfordCommas;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- *
  */
-public class AuthorLastFirstAbbrOxfordCommasTest extends TestCase {
+public class AuthorLastFirstAbbrOxfordCommasTest {
 
-	/**
-	 * Test method for {@link net.sf.jabref.export.layout.format.AuthorLastFirstAbbrOxfordCommas#format(java.lang.String)}.
-	 */
-	public void testFormat() {
-		LayoutFormatter a = new AuthorLastFirstAbbrOxfordCommas();
+    /**
+     * Test method for {@link net.sf.jabref.export.layout.format.AuthorLastFirstAbbrOxfordCommas#format(java.lang.String)}.
+     */
+    @Test
+    public void testFormat() {
+        LayoutFormatter a = new AuthorLastFirstAbbrOxfordCommas();
 
-		// Empty case
-		assertEquals("", a.format(""));
+        // Empty case
+        assertEquals("", a.format(""));
 
-		// Single Names
-		assertEquals("Someone, V. S.", a.format("Van Something Someone"));
+        // Single Names
+        assertEquals("Someone, V. S.", a.format("Van Something Someone"));
 
-		// Two names
-		assertEquals("von Neumann, J. and Black Brown, P.", a
-			.format("John von Neumann and Black Brown, Peter"));
+        // Two names
+        assertEquals("von Neumann, J. and Black Brown, P.", a
+                .format("John von Neumann and Black Brown, Peter"));
 
-		// Three names
-		assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
-			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+        // Three names
+        assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
+                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-		assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
-			.format("John von Neumann and John Smith and Black Brown, Peter"));
-	}
+        assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", a
+                .format("John von Neumann and John Smith and Black Brown, Peter"));
+    }
 
 }
