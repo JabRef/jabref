@@ -1,9 +1,11 @@
 language: java
 jdk:
   - openjdk7
+  - oraclejdk7
+  - oraclejdk8
 
 before_install:
   - chmod +x gradlew
 
 script:
-  - TERM=dumb ./gradlew assemble
+  - TERM=dumb ./gradlew build
