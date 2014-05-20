@@ -84,7 +84,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             {
                 return new String[]
                 {
-                    "volume", "number", "pages", "month", "note", //- "volume", "pages", "part", "eid"
+                    "volume", "pages", "number", "month", "note", //- "volume", "pages", "part", "eid"
                 };
             }
 

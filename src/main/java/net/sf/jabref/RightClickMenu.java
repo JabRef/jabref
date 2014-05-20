@@ -46,7 +46,7 @@ public class RightClickMenu extends JPopupMenu
             rankingMenu = new JMenu(),
             priorityMenu = new JMenu(),
             typeMenu = new JMenu(Globals.lang("Change entry type"));
-    JMenuItem groupAdd, groupRemove;
+    JMenuItem groupAdd, groupRemove, groupMoveTo;
     JCheckBoxMenuItem
             floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
             Globals.prefs.getBoolean("floatMarkedEntries"));
@@ -323,16 +323,17 @@ public class RightClickMenu extends JPopupMenu
         });
         add(groupRemove);
 
-        add(new AbstractAction(Globals.lang("Remove from group"))
+        groupMoveTo=add(new AbstractAction(Globals.lang("move to group"))
         {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("removeFromGroup");
+                    panel.runCommand("moveToGroup");
                 } catch (Throwable ex) {
                 	logger.warning(ex.getMessage());
                 }
             }
         });
+        add(groupMoveTo);
 
 
         floatMarked.addActionListener(new ActionListener() {
