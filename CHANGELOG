@@ -7,6 +7,7 @@
     - Fix for bug 1176: automatic bibtexkey generation for authors containing/ending with and in their name
     - Saving order of entries can now be configured per database
     - Improved XMP Privacy (pull request #8)
+    - Support FindFullText with ACS DOIs (pull request #9)
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
