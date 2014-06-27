@@ -32,6 +32,15 @@
 		<parameter id="description"
 			value="Import format for Medline references." />
 	</extension>
+	
+	<extension id="MedlinePlainImporter" plugin-id="net.sf.jabref.core"
+		point-id="ImportFormat">
+		<parameter id="importFormat"
+			value="net.sf.jabref.imports.MedlinePlainImporter" />
+		<parameter id="name" value="Medline Plain Importer" />
+		<parameter id="description"
+			value="Import format for Medline references (not XML)." />
+	</extension>
 
 	<!-- To extend JabRef with an Entry Fetcher use the following extension point -->
 	<extension-point id="EntryFetcher">
