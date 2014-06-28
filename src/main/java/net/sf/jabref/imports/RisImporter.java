@@ -60,14 +60,12 @@ public class RisImporter extends ImportFormat {
 
         // Our strategy is to look for the "AU  - *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("AU  - .*"),
-                pat2 = Pattern.compile("A1  - .*"),
-                pat3 = Pattern.compile("A2  - .*");
+        Pattern pat1 = Pattern.compile("TY  - .*");
 
 
         String str;
         while ((str = in.readLine()) != null){
-            if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find())
+            if (pat1.matcher(str).find())
                 return true;
         }
 
