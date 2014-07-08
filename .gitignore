@@ -12,6 +12,7 @@ out/
 buildant/
 *.iws
 .idea/
+classes/
 *.ipr
 *.iml
 .settings/
