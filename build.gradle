@@ -3,7 +3,6 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "application"
 apply plugin: 'project-report'
-apply plugin: 'pmd'
 
 
 // enables fatjar, the creation of a jar with all dependencies bundled inside
@@ -12,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
     }
 }
 apply plugin: 'fatjar'
@@ -96,7 +95,7 @@ sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.0'
 }
 
 compileJava {
