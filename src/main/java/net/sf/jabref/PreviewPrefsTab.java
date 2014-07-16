@@ -163,20 +163,30 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		test1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getTestEntry();
-				PreviewPanel testPanel = new PreviewPanel(null, entry, null , new MetaData(), layout1.getText());
-				testPanel.setPreferredSize(new Dimension(800, 350));
-				JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"),
-					JOptionPane.PLAIN_MESSAGE);
+				try {
+					PreviewPanel testPanel = new PreviewPanel(null, entry, null , new MetaData(), layout1.getText());
+					testPanel.setPreferredSize(new Dimension(800, 350));
+					JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"),
+						JOptionPane.PLAIN_MESSAGE);
+				} catch (StringIndexOutOfBoundsException ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 
 		test2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getTestEntry();
-				PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout2.getText());
-				testPanel.setPreferredSize(new Dimension(800, 350));
-				JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
-                                        Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+				try {
+					PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout2.getText());
+					testPanel.setPreferredSize(new Dimension(800, 350));
+					JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
+	                                        Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+				} catch (StringIndexOutOfBoundsException ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 	}

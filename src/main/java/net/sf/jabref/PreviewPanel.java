@@ -364,6 +364,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 		try {
 			readLayout();
 			update();
+		} catch (StringIndexOutOfBoundsException ex) {
+			throw ex;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

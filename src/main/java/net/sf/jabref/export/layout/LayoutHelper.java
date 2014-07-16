@@ -20,6 +20,8 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
 
 /**
  * Helper class to get a Layout object.
@@ -62,8 +64,8 @@ public class LayoutHelper {
     }
 
     public Layout getLayoutFromText(String classPrefix) throws Exception
-    {
-        parse();
+    {    	
+    	parse();
 
         StringInt si;
 
@@ -76,7 +78,7 @@ public class LayoutHelper {
                 si.s = si.s.trim().toLowerCase();
             }
         }
-
+        
         Layout layout = new Layout(parsedEntries, classPrefix);
 
         return layout;
@@ -288,7 +290,7 @@ public class LayoutHelper {
         return null;
     }
 
-    private Object parse() throws IOException {
+    private Object parse() throws IOException, StringIndexOutOfBoundsException {
 		skipWhitespace();
 
 		int c;
@@ -344,10 +346,11 @@ public class LayoutHelper {
     /**
 	 * 
 	 */
-    private void parseField() throws IOException
+    private void parseField() throws IOException, StringIndexOutOfBoundsException
     {
         int c;
         StringBuffer buffer = null;
+        char firstLetter = ' ';
         String name;
 
         while (!_eof)
@@ -365,11 +368,21 @@ public class LayoutHelper {
 
                 //System.out.println("\n#" + (char) c);
                 name = buffer != null ? buffer.toString() : "";
-
+                
+                try {
+                	firstLetter = name.charAt(0);
+                } catch (StringIndexOutOfBoundsException ex) {
+                	StringBuilder lastFive = new StringBuilder(10); 
+                	for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size()-6), parsedEntries.size()-1)) {
+                		lastFive.append(entry.s);
+                	}
+                	throw new StringIndexOutOfBoundsException("Backslash parsing error near " + "\'" + lastFive.toString().replace("\n", " ") +  "\'");
+                }
+                
                 //System.out.println("NAME:" + name);
                 buffer = null;
-
-                if (name.charAt(0) == 'b')
+                
+                if (firstLetter == 'b')
                 {
                     if (name.equalsIgnoreCase("begin"))
                     {
@@ -385,7 +398,7 @@ public class LayoutHelper {
                         return;                    
                     }
                 }
-                else if (name.charAt(0) == 'f')
+                else if (firstLetter == 'f')
                 {
                     if (name.equalsIgnoreCase("format"))
                     {
@@ -422,7 +435,7 @@ public class LayoutHelper {
                         return;
                     }
                 }
-                else if (name.charAt(0) == 'e')
+                else if (firstLetter == 'e')
                 {
                     if (name.equalsIgnoreCase("end"))
                     {
