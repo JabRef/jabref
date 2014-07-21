@@ -22,6 +22,10 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.Globals;
+
+import com.sun.star.ui.GlobalAcceleratorConfiguration;
+
 
 /**
  * Helper class to get a Layout object.
@@ -376,7 +380,7 @@ public class LayoutHelper {
                 	for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size()-6), parsedEntries.size()-1)) {
                 		lastFive.append(entry.s);
                 	}
-                	throw new StringIndexOutOfBoundsException("Backslash parsing error near " + "\'" + lastFive.toString().replace("\n", " ") +  "\'");
+                	throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") +  "\'");
                 }
                 
                 //System.out.println("NAME:" + name);
