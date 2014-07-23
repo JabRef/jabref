@@ -170,7 +170,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 						JOptionPane.PLAIN_MESSAGE);
 				} catch (StringIndexOutOfBoundsException ex) {
 					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, Globals.lang("Parsing error") + ": " + Globals.lang("illegal backslash expression") + ".\n" + ex.getMessage() + "\n" + Globals.lang("Look at stderr for details") + ".", Globals.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -185,7 +185,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	                                        Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
 				} catch (StringIndexOutOfBoundsException ex) {
 					ex.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
