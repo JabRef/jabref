@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -202,8 +202,12 @@ public class ManageJournalsPanel extends JPanel{
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (readyToClose()) {
-                    storeSettings();
-                    dialog.dispose();
+                	try {
+                		storeSettings();
+                		dialog.dispose();
+                	} catch (FileNotFoundException ex) {
+                		JOptionPane.showMessageDialog(null, Globals.lang("Error_opening_file" + ": " + ex.getMessage()), Globals.lang("Error_opening_file"), JOptionPane.ERROR_MESSAGE); 
+                	}
                 }
             }
         });
@@ -340,7 +344,7 @@ public class ManageJournalsPanel extends JPanel{
         return true;
     }
 
-    public void storeSettings() {
+    public void storeSettings() throws FileNotFoundException {
         File f = null;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
@@ -352,6 +356,9 @@ public class ManageJournalsPanel extends JPanel{
             f = new File(personalFile.getText());
 
         if (f != null) {
+        	if (!f.exists()) {
+        		throw new FileNotFoundException(f.getAbsolutePath());
+        		}
             FileWriter fw = null;
             try {
                 fw = new FileWriter(f, false);
