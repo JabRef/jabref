@@ -206,7 +206,7 @@ public class ManageJournalsPanel extends JPanel{
                 		storeSettings();
                 		dialog.dispose();
                 	} catch (FileNotFoundException ex) {
-                		JOptionPane.showMessageDialog(null, Globals.lang("Error_opening_file" + ": " + ex.getMessage()), Globals.lang("Error_opening_file"), JOptionPane.ERROR_MESSAGE); 
+                		JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + ": " + ex.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                 	}
                 }
             }

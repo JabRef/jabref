@@ -171,7 +171,7 @@ public class JabRef {
 				Globals.journalAbbrev.readJournalList(new File(
 						personalJournalList));
 			} catch (FileNotFoundException e) {
-				JOptionPane.showMessageDialog(null, Globals.lang("Journal_file_not_found" + ": " + e.getMessage()), Globals.lang("Error_opening_file"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, Globals.lang("Journal file not found") + ": " + e.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
 				Globals.prefs.put("personalJournalList", "");
 			}
 		}
