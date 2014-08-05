@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -166,12 +166,13 @@ public class JabRef {
 		 * journal names and abbreviations to the list:
 		 */
 		String personalJournalList = prefs.get("personalJournalList");
-		if (personalJournalList != null) {
+		if (personalJournalList != null && !personalJournalList.isEmpty()) {
 			try {
 				Globals.journalAbbrev.readJournalList(new File(
 						personalJournalList));
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, Globals.lang("Journal file not found") + ": " + e.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+				Globals.prefs.put("personalJournalList", "");
 			}
 		}
 		

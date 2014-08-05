@@ -10,7 +10,8 @@
     - Support FindFullText with ACS DOIs (pull request #9)
     - Fixes groups and adds optional 2.9.2 save ordering (pull request #10)
     - Fixes bug 880 "PubMed Import broken" (pull request #11 by vegeziel)
-    - Fixes bug #959 "StringIndexOutOfBoundsException with invalid Preview text" (pull request #12 by IngvarJackal)
+    - Fixes bug #959 "StringIndexOutOfBoundsException with invalid Preview text" (pull request #13 by IngvarJackal)
+    - Fixes bug #960 "FileNotFoundException in Journal abbreviations window" (pull request #13 by IngvarJackal)
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
