@@ -8,6 +8,11 @@ Add a line with your changes and your name.
 Nicknames are OK
 
 
+## Add yourself to src/main/resources/help/About.html
+We try to keep an updated list of contributors in `About.html`.
+Open `About.html` and add yourself below `Contributions from:`.
+
+
 ## Adapt the year in the header
 
 The years stated in the header of each .java file should match the years where the file has been modified.
