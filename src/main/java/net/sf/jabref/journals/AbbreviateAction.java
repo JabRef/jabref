@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -55,6 +55,8 @@ public class AbbreviateAction extends AbstractWorker {
         int count = 0;
         for (BibtexEntry entry : entries) {
             if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso))
+                count++;
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journaltitle", ce, iso))
                 count++;
         }
         if (count > 0) {

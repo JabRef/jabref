@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 Raik Nagel and JabRef contributors
+/*  Copyright (C) 2003-2014 Raik Nagel and JabRef contributors
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -96,6 +96,10 @@ public class BibtexFields
     dummy = new BibtexSingleField( "journal", true, GUIGlobals.SMALL_W ) ;
     dummy.setExtras("journalNames");
     add(dummy) ;
+    dummy = new BibtexSingleField( "journaltitle", true, GUIGlobals.SMALL_W ) ;
+    dummy.setExtras("journalNames");
+    add(dummy) ;
+
     add( new BibtexSingleField( "key", true ) ) ;
     add( new BibtexSingleField( "month", true, GUIGlobals.SMALL_W ) ) ;
     add( new BibtexSingleField( "note", true, GUIGlobals.MEDIUM_W  ) ) ;
