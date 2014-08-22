@@ -345,13 +345,26 @@ public class ManageJournalsPanel extends JPanel{
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
                 f = new File(newNameTf.getText());
+                if(!f.exists())
+                	if(new File(f.getPath().substring(0, f.getPath().lastIndexOf("/"))).exists()
+                			|| new File(f.getPath().substring(0, f.getPath().lastIndexOf("\\"))).exists()){
+                		try {
+							f.createNewFile();
+						} catch (IOException e) {
+							JOptionPane.showMessageDialog(this, "Could not create the file in the path specified");
+							e.printStackTrace();
+						}
+                	}else{
+                		JOptionPane.showMessageDialog(this, "Informed folder does not exist");
+                	}
+                
             }// else {
             //    return; // Nothing to do.
             //}
         } else
             f = new File(personalFile.getText());
 
-        if (f != null) {
+        if (f.exists()) {
             FileWriter fw = null;
             try {
                 fw = new FileWriter(f, false);
