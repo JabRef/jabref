@@ -1,4 +1,5 @@
 [master]
+    - Fixed bug 960 "FileNotFoundException in Journal abbreviations window" (by edukempf)
     - Change default behaviour to be more non-invasive: timestamps and owners are NOT set by default per entry.
     - "Open Folder" works again
     - newline separator can now be configured globally
