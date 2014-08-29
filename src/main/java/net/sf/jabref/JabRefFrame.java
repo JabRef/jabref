@@ -290,6 +290,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
+                                        
       openFolder = new GeneralAction("openFolder", "Open folder",
                                         Globals.lang("Open folder"),
                                         prefs.getKey("Open folder")),
@@ -355,7 +356,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     Cleanup = new GeneralAction("Cleanup", "Cleanup entries", 
 					Globals.lang("Cleanup entries"), 
-					GUIGlobals.getIconUrl("cleanupentries") ),
+					prefs.getKey("Cleanup"),
+					("cleanupentries")),
           
     mergeEntries = new GeneralAction("mergeEntries", "Merge entries", 
 					Globals.lang("Merge entries"),
@@ -1121,16 +1123,15 @@ public JabRefPreferences prefs() {
           putValue(ACCELERATOR_KEY, key);
       }
 
-  /*    public GeneralAction(String command, String text, String description,
-                           URL imageUrl, KeyStroke key) {
+      public GeneralAction(String command, String text, String description, KeyStroke key, String imageUrl) {
       this.command = command;
-        ImageIcon icon = GUIGlobals.getImage(command);
+        ImageIcon icon = GUIGlobals.getImage(imageUrl);
         if (icon != null)
             putValue(SMALL_ICON, icon);
       putValue(NAME, text);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
         putValue(ACCELERATOR_KEY, key);
-    }*/
+    }
 
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
