@@ -1,5 +1,4 @@
 [master]
-    - Make (un)abbreviating journal titles also work on the journaltitle field
     - Change default behaviour to be more non-invasive: timestamps and owners are NOT set by default per entry.
     - "Open Folder" works again
     - newline separator can now be configured globally
@@ -13,6 +12,8 @@
     - Fixes bug 880 "PubMed Import broken" (pull request #11 by vegeziel)
     - Fixes bug #959 "StringIndexOutOfBoundsException with invalid Preview text" (pull request #13 by IngvarJackal)
     - Fixes bug #960 "FileNotFoundException in Journal abbreviations window" (pull request #13 by IngvarJackal)
+    - Make (un)abbreviating journal titles also work on the journaltitle field
+    - Fix error when setting a previously unset field via the source panel of the entry editor
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
