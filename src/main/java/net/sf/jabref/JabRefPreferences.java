@@ -1145,6 +1145,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Search ACM Portal", "ctrl shift F8");
         defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Search JSTOR", "shift F9");
+        defKeyBinds.put("Cleanup", "ctrl shift F7");
         defKeyBinds.put("Write XMP", "ctrl F7");
         defKeyBinds.put("New file link", "ctrl N");
         defKeyBinds.put("Fetch SPIRES", "ctrl F8");

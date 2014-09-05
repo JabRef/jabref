@@ -840,15 +840,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // Then set all fields that have been set by the user.
             for (String field : nu.getAllFields()){
-                if (!entry.getField(field).equals(nu.getField(field))) {
-                    String toSet = nu.getField(field);
-
+                String oldValue = entry.getField(field);
+                String newValue = nu.getField(field);
+                if (oldValue == null || !oldValue.equals(newValue)) {
                     // Test if the field is legally set.
-                    (new LatexFieldFormatter()).format(toSet, field);
+                    (new LatexFieldFormatter()).format(newValue, field);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field, entry
-                        .getField(field), toSet));
-                    entry.setField(field, toSet);
+                    compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                    entry.setField(field, newValue);
                     anyChanged = true;
                 }
             }

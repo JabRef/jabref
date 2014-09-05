@@ -1,4 +1,5 @@
 [master]
+	- Feature 850: Keyboard shortcut for 'Cleanup entries' (by eduardogreco)
     - Change default behaviour to be more non-invasive: timestamps and owners are NOT set by default per entry.
     - "Open Folder" works again
     - newline separator can now be configured globally
@@ -14,6 +15,7 @@
     - Fixes bug #960 "FileNotFoundException in Journal abbreviations window" (pull request #13 by IngvarJackal)
     - Make (un)abbreviating journal titles also work on the journaltitle field
     - Fix edits getting lost in Biblatex mode
+    - Fix error when setting a previously unset field via the source panel of the entry editor
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
