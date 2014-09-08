@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -51,7 +51,7 @@ public class EntryEditorTab {
 
 	private String[] fields;
 
-	EntryEditor parent;
+	private EntryEditor parent;
 
 	private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
@@ -60,12 +60,8 @@ public class EntryEditorTab {
    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     public FileListEditor fileListEditor = null;
 
-    protected EntryEditorTab() {
-
-    }
-
 	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, String name) {
+                          boolean addKeyField, boolean compressed, String name) {
 		if (fields != null)
 			this.fields = fields.toArray(new String[fields.size()]);
 		else
@@ -73,7 +69,7 @@ public class EntryEditorTab {
 
 		this.parent = parent;
 
-		setupPanel(frame, panel, addKeyField, name);
+		setupPanel(frame, panel, addKeyField, compressed, name);
 
 		/*
 		 * The following line makes sure focus cycles inside tab instead of
@@ -83,7 +79,8 @@ public class EntryEditorTab {
 	}
 
 
-    void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField, String title) {
+    void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
+	    boolean compressed, String title) {
     	
     	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
 		ActionMap am = panel.getActionMap();
@@ -112,16 +109,22 @@ public class EntryEditorTab {
     	
     	  	
         panel.setName(title);
+
+        int fieldsPerRow = compressed ? 2 : 1;
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
-        String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
+        String colSpec = compressed ? "fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref, "
+                                        +"8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
+                                    : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
-        for (String field : fields) {
+        int rows = (int)Math.ceil((double)fields.length/fieldsPerRow);
+        for (int i = 0; i < rows; i++) {
             sb.append("fill:pref:grow, ");
         }
         if (addKeyField)
             sb.append("4dlu, fill:pref");
         else
-            sb.delete(sb.length()-2, sb.length());
+            if (sb.length() >= 2)
+                sb.delete(sb.length() - 2, sb.length());
         String rowSpec = sb.toString();
 
         DefaultFormBuilder builder = new DefaultFormBuilder
@@ -162,7 +165,8 @@ public class EntryEditorTab {
             if (i == 0)
                 activeField = ta;
             //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
-            ta.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
+            if (!compressed)
+                ta.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             builder.append(ta.getLabel());
             if (ex == null)
                 builder.append(ta.getPane(), 3);
@@ -173,7 +177,8 @@ public class EntryEditorTab {
                 pan.add(ex, BorderLayout.NORTH);
                 builder.append(pan);
             }
-            builder.nextLine();
+            if ((i+1) % fieldsPerRow == 0)
+                builder.nextLine();
         }
 
         // Add the edit field for Bibtex-key.
@@ -307,6 +312,10 @@ public class EntryEditorTab {
 
 	public Component getPane() {
 		return scrollPane;
+	}
+
+	public EntryEditor getParent() {
+	    return parent;
 	}
 
 	/**

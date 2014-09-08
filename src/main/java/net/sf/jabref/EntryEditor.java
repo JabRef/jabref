@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -233,7 +233,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         List<String> fieldList = null;
         if (fields != null)
             fieldList = java.util.Arrays.asList(fields);
-        reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, Globals.lang("Required fields"));
+        reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Globals.lang("Required fields"));
         if (reqPan.fileListEditor != null) fileListEditor = reqPan.fileListEditor;
         tabbed.addTab(Globals.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
             .getPane(), Globals.lang("Show required fields"));
@@ -242,24 +242,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
             if (!prefs.getBoolean("biblatexMode")) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
-                    false, Globals.lang("Optional fields"));
+                    false, false, Globals.lang("Optional fields"));
                 if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
             }
             else {
-                optPan = new CompressedEntryEditorTab(frame, panel,
+                optPan = new EntryEditorTab(frame, panel,
                         java.util.Arrays.asList(entry.getType().getPrimaryOptionalFields()), this,
-                    false, Globals.lang("Optional fields"));
+                    false, true, Globals.lang("Optional fields"));
                 if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
-                optPan = new CompressedEntryEditorTab(frame, panel,
+                optPan = new EntryEditorTab(frame, panel,
                         java.util.Arrays.asList(Util.getRemainder(entry.getOptionalFields(),
                                 entry.getType().getPrimaryOptionalFields())), this,
-                    false, Globals.lang("Optional fields 2"));
+                    false, true, Globals.lang("Optional fields 2"));
                 if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
@@ -270,7 +270,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
-                tabList.getTabName(i));
+                false, tabList.getTabName(i));
             if (newTab.fileListEditor != null) fileListEditor = newTab.fileListEditor;
             tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
             tabs.add(newTab);

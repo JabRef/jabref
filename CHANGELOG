@@ -14,6 +14,7 @@
     - Fixes bug #959 "StringIndexOutOfBoundsException with invalid Preview text" (pull request #13 by IngvarJackal)
     - Fixes bug #960 "FileNotFoundException in Journal abbreviations window" (pull request #13 by IngvarJackal)
     - Make (un)abbreviating journal titles also work on the journaltitle field
+    - Fix edits getting lost in Biblatex mode
     - Fix error when setting a previously unset field via the source panel of the entry editor
 2.10
     - Made IEEEXploreFetcher author parsing work again.
