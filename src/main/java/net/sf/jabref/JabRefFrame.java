@@ -2564,9 +2564,8 @@ class SaveSessionAction
         }
         public void actionPerformed(ActionEvent event) {
             int currentSize = GUIGlobals.CURRENTFONT.getSize();
-            Font newFont = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize+1);
-            GUIGlobals.CURRENTFONT = newFont;
             Globals.prefs.putInt("fontSize", currentSize+1);
             for (int i=0; i<baseCount(); i++) {
                 baseAt(i).updateTableFont();
@@ -2583,9 +2582,8 @@ class SaveSessionAction
             int currentSize = GUIGlobals.CURRENTFONT.getSize();
             if (currentSize < 2 )
                 return;
-            Font newFont = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize-1);
-            GUIGlobals.CURRENTFONT = newFont;
             Globals.prefs.putInt("fontSize", currentSize-1);
             for (int i=0; i<baseCount(); i++) {
                 baseAt(i).updateTableFont();
