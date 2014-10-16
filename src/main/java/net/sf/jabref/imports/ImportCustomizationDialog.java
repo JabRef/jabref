@@ -22,7 +22,7 @@
 
  Further information about the GNU GPL is available at:
  http://www.gnu.org/copyleft/gpl.ja.html
-
+  Copyright (C) 2005-2014 JabRef contributors.
  */
 package net.sf.jabref.imports;
 
@@ -113,14 +113,16 @@ public class ImportCustomizationDialog extends JDialog {
       JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
       addFromFolderButton.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
+        	  String chosenFileStr = null;
               CustomImportList.Importer importer = prefs.customImports.new Importer();
               importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
                       Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
-              String chosenFileStr = FileDialogs.getNewFile(frame, importer.getBasePath(), ".class",
+              if(importer.getBasePath()!=null)
+              chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
                       Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
               if (chosenFileStr != null) {
                   try {
-                      importer.setClassName(pathToClass(importer.getBasePath(), new File(chosenFileStr)));
+                      importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
                       importer.setName(importer.getInstance().getFormatName());
                       importer.setCliId(importer.getInstance().getCLIId());
                       addOrReplaceImporter(importer);
@@ -286,7 +288,7 @@ public class ImportCustomizationDialog extends JDialog {
       } else if (columnIndex == 2) {
         value = importer.getClassName();
       } else if (columnIndex == 3) {
-        value = importer.getBasePath();
+        value = importer.getFileFromBasePath();
       }
       return value;
     }
