@@ -1,10 +1,10 @@
-### Prerequisites:
+## Prerequisites:
 * Java Development Kit ([Download Java DK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
-#### Ensure you have java SDK installed in your machine
+### Ensure you have java SDK installed in your machine
 * in the command line (terminal in linux, cmd in windows) run "javac -version"
 * if javac is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
 
-#### Install gradle in your machine
+### Install gradle in your machine
 * for debian based linux distros:
 
 1. "sudo apt-get install gradle"
@@ -17,16 +17,16 @@
 3. Add location of your Gradle “bin” folder to your path (e.g. "C:\Program Files\gradle-x.x\bin"). Open the system properties (WinKey + Pause), select the “Advanced” tab, and the “Environment Variables” button, then add “C:\Program Files\gradle-x.x\bin” (or wherever you unzipped Gradle) to the end of your “Path” variable under System Properties. Be sure to omit any quotation marks around the path even if it contains spaces. Also make sure you separated from previous PATH entries with a semicolon “;”.
 4. Open a new command prompt (type cmd in Start menu) and run gradle –version to verify that it is correctly installed.
 
-#### get git in place. To install it:
+### get git in place. To install it:
 * in debian based linux distros
 1. "sudo apt-get install git"
-#### in Windows
+### in Windows
 1. Go to http://git-scm.com/download/win download and install it
 
-#### Github account
+### Github account
 * If you do not have github account, create it at https://github.com/
 
-#### Get an IDE in place.
+### Get an IDE in place.
 * I suggest eclipse. 
 * In ubuntu linux, you can follow one of these guidelines:
 
@@ -35,23 +35,23 @@
 
 * In windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the install
 
-### Getting the code
-#### Fork jabref into your github account
+## Getting the code
+### Fork jabref into your github account
 1. Log into your github account
 2. Go to https://github.com/JabRef/jabref 
 3. Create a fork by clicking at fork button on the right top corner
 4. a fork repository will be created under your account (https://github.com/YOUR_USERNAME/jabref)
 
-#### Clone your forked repo into your local machine.
+### Clone your forked repo into your local machine.
 * In command line go to a folder you want to place the source code locally (parent folder of jabref/)
 * run "git clone https://github.com/YOUR_USERNAME/jabref.git jabref"
 
-#### Generating additional source codes and getting dependencies using Gradle:
+### Generating additional source codes and getting dependencies using Gradle:
 * Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute "cd jabref")
 * run "gradlew generateSource" ("./gradlew generateSource" in linux) to generate additional source and download libraries (it will take some minutes)
 * run "gradlew eclipse" (./"gradlew eclipse" in linux) if you are using eclipse IDE (alternatively you can use inteliJIdea running "gradlew idea")
 
-#### building it into your IDE
+### building it into your IDE
 * open eclipse (or your prefered IDE)
 * to import your jabref project go to menu File--> Import
 
