@@ -20,6 +20,7 @@
 ### get git in place. To install it:
 * in debian based linux distros
 1. "sudo apt-get install git"
+
 ### in Windows
 1. Go to http://git-scm.com/download/win download and install it
 
