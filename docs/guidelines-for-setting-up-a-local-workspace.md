@@ -1,5 +1,6 @@
 ## Prerequisites:
 * Java Development Kit ([Download Java DK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
+
 ### Ensure you have java SDK installed in your machine
 * in the command line (terminal in linux, cmd in windows) run "javac -version"
 * if javac is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
