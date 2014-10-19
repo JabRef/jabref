@@ -979,7 +979,8 @@ public class BibtexParser {
 					// "+be.getType().getName());
 					_pr
 						.addWarning(Globals.lang("unknown entry type") + ": "
-							+ be.getType().getName() + ". " + Globals.lang("Type set to 'other'")
+							+ be.getType().getName() + ":" + be.getField(BibtexFields.KEY_FIELD)
+							+ " . " + Globals.lang("Type set to 'other'")
 							+ ".");
 					be.setType(BibtexEntryType.OTHER);
 				}
