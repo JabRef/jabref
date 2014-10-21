@@ -151,7 +151,7 @@ public class ImportCustomizationDialog extends JDialog {
                   try {
                       zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
                   } catch (IOException exc) {
-                      exc.printStackTrace();
+                      Globals.logger("Could not open Zip-archive: \n"+ exc.getMessage());
                       JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
                               + "\n" + Globals.lang("Have you chosen the correct package path?"));
                       return;
