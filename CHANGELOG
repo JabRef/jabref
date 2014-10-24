@@ -17,6 +17,7 @@
     - Make (un)abbreviating journal titles also work on the journaltitle field
     - Fix edits getting lost in Biblatex mode
     - Fix error when setting a previously unset field via the source panel of the entry editor
+    - Improved BibLatex support (alias fields, option to convert old entries to the new format via the cleanup menu)
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
