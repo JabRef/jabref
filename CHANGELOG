@@ -18,6 +18,9 @@
     - Fix edits getting lost in Biblatex mode
     - Fix error when setting a previously unset field via the source panel of the entry editor
     - Improved BibLatex support (alias fields, option to convert old entries to the new format via the cleanup menu)
+    	- Fixes bug #1087 "jabref does not follow biblatex specification" 
+    	- Fixes bug #1014 'journal' not recognized as alias for 'journaltitle''
+    	- Fixes bug #874 Support of biblatex "date" field 
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.
