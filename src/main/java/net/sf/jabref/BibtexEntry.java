@@ -371,6 +371,8 @@ public class BibtexEntry
         if(name.equals("year") || name.equals("month"))
         {
         	String date = getField("date");
+        	if(date == null)
+        		return null;
         	
         	// Create date format matching dates with year and month
         	DateFormat df = new DateFormat() {
