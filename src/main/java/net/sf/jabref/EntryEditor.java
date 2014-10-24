@@ -40,8 +40,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -256,14 +259,47 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
+                
+                Set<String> deprecatedFields = new HashSet<String>(entry.FieldAliasesOldToNew.keySet());
+                deprecatedFields.add("year");
+                deprecatedFields.add("month");
+                String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(entry.getOptionalFields(),
+                        entry.getType().getPrimaryOptionalFields());
+                optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(optionalFieldsNotPrimaryOrDeprecated,
+                		deprecatedFields.toArray(new String[0]));
+                
+                // Get list of all optional fields of this entry and their aliases
+                Set<String> optionalFieldsAndAliases = new HashSet<String>();
+                for(String field : entry.getOptionalFields())
+                {
+                	optionalFieldsAndAliases.add(field);
+                	if(entry.FieldAliasesNewToOld.containsKey(field))
+                		optionalFieldsAndAliases.add(entry.FieldAliasesNewToOld.get(field));
+                }
+                	
+                // Get all optional fields which are deprecated
+                Set<String> usedOptionalFieldsDeprecated = new HashSet<String>(deprecatedFields);
+                usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
+                
+                // Add tabs
                 optPan = new EntryEditorTab(frame, panel,
-                        java.util.Arrays.asList(Util.getRemainder(entry.getOptionalFields(),
-                                entry.getType().getPrimaryOptionalFields())), this,
+                        java.util.Arrays.asList(optionalFieldsNotPrimaryOrDeprecated), this,
                     false, true, Globals.lang("Optional fields 2"));
                 if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
                 tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
+                
+                if(!usedOptionalFieldsDeprecated.isEmpty())
+                {
+	                optPan = new EntryEditorTab(frame, panel,
+	                        java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[0])), this,
+	                    false, true, Globals.lang("Deprecated fields"));
+	                if (optPan.fileListEditor != null) fileListEditor = optPan.fileListEditor;
+	                tabbed.addTab(Globals.lang("Deprecated fields"), GUIGlobals.getImage("optional"), optPan
+	                    .getPane(), Globals.lang("Show deprecated bibtex fields"));
+	                tabs.add(optPan);
+                }
             }
         }
 

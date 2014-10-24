@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
@@ -28,6 +29,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.factories.Borders;
+
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
@@ -61,11 +63,12 @@ public class CleanUpAction extends AbstractWorker {
 		CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths",
 		CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks",
 		CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts",
-	        CLEANUP_HTML = "CleanUpHTML",
+		CLEANUP_HTML = "CleanUpHTML",
 		CLEANUP_CASE = "CleanUpCase",
-                CLEANUP_LATEX = "CleanUpLaTeX",
-                CLEANUP_UNITS = "CleanUpUnits",
-                CLEANUP_UNICODE = "CleanUpUnicode";
+		CLEANUP_LATEX = "CleanUpLaTeX",
+		CLEANUP_UNITS = "CleanUpUnits",
+		CLEANUP_UNICODE = "CleanUpUnicode",
+		CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
                 
 	public static void putDefaults(HashMap<String, Object> defaults) {
 		defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
@@ -78,11 +81,12 @@ public class CleanUpAction extends AbstractWorker {
 		defaults.put(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, Boolean.FALSE);
 		defaults.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, Boolean.FALSE);
 		defaults.put(CLEANUP_MAKEPATHSRELATIVE, Boolean.TRUE);
-                defaults.put(CLEANUP_HTML, Boolean.TRUE);
-                defaults.put(CLEANUP_CASE, Boolean.TRUE);
-                defaults.put(CLEANUP_LATEX, Boolean.TRUE);
-                defaults.put(CLEANUP_UNITS, Boolean.TRUE);
-                defaults.put(CLEANUP_UNICODE, Boolean.TRUE);
+		defaults.put(CLEANUP_HTML, Boolean.TRUE);
+		defaults.put(CLEANUP_CASE, Boolean.TRUE);
+		defaults.put(CLEANUP_LATEX, Boolean.TRUE);
+		defaults.put(CLEANUP_UNITS, Boolean.TRUE);
+		defaults.put(CLEANUP_UNICODE, Boolean.TRUE);
+		defaults.put(CLEANUP_CONVERTTOBIBLATEX, Boolean.FALSE);
 	}
 	
 	private JCheckBox cleanUpSuperscrips;
@@ -95,14 +99,16 @@ public class CleanUpAction extends AbstractWorker {
 	private JCheckBox cleanUpUpgradeExternalLinks;
 	private JCheckBox cleanUpHTML;
 	private JCheckBox cleanUpCase;
-        private JCheckBox cleanUpLaTeX;
+	private JCheckBox cleanUpLaTeX;
 	private JCheckBox cleanUpUnits;
 	private JCheckBox cleanUpUnicode;
+	private JCheckBox cleanUpBiblatex;
+	
 	private JPanel optionsPanel = new JPanel();
 	private BasePanel panel;
 	private JabRefFrame frame;
 	
-	// global variable to count unsucessful Renames
+	// global variable to count unsuccessful renames
     int unsuccesfullRenames = 0;
 	
 	public CleanUpAction(BasePanel panel) {
@@ -131,10 +137,11 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpLaTeX = new JCheckBox(Globals.lang("Remove unneccessary $, {, and } and move adjacent numbers into equations"));
 		cleanUpUnits = new JCheckBox(Globals.lang("Add brackets and replace separators with their non-breaking version for units"));
 		cleanUpUnicode = new JCheckBox(Globals.lang("Run Unicode converter on title, author(s), and abstract"));
+		cleanUpBiblatex = new JCheckBox(Globals.lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 		optionsPanel = new JPanel();
 		retrieveSettings();
 
-		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
+		FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout,	optionsPanel);
         builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
@@ -153,6 +160,7 @@ public class CleanUpAction extends AbstractWorker {
         String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern), cc.xyw(2,13,1));
         builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2,14,1));
+        builder.add(cleanUpBiblatex, cc.xyw(1,15,2));
 	}
 	
 	private void retrieveSettings() {
@@ -165,11 +173,12 @@ public class CleanUpAction extends AbstractWorker {
 		cleanUpRenamePDFonlyRelativePaths.setSelected(Globals.prefs.getBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS));
 		cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
 		cleanUpUpgradeExternalLinks.setSelected(Globals.prefs.getBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS));
-                cleanUpHTML.setSelected(Globals.prefs.getBoolean(CLEANUP_HTML));
-                cleanUpCase.setSelected(Globals.prefs.getBoolean(CLEANUP_CASE));
-                cleanUpLaTeX.setSelected(Globals.prefs.getBoolean(CLEANUP_LATEX));
-                cleanUpUnits.setSelected(Globals.prefs.getBoolean(CLEANUP_UNITS));
-                cleanUpUnicode.setSelected(Globals.prefs.getBoolean(CLEANUP_UNICODE));
+		cleanUpHTML.setSelected(Globals.prefs.getBoolean(CLEANUP_HTML));
+		cleanUpCase.setSelected(Globals.prefs.getBoolean(CLEANUP_CASE));
+		cleanUpLaTeX.setSelected(Globals.prefs.getBoolean(CLEANUP_LATEX));
+		cleanUpUnits.setSelected(Globals.prefs.getBoolean(CLEANUP_UNITS));
+		cleanUpUnicode.setSelected(Globals.prefs.getBoolean(CLEANUP_UNICODE));
+		cleanUpBiblatex.setSelected(Globals.prefs.getBoolean(CLEANUP_CONVERTTOBIBLATEX));
 	}
 	
 	private void storeSettings() {
@@ -181,11 +190,12 @@ public class CleanUpAction extends AbstractWorker {
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF, cleanUpRenamePDF.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS, cleanUpRenamePDFonlyRelativePaths.isSelected());
 		Globals.prefs.putBoolean(CLEANUP_UPGRADE_EXTERNAL_LINKS, cleanUpUpgradeExternalLinks.isSelected());
-                Globals.prefs.putBoolean(CLEANUP_HTML, cleanUpHTML.isSelected());
-                Globals.prefs.putBoolean(CLEANUP_CASE, cleanUpCase.isSelected());
-                Globals.prefs.putBoolean(CLEANUP_LATEX, cleanUpLaTeX.isSelected());
-                Globals.prefs.putBoolean(CLEANUP_UNITS, cleanUpUnits.isSelected());
-                Globals.prefs.putBoolean(CLEANUP_UNICODE, cleanUpUnicode.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_HTML, cleanUpHTML.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_CASE, cleanUpCase.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_LATEX, cleanUpLaTeX.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_UNITS, cleanUpUnits.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_UNICODE, cleanUpUnicode.isSelected());
+		Globals.prefs.putBoolean(CLEANUP_CONVERTTOBIBLATEX, cleanUpBiblatex.isSelected());
 	}
 
 	private int showCleanUpDialog() {
@@ -230,13 +240,13 @@ public class CleanUpAction extends AbstractWorker {
     		choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected(),
     		choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected(),
     		choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected(),
-		choiceRenamePDF = cleanUpRenamePDF.isSelected(),
+    		choiceRenamePDF = cleanUpRenamePDF.isSelected(),
 	        choiceConvertHTML = cleanUpHTML.isSelected(),
-                choiceConvertCase = cleanUpCase.isSelected(),
-                choiceConvertLaTeX = cleanUpLaTeX.isSelected(),
-                choiceConvertUnits = cleanUpUnits.isSelected(),
-                choiceConvertUnicode = cleanUpUnicode.isSelected();
-   
+	        choiceConvertCase = cleanUpCase.isSelected(),
+	        choiceConvertLaTeX = cleanUpLaTeX.isSelected(),
+	        choiceConvertUnits = cleanUpUnits.isSelected(),
+	        choiceConvertUnicode = cleanUpUnicode.isSelected(),
+    		choiceConvertToBiblatex = cleanUpBiblatex.isSelected();
     	
     	if (choiceRenamePDF && Globals.prefs.getBoolean(AKS_AUTO_NAMING_PDFS_AGAIN)) { 
 	        CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
@@ -274,11 +284,12 @@ public class CleanUpAction extends AbstractWorker {
         	fixWrongFileEntries(entry, ce);
         	if (choiceMakePathsRelative) doMakePathsRelative(entry, ce);
         	if (choiceRenamePDF) doRenamePDFs(entry, ce);
-		if (choiceConvertHTML) doConvertHTML(entry, ce);
-		if (choiceConvertUnits) doConvertUnits(entry, ce);
+        	if (choiceConvertHTML) doConvertHTML(entry, ce);
+        	if (choiceConvertUnits) doConvertUnits(entry, ce);
         	if (choiceConvertCase) doConvertCase(entry, ce);
         	if (choiceConvertLaTeX) doConvertLaTeX(entry, ce);
         	if (choiceConvertUnicode) doConvertUnicode(entry, ce);
+        	if (choiceConvertToBiblatex) doConvertToBiblatex(entry, ce);
         	
             ce.end();
             if (ce.hasEdits()) {
@@ -385,16 +396,12 @@ public class CleanUpAction extends AbstractWorker {
                     return;
                 }
 		String newValue = oldValue;
-		try {
-                    int month = Integer.parseInt(newValue);
-                    newValue = "#" + Globals.MONTHS[month - 1] + '#';
-                } catch (NumberFormatException e) {
-                    // Much more liberal matching covering most known abbreviations etc.
-                    String testString = newValue.substring(0, 3).toLowerCase();
-                    if (Globals.MONTH_STRINGS.containsKey(testString)) {
-                        newValue = "#" + testString + '#';
-        	}
-    	}
+		int month = Globals.ParseMonthToInteger(oldValue);
+		if(month > 0)
+		{
+			newValue = "#" + Globals.MONTHS[month - 1] + '#';
+		}
+
     	if (!oldValue.equals(newValue)) {
     		entry.setField("month", newValue);
     		ce.addEdit(new UndoableFieldChange(entry, "month", oldValue, newValue));
@@ -638,6 +645,44 @@ public class CleanUpAction extends AbstractWorker {
             entry.setField(field, newValue);
             ce.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
         }
+    }
+    
+    /**
+	 * Converts to BibLatex format
+	 */
+    private void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
+        
+    	for (Map.Entry<String, String> alias : entry.FieldAliasesOldToNew.entrySet()) {
+    	    String oldFieldName = alias.getKey();
+    	    String newFieldName = alias.getValue();
+    	    String oldValue = entry.getField(oldFieldName);
+    	    String newValue = entry.getField(newFieldName);
+    	    if(oldValue != null && oldValue.length() > 0
+    	    		&& newValue == null)
+    	    {
+    	    	// There is content in the old field and no value in the new, so just copy
+    	    	entry.setField(newFieldName, oldValue);
+                ce.addEdit(new UndoableFieldChange(entry, newFieldName, null, oldValue));
+                
+                entry.setField(oldFieldName, null);
+                ce.addEdit(new UndoableFieldChange(entry, oldFieldName, oldValue, null));
+    	    }
+    	}
+    	
+    	// Dates: create date out of year and month, save it and delete old fields
+    	if(entry.getField("date") == null || entry.getField("date").length() == 0)
+    	{
+    		String newDate = entry.getFieldOrAlias("date");
+    		String oldYear = entry.getField("year");
+    		String oldMonth = entry.getField("month");
+    		entry.setField("date", newDate);
+    		entry.setField("year", null);
+    		entry.setField("month", null);
+    		
+    		ce.addEdit(new UndoableFieldChange(entry, "date", null, newDate));
+    		ce.addEdit(new UndoableFieldChange(entry, "date", oldYear, null));
+    		ce.addEdit(new UndoableFieldChange(entry, "date", oldMonth, null));
+    	}
     }
 
 }
