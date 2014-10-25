@@ -1,4 +1,5 @@
 [master]
+	- Fix for bug 958: ArrayIndexOutOfBoundsException on "Content Selector Dialog"
 	- Fix for bug 949: Exception properly logged
 	- Fix for bug 950: NullPointerException on "Manage custom imports"
 	- Feature 850: Keyboard shortcut for 'Cleanup entries' (by eduardogreco)

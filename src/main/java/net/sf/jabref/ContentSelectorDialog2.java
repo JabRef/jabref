@@ -251,8 +251,14 @@ public class ContentSelectorDialog2 extends JDialog {
 
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    applyChanges();
-		    dispose();
+			try {
+				applyChanges();
+				dispose();
+			}
+			catch (Exception ex) {
+				Globals.logger("Could not apply changes in \"Setup selectors\"");
+				JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+			}
 		}
 	    });
 
@@ -262,7 +268,13 @@ public class ContentSelectorDialog2 extends JDialog {
             if (!wordEditField.getText().equals("")) {
                 wordEditFieldListener.actionPerformed(null);
             }
-		    applyChanges();
+            try {
+            	applyChanges();
+            }
+            catch (Exception ex) {
+				Globals.logger("Could not apply changes in \"Setup selectors\"");
+				JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+			}
 		}
 	    });
 	
