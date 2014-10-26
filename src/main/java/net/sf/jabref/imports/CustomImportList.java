@@ -22,6 +22,8 @@
 
  Further information about the GNU GPL is available at:
  http://www.gnu.org/copyleft/gpl.ja.html
+  Copyright (C) 2005-2014 JabRef contributors.
+ 
 */
 package net.sf.jabref.imports;
 
@@ -93,13 +95,15 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     public void setBasePath(String basePath) {
       this.basePath = basePath;
     }
-    
-    public File getBasePath() {
+    public String getBasePath() {
+        return basePath;
+      }
+    public File getFileFromBasePath() {
       return new File(basePath);
     }
     
     public URL getBasePathUrl() throws MalformedURLException {
-      return getBasePath().toURI().toURL();
+      return getFileFromBasePath().toURI().toURL();
     }
     
     public String[] getAsStringArray() {

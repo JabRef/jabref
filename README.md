@@ -116,6 +116,8 @@ To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` project files.
 
+* If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
+
 ## Release Process
 
 Replace `ANY_ANT_TARGET` with the Ant Target of your choice, and the system will build your binaries.

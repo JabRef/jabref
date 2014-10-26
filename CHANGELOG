@@ -1,4 +1,6 @@
 [master]
+	- Fix for bug 949: Exception properly logged
+	- Fix for bug 950: NullPointerException on "Manage custom imports"
 	- Feature 850: Keyboard shortcut for 'Cleanup entries' (by eduardogreco)
     - Change default behaviour to be more non-invasive: timestamps and owners are NOT set by default per entry.
     - "Open Folder" works again
