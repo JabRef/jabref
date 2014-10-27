@@ -36,6 +36,11 @@ import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.export.FieldFormatter;
@@ -44,6 +49,9 @@ import net.sf.jabref.export.FieldFormatter;
 public class BibtexEntry
 {
     public final static String ID_FIELD = "id";
+    public static Map<String,String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
+    public static Map<String,String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
+    
     private String _id;
     private BibtexEntryType _type;
     private Map<String, String> _fields = new HashMap<String, String>();
@@ -83,6 +91,30 @@ public class BibtexEntry
             }
         }
         maxFieldLength = max;
+        
+        FieldAliasesOldToNew.put("address", "location");
+        FieldAliasesNewToOld.put("location", "address");
+        
+        FieldAliasesOldToNew.put("annote", "annotation");
+        FieldAliasesNewToOld.put("annotation", "annote");
+        
+        FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
+        FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
+        
+        FieldAliasesOldToNew.put("journal", "journaltitle");
+        FieldAliasesNewToOld.put("journaltitle", "journal");
+        
+        FieldAliasesOldToNew.put("key", "sortkey");
+        FieldAliasesNewToOld.put("sortkey", "key");
+        
+        FieldAliasesOldToNew.put("pdf", "file");
+        FieldAliasesNewToOld.put("file", "pdf");
+        
+        FieldAliasesOldToNew.put("primaryclass", "eprintclass");
+        FieldAliasesNewToOld.put("eprintclass", "primaryclass");
+        
+        FieldAliasesOldToNew.put("school", "institution");
+        FieldAliasesNewToOld.put("institution", "school");
     }
 
     /**
@@ -283,7 +315,111 @@ public class BibtexEntry
     public String getField(String name) {
         return _fields.get(name);
     }
+    
+	/**
+	 * Returns the contents of the given field, its alias or null if both are
+	 * not set.
+	 * 
+	 * The following aliases are considered (old bibtex <-> new biblatex) based
+	 * on the BibLatex documentation, chapter 2.2.5:
+	 *  address 		<-> location
+	 *  annote			<-> annotation 
+	 *  archiveprefix 	<-> eprinttype 
+	 *  journal 		<-> journaltitle 
+	 *  key				<-> sortkey 
+	 * 	pdf 			<-> file 
+	 * 	primaryclass 	<-> eprintclass 
+	 * 	school 			<-> institution 
+	 * These work bidirectional.
+	 * 
+	 * Special attention is paid to dates: (see the BibLatex documentation,
+	 * chapter 2.3.8) 
+	 * 	The fields 'year' and 'month' are used if the 'date'
+	 * 	field is empty. Conversely, getFieldOrAlias("year") also tries to
+	 * 	extract the year from the 'date' field (analogously for 'month').
+	 */
+    public String getFieldOrAlias(String name) {
+        String fieldValue = getField(name);
+        if (fieldValue != null && fieldValue.length() > 0) 
+        	return fieldValue;
+        
+        // No value of this field found, so look at the alias
+        
+        // Create bidirectional dictionary between field names and their aliases
+        Map<String,String> aliases = new HashMap<String, String>();
+        aliases.putAll(FieldAliasesOldToNew);
+        aliases.putAll(FieldAliasesNewToOld);
+        
+        String aliasForField = aliases.get(name);
+        if(aliasForField != null)
+        	return getField(aliasForField);
+       
+        // So we did not found the field itself or its alias...
+        // Finally, handle dates
+        if(name.equals("date"))
+        {
+        	String year = getField("year");
+        	int month = Globals.ParseMonthToInteger(getField("month"));
+        	if(year != null)
+        	{
+        		if(month == 0)
+        			return year;
+        		else
+        			return year + "-" + month;
+        	}
+        }
+        if(name.equals("year") || name.equals("month"))
+        {
+        	String date = getField("date");
+        	if(date == null)
+        		return null;
+        	
+        	// Create date format matching dates with year and month
+        	DateFormat df = new DateFormat() {
+        	    static final String FORMAT1 = "yyyy-MM-dd";
+        	    static final String FORMAT2 = "yyyy-MM";
+        	    final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
+        	    final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
+        	    @Override
+        	    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+        	        throw new UnsupportedOperationException();
+        	    }
 
+        	    @Override
+        	    public Date parse(String source, ParsePosition pos) {
+        	        if (source.length() - pos.getIndex() == FORMAT1.length())
+        	            return sdf1.parse(source, pos);
+        	        return sdf2.parse(source, pos);
+        	    }
+        	};
+        	
+        	try {
+				Date parsedDate = df.parse(date);
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(parsedDate);
+				if(name.equals("year"))
+					return Integer.toString(calendar.get(Calendar.YEAR));
+				if(name.equals("month"))
+					return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
+			} catch (ParseException e) {
+				// So not a date with year and month, try just to parse years
+				df = new SimpleDateFormat("yyyy");
+				
+				try {
+					Date parsedDate = df.parse(date);
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(parsedDate);
+					if(name.equals("year"))
+						return Integer.toString(calendar.get(Calendar.YEAR));
+				} catch (ParseException e2) {
+				return null; // Date field not in valid format
+				}
+			}	
+        }
+        	
+        return null;
+    }    
+    
     public String getCiteKey() {
         return (_fields.containsKey(BibtexFields.KEY_FIELD) ?
                 _fields.get(BibtexFields.KEY_FIELD) : null);
@@ -676,5 +812,4 @@ public class BibtexEntry
             return text;
         return text.substring(0, maxCharacters + 1) + "...";
     }
-    
 }

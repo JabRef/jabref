@@ -251,7 +251,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (fld[i].equals(GUIGlobals.TYPE_HEADER))
                     o = be.getType().getName();
                 else {
-                    o = be.getField(fld[i]);
+                    o = be.getFieldOrAlias(fld[i]);
                     if (getColumnName(col).equals("Author") && o != null) {
                         o = panel.database().resolveForStrings((String) o);
                     }
@@ -294,7 +294,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public boolean hasField(BibtexEntry be, String field) {
         // Returns true iff the entry has a nonzero value in its
         // 'search' field.
-        return ((be != null) && (be.getField(field) != null));
+        return ((be != null) && (be.getFieldOrAlias(field) != null));
     }
 
     public int[] hasField(BibtexEntry be, String[] field) {

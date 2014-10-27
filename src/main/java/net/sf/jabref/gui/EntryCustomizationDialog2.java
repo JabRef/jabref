@@ -197,11 +197,18 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 reqComp.setEnabled(true);
                 optComp.setFields(new ArrayList<String>());
                 optComp.setEnabled(true);
+                if(biblatexMode)
+                {
+                	optComp2.setFields(new ArrayList<String>());
+                    optComp2.setEnabled(true);
+                }
                 new FocusRequester(reqComp);
             }
         } else {
             reqComp.setFields(rl);
             optComp.setFields(optLists.get(s));
+            if(biblatexMode)
+            	optComp2.setFields(opt2Lists.get(s));
         }
 
         lastSelected = s;
@@ -250,21 +257,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                         oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
                     String[] priOpt = oldType.getPrimaryOptionalFields();
-                    ArrayList<String> secOpt = new ArrayList<String>();
-                    for (String anOldOpt : oldOpt) {
-                        boolean inPri = false;
-                        for (String aPriOpt : priOpt) {
-                            if (aPriOpt.equals(anOldOpt)) {
-                                inPri = true;
-                                break;
-                            }
-                        }
-                        if (!inPri)
-                            secOpt.add(anOldOpt);
-                    }
-                    String[] secOptArray = secOpt.toArray(new String[secOpt.size()]);
+                    String[] secOpt = Util.getRemainder(oldOpt, priOpt);
                     if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr) &&
-                            equalArrays(secOptArray, opt2Str))
+                            equalArrays(secOpt, opt2Str))
                         changesMade = false;
                 } else if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr))
                     changesMade = false;
@@ -317,6 +312,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);
+            if(biblatexMode)
+            	opt2Lists.remove(name);
         }
         //messageLabel.setText("'"+type.getName()+"' "+
         //        Globals.lang("is a standard type."));
@@ -397,19 +394,36 @@ class DefaultListener implements ActionListener {
         if (type != null) {
             String[] rf = type.getRequiredFieldsForCustomization(),
                     of = type.getOptionalFields();
-            List<String> req, opt;
+            List<String> req, opt1, opt2;
             if (rf != null)
                 req = java.util.Arrays.asList(rf);
             else
                 req = new ArrayList<String>();
-            if (of != null)
-                opt = java.util.Arrays.asList(of);
+            
+            opt1 = new ArrayList<String>();
+    		opt2 = new ArrayList<String>();
+            if (biblatexMode) {
+            	if(of != null)
+            	{
+	                String[] priOptArray = type.getPrimaryOptionalFields();
+	                String[] secOptArray = Util.getRemainder(of, priOptArray);
+	                if(priOptArray != null)
+	                	opt1 = java.util.Arrays.asList(priOptArray);
+	                if(secOptArray != null)
+	                	opt2 = java.util.Arrays.asList(secOptArray);
+            	}
+            }
             else
-                opt = new ArrayList<String>();
-
+            {
+            	if (of != null)
+                    opt1 = java.util.Arrays.asList(of);            	
+            }
+            
             reqComp.setFields(req);
             reqComp.setEnabled(true);
-            optComp.setFields(opt);
+            optComp.setFields(opt1);
+            if(biblatexMode)
+            	optComp2.setFields(opt2);
         }
     }
 }

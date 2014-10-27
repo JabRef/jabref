@@ -731,7 +731,7 @@ public class LabelPatternUtil {
             } else if (val.equals("shorttitle")) {
                 return getTitleWords(3, _entry);
             } else if (val.equals("shortyear")) {
-                String ss = _entry.getField("year");
+                String ss = _entry.getFieldOrAlias("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
@@ -770,7 +770,7 @@ public class LabelPatternUtil {
      * @return The field value.
      */
     private static String getField(BibtexEntry entry, String field) {
-        Object o = entry.getField(field);
+        Object o = entry.getFieldOrAlias(field);
         return o != null ? (String)o : "";
     }
 

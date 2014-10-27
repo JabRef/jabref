@@ -161,6 +161,37 @@ public class Globals {
 			"ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15" };
     public static Map<String,String> ENCODING_NAMES_LOOKUP;
 
+    /**
+     * Parses month expressions (like 1, jan, #jan#) to the numerical representation 
+     * (with January corresponding to 1)
+     * Returns 0 if the month could not be parsed.
+     * TODO: Move this method along with the two arrays 'MONTHS' and 'MONTH_STRINGS' to a seperate class?
+     */
+    public static int ParseMonthToInteger(String value)
+    {
+    	// implementation based on patch 3470076 by Mathias Walter
+    	// originally, this code was present in the CleanUp-doCleanUpMonth method
+    	if (value == null) 
+    		return 0;
+    	
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			// Much more liberal matching covering most known abbreviations etc.
+			String testString = value.replace("#", "").trim().substring(0, 3).toLowerCase();
+			if (Globals.MONTH_STRINGS.containsKey(testString)) {
+				int i = 0;
+				for(String month : MONTHS)
+				{
+					if(testString.equals(MONTHS[i]))
+						return i + 1;
+					i++;
+				}
+			}
+		}
+		return 0;
+    }
+    
     // String array that maps from month number to month string label:
 	public static String[] MONTHS = new String[] { "jan", "feb", "mar", "apr", "may", "jun", "jul",
 		"aug", "sep", "oct", "nov", "dec" };

@@ -18,6 +18,7 @@ package net.sf.jabref;
 /**
  * This class defines entry types for BibLatex support.
  */
+
 public class BibLatexEntryTypes {
 
     /*
@@ -32,13 +33,13 @@ public class BibLatexEntryTypes {
             return "Article";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "journaltitle", "year", "date"};
+            return new String[] {"author", "title", "journaltitle", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"translator", "annotator", "commentator", "subtitle", "titleaddon",
 				 "editor", "editora", "editorb", "editorc", "journalsubtitle", "issuetitle",
 				 "issuesubtitle", "language", "origlanguage", "series", "volume", "number",
-				 "eid", "issue", "date", "month", "year", "pages", "version", "note", "issn",
+				 "eid", "issue", "month", "year", "pages", "version", "note", "issn",
 				 "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
 				 "urldate"};
         }
@@ -46,7 +47,7 @@ public class BibLatexEntryTypes {
         // TODO: number vs issue?
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "editor", "series", "volume", "number",
-				 "eid", "issue", "date", "month", "year", "pages", "note", "issn",
+				 "eid", "issue", "pages", "note", "issn",
 				 "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
 
@@ -63,14 +64,14 @@ public class BibLatexEntryTypes {
             return "Book";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "year", "date"};
+            return new String[] {"author", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"editor", "editora", "editorb", "editorc", "translator",
 				 "annotator", "commentator", "introduction",
 				 "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
 				 "maintitleaddon", "language", "origlanguage", "volume", "part",
-				 "edition", "volumes", "series", "number", "note", "publisher",
+				 "edition", "volumes", "series", "number", "month", "year", "note", "publisher",
 				 "location", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
 				 "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
@@ -94,7 +95,7 @@ public class BibLatexEntryTypes {
             return "Inbook";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "booktitle", "year", "date"};
+            return new String[] {"author", "title", "booktitle", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"bookauthor", "editor", "editora", "editorb", "editorc",
@@ -103,7 +104,7 @@ public class BibLatexEntryTypes {
 				 "booksubtitle", "booktitleaddon", "language", "origlanguage", "volume", "part",
 				 "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
 				 "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-				 "eprinttype", "url", "urldate"};
+				 "eprinttype", "url", "urldate", "year"};
         }
 
         public String[] getPrimaryOptionalFields() {
@@ -174,11 +175,11 @@ public class BibLatexEntryTypes {
             return "Booklet";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "editor", "title", "year", "date"};
+            return new String[] {"author", "editor", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "howpublished", "type", "note",
-				 "location", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
+				 "location", "chapter", "year", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
 				 "eprintclass", "eprinttype", "url", "urldate"};
         }
 
@@ -200,7 +201,7 @@ public class BibLatexEntryTypes {
 	    return "Collection";
 	}
 	public String[] getRequiredFields() {
-	    return new String[] {"editor", "title", "year", "date"};
+	    return new String[] {"editor", "title", "date"};
 	}
 	public String[] getOptionalFields() {
 	    return new String[] {"editora", "editorb", "editorc", "translator", "annotator", 
@@ -208,7 +209,7 @@ public class BibLatexEntryTypes {
 				 "maintitle", "mainsubtitle", "maintitleaddon", "language", "origlanguage", "volume",
 				 "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
 				 "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-				 "eprinttype", "url", "urldate"};
+				 "eprinttype", "url", "urldate", "year"};
 	}
      
 	public String[] getPrimaryOptionalFields() {
@@ -231,7 +232,7 @@ public class BibLatexEntryTypes {
 	    return "Incollection";
 	}
 	public String[] getRequiredFields() {
-	    return new String[] {"author", "editor", "title", "booktitle", "year", "date"};
+	    return new String[] {"author", "editor", "title", "booktitle", "date"};
 	}
 	public String[] getOptionalFields() {
 	    return new String[] {"editora", "editorb", "editorc", "translator", "annotator",
@@ -239,7 +240,7 @@ public class BibLatexEntryTypes {
 				 "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon",
 				 "language", "origlanguage", "volume", "part", "edition", "volumes", "series", "number",
 				 "note", "publisher", "location", "isbn", "chapter", "pages", "addendum", "pubstate", "doi",
-				 "eprint", "eprintclass", "eprinttype", "url", "urldate"};
+				 "eprint", "eprintclass", "eprinttype", "url", "urldate", "year"};
 	}
      
 	public String[] getPrimaryOptionalFields() {
@@ -286,13 +287,13 @@ public class BibLatexEntryTypes {
             return "Manual";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "editor", "title", "year", "date"};
+            return new String[] {"author", "editor", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "edition", "type", "series",
 				 "number", "version", "note", "organization", "publisher", "location", "isbn", "chapter",
 				 "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-				 "eprinttype", "url", "urldate"};
+				 "eprinttype", "url", "urldate", "year"};
         }
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "edition", "publisher", "isbn", "chapter",
@@ -312,11 +313,11 @@ public class BibLatexEntryTypes {
             return "Misc";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "editor", "title", "year", "date"};
+            return new String[] {"author", "editor", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "howpublished", "type",
-				 "version", "note", "organization", "location", "date", "month", "year", "addendum",
+				 "version", "note", "organization", "location", "month", "year", "addendum",
 				 "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
@@ -336,11 +337,11 @@ public class BibLatexEntryTypes {
             return "Online";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "editor", "title", "year", "date", "url"};
+            return new String[] {"author", "editor", "title", "date", "url"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "version", "note",
-				 "organization", "date", "month", "year", "addendum", "pubstate", "urldate"};
+				 "organization", "month", "year", "addendum", "pubstate", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "note", "organization", "urldate"};
@@ -358,11 +359,11 @@ public class BibLatexEntryTypes {
             return "Patent";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "number", "year", "date"};
+            return new String[] {"author", "title", "number", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"holder", "subtitle", "titleaddon", "type", "version", "location", "note",
-				 "date", "month", "year", "addendum", "pubstate", "doi", "eprint", "eprintclass",
+				 "month", "year", "addendum", "pubstate", "doi", "eprint", "eprintclass",
 				 "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
@@ -382,11 +383,11 @@ public class BibLatexEntryTypes {
             return "Periodical";
         }
         public String[] getRequiredFields() {
-            return new String[] {"editor", "title", "year", "date"};
+            return new String[] {"editor", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"editora", "editorb", "editorc", "subtitle", "issuetitle",
-				 "issuesubtitle", "language", "series", "volume", "number", "issue", "date", "month", "year",
+				 "issuesubtitle", "language", "series", "volume", "number", "issue", "month", "year",
 				 "note", "issn", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
 				 "urldate"};
         }
@@ -431,13 +432,13 @@ public class BibLatexEntryTypes {
             return "Proceedings";
         }
         public String[] getRequiredFields() {
-            return new String[] {"editor", "title", "year", "date"};
+            return new String[] {"editor", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "maintitle", "mainsubtitle",
 				 "maintitleaddon", "eventtitle", "eventdate", "venue", "language", "volume", "part",
 				 "volumes", "series", "number", "note", "organization", "publisher", "location", "month",
-				 "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
+				 "year", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
 				 "eprintclass", "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
@@ -458,13 +459,13 @@ public class BibLatexEntryTypes {
             return "Inproceedings";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "editor", "title", "booktitle", "year", "date"};
+            return new String[] {"author", "editor", "title", "booktitle", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "maintitle", "mainsubtitle",
 				 "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", "eventdate", "venue",
 				 "language", "volume", "part", "volumes", "series", "number", "note", "organization",
-				 "publisher", "location", "month", "isbn", "chapter", "pages", "addendum",
+				 "publisher", "location", "month", "year", "isbn", "chapter", "pages", "addendum",
 				 "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
@@ -534,11 +535,11 @@ public class BibLatexEntryTypes {
             return "Report";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "type", "institution", "year", "date"};
+            return new String[] {"author", "title", "type", "institution", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "number", "version", "note",
-				 "location", "month", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi",
+				 "location", "month", "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi",
 				 "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
@@ -609,10 +610,10 @@ public class BibLatexEntryTypes {
             return "Thesis";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "type", "institution", "year", "date"};
+            return new String[] {"author", "title", "type", "institution", "date"};
         }
         public String[] getOptionalFields() {
-            return new String[] {"subtitle", "titleaddon", "language", "note", "location", "month",
+            return new String[] {"subtitle", "titleaddon", "language", "note", "location", "month", "year",
 				 "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
 				 "eprinttype", "url", "urldate"};
         }
@@ -633,11 +634,11 @@ public class BibLatexEntryTypes {
             return "Unpublished";
         }
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "year", "date"};
+            return new String[] {"author", "title", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "language", "howpublished", "note",
-				 "location", "date", "month", "year", "addendum", "pubstate", "url", "urldate"};
+				 "location", "month", "year", "addendum", "pubstate", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "howpublished", "pubstate", "url", "urldate"};
@@ -706,10 +707,10 @@ public class BibLatexEntryTypes {
         }
 	// Treated as alias of "THESIS", except "type" field is optional
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "institution", "year", "date"};
+            return new String[] {"author", "title", "institution", "date"};
         }
         public String[] getOptionalFields() {
-            return new String[] {"subtitle", "titleaddon", "type", "language", "note", "location", "month",
+            return new String[] {"subtitle", "titleaddon", "type", "language", "note", "location", "month", "year",
 				 "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
 				 "eprinttype", "url", "urldate"};
         }
@@ -731,10 +732,10 @@ public class BibLatexEntryTypes {
         }
 	// Treated as alias of "THESIS", except "type" field is optional
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "institution", "year", "date"};
+            return new String[] {"author", "title", "institution", "date"};
         }
         public String[] getOptionalFields() {
-            return new String[] {"subtitle", "titleaddon", "type", "language", "note", "location", "month",
+            return new String[] {"subtitle", "titleaddon", "type", "language", "note", "location", "month", "year",
 				 "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass",
 				 "eprinttype", "url", "urldate"};
         }
@@ -756,11 +757,11 @@ public class BibLatexEntryTypes {
         }
 	// Treated as alias of "REPORT", except "type" field is optional
         public String[] getRequiredFields() {
-            return new String[] {"author", "title", "institution", "year", "date"};
+            return new String[] {"author", "title", "institution", "date"};
         }
         public String[] getOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "type", "language", "number", "version", "note",
-				 "location", "month", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
+				 "location", "month", "year", "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate",
 				 "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
         }
         public String[] getPrimaryOptionalFields() {

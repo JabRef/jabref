@@ -613,7 +613,10 @@ public class BibtexDatabase {
 		if (field.equals("bibtextype"))
 			return bibtex.getType().getName();
 
-        Object o = bibtex.getField(field);
+		// TODO: Changed this to also consider alias fields, which is the expected 
+		// behavior for the preview layout and for the check whatever all fields are present.
+		// But there might be unwanted side-effects?!
+        Object o = bibtex.getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
