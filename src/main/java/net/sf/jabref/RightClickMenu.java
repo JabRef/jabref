@@ -25,9 +25,11 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.groups.*;
+import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
@@ -45,6 +47,7 @@ public class RightClickMenu extends JPopupMenu
             groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")), // JZTODO lyrics
             rankingMenu = new JMenu(),
             priorityMenu = new JMenu(),
+            readStatusMenu = new JMenu(),
             typeMenu = new JMenu(Globals.lang("Change entry type"));
     JMenuItem groupAdd, groupRemove, groupMoveTo;
     JCheckBoxMenuItem
@@ -200,10 +203,18 @@ public class RightClickMenu extends JPopupMenu
         	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
         		add(Quality.getInstance().getValues().get(0).getMenuAction(panel.frame));
         	}
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+        		add(Printed.getInstance().getValues().get(0).getMenuAction(panel.frame));
+        	}
 
         	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
 		        populateSpecialFieldMenu(this.priorityMenu, Priority.getInstance(), panel.frame);
 		        add(this.priorityMenu);
+        	}
+        	
+        	if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+		        populateSpecialFieldMenu(this.readStatusMenu, ReadStatus.getInstance(), panel.frame);
+		        add(this.readStatusMenu);
         	}
 	        
 	        addSeparator();

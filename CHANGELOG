@@ -22,6 +22,12 @@
     	- Fixes bug #1014 'journal' not recognized as alias for 'journaltitle''
     	- Fixes bug #874 Support of biblatex "date" field
     	- Fixes bug that prevented the secondary optional fields to update properly in the "Customize entry fields" dialog (in BibLatex mode)
+	- Added special fields 'Printed' and 'Read status', thereby implementing (at least partially):
+		- Feature #762 Printed attribute
+		- Feature #692 Marking of new entries and often read entries 
+		- Feature #685 Highlight new entries that were "forgotten"
+		- Feature #602 could add the mark as read feature 
+		- Feature #225 read? checkbox
 2.10
     - Made IEEEXploreFetcher author parsing work again.
     - Added a few more characters in the HTML/Unicode to LaTeX conversion.

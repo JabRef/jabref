@@ -90,9 +90,11 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.labelPattern.SearchFixDuplicateLabels;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
@@ -1558,13 +1560,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), "Marked %0 entries as relevant"));
               actions.put(Quality.getInstance().getValues().get(0).getActionName(),
                   new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), "Set quality of %0 entries to good"));
+              actions.put(Printed.getInstance().getValues().get(0).getActionName(),
+                      new SpecialFieldAction(frame, Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as printed"), "Marked %0 entries as printed"));
               
               for (SpecialFieldValue prio: Priority.getInstance().getValues()) {
 	              actions.put(prio.getActionName(), prio.getAction(this.frame));
               }
-              
-              for (SpecialFieldValue prio: Rank.getInstance().getValues()) {
-	              actions.put(prio.getActionName(), prio.getAction(this.frame));
+              for (SpecialFieldValue rank: Rank.getInstance().getValues()) {
+	              actions.put(rank.getActionName(), rank.getAction(this.frame));
+              }
+              for (SpecialFieldValue status: ReadStatus.getInstance().getValues()) {
+	              actions.put(status.getActionName(), status.getAction(this.frame));
               }
               
               actions.put("togglePreview", new BaseAction() {

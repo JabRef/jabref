@@ -30,6 +30,8 @@ public class SpecialFieldsUtils {
 	public final static String FIELDNAME_RANKING = "ranking";
 	public final static String FIELDNAME_RELEVANCE = "relevance";
 	public final static String FIELDNAME_QUALITY = "qualityassured";
+	public final static String FIELDNAME_READ = "readstatus";
+	public final static String FIELDNAME_PRINTED = "printed";
 
 	public final static String  PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
 	public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
@@ -48,6 +50,12 @@ public class SpecialFieldsUtils {
 	
 	public final static String  PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
 	public final static Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
+	
+	public final static String  PREF_SHOWCOLUMN_READ = "showReadColumn";
+	public final static Boolean PREF_SHOWCOLUMN_READ_DEFAULT = Boolean.FALSE;
+	
+	public final static String  PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
+	public final static Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
 	
 	public final static String  PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
 	public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
@@ -114,6 +122,8 @@ public class SpecialFieldsUtils {
 		exportFieldToKeywords(Rank.getInstance(), be, nc);
 		exportFieldToKeywords(Relevance.getInstance(), be, nc);
 		exportFieldToKeywords(Quality.getInstance(), be, nc);
+		exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
+		exportFieldToKeywords(Printed.getInstance(), be, nc);
 	}
 	
 	private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibtexEntry be, NamedCompound nc) {
@@ -141,6 +151,8 @@ public class SpecialFieldsUtils {
 		importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
 		importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
 		importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
+		importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
+		importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
 	}
 	
 	/**
@@ -156,6 +168,10 @@ public class SpecialFieldsUtils {
 			return Rank.getInstance();
 		} else if (fieldName.equals(FIELDNAME_RELEVANCE)) {
 			return Relevance.getInstance();
+		} else if (fieldName.equals(FIELDNAME_READ)) {
+			return ReadStatus.getInstance();
+		} else if (fieldName.equals(FIELDNAME_PRINTED)) {
+			return Printed.getInstance();
 		} else {
 			return null;
 		}

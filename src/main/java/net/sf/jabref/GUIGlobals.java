@@ -27,14 +27,17 @@ import java.util.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-
 import javax.swing.SwingConstants;
+
 import net.sf.jabref.external.ExternalFileType;
+
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
+import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -439,6 +442,16 @@ public class GUIGlobals {
         lab = new JLabel(Priority.getInstance().getRepresentingIcon());
         lab.setToolTipText(Rank.getInstance().getToolTip());
         tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
+        
+        // Read icon used for menu
+        lab = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
+        lab.setToolTipText(ReadStatus.getInstance().getToolTip());
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_READ, lab);
+        
+        // Print icon used for menu
+        lab = new JLabel(Printed.getInstance().getRepresentingIcon());
+        lab.setToolTipText(Printed.getInstance().getToolTip());
+        tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRINTED, lab);
         
         //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
 

@@ -31,13 +31,16 @@ import net.sf.jabref.SearchRuleSet;
 import net.sf.jabref.Util;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.matchers.Matcher;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -66,6 +69,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY},
     RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE},
     QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY},
+    PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED},
+    READ = {SpecialFieldsUtils.FIELDNAME_READ},
     FILE = {GUIGlobals.FILE_FIELD};
 
     BasePanel panel;
@@ -236,6 +241,13 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (rank != null) {
                     o = rank.createLabel();
                 }
+            // Handle read status column special
+            // Extra handling because the icon depends on a FieldValue
+            } else if (iconType[hasField].equals(READ[0])) {
+                SpecialFieldValue status = ReadStatus.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_READ));
+                if (status != null) {
+                    o = status.createLabel();
+                }
             } else {
                 o = GUIGlobals.getTableIcon(iconType[hasField]);
 
@@ -377,6 +389,10 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 iconCols.put(coln++, QUALITY);
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
                 iconCols.put(coln++, PRIORITY);
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
+                iconCols.put(coln++, PRINTED);
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
+                iconCols.put(coln++, READ);
         }
 
         if (Globals.prefs.getBoolean("fileColumn"))

@@ -144,6 +144,20 @@ public class BibtexFields
     	dummy.setDisplayable(false);
     }
     add(dummy) ;
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_READ , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
+    dummy =  new BibtexSingleField( SpecialFieldsUtils.FIELDNAME_PRINTED , false) ;
+    if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+    	dummy.setPrivate();
+    	dummy.setWriteable(false);
+    	dummy.setDisplayable(false);
+    }
+    add(dummy) ;
     
     // some semi-standard fields
     dummy = new BibtexSingleField( KEY_FIELD, true ) ;
