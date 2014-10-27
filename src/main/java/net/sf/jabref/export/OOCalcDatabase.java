@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -134,6 +134,14 @@ public class OOCalcDatabase {
             addTableCell(result, row, "Organization");
             addTableCell(result, row, "School");
             addTableCell(result, row, "Annote");
+            addTableCell(result, row, "Assignee");
+            addTableCell(result, row, "Day");
+            addTableCell(result, row, "Dayfiled");
+            addTableCell(result, row, "Monthfiled");
+            addTableCell(result, row, "Yearfiled");
+            addTableCell(result, row, "Language");
+            addTableCell(result, row, "Nationality");
+            addTableCell(result, row, "Revision");
             addTableCell(result, row, "Custom1");
             addTableCell(result, row, "Custom2");
             addTableCell(result, row, "Custom3");
@@ -169,6 +177,14 @@ public class OOCalcDatabase {
                 addTableCell(result, row, getField(e, "organization"));
                 addTableCell(result, row, getField(e, "school"));
                 addTableCell(result, row, getField(e, "annote"));
+                addTableCell(result, row, getField(e, "assignee"));
+                addTableCell(result, row, getField(e, "day"));
+                addTableCell(result, row, getField(e, "dayfiled"));
+                addTableCell(result, row, getField(e, "monthfiled"));
+                addTableCell(result, row, getField(e, "yearfiled"));
+                addTableCell(result, row, getField(e, "language"));
+                addTableCell(result, row, getField(e, "nationality"));
+                addTableCell(result, row, getField(e, "revision"));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
