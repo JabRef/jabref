@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -50,9 +49,11 @@ import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.undo.NamedCompound;
@@ -325,6 +326,20 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 	        	clone.retainAll(Relevance.getInstance().getKeyWords());
 	        	if (!clone.isEmpty()) {
 	        		keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
+	        	}
+	        	
+	        	// Read status
+	        	clone = createClone(keywordsToAdd);
+	        	clone.retainAll(ReadStatus.getInstance().getKeyWords());
+	        	if (!clone.isEmpty()) {
+	        		keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
+	        	}
+	        	
+	        	// Printed
+	        	clone = createClone(keywordsToAdd);
+	        	clone.retainAll(Printed.getInstance().getKeyWords());
+	        	if (!clone.isEmpty()) {
+	        		keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
 	        	}
 	        }
         }

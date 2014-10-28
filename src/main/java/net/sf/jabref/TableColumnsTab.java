@@ -54,9 +54,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JCheckBox showOneLetterHeadingForIconColumns;
 
     /*** begin: special fields ***/
-	private JCheckBox specialFieldsEnabled, rankingColumn, compactRankingColumn, qualityColumn, priorityColumn, relevanceColumn;
+	private JCheckBox specialFieldsEnabled, rankingColumn, compactRankingColumn, qualityColumn, priorityColumn, relevanceColumn, printedColumn, readStatusColumn;
 	private JRadioButton syncKeywords, writeSpecialFields;
-	private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldCompcatRankingColumn, oldQualityColumn, oldPriorityColumn, oldRelevanceColumn, oldSyncKeyWords, oldWriteSpecialFields;
+	private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldCompcatRankingColumn, oldQualityColumn, oldPriorityColumn, oldRelevanceColumn, oldPrintedColumn, oldReadStatusColumn, oldSyncKeyWords, oldWriteSpecialFields;
 
     /*** end: special fields ***/
 
@@ -237,6 +237,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 				qualityColumn.setEnabled(isEnabled);
 				priorityColumn.setEnabled(isEnabled);
 				relevanceColumn.setEnabled(isEnabled);
+				printedColumn.setEnabled(isEnabled);
+				readStatusColumn.setEnabled(isEnabled);
 				syncKeywords.setEnabled(isEnabled);
 				writeSpecialFields.setEnabled(isEnabled);
 			}
@@ -251,6 +253,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		qualityColumn = new JCheckBox(Globals.lang("Show quality"));
 		priorityColumn = new JCheckBox(Globals.lang("Show priority"));
 		relevanceColumn = new JCheckBox(Globals.lang("Show relevance"));
+		printedColumn = new JCheckBox(Globals.lang("Show printed status"));
+		readStatusColumn = new JCheckBox(Globals.lang("Show read status"));
 		
 		// "sync keywords" and "write special" fields may be configured mutually exclusive only
 		// The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
@@ -266,7 +270,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		builder.append(pan);
 
 		DefaultFormBuilder specialTableColumnsBuilder = new DefaultFormBuilder(new FormLayout(
-				"8dlu, 8dlu, 8cm, 8dlu, 8dlu, left:pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
+				"8dlu, 8dlu, 8cm, 8dlu, 8dlu, left:pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
         CellConstraints cc = new CellConstraints();
 		
         specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
@@ -275,10 +279,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 4, 2));
         specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 5, 2));
         specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 6, 2));
-        specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 7, 2));
-        specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 8, 2));
-        specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 9, 5));
-		specialTableColumnsBuilder.add(hlb, cc.xyw(1, 10, 2));
+        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 7, 2));
+        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 8, 2));
+        specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
+        specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
+        specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 12, 4));
+		specialTableColumnsBuilder.add(hlb, cc.xyw(1, 13, 2));
 
 		specialTableColumnsBuilder.add(fileColumn, cc.xyw(5, 1, 2));	
 		specialTableColumnsBuilder.add(pdfColumn, cc.xyw(5, 2, 2));	
@@ -288,7 +294,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		specialTableColumnsBuilder.add(arxivColumn, cc.xyw(5, 6, 2));	
 
 		specialTableColumnsBuilder.add(extraFileColumns, cc.xyw(5, 7, 2));	
-		specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, cc.xywh(5, 8, 2, 3));	
+		specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, cc.xywh(5, 8, 2, 5));	
 
 		builder.append(specialTableColumnsBuilder.getPanel());
 		builder.nextLine();
@@ -360,6 +366,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		
 		oldRelevanceColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE);
         relevanceColumn.setSelected(oldRelevanceColumn);
+        
+        oldPrintedColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED);
+        printedColumn.setSelected(oldPrintedColumn);
+        
+        oldReadStatusColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ);
+        readStatusColumn.setSelected(oldReadStatusColumn);
 		
 		oldSyncKeyWords = _prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
 		syncKeywords.setSelected(oldSyncKeyWords);
@@ -630,7 +642,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		newCompactRankingColumn = compactRankingColumn.isSelected(),
 		newQualityColumn = qualityColumn.isSelected(), 
 		newPriorityColumn = priorityColumn.isSelected(), 
-		newRelevanceColumn = relevanceColumn.isSelected(), 
+		newRelevanceColumn = relevanceColumn.isSelected(),
+		newPrintedColumn = printedColumn.isSelected(),
+		newReadStatusColumn = readStatusColumn.isSelected(),
 		newSyncKeyWords = syncKeywords.isSelected(), 
 		newWriteSpecialFields = writeSpecialFields.isSelected();
 		
@@ -641,6 +655,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 				(oldQualityColumn != newQualityColumn) ||
 				(oldPriorityColumn != newPriorityColumn) ||
 				(oldRelevanceColumn != newRelevanceColumn) ||
+				(oldPrintedColumn != newPrintedColumn) ||
+				(oldReadStatusColumn != newReadStatusColumn) ||
 				(oldSyncKeyWords != newSyncKeyWords) ||
 				(oldWriteSpecialFields != newWriteSpecialFields);
 		if (restartRequired) {
@@ -661,6 +677,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
 			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
 			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
+			_prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
 			_prefs.putBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
 			_prefs.putBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
 		}

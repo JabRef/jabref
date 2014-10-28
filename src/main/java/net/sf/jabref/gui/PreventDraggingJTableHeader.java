@@ -135,6 +135,10 @@ public class PreventDraggingJTableHeader extends JTableHeader {
 	            count++;
 	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
 	            count++;
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
+	            count++;
+	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
+	            count++;
         }
 
         return count;
