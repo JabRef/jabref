@@ -680,8 +680,8 @@ public class CleanUpAction extends AbstractWorker {
     		entry.setField("month", null);
     		
     		ce.addEdit(new UndoableFieldChange(entry, "date", null, newDate));
-    		ce.addEdit(new UndoableFieldChange(entry, "date", oldYear, null));
-    		ce.addEdit(new UndoableFieldChange(entry, "date", oldMonth, null));
+    		ce.addEdit(new UndoableFieldChange(entry, "year", oldYear, null));
+    		ce.addEdit(new UndoableFieldChange(entry, "month", oldMonth, null));
     	}
     }
 
