@@ -1,6 +1,7 @@
 [master]
 	- Partial fix for bug 913: fixed export for .ods and .sxc (by yaragg)
 	- Fix for bug 1240: Accepting string with length of one character (by lhaddad).
+	- Fix for bug 958: ArrayIndexOutOfBoundsException on "Content Selector Dialog"
 	- Fix for bug 949: Exception properly logged
 	- Fix for bug 950: NullPointerException on "Manage custom imports"
 	- Feature 850: Keyboard shortcut for 'Cleanup entries' (by eduardogreco)
