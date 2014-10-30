@@ -1,4 +1,5 @@
 [master]
+    - Adapted pattern to parse DBLP entries
 	- Partial fix for bug 913: fixed export for .ods and .sxc (by yaragg)
 	- Fix for bug 1240: Accepting string with length of one character (by lhaddad).
 	- Fix for bug 958: ArrayIndexOutOfBoundsException on "Content Selector Dialog"
