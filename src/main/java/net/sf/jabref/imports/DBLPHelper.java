@@ -66,7 +66,7 @@ public class DBLPHelper {
 	 */
 	public List<BibtexEntry> getBibTexFromPage(final String page) {
 		final List<BibtexEntry> bibtexList = new ArrayList<BibtexEntry>();
-		final String startPattern = "<pre>";
+		final String startPattern = "<pre class=\"verbatim select-on-click\">";
 		final String endPattern = "</pre>";
 
 		String tmpStr = page;
