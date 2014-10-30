@@ -1,5 +1,6 @@
 [master]
 	- Partial fix for bug 913: fixed export for .ods and .sxc (by yaragg)
+	- Fix for bug 1240: Accepting string with length of one character (by lhaddad).
 	- Fix for bug 949: Exception properly logged
 	- Fix for bug 950: NullPointerException on "Manage custom imports"
 	- Feature 850: Keyboard shortcut for 'Cleanup entries' (by eduardogreco)
@@ -20,15 +21,15 @@
     - Fix edits getting lost in Biblatex mode
     - Fix error when setting a previously unset field via the source panel of the entry editor
     - Improved BibLatex support (alias fields, option to convert old entries to the new format via the cleanup menu)
-    	- Fixes bug #1087 "jabref does not follow biblatex specification" 
+    	- Fixes bug #1087 "jabref does not follow biblatex specification"
     	- Fixes bug #1014 'journal' not recognized as alias for 'journaltitle''
     	- Fixes bug #874 Support of biblatex "date" field
     	- Fixes bug that prevented the secondary optional fields to update properly in the "Customize entry fields" dialog (in BibLatex mode)
 	- Added special fields 'Printed' and 'Read status', thereby implementing (at least partially):
 		- Feature #762 Printed attribute
-		- Feature #692 Marking of new entries and often read entries 
+		- Feature #692 Marking of new entries and often read entries
 		- Feature #685 Highlight new entries that were "forgotten"
-		- Feature #602 could add the mark as read feature 
+		- Feature #602 could add the mark as read feature
 		- Feature #225 read? checkbox
 2.10
     - Made IEEEXploreFetcher author parsing work again.
