@@ -180,7 +180,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
     private Object getField(BibtexEntry entry) {
         for (String aField : field) {
-            Object o = entry.getField(aField);
+            Object o = entry.getFieldOrAlias(aField);
             if (o != null)
                 return o;
         }
