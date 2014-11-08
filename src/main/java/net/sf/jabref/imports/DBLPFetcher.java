@@ -64,7 +64,7 @@ public class DBLPFetcher implements EntryFetcher {
 	        //System.out.println(page);
 	        String[] lines = page.split("\n");
 	        List<String> bibtexUrlList = new ArrayList<String>();
-	        for(String line : lines) {
+	        for(final String line : lines) {
 	        	if( line.startsWith("\"url\"") ) {
 	        		String addr = line.replace("\"url\":\"", "");
 	        		addr = addr.substring(0, addr.length()-2);
@@ -74,6 +74,12 @@ public class DBLPFetcher implements EntryFetcher {
 	        }
 
 
+	        // 2014-11-08
+	        // DBLP now shows the BibTeX entry using ugly HTML entities
+	        // but they also offer the download of a bib file
+	        // we find this in the page which we get from "url"
+	        // and this bib file is then in "biburl"
+
 	        int count = 1;
 	        for(String urlStr : bibtexUrlList) {
 	        	if( ! shouldContinue ) {
@@ -81,19 +87,33 @@ public class DBLPFetcher implements EntryFetcher {
 	        	}
 
 	        	final URL bibUrl = new URL(urlStr);
-		        String bibtexPage = readFromURL(bibUrl);
-		        //System.out.println(bibtexPage);
 
-		        List<BibtexEntry> bibtexList = helper.getBibTexFromPage(bibtexPage);
+		        final String bibtexHTMLPage = readFromURL(bibUrl);
 
-		        for(BibtexEntry bibtexEntry : bibtexList ) {
-		        	inspector.addEntry(bibtexEntry);
-		        	if( ! shouldContinue ) {
-		        		break;
+		        final String[] htmlLines = bibtexHTMLPage.split("\n");
+
+		        for(final String line : htmlLines) {
+		        	if( line.contains("biburl") ) {
+		        		int sidx = line.indexOf("{");
+		        		int eidx = line.indexOf("}");
+		        		// now we take everything within the curley braces
+		        		String bibtexUrl = line.substring(sidx+1, eidx);
+
+		        		// we do not access dblp.uni-trier.de as they will complain
+		        		bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
+
+			        	final URL bibFileURL = new URL(bibtexUrl);
+			        	//System.out.println("URL:|"+bibtexUrl+"|");
+				        final String bibtexPage = readFromURL(bibFileURL);
+
+				        BibtexEntry bibtexEntry = BibtexParser.singleFromString(bibtexPage);
+
+			        	inspector.addEntry(bibtexEntry);
+			        	inspector.setProgress(count, bibtexUrlList.size());
+			        	count++;
 		        	}
 		        }
-	        	inspector.setProgress(count, bibtexUrlList.size());
-	        	count++;
+
 	        }
 
 	        // everything went smooth

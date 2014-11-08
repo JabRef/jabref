@@ -78,7 +78,7 @@ public class DBLPHelper {
 				endIdx);
 		entry1 = cleanEntry(entry1);
 		bibtexList.add(BibtexParser.singleFromString(entry1));
-		//System.out.println("'" + entry1 + "'");
+		// System.out.println("'" + entry1 + "'");
 
 		// let's see whether there is another entry (crossref)
 		tmpStr = tmpStr
@@ -96,8 +96,10 @@ public class DBLPHelper {
 		return bibtexList;
 	}
 
+
+
 	private String cleanEntry(final String bibEntry) {
-        return bibEntry.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
+		return bibEntry.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
 	}
 
 }
