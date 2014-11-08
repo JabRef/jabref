@@ -20,11 +20,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.DuplicateCheck;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.OutputPrinter;
 
@@ -48,6 +51,8 @@ public class DBLPFetcher implements EntryFetcher {
 	@Override
 	public boolean processQuery(String query, ImportInspector inspector,
 			OutputPrinter status) {
+
+		final HashMap<String, Boolean> bibentryKnown = new HashMap<String, Boolean>();
 
 		boolean res = false;
 		this.query = query;
@@ -74,6 +79,12 @@ public class DBLPFetcher implements EntryFetcher {
 	        }
 
 
+	        // we save the duplicate check threshold
+	        // we need to overcome the "smart" approach of this heuristic
+	        // and we will set it back afterwards, so maybe someone is happy again
+    		double saveThreshold = DuplicateCheck.duplicateThreshold;
+    		DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
+
 	        // 2014-11-08
 	        // DBLP now shows the BibTeX entry using ugly HTML entities
 	        // but they also offer the download of a bib file
@@ -92,6 +103,7 @@ public class DBLPFetcher implements EntryFetcher {
 
 		        final String[] htmlLines = bibtexHTMLPage.split("\n");
 
+
 		        for(final String line : htmlLines) {
 		        	if( line.contains("biburl") ) {
 		        		int sidx = line.indexOf("{");
@@ -106,15 +118,25 @@ public class DBLPFetcher implements EntryFetcher {
 			        	//System.out.println("URL:|"+bibtexUrl+"|");
 				        final String bibtexPage = readFromURL(bibFileURL);
 
-				        BibtexEntry bibtexEntry = BibtexParser.singleFromString(bibtexPage);
+				        Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
-			        	inspector.addEntry(bibtexEntry);
-			        	inspector.setProgress(count, bibtexUrlList.size());
-			        	count++;
+				        for(BibtexEntry be : bibtexEntries) {
+
+				        	if( ! bibentryKnown.containsKey( be.getCiteKey() ) ) {
+
+					        	inspector.addEntry(be);
+					        	bibentryKnown.put(be.getCiteKey(), true);
+				        	}
+
+				        }
 		        	}
 		        }
 
+		        inspector.setProgress(count, bibtexUrlList.size());
+	        	count++;
 	        }
+
+	        DuplicateCheck.duplicateThreshold = saveThreshold;
 
 	        // everything went smooth
 	        res = true;
