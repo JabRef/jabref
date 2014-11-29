@@ -365,7 +365,7 @@ public class BibtexEntry
         		if(month == 0)
         			return year;
         		else
-        			return year + "-" + month;
+        			return year + "-" + String.format("%02d", month);
         	}
         }
         if(name.equals("year") || name.equals("month"))

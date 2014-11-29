@@ -16,7 +16,16 @@
 package net.sf.jabref.gui;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -683,6 +692,42 @@ public class CleanUpAction extends AbstractWorker {
     		ce.addEdit(new UndoableFieldChange(entry, "date", oldYear, null));
     		ce.addEdit(new UndoableFieldChange(entry, "date", oldMonth, null));
     	}
+    	
+    	// Dates: format dates correctly (yyyy-mm-dd or yyyy-mm)
+    	if(entry.getField("date") != null)
+    	{
+    		String oldDate = entry.getField("date");
+    	
+    		TemporalAccessor parsedDate = tryParseDate(oldDate);
+	    	if(parsedDate != null)
+	    	{
+	    		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM[-dd]");
+	    		String formatedDate = dateFormatter.format(parsedDate);
+	    		
+	    		 if (!oldDate.equals(formatedDate)) {
+    	            entry.setField("date", formatedDate);
+    	            ce.addEdit(new UndoableFieldChange(entry, "date", oldDate, formatedDate));
+    	        }
+	    	}
+    	}
     }
+    
+    TemporalAccessor tryParseDate(String dateString)
+    {
+    	// The following code is essentially copied from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat
+    	// Try to parse the following formats
+    	// 	"M/y" (covers 9/09, 9/2009, and 09/2009)
+    	// 	"yyyy-MM-dd" (covers 2009-1-15)
+    	String[] formatStrings = {"uuuu-MM-dd", "uuuu-MM", "uuuu-M"};
+        for (String formatString : formatStrings)
+        {
+            try
+            {
+            	return DateTimeFormatter.ofPattern(formatString).parse(dateString);
+            }
+            catch (DateTimeParseException e) {}
+        }
 
+        return null;
+    }
 }
