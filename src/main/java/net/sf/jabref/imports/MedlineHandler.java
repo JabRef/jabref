@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -38,14 +38,14 @@ public class MedlineHandler extends DefaultHandler
 		inMedlineID = false,		inURL=false,
 		inIssue = false,			inPubDate = false,
         inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
-		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,
+		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,inPmc=false,
         inAffiliation=false, inMeshHeader=false, inQualifierName=false,
         inLanguage=false, inPst=false;
     String title="", journal="", keywords ="",author="",
 		lastName="",suffix="",year="",forename="", abstractText="", affiliation="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
-		pubmedid="",doi="",pii="", majorTopic = "", minorTopics = "", language = "", pst= "";
+        pubmedid="",doi="",pii="", pmc="",majorTopic = "", minorTopics = "", language = "", pst= "";
     ArrayList<String> authors=new ArrayList<String>();
     TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum=0;
@@ -117,6 +117,8 @@ public class MedlineHandler extends DefaultHandler
 					inDoi=true;
 				else if(value.equals("pii"))
 					inPii=true;
+				else if(value.equals("pmc"))
+					inPmc=true;
 
 			}
 		}
@@ -194,6 +196,8 @@ public class MedlineHandler extends DefaultHandler
 			}
 			if(!pii.equals(""))
 			    b.setField("pii",pii);
+			if(!pmc.equals(""))
+			    b.setField("pmc",pmc);
             if(!affiliation.equals("")) {
                 b.setField("institution",affiliation.replaceAll("#", "\\\\#"));
             }
@@ -212,7 +216,7 @@ public class MedlineHandler extends DefaultHandler
 			title="";
 			journal="";
 			keywords ="";
-            doi=""; pii="";
+                        doi=""; pii=""; pmc="";
 			year="";
 			forename="";
 			lastName="";
@@ -293,7 +297,9 @@ public class MedlineHandler extends DefaultHandler
 			if(inDoi)
 				inDoi=false;
 			else if(inPii)
-				inPii=false;}
+				inPii=false;
+			else if(inPmc)
+				inPmc=false;}
     }
 
     public void characters( char[] data, int start, int length ) {
@@ -332,6 +338,7 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineDate){ MedlineDate += new String(data,start,length);}
 		else if(inDoi){ doi=new String(data,start,length);}
 		else if(inPii){ pii=new String(data,start,length);}
+		else if(inPmc){ pmc=new String(data,start,length);}
         else if(inAffiliation){ affiliation = new String(data,start,length);}
     }
 

@@ -1,4 +1,5 @@
 [master]
+    - Feature #809: import pubmed central id (pmc) field from medline
     - Fix undoing Cleanup/Convert to Biblatex
     - Adapted pattern to parse DBLP entries
     - Partial fix for bug 913: fixed export for .ods and .sxc (by yaragg)
