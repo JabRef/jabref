@@ -119,7 +119,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResults(conn);
+            bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
         } catch (FileNotFoundException e) {
 
             if (status != null) {
@@ -134,7 +134,9 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         }
 
 
-
+        //Usually includes an en-dash in the page range. Char is in cp1252 but not 
+        // ISO 8859-1 (which is what latex expects). For convenience replace here.
+        bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
 
         if (entry != null) {
