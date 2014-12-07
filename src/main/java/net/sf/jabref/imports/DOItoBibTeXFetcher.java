@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2014 JabRef contributors.
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -119,7 +119,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResults(conn);
+            bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
         } catch (FileNotFoundException e) {
 
             if (status != null) {
@@ -134,7 +134,9 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         }
 
 
-
+        //Usually includes an en-dash in the page range. Char is in cp1252 but not 
+        // ISO 8859-1 (which is what latex expects). For convenience replace here.
+        bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
 
         if (entry != null) {
