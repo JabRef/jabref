@@ -51,7 +51,7 @@
 ### Generating additional source codes and getting dependencies using Gradle:
 * Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute "cd jabref")
 * run "gradlew generateSource" ("./gradlew generateSource" in linux) to generate additional source and download libraries (it will take some minutes)
-* run "gradlew eclipse" (./"gradlew eclipse" in linux) if you are using eclipse IDE (alternatively you can use inteliJIdea running "gradlew idea")
+* run "gradlew eclipse" ("./gradlew eclipse" in linux) if you are using eclipse IDE (alternatively you can use inteliJIdea running "gradlew idea")
 
 ### building it into your IDE
 * open eclipse (or your prefered IDE)
