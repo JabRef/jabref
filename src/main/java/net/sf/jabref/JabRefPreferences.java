@@ -885,10 +885,9 @@ public class JabRefPreferences {
             // So, if this happens, we add the default value to the current
             // hashmap, so this doesn't happen again, and so this binding
             // will appear in the KeyBindingsDialog.
-            keyBinds.put(bindName, s);
-        }
-        if (s == null) {
             Globals.logger("Could not get key binding for \"" + bindName + "\"");
+            s = "Not associated"; // if the item of menu not in defKeyBind list
+            keyBinds.put(bindName, s);
         }
 
         if (Globals.ON_MAC) {
