@@ -10,6 +10,7 @@
 
 1. "sudo apt-get install gradle"
 2. test it by running gradle -version
+2.1. For the error "ERROR: JAVA_HOME is Set to an invalid directory", change the Java installation path in the file "/usr/bin/gradle" on line "export JAVA_HOME=/..."
 
 * for windows
 
