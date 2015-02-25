@@ -27,7 +27,6 @@ import java.util.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 import net.sf.jabref.external.ExternalFileType;
 

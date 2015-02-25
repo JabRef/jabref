@@ -20,11 +20,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-
 import net.sf.jabref.Globals;
-
-import com.sun.star.ui.GlobalAcceleratorConfiguration;
 
 
 /**

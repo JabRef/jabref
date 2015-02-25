@@ -40,9 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -260,7 +258,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
                 
-                Set<String> deprecatedFields = new HashSet<String>(entry.FieldAliasesOldToNew.keySet());
+                Set<String> deprecatedFields = new HashSet<String>(BibtexEntry.FieldAliasesOldToNew.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(entry.getOptionalFields(),
@@ -273,8 +271,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 for(String field : entry.getOptionalFields())
                 {
                 	optionalFieldsAndAliases.add(field);
-                	if(entry.FieldAliasesNewToOld.containsKey(field))
-                		optionalFieldsAndAliases.add(entry.FieldAliasesNewToOld.get(field));
+                	if(BibtexEntry.FieldAliasesNewToOld.containsKey(field))
+                		optionalFieldsAndAliases.add(BibtexEntry.FieldAliasesNewToOld.get(field));
                 }
                 	
                 // Get all optional fields which are deprecated

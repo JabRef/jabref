@@ -561,17 +561,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	protected void importFinishedHandler(int count, List<String> errors) {
 		
 		if (errors != null && errors.size() > 0) {
-			
-			StringBuilder warningInfo = new StringBuilder();
-			warningInfo.append("The import finished with warnings:\n");
-			warningInfo.append("There ");
-			warningInfo.append(errors.size() > 1 ? "were " : "was ");
-			warningInfo.append(errors.size());
-			warningInfo.append(errors.size() > 1 ? " files" : " file");
-			warningInfo.append(errors.size() > 1 ? " which" : " that");
-			warningInfo.append(" could not be imported.");
-			
-			JOptionPane.showMessageDialog(this, warningInfo.toString(),
+
+            JOptionPane.showMessageDialog(this, "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ") + errors.size() + (errors.size() > 1 ? " files" : " file") + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
                     Globals.lang("Warning"),
                     JOptionPane.WARNING_MESSAGE);
 		}

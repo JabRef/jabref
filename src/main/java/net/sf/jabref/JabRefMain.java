@@ -79,7 +79,7 @@ public class JabRefMain {
             // We need to load this class dynamically, or otherwise the Java 
             // runtime would crash while loading JabRefMain itself.
             Method method = Class.forName("net.sf.jabref.JabRef").getMethod(
-                "main", new Class[] { args.getClass() });
+                "main", args.getClass());
             method.invoke(null, new Object[] { args });
 
         } catch (InvocationTargetException e) {

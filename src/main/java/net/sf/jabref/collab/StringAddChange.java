@@ -33,17 +33,7 @@ public class StringAddChange extends Change {
     name = Globals.lang("Added string")+": '"+string.getName()+"'";
     this.string = string;
 
-    StringBuffer sb = new StringBuffer();
-    sb.append("<HTML><H2>");
-    sb.append(Globals.lang("Added string"));
-    sb.append("</H2><H3>");
-      sb.append(Globals.lang("Label")).append(":</H3>");
-    sb.append(string.getName());
-    sb.append("<H3>");
-      sb.append(Globals.lang("Content")).append(":</H3>");
-    sb.append(string.getContent());
-    sb.append("</HTML>");
-    tp.setText(sb.toString());
+      tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
   }
 

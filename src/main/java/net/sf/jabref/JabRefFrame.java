@@ -879,7 +879,7 @@ public JabRefPreferences prefs() {
 		  }
 		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
 		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", new Class[] { String.class })};
+			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", String.class)};
 			  registerMethod.invoke(osxAdapter, args);
 		  }
       }

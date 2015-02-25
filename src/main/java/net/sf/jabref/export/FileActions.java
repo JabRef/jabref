@@ -301,8 +301,8 @@ public class FileActions {
 			if (storedSaveOrderConfig != null) {
 				// follow the metaData
 				SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-				assert (saveOrderConfig.saveInOriginalOrder == false);
-				assert (saveOrderConfig.saveInSpecifiedOrder == true);
+				assert (!saveOrderConfig.saveInOriginalOrder);
+				assert (saveOrderConfig.saveInSpecifiedOrder);
 				pri = saveOrderConfig.sortCriteria[0].field;
 				sec = saveOrderConfig.sortCriteria[1].field;
 				ter = saveOrderConfig.sortCriteria[2].field;

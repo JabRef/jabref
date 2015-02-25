@@ -35,7 +35,6 @@ import net.sf.jabref.EntryEditor;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.RightClickMenu;
 import net.sf.jabref.Util;
@@ -340,9 +339,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                 for(int i=0;i<fileList.getRowCount();i++) {
                                     flEntry = fileList.getEntry(i);
                                     boolean correctType=false;
-                                    for(int j=0;j<listOfFileTypes.size();j++) {
-                                        if(flEntry.getType().toString().equals(listOfFileTypes.get(j))) {
-                                            correctType=true;
+                                    for (String listOfFileType : listOfFileTypes) {
+                                        if (flEntry.getType().toString().equals(listOfFileType)) {
+                                            correctType = true;
                                         }
                                     }
                                     if(correctType) {

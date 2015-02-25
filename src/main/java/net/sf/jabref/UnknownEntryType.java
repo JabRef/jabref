@@ -15,8 +15,6 @@
 */
 package net.sf.jabref;
 
-import java.io.Writer;
-
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
  * during bibtex parsing. The only known information is the type name.
