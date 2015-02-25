@@ -640,17 +640,17 @@ public class BibtexEntry
         boolean hasWritten = false;
         // Write required fields first.
         String[] s = getRequiredFields();
-        if (s != null) for (int i=0; i<s.length; i++) {
-            hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten,false);
-            written.put(s[i], null);
+        if (s != null) for (String value : s) {
+            hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
+            written.put(value, null);
         }
         // Then optional fields.
         s = getOptionalFields();
-        if (s != null) for (int i=0; i<s.length; i++) {
-            if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+        if (s != null) for (String value : s) {
+            if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
                 //writeField(s[i], out, ff);
-                hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten,false);
-                written.put(s[i], null);
+                hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
+                written.put(value, null);
             }
         }
         // Then write remaining fields in alphabetic order.

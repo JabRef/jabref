@@ -87,19 +87,11 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         JCheckBox doNotShowDialog = new JCheckBox(Globals.lang("Do not show these options in the future"),
                 false);
 
-        StringBuilder sb = new StringBuilder("<html>");
-        sb.append(Globals.lang("This database was written using an older version of JabRef."));
-        sb.append("<br>");
-        sb.append(Globals.lang("The current version features a new way of handling links to external files.<br>"
-            +"To take advantage of this, your links must be changed into the new format, and<br>"
-            +"JabRef must be configured to show the new links."));
-        sb.append("<p>");
-        sb.append(Globals.lang("Do you want JabRef to do the following operations?"));
-        sb.append("</html>");
-
         JPanel message = new JPanel();
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
-        b.append(new JLabel(sb.toString()));
+        b.append(new JLabel("<html>" + Globals.lang("This database was written using an older version of JabRef.") + "<br>" + Globals.lang("The current version features a new way of handling links to external files.<br>"
+                + "To take advantage of this, your links must be changed into the new format, and<br>"
+                + "JabRef must be configured to show the new links.") + "<p>" + Globals.lang("Do you want JabRef to do the following operations?") + "</html>"));
         b.nextLine();
         if (offerChangeSettings) {
             b.append(changeSettings);

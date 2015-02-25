@@ -66,13 +66,7 @@ public class SPIRESFetcher implements EntryFetcher {
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer("http://").append(spiresHost)
-				.append("/");
-		sb.append("spires/find/hep/www").append("?");
-		sb.append("rawcmd=find+");
-		sb.append(identifier);
-		sb.append("&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=");
-		return sb.toString();
+        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + identifier + "&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=";
 	}
 
 	/**
@@ -91,12 +85,7 @@ public class SPIRESFetcher implements EntryFetcher {
 			key = URLEncoder.encode(key, "UTF-8");
 		} catch (UnsupportedEncodingException ignored) {
 		}
-		StringBuffer sb = new StringBuffer("http://").append(spiresHost)
-				.append("/");
-		sb.append("spires/find/hep/www").append("?");
-		sb.append("rawcmd=find+").append(cmd).append("+");
-		sb.append(key);
-		return sb.toString();
+        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + cmd + "+" + key;
 	}
 
 	/**
@@ -112,12 +101,7 @@ public class SPIRESFetcher implements EntryFetcher {
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer("http://").append(spiresHost)
-				.append("/");
-		sb.append("spires/find/hep/www").append("?");
-		sb.append("rawcmd=find+eprint+");
-		sb.append(key);
-		return sb.toString();
+        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+eprint+" + key;
 	}
 
 	/**

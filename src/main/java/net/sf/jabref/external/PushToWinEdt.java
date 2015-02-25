@@ -63,11 +63,7 @@ public class PushToWinEdt implements PushToApplication {
         }
 
         try {
-            StringBuffer toSend = new StringBuffer("\"[InsText('")
-                    .append(Globals.prefs.get("citeCommandWinEdt")).append("{")
-                    .append(keyString.replaceAll("'", "''"))
-                    .append("}');]\"");
-            Runtime.getRuntime().exec(new String[] {winEdt, toSend.toString()});
+            Runtime.getRuntime().exec(new String[] {winEdt, "\"[InsText('" + Globals.prefs.get("citeCommandWinEdt") + "{" + keyString.replaceAll("'", "''") + "}');]\""});
 
         }
 

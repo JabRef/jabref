@@ -337,9 +337,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             int[] indicesToSelect = new int[listSize];
             for(int i=0;i<listSize;i++) {
                 indicesToSelect[i]=listSize+1;
-                for(int j=0;j<desiredColumns.length;j++) {
-                    if(listOfFileColumns.getModel().getElementAt(i).equals(desiredColumns[j])) {
-                        indicesToSelect[i]=i;
+                for (String desiredColumn : desiredColumns) {
+                    if (listOfFileColumns.getModel().getElementAt(i).equals(desiredColumn)) {
+                        indicesToSelect[i] = i;
                         break;
                     }
                 }
@@ -623,8 +623,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if(extraFileColumns.isSelected()&&!listOfFileColumns.isSelectionEmpty()) {
                     String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
                     for(int i=0;i<selections.length;i++) {
-                        selections[i]=listOfFileColumns.getModel().getElementAt(
-                                listOfFileColumns.getSelectedIndices()[i]).toString();
+                        selections[i]= listOfFileColumns.getModel().getElementAt(
+                                listOfFileColumns.getSelectedIndices()[i]);
                     }
                     _prefs.putStringArray("listOfFileColumns", selections);
                 }

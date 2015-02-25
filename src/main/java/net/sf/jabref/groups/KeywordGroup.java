@@ -17,7 +17,6 @@ package net.sf.jabref.groups;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -339,19 +338,16 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 	
 	public static String getDescriptionForPreview(String field, String expr,
             boolean caseSensitive, boolean regExp) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(regExp ? Globals.lang(
+        return (regExp ? Globals.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
                 field, Util.quoteForHTML(expr))
                 : Globals.lang(
-                        "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
-                        field, Util.quoteForHTML(expr)));
-        sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
-                : Globals.lang("case insensitive")).append("). ");
-        sb.append(regExp ? Globals.lang(
+                "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
+                field, Util.quoteForHTML(expr))) + " (" + (caseSensitive ? Globals.lang("case sensitive")
+                : Globals.lang("case insensitive")) + "). " + (regExp ? Globals.lang(
                 "Entries cannot be manually assigned to or removed from this group.")
                 : Globals.lang(
-                        "Additionally, entries whose <b>%0</b> field does not contain "
+                "Additionally, entries whose <b>%0</b> field does not contain "
                         + "<b>%1</b> can be assigned manually to this group by selecting them "
                         + "then using either drag and drop or the context menu. "
                         + "This process adds the term <b>%1</b> to "
@@ -360,8 +356,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                         + "then using the context menu. "
                         + "This process removes the term <b>%1</b> from "
                         + "each entry's <b>%0</b> field.",
-                        field, Util.quoteForHTML(expr)));
-        return sb.toString();
+                field, Util.quoteForHTML(expr)));
     }
 
 	public String getShortDescription() {

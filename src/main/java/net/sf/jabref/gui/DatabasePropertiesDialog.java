@@ -307,7 +307,7 @@ public class DatabasePropertiesDialog extends JDialog {
 				saveInOriginalOrder.setSelected(true);
 				selected = false;
 			} else {
-				assert (saveOrderConfig.saveInSpecifiedOrder == true);
+				assert (saveOrderConfig.saveInSpecifiedOrder);
 				saveInSpecifiedOrder.setSelected(true);
 				selected = true;
 			}

@@ -413,8 +413,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         if (Globals.prefs.getBoolean("extraFileColumns")) {
             String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
-            for(int i=0;i<desiredColumns.length;i++) {
-                iconCols.put(coln++, new String[] {GUIGlobals.FILE_FIELD,desiredColumns[i]});
+            for (String desiredColumn : desiredColumns) {
+                iconCols.put(coln++, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
             }
         }
 

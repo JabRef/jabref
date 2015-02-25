@@ -267,14 +267,9 @@ public class AutoDetectPaths extends AbstractWorker {
 
         if (Globals.prefs.hasKey("ooUnoilPath") && Globals.prefs.hasKey("ooJurtPath")
                 && Globals.prefs.hasKey("ooExecutablePath")) {
-            if (new File(Globals.prefs.get("ooUnoilPath"), "unoil.jar").exists()
-                && new File(Globals.prefs.get("ooJurtPath"), "jurt.jar").exists()
-                && new File(Globals.prefs.get("ooExecutablePath")).exists()) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return new File(Globals.prefs.get("ooUnoilPath"), "unoil.jar").exists()
+                    && new File(Globals.prefs.get("ooJurtPath"), "jurt.jar").exists()
+                    && new File(Globals.prefs.get("ooExecutablePath")).exists();
         }
         else return false;
     }

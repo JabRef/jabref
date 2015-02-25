@@ -150,14 +150,7 @@ public class OAI2Fetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuffer sb = new StringBuffer("http://").append(oai2Host).append("/");
-        sb.append(oai2Script).append("?");
-        sb.append("verb=GetRecord");
-        sb.append("&identifier=");
-        sb.append(oai2PrefixIdentifier);
-        sb.append(identifier);
-        sb.append("&metadataPrefix=").append(oai2MetaDataPrefix);
-        return sb.toString();
+        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
     }
     
     /**
