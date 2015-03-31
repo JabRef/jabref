@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -107,7 +107,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00C3 ISOlat1 
         {"196", "Auml", "\\{\\\\\"\\{A\\}\\}"}, // latin capital letter A with diaeresis, 
         //                                 U+00C4 ISOlat1 
-        {"197", "Aring", "\\{\\\\AA\\}"}, // latin capital letter A with ring above 
+        {"197", "Aring", "\\{\\{\\\\AA\\}\\}"}, // latin capital letter A with ring above 
         //                                 = latin capital letter A ring,
         //                                 U+00C5 ISOlat1 
         {"198", "AElig", "\\{\\\\AE\\}"}, // latin capital letter AE 
@@ -173,7 +173,7 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00E3 ISOlat1 
         {"228", "auml", "\\{\\\\\"\\{a\\}\\}"}, // latin small letter a with diaeresis, 
         //                                 U+00E4 ISOlat1 
-        {"229", "aring", "\\{\\\\aa\\}"}, // latin small letter a with ring above 
+        {"229", "aring", "\\{\\{\\\\aa\\}\\}"}, // latin small letter a with ring above 
         //                                 = latin small letter a ring,
         //                                 U+00E5 ISOlat1 
         {"230", "aelig", "\\{\\\\ae\\}"}, // latin small letter ae 

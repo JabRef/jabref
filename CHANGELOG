@@ -1,4 +1,5 @@
 [master]
+	- Fix for bug #1253: Cleanup entries error 2 (by ruy.takata)
     - Fix for bug 1213 (sourceforge): Fix encoding for DOI import
     - Feature #809: import pubmed central id (pmc) field from medline
     - Fix undoing Cleanup/Convert to Biblatex
