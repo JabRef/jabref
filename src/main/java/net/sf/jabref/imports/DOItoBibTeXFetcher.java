@@ -114,7 +114,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
+        conn.setRequestProperty("Accept", "application/x-bibtex");
 
 
         String bibtexString;
