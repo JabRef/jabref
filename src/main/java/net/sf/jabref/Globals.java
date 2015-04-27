@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -1184,103 +1184,75 @@ public class Globals {
 		// Use UNICODE characters for RTF-Chars which can not be found in the
 		// standard codepage
 
-		// RTFCHARS.put("`A", "\\u192"); // "Agrave" exists in standard
-		// codepage
+		RTFCHARS.put("`A", "\\u192A"); // "Agrave"
 		RTFCHARS.put("'A", "\\u193A"); // "Aacute"
-		// RTFCHARS.put("^A", "\\u194"); // "Acirc" exists in standard
-		// codepage
+		RTFCHARS.put("^A", "\\u194A"); // "Acirc"
 		RTFCHARS.put("~A", "\\u195A"); // "Atilde"
-		// RTFCHARS.put("\"A", "\\u196"); // "Auml" exists in standard
-		// codepage
+		RTFCHARS.put("\"A", "\\u196A"); // "Auml"
 		RTFCHARS.put("AA", "\\u197A"); // "Aring"
-		RTFCHARS.put("AE", "{\\uc2\\u198AE}"); // "AElig"
+		// RTFCHARS.put("AE", "{\\uc2\\u198AE}"); // "AElig"
+		RTFCHARS.put("AE", "{\\u198A}"); // "AElig"
 		RTFCHARS.put("cC", "\\u199C"); // "Ccedil"
-		// RTFCHARS.put("`E", "\\u200"); // "Egrave" exists in standard
-		// codepage
+		RTFCHARS.put("`E", "\\u200E"); // "Egrave"
 		RTFCHARS.put("'E", "\\u201E"); // "Eacute"
-		// RTFCHARS.put("^E", "\\u202"); // "Ecirc" exists in standard
-		// codepage
-		// RTFCHARS.put("\"E", "\\u203"); // "Euml" exists in standard
-		// codepage
-		// RTFCHARS.put("`I", "\\u204"); // "Igrave" exists in standard
-		// codepage
+		RTFCHARS.put("^E", "\\u202E"); // "Ecirc"
+		RTFCHARS.put("\"E", "\\u203E"); // "Euml"
+		RTFCHARS.put("`I", "\\u204I"); // "Igrave
 		RTFCHARS.put("'I", "\\u205I"); // "Iacute"
-		// RTFCHARS.put("^I", "\\u206"); // "Icirc" exists in standard
-		// codepage
-		// RTFCHARS.put("\"I", "\\u207"); // "Iuml" exists in standard
-		// codepage
+		RTFCHARS.put("^I", "\\u206I"); // "Icirc"
+		RTFCHARS.put("\"I", "\\u207I"); // "Iuml"
 		RTFCHARS.put("DH", "\\u208D"); // "ETH"
 		RTFCHARS.put("~N", "\\u209N"); // "Ntilde"
-		// RTFCHARS.put("`O", "\\u210"); // "Ograve" exists in standard
-		// codepage
+		RTFCHARS.put("`O", "\\u210O"); // "Ograve"
 		RTFCHARS.put("'O", "\\u211O"); // "Oacute"
-		// RTFCHARS.put("^O", "\\u212"); // "Ocirc" exists in standard
-		// codepage
+		RTFCHARS.put("^O", "\\u212O"); // "Ocirc"
 		RTFCHARS.put("~O", "\\u213O"); // "Otilde"
-		// RTFCHARS.put("\"O", "\\u214"); // "Ouml" exists in standard
-		// codepage
+		RTFCHARS.put("\"O", "\\u214O"); // "Ouml"
 		// According to ISO 8859-1 the "\times" symbol should be placed here
 		// (#215).
 		// Omitting this, because it is a mathematical symbol.
-		//RTFCHARS.put("O", "\\u216O"); // "Oslash"
-        RTFCHARS.put("O", "\\'d8");
+		RTFCHARS.put("O", "\\u216O"); // "Oslash"
+        //  RTFCHARS.put("O", "\\'d8");
         RTFCHARS.put("o", "\\'f8");
-		// RTFCHARS.put("`U", "\\u217"); // "Ugrave" exists in standard
-		// codepage
+		RTFCHARS.put("`U", "\\u217U"); // "Ugrave"
 		RTFCHARS.put("'U", "\\u218U"); // "Uacute"
-		// RTFCHARS.put("^U", "\\u219"); // "Ucirc" exists in standard
-		// codepage
-		// RTFCHARS.put("\"U", "\\u220"); // "Uuml" exists in standard
-		// codepage
+		RTFCHARS.put("^U", "\\u219U"); // "Ucirc" 		
+		RTFCHARS.put("\"U", "\\u220U"); // "Uuml" 
 		RTFCHARS.put("'Y", "\\u221Y"); // "Yacute"
 		RTFCHARS.put("TH", "{\\uc2\\u222TH}"); // "THORN"
 		RTFCHARS.put("ss", "{\\uc2\\u223ss}"); // "szlig"
         //RTFCHARS.put("ss", "AFFEN"); // "szlig"
-        // RTFCHARS.put("`a", "\\u224"); // "agrave" exists in standard
-		// codepage
+        RTFCHARS.put("`a", "\\u224a"); // "agrave"
 		RTFCHARS.put("'a", "\\u225a"); // "aacute"
-		// RTFCHARS.put("^a", "\\u226"); // "acirc" exists in standard
-		// codepage
+		RTFCHARS.put("^a", "\\u226a"); // "acirc"
 		RTFCHARS.put("~a", "\\u227a"); // "atilde"
-		// RTFCHARS.put("\"a", "\\u228"); // "auml" exists in standard
-		// codepage
+		RTFCHARS.put("\"a", "\\u228a"); // "auml"
 		RTFCHARS.put("aa", "\\u229a"); // "aring"
-		RTFCHARS.put("ae", "{\\uc2\\u230ae}"); // "aelig"
+		//  RTFCHARS.put("ae", "{\\uc2\\u230ae}"); // "aelig" \\u230e6
+		RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
 		RTFCHARS.put("cc", "\\u231c"); // "ccedil"
-		// RTFCHARS.put("`e", "\\u232"); // "egrave" exists in standard
-		// codepage
+		RTFCHARS.put("`e", "\\u232e"); // "egrave"
 		RTFCHARS.put("'e", "\\u233e"); // "eacute"
-		// RTFCHARS.put("^e", "\\u234"); // "ecirc" exists in standard
-		// codepage
-		// RTFCHARS.put("\"e", "\\u235"); // "euml" exists in standard
-		// codepage
-		// RTFCHARS.put("`i", "\\u236"); // "igrave" exists in standard
-		// codepage
+		RTFCHARS.put("^e", "\\u234e"); // "ecirc"
+		RTFCHARS.put("\"e", "\\u235e"); // "euml"
+		RTFCHARS.put("`i", "\\u236i"); // "igrave"
 		RTFCHARS.put("'i", "\\u237i"); // "iacute"
-		// RTFCHARS.put("^i", "\\u238"); // "icirc" exists in standard
-		// codepage
-		// RTFCHARS.put("\"i", "\\u239"); // "iuml" exists in standard
-		// codepage
+		RTFCHARS.put("^i", "\\u238i"); // "icirc"
+		RTFCHARS.put("\"i", "\\u239i"); // "iuml"
 		RTFCHARS.put("dh", "\\u240d"); // "eth"
-		// RTFCHARS.put("~n", "\\u241"); // "ntilde" exists in standard
-		// codepage
-		// RTFCHARS.put("`o", "\\u242"); // "ograve" exists in standard
-		// codepage
+		RTFCHARS.put("~n", "\\u241n"); // "ntilde"
+		RTFCHARS.put("`o", "\\u242o"); // "ograve"
 		RTFCHARS.put("'o", "\\u243o"); // "oacute"
-		// RTFCHARS.put("^o", "\\u244"); // "ocirc" exists in standard
-		// codepage
+		RTFCHARS.put("^o", "\\u244o"); // "ocirc"
 		RTFCHARS.put("~o", "\\u245o"); // "otilde"
-		// RTFCHARS.put("\"o", "\\u246"); // "ouml" exists in standard
-		// codepage
+		RTFCHARS.put("\"o", "\\u246o"); // "ouml"
 		// According to ISO 8859-1 the "\div" symbol should be placed here
 		// (#247).
 		// Omitting this, because it is a mathematical symbol.
-		//RTFCHARS.put("o", "\\u248o"); // "oslash"
-		// RTFCHARS.put("`u", "\\u249"); // "ugrave" exists in standard
-		// codepage
+		RTFCHARS.put("o", "\\u248o"); // "oslash"
+		RTFCHARS.put("`u", "\\u249u"); // "ugrave"
 		RTFCHARS.put("'u", "\\u250u"); // "uacute"
-		// RTFCHARS.put("^u", "\\u251"); // "ucirc" exists in standard
-		// codepage
+		RTFCHARS.put("^u", "\\u251u"); // "ucirc"
 		// RTFCHARS.put("\"u", "\\u252"); // "uuml" exists in standard
 		// codepage
 		RTFCHARS.put("'y", "\\u253y"); // "yacute"

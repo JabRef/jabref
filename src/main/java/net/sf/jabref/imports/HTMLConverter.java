@@ -188,13 +188,13 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00EA ISOlat1 
         {"235", "euml", "\\{\\\\\"\\{e\\}\\}"}, // latin small letter e with diaeresis, 
         //                                 U+00EB ISOlat1 
-        {"236", "igrave", "\\{\\\\`\\{\\\\i\\}\\}"}, // latin small letter i with grave,
+        {"236", "igrave", "\\{\\\\`\\{i\\}\\}"}, // latin small letter i with grave,
         //                                 U+00EC ISOlat1 
-        {"237", "iacute", "\\{\\\\'\\{\\\\i\\}\\}"}, // latin small letter i with acute, 
+        {"237", "iacute", "\\{\\\\'\\{i\\}\\}"}, // latin small letter i with acute, 
         //                                 U+00ED ISOlat1 
-        {"238", "icirc", "\\{\\\\\\^\\{\\\\i\\}\\}"}, // latin small letter i with circumflex, 
+        {"238", "icirc", "\\{\\\\\\^\\{i\\}\\}"}, // latin small letter i with circumflex, 
         //                                 U+00EE ISOlat1 
-        {"239", "iuml", "\\{\\\\\"\\{\\\\i\\}\\}"}, // latin small letter i with diaeresis, 
+        {"239", "iuml", "\\{\\\\\"\\{i\\}\\}"}, // latin small letter i with diaeresis, 
         //                                 U+00EF ISOlat1 
         {"240", "eth", "\\{\\\\dh\\}"}, // latin small letter eth, U+00F0 ISOlat1  
         {"241", "ntilde", "\\{\\\\~\\{n\\}\\}"}, // latin small letter n with tilde, 
@@ -227,6 +227,8 @@ public class HTMLConverter implements LayoutFormatter {
         //                                 U+00FE ISOlat1 
         {"255", "yuml", "\\{\\\\\"\\{y\\}\\}"}, // latin small letter y with diaeresis, 
         //                                 U+00FF ISOlat1 
+        {"332", "Omacro", "\\{\\\\=\\{O\\}\\}"}, // the small letter o with macron
+        {"333", "omacro", "\\{\\\\=\\{o\\}\\}"}, // the big letter O with macron
         {"402", "fnof", "\\$f\\$"}, // latin small f with hook = function 
         //                                   = florin, U+0192 ISOtech 
 

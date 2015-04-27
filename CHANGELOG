@@ -1,4 +1,6 @@
 [master]
+	- Fix for bug #1270: Cleanup entries error 3
+    - Fix for bug #919: Accents don't export to RTF (by ruy.takata)
     - Change the CrossRef content negotiation for bibtex DOI import (by sheffien)
     - Fix for bug #1253: Cleanup entries error 2 (by ruy.takata)
     - Fix for bug 1213 (sourceforge): Fix encoding for DOI import
