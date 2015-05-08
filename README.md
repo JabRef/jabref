@@ -121,6 +121,7 @@ and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` 
 ## Release Process
 
 Replace `ANY_ANT_TARGET` with the Ant Target of your choice, and the system will build your binaries.
+To get a list of all targets, use `gradlew tasks`.
 
 `gradlew generateSource antTargets.ANY_ANT_TARGET`
 
@@ -132,8 +133,11 @@ source tree) in the `build/lib` directory. Enjoy!
 On Mac OS X you should include the targets osx and osxjar,
 making the correct command `gradlew generateSource antTargets.compile antTargets.unjarlib antTargets.osx antTargets.jars antTargets.osxjar`.
 After the build is finished, you will find the OS X application
-`JabRef.app` in the `build/lib` directory along with the executable
+`JabRef.app` in the `buildant/lib` directory along with the executable
 jar.
 
+### Releasing on Windows
 
+Run `gradlew antTargets.release`
 
+All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
