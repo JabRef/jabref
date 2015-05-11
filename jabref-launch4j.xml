@@ -2,7 +2,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>JabRef-1.1.1.jar</jar>
-  <outfile>.\src\windows\nsis\dist\JabRef.exe</outfile>
+  <outfile>./src/main/resources/windows/nsis/dist/JabRef.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -12,7 +12,7 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>./src/resources/images/JabRef.ico</icon>
+  <icon>./src/main/resources/images/JabRef.ico</icon>
   <jre>
     <path></path>
     <minVersion>1.6.0</minVersion>
