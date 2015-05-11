@@ -16,6 +16,7 @@
 package net.sf.jabref.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
@@ -84,6 +86,7 @@ public class MainTable extends JTable {
 
         addFocusListener(Globals.focusListener);
         setAutoResizeMode(Globals.prefs.getInt("autoResizeMode"));
+      
         this.tableFormat = tableFormat;
         this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
@@ -109,9 +112,12 @@ public class MainTable extends JTable {
         selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
+        pane.setBorder(BorderFactory.createEmptyBorder());
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-        setGridColor(Globals.prefs.getColor("gridColor"));
-
+        //setGridColor(Globals.prefs.getColor("gridColor"));
+        setShowGrid(false);
+        setIntercellSpacing(new Dimension(0, 0));
+        
         this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
 
         comparatorChooser = this.createTableComparatorChooser(this, sortedForTable,
@@ -217,7 +223,7 @@ public class MainTable extends JTable {
     public TableCellRenderer getCellRenderer(int row, int column) {
         
         int score = -3;
-        TableCellRenderer renderer = defRenderer;
+        DefaultTableCellRenderer renderer = defRenderer;
 
         int status = getCellStatus(row, column);
 
@@ -256,6 +262,7 @@ public class MainTable extends JTable {
                 } else
                     renderer = compRenderer;
             }
+            renderer.setHorizontalAlignment( JLabel.CENTER );
         }
         else if (tableColorCodes) {
             if (status == REQUIRED)
@@ -263,7 +270,7 @@ public class MainTable extends JTable {
             else if (status == OPTIONAL)
                 renderer = optRenderer;
             else if (status == BOOLEAN)
-                renderer = getDefaultRenderer(Boolean.class);
+                renderer = (DefaultTableCellRenderer) getDefaultRenderer(Boolean.class);
         }
 
         // For MARKED feature:

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -129,7 +130,7 @@ public class EntryEditorTab {
 
         DefaultFormBuilder builder = new DefaultFormBuilder
                 (new FormLayout(colSpec, rowSpec), panel);
-
+        
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:
             int editorType = BibtexFields.getEditorType(fields[i]);

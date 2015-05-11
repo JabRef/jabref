@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
@@ -50,7 +51,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 		close.addActionListener(new CloseButtonListener());
 		setToolBar(tlb);
 		// setBorder(BorderFactory.createEtchedBorder());
-
+		setBorder(BorderFactory.createEmptyBorder());
 		// setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
 		// setPreferredSize(new java.awt.Dimension
 		// (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
