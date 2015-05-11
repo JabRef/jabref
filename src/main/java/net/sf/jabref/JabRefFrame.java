@@ -270,6 +270,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       editStrings = new GeneralAction("editStrings", "Edit strings",
                                       Globals.lang("Edit strings"),
                                       prefs.getKey("Edit strings")),
+	  toggleToolbar = new GeneralAction("toggleToolbar", "Hide/show toolbar",
+              Globals.lang("Hide/show toolbar"),
+	          prefs.getKey("Hide/show toolbar")),
       toggleGroups = new GeneralAction("toggleGroups",
                                        "Toggle groups interface",
                                        Globals.lang("Toggle groups interface"),
@@ -470,6 +473,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         
         initActions();
 
+        // Show the toolbar if it was visible at last shutdown:
+        tlb.setVisible(Globals.prefs.getBoolean("toolbarVisible"));
       
       setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
       if ( !prefs.getBoolean("windowMaximised") ) {
@@ -809,6 +814,7 @@ public JabRefPreferences prefs() {
       //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
       prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
       
+      prefs.putBoolean("toolbarVisible", tlb.isVisible());
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();
@@ -1394,6 +1400,7 @@ public JabRefPreferences prefs() {
       view.add(increaseFontSize);
       view.add(decreseFontSize);
       view.addSeparator();
+      view.add(toggleToolbar);
       view.add(toggleGroups);
       view.add(togglePreview);
       view.add(switchPreview);
@@ -1649,7 +1656,6 @@ public JabRefPreferences prefs() {
     //Insets margin = new Insets(0, 0, 0, 0);
     //for (int i=0; i<tlb.getComponentCount(); i++)
     //  ((JButton)tlb.getComponentAtIndex(i)).setMargin(margin);
-
   }
 
   

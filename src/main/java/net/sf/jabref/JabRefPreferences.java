@@ -373,6 +373,7 @@ public class JabRefPreferences {
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
+        defaults.put("toolbarVisible", Boolean.TRUE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("groupsVisibleRows", 8);
