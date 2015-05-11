@@ -101,6 +101,7 @@
 		<include name="jgoodies-looks-2.5.2.jar" />
 		<include name="jgoodies-forms-1.6.0.jar" />
         <include name="jgoodies/jgoodies-uif-lite.jar" />
+        <include name="jna-4.1.0.jar" />
         <include name="ritopt/ritopt-0.2.1-bin.jar" />
 		<include name="jayatana-1.2.4.jar" />
 		<include name="spin.jar" />

@@ -138,6 +138,11 @@ Project: JGoodies Looks
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
+Path:    jna-4.1.0.jar
+Project: Java Native Access (JNA)
+URL:     https://github.com/twall/jna
+License: LGPL 2.1
+
 Path:    microba.jar
 Project: Microba
 URL:     http://microba.sourceforge.net/

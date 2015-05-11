@@ -50,6 +50,12 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
+import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.ptr.PointerByReference;
+
 /**
  * JabRef Main Class - The application gets started here.
  *
@@ -181,9 +187,44 @@ public class JabRef {
 		Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 		Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 		
+		
+		// Set application user model id so that pinning JabRef to the Win7/8 taskbar works
+		// Based on http://stackoverflow.com/a/1928830
+		setCurrentProcessExplicitAppUserModelID("JabRef."+Globals.VERSION);
+	    //System.out.println(getCurrentProcessExplicitAppUserModelID());
+		
 		openWindow(processArguments(args, true));
 	}
     
+    // Do not use this code in release version, it contains some memory leaks
+    public static String getCurrentProcessExplicitAppUserModelID()
+    {
+      final PointerByReference r = new PointerByReference();
+
+      if (GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
+      {
+        final Pointer p = r.getValue();
+
+
+        return p.getString(0, true); // here we leak native memory by lazyness
+      }      
+      return "N/A";
+    }
+
+    public static void setCurrentProcessExplicitAppUserModelID(final String appID)
+    {
+      if (SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0)
+        throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
+    }
+
+    private static native NativeLong GetCurrentProcessExplicitAppUserModelID(PointerByReference appID);
+    private static native NativeLong SetCurrentProcessExplicitAppUserModelID(WString appID);
+
+
+    static
+    {
+      Native.register("shell32");
+    }
 
 
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
