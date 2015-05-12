@@ -401,6 +401,8 @@ public class JabRefPreferences {
         defaults.put("tableReqFieldBackground", "230:235:255");
         defaults.put("tableOptFieldBackground", "230:255:230");
         defaults.put("tableText", "0:0:0");
+        defaults.put("tablePadding", 0);
+        defaults.put("tableShowGrid", Boolean.FALSE);
         defaults.put("gridColor", "210:210:210");
         defaults.put("grayedOutBackground", "210:210:210");
         defaults.put("grayedOutText", "40:40:40");

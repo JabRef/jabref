@@ -31,12 +31,12 @@ import com.jgoodies.forms.layout.FormLayout;
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox colorCodes, overrideFonts;//, useCustomIconTheme;
+    private JCheckBox colorCodes, overrideFonts, showGrid;//, useCustomIconTheme;
     private ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
-    private JTextField fontSize;//, customIconThemeFile;
+    private JTextField fontSize, gridPadding;//, customIconThemeFile;
 
     /**
      * Customization of appearance parameters.
@@ -57,6 +57,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                   ("Use antialiasing font"));*/
         overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));
 
+        gridPadding = new JTextField(5);
+        showGrid = new JCheckBox(Globals.lang("Show gridlines"));
+        
         //useCustomIconTheme = new JCheckBox(Globals.lang("Use custom icon theme"));
         //customIconThemeFile = new JTextField();
         FormLayout layout = new FormLayout
@@ -78,6 +81,14 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         //builder.append(antialias);
         //builder.nextLine();
         builder.append(colorCodes);
+        builder.nextLine();
+        builder.append(showGrid);
+        builder.nextLine();
+        JPanel panelGridPadding = new JPanel();
+        lab = new JLabel(Globals.lang("Additional cell padding (in px)") + ":");
+        panelGridPadding.add(lab);
+        panelGridPadding.add(gridPadding);
+        builder.append(panelGridPadding);
         builder.nextLine();
         JButton fontButton = new JButton(Globals.lang("Set table font"));
         builder.append(fontButton);
@@ -149,6 +160,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize.setEnabled(overrideFonts.isSelected());
         //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
         //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
+        showGrid.setSelected(_prefs.getBoolean("tableShowGrid"));
+        gridPadding.setText("" + _prefs.getInt("tablePadding"));
         colorPanel.setValues();
     }
 
@@ -167,6 +180,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("overrideDefaultFonts", overrideFonts.isSelected());
         GUIGlobals.CURRENTFONT = font;
         colorPanel.storeSettings();
+        _prefs.putBoolean("tableShowGrid", showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
@@ -179,6 +193,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                         Globals.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);
             }
+           _prefs.putInt("tablePadding", Integer.parseInt(gridPadding.getText()));
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
@@ -193,6 +208,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
                             Globals.lang("Menu and label font size") + "'", Globals.lang("Changed font settings"),
+                            JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        try {
+            // Test if table padding is a number:
+            Integer.parseInt(gridPadding.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog
+                    (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
+                            Globals.lang("Additional cell padding (in px)") + "'", Globals.lang("Changed table settings"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }

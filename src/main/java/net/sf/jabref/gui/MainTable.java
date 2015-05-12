@@ -114,9 +114,14 @@ public class MainTable extends JTable {
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-        //setGridColor(Globals.prefs.getColor("gridColor"));
-        setShowGrid(false);
-        setIntercellSpacing(new Dimension(0, 0));
+        setGridColor(Globals.prefs.getColor("gridColor"));
+        if(Globals.prefs.getBoolean("tableShowGrid"))
+        	setShowGrid(true);
+        else
+        {
+	        setShowGrid(false);
+	        setIntercellSpacing(new Dimension(0, 0));
+        }
         
         this.setTableHeader(new PreventDraggingJTableHeader(this.getColumnModel()));
 
@@ -532,7 +537,7 @@ public class MainTable extends JTable {
      */
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
-        setRowHeight(GUIGlobals.TABLE_ROW_PADDING + GUIGlobals.CURRENTFONT.getSize());
+        setRowHeight(GUIGlobals.TABLE_ROW_PADDING + Globals.prefs.getInt("tablePadding") + GUIGlobals.CURRENTFONT.getSize());
     }
 
     public void ensureVisible(int row) {

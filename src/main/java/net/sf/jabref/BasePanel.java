@@ -45,8 +45,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javafx.scene.Parent;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
