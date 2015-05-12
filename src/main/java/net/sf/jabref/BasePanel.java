@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -45,6 +46,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -2078,6 +2080,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         splitPane.setTopComponent(mainTable.getPane());
 
+        // Remove borders
+        splitPane.setBorder(BorderFactory.createEmptyBorder());
+        setBorder(BorderFactory.createEmptyBorder());
+                
         //setupTable();
         // If an entry is currently being shown, make sure it stays shown,
         // otherwise set the bottom component to null.

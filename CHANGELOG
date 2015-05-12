@@ -1,4 +1,5 @@
 [master]
+    - Feature: Gridlines are now optional (and disabled by default)
     - Fix for bug #1270: Cleanup entries error 3
     - Fix for bug #919: Accents don't export to RTF (by ruy.takata)
     - Change the CrossRef content negotiation for bibtex DOI import (by sheffien)
