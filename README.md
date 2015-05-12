@@ -128,7 +128,8 @@ To get a list of all targets, use `gradlew tasks`.
 To compile, use the command `gradlew generateSource antTargets.jars`.
 After the build is finished, you can find the executable jar file
 named `JabRef-$VERSION.jar` (where $VERSION is the current version of the
-source tree) in the `build/lib` directory. Enjoy!
+source tree) in the `buildant\lib` directory. Enjoy!
+The setup files are created by invoking the command `gradlew generateSource antTargets.release`.
 
 On Mac OS X you should include the targets osx and osxjar,
 making the correct command `gradlew generateSource antTargets.compile antTargets.unjarlib antTargets.osx antTargets.jars antTargets.osxjar`.
