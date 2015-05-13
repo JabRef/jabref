@@ -26,8 +26,7 @@ Name "JabRef ${VERSION}"
 !define PRODUCT_NAME "JabRef"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 !define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
-
-
+!define AppUserModelId "JabRef.${VERSION}"
 
 # Variables
 Var StartmenuFolder
@@ -179,6 +178,9 @@ Section "-Installation actions" SecInstallation
   ; register JabRef
   WriteRegStr SHCTX "${REGKEY}" Path $INSTDIR
   WriteUninstaller $INSTDIR\uninstall.exe
+  ; register application user model id so that JabRef works with Win7 taskbar
+  CreateShortCut "$INSTDIR\$(^Name).lnk" "$INSTDIR\${PRODUCT_EXE}" "" "$INSTDIR\JabRef.exe" 0 SW_SHOWNORMAL
+  WinShell::SetLnkAUMI "$INSTDIR\$(^Name).lnk" "${AppUserModelId}"
   ; create shortcuts to startmenu
   SetOutPath "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\$StartmenuFolder"
@@ -212,6 +214,10 @@ Section "un.JabRef" un.SecUnProgramFiles
   ; delete executables
   Delete $INSTDIR\${PRODUCT_EXE}
   Delete $INSTDIR\uninstall.exe
+  ; remove application user model id
+  WinShell::UninstAppUserModelId "${AppUserModelId}"
+  WinShell::UninstShortcut "$INSTDIR\$(^Name).lnk"
+  Delete "$INSTDIR\$(^Name).lnk"
   ; delete dir only if empty
   RMDir $INSTDIR
   ; delete start menu entry
