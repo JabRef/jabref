@@ -36,7 +36,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
-    private JTextField fontSize;//, customIconThemeFile;
+    private JTextField fontSize, rowPadding;//, customIconThemeFile;
 
     /**
      * Customization of appearance parameters.
@@ -50,6 +50,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         // Font sizes:
         fontSize = new JTextField(5);
 
+        // Row padding size:
+        rowPadding = new JTextField(5);
 
         colorCodes = new JCheckBox(
                    Globals.lang("Color codes for required and optional fields"));
@@ -77,6 +79,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.appendSeparator(Globals.lang("Table appearance"));
         //builder.append(antialias);
         //builder.nextLine();
+        JPanel p2 = new JPanel();
+        p2.add(new JLabel(Globals.lang("Table row height padding") + ":"));
+        p2.add(rowPadding);
+        builder.append(p2);
+        builder.nextLine();
         builder.append(colorCodes);
         builder.nextLine();
         JButton fontButton = new JButton(Globals.lang("Set table font"));
@@ -143,6 +150,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
         //antialias.setSelected(_prefs.getBoolean("antialias"));
         fontSize.setText("" + _prefs.getInt("menuFontSize"));
+        rowPadding.setText("" + _prefs.getInt("tableRowPadding"));
         oldMenuFontSize = _prefs.getInt("menuFontSize");
         overrideFonts.setSelected(_prefs.getBoolean("overrideDefaultFonts"));
         oldOverrideFontSize = overrideFonts.isSelected();
@@ -183,19 +191,40 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
+        try {
+            int padding = Integer.parseInt(rowPadding.getText());
+                _prefs.putInt("tableRowPadding", padding);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    public boolean readyToClose() {
+    private boolean validateIntegerField(String fieldName, String fieldValue, String errorTitle)
+    {
         try {
-            // Test if font size is a number:
-            Integer.parseInt(fontSize.getText());
+            // Test if the field value is a number:
+            Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
-                            Globals.lang("Menu and label font size") + "'", Globals.lang("Changed font settings"),
+                            Globals.lang(fieldName) + "'", Globals.lang(errorTitle),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }
+        return true;
+    }
+
+    public boolean readyToClose() {
+        // Test if font size is a number:
+        if (validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings") == false) {
+            return false;
+        }
+
+        // Test if row padding is a number:
+        if (validateIntegerField("Table row height padding", rowPadding.getText(), "Changed table appearance settings") == false) {
+            return false;
+        }
+        
         return true;
 
     }
