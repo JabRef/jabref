@@ -691,6 +691,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
+        // The action for toggling the visibility of the toolbar
+        actions.put("toggleToolbar", new BaseAction() {
+            public void action() {
+            	frame.tlb.setVisible(! frame.tlb.isVisible());
+            }
+        });
 
         // action for collecting database strings from user
         actions.put("dbConnect", new DbConnectAction(this));
