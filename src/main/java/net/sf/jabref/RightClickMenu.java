@@ -334,7 +334,7 @@ public class RightClickMenu extends JPopupMenu
         });
         add(groupRemove);
 
-        groupMoveTo=add(new AbstractAction(Globals.lang("move to group"))
+        groupMoveTo=add(new AbstractAction(Globals.lang("Move to group"))
         {
             public void actionPerformed(ActionEvent e) {
                 try {
