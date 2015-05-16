@@ -398,6 +398,7 @@ public class JabRefPreferences {
         defaults.put("menuFontStyle", java.awt.Font.PLAIN);
         defaults.put("menuFontSize", 11);
         defaults.put("tableRowPadding", GUIGlobals.TABLE_ROW_PADDING);
+        defaults.put("tableShowGrid", Boolean.FALSE);
         // Main table color settings:
         defaults.put("tableBackground", "255:255:255");
         defaults.put("tableReqFieldBackground", "230:235:255");

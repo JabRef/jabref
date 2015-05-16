@@ -1,4 +1,6 @@
 [master]
+    - Some UI updates (mainly removing unnecessary boundaries)
+    - Feature: Gridlines are now optional (and disabled by default)
     - Fix for bug #1248: Key bindings not modified
     - Fix for bug #876: Windows 7/8/10 - Pinning Jabref to the taskbar
     - Feature: Option to change the table row height padding

@@ -1797,7 +1797,7 @@ public JabRefPreferences prefs() {
         } else {
             title = file.getName();
         }
-        tabbedPane.add(title, bp);
+        tabbedPane.add("<html><div style='padding:2px 5px;'>" + title + "</div></html>", bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
