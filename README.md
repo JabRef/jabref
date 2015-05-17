@@ -1,6 +1,6 @@
-# JabRef version 2.11 beta
+# JabRef development version
 
-This version is a beta version. Features may not work as expected.
+This version is a development version. Features may not work as expected.
 
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
