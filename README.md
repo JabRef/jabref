@@ -2,18 +2,28 @@
 
 This version is a development version. Features may not work as expected.
 
-JabRef is a graphical application for managing bibliographical data.
+JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
+JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
+You can customize the entry information shown in the main window, and sort by any of the standard Bibtex fields.
+JabRef can autogenerate bibtex keys for your entries.
+JabRef also lets you easily link to PDF or web sources for your reference entries.
+
+JabRef can import from and export to several formats, and you can customize export filters.
+JabRef can be run as a command line application to convert from any import format to any export format.
 
 * Homepage: http://jabref.sourceforge.net/
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
 * CI Server: https://travis-ci.org/JabRef/jabref
+* Open HUB page: https://www.openhub.net/p/jabref
 
-This repository has been generated out of the old git repository at sourceforge.
-The folder  `jabref` of the old repository is now this repository.
+The main git repository has been generated out of the old git repository at sourceforge.
+The folder `jabref` of the old repository is now the main repository.
 Although that changed **all** git commit ids, the advantage is to have a clean separation between plugins, the homepage and the code of JabRef.
 
-### Bug reports, suggestions, other feedback:
+
+### Bug reports, suggestions, other feedback
+
 We are thankful for any bug reports or other feedback. If there are
 features you want included in JabRef, tell us!
 
@@ -25,38 +35,14 @@ The "old" trackers at sourceforge still remain intact:
 Do *not* file patches using https://sourceforge.net/p/jabref/patches/.
 Just fork JabRef and create a pull request.
 
+For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful. It contains steps to get start with JabRef development.
+
+
 ### Next Steps
 
-* Change build system from `ant` to `gradle` to get rid of the binaries in the repository.
+* Completely change build system from `ant` to `gradle` to get rid of the binaries in the repository.
 * Migrate the sourceforge wiki to github
 * Fix bugs listed at https://sourceforge.net/p/jabref/bugs/.
-
-## Introduction
-
-JabRef is a graphical Java application for editing bibtex (`.bib`)
-databases. JabRef lets you organize your entries into overlapping
-logical groups, and with a single click limit your view to a single
-group or an intersection or union of several groups. You can customize
-the entry information shown in the main window, and sort by any of the
-standard Bibtex fields. JabRef can autogenerate bibtex keys for your
-entries. JabRef also lets you easily link to PDF or web sources for your
-reference entries.
-
-JabRef can import from and export to several formats, and you can
-customize export filters. JabRef can be run as a command line application
-to convert from any import format to any export format.
-
-
-## License
-
-JabRef is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 2 of the License, or (at your option) any later
-version.  dialog, for details about the GPL. See the enclosed text files
-'gpl2.txt' and 'gpl3.txt' for the full details.
-
-JabRef also uses libraries distributed by other parties; see the About
-box for details.
 
 
 ## Requirements
@@ -81,22 +67,22 @@ Wix (tool for compiling MSI files from an XML specification), available at http:
 JabRef can be downloaded as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
-     java -jar <path to jar>
+     `java -jar <path to jar>`
 or, if you are using the Java Runtime Environment:
-     jre -new -jar <path to jar> or
-     jrew -new -jar <path to jar>
+     `jre -new -jar <path to jar>` or
+     `jrew -new -jar <path to jar>`
 
-If you run JabRef under Java 1.5, you can add the option "-Dswing.aatext=true" before the
-"-jar" option, to activate antialiased text throughout the application.
-
+If you run JabRef under Java 1.5, you can add the option `-Dswing.aatext=true` before the
+`-jar` option, to activate antialiased text throughout the application.
 
 The jar file containing JabRef can be unpacked with the command:
-    jar xf <path to jar>
-or  jar xf <path to jar> <list of files to extract>
+    `jar xf <path to jar>`
+or  `jar xf <path to jar> <list of files to extract>`.
 Unpacking the jar file is not necessary to run the program.
 
 
 ## Documentation
+
 JabRef comes with an online help function, accessed by pressing F1 or
 clicking on a question mark icon. The help files are probably not
 exhaustive enough to satisfy everyone yet, but they should help sort
@@ -108,15 +94,14 @@ appear in your chosen languages.
 
 ## Building JabRef from source:
 
-To compile JabRef from source, you need:
+If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
-* A Java compiler, supporting Java 1.6 and `JAVA_HOME` points to this JDK.
+To compile JabRef from source, you need a Java compiler supporting Java 1.6 and `JAVA_HOME` pointing to this JDK.
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` project files.
 
-* If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
 ## Release Process
 
@@ -137,8 +122,20 @@ After the build is finished, you will find the OS X application
 `JabRef.app` in the `buildant/lib` directory along with the executable
 jar.
 
+
 ### Releasing on Windows
 
 Run `gradlew antTargets.release`
 
 All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
+
+
+## License
+
+JabRef is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+See the enclosed text files 'gpl3.txt' for full details.
+
+JabRef also uses libraries distributed by other parties; see the About box for details.
