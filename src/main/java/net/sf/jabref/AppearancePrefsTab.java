@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox colorCodes, overrideFonts;//, useCustomIconTheme;
+    private JCheckBox colorCodes, overrideFonts, showGrid;//, useCustomIconTheme;
     private ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
@@ -59,6 +59,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                   ("Use antialiasing font"));*/
         overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));
 
+        showGrid = new JCheckBox(Globals.lang("Show gridlines"));
+        
         //useCustomIconTheme = new JCheckBox(Globals.lang("Use custom icon theme"));
         //customIconThemeFile = new JTextField();
         FormLayout layout = new FormLayout
@@ -85,6 +87,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.append(p2);
         builder.nextLine();
         builder.append(colorCodes);
+        builder.nextLine();
+        builder.append(showGrid);
         builder.nextLine();
         JButton fontButton = new JButton(Globals.lang("Set table font"));
         builder.append(fontButton);
@@ -157,6 +161,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize.setEnabled(overrideFonts.isSelected());
         //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
         //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
+        showGrid.setSelected(_prefs.getBoolean("tableShowGrid"));
         colorPanel.setValues();
     }
 
@@ -175,6 +180,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("overrideDefaultFonts", overrideFonts.isSelected());
         GUIGlobals.CURRENTFONT = font;
         colorPanel.storeSettings();
+        _prefs.putBoolean("tableShowGrid", showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
@@ -187,7 +193,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                         Globals.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);
             }
-
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
