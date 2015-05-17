@@ -105,7 +105,9 @@ and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` 
 
 ## Release Process
 
-Requires [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
+Requires
+ * [launch4j](http://launch4j.sourceforge.net/)
+ * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
 
 Replace `ANY_ANT_TARGET` with the Ant Target of your choice, and the system will build your binaries.
 To get a list of all targets, use `gradlew tasks`.
