@@ -1,4 +1,4 @@
-[master]
+2.11 beta
     - Some UI updates (mainly removing unnecessary boundaries)
     - Feature: Gridlines are now optional (and disabled by default)
     - Fix for bug #1248: Key bindings not modified
