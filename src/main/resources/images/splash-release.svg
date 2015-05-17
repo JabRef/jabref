@@ -16,17 +16,17 @@
    height="432"
    id="svg2138"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="splash-release.svg"
    inkscape:export-filename="splash.png"
    inkscape:export-xdpi="90.000000"
    inkscape:export-ydpi="90.000000">
   <sodipodi:namedview
-     inkscape:window-y="-3"
-     inkscape:window-x="33"
-     inkscape:window-height="880"
-     inkscape:window-width="1512"
-     inkscape:current-layer="svg2138"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="1155"
+     inkscape:window-width="1920"
+     inkscape:current-layer="layer6"
      inkscape:document-units="px"
      inkscape:cy="265.8697"
      inkscape:cx="326.60531"
@@ -142,7 +142,7 @@
      inkscape:groupmode="layer">
     <text
        xml:space="preserve"
-       style="font-size:13.62155151px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#797580;fill-opacity:1;display:inline;font-family:Bitstream Vera Sans"
+       style="font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.62155151px;line-height:100%;font-family:'Bitstream Vera Sans';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#797580;fill-opacity:1"
        x="-334.06213"
        y="332.76978"
        id="text3052"
@@ -168,7 +168,7 @@
            x="90.919563"
            y="346.39133"
            id="tspan3062"
-           style="text-align:start;text-anchor:start">Copyright (2003-2014) Morten O. Alver, Nizar Batada, Oliver Kopp </tspan><tspan
+           style="text-align:start;text-anchor:start">Copyright (2003-2015) Morten O. Alver, Nizar Batada, Oliver Kopp </tspan><tspan
            dx="0"
            x="601.62128"
            y="346.39133"
