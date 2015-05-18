@@ -1,4 +1,5 @@
 [master]
+    - Feature: Ability to reorder the panels in the side pane
 2.11 beta
     - Some UI updates (mainly removing unnecessary boundaries)
     - Feature: Gridlines are now optional (and disabled by default)
