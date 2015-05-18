@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -31,6 +31,8 @@ import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 
 	protected JButton close = new JButton(GUIGlobals.getImage("close"));
+	protected JButton up = new JButton(GUIGlobals.getImage("up"));
+	protected JButton down = new JButton(GUIGlobals.getImage("down"));
 
 	protected boolean visible = false;
 
@@ -46,7 +48,15 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 		close.setMargin(new Insets(0, 0, 0, 0));
 		// tlb.setOpaque(false);
 		close.setBorder(null);
+		up.setMargin(new Insets(0, 0, 0, 0));
+		down.setMargin(new Insets(0, 0, 0, 0));
+		up.setBorder(null);
+		down.setBorder(null);
+		up.addActionListener(new UpButtonListener());
+		down.addActionListener(new DownButtonListener());
         tlb.setFloatable(false);
+		tlb.add(up);
+		tlb.add(down);
 		tlb.add(close);
 		close.addActionListener(new CloseButtonListener());
 		setToolBar(tlb);
@@ -60,6 +70,14 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
 	public void hideAway() {
 		manager.hideComponent(this);
+	}
+	
+	public void moveUp() {
+		manager.moveUp(this);
+	}
+	
+	public void moveDown() {
+		manager.moveDown(this);
 	}
 
 	/**
@@ -109,6 +127,18 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 	class CloseButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			hideAway();
+		}
+	}
+	
+	class UpButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			moveUp();
+		}
+	}
+	
+	class DownButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			moveDown();
 		}
 	}
 }

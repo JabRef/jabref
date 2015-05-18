@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -37,6 +37,7 @@ public class SidePaneManager {
 	SidePane sidep;
 
 	Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
+	Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
 
 	List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
 
@@ -104,6 +105,7 @@ public class SidePaneManager {
 
 	public synchronized void register(String name, SidePaneComponent comp) {
         components.put(name, comp);
+        componentNames.put(comp, name);
 	}
 
 	public synchronized void registerAndShow(String name, SidePaneComponent comp) {
@@ -115,6 +117,10 @@ public class SidePaneManager {
 		if (!visible.contains(component)) {
 			// Put the new component at the top of the group
 			visible.add(0, component);
+			
+			// Sort the visible components by their preferred position
+			Collections.sort(visible, new PreferredIndexSort());
+			
 			updateView();
 			component.componentOpening();
 		}
@@ -123,6 +129,10 @@ public class SidePaneManager {
     public SidePaneComponent getComponent(String name) {
         return components.get(name);
     }
+	
+	public String getComponentName(SidePaneComponent comp) {
+		return componentNames.get(comp);
+	}
 
     public synchronized void hideComponent(SidePaneComponent comp) {
 		if (visible.contains(comp)) {
@@ -143,7 +153,97 @@ public class SidePaneManager {
 	}
     }
 
+	private Map<String, Integer> getPreferredPositions() {
+		Map<String, Integer> preferredPositions = new HashMap<String, Integer>();
+		
+		String[] componentNames = Globals.prefs.getStringArray("sidePaneComponentNames");
+		String[] componentPositions = Globals.prefs.getStringArray("sidePaneComponentPreferredPositions");
+		
+		for (int i = 0; i < componentNames.length; ++i) {
+			try {
+				preferredPositions.put(componentNames[i], Integer.parseInt(componentPositions[i]));
+			}
+			catch (NumberFormatException e) {
+				// Invalid integer format, ignore
+			}
+		}
+		
+		return preferredPositions;
+	}
+	
+	private void updatePreferredPositions() {
+		Map<String, Integer> preferredPositions = getPreferredPositions();
+		
+		// Update the preferred positions of all visible components
+		int index = 0;
+		for (SidePaneComponent comp : visible) {
+			String componentName = getComponentName(comp);
+			preferredPositions.put(componentName, index++);
+		}
+		
+		// Split the map into a pair of parallel String arrays suitable for storage
+		String[] componentNames = preferredPositions.keySet().toArray(new String[0]);
+		String[] componentPositions = new String[preferredPositions.size()];
+		
+		for (int i = 0; i < componentNames.length; ++i) {
+			componentPositions[i] = preferredPositions.get(componentNames[i]).toString();
+		}
+		
+		Globals.prefs.putStringArray("sidePaneComponentNames", componentNames);
+		Globals.prefs.putStringArray("sidePaneComponentPreferredPositions", componentPositions);
+	}
+	
+	// Helper class for sorting visible componenys based on their preferred position
+	private class PreferredIndexSort implements Comparator<SidePaneComponent> {
+		private Map<String, Integer> preferredPositions;
+		
+		public PreferredIndexSort() {
+			preferredPositions = getPreferredPositions();
+		}
+		
+		@Override
+		public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
+			String comp1Name = getComponentName(comp1);
+			String comp2Name = getComponentName(comp2);
+			
+			// Manually provide default values, since getOrDefault() doesn't exist prior to Java 8
+			int pos1 = (preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0);
+			int pos2 = (preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0);
+			
+			return Integer.compare(pos1, pos2);
+		}
+	}
+	
+	public synchronized void moveUp(SidePaneComponent comp) {
+		if (visible.contains(comp)) {
+			int currIndex = visible.indexOf(comp);
+			if (currIndex > 0) {
+				int newIndex = currIndex - 1; 
+				visible.remove(currIndex);
+				visible.add(newIndex, comp);
+				
+				updatePreferredPositions();
+				updateView();
+			}
+		}
+	}
+	
+	public synchronized void moveDown(SidePaneComponent comp) {
+		if (visible.contains(comp)) {
+			int currIndex = visible.indexOf(comp);
+			if (currIndex < (visible.size() - 1)) {
+				int newIndex = currIndex + 1;
+				visible.remove(currIndex);
+				visible.add(newIndex, comp);
+				
+				updatePreferredPositions();
+				updateView();
+			}
+		}
+	}
+	
 	public synchronized void unregisterComponent(String name) {
+		componentNames.remove(components.get(name));
 	    components.remove(name);
 	}
 
