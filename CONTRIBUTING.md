@@ -1,6 +1,8 @@
 ## Understanding the basics
 Not sure what a pull request is, or how to submit one?  Take a look at GitHub's excellent [help documentation] first.
 
+We also have [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
+
 
 ## Add your change to the CHANGELOG
 You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the JabRef source.
