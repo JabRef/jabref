@@ -205,10 +205,12 @@ public class SidePaneManager {
 		public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
 			String comp1Name = getComponentName(comp1);
 			String comp2Name = getComponentName(comp2);
-			return Integer.compare(
-					preferredPositions.getOrDefault(comp1Name, 0),
-					preferredPositions.getOrDefault(comp2Name, 0)
-			);
+			
+			// Manually provide default values, since getOrDefault() doesn't exist prior to Java 8
+			int pos1 = (preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0);
+			int pos2 = (preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0);
+			
+			return Integer.compare(pos1, pos2);
 		}
 	}
 	
