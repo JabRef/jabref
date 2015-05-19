@@ -1,4 +1,5 @@
 [master]
+    - Updated DBLPfetcher to new DBLP functionality
     - Feature: Ability to reorder the panels in the side pane
 	- Feature: Option to save selected entries as plain BibTex without JabRef metadata
 2.11 beta
