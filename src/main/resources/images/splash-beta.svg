@@ -14,7 +14,7 @@
    inkscape:export-xdpi="90.000000"
    inkscape:export-filename="splash.png"
    sodipodi:docname="splash-beta.svg"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:version="0.32"
    id="svg2138"
    height="432"
@@ -22,11 +22,11 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
   <sodipodi:namedview
-     inkscape:window-y="-3"
-     inkscape:window-x="33"
-     inkscape:window-height="880"
-     inkscape:window-width="1512"
-     inkscape:current-layer="layer2"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="1155"
+     inkscape:window-width="1920"
+     inkscape:current-layer="layer1"
      inkscape:document-units="px"
      inkscape:cy="225.8697"
      inkscape:cx="105.10531"
@@ -64,16 +64,16 @@
      style="display:inline">
     <image
        xlink:href="splash-release.svg"
-       style="display:inline"
-       y="-0.86970043"
-       x="-0.89468384"
-       id="image3653"
+       width="576"
        height="432"
-       width="576" />
+       id="image3653"
+       x="-0.89468384"
+       y="-0.86970043"
+       style="display:inline" />
   </g>
   <g
      transform="translate(-77.5,-170.36218)"
-     inkscape:label="beta"
+     inkscape:label="beta 2"
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline">
@@ -81,16 +81,16 @@
        inkscape:export-ydpi="75"
        inkscape:export-xdpi="75"
        inkscape:export-filename="/home/alver/jabref/jabref/src/images/splash.png"
-       transform="matrix(0.9688007,-0.2478411,0.2478411,0.9688007,-87.20276,118.59483)"
-       style="font-size:56px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#f91616;fill-opacity:0.65789472;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       transform="matrix(0.9688007,-0.2478411,0.2478411,0.9688007,-139.20276,134.59483)"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:56px;line-height:100%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#f91616;fill-opacity:0.65789472;stroke:none"
        id="flowRoot2745"
        xml:space="preserve"><flowRegion
          id="flowRegion2747"><rect
-           style="font-size:56px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#f91616;fill-opacity:0.65789472;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:56px;line-height:100%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#f91616;fill-opacity:0.65789472"
            y="470.36218"
            x="482"
-           height="68"
-           width="164"
+           height="99.498024"
+           width="246.77605"
            id="rect2749" /></flowRegion><flowPara
-         id="flowPara2751">beta</flowPara></flowRoot>  </g>
+         id="flowPara2751">beta 2</flowPara></flowRoot>  </g>
 </svg>
