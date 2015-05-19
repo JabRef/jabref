@@ -70,6 +70,7 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.FileActions.DatabaseSaveType;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.AttachFileAction;
@@ -411,9 +412,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("saveSelectedAs", new SaveSelectedAction(false));
+        actions.put("saveSelectedAs", new SaveSelectedAction(FileActions.DatabaseSaveType.DEFAULT));
         
-        actions.put("saveSelectedAsPlain", new SaveSelectedAction(true));
+        actions.put("saveSelectedAsPlain", new SaveSelectedAction(FileActions.DatabaseSaveType.PLAIN_BIBTEX));
         
         // The action for copying selected entries.
         actions.put("copy", new BaseAction() {
@@ -1696,7 +1697,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //}).start();
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, String encoding, boolean savePlainBibtex) throws SaveException {
+    private boolean saveDatabase(File file, boolean selectedOnly, String encoding, FileActions.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
         try {
@@ -1705,7 +1706,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                            Globals.prefs, false, false, encoding, false);
             else
                 session = FileActions.savePartOfDatabase(database, metaData, file,
-                                               Globals.prefs, mainTable.getSelectedEntries(), encoding, savePlainBibtex);
+                                               Globals.prefs, mainTable.getSelectedEntries(), encoding, saveType);
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
@@ -1755,7 +1756,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         JOptionPane.QUESTION_MESSAGE, null, Globals.ENCODINGS, encoding);
                 if (choice != null) {
                     String newEncoding = (String)choice;
-                    return saveDatabase(file, selectedOnly, newEncoding, savePlainBibtex);
+                    return saveDatabase(file, selectedOnly, newEncoding, saveType);
                 } else
                     commit = false;
             } else if (answer == JOptionPane.CANCEL_OPTION)
@@ -3078,10 +3079,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class SaveSelectedAction extends BaseAction {
     	
-    	private boolean savePlainBibtex;
+    	private DatabaseSaveType saveType;
     	
-    	public SaveSelectedAction(boolean savePlainBibtex) {
-    		this.savePlainBibtex = savePlainBibtex;
+    	public SaveSelectedAction(DatabaseSaveType saveType) {
+    		this.saveType = saveType;
     	}
     	
         public void action() throws Throwable {
@@ -3097,7 +3098,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                    == JOptionPane.OK_OPTION)) {
 
-                saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"), savePlainBibtex);
+                saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"), saveType);
                 //runCommand("save");
                 frame.getFileHistory().newFile(expFile.getPath());
                 frame.output(Globals.lang("Saved selected to")+" '"

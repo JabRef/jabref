@@ -55,7 +55,11 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.SortedList;
 
 public class FileActions {
-
+	
+	public enum DatabaseSaveType {
+		DEFAULT, PLAIN_BIBTEX
+	}
+	
     private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
 
@@ -357,7 +361,7 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
-            File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, boolean writePlainBibtex) throws SaveException {
+            File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, DatabaseSaveType saveType) throws SaveException {
 
         TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>(); // Map
         // to
@@ -382,7 +386,7 @@ public class FileActions {
             // Define our data stream.
             VerifyingWriter fw = session.getWriter();
 
-            if (!writePlainBibtex) {
+            if (saveType != DatabaseSaveType.PLAIN_BIBTEX) {
             	// Write signature.
             	writeBibFileHeader(fw, encoding);
             }
@@ -425,7 +429,7 @@ public class FileActions {
             }
 
             // Write meta data.
-            if (!writePlainBibtex && metaData != null) {
+            if (saveType != DatabaseSaveType.PLAIN_BIBTEX && metaData != null) {
                 metaData.writeMetaData(fw);
             }
 

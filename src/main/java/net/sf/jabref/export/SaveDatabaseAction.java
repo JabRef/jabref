@@ -218,7 +218,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Globals.prefs, false, false, encoding, false);
             else
                 session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file,
-                        Globals.prefs, panel.getSelectedEntries(), encoding, false);
+                        Globals.prefs, panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
