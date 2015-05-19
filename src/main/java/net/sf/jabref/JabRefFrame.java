@@ -186,6 +186,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                          "Save selected as ...",
                                          Globals.lang("Save selected as ..."),
                                          GUIGlobals.getIconUrl("saveAs")),
+      saveSelectedAsPlain = new GeneralAction("saveSelectedAsPlain",
+                                                 "Save selected as plain BibTeX ...",
+                                                 Globals.lang("Save selected as plain BibTeX ..."),
+                                                 GUIGlobals.getIconUrl("saveAs")),
       exportAll = ExportFormats.getExportAction(this, false),
       exportSelected = ExportFormats.getExportAction(this, true),
       importCurrent = ImportFormats.getImportAction(this, false),
@@ -1291,6 +1295,7 @@ public JabRefPreferences prefs() {
       file.add(saveAs);
       file.add(saveAll);
       file.add(saveSelectedAs);
+      file.add(saveSelectedAsPlain);
       file.addSeparator();
       //file.add(importMenu);
       //file.add(importNewMenu);
