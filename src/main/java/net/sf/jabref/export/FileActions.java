@@ -357,7 +357,7 @@ public class FileActions {
      * @return A List containing warnings, if any.
      */
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
-            File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding) throws SaveException {
+            File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, boolean writePlainBibtex) throws SaveException {
 
         TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>(); // Map
         // to
@@ -382,9 +382,11 @@ public class FileActions {
             // Define our data stream.
             VerifyingWriter fw = session.getWriter();
 
-            // Write signature.
-            writeBibFileHeader(fw, encoding);
-
+            if (!writePlainBibtex) {
+            	// Write signature.
+            	writeBibFileHeader(fw, encoding);
+            }
+            
             // Write preamble if there is one.
             writePreamble(fw, database.getPreamble());
 
@@ -423,7 +425,7 @@ public class FileActions {
             }
 
             // Write meta data.
-            if (metaData != null) {
+            if (!writePlainBibtex && metaData != null) {
                 metaData.writeMetaData(fw);
             }
 

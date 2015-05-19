@@ -411,30 +411,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("saveSelectedAs", new BaseAction () {
-                public void action() throws Throwable {
-
-                  String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
-                                                         JFileChooser.SAVE_DIALOG, false);
-                  if (chosenFile != null) {
-                    File expFile = new File(chosenFile);
-                    if (!expFile.exists() ||
-                        (JOptionPane.showConfirmDialog
-                         (frame, "'"+expFile.getName()+"' "+
-                          Globals.lang("exists. Overwrite file?"),
-                          Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                         == JOptionPane.OK_OPTION)) {
-
-                      saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"));
-                      //runCommand("save");
-                      frame.getFileHistory().newFile(expFile.getPath());
-                      frame.output(Globals.lang("Saved selected to")+" '"
-                                   +expFile.getPath()+"'.");
-                        }
-                    }
-                }
-            });
-    
+        actions.put("saveSelectedAs", new SaveSelectedAction(false));
+        
+        actions.put("saveSelectedAsPlain", new SaveSelectedAction(true));
+        
         // The action for copying selected entries.
         actions.put("copy", new BaseAction() {
                 public void action() {
@@ -1716,7 +1696,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //}).start();
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
+    private boolean saveDatabase(File file, boolean selectedOnly, String encoding, boolean savePlainBibtex) throws SaveException {
         SaveSession session;
         frame.block();
         try {
@@ -1725,7 +1705,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                            Globals.prefs, false, false, encoding, false);
             else
                 session = FileActions.savePartOfDatabase(database, metaData, file,
-                                               Globals.prefs, mainTable.getSelectedEntries(), encoding);
+                                               Globals.prefs, mainTable.getSelectedEntries(), encoding, savePlainBibtex);
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
@@ -1775,7 +1755,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         JOptionPane.QUESTION_MESSAGE, null, Globals.ENCODINGS, encoding);
                 if (choice != null) {
                     String newEncoding = (String)choice;
-                    return saveDatabase(file, selectedOnly, newEncoding);
+                    return saveDatabase(file, selectedOnly, newEncoding, savePlainBibtex);
                 } else
                     commit = false;
             } else if (answer == JOptionPane.CANCEL_OPTION)
@@ -3096,5 +3076,34 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.forward.setEnabled(nextEntries.size() > 0);
     }
 
+    private class SaveSelectedAction extends BaseAction {
+    	
+    	private boolean savePlainBibtex;
+    	
+    	public SaveSelectedAction(boolean savePlainBibtex) {
+    		this.savePlainBibtex = savePlainBibtex;
+    	}
+    	
+        public void action() throws Throwable {
 
+            String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+                                                   JFileChooser.SAVE_DIALOG, false);
+            if (chosenFile != null) {
+              File expFile = new File(chosenFile);
+              if (!expFile.exists() ||
+                  (JOptionPane.showConfirmDialog
+                   (frame, "'"+expFile.getName()+"' "+
+                    Globals.lang("exists. Overwrite file?"),
+                    Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
+                   == JOptionPane.OK_OPTION)) {
+
+                saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"), savePlainBibtex);
+                //runCommand("save");
+                frame.getFileHistory().newFile(expFile.getPath());
+                frame.output(Globals.lang("Saved selected to")+" '"
+                             +expFile.getPath()+"'.");
+                  }
+              }
+          }
+      }
 }
