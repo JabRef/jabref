@@ -1,7 +1,7 @@
 [master]
     - Updated DBLPfetcher to new DBLP functionality
     - Feature: Ability to reorder the panels in the side pane
-	- Feature: Option to save selected entries as plain BibTex without JabRef metadata
+    - Feature: Option to save selected entries as plain BibTex without JabRef metadata
 2.11 beta
     - Some UI updates (mainly removing unnecessary boundaries)
     - Feature: Gridlines are now optional (and disabled by default)
