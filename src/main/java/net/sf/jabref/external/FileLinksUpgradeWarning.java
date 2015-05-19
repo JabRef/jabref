@@ -89,9 +89,11 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         JPanel message = new JPanel();
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
-        b.append(new JLabel("<html>" + Globals.lang("This database was written using an older version of JabRef.") + "<br>" + Globals.lang("The current version features a new way of handling links to external files.<br>"
-                + "To take advantage of this, your links must be changed into the new format, and<br>"
-                + "JabRef must be configured to show the new links.") + "<p>" + Globals.lang("Do you want JabRef to do the following operations?") + "</html>"));
+        // Keep the formatting of these lines. Otherwise, strings have to be translated again.
+        // See updated JabRef_en.properties modifications by python syncLang.py -s -u
+        b.append(new JLabel("<html>" + Globals.lang("This database was written using an older version of JabRef.") + "<br>"
+                + Globals.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
+                + Globals.lang("Do you want JabRef to do the following operations?") + "</html>"));
         b.nextLine();
         if (offerChangeSettings) {
             b.append(changeSettings);
