@@ -28,7 +28,7 @@ test {
     }
 }
 
-version = "2.11b2"
+version = "2.11dev"
 
 repositories {
     mavenCentral()
