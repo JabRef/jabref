@@ -37,4 +37,4 @@ See [good commit message] or [commit guidelines section of Pro Git].
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[help documentation]: http://help.github.com/send-pull-requests
+[help documentation]: https://help.github.com/articles/using-pull-requests/
