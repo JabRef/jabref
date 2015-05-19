@@ -1,3 +1,12 @@
+Legend
+------
+License:
+ * GPLv2+ means "GPLv2 or later"
+ * GPLv2! means "exactly version 2.0 of GPL"
+ * GPLv2  means, we haven't checked whether later options are allowed
+ * similar for LGPL and other version of GPL
+
+
 Directory oo/
 -------------
 
@@ -54,6 +63,15 @@ Path:    plugin/velocity-dep-1.5.jar
 Project: Apache Velocity
 URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
 License: Apache 2.0
+
+
+Directory ritopt/
+-----------------
+
+Path:    ritopt/ritopt-0.2.1-bin.jar
+Project: ritopt
+URL:     http://ritopt.sourceforge.net/download.shtml
+License: GPLv2+
 
 
 Directory spl/
