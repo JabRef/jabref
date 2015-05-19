@@ -187,12 +187,13 @@ public class JabRef {
 		Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 		Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 		
-		
-		// Set application user model id so that pinning JabRef to the Win7/8 taskbar works
-		// Based on http://stackoverflow.com/a/1928830
-		setCurrentProcessExplicitAppUserModelID("JabRef."+Globals.VERSION);
-	    //System.out.println(getCurrentProcessExplicitAppUserModelID());
-		
+		if (Globals.ON_WIN) {
+            // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
+            // Based on http://stackoverflow.com/a/1928830
+            setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.VERSION);
+            //System.out.println(getCurrentProcessExplicitAppUserModelID());
+        }
+
 		openWindow(processArguments(args, true));
 	}
     
@@ -223,7 +224,9 @@ public class JabRef {
 
     static
     {
-      Native.register("shell32");
+        if (Globals.ON_WIN) {
+            Native.register("shell32");
+        }
     }
 
 
