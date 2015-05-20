@@ -75,7 +75,7 @@ dependencies {
     compile 'mysql:mysql-connector-java:5.0.7'
     compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
 
-    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'jayatana-1.2.4.jar', 'microba.jar', 'spin.jar'])
+    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'microba.jar', 'spin.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 

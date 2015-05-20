@@ -100,7 +100,6 @@
         <include name="jgoodies/com.jgoodies.uif_lite-2.1.4.jar" />
         <include name="jna-4.1.0.jar" />
         <include name="ritopt/ritopt-0.2.1-bin.jar" />
-		<include name="jayatana-1.2.4.jar" />
 		<include name="spin.jar" />
 		<include name="glazedlists-1.8.0_java15.jar" />
 		<include name="microba.jar" />
