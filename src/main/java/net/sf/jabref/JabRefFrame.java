@@ -1686,7 +1686,7 @@ public JabRefPreferences prefs() {
     protected void initActions() {
         openDatabaseOnlyActions = new LinkedList<Object>();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
-                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
+                mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
                 selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
                 makeKeyAction, normalSearch,
