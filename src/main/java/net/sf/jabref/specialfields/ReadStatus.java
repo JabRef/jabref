@@ -30,12 +30,12 @@ public class ReadStatus extends SpecialField {
 	
 	public ReadStatus() {
 		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-		values.add(new SpecialFieldValue(this, null, "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
+		values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
 		ImageIcon icon;
 		icon = GUIGlobals.getImage("readStatusRead");
-		values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Globals.lang("Set read status to read"), icon, Globals.lang("Read status read")));
+		values.add(new SpecialFieldValue(this, Globals.lang("read"), "setReadStatusToRead", Globals.lang("Set read status to read"), icon, Globals.lang("Read status read")));
 		icon = GUIGlobals.getImage("readStatusSkimmed");
-		values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
+		values.add(new SpecialFieldValue(this, Globals.lang("skimmed"), "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
 		this.setValues(values);
 		TEXT_DONE_PATTERN = "Set read status '%0' for %1 entries";
 	}

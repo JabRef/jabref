@@ -14,12 +14,12 @@ public class RankExtended extends Rank {
 	public RankExtended() {
 		super();
 		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-		values.add(new SpecialFieldValue(this, null, "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));
-		values.add(new SpecialFieldValue(this, "rank1", "setRank1", Globals.lang("Set rank to one star"), GUIGlobals.getImage("rank1"), Globals.lang("One star")));
-		values.add(new SpecialFieldValue(this, "rank2", "setRank2", Globals.lang("Set rank to two stars"), GUIGlobals.getImage("rank2"), Globals.lang("Two stars")));
-		values.add(new SpecialFieldValue(this, "rank3", "setRank3", Globals.lang("Set rank to three stars"), GUIGlobals.getImage("rank3"), Globals.lang("Three stars")));
-		values.add(new SpecialFieldValue(this, "rank4", "setRank4", Globals.lang("Set rank to four stars"), GUIGlobals.getImage("rank4"), Globals.lang("Four stars")));
-		values.add(new SpecialFieldValue(this, "rank5", "setRank5", Globals.lang("Set rank to five stars"), GUIGlobals.getImage("rank5"), Globals.lang("Five stars")));
+		values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));
+		values.add(new SpecialFieldValue(this, Globals.lang("rank1"), "setRank1", Globals.lang("Set rank to one star"), GUIGlobals.getImage("rank1"), Globals.lang("One star")));
+		values.add(new SpecialFieldValue(this, Globals.lang("rank2"), "setRank2", Globals.lang("Set rank to two stars"), GUIGlobals.getImage("rank2"), Globals.lang("Two stars")));
+		values.add(new SpecialFieldValue(this, Globals.lang("rank3"), "setRank3", Globals.lang("Set rank to three stars"), GUIGlobals.getImage("rank3"), Globals.lang("Three stars")));
+		values.add(new SpecialFieldValue(this, Globals.lang("rank4"), "setRank4", Globals.lang("Set rank to four stars"), GUIGlobals.getImage("rank4"), Globals.lang("Four stars")));
+		values.add(new SpecialFieldValue(this, Globals.lang("rank5"), "setRank5", Globals.lang("Set rank to five stars"), GUIGlobals.getImage("rank5"), Globals.lang("Five stars")));
 		this.setValues(values);
 	}
 	

@@ -1546,11 +1546,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
               });
               
               actions.put(Relevance.getInstance().getValues().get(0).getActionName(), 
-                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), "Marked %0 entries as relevant"));
+                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), Globals.lang("Toggled relevance for %0 entries")));
               actions.put(Quality.getInstance().getValues().get(0).getActionName(),
-                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), "Set quality of %0 entries to good"));
+                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), Globals.lang("Toggled quality for %0 entries")));
               actions.put(Printed.getInstance().getValues().get(0).getActionName(),
-                      new SpecialFieldAction(frame, Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as printed"), "Marked %0 entries as printed"));
+                      new SpecialFieldAction(frame, Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as printed"), Globals.lang("Toggled print status for %0 entries")));
               
               for (SpecialFieldValue prio: Priority.getInstance().getValues()) {
 	              actions.put(prio.getActionName(), prio.getAction(this.frame));
