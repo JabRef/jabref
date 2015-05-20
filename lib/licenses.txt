@@ -7,6 +7,15 @@ License:
  * similar for LGPL and other version of GPL
 
 
+Directory jgoodies/
+-------------------
+
+Path:    jgoodies/com.jgoodies.uif_lite-2.1.4.jar
+Project: com.jgoodies.uif_lite
+URL:     https://github.com/JabRef/com.jgoodies.uif_lite
+License: BSD
+
+
 Directory oo/
 -------------
 
