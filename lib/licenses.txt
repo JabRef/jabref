@@ -51,12 +51,12 @@ License: Apache 2.0
 Path:    plugin/jpf-boot.jar
 Project: Java Plugin Framework
 URL:     http://jpf.sourceforge.net/
-License: LGPL 2.1
+License: LGPL 2.1+
 
 Path:    plugin/jpf.jar
 Project: Java Plugin Framework
 URL:     http://jpf.sourceforge.net/
-License: LGPL 2.1
+License: LGPL 2.1+
 
 Path:    plugin/JPFCodeGenerator-rt.jar
 Project: Part of JabRef
@@ -138,7 +138,7 @@ License: Apache 2.0
 Path:    glazedlists-1.8.0_java15.jar
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
-License: LPGL 2.1
+License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
 
 Path:    jayatana-*.jar
 Project: java-swing-ayatana
@@ -168,7 +168,7 @@ License: BSD
 Path:    jna-4.1.0.jar
 Project: Java Native Access (JNA)
 URL:     https://github.com/twall/jna
-License: LGPL 2.1
+License: LGPL 2.1+ and Apache 2.0
 
 Path:    microba.jar
 Project: Microba
@@ -178,7 +178,7 @@ License: BSD
 Path:    mysql-connector-java-5.0.7-bin.jar
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
-License: GPLv2
+License: GPLv2! and Oracle’s FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
 
 Path:    pdfbox-*.jar
 Project: Apache PDFBox
@@ -193,4 +193,4 @@ License: BSD
 Path:    spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
-License: LGPL 2.1
+License: LGPL 2.1+
