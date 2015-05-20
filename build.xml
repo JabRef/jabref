@@ -13,7 +13,7 @@
                help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
 
    Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK1.6 or higher
+                 2. JAVA_HOME environment variable contains the path to JDK1.7 or higher
                  3. ANT_HOME environment variable contains the path to ant's home directory
 
    Language: XML
@@ -97,7 +97,7 @@
         <include name="jgoodies-common-1.4.0.jar" />
 		<include name="jgoodies-looks-2.5.2.jar" />
 		<include name="jgoodies-forms-1.6.0.jar" />
-        <include name="jgoodies/jgoodies-uif-lite.jar" />
+        <include name="jgoodies/com.jgoodies.uif_lite-2.1.4.jar" />
         <include name="jna-4.1.0.jar" />
         <include name="ritopt/ritopt-0.2.1-bin.jar" />
 		<include name="jayatana-1.2.4.jar" />
@@ -163,7 +163,7 @@
 	<!-- Compiles project -->
 	<target name="compile">
 		<mkdir dir="${build.classes}" />
-		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
+		<javac destdir="${build.classes}" encoding="UTF8" source="1.7" target="1.7">
 			<src path="${java.dir}" />
             <src path="${gen.dir}" />
 			<classpath refid="classpath" />
@@ -174,7 +174,7 @@
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
 
-		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.6">
+		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.7">
 		</javac>
 	</target>
 
@@ -385,7 +385,7 @@ version=${jabref.version}</echo>
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
-                    jvmversion="1.6+"
+                    jvmversion="1.7+"
 		    vmoptions="-Xms128m -Xmx512m"
                     stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">
