@@ -8,7 +8,7 @@ apply plugin: 'project-report'
 // enables fatjar, the creation of a jar with all dependencies bundled inside
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
@@ -31,7 +31,7 @@ test {
 version = "2.11dev"
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 sourceSets {
@@ -97,7 +97,7 @@ sourceCompatibility = 1.7
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.4'
 }
 
 compileJava {
