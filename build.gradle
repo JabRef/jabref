@@ -75,12 +75,14 @@ dependencies {
     compile 'mysql:mysql-connector-java:5.0.7'
     compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
 
-    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'microba.jar', 'spin.jar'])
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.8.0'
+    compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
+    compile 'commons-logging:commons-logging:1.0.2'
     // not available in maven repository
-    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'commons-logging.jar', 'JPFCodeGenerator-rt.jar'])
+    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
     compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
     compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
