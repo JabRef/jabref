@@ -127,12 +127,12 @@ compileJava.dependsOn "generateSource"
 
 task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchTreeParserSource"]) {
     group = 'JabRef'
-    description = 'Generates all Java source files.'
+    description 'Generates all Java source files.'
 }
 
 task generatePluginSource(type: JavaExec) {
-    group = 'JabRef'
-    description = 'Generates _JabRefPlugin.java with JPF.'
+    group 'JabRef'
+    description 'Generates _JabRefPlugin.java with JPF.'
 
     ext.pluginsDir = "src/main/resources/plugins"
 
@@ -145,8 +145,8 @@ task generatePluginSource(type: JavaExec) {
 }
 
 task generateBstGrammarSource(type: JavaExec) {
-    group = 'JabRef'
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
+    group 'JabRef'
+    description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
     File antlrSource = file('src/main/antlr3/net/sf/jabref/bst/Bst.g')
 
@@ -162,8 +162,8 @@ task generateBstGrammarSource(type: JavaExec) {
 task generateSearchLexerSource(type: JavaExec) {
     String grammarFile = "Lexer"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
@@ -186,8 +186,8 @@ task generateSearchLexerSource(type: JavaExec) {
 task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
     String grammarFile = "Parser"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
@@ -210,8 +210,8 @@ task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerS
 task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
     String grammarFile = "TreeParser"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
