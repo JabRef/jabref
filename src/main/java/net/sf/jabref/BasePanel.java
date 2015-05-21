@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -1508,8 +1508,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 public void update() {
                   markBaseChanged();
-                  output(Globals.lang("Marked selected")+" "+Globals.lang(besLength>0?"entry":"entries"));
-
+                  String outputStr;
+                  if (besLength == 1) {
+                      outputStr = Globals.lang("Marked selected entry");
+                  } else {
+                      outputStr = Globals.lang("Marked all %0 selected entries", Integer.toString(besLength));
+                  }
+                  output(outputStr);
                 }
               });
 
@@ -1526,7 +1531,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   ce.end();
                   undoManager.addEdit(ce);
                   markBaseChanged();
-                  output(Globals.lang("Unmarked selected")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  String outputStr;
+                  if (bes.length == 1) {
+                      outputStr = Globals.lang("Unmarked selected entry");
+                  } else {
+                      outputStr = Globals.lang("Unmarked all %0 selected entries", Integer.toString(bes.length));
+                  }
+                  output(outputStr);
                     } catch (Throwable ex) { ex.printStackTrace(); }
                 }
               });
@@ -1543,13 +1554,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   markBaseChanged();
                 }
               });
-              
+
+              // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
               actions.put(Relevance.getInstance().getValues().get(0).getActionName(), 
-                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as relevant"), Globals.lang("Toggled relevance for %0 entries")));
+                  new SpecialFieldAction(frame, Relevance.getInstance(), Relevance.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Toggle relevance"), Globals.lang("Toggled relevance for %0 entries")));
               actions.put(Quality.getInstance().getValues().get(0).getActionName(),
-                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries' quality as good"), Globals.lang("Toggled quality for %0 entries")));
+                  new SpecialFieldAction(frame, Quality.getInstance(), Quality.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Toggle quality"), Globals.lang("Toggled quality for %0 entries")));
               actions.put(Printed.getInstance().getValues().get(0).getActionName(),
-                      new SpecialFieldAction(frame, Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Marked entries as printed"), Globals.lang("Toggled print status for %0 entries")));
+                      new SpecialFieldAction(frame, Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue(), true, Globals.lang("Toggle print status"), Globals.lang("Toggled print status for %0 entries")));
               
               for (SpecialFieldValue prio: Priority.getInstance().getValues()) {
 	              actions.put(prio.getActionName(), prio.getAction(this.frame));
