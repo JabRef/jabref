@@ -344,8 +344,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                 : Globals.lang(
                 "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
                 field, Util.quoteForHTML(expr))) + " (" + (caseSensitive ? Globals.lang("case sensitive")
-                : Globals.lang("case insensitive")) + "). " + (regExp ? Globals.lang(
-                "Entries cannot be manually assigned to or removed from this group.")
+                : Globals.lang("case insensitive")) + "). " + (regExp ?
+                Globals.lang("Entries cannot be manually assigned to or removed from this group.")
                 : Globals.lang(
                 "Additionally, entries whose <b>%0</b> field does not contain "
                         + "<b>%1</b> can be assigned manually to this group by selecting them "
