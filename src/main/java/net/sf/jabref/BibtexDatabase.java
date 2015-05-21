@@ -279,7 +279,7 @@ public class BibtexDatabase {
         throws KeyCollisionException
     {
     	if (hasStringLabel(string.getName())){
-    		throw new KeyCollisionException("A string with this label already exists,");
+    		throw new KeyCollisionException(Globals.lang("A string with this label already exists"));
         }
 
         if (_strings.containsKey(string.getId()))
