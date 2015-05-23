@@ -2434,6 +2434,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		return dateFormatter.format(date);
 	}
 
+	/**
+	 * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
+	 */
     public static void markEntry(BibtexEntry be, int markIncrement, boolean increment, NamedCompound ce) {
 		Object o = be.getField(BibtexFields.MARKED);
         int prevMarkLevel = 0;
