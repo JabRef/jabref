@@ -1491,54 +1491,33 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       }
                   });
                 */
-              actions.put("markEntries", new AbstractWorker() {
-                  private int besLength = -1;
-                public void run() {
-
-                  NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
-                  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                  besLength = bes.length;
-
-                    for (BibtexEntry be : bes) {
-                        Util.markEntry(be, 1, true, ce);
-                    }
-                  ce.end();
-                  undoManager.addEdit(ce);
-                }
-
-                public void update() {
-                  markBaseChanged();
-                  String outputStr;
-                  if (besLength == 1) {
-                      outputStr = Globals.lang("Marked selected entry");
-                  } else {
-                      outputStr = Globals.lang("Marked all %0 selected entries", Integer.toString(besLength));
-                  }
-                  output(outputStr);
-                }
-              });
+              actions.put("markEntries", new MarkEntriesAction(frame, 0));
 
               actions.put("unmarkEntries", new BaseAction() {
                 public void action() {
                     try {
-                  NamedCompound ce = new NamedCompound(Globals.lang("Unmark entries"));
-                  BibtexEntry[] bes = mainTable.getSelectedEntries();
-          if (bes == null)
-              return;
+                        BibtexEntry[] bes = mainTable.getSelectedEntries();
+                        if (bes.length == 0) {
+                            output(Globals.lang("No entries selected."));
+                            return;
+                        }
+                        NamedCompound ce = new NamedCompound(Globals.lang("Unmark entries"));
                         for (BibtexEntry be : bes) {
                             Util.unmarkEntry(be, false, database, ce);
                         }
-                  ce.end();
-                  undoManager.addEdit(ce);
-                  markBaseChanged();
-                  String outputStr;
-                  if (bes.length == 1) {
-                      outputStr = Globals.lang("Unmarked selected entry");
-                  } else {
-                      outputStr = Globals.lang("Unmarked all %0 selected entries", Integer.toString(bes.length));
-                  }
-                  output(outputStr);
-                    } catch (Throwable ex) { ex.printStackTrace(); }
+                        ce.end();
+                        undoManager.addEdit(ce);
+                        markBaseChanged();
+                        String outputStr;
+                        if (bes.length == 1) {
+                            outputStr = Globals.lang("Unmarked selected entry");
+                        } else {
+                            outputStr = Globals.lang("Unmarked all %0 selected entries", Integer.toString(bes.length));
+                        }
+                        output(outputStr);
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
                 }
               });
 
@@ -1552,6 +1531,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   ce.end();
                   undoManager.addEdit(ce);
                   markBaseChanged();
+                  output(Globals.lang("Unmarked all entries"));
                 }
               });
 
@@ -2937,8 +2917,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     /**
      * Get an array containing the currently selected entries.
+     * The array is stable and not changed if the selection changes
      *
-     * @return An array containing the selected entries.
+     * @return An array containing the selected entries. Is never null.
      */
     public BibtexEntry[] getSelectedEntries() {
         return mainTable.getSelectedEntries();

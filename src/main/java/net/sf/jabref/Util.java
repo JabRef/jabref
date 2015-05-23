@@ -2478,6 +2478,9 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		be.setField(BibtexFields.MARKED, newValue);
 	}
 
+    /**
+     * SIDE EFFECT: Unselectes given entry
+     */
 	public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel,
                                    BibtexDatabase database, NamedCompound ce) {
 		Object o = be.getField(BibtexFields.MARKED);

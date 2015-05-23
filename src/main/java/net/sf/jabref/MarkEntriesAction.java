@@ -18,6 +18,7 @@ package net.sf.jabref;
 import net.sf.jabref.undo.NamedCompound;
 
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -59,20 +60,37 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
 
     public void run() {
         BasePanel panel = frame.basePanel();
-        NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
         BibtexEntry[] bes = panel.getSelectedEntries();
+
+        // used at update() to determine output string
         besLength = bes.length;
 
-        for (BibtexEntry be : bes) {
-            Util.markEntry(be, level + 1, false, ce);
+        if (bes.length != 0) {
+            NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
+            for (BibtexEntry be : bes) {
+                Util.markEntry(be, level + 1, false, ce);
+            }
+            ce.end();
+            panel.undoManager.addEdit(ce);
         }
-        ce.end();
-        panel.undoManager.addEdit(ce);
     }
 
     @Override
     public void update() {
-        frame.basePanel().markBaseChanged();
-        frame.output(Globals.lang("Marked selected")+" "+Globals.lang(besLength>0?"entry":"entries"));
+        String outputStr;
+        switch (besLength) {
+        case 0:
+            outputStr = Globals.lang("No entries selected.");
+            break;
+        case 1:
+            frame.basePanel().markBaseChanged();
+            outputStr = Globals.lang("Marked selected entry");
+            break;
+        default:
+            frame.basePanel().markBaseChanged();
+            outputStr = Globals.lang("Marked all %0 selected entries", Integer.toString(besLength));
+            break;
+        }
+        frame.output(outputStr);
     }
 }

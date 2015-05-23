@@ -328,6 +328,9 @@ public class MainTable extends JTable {
         return sortedForGrouping.get(row);
     }
 
+    /**
+     * @return the return value is never null
+     */
     public BibtexEntry[] getSelectedEntries() {
         final BibtexEntry[] BE_ARRAY = new BibtexEntry[0];
         return getSelected().toArray(BE_ARRAY);
@@ -472,6 +475,13 @@ public class MainTable extends JTable {
         }
     }
 
+    /**
+     * Use with caution! If you modify an entry in the table, the selection changes
+     * 
+     * You can avoid it with
+     *   <code>.getSelected().getReadWriteLock().writeLock().lock()</code>
+     *   and then <code>.unlock()</code>
+     */
     public EventList<BibtexEntry> getSelected() {
         return selectionModel.getSelected();
     }
