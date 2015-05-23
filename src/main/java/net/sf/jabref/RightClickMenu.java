@@ -160,8 +160,9 @@ public class RightClickMenu extends JPopupMenu
             });
             addSeparator();
         } else if (be != null) {
-            if (be.getField(BibtexFields.MARKED) == null) {
-
+            String marked = be.getField(BibtexFields.MARKED);
+            // We have to check for "" too as the marked field may be empty
+            if ((marked == null) || (marked.isEmpty())) {
                 add(new AbstractAction(Globals.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
                     public void actionPerformed(ActionEvent e) {
                         try {
