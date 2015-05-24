@@ -21,7 +21,7 @@ public class RankCompact extends Rank {
 		values.add(new SpecialFieldValue(this, Globals.lang("rank4"), "setRank4", Globals.lang("Set rank to four stars"), GUIGlobals.getImage("rankc4"), Globals.lang("Four stars")));
 		values.add(new SpecialFieldValue(this, Globals.lang("rank5"), "setRank5", Globals.lang("Set rank to five stars"), GUIGlobals.getImage("rankc5"), Globals.lang("Five stars")));
 		this.setValues(values);
-		TEXT_DONE_PATTERN = "Set rank %0 for %1 entries";
+		TEXT_DONE_PATTERN = "Set rank to '%0' for %1 entries";
 	}
 
 	public static RankCompact getInstance() {

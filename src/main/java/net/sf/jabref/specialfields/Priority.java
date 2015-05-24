@@ -39,7 +39,7 @@ public class Priority extends SpecialField {
 		icon = GUIGlobals.getImage("green");
 		values.add(new SpecialFieldValue(this, Globals.lang("prio3"), "setPriority3", Globals.lang("Set priority to low"), icon, Globals.lang("Priority low")));
 		this.setValues(values);
-		TEXT_DONE_PATTERN = "Set priority %0 for %1 entries";
+		TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";
 	}
 	
 	public static Priority getInstance() {

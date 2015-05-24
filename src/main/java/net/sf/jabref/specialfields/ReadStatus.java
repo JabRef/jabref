@@ -37,7 +37,7 @@ public class ReadStatus extends SpecialField {
 		icon = GUIGlobals.getImage("readStatusSkimmed");
 		values.add(new SpecialFieldValue(this, Globals.lang("skimmed"), "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
 		this.setValues(values);
-		TEXT_DONE_PATTERN = "Set read status '%0' for %1 entries";
+		TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
 	}
 	
 	public static ReadStatus getInstance() {
