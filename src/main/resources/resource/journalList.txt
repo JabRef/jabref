@@ -15227,7 +15227,6 @@ Thai Journal of Nursing = Thai J. Nurs.
 Thai Journal of Pharmaceutical Sciences = Thai J. Pharm. Sci.
 The American Naturalist = Am. Nat.
 The European Physical Journal D = Eur. Phys. J. D
-The Journal of Chemical Physics = J. Chem. Phys.
 The Journal of Physical Chemistry A = J. Phys. Chem. A
 TheScientificWorldJournal = ScientificWorldJournal
 Theoretica Chimica Acta = Theor. Chim. Acta
