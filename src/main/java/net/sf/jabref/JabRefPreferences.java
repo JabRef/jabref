@@ -888,11 +888,16 @@ public class JabRefPreferences {
         // new version where new bindings have been introduced.
         if (s == null) {
             s = defKeyBinds.get(bindName);
-            // So, if this happens, we add the default value to the current
+            if (s == null) {
+                // there isn't even a default value
+                // Output error
+                Globals.logger("Could not get key binding for \"" + bindName + "\"");
+                // fall back to a default value
+                s = "Not associated";
+            }
+            // So, if there is no configured key binding, we add the fallback value to the current
             // hashmap, so this doesn't happen again, and so this binding
             // will appear in the KeyBindingsDialog.
-            Globals.logger("Could not get key binding for \"" + bindName + "\"");
-            s = "Not associated"; // if the item of menu not in defKeyBind list
             keyBinds.put(bindName, s);
         }
 
