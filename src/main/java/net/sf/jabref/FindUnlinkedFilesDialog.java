@@ -78,6 +78,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 	public static final String ACTION_COMMAND = "findUnlinkedFiles";
 	public static final String ACTION_TITLE = Globals.lang("Find unlinked files") + "..."; // this entry is NOT in Menu_en.properties as the same string also appears in JabRef_en.properties
 	public static final String ACTION_ICON = "toggleSearch";
+	public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
 	public static final String ACTION_SHORT_DESCRIPTION = Globals.lang("Searches for unlinked PDF files on the file system");
 
 	private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
