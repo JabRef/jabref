@@ -463,7 +463,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                (new CloseAction()).actionPerformed(null);
+                if (Globals.ON_MAC){
+                    setState(Frame.ICONIFIED);
+                } else {
+                    (new CloseAction()).actionPerformed(null);
+                }
             }
         });
 
@@ -826,7 +830,6 @@ public JabRefPreferences prefs() {
           String[] names = new String[filenames.size()];
           for (int i = 0; i < filenames.size(); i++) {
             names[i] = filenames.elementAt(i);
-
           }
           prefs.putStringArray("lastEdited", names);
         }
