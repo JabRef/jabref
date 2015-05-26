@@ -1,4 +1,5 @@
 [master]
+    - Add some predefined look and feels in preference window
     - Fixes #1131: MacOSX: JabRef minimizes when clicking on x
     - Dropped jayatana version 1.2.4 as version 2.x superseeds it
     - Feature: Trim journal names before looking up the abbreviation

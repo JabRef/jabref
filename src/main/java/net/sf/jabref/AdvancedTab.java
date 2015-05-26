@@ -40,7 +40,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
             useIEEEAbrv, biblatexMode;
-    JTextField className, remoteServerPort;
+    JComboBox<String> className;
+    JTextField remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
     JPanel p1 = new JPanel(),
@@ -69,8 +70,17 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
     remoteServerPort = new JTextField();
-    className = new JTextField(50);
-    final JTextField clName = className;
+    String[] lookAndFeels = {
+    	"com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
+    	"com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
+    	"com.sun.java.swing.plaf.motif.MotifLookAndFeel",
+    	"javax.swing.plaf.mac.MacLookAndFeel",
+    	"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
+    	"javax.swing.plaf.metal.MetalLookAndFeel"
+    };
+    className = new JComboBox<String>(lookAndFeels);
+    className.setEditable(true);
+    final JComboBox<String> clName = className;
     useDefault.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
             clName.setEnabled(((JCheckBox)e.getSource()).isSelected());
@@ -173,7 +183,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
         oldLnf = _prefs.get("lookAndFeel");
         useDefault.setSelected(!oldUseDef);
-        className.setText(oldLnf);
+        className.setSelectedItem(oldLnf);
         className.setEnabled(!oldUseDef);
         useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
         oldPort = _prefs.getInt("remoteServerPort");
@@ -193,7 +203,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     public void storeSettings() {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
-        _prefs.put("lookAndFeel", className.getText());
+        _prefs.put("lookAndFeel", className.getSelectedItem().toString());
         _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
         _prefs.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
@@ -228,7 +238,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("biblatexMode", biblatexMode.isSelected());
 
         if ((useDefault.isSelected() == oldUseDef) ||
-            !oldLnf.equals(className.getText())) {
+            !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null, 
             		Globals.lang("You have changed the look and feel setting.")
             		.concat(" ")
