@@ -23,6 +23,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
@@ -77,8 +78,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     // keyword to add
     private JTextField keyword;
 
-	private DefaultListModel keywordListModel;
-	private JList keywordList;
+    private DefaultListModel<String> keywordListModel;
+    private JList<String> keywordList;
 
     private JRadioButton intersectKeywords, mergeKeywords;
 
@@ -94,8 +95,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private void createDialog() {
         keyword = new JTextField();
 
-		keywordListModel = new DefaultListModel();
-		keywordList = new JList(keywordListModel);
+        keywordListModel = new DefaultListModel<String>();
+        keywordList = new JList<String>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -170,7 +171,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 					keywordListModel.addElement(text);
 				} else {
 					int idx = 0;
-					String element = (String) keywordListModel.getElementAt(idx);
+                    String element = keywordListModel.getElementAt(idx);
 					while ((idx < keywordListModel.size()) &&
                             (element.compareTo(text) < 0)) {
 						idx++;
@@ -194,7 +195,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             public void actionPerformed(ActionEvent arg0) {
 				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-				String[] values = (String[]) keywordList.getSelectedValues();
+                List<String> values = keywordList.getSelectedValuesList();
 
 				for (String val: values) {
 					keywordListModel.removeElement(val);
@@ -270,8 +271,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-		for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-			String keyword = (String) keywords.nextElement();
+        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements(); ) {
+        	String keyword = keywords.nextElement();
         	userSelectedKeywords.add(keyword);
         	if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
         		keywordsToAdd.add(keyword);

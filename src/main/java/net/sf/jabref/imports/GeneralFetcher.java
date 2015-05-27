@@ -15,26 +15,14 @@
 */
 package net.sf.jabref.imports;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.FocusRequester;
@@ -67,7 +55,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
 			GUIGlobals.getImage("helpSmall")), reset = new JButton(
                                 Globals.lang("Reset"));
-	JComboBox fetcherChoice;
+    JComboBox<String> fetcherChoice;
     CardLayout optionsCards = new CardLayout();
     JPanel optionsPanel = new JPanel(optionsCards);
     JPanel optPanel = new JPanel(new BorderLayout());
@@ -96,7 +84,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-		fetcherChoice = new JComboBox(choices);
+        fetcherChoice = new JComboBox<String>(choices);
         int defaultFetcher = Globals.prefs.getInt("selectedFetcherIndex");
         if (defaultFetcher >= fetcherArray.length)
             defaultFetcher = 0;

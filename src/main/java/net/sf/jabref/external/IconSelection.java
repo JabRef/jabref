@@ -19,22 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -46,9 +33,9 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 public class IconSelection extends JDialog {
 
-	JList icons;
+    JList<JLabel> icons;
     List<String> iconKeys;
-	DefaultListModel listModel;
+    DefaultListModel<JLabel> listModel;
     JButton ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
     private boolean okPressed = false;
@@ -101,12 +88,12 @@ public class IconSelection extends JDialog {
 
         }
 
-		listModel = new DefaultListModel();
-		icons = new JList(listModel);
+        listModel = new DefaultListModel<JLabel>();
+        icons = new JList<JLabel>(listModel);
         for (ImageIcon anIconSet : iconSet) {
             listModel.addElement(new JLabel(anIconSet));
         }
-		class MyRenderer implements ListCellRenderer {
+        class MyRenderer implements ListCellRenderer<JLabel> {
             JLabel comp = new JLabel();
             public MyRenderer() {
                 comp.setOpaque(true);
@@ -114,11 +101,11 @@ public class IconSelection extends JDialog {
                 comp.setHorizontalAlignment(JLabel.CENTER);
             }
 
-			public Component getListCellRendererComponent(JList list, Object value, int i,
+            public Component getListCellRendererComponent(JList<? extends JLabel> list, JLabel value, int i,
                                                           boolean isSelected, 
                                                           boolean hasFocus) {
                 comp.setText(null);
-				comp.setIcon(((JLabel) value).getIcon());
+                comp.setIcon(value.getIcon());
                 if (isSelected) {
                     comp.setBackground(list.getSelectionBackground());
                     comp.setForeground(list.getSelectionForeground());

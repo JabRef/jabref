@@ -48,8 +48,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JTextField defOwnerField, timeStampFormat, timeStampField;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
-	private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[0])),
-			encodings = new JComboBox(Globals.ENCODINGS);
+    private JComboBox<String> language = new JComboBox<String>(GUIGlobals.LANGUAGES.keySet().toArray(new String[0])),
+    encodings = new JComboBox<String>(Globals.ENCODINGS);
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;

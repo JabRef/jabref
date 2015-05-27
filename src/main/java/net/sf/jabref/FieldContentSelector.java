@@ -15,20 +15,12 @@
 */
 package net.sf.jabref;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;
@@ -45,7 +37,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
-	JComboBox comboBox;
+	JComboBox<String> comboBox;
 
 	FieldEditor editor;
 
@@ -97,7 +89,7 @@ public class FieldContentSelector extends JComponent {
         this.action = action;
         this.delimiter = delimiter;
 
-		comboBox = new JComboBox() {
+		comboBox = new JComboBox<String>() {
 			public Dimension getPreferredSize() {
 				Dimension parents = super.getPreferredSize();
 				if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)

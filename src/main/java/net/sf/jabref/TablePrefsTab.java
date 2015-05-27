@@ -22,15 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -47,7 +39,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		lastNamesOnly;
 
 	private JTextField priField, secField, terField, numericFields;
-	private JComboBox priSort, secSort, terSort;
+	private JComboBox<String> priSort, secSort, terSort;
 
 	/**
 	 * Customization of external program paths.
@@ -70,9 +62,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		v.add(BibtexFields.KEY_FIELD);
 		Collections.sort(v);
 		String[] allPlusKey = v.toArray(new String[v.size()]);
-		priSort = new JComboBox(allPlusKey);
-		secSort = new JComboBox(allPlusKey);
-		terSort = new JComboBox(allPlusKey);
+		priSort = new JComboBox<String>(allPlusKey);
+		secSort = new JComboBox<String>(allPlusKey);
+		terSort = new JComboBox<String>(allPlusKey);
 
 		autoResizeMode = new JCheckBox(Globals.lang("Fit table horizontally on screen"));
 

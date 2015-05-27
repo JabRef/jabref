@@ -19,11 +19,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -32,13 +28,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,7 +67,7 @@ public class ExportToClipboardAction extends AbstractWorker {
 			piv++;
 		}
         
-		JList list = new JList(array);
+        JList<String> list = new JList<String>(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

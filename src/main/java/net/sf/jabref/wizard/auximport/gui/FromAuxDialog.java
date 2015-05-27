@@ -57,6 +57,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -68,8 +70,6 @@ import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 
 public class FromAuxDialog
         extends JDialog {
@@ -80,10 +80,10 @@ public class FromAuxDialog
     private JButton cancelButton = new JButton();
     private JButton parseButton = new JButton();
 
-	private JComboBox dbChooser = new JComboBox();
+    private JComboBox<String> dbChooser = new JComboBox<String>();
     private JTextField auxFileField;
 
-	private JList notFoundList;
+    private JList<String> notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
@@ -190,7 +190,7 @@ public class FromAuxDialog
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-		notFoundList = new JList();
+        notFoundList = new JList<String>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
