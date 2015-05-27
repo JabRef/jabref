@@ -61,7 +61,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     MetaData metaData;
     BasePanel panel = null;
-    JComboBox<String> encoding;
+	JComboBox encoding;
     JButton ok, cancel;
     JTextField fileDir = new JTextField(40),
  fileDirIndv = new JTextField(40),
@@ -73,7 +73,7 @@ public class DatabasePropertiesDialog extends JDialog {
     
 	private JRadioButton saveAsConfiguredGlobally, saveInOriginalOrder,
 			saveInSpecifiedOrder;
-    private JComboBox<String> savePriSort, saveSecSort, saveTerSort;
+	private JComboBox savePriSort, saveSecSort, saveTerSort;
     private JTextField savePriField, saveSecField, saveTerField;
     private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
 	
@@ -84,7 +84,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), true);
-        encoding = new JComboBox<String>(Globals.ENCODINGS);
+		encoding = new JComboBox(Globals.ENCODINGS);
         ok = new JButton(Globals.lang("Ok"));
         cancel = new JButton(Globals.lang("Cancel"));
         init(parent);
@@ -238,9 +238,9 @@ public class DatabasePropertiesDialog extends JDialog {
 		v.add(BibtexFields.KEY_FIELD);
 		Collections.sort(v);
 		String[] allPlusKey = v.toArray(new String[v.size()]);
-		savePriSort = new JComboBox<String>(allPlusKey);
-		saveSecSort = new JComboBox<String>(allPlusKey);
-		saveTerSort = new JComboBox<String>(allPlusKey);
+		savePriSort = new JComboBox(allPlusKey);
+		saveSecSort = new JComboBox(allPlusKey);
+		saveTerSort = new JComboBox(allPlusKey);
 		
 		savePriSort.insertItemAt(Globals.lang("<select>"), 0);
 		saveSecSort.insertItemAt(Globals.lang("<select>"), 0);

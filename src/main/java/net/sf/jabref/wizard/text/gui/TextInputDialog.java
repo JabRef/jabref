@@ -50,8 +50,21 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,14 +74,50 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.*;
-import net.sf.jabref.*;
+import javax.swing.text.EditorKit;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.ClipBoardManager;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.imports.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
@@ -88,7 +137,7 @@ public class TextInputDialog
   private JPanel rawPanel = new JPanel() ;
   private JPanel sourcePanel = new JPanel() ;
   private IntegrityMessagePanel warnPanel;
-  private JList<String> fieldList ;
+	private JList fieldList;
   private JRadioButton overRadio;
 
     private BibtexEntry entry ;
@@ -263,7 +312,7 @@ public class TextInputDialog
     //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
     inputPanel.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
-    fieldList = new JList<String>( getAllFields() ) ;
+		fieldList = new JList(getAllFields());
     fieldList.setCellRenderer( new SimpleCellRenderer( fieldList.getFont() ) ) ;
     ListSelectionModel listSelectionModel = fieldList.getSelectionModel() ;
     listSelectionModel.setSelectionMode( ListSelectionModel.SINGLE_SELECTION ) ;
@@ -423,7 +472,7 @@ public class TextInputDialog
 // ---------------------------------------------------------------------------
   private void insertTextForTag()
   {
-    String type = fieldList.getSelectedValue() ;
+    String type = (String) fieldList.getSelectedValue() ;
     if ( type != null )
     {
       String txt = textPane.getSelectedText() ;
@@ -690,11 +739,11 @@ public class TextInputDialog
 //            System.out.println( "Event for index" + index ) ;
           if ( lastIndex > -1 )
           {
-            String tag1 = fieldList.getModel().getElementAt( lastIndex ) ;
+            String tag1 = (String) fieldList.getModel().getElementAt( lastIndex ) ;
             marked.setStyleForTag( tag1, "used", doc ) ;
           }
 
-          String tag2 = fieldList.getModel().getElementAt( index ) ;
+          String tag2 = (String) fieldList.getModel().getElementAt( index ) ;
           marked.setStyleForTag( tag2, "marked", doc ) ;
 
           lastIndex = index ;

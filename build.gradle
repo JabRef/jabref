@@ -95,7 +95,7 @@ dependencies {
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {

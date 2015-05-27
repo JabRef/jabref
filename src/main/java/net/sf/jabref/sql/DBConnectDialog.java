@@ -21,7 +21,19 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 
@@ -45,7 +57,7 @@ public class DBConnectDialog extends JDialog {
     JLabel lblPassword       = new JLabel();
 
     // input fields
-    JComboBox<String> cmbServerType = new JComboBox<String>();
+	JComboBox cmbServerType = new JComboBox();
     JTextField txtServerHostname = new JTextField(40);
     JTextField txtDatabase = new JTextField(40);
     JTextField txtUsername = new JTextField(40);        

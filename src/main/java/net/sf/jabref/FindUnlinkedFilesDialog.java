@@ -23,7 +23,13 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -55,12 +61,12 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
 import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
 import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -125,8 +131,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 	protected JTree tree;
 	protected JScrollPane scrollpaneTree;
-	protected JComboBox<FileFilter> comboBoxFileTypeSelection;
-	protected JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
+	protected JComboBox comboBoxFileTypeSelection;
+	protected JComboBox comboBoxEntryTypeSelection;
 	
 	private JProgressBar progressBarSearching;
 	private JProgressBar progressBarImporting;
@@ -1000,7 +1006,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		for (FileFilter fileFilter : fileFilterList) {
 			vector.add(fileFilter);
 		}
-		comboBoxFileTypeSelection = new JComboBox<FileFilter>(vector);
+		comboBoxFileTypeSelection = new JComboBox(vector);
 		
 		comboBoxFileTypeSelection.setRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = 8503499454763947465L;
@@ -1035,7 +1041,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 		while(iterator.hasNext()) {
 			list.add(new BibtexEntryTypeWrapper(iterator.next()));
 		}
-		comboBoxEntryTypeSelection = new JComboBox<BibtexEntryTypeWrapper>(list);
+		comboBoxEntryTypeSelection = new JComboBox(list);
 	}
 	
 	/**

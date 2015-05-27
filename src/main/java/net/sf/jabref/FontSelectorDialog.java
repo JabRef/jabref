@@ -48,12 +48,30 @@ modified slightly by nizar batada for JabRef
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -196,14 +214,14 @@ public class FontSelectorDialog extends JDialog {
                 JPanel familyPanel = createTextFieldAndListPanel(
                                                                  Globals.lang("Font Family"),
                                                                  familyField = new JTextField(),
-                                                                 familyList = new JList<String>(getFontList()));
+ familyList = new JList(getFontList()));
                 listPanel.add(familyPanel);
 
                 String[] sizes = { "9", "10", "12", "14", "16", "18", "24" };
                 JPanel sizePanel = createTextFieldAndListPanel(
                                                                Globals.lang("Font Size"),
                                        sizeField = new JTextField(),
-                                       sizeList = new JList<String>(sizes));
+ sizeList = new JList(sizes));
                 listPanel.add(sizePanel);
 
                 String[] styles = {PLAIN,BOLD,ITALIC,BOLD_ITALIC};
@@ -211,7 +229,7 @@ public class FontSelectorDialog extends JDialog {
                 JPanel stylePanel = createTextFieldAndListPanel(
                                                                 Globals.lang("Font Style"),
                                         styleField = new JTextField(),
-                                        styleList = new JList<String>(styles));
+ styleList = new JList(styles));
                 styleField.setEditable(false);
                 listPanel.add(stylePanel);
 
@@ -220,7 +238,7 @@ public class FontSelectorDialog extends JDialog {
                 sizeList.setSelectedValue(String.valueOf(font.getSize()),true);
                 sizeField.setText(String.valueOf(font.getSize()));
                 styleList.setSelectedIndex(font.getStyle());
-                styleField.setText(styleList.getSelectedValue());
+		styleField.setText((String) styleList.getSelectedValue());
 
                 ListHandler listHandler = new ListHandler();
                 familyList.addListSelectionListener(listHandler);
@@ -312,11 +330,11 @@ public class FontSelectorDialog extends JDialog {
         // private members
         private boolean isOK;
         private JTextField familyField;
-        private JList<String> familyList;
+	private JList familyList;
         private JTextField sizeField;
-        private JList<String> sizeList;
+	private JList sizeList;
         private JTextField styleField;
-        private JList<String> styleList;
+	private JList styleList;
         private JLabel preview;
         private JButton ok;
         private JButton cancel;
@@ -354,7 +372,7 @@ public class FontSelectorDialog extends JDialog {
                 }
         }
 
-        private JPanel createTextFieldAndListPanel(String label,JTextField textField, JList<String> list){
+	private JPanel createTextFieldAndListPanel(String label, JTextField textField, JList list) {
                 GridBagLayout layout = new GridBagLayout();
                 JPanel panel = new JPanel(layout);
 
@@ -417,17 +435,17 @@ public class FontSelectorDialog extends JDialog {
                 {
                         Object source = evt.getSource();
                         if(source == familyList) {
-                                String family = familyList.getSelectedValue();
+				String family = (String) familyList.getSelectedValue();
                                 if(family != null)
                                         familyField.setText(family);
                         }
                         else if(source == sizeList) {
-                                String size = sizeList.getSelectedValue();
+				String size = (String) sizeList.getSelectedValue();
                                 if(size != null)
                                         sizeField.setText(size);
                         }
                         else if(source == styleList) {
-                                String style = styleList.getSelectedValue();
+				String style = (String) styleList.getSelectedValue();
                                 if(style != null)
                                         styleField.setText(style);
                         }

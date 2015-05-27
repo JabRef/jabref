@@ -15,13 +15,25 @@
 */
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.help.HelpAction;
 
@@ -39,7 +51,7 @@ public class FileTab extends JPanel implements PrefsTab {
 
     private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
             promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
-    private JComboBox<String> valueDelimiter, newlineSeparator;
+	private JComboBox valueDelimiter, newlineSeparator;
     private JRadioButton
         resolveStringsStandard, resolveStringsAll;
     private JTextField bracesAroundCapitalsFields, nonWrappableFields,
@@ -66,7 +78,7 @@ public class FileTab extends JPanel implements PrefsTab {
         autoSave = new JCheckBox(Globals.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox<String>(new String[]{
+		valueDelimiter = new JComboBox(new String[] {
                 Globals.lang("Quotes") + ": \", \"",
                 Globals.lang("Curly Brackets") + ": {, }" });
         includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
@@ -91,7 +103,7 @@ public class FileTab extends JPanel implements PrefsTab {
         
         
         // This is sort of a quick hack
-        newlineSeparator = new JComboBox<String>(new String[] {"CR", "CR/LF", "LF"});
+		newlineSeparator = new JComboBox(new String[] {"CR", "CR/LF", "LF"});
 
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);

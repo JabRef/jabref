@@ -17,7 +17,15 @@ package net.sf.jabref;
 
 import java.awt.BorderLayout;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -40,7 +48,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
             useIEEEAbrv, biblatexMode;
-    JComboBox<String> className;
+	JComboBox className;
     JTextField remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -78,9 +86,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     	"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
     	"javax.swing.plaf.metal.MetalLookAndFeel"
     };
-    className = new JComboBox<String>(lookAndFeels);
+		className = new JComboBox(lookAndFeels);
     className.setEditable(true);
-    final JComboBox<String> clName = className;
+		final JComboBox clName = className;
     useDefault.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
             clName.setEnabled(((JCheckBox)e.getSource()).isSelected());
