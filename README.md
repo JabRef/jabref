@@ -12,6 +12,7 @@ JabRef can import from and export to several formats, and you can customize expo
 JabRef can be run as a command line application to convert from any import format to any export format.
 
 * Homepage: http://jabref.sourceforge.net/
+* Development mailinglist: https://lists.sourceforge.net/lists/listinfo/jabref-devel
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
 * CI Server: https://travis-ci.org/JabRef/jabref
