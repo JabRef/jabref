@@ -48,7 +48,7 @@ For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful. It co
 
 ## Requirements
 
-JabRef runs on any system equipped with the Java Virtual Machine (1.7 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+JabRef runs on any system equipped with the Java Virtual Machine (1.6 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 If you do not plan to compile JabRef, the Java Runtime Environment may be a better choice than the Java Development Kit.
 
 
@@ -97,7 +97,7 @@ appear in your chosen languages.
 
 If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
-To compile JabRef from source, you need a Java compiler supporting Java 1.7 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java compiler supporting Java 1.6 and `JAVA_HOME` pointing to this JDK.
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`

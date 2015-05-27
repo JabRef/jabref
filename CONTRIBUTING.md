@@ -3,6 +3,7 @@ Not sure what a pull request is, or how to submit one?  Take a look at GitHub's 
 
 We also have [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
+Please keep in mind that JabRef relies on Java 6 due to the availability of Java 6 on older Mac OS X operating system.
 
 ## Add your change to the CHANGELOG
 You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the JabRef source.
