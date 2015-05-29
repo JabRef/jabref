@@ -634,7 +634,7 @@ public class JabRef {
             else {
             	try {
             		UIManager.setLookAndFeel(lookFeel);
-            	} catch(ClassNotFoundException e) {
+            	} catch (Exception e) { // javax.swing.UnsupportedLookAndFeelException (sure; see bug #1278) or ClassNotFoundException (unsure) may be thrown
             		// specified look and feel does not exist on the classpath, so use system l&f
             		UIManager.setLookAndFeel(systemLnF);
             		// also set system l&f as default
