@@ -614,24 +614,36 @@ public class JabRef {
     
     private void setLookAndFeel() {
         try {
-            String systemLnF;
-            // * Look first into the Preferences
-            // * Fallback to the System Look & Fell
+            String lookFeel;
+        	String systemLnF = UIManager.getSystemLookAndFeelClassName();
+            
             if (Globals.prefs.getBoolean("useDefaultLookAndFeel")) {
-                systemLnF = UIManager.getSystemLookAndFeelClassName();
+            	// Use system Look & Feel by default
+            	lookFeel = systemLnF;
             } else {
-                systemLnF = Globals.prefs.get("lookAndFeel");
+            	lookFeel = Globals.prefs.get("lookAndFeel");
             }
 
             // At all cost, avoid ending up with the Metal look and feel:
-            if (systemLnF.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+            if (lookFeel.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
                 com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
                 UIManager.setLookAndFeel(lnf);
             }
             else {
-                UIManager.setLookAndFeel(systemLnF);
+            	try {
+            		UIManager.setLookAndFeel(lookFeel);
+            	} catch(ClassNotFoundException e) {
+            		// specified look and feel does not exist on the classpath, so use system l&f
+            		UIManager.setLookAndFeel(systemLnF);
+            		// also set system l&f as default
+            		Globals.prefs.put("lookAndFeel", systemLnF);
+            		// notify the user
+            		JOptionPane.showMessageDialog(jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
+                            Globals.lang("Warning"),
+                            JOptionPane.WARNING_MESSAGE);
+            	}
             }
         } catch (Exception e) {
             e.printStackTrace();
