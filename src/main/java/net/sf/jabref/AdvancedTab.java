@@ -16,6 +16,8 @@
 package net.sf.jabref;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -70,7 +72,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
     biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
     remoteServerPort = new JTextField();
-    String[] lookAndFeels = {
+    String[] possibleLookAndFeels = {
     	"com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
     	"com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
     	"com.sun.java.swing.plaf.motif.MotifLookAndFeel",
@@ -78,7 +80,16 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     	"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
     	"javax.swing.plaf.metal.MetalLookAndFeel"
     };
-    className = new JComboBox<String>(lookAndFeels);
+    // Only list L&F which are available
+    List<String> lookAndFeels = new ArrayList<String>();
+    for (String lf : possibleLookAndFeels) {
+    	try {
+    		// Try to find L&F, throws exception if not successful
+    		Class.forName(lf);
+    		lookAndFeels.add(lf);
+    	} catch(ClassNotFoundException e) {}
+    }
+    className = new JComboBox<String>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
     className.setEditable(true);
     final JComboBox<String> clName = className;
     useDefault.addChangeListener(new ChangeListener() {
