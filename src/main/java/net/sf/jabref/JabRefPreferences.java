@@ -1134,6 +1134,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Replace string", "ctrl R");
         defKeyBinds.put("Delete", "DELETE");
         defKeyBinds.put("Open file", "F4");
+        defKeyBinds.put("Open folder", "ctrl shift O");
         defKeyBinds.put("Open PDF or PS", "shift F5");
         defKeyBinds.put("Open URL or DOI", "F3");
         defKeyBinds.put("Open SPIRES entry", "ctrl F3");
@@ -1175,6 +1176,7 @@ public class JabRefPreferences {
         defKeyBinds.put("File list editor, move entry up", "ctrl UP");
         defKeyBinds.put("File list editor, move entry down", "ctrl DOWN");
         defKeyBinds.put("Minimize to system tray", "ctrl alt W");
+        defKeyBinds.put("Hide/show toolbar", "ctrl alt T");
     }
 
     private String getNextUnit(Reader data) throws IOException {
