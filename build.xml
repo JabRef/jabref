@@ -424,7 +424,7 @@ version=${jabref.version}</echo>
 	<!-- This target creates a bundle made for the Legacy Apple JVM (1.6) --> 
 	<target name="osxjar" depends="jars">
 		<jarbundler dir="${build.lib}"
-                    name="JabRef-legacy"
+                    name="JabRef_LegacyMac"
                     mainclass="net.sf.jabref.JabRef"
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
@@ -437,16 +437,16 @@ version=${jabref.version}</echo>
                           iconFile="${images.dir}/JabRef-Logo.icns"/>
         </jarbundler>
         <!-- After running jarbundler we need to hack the Info.plist file: -->
-        <replace file="${build.lib}/JabRef.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
+        <replace file="${build.lib}/JabRef_LegacyMac.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
 		<zip basedir="${build.lib}"
 			destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip"
-			excludes="JabRef.app/Contents/MacOS/JavaApplicationStub"
-			includes="JabRef.app/"
+			excludes="JabRef_LegacyMac.app/Contents/MacOS/JavaApplicationStub"
+			includes="JabRef_LegacyMac.app/"
 			level="9">
-			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
+			<zipfileset dir="${build.lib}" includes="JabRef_LegacyMac.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
 		</zip>
 	</target>
 
