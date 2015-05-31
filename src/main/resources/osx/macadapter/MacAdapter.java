@@ -18,6 +18,9 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 	public MacAdapter(JabRefFrame inputFrame) {
 		parentFrame = inputFrame;
 		Application.getApplication().setOpenFileHandler(this);
+		Application.getApplication().setAboutHandler(this);
+		Application.getApplication().setPreferencesHandler(this);
+		Application.getApplication().setQuitHandler(this);
 	}
 	
 	@Override
@@ -32,19 +35,16 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 
 	@Override
 	public void handleQuitRequestWith(QuitEvent arg0, QuitResponse arg1) {
-		// TODO Auto-generated method stub
-		
+		parentFrame.quit();		
 	}
 
 	@Override
 	public void handleAbout(AboutEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		parentFrame.about();
 	}
 
 	@Override
 	public void handlePreferences(PreferencesEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		parentFrame.preferences();
 	} 	
 }

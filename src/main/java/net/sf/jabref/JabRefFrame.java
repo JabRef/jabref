@@ -636,7 +636,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             sidePaneManager.show("search");
     }
 
-    // The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
     public void openAction(String filePath) {
     	File file = new File(filePath);
     	
@@ -676,7 +676,7 @@ AboutAction aboutAction = new AboutAction();
   }
 
 
-  // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
+  // General info dialog.  The MacAdapter calls this method when "About"
   // is selected from the application menu.
   public void about() {
     JDialog about = new JDialog(JabRefFrame.this, Globals.lang("About JabRef"),
@@ -714,7 +714,7 @@ AboutAction aboutAction = new AboutAction();
 
   }
 
-  // General preferences dialog.  The OSXAdapter calls this method when "Preferences..."
+  // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
   // is selected from the application menu.
   public void preferences() {
     //PrefsDialog.showPrefsDialog(JabRefFrame.this, prefs);
@@ -742,7 +742,7 @@ public JabRefPreferences prefs() {
   return prefs;
 }
 
-  // General info dialog.  The OSXAdapter calls this method when "Quit OSXAdapter"
+  // General info dialog.  The MacAdapter calls this method when "Quit"
   // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
   public void quit() {
     // Ask here if the user really wants to close, if the base
