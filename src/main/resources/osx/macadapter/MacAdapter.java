@@ -36,6 +36,7 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 		Application.getApplication().setAboutHandler(this);
 		Application.getApplication().setPreferencesHandler(this);
 		Application.getApplication().setQuitHandler(this);
+		FullScreenUtilities.setWindowCanFullScreen(parentFrame, true);
 	}
 	
 	@Override
