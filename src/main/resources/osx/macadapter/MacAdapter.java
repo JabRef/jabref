@@ -28,7 +28,7 @@ import com.apple.eawt.AppEvent.QuitEvent;
 
 public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler {
 
-	private JabRefFrame parentFrame;
+	private JabRefFrame parentFrame = null;
 	
 	public MacAdapter(JabRefFrame inputFrame) {
 		parentFrame = inputFrame;
@@ -41,28 +41,33 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 	@Override
 	// The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.	
 	public void openFiles(OpenFilesEvent event) {
-		List<File> files = event.getFiles();
+		if (parentFrame != null) {
+			List<File> files = event.getFiles();
 		
-		for (int i=0; i<files.size(); i++) {
-			parentFrame.openAction(files.get(i).getAbsolutePath());
+			for (int i=0; i<files.size(); i++) 
+				parentFrame.openAction(files.get(i).getAbsolutePath());
 		}
 	} 
 
 	@Override
 	public void handleQuitRequestWith(QuitEvent evt, QuitResponse resp) {
-		if (parentFrame.quit())
-			resp.performQuit();
-		else
-			resp.cancelQuit();
+		if (parentFrame != null) {
+			if (parentFrame.quit())
+				resp.performQuit();
+			else
+				resp.cancelQuit();
+		}
 	}
 
 	@Override
 	public void handleAbout(AboutEvent arg0) {
-		parentFrame.about();
+		if (parentFrame != null)
+			parentFrame.about();
 	}
 
 	@Override
 	public void handlePreferences(PreferencesEvent arg0) {
-		parentFrame.preferences();
+		if (parentFrame != null)
+			parentFrame.preferences();
 	} 	
 }
