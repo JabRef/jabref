@@ -82,8 +82,6 @@ import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
-import osx.macadapter.MacAdapter;
-
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
@@ -452,7 +450,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
         if (System.getProperty("os.name").equals("Mac OS X")) {
-        	MacAdapter macreg = new MacAdapter(this);
+        	try {
+        		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
+        		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
+        		method.invoke(macreg.newInstance(), this);
+        	}
+        	catch (Exception e) {
+        		System.err.println("Exception ("+e.getClass().toString()+"): "+e.getMessage());
+        	}
         }
         
         UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));

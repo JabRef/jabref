@@ -30,7 +30,7 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 
 	private JabRefFrame parentFrame = null;
 	
-	public MacAdapter(JabRefFrame inputFrame) {
+	public void registerMacEvents(JabRefFrame inputFrame) {
 		parentFrame = inputFrame;
 		Application.getApplication().setOpenFileHandler(this);
 		Application.getApplication().setAboutHandler(this);
