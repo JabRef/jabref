@@ -170,13 +170,15 @@
 	</target>
 
 	<!-- Builds the OSXAdapter -->
-	<target name="osx">
+	<target name="osx" depends="compile">
 		<mkdir dir="${build.classes}" />
-
 		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.7">
+			<!-- Hack to force visibility of com.apple.eawt in rt.jar in JDK7 & 8
+				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
+			<compilerarg value="-XDignore.symbol.file"/>			
 		</javac>
 	</target>
-
+	
 	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
 	<target name="non_osx">
 		<mkdir dir="${build.classes.osx}" />
