@@ -944,6 +944,7 @@ public class JabRef {
             pr.setFile(file);
             pr.setInvalid(true);
             pr.setErrorMessage(ex.getMessage());
+            ex.printStackTrace();
             return pr;
         }
 
