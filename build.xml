@@ -44,7 +44,7 @@
 	<property name="build.dir" value="buildant" />
 	<property name="build.classes" value="${build.dir}/classes" />
 	<property name="build.tmp" value="${build.dir}/tmp" />
-	<property name="build.classes.osx" value="${build.dir}/classes/osxadapter" />
+	<property name="build.classes.osx" value="${build.dir}/classes/osx/macadapter" />
 	<property name="build.lib" value="${build.dir}/lib" />
 	<property name="build.win" value="${build.dir}/windows" />
 	<property name="build.images" value="${build.dir}/images" />
@@ -179,10 +179,13 @@
 		</javac>
 	</target>
 	
-	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
+	<!-- Copies in the OSXAdapter class, which is compilable only on Mac
+		 Development on other platforms should also be possible by using the 
+       	 distributed stub of com.apple.eawt as described in 
+         http://stackoverflow.com/questions/2151174/how-can-i-develop-apple-java-extensions-on-windows -->
 	<target name="non_osx">
 		<mkdir dir="${build.classes.osx}" />
-		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.classes.osx}" />
+		<copy file="${osxbin.dir}/MacAdapter.class" todir="${build.classes.osx}" />
 	</target>
 
 	<!-- Jars up project -->
