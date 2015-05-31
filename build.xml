@@ -44,7 +44,7 @@
 	<property name="build.dir" value="buildant" />
 	<property name="build.classes" value="${build.dir}/classes" />
 	<property name="build.tmp" value="${build.dir}/tmp" />
-	<property name="build.classes.osx" value="${build.dir}/classes/osxadapter" />
+	<property name="build.classes.osx" value="${build.dir}/classes/osx/macadapter" />
 	<property name="build.lib" value="${build.dir}/lib" />
 	<property name="build.win" value="${build.dir}/windows" />
 	<property name="build.images" value="${build.dir}/images" />
@@ -170,17 +170,22 @@
 	</target>
 
 	<!-- Builds the OSXAdapter -->
-	<target name="osx">
+	<target name="osx" depends="compile">
 		<mkdir dir="${build.classes}" />
-
 		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.7">
+			<!-- Hack to force visibility of com.apple.eawt in rt.jar in JDK7 & 8
+				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
+			<compilerarg value="-XDignore.symbol.file"/>			
 		</javac>
 	</target>
-
-	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
+	
+	<!-- Copies in the OSXAdapter class, which is compilable only on Mac
+		 Development on other platforms should also be possible by using the 
+       	 distributed stub of com.apple.eawt as described in 
+         http://stackoverflow.com/questions/2151174/how-can-i-develop-apple-java-extensions-on-windows -->
 	<target name="non_osx">
 		<mkdir dir="${build.classes.osx}" />
-		<copy file="${osxbin.dir}/OSXAdapter.class" todir="${build.classes.osx}" />
+		<copy file="${osxbin.dir}/MacAdapter.class" todir="${build.classes.osx}" />
 	</target>
 
 	<!-- Jars up project -->
@@ -376,10 +381,55 @@ version=${jabref.version}</echo>
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
 
-
+	<taskdef
+		name="bundleapp"
+		classname="com.oracle.appbundler.AppBundlerTask"
+		classpath="${buildlib.dir}/appbundler-1.0.jar" />
+	
+	<!-- This target creates a bundle made for the Oracle Apple JVM (1.7+) --> 
+	<target name="macbundle" depends="jars">
+		<bundleapp
+			name="JabRef"
+			mainclassname="net.sf.jabref.JabRef"
+			outputdirectory="${build.lib}"
+			displayname="JabRef"
+			identifier="jabref.JabRef"
+			icon="${images.dir}/JabRef-Logo.icns"
+			shortversion="${jabref.version}">
+			<classpath file="${build.lib}/JabRef-${jabref.version}.jar" />	
+			<!-- Memory options apparently break the bundle 
+			<option value="-Xms128m -Xmx512m" /> -->
+		</bundleapp>
+		<!-- We still need to hack the Info.plist to enable high resolution for Retina displays -->
+		<replace file="${build.lib}/JabRef.app/Contents/Info.plist" 
+			token="&lt;key&gt;JVMOptions&lt;/key&gt;"
+			value="&lt;key&gt;NSHighResolutionCapable&lt;/key&gt;&#10;
+	&lt;true/&gt;&#10;&lt;key&gt;JVMOptions&lt;/key&gt;"/>
+		<!-- We also need to add native support for bib files in the Info.plist -->
+		<replace file="${build.lib}/JabRef.app/Contents/Info.plist" 
+		token="&lt;key&gt;JVMOptions&lt;/key&gt;"
+		value="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;
+	&lt;array&gt;&#10;
+		&lt;dict&gt;&#10;
+			&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;
+			&lt;string&gt;BibTeX file&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeRole&lt;/key&gt;&#10;
+			&lt;string&gt;Editor&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeIconFile&lt;/key&gt;&#10;
+			&lt;string&gt;JabRef-Logo.icns&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeExtensions&lt;/key&gt;&#10;
+			&lt;array&gt;&#10;
+				&lt;string&gt;bib&lt;/string&gt;&#10;
+			&lt;/array&gt;&#10;
+		&lt;/dict&gt;&#10;
+	&lt;/array&gt;&#10;
+	&lt;key&gt;JVMOptions&lt;/key&gt;"/>
+	</target>
+	
+	<!-- This target creates a bundle made for the Legacy Apple JVM (1.6) --> 
 	<target name="osxjar" depends="jars">
 		<jarbundler dir="${build.lib}"
-                    name="JabRef"
+                    name="JabRef_LegacyMac"
                     mainclass="net.sf.jabref.JabRef"
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
@@ -392,16 +442,16 @@ version=${jabref.version}</echo>
                           iconFile="${images.dir}/JabRef-Logo.icns"/>
         </jarbundler>
         <!-- After running jarbundler we need to hack the Info.plist file: -->
-        <replace file="${build.lib}/JabRef.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
+        <replace file="${build.lib}/JabRef_LegacyMac.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
 		<zip basedir="${build.lib}"
 			destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip"
-			excludes="JabRef.app/Contents/MacOS/JavaApplicationStub"
-			includes="JabRef.app/"
+			excludes="JabRef_LegacyMac.app/Contents/MacOS/JavaApplicationStub"
+			includes="JabRef_LegacyMac.app/"
 			level="9">
-			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
+			<zipfileset dir="${build.lib}" includes="JabRef_LegacyMac.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
 		</zip>
 	</target>
 
