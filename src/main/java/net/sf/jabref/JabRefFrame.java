@@ -82,6 +82,8 @@ import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
+import osx.macadapter.MacAdapter;
+
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
@@ -449,8 +451,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   private void init() {
 	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
-        macOSXRegistration();
-
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+        	MacAdapter macreg = new MacAdapter(this);
+        }
+        
         UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
 
         MyGlassPane glassPane = new MyGlassPane();
@@ -856,56 +860,6 @@ public JabRefPreferences prefs() {
       System.exit(0); // End program.
     }
   }
-
-    
-
-  private void macOSXRegistration() {
-    if (Globals.osName.equals(Globals.MAC)) {
-      try {
-    	  Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
-		  
-		  Class<?>[] defArgs = {Object.class, Method.class};
-		  Class<?> thisClass = JabRefFrame.class;
-		  Method registerMethod = osxAdapter.getDeclaredMethod("setAboutHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("about", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setPreferencesHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("preferences", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setQuitHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("quit", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", String.class)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-      }
-      catch (NoClassDefFoundError e) {
-        // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
-        // because OSXAdapter extends ApplicationAdapter in its def
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (ClassNotFoundException e) {
-        // This shouldn't be reached; if there's a problem with the OSXAdapter we should get the
-        // above NoClassDefFoundError first.
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (Exception e) {
-        System.err.println("Exception while loading the OSXAdapter:");
-        e.printStackTrace();
-      }
-    }
-  }
-
 
   private void initLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
