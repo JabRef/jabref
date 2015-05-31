@@ -376,10 +376,55 @@ version=${jabref.version}</echo>
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
 
-
+	<taskdef
+		name="bundleapp"
+		classname="com.oracle.appbundler.AppBundlerTask"
+		classpath="${buildlib.dir}/appbundler-1.0.jar" />
+	
+	<!-- This target creates a bundle made for the Oracle Apple JVM (1.7+) --> 
+	<target name="macbundle" depends="jars">
+		<bundleapp
+			name="JabRef"
+			mainclassname="net.sf.jabref.JabRef"
+			outputdirectory="${build.lib}"
+			displayname="JabRef"
+			identifier="jabref.JabRef"
+			icon="${images.dir}/JabRef-Logo.icns"
+			shortversion="${jabref.version}">
+			<classpath file="${build.lib}/JabRef-${jabref.version}.jar" />	
+			<!-- Memory options apparently break the bundle 
+			<option value="-Xms128m -Xmx512m" /> -->
+		</bundleapp>
+		<!-- We still need to hack the Info.plist to enable high resolution for Retina displays -->
+		<replace file="${build.lib}/JabRef.app/Contents/Info.plist" 
+			token="&lt;key&gt;JVMOptions&lt;/key&gt;"
+			value="&lt;key&gt;NSHighResolutionCapable&lt;/key&gt;&#10;
+	&lt;true/&gt;&#10;&lt;key&gt;JVMOptions&lt;/key&gt;"/>
+		<!-- We also need to add native support for bib files in the Info.plist -->
+		<replace file="${build.lib}/JabRef.app/Contents/Info.plist" 
+		token="&lt;key&gt;JVMOptions&lt;/key&gt;"
+		value="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;
+	&lt;array&gt;&#10;
+		&lt;dict&gt;&#10;
+			&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;
+			&lt;string&gt;BibTeX file&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeRole&lt;/key&gt;&#10;
+			&lt;string&gt;Editor&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeIconFile&lt;/key&gt;&#10;
+			&lt;string&gt;JabRef-Logo.icns&lt;/string&gt;&#10;
+			&lt;key&gt;CFBundleTypeExtensions&lt;/key&gt;&#10;
+			&lt;array&gt;&#10;
+				&lt;string&gt;bib&lt;/string&gt;&#10;
+			&lt;/array&gt;&#10;
+		&lt;/dict&gt;&#10;
+	&lt;/array&gt;&#10;
+	&lt;key&gt;JVMOptions&lt;/key&gt;"/>
+	</target>
+	
+	<!-- This target creates a bundle made for the Legacy Apple JVM (1.6) --> 
 	<target name="osxjar" depends="jars">
 		<jarbundler dir="${build.lib}"
-                    name="JabRef"
+                    name="JabRef-legacy"
                     mainclass="net.sf.jabref.JabRef"
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
