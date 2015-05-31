@@ -305,6 +305,10 @@ public class JabRef {
             Util.pr(ex.getMessage());
             }
         }
+        
+        // Set up custom or default icon theme
+        // Has to be done here as openBibFile requires an initialized icon theme (due to the implementation of special fields)
+        GUIGlobals.setUpIconTheme();
 
         // Vector to put imported/loaded database(s) in.
         Vector<ParserResult> loaded = new Vector<ParserResult>();
@@ -681,9 +685,8 @@ public class JabRef {
             // Jabref version.
             Util.performCompatibilityUpdate();
 
-
             // Set up custom or default icon theme:
-            GUIGlobals.setUpIconTheme();
+            // This is now done at processArguments
 
             // TODO: remove temporary registering of external file types?
             Globals.prefs.updateExternalFileTypes();
