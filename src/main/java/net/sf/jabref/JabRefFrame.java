@@ -744,7 +744,8 @@ public JabRefPreferences prefs() {
 
   // General info dialog.  The MacAdapter calls this method when "Quit"
   // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
-  public void quit() {
+  // The function returns a boolean indicating if quitting is ok or not.
+  public boolean quit() {
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
     boolean close = true;
@@ -763,7 +764,7 @@ public JabRefPreferences prefs() {
           if ( (answer == JOptionPane.CANCEL_OPTION) ||
               (answer == JOptionPane.CLOSED_OPTION)) {
             close = false; // The user has cancelled.
-              return;
+              return false;
           }
           if (answer == JOptionPane.YES_OPTION) {
             // The user wants to save.
@@ -801,7 +802,7 @@ public JabRefPreferences prefs() {
               WaitForSaveOperation w = new WaitForSaveOperation(this);
               w.show(); // This method won't return until cancelled or the save operation is done.
               if (w.cancelled())
-                  return; // The user clicked cancel.
+                  return false; // The user clicked cancel.
           }
       }
 
@@ -856,9 +857,11 @@ public JabRefPreferences prefs() {
       }
       
       prefs.flush();
-      
-      System.exit(0); // End program.
+
+      return true;
     }
+    
+    return false;
   }
 
   private void initLayout() {

@@ -49,8 +49,11 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 	} 
 
 	@Override
-	public void handleQuitRequestWith(QuitEvent arg0, QuitResponse arg1) {
-		parentFrame.quit();		
+	public void handleQuitRequestWith(QuitEvent evt, QuitResponse resp) {
+		if (parentFrame.quit())
+			resp.performQuit();
+		else
+			resp.cancelQuit();
 	}
 
 	@Override
