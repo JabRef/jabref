@@ -449,8 +449,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   private void init() {
 	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
-        macOSXRegistration();
-
         UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
 
         MyGlassPane glassPane = new MyGlassPane();
@@ -580,6 +578,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         });
+        
+        //Note: The registration of Apple event is at the end of initialization, because
+        //if the events happen too early (ie when the window is not initialized yet), the
+        //opened (double-clicked) documents are not displayed.
+        macOSXRegistration();
     }
 
     public void setWindowTitle() {
