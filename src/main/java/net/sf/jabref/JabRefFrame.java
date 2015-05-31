@@ -448,17 +448,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
   private void init() {
 	    tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
-
-        if (System.getProperty("os.name").equals("Mac OS X")) {
-        	try {
-        		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
-        		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
-        		method.invoke(macreg.newInstance(), this);
-        	}
-        	catch (Exception e) {
-        		System.err.println("Exception ("+e.getClass().toString()+"): "+e.getMessage());
-        	}
-        }
         
         UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
 
@@ -589,6 +578,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         });
+        
+        //Note: The registration of Apple event is at the end of initialization, because
+        //if the events happen too early (ie when the window is not initialized yet), the
+        //opened (double-clicked) documents are not displayed.
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+        	try {
+        		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
+        		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
+        		method.invoke(macreg.newInstance(), this);
+        	}
+        	catch (Exception e) {
+        		System.err.println("Exception ("+e.getClass().toString()+"): "+e.getMessage());
+        	}
+        }
     }
 
     public void setWindowTitle() {
