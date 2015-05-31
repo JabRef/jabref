@@ -1154,8 +1154,13 @@ public JabRefPreferences prefs() {
         }
       }
       else {
-        Util.pr("Action '" + command + "' must be disabled when no "
-                + "database is open.");
+          // QUICK HACK to solve bug #1277
+          if (e.getActionCommand().equals("Hide/show toolbar")) {
+              // code copied from BasePanel.java, action "toggleToolbar"
+              tlb.setVisible(! tlb.isVisible());
+          } else {
+              Util.pr("Action '" + command + "' must be disabled when no database is open.");
+          }
       }
     }
   }
