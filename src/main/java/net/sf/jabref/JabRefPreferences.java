@@ -62,6 +62,7 @@ public class JabRefPreferences {
             SHOWONELETTERHEADINGFORICONCOLUMNS = "showOneLetterHeadingForIconColumns",
             EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings",
             EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA",
+            EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF",
             SHORTEST_TO_COMPLETE = "shortestToComplete",
             AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
             // here are the possible values for _MODE:
@@ -352,6 +353,7 @@ public class JabRefPreferences {
         defaults.put("searchPanePosY", 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
