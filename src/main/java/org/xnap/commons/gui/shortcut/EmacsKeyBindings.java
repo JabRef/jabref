@@ -132,10 +132,12 @@ public class EmacsKeyBindings
 			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
 											  InputEvent.ALT_MASK),
 					   DefaultEditorKit.nextWordAction),
-		new JTextComponent.
-			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-											  InputEvent.CTRL_MASK),
-					   DefaultEditorKit.forwardAction),
+// CTRL+F is also used for "search", which is used more often than going forward one letter
+// Therefore, we just disalbe this key
+//		new JTextComponent.
+//			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
+//											  InputEvent.CTRL_MASK),
+//					   DefaultEditorKit.forwardAction),
 		new JTextComponent.
 			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B,
 											  InputEvent.CTRL_MASK),
