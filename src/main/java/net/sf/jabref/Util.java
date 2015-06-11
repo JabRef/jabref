@@ -3069,10 +3069,7 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
    	 * Check if the String matches a DOI (with http://...)
    	 */
     public static boolean checkForDOIwithHTTPprefix(String check) {
-    	if (check == null)
-    		return false;
-
-    	return check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
+		return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
 	}
     
     /**
@@ -3081,11 +3078,8 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
      * @return true if "check" contains a DOI
      */
     public static boolean checkForPlainDOI(String check) {
-    	if (check == null)
-    		return false;
-
-    	return check.matches(".*" + REGEXP_PLAINDOI + ".*");
-    }
+		return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
+	}
        
     /**
    	 * Remove the http://... from DOI
