@@ -1,5 +1,7 @@
 # JabRef 2.11 development version
 
+[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
+
 This version is a development version. Features may not work as expected.
 
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
