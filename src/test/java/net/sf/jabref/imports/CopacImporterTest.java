@@ -33,7 +33,7 @@ public class CopacImporterTest {
                 .getResourceAsStream("IsiImporterTest1.isi")));
 
         assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
-                .getResourceAsStream("IsiImporterTestINSPEC.isi")));
+                .getResourceAsStream("IsiImporterTestInspec.isi")));
 
         assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("IsiImporterTestWOS.isi")));

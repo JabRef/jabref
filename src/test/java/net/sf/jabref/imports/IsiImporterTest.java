@@ -35,7 +35,7 @@ public class IsiImporterTest {
                 .getResourceAsStream("IsiImporterTest1.isi")));
 
         assertTrue(importer.isRecognizedFormat(IsiImporterTest.class
-                .getResourceAsStream("IsiImporterTestINSPEC.isi")));
+                .getResourceAsStream("IsiImporterTestInspec.isi")));
 
         assertTrue(importer.isRecognizedFormat(IsiImporterTest.class
                 .getResourceAsStream("IsiImporterTestWOS.isi")));
