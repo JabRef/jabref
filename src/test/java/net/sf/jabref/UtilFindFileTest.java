@@ -93,6 +93,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
             File fullPath = Util.expandFilename(pdf, dirsToSearch);
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
                     .getAbsolutePath());
@@ -102,6 +103,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             dirsToSearch[0] = tmp;
 
             fullPath = Util.expandFilename(pdf, dirsToSearch);
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
                     .getAbsolutePath());
@@ -110,6 +112,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             assertNull(fullPath);
 
             fullPath = Util.expandFilename(pdf, new String[]{dirsToSearch[1]});
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
                     .getAbsolutePath());
@@ -122,6 +125,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
             File fullPath = Util.expandFilename(pdf, dirsToSearch);
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
                     .getAbsolutePath());
@@ -131,6 +135,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             dirsToSearch[0] = tmp;
 
             fullPath = Util.expandFilename(pdf, dirsToSearch);
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
                     .getAbsolutePath());
@@ -139,6 +144,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
             assertNull(fullPath);
 
             fullPath = Util.expandFilename(pdf, new String[]{dirsToSearch[1]});
+            assertNotNull(fullPath);
             assertTrue(fullPath.exists());
             assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
                     .getAbsolutePath());

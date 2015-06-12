@@ -152,61 +152,61 @@ public class FileBasedTestCase {
             Globals.prefs.put("pdfDirectory", root.getPath());
 
             File subDir1 = new File(root, "Organization Science");
-            subDir1.mkdir();
+            assertTrue(subDir1.mkdir());
 
             File pdf1 = new File(subDir1, "HipKro03 - Hello.pdf");
-            pdf1.createNewFile();
+            assertTrue(pdf1.createNewFile());
 
             File pdf1a = new File(root, "HipKro03 - Hello.pdf");
-            pdf1a.createNewFile();
+            assertTrue(pdf1a.createNewFile());
 
             File subDir2 = new File(root, "pdfs");
-            subDir2.mkdir();
+            assertTrue(subDir2.mkdir());
 
             File subsubDir1 = new File(subDir2, "sub");
-            subsubDir1.mkdir();
+            assertTrue(subsubDir1.mkdir());
 
             File pdf2 = new File(subsubDir1, "HipKro03-sub.pdf");
-            pdf2.createNewFile();
+            assertTrue(pdf2.createNewFile());
 
             File dir2002 = new File(root, "2002");
-            dir2002.mkdir();
+            assertTrue(dir2002.mkdir());
 
             File dir2003 = new File(root, "2003");
-            dir2003.mkdir();
+            assertTrue(dir2003.mkdir());
 
             File pdf3 = new File(dir2003, "Paper by HipKro03.pdf");
-            pdf3.createNewFile();
+            assertTrue(pdf3.createNewFile());
 
             File dirTest = new File(root, "test");
-            dirTest.mkdir();
+            assertTrue(dirTest.mkdir());
 
             File pdf4 = new File(dirTest, "HipKro03.pdf");
-            pdf4.createNewFile();
+            assertTrue(pdf4.createNewFile());
 
             File pdf5 = new File(dirTest, ".TEST");
-            pdf5.createNewFile();
+            assertTrue(pdf5.createNewFile());
 
             File pdf6 = new File(dirTest, "TEST[");
-            pdf6.createNewFile();
+            assertTrue(pdf6.createNewFile());
 
             File pdf7 = new File(dirTest, "TE.ST");
-            pdf7.createNewFile();
+            assertTrue(pdf7.createNewFile());
 
             File foo = new File(dirTest, "foo.dat");
-            foo.createNewFile();
+            assertTrue(foo.createNewFile());
 
             File graphicsDir = new File(root, "graphicsDir");
-            graphicsDir.mkdir();
+            assertTrue(graphicsDir.mkdir());
 
             File graphicsSubDir = new File(graphicsDir, "subDir");
-            graphicsSubDir.mkdir();
+            assertTrue(graphicsSubDir.mkdir());
 
             File jpg = new File(graphicsSubDir, "HipKro03test.jpg");
-            jpg.createNewFile();
+            assertTrue(jpg.createNewFile());
 
             File png = new File(graphicsSubDir, "HipKro03test.png");
-            png.createNewFile();
+            assertTrue(png.createNewFile());
 
         } catch (Exception e) {
             throw new RuntimeException();
