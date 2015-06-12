@@ -9,4 +9,5 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - TERM=dumb ./gradlew check --info
+  - ./gradlew check --info
+
