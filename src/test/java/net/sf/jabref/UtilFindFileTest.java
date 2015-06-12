@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,7 +29,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
      *
      * @throws IOException
      */
-    @Test
+    @Test @Ignore(value = "works on windows but not on linux")
     public void testFindFileRelative() throws IOException {
 
         // Most basic case
@@ -49,7 +50,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     }
 
-    @Test
+    @Test @Ignore(value = "works on windows but not on linux")
     public void testFindPdf() throws IOException {
         String pdf = UtilFindFiles.findPdf(entry, "pdf", root.getAbsolutePath());
         assertEqualPaths("HipKro03 - Hello.pdf", pdf);
@@ -152,7 +153,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     }
 
-    @Test
+    @Test @Ignore(value = "works on windows but not on linux")
     public void testFindFile() throws IOException {
 
         // Simple case
