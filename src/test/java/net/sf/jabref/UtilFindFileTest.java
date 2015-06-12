@@ -49,25 +49,24 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
     }
 
-
     @Test
     public void testFindPdf() throws IOException {
+        String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath());
+        assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
-        {
-            String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath());
-            assertEqualPaths("HipKro03 - Hello.pdf", pdf);
+        File fullPath = Util.expandFilename(pdf, root.getAbsolutePath());
+        assertNotNull("expanded file must not be null", fullPath);
+        assertTrue(fullPath.exists());
+    }
 
-            File fullPath = Util.expandFilename(pdf, root.getAbsolutePath());
-            assertTrue(fullPath.exists());
-        }
-        {
-            String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
+    @Test
+    public void testFindPdfInSubfolder() {
+        String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
 
-            assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+        assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
-            File fullPath = Util.expandFilename(pdf, root.getAbsolutePath() + "/pdfs/");
-            assertTrue(fullPath.exists());
-        }
+        File fullPath = Util.expandFilename(pdf, root.getAbsolutePath() + "/pdfs/");
+        assertTrue(fullPath.exists());
     }
 
     @Test
