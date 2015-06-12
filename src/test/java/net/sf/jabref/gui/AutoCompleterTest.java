@@ -143,15 +143,15 @@ public class AutoCompleterTest {
     @Test
     public void testEntryEditorForNameFieldAutoCompleter() {
         // construct an EntryEditor ...
-        JabRef jabref = TestUtils.getInitializedJabRef();
+        TestUtils.initJabRef();
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("author", "Brigitte Laurant");
         FieldEditor authorTextField = new FieldTextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(jabref.jrf, jabref.jrf.basePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AbstractAutoCompleter autoCompleter = jabref.jrf.basePanel().getAutoCompleter("author");
+        AbstractAutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleter("author");
         assertTrue(autoCompleter.indexContainsWord("Hans Meiser"));
         assertTrue(autoCompleter.indexContainsWord("Meiser, Hans"));
 
@@ -161,15 +161,15 @@ public class AutoCompleterTest {
     @Test
     public void testEntryEditorForFieldAnotherAutoCompleter() {
         // construct an EntryEditor ...
-        JabRef jabref = TestUtils.getInitializedJabRef();
+        TestUtils.initJabRef();
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("journal", "Testtext");
         FieldEditor authorTextField = new FieldTextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(jabref.jrf, jabref.jrf.basePanel(), bibtexEntry);
+        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AbstractAutoCompleter autoCompleter = jabref.jrf.basePanel().getAutoCompleter("journal");
+        AbstractAutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleter("journal");
         assertTrue(autoCompleter.indexContainsWord("New Testtext"));
 
         TestUtils.closeJabRef();

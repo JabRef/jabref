@@ -51,7 +51,7 @@ public class GeneralFetcherTest {
     @Before
     public void setUp() {
         JabRef.main(new String[0]);
-        jrf = JabRef.singleton.jrf;
+        jrf = JabRef.jrf;
         spm = jrf.sidePaneManager;
         acmpf = new ACMPortalFetcher();
         ArrayList<EntryFetcher> al = new ArrayList<EntryFetcher>();

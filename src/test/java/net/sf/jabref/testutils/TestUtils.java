@@ -14,23 +14,21 @@ public class TestUtils {
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
 
     /**
-     * Returns a full configured and initialized instance of JabRef. As long as
-     * {@link TestUtils#closeJabRef()} wasn't called this method returns the
-     * same instance.
+     * Initialize JabRef. Can be cleaned up with
+     * {@link TestUtils#closeJabRef()}
      *
      * @see TestUtils#closeJabRef()
      */
-    public static JabRef getInitializedJabRef() {
+    public static void initJabRef() {
         disableSystemExit();
         try {
             String[] args = {"-p", " ", PATH_TO_TEST_BIBTEX};
             JabRef.main(args);
         } catch (ExitException ignored) {
+
         } finally {
             enableSystemExit();
         }
-        JabRef jabref = JabRef.singleton;
-        return jabref;
     }
 
     /**
@@ -39,7 +37,7 @@ public class TestUtils {
     public static void closeJabRef() {
         JabRef jabref = JabRef.singleton;
         if (jabref != null) {
-            jabref.jrf.dispose();
+            JabRef.jrf.dispose();
         }
     }
 
