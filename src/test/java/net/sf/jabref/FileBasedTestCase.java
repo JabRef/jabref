@@ -17,15 +17,6 @@ import static org.junit.Assert.*;
 public class FileBasedTestCase {
 
     /**
-     * Will check if two paths are the same.
-     */
-    public static void assertEqualPaths(String path1, String path2) {
-        assertNotNull("first path must not be null", path1);
-        assertNotNull("second path must not be null", path2);
-        assertEquals(path1.replaceAll("\\\\", "/"), path2.replaceAll("\\\\", "/"));
-    }
-
-    /**
      * Creates a temp directory in the System temp directory.
      * <p/>
      * Taken from
@@ -132,7 +123,6 @@ public class FileBasedTestCase {
 
     @Before
     public void setUp() throws Exception {
-
         Globals.prefs = JabRefPreferences.getInstance();
         oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
         oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
