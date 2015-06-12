@@ -36,17 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.OpenFileFilter;
-import net.sf.jabref.UrlDragDrop;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.XMPUtil;
@@ -446,8 +436,8 @@ public class ExternalFilePanel extends JPanel {
                 String[] dirs = metaData.getFileDirectory(fieldName);
                 Collections.addAll(list, dirs);
 
-				String found = Util.findPdf(getEntry(), fieldName, list
-					.toArray(new String[list.size()]));// , off);
+				String found = UtilFindFiles.findPdf(getEntry(), fieldName, list
+						.toArray(new String[list.size()]));// , off);
                                         
                                 
 				// To activate findFile:
