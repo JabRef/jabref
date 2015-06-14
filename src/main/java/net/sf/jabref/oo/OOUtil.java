@@ -15,21 +15,31 @@
 */
 package net.sf.jabref.oo;
 
-import com.sun.star.beans.XPropertySet;
-import com.sun.star.beans.Property;
-import com.sun.star.text.*;
-import com.sun.star.uno.UnoRuntime;
-import com.sun.star.frame.XDesktop;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.export.layout.Layout;
-
-import javax.swing.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.export.layout.Layout;
+
+import com.sun.star.beans.Property;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.frame.XDesktop;
+import com.sun.star.text.ControlCharacter;
+import com.sun.star.text.XParagraphCursor;
+import com.sun.star.text.XText;
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.UnoRuntime;
 
 /**
  * Utility methods for processing OO Writer documents.
@@ -260,7 +270,7 @@ public class OOUtil {
         for (XTextDocument doc : list) {
             values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
         }
-        JList<String> sel = new JList<String>(values);
+		JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),

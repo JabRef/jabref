@@ -13,7 +13,7 @@
                help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
 
    Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK1.7 or higher
+                 2. JAVA_HOME environment variable contains the path to JDK1.6 or higher
                  3. ANT_HOME environment variable contains the path to ant's home directory
 
    Language: XML
@@ -162,7 +162,7 @@
 	<!-- Compiles project -->
 	<target name="compile">
 		<mkdir dir="${build.classes}" />
-		<javac destdir="${build.classes}" encoding="UTF8" source="1.7" target="1.7">
+		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
 			<src path="${java.dir}" />
             <src path="${gen.dir}" />
 			<classpath refid="classpath" />
@@ -172,7 +172,7 @@
 	<!-- Builds the OSXAdapter -->
 	<target name="osx" depends="compile">
 		<mkdir dir="${build.classes}" />
-		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.7">
+		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.6">
 			<!-- Hack to force visibility of com.apple.eawt in rt.jar in JDK7 & 8
 				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
 			<compilerarg value="-XDignore.symbol.file"/>			
@@ -434,7 +434,7 @@ version=${jabref.version}</echo>
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
                     version="${jabref.version}"
-                    jvmversion="1.7+"
+                    jvmversion="1.6+"
 		    vmoptions="-Xms128m -Xmx512m"
                     stubfile="${osxbin.dir}/JavaApplicationStub"
                     signature="JABr">

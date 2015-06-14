@@ -25,14 +25,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.groups.GroupsPrefsTab;
-import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -56,7 +64,7 @@ public class PrefsDialog3 extends JDialog {
 		final JabRefPreferences prefs = JabRefPreferences.getInstance();
 		frame = parent;
 
-		final JList<String> chooser;
+		final JList chooser;
 
 		JButton importPrefs = new JButton(Globals.lang("Import preferences"));
 		JButton exportPrefs = new JButton(Globals.lang("Export preferences"));
@@ -105,7 +113,7 @@ public class PrefsDialog3 extends JDialog {
 
 		upper.setBorder(BorderFactory.createEtchedBorder());
 
-		chooser = new JList<String>(names);
+		chooser = new JList(names);
 		chooser.setBorder(BorderFactory.createEtchedBorder());
 		// Set a prototype value to control the width of the list:
 		chooser.setPrototypeCellValue("This should be wide enough");
@@ -118,7 +126,7 @@ public class PrefsDialog3 extends JDialog {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting())
 					return;
-				String o = chooser.getSelectedValue();
+				String o = (String) chooser.getSelectedValue();
 				cardLayout.show(main, o);
 			}
 		});
