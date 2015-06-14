@@ -17,29 +17,11 @@ package net.sf.jabref;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.awt.event.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -212,10 +194,10 @@ class KeyBindingsDialog extends JDialog {
       // When the user release the mouse button and completes the selection,
       // getValueIsAdjusting() becomes false
       if (!evt.getValueIsAdjusting()) {
-				JList list = (JList) evt.getSource();
+        JList<?> list = (JList<?>) evt.getSource();
 
         // Get all selected items
-				Object[] selected = list.getSelectedValues();
+        List<?> selected = list.getSelectedValuesList();
 
         // Iterate all selected items
           for (Object sel : selected) {

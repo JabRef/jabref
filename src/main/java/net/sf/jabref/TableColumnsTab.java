@@ -18,39 +18,22 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.external.ExternalFileType;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
@@ -64,7 +47,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
 
     private JCheckBox extraFileColumns;
-	private JList listOfFileColumns;
+    private JList<String> listOfFileColumns;
 
     private JRadioButton preferUrl, preferDoi;
 
@@ -233,7 +216,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 for(int i=0;i<fileTypes.length;i++) {
                     fileTypeNames[i]=fileTypes[i].getName();
                 }
-		listOfFileColumns = new JList(fileTypeNames);
+                listOfFileColumns = new JList<String>(fileTypeNames);
                 JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
                 listOfFileColumns.setVisibleRowCount(3);
 
@@ -640,7 +623,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if(extraFileColumns.isSelected()&&!listOfFileColumns.isSelectionEmpty()) {
                     String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
                     for(int i=0;i<selections.length;i++) {
-                        selections[i]= (String) listOfFileColumns.getModel().getElementAt(
+                        selections[i]= listOfFileColumns.getModel().getElementAt(
                                 listOfFileColumns.getSelectedIndices()[i]);
                     }
                     _prefs.putStringArray("listOfFileColumns", selections);

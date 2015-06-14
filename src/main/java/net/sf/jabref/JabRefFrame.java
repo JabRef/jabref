@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -582,7 +582,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //Note: The registration of Apple event is at the end of initialization, because
         //if the events happen too early (ie when the window is not initialized yet), the
         //opened (double-clicked) documents are not displayed.
-        macOSXRegistration();
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+        	try {
+        		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
+        		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
+        		method.invoke(macreg.newInstance(), this);
+        	}
+        	catch (Exception e) {
+        		System.err.println("Exception ("+e.getClass().toString()+"): "+e.getMessage());
+        	}
+        }
     }
 
     public void setWindowTitle() {
@@ -635,7 +644,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             sidePaneManager.show("search");
     }
 
-    // The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
     public void openAction(String filePath) {
     	File file = new File(filePath);
     	
@@ -675,7 +684,7 @@ AboutAction aboutAction = new AboutAction();
   }
 
 
-  // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
+  // General info dialog.  The MacAdapter calls this method when "About"
   // is selected from the application menu.
   public void about() {
     JDialog about = new JDialog(JabRefFrame.this, Globals.lang("About JabRef"),
@@ -713,7 +722,7 @@ AboutAction aboutAction = new AboutAction();
 
   }
 
-  // General preferences dialog.  The OSXAdapter calls this method when "Preferences..."
+  // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
   // is selected from the application menu.
   public void preferences() {
     //PrefsDialog.showPrefsDialog(JabRefFrame.this, prefs);
@@ -741,9 +750,10 @@ public JabRefPreferences prefs() {
   return prefs;
 }
 
-  // General info dialog.  The OSXAdapter calls this method when "Quit OSXAdapter"
+  // General info dialog.  The MacAdapter calls this method when "Quit"
   // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
-  public void quit() {
+  // The function returns a boolean indicating if quitting is ok or not.
+  public boolean quit() {
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
     boolean close = true;
@@ -762,7 +772,7 @@ public JabRefPreferences prefs() {
           if ( (answer == JOptionPane.CANCEL_OPTION) ||
               (answer == JOptionPane.CLOSED_OPTION)) {
             close = false; // The user has cancelled.
-              return;
+              return false;
           }
           if (answer == JOptionPane.YES_OPTION) {
             // The user wants to save.
@@ -800,7 +810,7 @@ public JabRefPreferences prefs() {
               WaitForSaveOperation w = new WaitForSaveOperation(this);
               w.show(); // This method won't return until cancelled or the save operation is done.
               if (w.cancelled())
-                  return; // The user clicked cancel.
+                  return false; // The user clicked cancel.
           }
       }
 
@@ -855,60 +865,12 @@ public JabRefPreferences prefs() {
       }
       
       prefs.flush();
-      
-      System.exit(0); // End program.
-    }
-  }
 
+      return true;
+    }
     
-
-  private void macOSXRegistration() {
-    if (Globals.osName.equals(Globals.MAC)) {
-      try {
-    	  Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
-		  
-		  Class<?>[] defArgs = {Object.class, Method.class};
-		  Class<?> thisClass = JabRefFrame.class;
-		  Method registerMethod = osxAdapter.getDeclaredMethod("setAboutHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("about", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setPreferencesHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("preferences", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setQuitHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("quit", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", String.class)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-      }
-      catch (NoClassDefFoundError e) {
-        // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
-        // because OSXAdapter extends ApplicationAdapter in its def
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (ClassNotFoundException e) {
-        // This shouldn't be reached; if there's a problem with the OSXAdapter we should get the
-        // above NoClassDefFoundError first.
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (Exception e) {
-        System.err.println("Exception while loading the OSXAdapter:");
-        e.printStackTrace();
-      }
-    }
+    return false;
   }
-
 
   private void initLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);

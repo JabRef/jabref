@@ -43,22 +43,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.*;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.wizard.integrity.IntegrityCheck;
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
@@ -69,8 +58,7 @@ public class IntegrityMessagePanel
     implements ListSelectionListener, KeyListener, ActionListener
 
 {
-	
-	private JList warnings;
+  private JList<IntegrityMessage> warnings ;
   private HintListModel warningData ;
 
   private IntegrityCheck validChecker ;
@@ -86,7 +74,7 @@ public class IntegrityMessagePanel
 
   // JList --------------------------------------------------------------
     warningData = new HintListModel() ;
-		warnings = new JList(warningData);
+    warnings = new JList<IntegrityMessage>( warningData ) ;
     warnings.setCellRenderer( new IntegrityListRenderer() );
     warnings.addListSelectionListener(this);
 
