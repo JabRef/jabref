@@ -381,13 +381,18 @@ version=${jabref.version}</echo>
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
 
-	<taskdef
-		name="bundleapp"
-		classname="com.oracle.appbundler.AppBundlerTask"
-		classpath="${buildlib.dir}/appbundler-1.0.jar" />
-	
+	<target name="java16test">
+		<condition property="java16">
+			<equals arg1="${ant.java.version}" arg2="1.6"/>
+		</condition>
+	</target>
+
 	<!-- This target creates a bundle made for the Oracle Apple JVM (1.7+) --> 
-	<target name="macbundle" depends="jars">
+	<target name="macbundle" depends="java16test, jars" unless="java16">
+		<taskdef
+			name="bundleapp"
+			classname="com.oracle.appbundler.AppBundlerTask"
+			classpath="${buildlib.dir}/appbundler-1.0.jar" />
 		<bundleapp
 			name="JabRef"
 			mainclassname="net.sf.jabref.JabRef"
