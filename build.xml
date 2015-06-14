@@ -429,6 +429,13 @@ version=${jabref.version}</echo>
 		&lt;/dict&gt;&#10;
 	&lt;/array&gt;&#10;
 	&lt;key&gt;JVMOptions&lt;/key&gt;"/>
+		<zip basedir="${build.lib}"
+			destfile="${build.lib}/JabRef-${jabref.version}-OSX.zip"
+			excludes="JabRef.app/Contents/MacOS/JavaAppLauncher"
+			includes="JabRef.app/"
+			level="9">
+			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaAppLauncher" filemode="755" />
+		</zip>
 	</target>
 	
 	<!-- This target creates a bundle made for the Legacy Apple JVM (1.6) --> 
