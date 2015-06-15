@@ -820,8 +820,7 @@ public class Util {
             temp = File.createTempFile("jabref-link", "."+fileType.getExtension());
             temp.deleteOnExit();
             System.out.println("Downloading to '"+temp.getPath()+"'");
-            URLDownload ud = new URLDownload(null, new URL(link), temp);
-            ud.download();
+			new URLDownload(new URL(link)).downloadToFile(temp);
             System.out.println("Done");
         } catch (MalformedURLException ex) {
             ex.printStackTrace();

@@ -43,10 +43,7 @@ public class BibsonomyScraper {
                     .replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
                     
             URL url = new URL(BIBSONOMY_SCRAPER+entryUrl+BIBSONOMY_SCRAPER_POST);
-            URLDownload ud = new URLDownload(url);
-            ud.setEncoding("UTF8");
-            ud.download();
-            String bibtex = ud.getStringContent();
+            String bibtex = new URLDownload(url).downloadToString("UTF8");
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {

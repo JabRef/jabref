@@ -434,8 +434,7 @@ public class ManageJournalsPanel extends JPanel{
                 if (toName == null)
                     return;
                 else toFile = new File(toName);
-                URLDownload ud = new URLDownload(comp, url, toFile);
-                ud.download();
+                URLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, Globals.lang("Error downloading file '%0'", chosen),

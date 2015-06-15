@@ -15,182 +15,124 @@
 */
 package net.sf.jabref.net;
 
-import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.Globals;
 
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
+import java.net.CookieHandler;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.CookieHandler;
-
-import javax.swing.ProgressMonitorInputStream;
 
 /**
+ * Each call to a public method creates a new HTTP connection. Nothing is cached.
+ *
  * @author Erik Putrycz erik.putrycz-at-nrc-cnrc.gc.ca
+ * @author Simon Harrer
  */
+public class URLDownload {
 
-public class URLDownload {  
-    
-    private URL source;
-    private URLConnection con = null;
-    private File dest;
-    private Component parent;
-    private String mimeType = null;
-    private String content = null;
-    private String encoding = null;
+    public static URLDownload buildMonitoredDownload(final Component component, URL source) {
+        return new URLDownload(source) {
+            @Override
+            protected InputStream monitorInputStream(InputStream in) {
+                return new ProgressMonitorInputStream(component, "Downloading " + this.getSource().toString(), in);
+            }
+        };
+    }
+
+    private final URL source;
 
     /**
-     * URL download to a string. After construction, call download() and then getStringContent().
-     * @param _source The URL to download.
+     * URL download to a string.
+     * <p/>
+     * Example
+     * URLDownload dl = new URLDownload(URL);
+     * String content = dl.downloadToString(ENCODING);
+     * dl.downloadToFile(FILE); // available in FILE
+     * String contentType = dl.determineMimeType();
+     *
+     * @param source The URL to download.
      */
-    public URLDownload(URL _source) {
-        this.source = _source;
-        this.dest = null;
-        this.parent = null;
+    public URLDownload(URL source) {
+        this.source = source;
 
         setCookieHandler();
     }
 
-    /**
-     * URL download to a file. After construction, call download().
-     * @param _parent Parent component.
-     * @param _source The URL to download.
-     * @param _dest The file to download into.
-     */
-    public URLDownload(Component _parent, URL _source, File _dest) {
-        source = _source;
-        dest = _dest;
-        parent = _parent;
-
-        setCookieHandler();
+    public URL getSource() {
+        return source;
     }
 
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-
-    private void setCookieHandler() {
+    private static void setCookieHandler() {
         try {
             // This should set up JabRef to receive cookies properly
-            CookieHandler cm;
-            if ((cm = CookieHandler.getDefault()) == null) {
-                cm = new CookieHandlerImpl();
-                CookieHandler.setDefault(cm);
+            if (CookieHandler.getDefault() == null) {
+                CookieHandler.setDefault(new CookieHandlerImpl());
             }
-        } catch (SecurityException e) {
+        } catch (SecurityException ignored) {
             // Setting or getting the system default cookie handler is forbidden
             // In this case cookie handling is not possible.
         }
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public String determineMimeType() throws IOException {
+        // this does not cause a real performance issue as the underlying HTTP/TCP connection is reused
+        URLConnection urlConnection = openConnection();
+        try {
+            return urlConnection.getContentType();
+        } finally {
+            try {
+                urlConnection.getInputStream().close();
+            } catch (IOException ignored) {
+
+            }
+        }
     }
 
-    public URLConnection getURLConnection() {
-        return con;
+    protected URLConnection openConnection() throws IOException {
+        URLConnection connection = source.openConnection();
+        connection.setRequestProperty("User-Agent", "Jabref");
+        // this does network i/o: GET + read returned headers
+        connection.connect();
+        return connection;
     }
 
     /**
-     * This method can be used after download() has been called, to get the contents
-     * of the download, provided this URLDownload was created with the constructor
-     * that takes no File argument.
+     * Encoding will be determined from "defaultEncoding"
+     *
+     * @return the downloaded string
+     * @throws IOException
      */
-    public String getStringContent() {
-        return content;
+    public String downloadToString() throws IOException {
+        return downloadToString(Globals.prefs.get("defaultEncoding"));
     }
 
-    public void openConnectionOnly() throws IOException {
-        con = source.openConnection();
-        con.setRequestProperty("User-Agent", "Jabref");
-        mimeType = con.getContentType();
-    }
-
-    public void download() throws IOException {
-
-        if (con == null) {
-            con = source.openConnection();
-            con.setRequestProperty("User-Agent", "Jabref");
-            mimeType = con.getContentType();
-        }
-        if (dest != null)
-            downloadToFile();
-        else
-            downloadToString();
-    }
-
-    protected void downloadToString() throws IOException {
-
-    	InputStream input = new BufferedInputStream(con.getInputStream());
+    public String downloadToString(String encoding) throws IOException {
+        InputStream input = new BufferedInputStream(openConnection().getInputStream());
         Writer output = new StringWriter();
 
-        try
-          {
-            copy(input, output);
-          }
-        catch (IOException e)
-          {
+        try {
+            copy(input, output, encoding);
+        } catch (IOException e) {
             e.printStackTrace();
-          }
-        finally
-          {
-            try
-              {
+        } finally {
+            try {
                 input.close();
+            } catch (Exception ignored) {
+            }
+            try {
                 output.close();
-              }
-            catch (Exception ignored)
-              {
-              }
-          }
+            } catch (Exception ignored) {
+            }
+        }
 
-        content = output.toString();
+        return output.toString();
     }
 
-
-    protected void downloadToFile() throws IOException {
-
-    	InputStream input = new BufferedInputStream(con.getInputStream());
-        OutputStream output =  new BufferedOutputStream(new FileOutputStream(dest));
-
-        try
-          {
-            copy(input, output);
-          }
-        catch (IOException e)
-          {
-            e.printStackTrace();
-          }
-        finally
-          {
-            try
-              {
-                input.close();
-                output.close();
-              }
-            catch (Exception ignored)
-              {
-              }
-          }        
-    }
-
-    public void copy(InputStream in, OutputStream out) throws IOException
-      {
-        InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
-        byte[] buffer = new byte[512];
-        while(true)
-        {
-            int bytesRead = _in.read(buffer);
-            if(bytesRead == -1) break;
-            out.write(buffer, 0, bytesRead);
-        }        
-      }
-
-    public void copy(InputStream in, Writer out) throws IOException
-      {
-        InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
-        Reader r = encoding != null ? new InputStreamReader(_in, encoding) :
-                ImportFormatReader.getReaderDefaultEncoding(_in);
+    private void copy(InputStream in, Writer out, String encoding) throws IOException {
+        InputStream monitoredInputStream = monitorInputStream(in);
+        Reader r = new InputStreamReader(monitoredInputStream, encoding);
         BufferedReader read = new BufferedReader(r);
 
         String line;
@@ -198,5 +140,46 @@ public class URLDownload {
             out.write(line);
             out.write("\n");
         }
-      }
+    }
+
+    public void downloadToFile(File destination) throws IOException {
+        InputStream input = new BufferedInputStream(openConnection().getInputStream());
+        OutputStream output = new BufferedOutputStream(new FileOutputStream(destination));
+
+        try {
+            copy(input, output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                input.close();
+            } catch (Exception ignored) {
+            }
+            try {
+                output.close();
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private void copy(InputStream in, OutputStream out) throws IOException {
+        InputStream monitorInputStream = monitorInputStream(in);
+        byte[] buffer = new byte[512];
+        while (true) {
+            int bytesRead = monitorInputStream.read(buffer);
+            if (bytesRead == -1) break;
+            out.write(buffer, 0, bytesRead);
+        }
+    }
+
+    protected InputStream monitorInputStream(InputStream in) {
+        return in;
+    }
+
+    @Override
+    public String toString() {
+        return "URLDownload{" +
+                "source=" + source +
+                '}';
+    }
 }

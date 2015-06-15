@@ -38,15 +38,15 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     final static String URL_START = "http://scholar.google.com";
     final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
     final static String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
-    final static String SEARCH_URL = URL_START+"/scholar?q="+QUERY_MARKER
-            +"&amp;hl=en&amp;btnG=Search";
+    final static String SEARCH_URL = URL_START + "/scholar?q=" + QUERY_MARKER
+            + "&amp;hl=en&amp;btnG=Search";
 
     final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
     final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
     final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    protected HashMap<String,String> entryLinks = new HashMap<String, String>();
+    protected HashMap<String, String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -145,26 +145,18 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     protected void runConfig() throws IOException {
-        String urlQuery;
         try {
-            URL url;
-            URLDownload ud;
-            url = new URL("http://scholar.google.com");
-            ud = new URLDownload(url);
-            ud.download();
-            url = new URL(URL_SETTING);
-            ud = new URLDownload(url);
-            ud.download();
+            new URLDownload(new URL("http://scholar.google.com")).downloadToString();
             //save("setting.html", ud.getStringContent());
-            String settingsPage = ud.getStringContent();
+            String settingsPage = new URLDownload(new URL(URL_SETTING)).downloadToString();
             // Get the form items and their values from the page:
-            HashMap<String,String> formItems = getFormElements(settingsPage);
+            HashMap<String, String> formItems = getFormElements(settingsPage);
             // Override the important ones:
             formItems.put("scis", "yes");
             formItems.put("scisf", "4");
             formItems.put("num", String.valueOf(MAX_ENTRIES_TO_LOAD));
-            StringBuilder ub = new StringBuilder(URL_SETPREFS+"?");
-            for (Iterator<String> i = formItems.keySet().iterator(); i.hasNext();) {
+            StringBuilder ub = new StringBuilder(URL_SETPREFS + "?");
+            for (Iterator<String> i = formItems.keySet().iterator(); i.hasNext(); ) {
                 String name = i.next();
                 ub.append(name).append("=").append(formItems.get(name));
                 if (i.hasNext())
@@ -172,9 +164,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             }
             ub.append("&submit=");
             // Download the URL to set preferences:
-            URL url_setprefs = new URL(ub.toString());
-            ud = new URLDownload(url_setprefs);
-            ud.download();
+            new URLDownload(new URL(ub.toString())).downloadToString();
 
         } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
@@ -182,9 +172,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     /**
-     *
-     * @param query
-     *            The search term to query Google Scholar for.
+     * @param query The search term to query Google Scholar for.
      * @return a list of IDs
      * @throws java.io.IOException
      */
@@ -210,9 +198,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     protected String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
         URL url = new URL(urlQuery);
-        URLDownload ud = new URLDownload(url);
-        ud.download();
-        String cont = ud.getStringContent();
+        String cont = new URLDownload(url).downloadToString();
         //save("query.html", cont);
         Matcher m = BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
@@ -230,14 +216,12 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             if (fS && fE) {
                 if (titleS.end() < titleE.start()) {
                     pText = part.substring(titleS.end(), titleE.start());
-                }
-                else pText = part;
-            }
-            else
+                } else pText = part;
+            } else
                 pText = link;
 
             pText = pText.replaceAll("\\[PDF\\]", "");
-            JLabel preview = new JLabel("<html>"+pText+"</html>");
+            JLabel preview = new JLabel("<html>" + pText + "</html>");
             ids.put(link, preview);
 
             // See if we can extract the link Google Scholar puts on the entry's title.
@@ -260,10 +244,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     protected BibtexEntry downloadEntry(String link) throws IOException {
         try {
-            URL url = new URL(URL_START+link);
-            URLDownload ud = new URLDownload(url);
-            ud.download();
-            String s = ud.getStringContent();
+            URL url = new URL(URL_START + link);
+            String s = new URLDownload(url).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {
@@ -279,31 +261,28 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                         if (storedUrl != null)
                             entry.setField("url", storedUrl);
                     }
-                    
+
                     // Clean up some remaining HTML code from Elsevier(?) papers
                     // Search for: Poincare algebra
                     // to see an example
                     String title = entry.getField("title");
                     if (title != null) {
-                        String newtitle = title.replaceAll("<.?i>([^<]*)</i>","$1");
-                        if(!newtitle.equals(title)) {
-                            entry.setField("title",newtitle);
+                        String newtitle = title.replaceAll("<.?i>([^<]*)</i>", "$1");
+                        if (!newtitle.equals(title)) {
+                            entry.setField("title", newtitle);
                         }
                     }
-                    
+
                     return entry;
-                }
-                else if (entries.size() == 0) {
-                    System.out.println("No entry found! ("+link+")");
+                } else if (entries.size() == 0) {
+                    System.out.println("No entry found! (" + link + ")");
+                    return null;
+                } else {
+                    System.out.println(entries.size() + " entries found! (" + link + ")");
                     return null;
                 }
-                else {
-                    System.out.println(entries.size()+" entries found! ("+link+")");
-                    return null;
-                }
-            }
-            else {
-                System.out.println("Parser failed! ("+link+")");
+            } else {
+                System.out.println("Parser failed! (" + link + ")");
                 return null;
 
             }
@@ -315,18 +294,19 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
 
     static Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
-    public static HashMap<String,String> getFormElements(String page) {
+
+    public static HashMap<String, String> getFormElements(String page) {
         Matcher m = inputPattern.matcher(page);
-        HashMap<String,String> items = new HashMap<String, String>();
+        HashMap<String, String> items = new HashMap<String, String>();
         while (m.find()) {
             String name = m.group(2);
             if ((name.length() > 2) && (name.charAt(0) == '"')
-                    && (name.charAt(name.length()-1) == '"'))
-                name = name.substring(1, name.length()-1);
+                    && (name.charAt(name.length() - 1) == '"'))
+                name = name.substring(1, name.length() - 1);
             String value = m.group(3);
             if ((value.length() > 2) && (value.charAt(0) == '"')
-                    && (value.charAt(value.length()-1) == '"'))
-                value = value.substring(1, value.length()-1);
+                    && (value.charAt(value.length() - 1) == '"'))
+                value = value.substring(1, value.length() - 1);
             items.put(name, value);
         }
         return items;

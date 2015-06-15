@@ -97,16 +97,12 @@ public class FindFullText {
                         // Check the MIME type of this URL to see if it is a PDF. If not,
                         // it could be because the user doesn't have access:
                         try {
-                            URLDownload udl = new URLDownload(null, result, null);
-                            udl.openConnectionOnly();
-
-                            String mimeType = udl.getMimeType();
+                            String mimeType = new URLDownload(result).determineMimeType();
                             if ((mimeType != null) && (mimeType.toLowerCase().equals("application/pdf"))) {
                                 return new FindResult(result, url);
                             }
                             else {
-                                udl = new URLDownload(null, result, new File("page.html"));
-                                udl.download();
+                                new URLDownload(result).downloadToFile(new File("page.html"));
                                 return new FindResult(WRONG_MIME_TYPE, url);
                             }
                         } catch (IOException ex) {

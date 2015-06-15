@@ -169,11 +169,10 @@ public class JSTORFetcher2 implements EntryFetcher {
             String[] numberOfRefs, ImportInspector dialog, OutputPrinter status) throws IOException {
         URL url = new URL(urlQuery);
         URLDownload ud = new URLDownload(url);
-        ud.download();
 
-        String cont = ud.getStringContent();
+        String cont = ud.downloadToString();
         String entirePage = cont;
-        String pageEntire = ud.getStringContent();
+        String pageEntire = cont;
 
         int countOfRefs = 0;
         int refsRequested = 0;
