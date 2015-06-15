@@ -582,7 +582,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //Note: The registration of Apple event is at the end of initialization, because
         //if the events happen too early (ie when the window is not initialized yet), the
         //opened (double-clicked) documents are not displayed.
-        if (System.getProperty("os.name").equals("Mac OS X")) {
+        if (Globals.ON_MAC) {
         	try {
         		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
         		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
