@@ -431,9 +431,9 @@ version=${jabref.version}</echo>
 		</zip>
 	</target>
 	
-	<target name="osxjar" depends="jars" description="creates a bundle made for the Legacy Apple JVM (1.6)">
+	<target name="macbundle_java16" depends="jars" description="creates a bundle made for the Legacy Apple JVM (1.6)">
 		<jarbundler dir="${build.lib}"
-                    name="JabRef_LegacyOSX"
+                    name="JabRef_Java6"
                     mainclass="net.sf.jabref.JabRef"
                     jar="${build.lib}/${build.jar}"
                     icon="${images.dir}/JabRef-Logo.icns"
@@ -446,16 +446,16 @@ version=${jabref.version}</echo>
                           iconFile="${images.dir}/JabRef-Logo.icns"/>
         </jarbundler>
         <!-- After running jarbundler we need to hack the Info.plist file: -->
-        <replace file="${build.lib}/JabRef_LegacyOSX.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
+        <replace file="${build.lib}/JabRef_Java6.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
             value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
    &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
    &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
 		<zip basedir="${build.lib}"
-			destfile="${build.lib}/JabRef-${jabref.version}-LegacyOSX.zip"
-			excludes="JabRef_LegacyOSX.app/Contents/MacOS/JavaApplicationStub"
-			includes="JabRef_LegacyOSX.app/"
+			destfile="${build.lib}/JabRef-${jabref.version}-OSX-Java6.zip"
+			excludes="JabRef_Java6.app/Contents/MacOS/JavaApplicationStub"
+			includes="JabRef_Java6.app/"
 			level="9">
-			<zipfileset dir="${build.lib}" includes="JabRef_LegacyOSX.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
+			<zipfileset dir="${build.lib}" includes="JabRef_Java6.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
 		</zip>
 	</target>
 
@@ -609,8 +609,8 @@ version=${jabref.version}</echo>
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
-	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, osxjar, macbundle" description="creates development snapshot binaries" />
+	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle_java16, macbundle" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, win.installer, non_osx, osxjar, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
-	<target name="release.linux" depends="clean, win.installer.linux, non_osx, osxjar, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, win.installer, non_osx, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, win.installer.linux, non_osx, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>
