@@ -611,6 +611,6 @@ version=${jabref.version}</echo>
 
 	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle_java16, macbundle" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, win.installer, non_osx, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
-	<target name="release.linux" depends="clean, win.installer.linux, non_osx, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, non_osx, win.installer, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>
