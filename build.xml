@@ -188,8 +188,7 @@
 		<copy file="${osxbin.dir}/MacAdapter.class" todir="${build.classes.osx}" />
 	</target>
 
-	<!-- Jars up project -->
-	<target name="jars" depends="build, unjarlib">
+	<target name="jars" depends="build, unjarlib" description="Jars up project">
 		<mkdir dir="${build.lib}" />
 
 		<mkdir dir="${build.tmp}" />
@@ -305,7 +304,6 @@ build=${build.number}
 version=${jabref.version}</echo>
 	</target>
 
-	<!-- Creates javadocs for the extensions -->
 	<target name="extension-javadocs" depends="build" description="Generates the javadocs for the extensions archive">
 		<mkdir dir="${build.extension-javadocs}" />
 		<copy todir="${build.extension-javadocs}">
@@ -334,10 +332,8 @@ version=${jabref.version}</echo>
 		</javadoc>
 	</target>
 
-	<!-- Creates javadocs for the extensions -->
 	<target name="extensions" depends="extension-javadocs" description="Generates the extensions archive">
-		<!-- copy examples -->
-		<copy todir="${build.extensions}">
+		<copy todir="${build.extensions}" description="copy examples">
 			<fileset dir="${java.dir}">
 				<include name="net/sf/jabref/export/layout/format/CurrentDate.java" />
 				<include name="net/sf/jabref/export/layout/format/ToLowerCase.java" />
@@ -355,8 +351,7 @@ version=${jabref.version}</echo>
 				<filter token="version" value="${jabref.version}" />
 			</filterset>
 		</copy>
-		<!-- create extensions-zip file -->
-		<zip destfile="${build.dir}/jabref-extensions.zip">
+		<zip destfile="${build.dir}/jabref-extensions.zip" description="create extensions-zip file">
 			<zipfileset dir="${build.extensions}" prefix="jabref-extensions" />
 		</zip>
 	</target>
@@ -365,8 +360,7 @@ version=${jabref.version}</echo>
 		<delete dir="${build.dir}" />
 	</target>
 
-	<!-- Unpacks jar needed jar files from lib directory into temp directory. -->
-	<target name="unjarlib" description="Unpacks jars from library">
+	<target name="unjarlib" description="Unpacks jars from lib directory into temp directory">
 		<mkdir dir="${build.tmp}" />
 		<unjar dest="${build.tmp}">
 			<fileset refid="jarsFileset" />
@@ -387,8 +381,7 @@ version=${jabref.version}</echo>
 		</condition>
 	</target>
 
-	<!-- This target creates a bundle made for the Oracle Apple JVM (1.7+) --> 
-	<target name="macbundle" depends="java16test, jars" unless="java16">
+	<target name="macbundle" depends="java16test, jars" unless="java16" description="creates a bundle made for the Oracle Apple JVM (1.7+)">
 		<taskdef
 			name="bundleapp"
 			classname="com.oracle.appbundler.AppBundlerTask"
@@ -438,8 +431,7 @@ version=${jabref.version}</echo>
 		</zip>
 	</target>
 	
-	<!-- This target creates a bundle made for the Legacy Apple JVM (1.6) --> 
-	<target name="osxjar" depends="jars">
+	<target name="osxjar" depends="jars" description="creates a bundle made for the Legacy Apple JVM (1.6)">
 		<jarbundler dir="${build.lib}"
                     name="JabRef_LegacyOSX"
                     mainclass="net.sf.jabref.JabRef"
@@ -483,8 +475,7 @@ version=${jabref.version}</echo>
 		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
 	</target>
 
-	<target name="win.installer.step1">
-		<!-- Gather everything that will go into the installer in dist -->
+	<target name="win.installer.step1" description="Gather everything that will go into the installer in dist">
 		<mkdir dir="${win.installer.dir}/dist" />
 
 		<copy file="${build.lib}/${build.jar}" todir="${win.installer.dir}/dist" />
