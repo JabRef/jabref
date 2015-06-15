@@ -59,7 +59,7 @@ public class JabRefPreferences {
             EMACS_23 = "emacsUseV23InsertString",
             EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
             PDF_PREVIEW = "pdfPreview",
-            SHOWONELETTERHEADINGFORICONCOLUMNS = "showOneLetterHeadingForIconColumns",
+            SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS = "showOneLetterHeadingForIconColumns",
             EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings",
             EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA",
             SHORTEST_TO_COMPLETE = "shortestToComplete",
@@ -448,7 +448,7 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
-        defaults.put(SHOWONELETTERHEADINGFORICONCOLUMNS, Boolean.FALSE);
+        defaults.put(SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
 
         defaults.put("useOwner", Boolean.FALSE);
         defaults.put("overwriteOwner", Boolean.FALSE);

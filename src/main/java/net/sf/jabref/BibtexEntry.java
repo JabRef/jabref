@@ -51,6 +51,33 @@ public class BibtexEntry
     public final static String ID_FIELD = "id";
     public static Map<String,String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
     public static Map<String,String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
+
+    static{
+        FieldAliasesOldToNew.put("address", "location");
+        FieldAliasesNewToOld.put("location", "address");
+
+        FieldAliasesOldToNew.put("annote", "annotation");
+        FieldAliasesNewToOld.put("annotation", "annote");
+
+        FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
+        FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
+
+        FieldAliasesOldToNew.put("journal", "journaltitle");
+        FieldAliasesNewToOld.put("journaltitle", "journal");
+
+        FieldAliasesOldToNew.put("key", "sortkey");
+        FieldAliasesNewToOld.put("sortkey", "key");
+
+        FieldAliasesOldToNew.put("pdf", "file");
+        FieldAliasesNewToOld.put("file", "pdf");
+
+        FieldAliasesOldToNew.put("primaryclass", "eprintclass");
+        FieldAliasesNewToOld.put("eprintclass", "primaryclass");
+
+        FieldAliasesOldToNew.put("school", "institution");
+        FieldAliasesNewToOld.put("institution", "school");
+    }
+
     
     private String _id;
     private BibtexEntryType _type;
@@ -60,100 +87,9 @@ public class BibtexEntry
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;
 
-    /** Display name map for entry field names. */
-    private static final Map<String, String> tagDisplayNameMap = new HashMap<String, String>();
-    /** The maximum length of a field name to properly make the alignment of the
-     *  equal sign. */
-    private static final int maxFieldLength;
-    static{
-        // The field name display map.
-        tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
-        tagDisplayNameMap.put("howpublished", "HowPublished");
-        tagDisplayNameMap.put("lastchecked", "LastChecked");
-        tagDisplayNameMap.put("isbn", "ISBN");
-        tagDisplayNameMap.put("issn", "ISSN");
-        tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
 
-        // Looking for the longest field name.
-        // XXX JK: Look for all used field names not only defined once, since
-        //         there may be some unofficial field name used.
-        int max = 0;
-        for (BibtexEntryType t : BibtexEntryType.ALL_TYPES.values()) {
-            if (t.getRequiredFields() != null) {
-                for(String field : t.getRequiredFields()) {
-                    max = Math.max(max, field.length());
-                }
-            }
-            if (t.getOptionalFields() != null) {
-                for(String field : t.getOptionalFields()) {
-                    max = Math.max(max, field.length());
-                }
-            }
-        }
-        maxFieldLength = max;
-        
-        FieldAliasesOldToNew.put("address", "location");
-        FieldAliasesNewToOld.put("location", "address");
-        
-        FieldAliasesOldToNew.put("annote", "annotation");
-        FieldAliasesNewToOld.put("annotation", "annote");
-        
-        FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
-        FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
-        
-        FieldAliasesOldToNew.put("journal", "journaltitle");
-        FieldAliasesNewToOld.put("journaltitle", "journal");
-        
-        FieldAliasesOldToNew.put("key", "sortkey");
-        FieldAliasesNewToOld.put("sortkey", "key");
-        
-        FieldAliasesOldToNew.put("pdf", "file");
-        FieldAliasesNewToOld.put("file", "pdf");
-        
-        FieldAliasesOldToNew.put("primaryclass", "eprintclass");
-        FieldAliasesNewToOld.put("eprintclass", "primaryclass");
-        
-        FieldAliasesOldToNew.put("school", "institution");
-        FieldAliasesNewToOld.put("institution", "school");
-    }
 
-    /**
-     * Get display version of a entry field.
-     *
-     * BibTeX is case-insensitive therefore there is no difference between:
-     * howpublished, HOWPUBLISHED, HowPublished, etc. Since the camel case
-     * version is the most easy to read this should be the one written in the
-     * *.bib file. Since there is no way how do detect multi-word strings by
-     * default the first character will be made uppercase. In other characters
-     * case needs to be changed the {@link #tagDisplayNameMap} will be used. 
-     *
-     * @param field The name of the field.
-     * @return The display version of the field name.
-     */
-	private static String getFieldDisplayName(String field) {
-        if (field.length() == 0) {
-            // hard coded "UNKNOWN" is assigned to a field without any name
-            field = "UNKNOWN";
-        }
 
-        String suffix = "";
-		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES)) {
-			for (int i = maxFieldLength - field.length(); i > 0; i--)
-				suffix += " ";
-		}
-
-		String res;
-		if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME)) {
-			if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
-				res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
-			} else {
-				res = (field.charAt(0)+"").toUpperCase() + field.substring(1) + suffix;
-			}
-		} else {
-			res = field + suffix;
-		}
-		return res;
-	}
 
     public BibtexEntry(){
     	this(Util.createNeutralId());
@@ -551,217 +487,7 @@ public class BibtexEntry
      * isDisplayableField(String).
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
-        switch (Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE)) {
-        case 0:
-            writeSorted(out, ff, write);
-            break;
-        case 1:
-            writeUnsorted(out, ff, write);
-            break;
-        case 2:
-            writeUserOrder(out,ff,write);
-            break;
-        }
-        
-        
-    }
-    
-    
-    /**
-     * user defined order
-     * @param out
-     * @param ff A formatter to filter field contents before writing
-     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
-     * @throws IOException
-     */
-    private void writeUserOrder(Writer out, FieldFormatter ff, boolean write) throws IOException {
-     // Write header with type and bibtex-key.
-        out.write("@"+_type.getName()+"{");
-
-        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
-        boolean hasWritten = false;
-        
-     // Write user defined fields first.
-        String[] s = getUserDefinedFields();
-        if (s != null) {
-            //do not sort, write as it is.
-            for (String value : s) {
-                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
-                    written.put(value, null);
-                }
-            }
-        }
-        
-        // Then write remaining fields in alphabetic order.
-        boolean first = true, previous = true;
-        previous = false;
-        //STA get remaining fields
-        TreeSet<String> remainingFields = new TreeSet<String>();
-        for (String key : _fields.keySet()){
-            //iterate through all fields
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                               BibtexFields.isDisplayableField(key));
-            //find the ones has not been written.
-            if (!written.containsKey(key) && writeIt)
-                       remainingFields.add(key);
-        }
-        //END get remaining fields
-        
-        first = previous;
-        for (String field: remainingFields) {
-            hasWritten = hasWritten | writeField(field, out, ff, hasWritten, hasWritten && first);
-            first = false;
-        }
-
-        // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
-        
-    }
-    
-    /** 
-     * old style ver<=2.9.2, write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
-     * @param out
-     * @param ff A formatter to filter field contents before writing
-     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
-     * @throws IOException
-     */
-    private void writeUnsorted(Writer out, FieldFormatter ff, boolean write) throws IOException {
-        // Write header with type and bibtex-key.
-        out.write("@"+_type.getName().toUpperCase(Locale.US)+"{");
-
-        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
-        boolean hasWritten = false;
-        // Write required fields first.
-        String[] s = getRequiredFields();
-        if (s != null) for (String value : s) {
-            hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
-            written.put(value, null);
-        }
-        // Then optional fields.
-        s = getOptionalFields();
-        if (s != null) for (String value : s) {
-            if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                //writeField(s[i], out, ff);
-                hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
-                written.put(value, null);
-            }
-        }
-        // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<String>();
-        for (String key : _fields.keySet()){
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                               BibtexFields.isDisplayableField(key));
-            if (!written.containsKey(key) && writeIt)
-                       remainingFields.add(key);
-        }
-        for (String field: remainingFields)
-            hasWritten = hasWritten | writeField(field, out, ff, hasWritten,false);
-
-        // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
-    }
-    
-    /**
-     * new style ver>=2.10, sort the field for requiredFields, optionalFields and other fields separately
-     * @param out
-     * @param ff A formatter to filter field contents before writing
-     * @param write True if this is a write, false if it is a display. The write will not include non-writeable fields if it is a write, otherwise non-displayable fields will be ignored. Refer to GUIGlobals for isWriteableField(String) and isDisplayableField(String).
-     * @throws IOException
-     */
-    private void writeSorted(Writer out, FieldFormatter ff, boolean write) throws IOException {
-        // Write header with type and bibtex-key.
-        out.write("@"+_type.getName()+"{");
-
-        String str = Util.shaveString(getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
-        boolean hasWritten = false;
-        // Write required fields first.
-        // Thereby, write the title field first.
-        hasWritten = hasWritten | writeField("title", out, ff, hasWritten, false);
-        written.put("title", null);
-        String[] s = getRequiredFields();
-        if (s != null) {
-            Arrays.sort(s); // Sorting in alphabetic order.
-            for (String value : s) {
-                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, false);
-                    written.put(value, null);
-                }
-            }
-        }
-        // Then optional fields.
-        s = getOptionalFields();
-        boolean first = true, previous = true;
-        previous = false;
-        if (s != null) {
-            Arrays.sort(s); // Sorting in alphabetic order.
-            for (String value : s) {
-                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    //writeField(s[i], out, ff);
-                    hasWritten = hasWritten | writeField(value, out, ff, hasWritten, hasWritten && first);
-                    written.put(value, null);
-                    first = false;
-                    previous = true;
-                }
-            }
-        }
-        // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<String>();
-        for (String key : _fields.keySet()){
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                               BibtexFields.isDisplayableField(key));
-            if (!written.containsKey(key) && writeIt)
-                       remainingFields.add(key);
-        }
-        first = previous;
-        for (String field: remainingFields) {
-            hasWritten = hasWritten | writeField(field, out, ff, hasWritten, hasWritten && first);
-            first = false;
-        }
-
-        // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
-    }
-
-    /**
-     * Write a single field, if it has any content.
-     * @param name The field name
-     * @param out The Writer to send it to
-     * @param ff A formatter to filter field contents before writing
-     * @param isNotFirst Indicates whether this is the first field written for
-     *    this entry - if not, start by writing a comma and newline
-     * @return true if this field was written, false if it was skipped because
-     *    it was not set
-     * @throws IOException In case of an IO error
-     */
-    private boolean writeField(String name, Writer out,
-                            FieldFormatter ff, boolean isNotFirst, boolean isNextGroup) throws IOException {
-        String o = getField(name);
-        if (o != null || Globals.prefs.getBoolean("includeEmptyFields")) {
-            if (isNotFirst)
-                out.write(","+Globals.NEWLINE);
-            if (isNextGroup)
-                out.write(Globals.NEWLINE);
-            out.write("  "+ getFieldDisplayName(name) + " = ");
-
-            try {
-                out.write(ff.format(o, name));
-            } catch (Throwable ex) {
-                throw new IOException
-                    (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
-            }
-            return true;
-        } else
-            return false;
+        new BibtexEntryWriter(ff, write).write(this, out);
     }
 
     /**

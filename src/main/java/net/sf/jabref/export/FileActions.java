@@ -35,24 +35,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.BibtexStringComparator;
-import net.sf.jabref.CrossRefEntryComparator;
-import net.sf.jabref.CustomEntryType;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.FieldComparatorStack;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.IdComparator;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.config.SaveOrderConfig;
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.SortedList;
 
 public class FileActions {
 	
@@ -221,7 +205,7 @@ public class FileActions {
             // sorted as they appear on the screen.
             List<BibtexEntry> sorter = getSortedEntries(database, metaData, null, true);
 
-            FieldFormatter ff = new LatexFieldFormatter();
+            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibtexEntry be : sorter) {
                 exceptionCause = be;
@@ -247,7 +231,7 @@ public class FileActions {
                 }
 
                 if (write) {
-                    be.write(fw, ff, true);
+                    bibtexEntryWriter.write(be, fw);
                     fw.write(Globals.NEWLINE);
                 }
             }
@@ -404,14 +388,11 @@ public class FileActions {
             List<Comparator<BibtexEntry>> comparators = getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
-            BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
-            SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
+            List<BibtexEntry> sorter = new ArrayList<>(bes.length);
+            Collections.addAll(sorter, bes);
+            Collections.sort(sorter, new FieldComparatorStack<BibtexEntry>(comparators));
 
-            if ((bes != null) && (bes.length > 0)) {
-                Collections.addAll(sorter, bes);
-            }
-
-            FieldFormatter ff = new LatexFieldFormatter();
+            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibtexEntry aSorter : sorter) {
                 be = (aSorter);
@@ -424,7 +405,7 @@ public class FileActions {
                     types.put(tp.getName(), tp);
                 }
 
-                be.write(fw, ff, true);
+                bibtexEntryWriter.write(be, fw);
                 fw.write(Globals.NEWLINE);
             }
 
@@ -514,10 +495,8 @@ public class FileActions {
             comparators = getSaveComparators(isSaveOperation, metaData);
         }
 
-        // Use glazed lists to get a sorted view of the entries:
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
-        SortedList<BibtexEntry> sorter = new SortedList<BibtexEntry>(entryList, comparatorStack);
+        List<BibtexEntry> sorter = new ArrayList<>();
 
         if (keySet == null) {
             keySet = database.getKeySet();
@@ -530,6 +509,9 @@ public class FileActions {
                 sorter.add(database.getEntryById((i.next())));
             }
         }
+
+        Collections.sort(sorter, comparatorStack);
+
         return sorter;
     }
 

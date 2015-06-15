@@ -597,8 +597,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             StringWriter sw = new StringWriter(200);
 
             try {
-                LatexFieldFormatter formatter = new LatexFieldFormatter();
-                formatter.setNeverFailOnHashes(true);
+                LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
                 entry.write(sw, formatter, false);
 
                 String srcString = sw.getBuffer().toString();

@@ -132,13 +132,13 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         if (isNumeric) {
             Integer i1 = null, i2 = null;
             try {
-                i1 = Integer.parseInt((String)f1);
+                i1 = Util.intValueOf((String)f1);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
             try {
-                i2 = Integer.parseInt((String)f2);
+                i2 = Util.intValueOf((String) f2);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
