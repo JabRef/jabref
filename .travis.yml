@@ -11,3 +11,5 @@ before_install:
 script:
   - ./gradlew check --info
 
+after_success:
+  - ./gradlew jacocoTestReport coveralls
