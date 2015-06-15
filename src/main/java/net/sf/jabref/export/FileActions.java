@@ -388,7 +388,7 @@ public class FileActions {
             List<Comparator<BibtexEntry>> comparators = getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
-            List<BibtexEntry> sorter = new ArrayList<>(bes.length);
+            List<BibtexEntry> sorter = new ArrayList<BibtexEntry>(bes.length);
             Collections.addAll(sorter, bes);
             Collections.sort(sorter, new FieldComparatorStack<BibtexEntry>(comparators));
 
@@ -496,7 +496,7 @@ public class FileActions {
         }
 
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
-        List<BibtexEntry> sorter = new ArrayList<>();
+        List<BibtexEntry> sorter = new ArrayList<BibtexEntry>();
 
         if (keySet == null) {
             keySet = database.getKeySet();
