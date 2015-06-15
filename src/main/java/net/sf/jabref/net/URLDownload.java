@@ -92,7 +92,7 @@ public class URLDownload {
 
     protected URLConnection openConnection() throws IOException {
         URLConnection connection = source.openConnection();
-        connection.setRequestProperty("User-Agent", "Jabref");
+        connection.setRequestProperty("User-Agent", "JabRef");
         // this does network i/o: GET + read returned headers
         connection.connect();
         return connection;
@@ -178,8 +178,6 @@ public class URLDownload {
 
     @Override
     public String toString() {
-        return "URLDownload{" +
-                "source=" + source +
-                '}';
+        return "URLDownload{" + "source=" + source + '}';
     }
 }
