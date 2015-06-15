@@ -1192,10 +1192,11 @@ public class XMPUtil {
 				// Read from pdf and write as BibTex
 				List<BibtexEntry> l = XMPUtil.readXMP(new File(args[0]));
 
-                for (BibtexEntry e : l) {
+				BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), false);
+
+                for (BibtexEntry entry : l) {
                     StringWriter sw = new StringWriter();
-                    e.write(sw, new LatexFieldFormatter(),
-                            false);
+					bibtexEntryWriter.write(entry, sw);
                     System.out.println(sw.getBuffer().toString());
                 }
 

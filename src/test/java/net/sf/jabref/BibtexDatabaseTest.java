@@ -2,6 +2,8 @@ package net.sf.jabref;
 
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -12,6 +14,16 @@ import static org.junit.Assert.assertEquals;
 
 public class BibtexDatabaseTest {
 
+    @Before
+    public void setup() {
+        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
+    }
+
+    @After
+    public void teardown() {
+        Globals.prefs = null;
+    }
+
     /**
      * Some basic test cases for resolving strings.
      *
@@ -20,6 +32,7 @@ public class BibtexDatabaseTest {
      */
     @Test
     public void testResolveStrings() throws IOException {
+
 
         ParserResult result = BibtexParser.parse(new FileReader("src/test/resources/net/sf/jabref/util/twente.bib"));
 

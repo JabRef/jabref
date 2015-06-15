@@ -250,10 +250,10 @@ public class PluginInstaller {
             }
         }
         File destFile = new File(PluginCore.userPluginDir, destFileName);
-        URLDownload ud = new URLDownload(frame, source, destFile);
+        URLDownload ud = URLDownload.buildMonitoredDownload(frame, source);
 
         try {
-            ud.download();
+            ud.downloadToFile(destFile);
             return SUCCESS;
         } catch (IOException e) {
             e.printStackTrace();

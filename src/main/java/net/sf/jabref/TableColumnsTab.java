@@ -403,7 +403,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 		
         /*** end: special fields ***/
 
-        boolean oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS);
+        boolean oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS);
 		showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
 		tableRows.clear();
@@ -649,7 +649,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     _prefs.putStringArray("listOfFileColumns", new String[] {});
                 }
 		
-		_prefs.putBoolean(JabRefPreferences.SHOWONELETTERHEADINGFORICONCOLUMNS, showOneLetterHeadingForIconColumns.isSelected());
+		_prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());
 
         /*** begin: special fields ***/
         

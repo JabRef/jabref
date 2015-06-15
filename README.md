@@ -1,5 +1,7 @@
 # JabRef 2.11 development version
 
+[![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
 
 This version is a development version. Features may not work as expected.

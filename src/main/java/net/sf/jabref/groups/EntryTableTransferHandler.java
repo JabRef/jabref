@@ -515,7 +515,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 		// System.out.println("Import url: " + dropLink.toString());
 		// System.out.println("Temp file: "+tmpfile.getAbsolutePath());
 
-		new URLDownload(entryTable, dropLink, tmpfile).download();
+		URLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
 
 		// Import into new if entryTable==null, otherwise into current database:
 		ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));

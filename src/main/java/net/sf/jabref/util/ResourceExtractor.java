@@ -49,9 +49,9 @@ public class ResourceExtractor implements Worker {
     }
     
     public void run() {
-        URLDownload ud = new URLDownload(parent, resource, destination);
+        URLDownload ud = URLDownload.buildMonitoredDownload(parent, resource);
         try {
-            ud.download();
+            ud.downloadToFile(destination);
         } catch (IOException ex) {
             Globals.logger("Error extracting resource: "+ex.getMessage());            
         }

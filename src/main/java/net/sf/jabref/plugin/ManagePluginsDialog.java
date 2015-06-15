@@ -230,8 +230,8 @@ public class ManagePluginsDialog {
         try {
             File tmpFile = File.createTempFile("jabref-plugin", ".jar");
             tmpFile.deleteOnExit();
-            URLDownload ud = new URLDownload(frame, url, tmpFile);
-            ud.download();
+            URLDownload ud = URLDownload.buildMonitoredDownload(frame, url);
+            ud.downloadToFile(tmpFile);
             String path = url.getPath();
             int pos = path.lastIndexOf('/');
             if ((pos >= 0) && (pos < path.length()-1))

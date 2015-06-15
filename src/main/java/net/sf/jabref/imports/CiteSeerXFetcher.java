@@ -116,10 +116,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
     protected String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
-        URLDownload ud = new URLDownload(url);
-        ud.download();
-
-        String cont = ud.getStringContent();
+        String cont = new URLDownload(url).downloadToString();
         //System.out.println(cont);
         Matcher m = CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
@@ -138,11 +135,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     protected BibtexEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
-        URLDownload ud = new URLDownload(url);
-        ud.setEncoding("UTF8");
-        ud.download();
-
-        String cont = ud.getStringContent();
+        String cont = new URLDownload(url).downloadToString("UTF8");
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = titlePattern.matcher(cont);

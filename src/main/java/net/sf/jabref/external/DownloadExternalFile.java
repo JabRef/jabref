@@ -15,18 +15,16 @@
 */
 package net.sf.jabref.external;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.net.URLDownload;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -74,7 +72,7 @@ public class DownloadExternalFile {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"),
-                Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -91,20 +89,24 @@ public class DownloadExternalFile {
     public void download(URL url, final DownloadCallback callback) throws IOException {
 
         String res = url.toString();
-        URLDownload udl = null;
+
+
+        String mimeType;
 
         // First of all, start the download itself in the background to a temporary file:
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
+
+        URLDownload udl = URLDownload.buildMonitoredDownload(frame, url);
+
         //long time = System.currentTimeMillis();
         try {
-            udl = new URLDownload(frame, url, tmp);
             // TODO: what if this takes long time?
             // TODO: stop editor dialog if this results in an error:
-            udl.openConnectionOnly(); // Read MIME type
+            mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
-                    + ex.getMessage(), Globals.lang("Download file"),
+            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
+                            + ex.getMessage(), Globals.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
             Globals.logger("Error while downloading " + "'" + res + "'");
             return;
@@ -116,15 +118,15 @@ public class DownloadExternalFile {
             public void run() {
 
                 try {
-                    udlF.download();
+                    udlF.downloadToFile(tmp);
                 } catch (IOException e2) {
                     dontShowDialog = true;
                     if ((editor != null) && (editor.isVisible()))
                         editor.setVisible(false, false);
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL")+": "
-                            + e2.getMessage(), Globals.lang("Download file"),
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
+                                    + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    Globals.logger("Error while downloading " + "'" + urlF.toString()+ "'");
+                    Globals.logger("Error while downloading " + "'" + urlF.toString() + "'");
                     return;
                 }
 
@@ -138,18 +140,17 @@ public class DownloadExternalFile {
         }).start();
 
         ExternalFileType suggestedType = null;
-        if (udl.getMimeType() != null) {
-            System.out.println("mimetype:"+udl.getMimeType());
-            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(udl.getMimeType());
+        if (mimeType != null) {
+            System.out.println("mimetype:" + mimeType);
+            suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
             /*if (suggestedType != null)
                 System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
         if (suggestedType != null) {
-            suffix = suggestedType.getExtension();   
-        }
-        else {
+            suffix = suggestedType.getExtension();
+        } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
             suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
@@ -181,8 +182,8 @@ public class DownloadExternalFile {
                 }
                 if (f.exists()) {
                     return JOptionPane.showConfirmDialog
-                        (frame, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
-                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
+                            (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
+                                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
                             == JOptionPane.OK_OPTION;
                 } else
                     return true;
@@ -199,7 +200,7 @@ public class DownloadExternalFile {
             String dirPrefix;
             if (directory != null) {
                 if (!directory.endsWith(System.getProperty("file.separator")))
-                    dirPrefix = directory+System.getProperty("file.separator");
+                    dirPrefix = directory + System.getProperty("file.separator");
                 else
                     dirPrefix = directory;
             } else
@@ -225,8 +226,7 @@ public class DownloadExternalFile {
             }
 
             tmp.delete();
-        }
-        else {
+        } else {
             // Cancelled. Just delete the temp file:
             if (downloadFinished)
                 tmp.delete();
@@ -237,16 +237,17 @@ public class DownloadExternalFile {
     /**
      * Construct a File object pointing to the file linked, whether the link is
      * absolute or relative to the main directory.
+     *
      * @param directory The main directory.
-     * @param link The absolute or relative link.
+     * @param link      The absolute or relative link.
      * @return The expanded File.
      */
     private File expandFilename(String directory, String link) {
         File toFile = new File(link);
         // If this is a relative link, we should perhaps append the directory:
-        String dirPrefix = directory+System.getProperty("file.separator");
+        String dirPrefix = directory + System.getProperty("file.separator");
         if (!toFile.isAbsolute()) {
-            toFile = new File(dirPrefix+link);
+            toFile = new File(dirPrefix + link);
         }
         return toFile;
     }
@@ -263,7 +264,7 @@ public class DownloadExternalFile {
     }
 
     public String getSuggestedFileName(String suffix) {
-        
+
         String plannedName = bibtexKey;
         if (suffix.length() > 0)
             plannedName += "." + suffix;
@@ -296,8 +297,8 @@ public class DownloadExternalFile {
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < link.length()-1)) {
-                strippedLink = link.substring(0, link.length()-url.getQuery().length()-1);
+            if ((url.getQuery() != null) && (url.getQuery().length() < link.length() - 1)) {
+                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
         } catch (MalformedURLException e) {
             // Don't report this error, since this getting the suffix is a non-critical
@@ -311,8 +312,7 @@ public class DownloadExternalFile {
         else suffix = strippedLink.substring(index + 1);
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
-        }
-        else {
+        } else {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             index = link.lastIndexOf('.');
@@ -324,9 +324,8 @@ public class DownloadExternalFile {
                     return "";
                 else
                     return suffix; // return the first one we found, anyway.
-            }
-            else {
-                 // Check if there are path separators in the suffix - if so, it is definitely
+            } else {
+                // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
                 if (link.substring(index + 1).indexOf('/') > 0)
                     return "";

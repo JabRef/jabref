@@ -326,9 +326,8 @@ public class ExternalFilePanel extends JPanel {
 
 					URL url = new URL(res);
 
-					URLDownload udl = new URLDownload(parent, url, file);
 					try {
-						udl.download();
+						URLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
 					} catch (IOException e2) {
 						JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL")+": "
 							+ e2.getMessage(), Globals.lang("Download file"),

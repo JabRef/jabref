@@ -65,10 +65,11 @@ public class SendAsEMailAction extends AbstractWorker {
 		BibtexEntry[] bes = panel.getSelectedEntries();
 
 		// write the entries using sw, which is used later to form the email content
-		LatexFieldFormatter ff = new LatexFieldFormatter();
+		BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+
 		for (BibtexEntry entry: bes) {
 		    try {
-                entry.write(sw, ff, true);
+				bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {
                 e.printStackTrace();
             }

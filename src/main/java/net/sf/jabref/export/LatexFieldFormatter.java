@@ -15,29 +15,46 @@
 */
 package net.sf.jabref.export;
 
+import net.sf.jabref.*;
+
 import java.util.Vector;
 
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
-
 public class LatexFieldFormatter implements FieldFormatter {
+
+    public static LatexFieldFormatter buildIgnoreHashes() {
+        return new LatexFieldFormatter(true);
+    }
 
     StringBuffer sb;
     int col; // First line usually starts about so much further to the right.
     final int STARTCOL = 4;
-    private boolean neverFailOnHashes = false;
 
-    public void setNeverFailOnHashes(boolean neverFailOnHashes) {
+    private final boolean neverFailOnHashes;
+
+    private final boolean resolveStringsAllFields;
+    private final char valueDelimitersZero;
+    private final char valueDelimitersOne;
+    private final boolean writefieldWrapfield;
+    private final String[] doNotResolveStringsFors;
+
+    public LatexFieldFormatter() {
+        this(true);
+    }
+
+    private LatexFieldFormatter(boolean neverFailOnHashes) {
         this.neverFailOnHashes = neverFailOnHashes;
+
+        this.resolveStringsAllFields = Globals.prefs.getBoolean("resolveStringsAllFields");
+        valueDelimitersZero = Globals.prefs.getValueDelimiters(0);
+        valueDelimitersOne = Globals.prefs.getValueDelimiters(1);
+        doNotResolveStringsFors = Globals.prefs.getStringArray("doNotResolveStringsFor");
+        writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
     }
 
     public String format(String text, String fieldName)
             throws IllegalArgumentException {
-        if (text == null) return Globals.prefs.getValueDelimiters(0)
-                + "" + Globals.prefs.getValueDelimiters(1);
+
+        if (text == null) return valueDelimitersZero + "" + valueDelimitersOne;
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
             text = Util.putBracesAroundCapitals(text);
@@ -53,9 +70,10 @@ public class LatexFieldFormatter implements FieldFormatter {
         // If the field is non-standard, we will just append braces,
         // wrap and write.
         boolean resolveStrings = true;
-        if (Globals.prefs.getBoolean("resolveStringsAllFields")) {
+        if (resolveStringsAllFields) {
             // Resolve strings for all fields except some:
-            String[] exceptions = Globals.prefs.getStringArray("doNotResolveStringsFor");
+
+            String[] exceptions = doNotResolveStringsFors;
             for (String exception : exceptions) {
                 if (exception.equals(fieldName)) {
                     resolveStrings = false;
@@ -86,24 +104,26 @@ public class LatexFieldFormatter implements FieldFormatter {
                 throw new IllegalArgumentException("Curly braces { and } must be balanced.");
 
             sb = new StringBuffer(
-                    Globals.prefs.getValueDelimiters(0) + "");
+                    valueDelimitersZero + "");
             // No formatting at all for these fields, to allow custom formatting?
 //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
 //              sb.append(text);
 //            else
 //             currently, we do not do any more wrapping
-            if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD)&&!Globals.prefs.isNonWrappableField(fieldName))
+            if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName))
                 sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
             else
                 sb.append(text);
 
-            sb.append(Globals.prefs.getValueDelimiters(1));
+            sb.append(valueDelimitersOne);
 
             return sb.toString();
         }
 
         sb = new StringBuffer();
-        int pivot = 0, pos1, pos2;
+        int pivot = 0;
+        int pos1;
+        int pos2;
         col = STARTCOL;
         // Here we assume that the user encloses any bibtex strings in #, e.g.:
         // #jan# - #feb#
@@ -156,10 +176,10 @@ public class LatexFieldFormatter implements FieldFormatter {
         }
 
         // currently, we do not add newlines and new formatting
-        if (Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD)&&!Globals.prefs.isNonWrappableField(fieldName)) {
+        if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
 //             introduce a line break to be read at the parser
-             return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
-             
+            return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+
         } else
             return sb.toString();
 
@@ -171,7 +191,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
-        sb.append(Globals.prefs.getValueDelimiters(0));
+        sb.append(valueDelimitersZero);
         boolean escape = false, inCommandName = false, inCommand = false,
                 inCommandOption = false;
         int nestedEnvironments = 0;
@@ -236,7 +256,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 sb.append(c);
             escape = (c == '\\');
         }
-        sb.append(Globals.prefs.getValueDelimiters(1));
+        sb.append(valueDelimitersOne);
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
