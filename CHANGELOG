@@ -1,4 +1,6 @@
 [master]
+    - New MacOSX integration
+    - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
     - Fix for bug #1278 Crash after changing LookAndFeel (showing a proper error message if L&F is not available)
     - Adds some predefined look and feels in preference window (lists only available L&Fs)
     - Fixes #1131: MacOSX: JabRef minimizes when clicking on x
