@@ -12,6 +12,7 @@
     - Opening a file using the CLI works again. Just use the filename as parameter, without any command.
     - Emacs keybindings: CTRL+f is not rebound as CTRL+f is more often used for "search"
     - Performance Improvement: Saving of large databases is dramatically faster
+    - When a syntax error in the BibTeX source panel is made, the error cause is now always output
     - Jars that are available in maven are now downloaded and used in both ant and gradle
     - Replaced option parsing library ritopt with apache commons-cli which is in maven repository
     - BREAKING passing an option file to the cli command no longer works due to change of internal cli library!
