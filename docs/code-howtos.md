@@ -1,5 +1,11 @@
 This page provides some development support in the form of howtos. 
 
+# Logging
+
+JabRef uses Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html).
+The plugin framework uses [apache.commons.logging](http://commons.apache.org/proper/commons-logging/).
+We intend to switch to [slf4j](http://slf4j.org/).
+
 # Drag and Drop
 
 net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor sets an TransferHandler inherited from FileListEditorTransferHandler. There, at importData, an DroppedFileHandler is instantiated and handleDroppedfile called. 
