@@ -14,9 +14,9 @@ public class JabRefCLITest {
         JabRefCLI cli = new JabRefCLI(new String[]{"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals("[]", Arrays.toString(cli.getLeftOver()));
-        assertEquals("some/file", cli.importFile.getStringValue());
+        assertEquals("some/file", cli.getFileImport());
         assertTrue(cli.isDisableGui());
-        assertEquals("some/export/file", cli.exportFile.getStringValue());
+        assertEquals("some/export/file", cli.getFileExport());
     }
 
     @Test
@@ -24,9 +24,9 @@ public class JabRefCLITest {
         JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals("[]", Arrays.toString(cli.getLeftOver()));
-        assertEquals("some/file", cli.importFile.getStringValue());
+        assertEquals("some/file", cli.getFileImport());
         assertTrue(cli.isDisableGui());
-        assertEquals("some/export/file", cli.exportFile.getStringValue());
+        assertEquals("some/export/file", cli.getFileExport());
     }
 
 }

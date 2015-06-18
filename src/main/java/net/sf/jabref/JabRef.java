@@ -194,7 +194,13 @@ public class JabRef {
             //System.out.println(getCurrentProcessExplicitAppUserModelID());
         }
 
-		openWindow(processArguments(args, true));
+        Vector<ParserResult> loaded = processArguments(args, true);
+
+        if (graphicFailure || cli.isDisableGui() || cli.isShowVersion()) {
+            System.exit(0);
+        }
+
+		openWindow(loaded);
 	}
     
     // Do not use this code in release version, it contains some memory leaks
@@ -235,25 +241,15 @@ public class JabRef {
         cli = new JabRefCLI(args);
 
         if (initialStartup && cli.isShowVersion()) {
-            cli.options.displayVersion();
-            cli.disableGui.setInvoked(true);
+            cli.displayVersion();
         }
 
         if (initialStartup && cli.isHelp()) {
-            System.out.println("jabref [options] [bibtex-file]\n");
-            System.out.println(cli.getHelp());
-
-            String importFormats = Globals.importFormatReader.getImportFormatList();
-            System.out.println(Globals.lang("Available import formats") + ":\n"
-                + importFormats);
-
-            String outFormats = ExportFormats.getConsoleExportList(70, 20, "\t");
-            System.out.println(Globals.lang("Available export formats") + ": " + outFormats
-                + ".");
+            cli.printUsage();
             System.exit(0);
         }
         
-        boolean commandmode = cli.isDisableGui() || cli.fetcherEngine.isInvoked();
+        boolean commandmode = cli.isDisableGui() || cli.isFetcherEngine();
         
         // First we quickly scan the command line parameters for any that signal
         // that the GUI
@@ -270,8 +266,8 @@ public class JabRef {
         }
 
         // Check if we should reset all preferences to default values:
-        if (cli.defPrefs.isInvoked()) {
-            String value = cli.defPrefs.getStringValue();
+        if (cli.isPreferencesReset()) {
+            String value = cli.getPreferencesReset();
             if (value.trim().equals("all")) {
                 try {
                     System.out.println(Globals.lang("Setting all preferences to default values."));
@@ -295,9 +291,9 @@ public class JabRef {
         }
 
         // Check if we should import preferences from a file:
-        if (cli.importPrefs.isInvoked()) {
+        if (cli.isPreferencesImport()) {
             try {
-                Globals.prefs.importPreferences(cli.importPrefs.getStringValue());
+                Globals.prefs.importPreferences(cli.getPreferencesImport());
                 BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
             }
@@ -345,8 +341,8 @@ public class JabRef {
             }
         }
 
-        if (!cli.isBlank() && cli.importFile.isInvoked()) {
-            toImport.add(cli.importFile.getStringValue());
+        if (!cli.isBlank() && cli.isFileImport()) {
+            toImport.add(cli.getFileImport());
         }
 
         for (String filenameString : toImport) {
@@ -355,22 +351,22 @@ public class JabRef {
 				loaded.add(pr);
 		}
 
-        if (!cli.isBlank() && cli.importToOpenBase.isInvoked()) {
-            ParserResult res = importToOpenBase(cli.importToOpenBase.getStringValue());
+        if (!cli.isBlank() && cli.isImportToOpenBase()) {
+            ParserResult res = importToOpenBase(cli.getImportToOpenBase());
             if (res != null)
                 loaded.add(res);
         }
 
-        if (!cli.isBlank() && cli.fetcherEngine.isInvoked()) {
-            ParserResult res = fetch(cli.fetcherEngine.getStringValue());
+        if (!cli.isBlank() && cli.isFetcherEngine()) {
+            ParserResult res = fetch(cli.getFetcherEngine());
             if (res != null)
                 loaded.add(res);
         }
 
 
-        if(cli.exportMatches.isInvoked()) {
+        if(cli.isExportMatches()) {
             if (loaded.size() > 0) {
-                String[] data = cli.exportMatches.getStringValue().split(",");
+                String[] data = cli.getExportMatches().split(",");
                 String searchTerm = data[0].replace("\\$"," "); //enables blanks within the search term:
                                                                 //? stands for a blank
                 ParserResult pr =
@@ -397,7 +393,7 @@ public class JabRef {
 		                	break;
 		                }
 		                default:{
-		                	System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.exportMatchesSyntax);
+		                	System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
 		                	System.exit(0);
 		                }
 	                } //end switch
@@ -425,9 +421,9 @@ public class JabRef {
         } //end exportMatches invoked 
 
 
-        if (cli.exportFile.isInvoked()) {
+        if (cli.isFileExport()) {
             if (loaded.size() > 0) {
-                String[] data = cli.exportFile.getStringValue().split(",");
+                String[] data = cli.getFileExport().split(",");
 
                 if (data.length == 1) {
                     // This signals that the latest import should be stored in BibTeX
@@ -494,21 +490,21 @@ public class JabRef {
 
         //Util.pr(": Finished export");
 
-        if (cli.exportPrefs.isInvoked()) {
+        if (cli.isPreferencesExport()) {
             try {
-                Globals.prefs.exportPreferences(cli.exportPrefs.getStringValue());
+                Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (IOException ex) {
                 Util.pr(ex.getMessage());
             }
         }
 
 
-        if (!cli.isBlank() && cli.auxImExport.isInvoked()) {
+        if (!cli.isBlank() && cli.isAuxImport()) {
             boolean usageMsg = false;
 
             if (loaded.size() > 0) // bibtex file loaded
              {
-                String[] data = cli.auxImExport.getStringValue().split(",");
+                String[] data = cli.getAuxImport().split(",");
 
                 if (data.length == 2) {
                     ParserResult pr = loaded.firstElement();
@@ -679,7 +675,6 @@ public class JabRef {
     }
 
 	public void openWindow(Vector<ParserResult> loaded) {
-        if (!graphicFailure && !cli.isDisableGui()) {
             // Call the method performCompatibilityUpdate(), which does any
             // necessary changes for users with a preference set from an older
             // Jabref version.
@@ -872,8 +867,6 @@ public class JabRef {
                 jrf.tabbedPane.setSelectedIndex(0);
                 new FocusRequester(((BasePanel) jrf.tabbedPane.getComponentAt(0)).mainTable);
             }
-        } else
-            System.exit(0);
     }
 
     /**
