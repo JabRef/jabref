@@ -84,7 +84,10 @@ dependencies {
     // not available in maven repository
     compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
-    compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
+    compile 'com.sun.jersey:jersey-client:1.14'
+    compile 'com.sun.jersey:jersey-core:1.14'
+    compile 'com.sun.jersey.contribs:jersey-multipart:1.14'
+
     compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
 
     compile 'junit:junit:4.12'
@@ -94,6 +97,8 @@ dependencies {
 
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
+// add jars from this classpath to the classpath for the ant build
+ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
 
 sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
