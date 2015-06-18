@@ -20,6 +20,11 @@ Project: ANTLR
 URL:     http://www.antlr.org/
 License: BSD
 
+Id:      commons-cli:commons-cli
+Project: Apache Commons CLI
+URL:     http://commons.apache.org/cli/
+License: Apache 2.0
+
 Id:      commons-logging:commons-logging
 Project: Apache Commongs Logging
 URL:     http://commons.apache.org/logging/
@@ -147,11 +152,6 @@ Path:    lib/plugin/velocity-dep-1.5.jar
 Project: Apache Velocity
 URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
 License: Apache 2.0
-
-Path:    lib/ritopt/ritopt-0.2.1-bin.jar
-Project: ritopt
-URL:     http://ritopt.sourceforge.net/download.shtml
-License: GPLv2+
 
 Path:    lib/spl/sciplore/mrDlib-serialization-api.jar
 Project: Mr. DLib
