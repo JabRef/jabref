@@ -40,9 +40,7 @@ The "old" trackers at sourceforge still remain intact:
 
 Do *not* file patches using https://sourceforge.net/p/jabref/patches/.
 Just fork JabRef and create a pull request.
-
-For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful. It contains steps to get start with JabRef development.
-
+For details see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Next Steps
 
