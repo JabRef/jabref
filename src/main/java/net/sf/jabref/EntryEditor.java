@@ -75,6 +75,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
@@ -817,7 +818,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     /**
      * Returns false if the contents of the source panel has not been validated,
-     * true othervise.
+     * true otherwise.
      */
     public boolean lastSourceAccepted() {
         if (tabbed.getSelectedComponent() == srcPanel)
@@ -835,13 +836,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         BibtexParser bp = new BibtexParser(new java.io.StringReader(source.getText()));
 
         try {
-            BibtexDatabase db = bp.parse().getDatabase();
+            ParserResult parserResult = bp.parse();
+            BibtexDatabase db = parserResult.getDatabase();
 
             if (db.getEntryCount() > 1)
                 throw new Exception("More than one entry found.");
 
-            if (db.getEntryCount() < 1)
-                throw new Exception("No entries found.");
+            if (db.getEntryCount() < 1) {
+                if (parserResult.hasWarnings()) {
+                    // put the warning into as exception text -> it will be displayed to the user
+                    throw new Exception(parserResult.warnings()[0]);
+                } else {
+                    throw new Exception("No entries found.");
+                }
+            }
 
             NamedCompound compound = new NamedCompound(Globals.lang("source edit"));
             BibtexEntry nu = db.getEntryById(db.getKeySet().iterator().next());
