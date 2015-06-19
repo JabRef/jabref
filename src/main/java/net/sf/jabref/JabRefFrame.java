@@ -750,9 +750,77 @@ public JabRefPreferences prefs() {
   return prefs;
 }
 
-  // General info dialog.  The MacAdapter calls this method when "Quit"
-  // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
-  // The function returns a boolean indicating if quitting is ok or not.
+/**
+ * Tears down all things started by JabRef
+ * 
+ * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
+ * 
+ * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is set to true
+ */
+  private void tearDownJabRef(Vector<String> filenames) {
+      dispose();
+
+      if (basePanel() != null)
+        basePanel().saveDividerLocation();
+      prefs.putInt("posX", JabRefFrame.this.getLocation().x);
+      prefs.putInt("posY", JabRefFrame.this.getLocation().y);
+      prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
+      prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
+      //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
+      prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
+      
+      prefs.putBoolean("toolbarVisible", tlb.isVisible());
+      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
+      // Store divider location for side pane:
+      int width = contentPane.getDividerLocation();
+      if (width > 0) 
+          prefs.putInt("sidePaneWidth", width);
+      if (prefs.getBoolean("openLastEdited")) {
+        // Here we store the names of all current files. If
+        // there is no current file, we remove any
+        // previously stored file name.
+        if (filenames.size() == 0) {
+          prefs.remove("lastEdited");
+        }
+        else {
+          String[] names = new String[filenames.size()];
+          for (int i = 0; i < filenames.size(); i++) {
+            names[i] = filenames.elementAt(i);
+          }
+          prefs.putStringArray("lastEdited", names);
+        }
+
+      }
+
+      fileHistory.storeHistory();
+      prefs.customExports.store();
+      prefs.customImports.store();
+      BibtexEntryType.saveCustomEntryTypes(prefs);
+
+      // Clear autosave files:
+      if (Globals.autoSaveManager != null)
+        Globals.autoSaveManager.clearAutoSaves();
+
+      // Let the search interface store changes to prefs.
+      // But which one? Let's use the one that is visible.
+      if (basePanel() != null) {
+        (searchManager).updatePrefs();
+      }
+      
+      prefs.flush();
+  }
+  
+  /**
+    * General info dialog.  The MacAdapter calls this method when "Quit"
+    * is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
+    * The function returns a boolean indicating if quitting is ok or not.
+    * 
+    * Non-OSX JabRef calls this when choosing "Quit" from the menu
+    * 
+    * SIDE EFFECT: tears down JabRef
+    * 
+    * @return true if the user chose to quit; false otherwise
+    */
   public boolean quit() {
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
@@ -815,57 +883,7 @@ public JabRefPreferences prefs() {
       }
 
 
-      dispose();
-
-      if (basePanel() != null)
-        basePanel().saveDividerLocation();
-      prefs.putInt("posX", JabRefFrame.this.getLocation().x);
-      prefs.putInt("posY", JabRefFrame.this.getLocation().y);
-      prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
-      prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-      //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
-      prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
-      
-      prefs.putBoolean("toolbarVisible", tlb.isVisible());
-      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
-      // Store divider location for side pane:
-      int width = contentPane.getDividerLocation();
-      if (width > 0) 
-          prefs.putInt("sidePaneWidth", width);
-      if (prefs.getBoolean("openLastEdited")) {
-        // Here we store the names of allcurrent filea. If
-        // there is no current file, we remove any
-        // previously stored file name.
-        if (filenames.size() == 0) {
-          prefs.remove("lastEdited");
-        }
-        else {
-          String[] names = new String[filenames.size()];
-          for (int i = 0; i < filenames.size(); i++) {
-            names[i] = filenames.elementAt(i);
-          }
-          prefs.putStringArray("lastEdited", names);
-        }
-
-      }
-
-      fileHistory.storeHistory();
-      prefs.customExports.store();
-      prefs.customImports.store();
-      BibtexEntryType.saveCustomEntryTypes(prefs);
-
-      // Clear autosave files:
-      if (Globals.autoSaveManager != null)
-        Globals.autoSaveManager.clearAutoSaves();
-
-      // Let the search interface store changes to prefs.
-      // But which one? Let's use the one that is visible.
-      if (basePanel() != null) {
-        (searchManager).updatePrefs();
-      }
-      
-      prefs.flush();
-
+      tearDownJabRef(filenames);
       return true;
     }
     
@@ -1831,7 +1849,11 @@ public JabRefPreferences prefs() {
     }
 
     public void actionPerformed(ActionEvent e) {
-      quit();
+      if (quit()) {
+          // FIXME: tearDownJabRef() does not cancel all threads. Therefore, some threads remain running and prevent JabRef from beeing unloaded completely
+          // QUICKHACK: finally tear down all existing threads
+          System.exit(0);
+      }
     }
   }
 
@@ -2322,7 +2344,7 @@ class SaveSessionAction
     }
 
     public void actionPerformed(ActionEvent e) {
-      // Here we store the names of allcurrent filea. If
+      // Here we store the names of all current files. If
       // there is no current file, we remove any
       // previously stored file name.
       Vector<String> filenames = new Vector<String>();
