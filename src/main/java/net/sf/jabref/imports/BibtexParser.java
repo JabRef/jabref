@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2003-06 David Weitzman, Nizar N. Batada, Morten O. Alver, Christopher Oezbek
+ Copyright (C) 2015 Oliver Kopp
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -36,8 +37,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.jabref.*;
+import net.sf.jabref.collab.FileUpdateMonitor;
 
 /**
  * Class for importing BibTeX-files.
@@ -61,6 +65,8 @@ import net.sf.jabref.*;
  */
 public class BibtexParser {
 	
+	private static final Logger logger = Logger.getLogger(BibtexParser.class.getName());
+	
 	private PushbackReader _in;
 
 	private BibtexDatabase _db;
@@ -77,7 +83,7 @@ public class BibtexParser {
 	
 	private static final Integer LOOKAHEAD = 64;
 
-	private final boolean autoDoubleBraces = Globals.prefs.getBoolean("autoDoubleBraces");
+	private final boolean autoDoubleBraces;
 
 	public BibtexParser(Reader in) {
 
@@ -87,6 +93,7 @@ public class BibtexParser {
 		if (Globals.prefs == null) {
 			Globals.prefs = JabRefPreferences.getInstance();
 		}
+		autoDoubleBraces = Globals.prefs.getBoolean("autoDoubleBraces");
 		_in = new PushbackReader(in, LOOKAHEAD);
 	}
 
@@ -362,7 +369,7 @@ public class BibtexParser {
 								+ Globals.lang("grouping may not work for this entry") + ")");
 						}
 					} catch (IOException ex) {
-						ex.printStackTrace();
+						logger.log(Level.WARNING, ex.getMessage(), ex);
 						_pr.addWarning(Globals.lang("Error occured when parsing entry") + ": '"
 							+ ex.getMessage() + "'. " + Globals.lang("Skipped entry."));
 

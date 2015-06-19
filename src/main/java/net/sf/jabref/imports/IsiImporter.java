@@ -24,11 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.util.CaseChangers;
 
 /**
@@ -354,18 +350,19 @@ public class IsiImporter extends ImportFormat {
 
 		String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
-            if (Globals.MONTH_STRINGS.containsKey(part1.toLowerCase())) {
-                return "#" + part1.toLowerCase() + "#";
+            MonthUtil.Month month = MonthUtil.getMonthByShortName(part1.toLowerCase());
+            if (month.isValid()) {
+                return month.bibtexFormat;
             }
         }
 
 		// Try two digit month
         for (String part : parts) {
-            int number;
             try {
-                number = Integer.parseInt(part);
-                if (number >= 1 && number <= 12) {
-                    return "#" + Globals.MONTHS[number - 1] + "#";
+                int number = Integer.parseInt(part);
+                MonthUtil.Month month = MonthUtil.getMonthByNumber(number);
+                if (month.isValid()) {
+                    return month.bibtexFormat;
                 }
             } catch (NumberFormatException ignored) {
 

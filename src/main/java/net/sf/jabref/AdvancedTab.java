@@ -50,7 +50,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JLabel lab;
     JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac, filechooserDisableRename,
             useIEEEAbrv, biblatexMode;
-	JComboBox className;
+    JComboBox className;
     JTextField remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -99,7 +99,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     }
     className = new JComboBox(lookAndFeels.toArray(new String[lookAndFeels.size()]));
     className.setEditable(true);
-		final JComboBox clName = className;
+    final JComboBox clName = className;
     useDefault.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
             clName.setEnabled(((JCheckBox)e.getSource()).isSelected());

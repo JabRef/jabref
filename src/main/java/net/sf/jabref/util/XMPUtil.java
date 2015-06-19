@@ -316,8 +316,7 @@ public class XMPUtil {
 			if (c != null) {
 				entry.setField("year", String.valueOf(c.get(Calendar.YEAR)));
 				if (date.length() > 4) {
-					entry.setField("month", "#"
-							+ Globals.MONTHS[c.get(Calendar.MONTH)] + "#");
+					entry.setField("month", MonthUtil.getMonthByIndex(c.get(Calendar.MONTH)).bibtexFormat);
 				}
 			}
 		}

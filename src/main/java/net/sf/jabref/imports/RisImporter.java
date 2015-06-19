@@ -23,11 +23,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -180,10 +176,11 @@ public class RisImporter extends ImportFormat {
                         hm.put("year", parts[0]);
                         if ((parts.length > 1) && (parts[1].length() > 0)) {
                             try {
-                                int month = Integer.parseInt(parts[1]);
-                                if ((month > 0) && (month <= 12)) {
-                                    //System.out.println(Globals.MONTHS[month-1]);
-                                    hm.put("month", "#" + Globals.MONTHS[month - 1] + "#");
+
+                                int monthNumber = Integer.parseInt(parts[1]);
+                                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
+                                if (month.isValid()) {
+                                    hm.put("month", month.bibtexFormat);
                                 }
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.

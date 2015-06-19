@@ -29,12 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -217,10 +212,11 @@ public class OAI2Fetcher implements EntryFetcher {
             
             if (key.matches("\\d\\d\\d\\d\\..*")){
                 be.setField("year", "20" + key.substring(0,2));
-                
-                int month = Integer.parseInt(key.substring(2,4));
-                if (month >= 1 && month <= 12){
-                    be.setField("month", "#" + Globals.MONTHS[month - 1] + "#");
+
+                int monthNumber = Integer.parseInt(key.substring(2,4));
+                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
+                if (month.isValid()) {
+                    be.setField("month", month.bibtexFormat);
                 }
             }
             

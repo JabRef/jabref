@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -582,7 +582,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //Note: The registration of Apple event is at the end of initialization, because
         //if the events happen too early (ie when the window is not initialized yet), the
         //opened (double-clicked) documents are not displayed.
-        macOSXRegistration();
+        if (Globals.ON_MAC) {
+        	try {
+        		Class<? > macreg = Class.forName("osx.macadapter.MacAdapter"); 
+        		Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
+        		method.invoke(macreg.newInstance(), this);
+        	}
+        	catch (Exception e) {
+        		System.err.println("Exception ("+e.getClass().toString()+"): "+e.getMessage());
+        	}
+        }
     }
 
     public void setWindowTitle() {
@@ -635,7 +644,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             sidePaneManager.show("search");
     }
 
-    // The OSXAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+    // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
     public void openAction(String filePath) {
     	File file = new File(filePath);
     	
@@ -675,7 +684,7 @@ AboutAction aboutAction = new AboutAction();
   }
 
 
-  // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
+  // General info dialog.  The MacAdapter calls this method when "About"
   // is selected from the application menu.
   public void about() {
     JDialog about = new JDialog(JabRefFrame.this, Globals.lang("About JabRef"),
@@ -713,7 +722,7 @@ AboutAction aboutAction = new AboutAction();
 
   }
 
-  // General preferences dialog.  The OSXAdapter calls this method when "Preferences..."
+  // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
   // is selected from the application menu.
   public void preferences() {
     //PrefsDialog.showPrefsDialog(JabRefFrame.this, prefs);
@@ -741,9 +750,78 @@ public JabRefPreferences prefs() {
   return prefs;
 }
 
-  // General info dialog.  The OSXAdapter calls this method when "Quit OSXAdapter"
-  // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
-  public void quit() {
+/**
+ * Tears down all things started by JabRef
+ * 
+ * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
+ * 
+ * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is set to true
+ */
+  private void tearDownJabRef(Vector<String> filenames) {
+      dispose();
+
+      if (basePanel() != null)
+        basePanel().saveDividerLocation();
+      prefs.putInt("posX", JabRefFrame.this.getLocation().x);
+      prefs.putInt("posY", JabRefFrame.this.getLocation().y);
+      prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
+      prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
+      //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
+      prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
+      
+      prefs.putBoolean("toolbarVisible", tlb.isVisible());
+      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
+      // Store divider location for side pane:
+      int width = contentPane.getDividerLocation();
+      if (width > 0) 
+          prefs.putInt("sidePaneWidth", width);
+      if (prefs.getBoolean("openLastEdited")) {
+        // Here we store the names of all current files. If
+        // there is no current file, we remove any
+        // previously stored file name.
+        if (filenames.size() == 0) {
+          prefs.remove("lastEdited");
+        }
+        else {
+          String[] names = new String[filenames.size()];
+          for (int i = 0; i < filenames.size(); i++) {
+            names[i] = filenames.elementAt(i);
+          }
+          prefs.putStringArray("lastEdited", names);
+        }
+
+      }
+
+      fileHistory.storeHistory();
+      prefs.customExports.store();
+      prefs.customImports.store();
+      BibtexEntryType.saveCustomEntryTypes(prefs);
+
+      // Clear autosave files:
+      if (Globals.autoSaveManager != null)
+        Globals.autoSaveManager.clearAutoSaves();
+
+      // Let the search interface store changes to prefs.
+      // But which one? Let's use the one that is visible.
+      if (basePanel() != null) {
+        (searchManager).updatePrefs();
+      }
+      
+      prefs.flush();
+  }
+  
+  /**
+    * General info dialog.  The MacAdapter calls this method when "Quit"
+    * is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
+    * The function returns a boolean indicating if quitting is ok or not.
+    * 
+    * Non-OSX JabRef calls this when choosing "Quit" from the menu
+    * 
+    * SIDE EFFECT: tears down JabRef
+    * 
+    * @return true if the user chose to quit; false otherwise
+    */
+  public boolean quit() {
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
     boolean close = true;
@@ -762,7 +840,7 @@ public JabRefPreferences prefs() {
           if ( (answer == JOptionPane.CANCEL_OPTION) ||
               (answer == JOptionPane.CLOSED_OPTION)) {
             close = false; // The user has cancelled.
-              return;
+              return false;
           }
           if (answer == JOptionPane.YES_OPTION) {
             // The user wants to save.
@@ -800,115 +878,17 @@ public JabRefPreferences prefs() {
               WaitForSaveOperation w = new WaitForSaveOperation(this);
               w.show(); // This method won't return until cancelled or the save operation is done.
               if (w.cancelled())
-                  return; // The user clicked cancel.
+                  return false; // The user clicked cancel.
           }
       }
 
 
-      dispose();
-
-      if (basePanel() != null)
-        basePanel().saveDividerLocation();
-      prefs.putInt("posX", JabRefFrame.this.getLocation().x);
-      prefs.putInt("posY", JabRefFrame.this.getLocation().y);
-      prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
-      prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-      //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
-      prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
-      
-      prefs.putBoolean("toolbarVisible", tlb.isVisible());
-      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
-      // Store divider location for side pane:
-      int width = contentPane.getDividerLocation();
-      if (width > 0) 
-          prefs.putInt("sidePaneWidth", width);
-      if (prefs.getBoolean("openLastEdited")) {
-        // Here we store the names of allcurrent filea. If
-        // there is no current file, we remove any
-        // previously stored file name.
-        if (filenames.size() == 0) {
-          prefs.remove("lastEdited");
-        }
-        else {
-          String[] names = new String[filenames.size()];
-          for (int i = 0; i < filenames.size(); i++) {
-            names[i] = filenames.elementAt(i);
-          }
-          prefs.putStringArray("lastEdited", names);
-        }
-
-      }
-
-      fileHistory.storeHistory();
-      prefs.customExports.store();
-      prefs.customImports.store();
-      BibtexEntryType.saveCustomEntryTypes(prefs);
-
-      // Clear autosave files:
-      if (Globals.autoSaveManager != null)
-        Globals.autoSaveManager.clearAutoSaves();
-
-      // Let the search interface store changes to prefs.
-      // But which one? Let's use the one that is visible.
-      if (basePanel() != null) {
-        (searchManager).updatePrefs();
-      }
-      
-      prefs.flush();
-      
-      System.exit(0); // End program.
+      tearDownJabRef(filenames);
+      return true;
     }
-  }
-
     
-
-  private void macOSXRegistration() {
-    if (Globals.osName.equals(Globals.MAC)) {
-      try {
-    	  Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
-		  
-		  Class<?>[] defArgs = {Object.class, Method.class};
-		  Class<?> thisClass = JabRefFrame.class;
-		  Method registerMethod = osxAdapter.getDeclaredMethod("setAboutHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("about", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setPreferencesHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("preferences", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setQuitHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("quit", (Class[])null)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-		  registerMethod = osxAdapter.getDeclaredMethod("setFileHandler", defArgs);
-		  if (registerMethod != null) {
-			  Object[] args = {this, thisClass.getDeclaredMethod("openAction", String.class)};
-			  registerMethod.invoke(osxAdapter, args);
-		  }
-      }
-      catch (NoClassDefFoundError e) {
-        // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
-        // because OSXAdapter extends ApplicationAdapter in its def
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (ClassNotFoundException e) {
-        // This shouldn't be reached; if there's a problem with the OSXAdapter we should get the
-        // above NoClassDefFoundError first.
-        System.err.println("This version of Mac OS X does not support the Apple EAWT.  Application Menu handling has been disabled (" +
-                           e + ")");
-      }
-      catch (Exception e) {
-        System.err.println("Exception while loading the OSXAdapter:");
-        e.printStackTrace();
-      }
-    }
+    return false;
   }
-
 
   private void initLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
@@ -1869,7 +1849,11 @@ public JabRefPreferences prefs() {
     }
 
     public void actionPerformed(ActionEvent e) {
-      quit();
+      if (quit()) {
+          // FIXME: tearDownJabRef() does not cancel all threads. Therefore, some threads remain running and prevent JabRef from beeing unloaded completely
+          // QUICKHACK: finally tear down all existing threads
+          System.exit(0);
+      }
     }
   }
 
@@ -2360,7 +2344,7 @@ class SaveSessionAction
     }
 
     public void actionPerformed(ActionEvent e) {
-      // Here we store the names of allcurrent filea. If
+      // Here we store the names of all current files. If
       // there is no current file, we remove any
       // previously stored file name.
       Vector<String> filenames = new Vector<String>();
