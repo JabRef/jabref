@@ -77,7 +77,7 @@ public class BibtexParser {
 	
 	private static final Integer LOOKAHEAD = 64;
 
-	private final boolean autoDoubleBraces = Globals.prefs.getBoolean("autoDoubleBraces");
+	private final boolean autoDoubleBraces;
 
 	public BibtexParser(Reader in) {
 
@@ -87,6 +87,7 @@ public class BibtexParser {
 		if (Globals.prefs == null) {
 			Globals.prefs = JabRefPreferences.getInstance();
 		}
+		autoDoubleBraces = Globals.prefs.getBoolean("autoDoubleBraces");
 		_in = new PushbackReader(in, LOOKAHEAD);
 	}
 
