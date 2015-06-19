@@ -1,3 +1,14 @@
+// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
+    }
+}
+
 plugins {
     id "com.github.youribonnaffe.gradle.format" version "1.2"
 }
@@ -246,16 +257,6 @@ idea.project.ipr {
 
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-    }
-}
 
 jacocoTestReport {
     reports {
