@@ -30,15 +30,7 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.factories.Borders;
 
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.CheckBoxMessage;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.ImportSettingsTab;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.imports.HTMLConverter;
 import net.sf.jabref.imports.CaseKeeper;
@@ -396,10 +388,10 @@ public class CleanUpAction extends AbstractWorker {
                     return;
                 }
 		String newValue = oldValue;
-		int month = Globals.ParseMonthToInteger(oldValue);
-		if(month > 0)
+		MonthUtil.Month month = MonthUtil.getMonth(oldValue);
+		if(month.isValid())
 		{
-			newValue = "#" + Globals.MONTHS[month - 1] + '#';
+			newValue = month.bibtexFormat;
 		}
 
     	if (!oldValue.equals(newValue)) {

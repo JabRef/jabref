@@ -441,12 +441,12 @@ public class BibtexDatabase {
 
         // If we get to this point, the string has obviously not been defined locally.
         // Check if one of the standard BibTeX month strings has been used:
-        Object o;
-        if ((o = Globals.MONTH_STRINGS.get(label.toLowerCase())) != null) {
-            return (String)o;
+        MonthUtil.Month month = MonthUtil.getMonthByShortName(label);
+        if(month.isValid()) {
+            return month.fullName;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     private String resolveContent(String res, HashSet<String> usedIds) {

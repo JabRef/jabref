@@ -24,14 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.ResourceBundle.Control;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Filter;
@@ -161,57 +154,7 @@ public class Globals {
 			"ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15" };
     public static Map<String,String> ENCODING_NAMES_LOOKUP;
 
-    /**
-     * Parses month expressions (like 1, jan, #jan#) to the numerical representation 
-     * (with January corresponding to 1)
-     * Returns 0 if the month could not be parsed.
-     * TODO: Move this method along with the two arrays 'MONTHS' and 'MONTH_STRINGS' to a seperate class?
-     */
-    public static int ParseMonthToInteger(String value)
-    {
-    	// implementation based on patch 3470076 by Mathias Walter
-    	// originally, this code was present in the CleanUp-doCleanUpMonth method
-    	if (value == null) 
-    		return 0;
-    	
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			// Much more liberal matching covering most known abbreviations etc.
-			String testString = value.replace("#", "").trim().substring(0, 3).toLowerCase();
-			if (Globals.MONTH_STRINGS.containsKey(testString)) {
-				int i = 0;
-				for(String month : MONTHS)
-				{
-					if(testString.equals(MONTHS[i]))
-						return i + 1;
-					i++;
-				}
-			}
-		}
-		return 0;
-    }
-    
-    // String array that maps from month number to month string label:
-	public static String[] MONTHS = new String[] { "jan", "feb", "mar", "apr", "may", "jun", "jul",
-		"aug", "sep", "oct", "nov", "dec" };
-	
-	// Map that maps from month string labels to
-	public static Map<String, String> MONTH_STRINGS = new HashMap<String, String>();
 	static {
-		MONTH_STRINGS.put("jan", "January");
-		MONTH_STRINGS.put("feb", "February");
-		MONTH_STRINGS.put("mar", "March");
-		MONTH_STRINGS.put("apr", "April");
-		MONTH_STRINGS.put("may", "May");
-		MONTH_STRINGS.put("jun", "June");
-		MONTH_STRINGS.put("jul", "July");
-		MONTH_STRINGS.put("aug", "August");
-		MONTH_STRINGS.put("sep", "September");
-		MONTH_STRINGS.put("oct", "October");
-		MONTH_STRINGS.put("nov", "November");
-		MONTH_STRINGS.put("dec", "December");
-
 		// Build list of encodings, by filtering out all that are not supported
 		// on this system:
 		List<String> encodings = new ArrayList<String>();

@@ -125,8 +125,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 			 * 
 			 * http://sourceforge.net/tracker/index.php?func=detail&aid=1535044&group_id=92314&atid=600306
 			 */
-			f1 = Util.getMonthNumber((String) f1);
-			f2 = Util.getMonthNumber((String) f2);
+			f1 = MonthUtil.getMonth((String) f1).number;
+			f2 = MonthUtil.getMonth((String) f2).number;
 		}
 
         if (isNumeric) {

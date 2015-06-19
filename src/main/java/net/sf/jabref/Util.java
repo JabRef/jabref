@@ -234,9 +234,9 @@ public class Util {
 
 		o = entry.getField("month");
 		if (o != null) {
-			int month = Util.getMonthNumber(o.toString());
-			if (month != -1) {
-				return year + "-" + (month + 1 < 10 ? "0" : "") + (month + 1);
+			MonthUtil.Month month = MonthUtil.getMonth(o.toString());
+			if (month.isValid()) {
+				return year + "-" + month.twoDigitNumber;
 			}
 		}
 		return year;
@@ -2275,36 +2275,6 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		} catch (NumberFormatException e) {
 			return year;
 		}
-	}
-
-	/**
-	 * Will return an integer indicating the month of the entry from 0 to 11.
-	 * 
-	 * -1 signals a unknown month string.
-	 * 
-	 * This method accepts three types of months given:
-	 *  - Single and Double Digit months from 1 to 12 (01 to 12)
-	 *  - 3 Digit BibTex strings (jan, feb, mar...)
-	 *  - Full English Month identifiers.
-	 * 
-	 * @param month
-	 * @return
-	 */
-	public static int getMonthNumber(String month) {
-
-		month = month.replaceAll("#", "").toLowerCase();
-
-		for (int i = 0; i < Globals.MONTHS.length; i++) {
-			if (month.startsWith(Globals.MONTHS[i])) {
-				return i;
-			}
-		}
-
-		try {
-			return intValueOf(month) - 1;
-		} catch (NumberFormatException ignored) {
-		}
-		return -1;
 	}
 
 	/**

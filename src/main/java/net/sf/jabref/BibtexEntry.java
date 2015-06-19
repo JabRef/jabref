@@ -295,14 +295,15 @@ public class BibtexEntry
         if(name.equals("date"))
         {
         	String year = getField("year");
-        	int month = Globals.ParseMonthToInteger(getField("month"));
+        	MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
         	if(year != null)
         	{
-        		if(month == 0)
-        			return year;
-        		else
-        			return year + "-" + String.format("%02d", month);
-        	}
+                if (month.isValid()) {
+                    return year + "-" + month.twoDigitNumber;
+                } else {
+                    return year;
+                }
+            }
         }
         if(name.equals("year") || name.equals("month"))
         {
