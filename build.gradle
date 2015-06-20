@@ -97,7 +97,7 @@ dependencies {
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
 // add jars from this classpath to the classpath for the ant build
-ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
+ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
 
 sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
