@@ -23,7 +23,6 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 
 Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](formatter_settings.xml).
-In case you want to keep some statements formatted as you did, enclose them between `@formatter:off` and `@formatter:on`.
 
 
 ### Add your change to the CHANGELOG
