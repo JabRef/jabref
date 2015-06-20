@@ -22,7 +22,8 @@ apply plugin: "project-report"
 
 format {
     configurationFile = file('formatter_settings.xml')
-    files = sourceSets.main.java
+    // default: reformat main and test
+    //files = sourceSets.main.java
 }
 
 fatJar {
