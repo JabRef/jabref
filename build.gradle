@@ -6,6 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
     }
 }
 
@@ -13,9 +14,12 @@ plugins {
     //The format plugin requires Java 1.8. As JabRef currently supports Java 1.6, the formatter plugin is disabled.
     //id "com.github.youribonnaffe.gradle.format" version "1.2"
 
-    id "eu.appsatori.fatjar" version "0.3"
+    // Version 0.3 requires Java 1.7, therefore we use version 0.2
+    // This version, however, is not available as plugin directly from gradle
+    // id "eu.appsatori.fatjar" version "0.3"
 }
 
+apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
