@@ -10,7 +10,9 @@ buildscript {
 }
 
 plugins {
-    id "com.github.youribonnaffe.gradle.format" version "1.2"
+    //The format plugin requires Java 1.8. As JabRef currently supports Java 1.6, the formatter plugin is disabled.
+    //id "com.github.youribonnaffe.gradle.format" version "1.2"
+
     id "eu.appsatori.fatjar" version "0.3"
 }
 
@@ -20,11 +22,13 @@ apply plugin: "idea"
 apply plugin: "application"
 apply plugin: "project-report"
 
+/* disabled, because plugin requires Java 1.8
 format {
     configurationFile = file('formatter_settings.xml')
     // default: reformat main and test
     //files = sourceSets.main.java
 }
+*/
 
 fatJar {
     classifier 'fat'

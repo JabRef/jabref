@@ -1,9 +1,8 @@
 language: java
 jdk:
-# Java versions <= 7 disables as com.github.youribonnaffe.gradle.format requires Java 8
-#  - openjdk6
-#  - openjdk7
-#  - oraclejdk7
+  - openjdk6
+  - openjdk7
+  - oraclejdk7
   - oraclejdk8
 
 before_install:
