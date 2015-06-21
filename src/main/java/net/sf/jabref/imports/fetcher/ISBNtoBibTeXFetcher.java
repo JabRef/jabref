@@ -38,6 +38,8 @@ import net.sf.jabref.imports.UnitFormatter;
 /**
  * This class uses Manas Tungare's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
  * The online version of the converter is available at http://manas.tungare.name/software/isbn-to-bibtex/
+ * This was not approved by him, see discussion https://sourceforge.net/p/jabref/bugs/1241/.
+ * We are currently working on sorting things out
  */
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
 	

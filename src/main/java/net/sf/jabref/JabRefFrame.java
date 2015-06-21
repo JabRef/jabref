@@ -45,6 +45,7 @@ import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.EntryFetcher;
@@ -158,6 +159,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
       newDatabaseAction = new NewDatabaseAction(),
       newSubDatabaseAction = new NewSubDatabaseAction(),
       integrityCheckAction = new IntegrityCheckAction(),
+            forkMeOnGitHubAction = new ForkMeOnGitHubAction(),
       help = new HelpAction("JabRef help", helpDiag,
                             GUIGlobals.baseFrameHelp, Globals.lang("JabRef help"),
                             prefs.getKey("Help")),
@@ -1485,6 +1487,7 @@ public JabRefPreferences prefs() {
       helpMenu.add(contents);
       helpMenu.addSeparator();
       helpMenu.add(errorConsole);
+        helpMenu.add(forkMeOnGitHubAction);
       helpMenu.addSeparator();
       helpMenu.add(about);
       mb.add(helpMenu);

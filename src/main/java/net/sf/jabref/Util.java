@@ -1,4 +1,6 @@
 /*  Copyright (C) 2003-2012 JabRef contributors.
+    Copyright (C) 2015 Oliver Kopp
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -602,10 +604,7 @@ public class Util {
 
 		if (fieldName.equals("url")) { // html
 			try {
-                link = sanitizeUrl(link);
-                ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
-                openExternalFilePlatformIndependent(fileType, link);
-
+                openBrowser(link);
             } catch (IOException e) {
                 System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
@@ -785,6 +784,9 @@ public class Util {
     }
 
     private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
+        // For URLs, other solutions are
+        //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
+        //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (Globals.ON_MAC) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
             String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
@@ -3130,5 +3132,18 @@ public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry ent
 		int endIndex = (s.endsWith("]") ? s.length() - 1 : s.length());
 		return s.substring(beginIndex, endIndex);
 	}
+
+    /**
+     * Opens the given URL using the system browser
+     * 
+     * @param url the URL to open
+     * @throws IOException
+     */
+    public static void openBrowser(String url) throws IOException {
+        url = sanitizeUrl(url);
+        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
+        openExternalFilePlatformIndependent(fileType, url);
+    }
+
 }
 
