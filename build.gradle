@@ -102,12 +102,6 @@ dependencies {
     // not available in maven repository
     compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
-    compile 'com.sun.jersey:jersey-client:1.14'
-    compile 'com.sun.jersey:jersey-core:1.14'
-    compile 'com.sun.jersey.contribs:jersey-multipart:1.14'
-
-    compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
-
     compile 'junit:junit:4.12'
 
     generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])

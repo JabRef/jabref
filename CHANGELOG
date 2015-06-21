@@ -1,4 +1,5 @@
 [master]
+    - Remove Mr.DLib support as MR.DLib will be shut down in 2015
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
