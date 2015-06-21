@@ -38,6 +38,7 @@ public class FileNameCleaner {
             124
     };
 
+
     /**
      * Replaces illegal characters in given fileName by '_'
      *

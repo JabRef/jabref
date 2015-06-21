@@ -261,8 +261,7 @@ public class XMPSchemaBibtexTest {
 
         assertEquals("Beach sand convolution by surf-wave optimzation",
                 XMPSchemaBibtex.getTextContent(
-                        d.getElementsByTagName("bibtex:title").item(0)).trim()
-        );
+                        d.getElementsByTagName("bibtex:title").item(0)).trim());
 
     }
 

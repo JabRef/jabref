@@ -15,6 +15,7 @@ import net.sf.jabref.undo.NamedCompound;
  * Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
  */
 public class AutoLinkFilesAction extends AbstractAction {
+
     public AutoLinkFilesAction() {
         putValue(SMALL_ICON, GUIGlobals.getImage("autoGroup"));
         putValue(NAME, Globals.lang("Automatically set file links"));
@@ -31,6 +32,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         JDialog diag = new JDialog(JabRef.jrf, true);
         final NamedCompound nc = new NamedCompound(Globals.lang("Automatically set file links"));
         Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 if (e.getID() > 0) {
                     // entry has been updated in Util.autoSetLinks, only treat nc and status message
@@ -41,8 +43,9 @@ public class AutoLinkFilesAction extends AbstractAction {
                     }
                     JabRef.jrf.output(Globals.lang("Finished autosetting external links."));
                 }
-                else JabRef.jrf.output(Globals.lang("Finished autosetting external links.")
-                    +" "+Globals.lang("No files found."));
+                else
+                    JabRef.jrf.output(Globals.lang("Finished autosetting external links.")
+                            + " " + Globals.lang("No files found."));
             }
         }, diag);
     }

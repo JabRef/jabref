@@ -78,6 +78,7 @@ public class JSTORFetcher implements EntryFetcher {
      */
     protected static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
 
+
     public String getHelpPage() {
         return "JSTOR.html";
     }
@@ -98,7 +99,7 @@ public class JSTORFetcher implements EntryFetcher {
     public String getTitle() {
         return "JSTOR";
     }
-    
+
     public void stopFetching() {
         // cannot be interrupted
     }
@@ -114,15 +115,15 @@ public class JSTORFetcher implements EntryFetcher {
 
             // Last retrieve the Bibtex-entries of the citations found
             Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
-            
-            if (entries.size() == 0){
+
+            if (entries.size() == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
                         Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-            
-            for (BibtexEntry entry : entries){
+
+            for (BibtexEntry entry : entries) {
                 dialog.addEntry(entry);
             }
             return true;
@@ -145,7 +146,7 @@ public class JSTORFetcher implements EntryFetcher {
      *             Most probably related to a problem connecting to JStor.
      */
     protected Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
-        throws IOException {
+            throws IOException {
         try {
             URL url = new URL(URL_BIBTEX);
             URLConnection conn = url.openConnection();
@@ -153,7 +154,7 @@ public class JSTORFetcher implements EntryFetcher {
             conn.connect();
 
             BibtexParser parser = new BibtexParser(new BufferedReader(new InputStreamReader(conn
-                .getInputStream())));
+                    .getInputStream())));
             return parser.parse().getDatabase().getEntries();
         } catch (MalformedURLException e) {
             // Propagate...
@@ -187,8 +188,8 @@ public class JSTORFetcher implements EntryFetcher {
         String urlQuery;
         try {
             urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + MAX_CITATIONS +
-                "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
-                "&wc=on&citationAction=saveAll";
+                    "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
+                    "&wc=on&citationAction=saveAll";
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

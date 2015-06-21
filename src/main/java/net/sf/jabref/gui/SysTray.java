@@ -32,12 +32,15 @@ public class SysTray {
     private TrayIcon icon;
     private SystemTray tray = null;
 
+
     public SysTray(JabRefFrame frame) {
         this.frame = frame;
 
         final ActionListener showJabref = new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         SysTray.this.frame.showIfMinimizedToSysTray();
                     }
@@ -53,6 +56,7 @@ public class SysTray {
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);
         icon.setImageAutoSize(true);
         icon.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 showJabref.actionPerformed(new ActionEvent(mouseEvent.getSource(), 0, ""));
@@ -60,12 +64,12 @@ public class SysTray {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                super.mousePressed(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mousePressed(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                super.mouseReleased(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mouseReleased(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
         });
         if (SystemTray.isSupported())

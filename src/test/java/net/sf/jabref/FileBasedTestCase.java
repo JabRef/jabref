@@ -73,10 +73,12 @@ public class FileBasedTestCase {
             File[] fileArray = file.listFiles();
 
             if (fileArray != null)
-                for (File aFileArray : fileArray) deleteRecursive(aFileArray);
+                for (File aFileArray : fileArray)
+                    deleteRecursive(aFileArray);
         }
         file.delete();
     }
+
 
     static BibtexDatabase database;
 
@@ -89,6 +91,7 @@ public class FileBasedTestCase {
     private boolean oldUseRegExp;
 
     private boolean oldAutoLinkExcatKeyOnly;
+
 
     public static BibtexEntry getBibtexEntry() {
 
@@ -106,7 +109,7 @@ public class FileBasedTestCase {
                             + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
                             + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                             + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}"
-            );
+                    );
 
             BibtexParser parser = new BibtexParser(reader);
             ParserResult result = null;

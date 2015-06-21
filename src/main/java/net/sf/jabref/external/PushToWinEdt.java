@@ -25,11 +25,12 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class PushToWinEdt implements PushToApplication {
 
-    private boolean couldNotCall=false;
-    private boolean notDefined=false;
+    private boolean couldNotCall = false;
+    private boolean notDefined = false;
     private JPanel settings = null;
     private JTextField winEdtPath = new JTextField(30),
-        citeCommand = new JTextField(30);
+            citeCommand = new JTextField(30);
+
 
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
@@ -72,17 +73,16 @@ public class PushToWinEdt implements PushToApplication {
             excep.printStackTrace();
         }
 
-
     }
 
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            panel.output(Globals.lang("Error") + ": "+
-                    Globals.lang("Path to %0 not defined", getApplicationName())+".");
+            panel.output(Globals.lang("Error") + ": " +
+                    Globals.lang("Path to %0 not defined", getApplicationName()) + ".");
         }
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
-                    +Globals.prefs.get("winEdtPath") + "'.");
+                    + Globals.prefs.get("winEdtPath") + "'.");
         }
         else
             Globals.lang("Pushed citations to WinEdt");

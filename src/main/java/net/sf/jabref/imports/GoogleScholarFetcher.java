@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
@@ -90,9 +89,11 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         int toDownload = 0, downloaded = 0;
         for (String link : selection.keySet()) {
             boolean isSelected = selection.get(link);
-            if (isSelected) toDownload++;
+            if (isSelected)
+                toDownload++;
         }
-        if (toDownload == 0) return;
+        if (toDownload == 0)
+            return;
 
         for (String link : selection.keySet()) {
             if (stopFetching)
@@ -111,7 +112,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         }
 
     }
-
 
     public String getTitle() {
         return "Google Scholar";
@@ -137,7 +137,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = true;
     }
 
-
     private void save(String filename, String content) throws IOException {
         BufferedWriter out = new BufferedWriter(new FileWriter(filename));
         out.write(content);
@@ -156,7 +155,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             formItems.put("scisf", "4");
             formItems.put("num", String.valueOf(MAX_ENTRIES_TO_LOAD));
             StringBuilder ub = new StringBuilder(URL_SETPREFS + "?");
-            for (Iterator<String> i = formItems.keySet().iterator(); i.hasNext(); ) {
+            for (Iterator<String> i = formItems.keySet().iterator(); i.hasNext();) {
                 String name = i.next();
                 ub.append(name).append("=").append(formItems.get(name));
                 if (i.hasNext())
@@ -216,7 +215,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             if (fS && fE) {
                 if (titleS.end() < titleE.start()) {
                     pText = part.substring(titleS.end(), titleE.start());
-                } else pText = part;
+                } else
+                    pText = part;
             } else
                 pText = link;
 
@@ -294,6 +294,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
 
     static Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
+
 
     public static HashMap<String, String> getFormElements(String page) {
         Matcher m = inputPattern.matcher(page);

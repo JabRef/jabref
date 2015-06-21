@@ -69,22 +69,22 @@ public class PushToApplicationButton implements ActionListener {
         applications = new ArrayList<PushToApplication>();
 
         JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        if(jabrefPlugin != null){
-		    List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
-		    for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
-		        applications.add(extension.getPushToApp());
-		    }
-		
-		    applications.add(new PushToLyx());
-		    applications.add(new PushToEmacs());
-		    applications.add(new PushToWinEdt());
-		    applications.add(new PushToLatexEditor());
-		    applications.add(new PushToVim());
+        if (jabrefPlugin != null) {
+            List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
+            for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
+                applications.add(extension.getPushToApp());
+            }
+
+            applications.add(new PushToLyx());
+            applications.add(new PushToEmacs());
+            applications.add(new PushToWinEdt());
+            applications.add(new PushToLatexEditor());
+            applications.add(new PushToVim());
             applications.add(OpenOfficePanel.getInstance());
             applications.add(new PushToTeXstudio());
-		
-		    // Finally, sort the entries:
-		    //Collections.sort(applications, new PushToApplicationComparator());
+
+            // Finally, sort the entries:
+            //Collections.sort(applications, new PushToApplicationComparator());
         }
     }
 
@@ -100,7 +100,7 @@ public class PushToApplicationButton implements ActionListener {
         comp.setLayout(new BorderLayout());
 
         menuButton = new JButton(new ImageIcon(ARROW_ICON));
-        menuButton.setMargin(new Insets(0,0,0,0));
+        menuButton.setMargin(new Insets(0, 0, 0, 0));
         menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
                 menuButton.getIcon().getIconHeight()));
         menuButton.addActionListener(new MenuButtonActionListener());
@@ -108,7 +108,7 @@ public class PushToApplicationButton implements ActionListener {
         pushButton = new JButton();
         if (Globals.prefs.hasKey("pushToApplication")) {
             String appSelected = Globals.prefs.get("pushToApplication");
-            for (int i=0; i<pushActions.size(); i++) {
+            for (int i = 0; i < pushActions.size(); i++) {
                 PushToApplication toApp = pushActions.get(i);
                 if (toApp.getName().equals(appSelected)) {
                     selected = i;
@@ -130,6 +130,7 @@ public class PushToApplicationButton implements ActionListener {
 
         optPopup.add(settings);
         settings.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 PushToApplication toApp = pushActions.get(selected);
                 JPanel options = toApp.getSettingsPanel();
@@ -148,8 +149,8 @@ public class PushToApplicationButton implements ActionListener {
      */
     private void buildPopupMenu() {
         popup = new JPopupMenu();
-        int j=0;
-        for (PushToApplication application : pushActions){
+        int j = 0;
+        for (PushToApplication application : pushActions) {
             JMenuItem item = new JMenuItem(application.getApplicationName(),
                     application.getIcon());
             item.setToolTipText(application.getTooltip());
@@ -179,7 +180,7 @@ public class PushToApplicationButton implements ActionListener {
      * @return The component.
      */
     public Component getComponent() {
-       return comp;
+        return comp;
     }
 
     public Action getMenuAction() {
@@ -198,23 +199,28 @@ public class PushToApplicationButton implements ActionListener {
         action.actionPerformed(new ActionEvent(toApp, 0, "push"));
     }
 
+
     static class BooleanHolder {
+
         public BooleanHolder(boolean value) {
             this.value = value;
         }
+
+
         public boolean value;
     }
 
+
     public static void showSettingsDialog(Object parent, PushToApplication toApp, JPanel options) {
-        
+
         final BooleanHolder okPressed = new BooleanHolder(false);
         JDialog dg;
         if (parent instanceof JDialog)
-            dg = new JDialog((JDialog)parent, Globals.lang("Settings"), true);
+            dg = new JDialog((JDialog) parent, Globals.lang("Settings"), true);
         else
-            dg = new JDialog((JFrame)parent, Globals.lang("Settings"), true);
+            dg = new JDialog((JFrame) parent, Globals.lang("Settings"), true);
         final JDialog diag = dg;
-        options.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         JButton ok = new JButton(Globals.lang("Ok"));
@@ -223,15 +229,17 @@ public class PushToApplicationButton implements ActionListener {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         ok.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 okPressed.value = true;
                 diag.dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 diag.dispose();
             }
@@ -241,15 +249,16 @@ public class PushToApplicationButton implements ActionListener {
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
         });
         diag.pack();
         if (parent instanceof JDialog)
-            diag.setLocationRelativeTo((JDialog)parent);
+            diag.setLocationRelativeTo((JDialog) parent);
         else
-            diag.setLocationRelativeTo((JFrame)parent);
+            diag.setLocationRelativeTo((JFrame) parent);
         // Show the dialog:
         diag.setVisible(true);
         // If the user pressed Ok, ask the PushToApplication implementation
@@ -259,8 +268,12 @@ public class PushToApplicationButton implements ActionListener {
         }
     }
 
+
     class PopupItemActionListener implements ActionListener {
+
         private int index;
+
+
         public PopupItemActionListener(int index) {
             this.index = index;
         }
@@ -275,7 +288,6 @@ public class PushToApplicationButton implements ActionListener {
             pushButton.requestFocus();
         }
     }
-
 
     class MenuButtonActionListener implements ActionListener {
 
@@ -304,6 +316,7 @@ public class PushToApplicationButton implements ActionListener {
     }
 
     class PushButtonMouseListener extends MouseAdapter {
+
         public void mousePressed(MouseEvent event) {
             if (event.isPopupTrigger())
                 processPopupTrigger(event);

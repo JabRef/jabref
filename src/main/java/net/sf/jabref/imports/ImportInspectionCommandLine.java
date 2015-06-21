@@ -27,14 +27,16 @@ public class ImportInspectionCommandLine implements ImportInspector {
 
     List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
 
+
     public void addEntry(BibtexEntry entry) {
         entries.add(entry);
     }
 
     public void setProgress(int current, int max) {
         status.setStatus(Globals.lang("Progress: %0 of %1", String.valueOf(current), String
-            .valueOf(max)));
+                .valueOf(max)));
     }
+
 
     OutputPrinter status = new OutputPrinter() {
 
@@ -50,6 +52,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
             System.out.println(message);
         }
     };
+
 
     public Collection<BibtexEntry> query(String query, EntryFetcher fetcher) {
         entries.clear();

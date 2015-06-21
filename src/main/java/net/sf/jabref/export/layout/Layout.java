@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 
-
 /**
  * Main class for formatting DOCUMENT ME!
  *
@@ -30,15 +29,17 @@ import net.sf.jabref.BibtexEntry;
  */
 public class Layout
 {
+
     //~ Instance fields ////////////////////////////////////////////////////////
 
     private LayoutEntry[] layoutEntries;
 
     private ArrayList<String> missingFormatters = new ArrayList<String>();
 
+
     //~ Constructors ///////////////////////////////////////////////////////////
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix)  throws Exception
+    public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception
     {
         StringInt si;
         Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>(parsedEntries.size());
@@ -115,9 +116,9 @@ public class Layout
             layoutEntry.setPostFormatter(formatter);
         }
     }
-    
+
     public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
-    	return doLayout(bibtex, database, null);
+        return doLayout(bibtex, database, null);
     }
 
     /**
@@ -145,7 +146,7 @@ public class Layout
 
         return sb.toString();
     }
-    
+
     /**
      * Returns the processed text. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
@@ -169,7 +170,7 @@ public class Layout
 
                     while ((eol < fieldText.length()) &&
                             ((fieldText.charAt(eol) == '\n') ||
-                                    (fieldText.charAt(eol) == '\r'))) {
+                            (fieldText.charAt(eol) == '\r'))) {
                         eol++;
                     }
 
@@ -186,6 +187,7 @@ public class Layout
 
         return sb.toString();
     }
+
     // added section - end (arudert)
 
     public ArrayList<String> getMissingFormatters() {

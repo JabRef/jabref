@@ -28,7 +28,8 @@ public class EntryFromFileCreatorManagerTest {
         assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testAddEntrysFromFiles() throws Exception {
         ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
         BibtexDatabase database = result.getDatabase();

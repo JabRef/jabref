@@ -35,6 +35,7 @@ public class RegExpFileSearch {
 
     final static String EXT_MARKER = "__EXTENSION__";
 
+
     public static void main(String[] args) {
         BibtexEntry entry = new BibtexEntry(Util.createNeutralId());
         entry.setField(BibtexFields.KEY_FIELD, "raffel01");
@@ -59,7 +60,7 @@ public class RegExpFileSearch {
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
     public static Map<BibtexEntry, java.util.List<File>> findFilesForSet(Collection<BibtexEntry> entries,
-                 Collection<String> extensions, List<File> directories, String regExp) {
+            Collection<String> extensions, List<File> directories, String regExp) {
 
         Map<BibtexEntry, java.util.List<File>> res = new HashMap<BibtexEntry, List<File>>();
         for (BibtexEntry entry : entries) {
@@ -78,69 +79,69 @@ public class RegExpFileSearch {
      * @return A list of files paths matching the given criteria.
      */
     public static List<File> findFiles(BibtexEntry entry, Collection<String> extensions,
-                                       Collection<File> directories, String regularExpression) {
+            Collection<File> directories, String regularExpression) {
 
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
             sb.append(i.next());
             if (i.hasNext())
-                    sb.append("|");
+                sb.append("|");
         }
-        String extensionRegExp = "("+sb.toString()+")";
+        String extensionRegExp = "(" + sb.toString() + ")";
 
         return findFile(entry, null, directories, regularExpression, extensionRegExp, true);
     }
 
-        /**
-	 * Searches the given directory and file name pattern for a file for the
-	 * bibtexentry.
-	 *
-	 * Used to fix:
-	 *
-	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
-	 *
-	 * Requirements:
-	 *  - Be able to find the associated PDF in a set of given directories.
-	 *  - Be able to return a relative path or absolute path.
-	 *  - Be fast.
-	 *  - Allow for flexible naming schemes in the PDFs.
-	 *
-	 * Syntax scheme for file:
-	 * <ul>
-	 * <li>* Any subDir</li>
-	 * <li>** Any subDir (recursiv)</li>
-	 * <li>[key] Key from bibtex file and database</li>
-	 * <li>.* Anything else is taken to be a Regular expression.</li>
-	 * </ul>
-	 *
-	 * @param entry
-	 *            non-null
-	 * @param database
-	 *            non-null
-	 * @param dirs
-	 *            A set of root directories to start the search from. Paths are
-	 *            returned relative to these directories if relative is set to
-	 *            true. These directories will not be expanded or anything. Use
-	 *            the file attribute for this.
-	 * @param file
-	 *            non-null
-	 *
-	 * @param relative
-	 *            whether to return relative file paths or absolute ones
-	 *
-	 * @return Will return the first file found to match the given criteria or
-	 *         null if none was found.
-	 */
-	public static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
-		String file, String extensionRegExp, boolean relative) {
+    /**
+     * Searches the given directory and file name pattern for a file for the
+     * bibtexentry.
+     *
+     * Used to fix:
+     *
+     * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
+     *
+     * Requirements:
+     *  - Be able to find the associated PDF in a set of given directories.
+     *  - Be able to return a relative path or absolute path.
+     *  - Be fast.
+     *  - Allow for flexible naming schemes in the PDFs.
+     *
+     * Syntax scheme for file:
+     * <ul>
+     * <li>* Any subDir</li>
+     * <li>** Any subDir (recursiv)</li>
+     * <li>[key] Key from bibtex file and database</li>
+     * <li>.* Anything else is taken to be a Regular expression.</li>
+     * </ul>
+     *
+     * @param entry
+     *            non-null
+     * @param database
+     *            non-null
+     * @param dirs
+     *            A set of root directories to start the search from. Paths are
+     *            returned relative to these directories if relative is set to
+     *            true. These directories will not be expanded or anything. Use
+     *            the file attribute for this.
+     * @param file
+     *            non-null
+     *
+     * @param relative
+     *            whether to return relative file paths or absolute ones
+     *
+     * @return Will return the first file found to match the given criteria or
+     *         null if none was found.
+     */
+    public static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
+            String file, String extensionRegExp, boolean relative) {
         ArrayList<File> res = new ArrayList<File>();
-		for (File directory : dirs) {
+        for (File directory : dirs) {
             List<File> tmp = findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
             if (tmp != null)
                 res.addAll(tmp);
-		}
-		return res;
-	}
+        }
+        return res;
+    }
 
     /**
      * Internal Version of findFile, which also accepts a current directory to
@@ -148,7 +149,7 @@ public class RegExpFileSearch {
      *
      */
     public static List<File> findFile(BibtexEntry entry, BibtexDatabase database, String directory,
-        String file, String extensionRegExp, boolean relative) {
+            String file, String extensionRegExp, boolean relative) {
 
         List<File> res;
         File root;
@@ -162,9 +163,8 @@ public class RegExpFileSearch {
         }
         res = findFile(entry, database, root, file, extensionRegExp);
 
-
         if (res.size() > 0) {
-            for (int i=0; i<res.size(); i++)
+            for (int i = 0; i < res.size(); i++)
                 try {
                     /**
                      * [ 1601651 ] PDF subdirectory - missing first character
@@ -177,7 +177,7 @@ public class RegExpFileSearch {
                     if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
                         tmp = tmp.substring(1);
                     res.set(i, new File(tmp));
-                    
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -190,7 +190,7 @@ public class RegExpFileSearch {
      * given directory using the given regular expression string for search.
      */
     protected static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
-        String file, String extensionRegExp) {
+            String file, String extensionRegExp) {
 
         ArrayList<File> res = new ArrayList<File>();
 
@@ -273,13 +273,14 @@ public class RegExpFileSearch {
         }
 
         // Last step: check if the given file can be found in this directory
-        String filePart = fileParts[fileParts.length-1].replaceAll("\\[extension\\]", EXT_MARKER);
+        String filePart = fileParts[fileParts.length - 1].replaceAll("\\[extension\\]", EXT_MARKER);
         String filenameToLookFor = Util.expandBrackets(filePart, entry, database)
                 .replaceAll(EXT_MARKER, extensionRegExp);
         final Pattern toMatch = Pattern.compile("^"
-            + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$", Pattern.CASE_INSENSITIVE);
+                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$", Pattern.CASE_INSENSITIVE);
 
         File[] matches = directory.listFiles(new FilenameFilter() {
+
             public boolean accept(File arg0, String arg1) {
                 return toMatch.matcher(arg1).matches();
             }
@@ -288,8 +289,5 @@ public class RegExpFileSearch {
             Collections.addAll(res, matches);
         return res;
     }
-
-
-
 
 }

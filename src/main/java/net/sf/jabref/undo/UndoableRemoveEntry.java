@@ -34,47 +34,46 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
     private BibtexEntry entry;
     private BasePanel panel;
 
+
     public UndoableRemoveEntry(BibtexDatabase base, BibtexEntry entry,
-			       BasePanel panel) {
-	this.base = base;
-	this.entry = entry;
-	this.panel = panel;
+            BasePanel panel) {
+        this.base = base;
+        this.entry = entry;
+        this.panel = panel;
     }
 
     public String getUndoPresentationName() {
-	return "Undo: remove entry";
+        return "Undo: remove entry";
     }
 
     public String getRedoPresentationName() {
-	return "Redo: remove entry";
+        return "Redo: remove entry";
     }
 
     public void undo() {
-	super.undo();
+        super.undo();
 
-	// Revert the change.
-	try {
-	    String id = Util.createNeutralId();
-	    entry.setId(id);
-	    base.insertEntry(entry);
-	} catch (Throwable ex) {
-          ex.printStackTrace();
-	}
+        // Revert the change.
+        try {
+            String id = Util.createNeutralId();
+            entry.setId(id);
+            base.insertEntry(entry);
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	try {
-	    base.removeEntry(entry.getId());
-	    // If the entry has an editor currently open, we must close it.
-	    panel.ensureNotShowing(entry);
-	} catch (Throwable ex) {
-          ex.printStackTrace();
-	}
+        // Redo the change.
+        try {
+            base.removeEntry(entry.getId());
+            // If the entry has an editor currently open, we must close it.
+            panel.ensureNotShowing(entry);
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
     }
-
-
 
 }

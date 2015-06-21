@@ -41,6 +41,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Either set field, or clear field.
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
+
     private JabRefFrame frame;
     private JDialog diag;
     private JRadioButton all, selected, clear, set, rename;
@@ -48,6 +49,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JButton ok, cancel;
     boolean cancelled = true;
     private JCheckBox overwrite;
+
 
     public MassSetFieldAction(JabRefFrame frame) {
         putValue(NAME, "Set/clear/rename fields");
@@ -73,18 +75,21 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename = new JRadioButton(Globals.lang("Rename field to:"));
         rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
+
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are setting, not clearing:
                 text.setEnabled(set.isSelected());
             }
         });
         clear.addChangeListener(new ChangeListener() {
+
             public void stateChanged(ChangeEvent event) {
                 // Overwrite protection makes no sense if we are clearing the field:
                 overwrite.setEnabled(!clear.isSelected());
             }
         });
         rename.addChangeListener(new ChangeListener() {
+
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are renaming
                 renameTo.setEnabled(rename.isSelected());
@@ -120,40 +125,41 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.nextLine();
         builder.append(overwrite, 3);
 
-
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
         ok.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent e) {
-               // Check if the user tries to rename multiple fields:
-               if (rename.isSelected()) {
+
+            public void actionPerformed(ActionEvent e) {
+                // Check if the user tries to rename multiple fields:
+                if (rename.isSelected()) {
                     String[] fields = getFieldNames(field.getText());
-                   if (fields.length > 1) {
-                       JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
-                               "", JOptionPane.ERROR_MESSAGE);
-                       return; // Do not close the dialog.
-                   }
-               }
+                    if (fields.length > 1) {
+                        JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
+                                "", JOptionPane.ERROR_MESSAGE);
+                        return; // Do not close the dialog.
+                    }
+                }
                 cancelled = false;
                 diag.dispose();
             }
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelled = true;
-                    diag.dispose();
-                }
-            };
+
+            public void actionPerformed(ActionEvent e) {
+                cancelled = true;
+                diag.dispose();
+            }
+        };
         cancel.addActionListener(cancelAction);
 
         // Key bindings:

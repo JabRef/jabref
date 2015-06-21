@@ -57,7 +57,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
  *
@@ -75,8 +74,7 @@ public class FileListEntryEditor {
             cancel = new JButton(Globals.lang("Cancel")),
             open = new JButton(Globals.lang("Open"));
 
-
-	JComboBox types;
+    JComboBox types;
     JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
     JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
     ConfirmCloseFileListEntryEditor externalConfirm = null;
@@ -88,12 +86,14 @@ public class FileListEntryEditor {
 
     public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
+
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
-                               boolean showOpenButton, MetaData metaData) {
+            boolean showOpenButton, MetaData metaData) {
         this.entry = entry;
         this.metaData = metaData;
 
         AbstractAction okAction = new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:
                 if (!ok.isEnabled())
@@ -111,14 +111,15 @@ public class FileListEntryEditor {
                 okPressed = true;
             }
         };
-		types = new JComboBox();
+        types = new JComboBox();
         types.addItemListener(new ItemListener() {
+
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (!okDisabledExternally)
                     ok.setEnabled(types.getSelectedItem() != null);
             }
         });
-        
+
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(Globals.lang("Link"));
@@ -132,7 +133,7 @@ public class FileListEntryEditor {
         builder.nextLine();
         builder.append(Globals.lang("Description"));
         builder.append(description, 3);
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.nextLine();
         builder.append(Globals.lang("File type"));
         builder.append(types, 3);
@@ -141,7 +142,7 @@ public class FileListEntryEditor {
             builder.append(downloadLabel);
             builder.append(prog, 3);
         }
-        
+
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         //bb.addButton(open);
@@ -151,25 +152,25 @@ public class FileListEntryEditor {
         bb.addButton(cancel);
         bb.addGlue();
 
-
         ok.addActionListener(okAction);
         // Add OK action to the two text fields to simplify entering:
         link.addActionListener(okAction);
         description.addActionListener(okAction);
 
         open.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 openFile();
             }
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    diag.dispose();
-                }
-            };
-        cancel.addActionListener(cancelAction);
 
+            public void actionPerformed(ActionEvent e) {
+                diag.dispose();
+            }
+        };
+        cancel.addActionListener(cancelAction);
 
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
@@ -178,17 +179,19 @@ public class FileListEntryEditor {
         am.put("close", cancelAction);
 
         link.getDocument().addDocumentListener(new DocumentListener() {
+
             public void insertUpdate(DocumentEvent documentEvent) {
                 checkExtension();
             }
+
             public void removeUpdate(DocumentEvent documentEvent) {
             }
+
             public void changedUpdate(DocumentEvent documentEvent) {
                 checkExtension();
             }
 
         });
-
 
         diag = new JDialog(frame, Globals.lang("Edit file link"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -196,10 +199,12 @@ public class FileListEntryEditor {
         diag.pack();
         Util.placeDialog(diag, frame);
         diag.addWindowListener(new WindowAdapter() {
+
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             browse.actionPerformed(new ActionEvent(browseBut, 0, ""));
                         }
@@ -237,7 +242,7 @@ public class FileListEntryEditor {
     }
 
     public void openFile() {
-        ExternalFileType type = (ExternalFileType)types.getSelectedItem();
+        ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null)
             try {
                 Util.openExternalFileAnyFormat(metaData, link.getText(), type);
@@ -284,60 +289,63 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-		types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType))
             types.setSelectedItem(entry.getType());
         // If the entry has a link but not a file type, try to deduce the file type:
         else if ((entry.getLink() != null) && (entry.getLink().length() > 0)) {
-            checkExtension();    
+            checkExtension();
         }
 
     }
 
     public void storeSettings(FileListEntry entry) {
         entry.setDescription(description.getText().trim());
-	// See if we should trim the file link to be relative to the file directory:
-	try {
-        String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        if (dirs.length == 0) {
-            entry.setLink(link.getText().trim());
-        } else {
-            boolean found = false;
-            for (String dir : dirs) {
-                String canPath = (new File(dir)).getCanonicalPath();
-                File fl = new File(link.getText().trim());
-                if (fl.isAbsolute()) {
-                    String flPath = fl.getCanonicalPath();
-                    if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                        String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
-                        entry.setLink(relFileName);
-                        found = true;
-                        break;
+        // See if we should trim the file link to be relative to the file directory:
+        try {
+            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            if (dirs.length == 0) {
+                entry.setLink(link.getText().trim());
+            } else {
+                boolean found = false;
+                for (String dir : dirs) {
+                    String canPath = (new File(dir)).getCanonicalPath();
+                    File fl = new File(link.getText().trim());
+                    if (fl.isAbsolute()) {
+                        String flPath = fl.getCanonicalPath();
+                        if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
+                            String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
+                            entry.setLink(relFileName);
+                            found = true;
+                            break;
+                        }
                     }
                 }
+                if (!found)
+                    entry.setLink(link.getText().trim());
             }
-            if (!found)
-                entry.setLink(link.getText().trim());
+        } catch (java.io.IOException ex)
+        {
+            ex.printStackTrace();
+            // Don't think this should happen, but set the file link directly as a fallback:
+            entry.setLink(link.getText().trim());
         }
-    } catch (java.io.IOException ex)
-	{ 
-		ex.printStackTrace();
-		// Don't think this should happen, but set the file link directly as a fallback:
-		entry.setLink(link.getText().trim());
-	}
-	
-        entry.setType((ExternalFileType)types.getSelectedItem());
+
+        entry.setType((ExternalFileType) types.getSelectedItem());
     }
 
     public boolean okPressed() {
         return okPressed;
     }
 
+
     class BrowseListener implements ActionListener {
+
         private JFrame parent;
         private JTextField comp;
+
 
         public BrowseListener(JFrame parent, JTextField comp) {
             this.parent = parent;
@@ -351,7 +359,7 @@ public class FileListEntryEditor {
                 initial = new File(Globals.prefs.get("fileWorkingDirectory"));
             }
             String chosen = FileDialogs.getNewFile(parent, initial, Globals.NONE,
-                JFileChooser.OPEN_DIALOG, false);
+                    JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
@@ -366,6 +374,5 @@ public class FileListEntryEditor {
             }
         }
     }
-
 
 }

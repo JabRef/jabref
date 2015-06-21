@@ -22,8 +22,8 @@ import java.util.List;
  */
 public interface IExportFormatProvider {
 
-	/**
-	 * @return a list of export formats
-	 */
-	List<IExportFormat> getExportFormats();
+    /**
+     * @return a list of export formats
+     */
+    List<IExportFormat> getExportFormats();
 }

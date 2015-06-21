@@ -51,13 +51,16 @@ public class CaseChangers {
 
     public static final String SPACE_SEPARATOR = " ";
 
+
     public static interface CaseChanger {
+
         String getName();
 
         String changeCase(String input);
     }
 
     public static class LowerCaseChanger implements CaseChanger {
+
         public String getName() {
             return "lower";
         }
@@ -68,6 +71,7 @@ public class CaseChangers {
     }
 
     public static class UpperCaseChanger implements CaseChanger {
+
         public String getName() {
             return "UPPER";
         }
@@ -78,7 +82,9 @@ public class CaseChangers {
     }
 
     public static class UpperFirstCaseChanger implements CaseChanger {
+
         private final static Pattern UF_PATTERN = Pattern.compile("\\b\\w");
+
 
         public String getName() {
             return "Upper first";
@@ -130,6 +136,7 @@ public class CaseChangers {
             notToCapitalize = Collections.unmodifiableSet(smallerWords);
         }
 
+
         public String getName() {
             return "Title";
         }
@@ -156,6 +163,7 @@ public class CaseChangers {
         }
 
     }
+
 
     public final static LowerCaseChanger LOWER = new LowerCaseChanger();
     public final static UpperCaseChanger UPPER = new UpperCaseChanger();

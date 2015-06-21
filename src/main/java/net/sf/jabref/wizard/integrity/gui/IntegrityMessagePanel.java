@@ -33,7 +33,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 //
 // modified :
 
-package net.sf.jabref.wizard.integrity.gui ;
+package net.sf.jabref.wizard.integrity.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -65,191 +65,196 @@ import net.sf.jabref.wizard.integrity.IntegrityMessage;
 import net.sf.jabref.wizard.text.gui.HintListModel;
 
 public class IntegrityMessagePanel
-    extends JPanel
-    implements ListSelectionListener, KeyListener, ActionListener
+        extends JPanel
+        implements ListSelectionListener, KeyListener, ActionListener
 
 {
-	
-	private JList warnings;
-  private HintListModel warningData ;
 
-  private IntegrityCheck validChecker ;
+    private JList warnings;
+    private HintListModel warningData;
 
-  private JTextField content  ;
-  private JButton applyButton ;
+    private IntegrityCheck validChecker;
+
+    private JTextField content;
+    private JButton applyButton;
     private BasePanel basePanel;
 
-  public IntegrityMessagePanel(BasePanel basePanel)
-  {
-    this.basePanel = basePanel;
-    validChecker = new IntegrityCheck() ; // errors, warnings, hints
 
-  // JList --------------------------------------------------------------
-    warningData = new HintListModel() ;
-		warnings = new JList(warningData);
-    warnings.setCellRenderer( new IntegrityListRenderer() );
-    warnings.addListSelectionListener(this);
-
-    JScrollPane paneScrollPane = new JScrollPane( warnings ) ;
-    paneScrollPane.setVerticalScrollBarPolicy(
-        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
-    paneScrollPane.setPreferredSize( new Dimension( 540, 255 ) ) ;
-    paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
-
-  // Fix Panel ---------------------------------------------------------
-    JPanel fixPanel = new JPanel() ;
-//    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
-
-    JLabel label1 = new JLabel(Globals.lang("Field_content")) ;
-
-    content = new JTextField(40) ;
-    content.addKeyListener(this);
-    applyButton = new JButton(Globals.lang("Apply")) ;
-    applyButton.addActionListener(this) ;
-    applyButton.setEnabled(false);
-      JButton fixButton = new JButton(Globals.lang("Suggest"));
-    fixButton.setEnabled(false);
-
-    fixPanel.add(label1) ;
-    fixPanel.add(content) ;
-    fixPanel.add(applyButton) ;
-    fixPanel.add(fixButton) ;
-
-  // Main Panel --------------------------------------------------------
-    this.setLayout( new BorderLayout() );
-    this.add( paneScrollPane, BorderLayout.CENTER ) ;
-    this.add( fixPanel, BorderLayout.SOUTH) ;
-  }
-
-  // ------------------------------------------------------------------------
-
-  public void updateView( BibtexEntry entry )
-  {
-    warningData.clear();
-    IntegrityMessage.setPrintMode( IntegrityMessage.SINLGE_MODE) ;
-    warningData.setData( validChecker.checkBibtexEntry( entry ) ) ;
-  }
-
-  public void updateView( BibtexDatabase base )
-  {
-    warningData.clear();
-    IntegrityMessage.setPrintMode( IntegrityMessage.FULL_MODE) ;
-    warningData.setData( validChecker.checkBibtexDatabase( base ) ) ;
-  }
-
-
-  // ------------------------------------------------------------------------
-  //This method is required by ListSelectionListener.
-  public void valueChanged( ListSelectionEvent e )
-  {
-    if ( e.getValueIsAdjusting() )
+    public IntegrityMessagePanel(BasePanel basePanel)
     {
-      Object obj = warnings.getSelectedValue() ;
-      String str = "" ;
-      if (obj != null)
-      {
-        IntegrityMessage msg = (IntegrityMessage) obj ;
-        BibtexEntry entry = msg.getEntry() ;
+        this.basePanel = basePanel;
+        validChecker = new IntegrityCheck(); // errors, warnings, hints
 
-        if (entry != null)
-        {
-          str = entry.getField(msg.getFieldName()) ;
-          basePanel.highlightEntry(entry);
-  // make the "invalid" field visible  ....
-  //          EntryEditor editor = basePanel.getCurrentEditor() ;
-  //          editor.
-        }
-      }
-      content.setText(str);
-      applyButton.setEnabled(false);
+        // JList --------------------------------------------------------------
+        warningData = new HintListModel();
+        warnings = new JList(warningData);
+        warnings.setCellRenderer(new IntegrityListRenderer());
+        warnings.addListSelectionListener(this);
+
+        JScrollPane paneScrollPane = new JScrollPane(warnings);
+        paneScrollPane.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        paneScrollPane.setPreferredSize(new Dimension(540, 255));
+        paneScrollPane.setMinimumSize(new Dimension(10, 10));
+
+        // Fix Panel ---------------------------------------------------------
+        JPanel fixPanel = new JPanel();
+        //    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
+
+        JLabel label1 = new JLabel(Globals.lang("Field_content"));
+
+        content = new JTextField(40);
+        content.addKeyListener(this);
+        applyButton = new JButton(Globals.lang("Apply"));
+        applyButton.addActionListener(this);
+        applyButton.setEnabled(false);
+        JButton fixButton = new JButton(Globals.lang("Suggest"));
+        fixButton.setEnabled(false);
+
+        fixPanel.add(label1);
+        fixPanel.add(content);
+        fixPanel.add(applyButton);
+        fixPanel.add(fixButton);
+
+        // Main Panel --------------------------------------------------------
+        this.setLayout(new BorderLayout());
+        this.add(paneScrollPane, BorderLayout.CENTER);
+        this.add(fixPanel, BorderLayout.SOUTH);
     }
-  }
 
-// --------------------------------------------------------------------------
-// This methods are required by KeyListener
-  public void keyPressed( KeyEvent e )
-  {
-  }
+    // ------------------------------------------------------------------------
 
-  public void keyReleased( KeyEvent e )
-  {
-    applyButton.setEnabled(true);
-    if (e.getKeyCode() == KeyEvent.VK_ENTER)
+    public void updateView(BibtexEntry entry)
     {
-      applyButton.doClick();
+        warningData.clear();
+        IntegrityMessage.setPrintMode(IntegrityMessage.SINLGE_MODE);
+        warningData.setData(validChecker.checkBibtexEntry(entry));
     }
-  }
 
-  public void keyTyped( KeyEvent e )
-  {
-  }
-
-  public void actionPerformed( ActionEvent e )
-  {
-    Object obj = e.getSource() ;
-    if (obj == applyButton)
+    public void updateView(BibtexDatabase base)
     {
-      Object data = warnings.getSelectedValue() ;
-      if (data != null)
-      {
-        IntegrityMessage msg = (IntegrityMessage) data ;
-        BibtexEntry entry = msg.getEntry() ;
-
-        if (entry != null)
-        {
-//          System.out.println("update") ;
-            String oldContent = entry.getField(msg.getFieldName());
-            UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent,
-                        content.getText());
-            entry.setField(msg.getFieldName(), content.getText());
-            basePanel.undoManager.addEdit(edit);
-            basePanel.markBaseChanged();
-            msg.setFixed(true);
-//          updateView(entry) ;
-          warningData.valueUpdated(warnings.getSelectedIndex()) ;
-        }
-      }
-
-      applyButton.setEnabled(false);
+        warningData.clear();
+        IntegrityMessage.setPrintMode(IntegrityMessage.FULL_MODE);
+        warningData.setData(validChecker.checkBibtexDatabase(base));
     }
-  }
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  class IntegrityListRenderer extends DefaultListCellRenderer
-  {
-    final ImageIcon warnIcon = GUIGlobals.getImage("integrityWarn");
-    final ImageIcon infoIcon = GUIGlobals.getImage("integrityInfo");
-    final ImageIcon failIcon = GUIGlobals.getImage("integrityFail");
-    final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
 
-    public Component getListCellRendererComponent(
-        JList list,
-        Object value, // value to display
-        int index, // cell index
-        boolean iss, // is the cell selected
-        boolean chf ) // the list and the cell have the focus
+    // ------------------------------------------------------------------------
+    //This method is required by ListSelectionListener.
+    public void valueChanged(ListSelectionEvent e)
     {
-      super.getListCellRendererComponent( list, value, index, iss, chf ) ;
+        if (e.getValueIsAdjusting())
+        {
+            Object obj = warnings.getSelectedValue();
+            String str = "";
+            if (obj != null)
+            {
+                IntegrityMessage msg = (IntegrityMessage) obj;
+                BibtexEntry entry = msg.getEntry();
 
-      if (value != null)
-      {
-        IntegrityMessage msg = (IntegrityMessage) value ;
-        if (msg.getFixed())
-        {
-          setIcon(fixedIcon) ;
+                if (entry != null)
+                {
+                    str = entry.getField(msg.getFieldName());
+                    basePanel.highlightEntry(entry);
+                    // make the "invalid" field visible  ....
+                    //          EntryEditor editor = basePanel.getCurrentEditor() ;
+                    //          editor.
+                }
+            }
+            content.setText(str);
+            applyButton.setEnabled(false);
         }
-        else
-        {
-          int id = msg.getType() ;
-          if ( id < 1000 )
-            setIcon( infoIcon ) ;
-          else if ( id < 2000 )
-            setIcon( warnIcon ) ;
-          else setIcon( failIcon ) ;
-        }
-      }
-      return this ;
     }
-  }
+
+    // --------------------------------------------------------------------------
+    // This methods are required by KeyListener
+    public void keyPressed(KeyEvent e)
+    {
+    }
+
+    public void keyReleased(KeyEvent e)
+    {
+        applyButton.setEnabled(true);
+        if (e.getKeyCode() == KeyEvent.VK_ENTER)
+        {
+            applyButton.doClick();
+        }
+    }
+
+    public void keyTyped(KeyEvent e)
+    {
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        Object obj = e.getSource();
+        if (obj == applyButton)
+        {
+            Object data = warnings.getSelectedValue();
+            if (data != null)
+            {
+                IntegrityMessage msg = (IntegrityMessage) data;
+                BibtexEntry entry = msg.getEntry();
+
+                if (entry != null)
+                {
+                    //          System.out.println("update") ;
+                    String oldContent = entry.getField(msg.getFieldName());
+                    UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent,
+                            content.getText());
+                    entry.setField(msg.getFieldName(), content.getText());
+                    basePanel.undoManager.addEdit(edit);
+                    basePanel.markBaseChanged();
+                    msg.setFixed(true);
+                    //          updateView(entry) ;
+                    warningData.valueUpdated(warnings.getSelectedIndex());
+                }
+            }
+
+            applyButton.setEnabled(false);
+        }
+    }
+
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    class IntegrityListRenderer extends DefaultListCellRenderer
+    {
+
+        final ImageIcon warnIcon = GUIGlobals.getImage("integrityWarn");
+        final ImageIcon infoIcon = GUIGlobals.getImage("integrityInfo");
+        final ImageIcon failIcon = GUIGlobals.getImage("integrityFail");
+        final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
+
+
+        public Component getListCellRendererComponent(
+                JList list,
+                Object value, // value to display
+                int index, // cell index
+                boolean iss, // is the cell selected
+                boolean chf) // the list and the cell have the focus
+        {
+            super.getListCellRendererComponent(list, value, index, iss, chf);
+
+            if (value != null)
+            {
+                IntegrityMessage msg = (IntegrityMessage) value;
+                if (msg.getFixed())
+                {
+                    setIcon(fixedIcon);
+                }
+                else
+                {
+                    int id = msg.getType();
+                    if (id < 1000)
+                        setIcon(infoIcon);
+                    else if (id < 2000)
+                        setIcon(warnIcon);
+                    else
+                        setIcon(failIcon);
+                }
+            }
+            return this;
+        }
+    }
 
 }

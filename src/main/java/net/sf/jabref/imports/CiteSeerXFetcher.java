@@ -29,17 +29,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class CiteSeerXFetcher implements EntryFetcher {
 
     protected static int MAX_PAGES_TO_LOAD = 8;
     final static String QUERY_MARKER = "___QUERY___";
     final static String URL_START = "http://citeseer.ist.psu.edu";
-    final static String SEARCH_URL = URL_START+"/search?q="+QUERY_MARKER
-            +"&submit=Search&sort=rlv&t=doc";
+    final static String SEARCH_URL = URL_START + "/search?q=" + QUERY_MARKER
+            + "&submit=Search&sort=rlv&t=doc";
     final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
     protected boolean stopFetching = false;
+
 
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         stopFetching = false;
@@ -87,7 +87,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         stopFetching = true;
     }
 
-        /**
+    /**
      *
      * @param query
      *            The search term to query JStor for.
@@ -120,17 +120,19 @@ public class CiteSeerXFetcher implements EntryFetcher {
         //System.out.println(cont);
         Matcher m = CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
-            ids.add(URL_START+m.group(1));
+            ids.add(URL_START + m.group(1));
         }
 
         return null;
     }
 
-    final static String basePattern = "<meta name=\""+QUERY_MARKER+"\" content=\"(.*)\" />";
+
+    final static String basePattern = "<meta name=\"" + QUERY_MARKER + "\" content=\"(.*)\" />";
     final static Pattern titlePattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_title"));
     final static Pattern authorPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_authors"));
     final static Pattern yearPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_year"));
     final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
+
 
     protected BibtexEntry getSingleCitation(String urlString) throws IOException {
 

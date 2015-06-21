@@ -34,13 +34,14 @@ class EntryEditorTabFocusListener implements FocusListener {
     DocumentListener d;
     private EntryEditorTab entryEditorTab;
 
+
     public EntryEditorTabFocusListener(final EntryEditorTab entryEditorTab) {
         this.entryEditorTab = entryEditorTab;
     }
 
     public void focusGained(FocusEvent e) {
 
-        synchronized (this){
+        synchronized (this) {
             if (c != null) {
                 c.getDocument().removeDocumentListener(d);
                 c = null;
@@ -98,7 +99,7 @@ class EntryEditorTabFocusListener implements FocusListener {
     }
 
     public void focusLost(FocusEvent e) {
-synchronized (this) {
+        synchronized (this) {
             if (c != null) {
                 c.getDocument().removeDocumentListener(d);
                 c = null;

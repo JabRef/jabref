@@ -32,9 +32,11 @@ import net.sf.jabref.AuthorList;
  *
  */
 public class PersonName {
+
     protected String givenName = null;
     protected String surname = null;
     protected String middleName = null;
+
 
     public PersonName() {
     }
@@ -50,37 +52,37 @@ public class PersonName {
     }
 
     protected void parseName(String author) {
-    		Vector<String> v = new Vector<String>();
-            String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
-             
-            //Formating names and replacing escape Char for ',' back to a comma
-//            XMLChars xmlChars = new XMLChars();
-//            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
- 
-            int endOfLastName = authorMod.indexOf(",");
+        Vector<String> v = new Vector<String>();
+        String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 
-            // Tokenize just the firstName and middleNames as we have the surname
-            // before the comma.
-            WSITools.tokenize(v, authorMod.substring(endOfLastName+1).trim(), " \n\r");
-            if (endOfLastName>=0) // comma is found
-            	v.add(authorMod.substring(0, endOfLastName));
-            
-            int amountOfNames = v.size();
+        //Formating names and replacing escape Char for ',' back to a comma
+        //            XMLChars xmlChars = new XMLChars();
+        //            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
 
-            if (amountOfNames == 1)
-                surname = v.get(0);
-            else if (amountOfNames == 2) {
-                givenName = v.get(0);
-                surname = v.get(1);
-            }
-            else {
-                givenName = v.get(0);
-                middleName = "";
-                for (int i = 1; i < amountOfNames - 1 ; i++)
-                	middleName += " " + v.get(i);
-                middleName = middleName.trim();
-                surname = v.get(amountOfNames-1);
-                }
+        int endOfLastName = authorMod.indexOf(",");
+
+        // Tokenize just the firstName and middleNames as we have the surname
+        // before the comma.
+        WSITools.tokenize(v, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
+        if (endOfLastName >= 0) // comma is found
+            v.add(authorMod.substring(0, endOfLastName));
+
+        int amountOfNames = v.size();
+
+        if (amountOfNames == 1)
+            surname = v.get(0);
+        else if (amountOfNames == 2) {
+            givenName = v.get(0);
+            surname = v.get(1);
+        }
+        else {
+            givenName = v.get(0);
+            middleName = "";
+            for (int i = 1; i < amountOfNames - 1; i++)
+                middleName += " " + v.get(i);
+            middleName = middleName.trim();
+            surname = v.get(amountOfNames - 1);
+        }
     }
 
     public String getGivenNames() {
@@ -124,15 +126,15 @@ public class PersonName {
 
     public String getFullname()
     {
-    	String fullName = "";
-    	if(givenName != null && !givenName.equals(""))
-    		fullName += givenName + " "; 
-    	if(middleName != null && !middleName.equals(""))
-    		fullName += middleName + " ";
-    	if(surname != null && !surname.equals(""))
-    		fullName += surname;
-    	
-    	return fullName.trim();
+        String fullName = "";
+        if (givenName != null && !givenName.equals(""))
+            fullName += givenName + " ";
+        if (middleName != null && !middleName.equals(""))
+            fullName += middleName + " ";
+        if (surname != null && !surname.equals(""))
+            fullName += surname;
+
+        return fullName.trim();
     }
 
     public String toString() {

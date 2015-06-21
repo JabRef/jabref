@@ -28,11 +28,9 @@ package net.sf.jabref;
 
 import java.util.Map;
 
-public interface SearchRule{
+public interface SearchRule {
 
-    public int applyRule(Map<String, String> searchStrings,BibtexEntry bibtexEntry) ;
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry);
 
     public boolean validateSearchStrings(Map<String, String> searchStrings);
 }
-
-

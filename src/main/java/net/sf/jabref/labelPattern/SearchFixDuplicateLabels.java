@@ -28,8 +28,10 @@ import java.util.List;
  * Function for resolving duplicate BibTeX keys.
  */
 public class SearchFixDuplicateLabels extends AbstractWorker {
+
     private BasePanel panel;
     HashMap<String, List<BibtexEntry>> dupes = null;
+
 
     public SearchFixDuplicateLabels(BasePanel panel) {
 
@@ -86,7 +88,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             rdld.show();
             if (rdld.isOkPressed()) {
                 List<JCheckBox> cbs = rdld.getCheckBoxes();
-                for (int i=0; i<cbs.size(); i++) {
+                for (int i = 0; i < cbs.size(); i++) {
                     if (cbs.get(i).isSelected()) {
                         // The checkbox for entry i has been selected, so we should generate a new key for it:
                         toGenerateFor.add(dupes.get(key).get(i));
@@ -102,7 +104,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                 String oldKey = entry.getCiteKey();
                 entry = LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
                 ce.addEdit(new UndoableKeyChange(panel.database(), entry.getId(), oldKey,
-                    entry.getField(BibtexFields.KEY_FIELD)));
+                        entry.getField(BibtexFields.KEY_FIELD)));
             }
             ce.end();
             panel.undoManager.addEdit(ce);

@@ -40,8 +40,8 @@ public class PreambleEditor extends JDialog {
 
 
     public PreambleEditor(JabRefFrame baseFrame,
-                          BasePanel panel, BibtexDatabase base,
-                          JabRefPreferences prefs) {
+            BasePanel panel, BibtexDatabase base,
+            JabRefPreferences prefs) {
         super(baseFrame);
         this.baseFrame = baseFrame;
         this.panel = panel;
@@ -49,6 +49,7 @@ public class PreambleEditor extends JDialog {
         this.prefs = prefs;
 
         addWindowListener(new WindowAdapter() {
+
             public void windowClosing(WindowEvent e) {
                 closeAction.actionPerformed(null);
             }
@@ -58,6 +59,7 @@ public class PreambleEditor extends JDialog {
             }
         });
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
+
             protected boolean accept(Component c) {
                 return (super.accept(c) && (c instanceof FieldEditor));
             }
@@ -105,7 +107,6 @@ public class PreambleEditor extends JDialog {
         ta.getInputMap().put(prefs.getKey("Redo"), "redo");
         ta.getActionMap().put("redo", redoAction);
 
-
         ta.addFocusListener(new FieldListener());
     }
 
@@ -113,11 +114,13 @@ public class PreambleEditor extends JDialog {
         ed.setText(base.getPreamble());
     }
 
+
     class FieldListener extends FocusAdapter {
+
         /*
-       * Focus listener that fires the storeFieldAction when a FieldTextArea
-       * loses focus.
-       */
+        * Focus listener that fires the storeFieldAction when a FieldTextArea
+        * loses focus.
+        */
         public void focusLost(FocusEvent e) {
             if (!e.isTemporary())
                 storeFieldAction.actionPerformed(new ActionEvent(e.getSource(), 0, ""));
@@ -125,9 +128,12 @@ public class PreambleEditor extends JDialog {
 
     }
 
+
     StoreFieldAction storeFieldAction = new StoreFieldAction();
 
+
     class StoreFieldAction extends AbstractAction {
+
         public StoreFieldAction() {
             super("Store field value");
             putValue(SHORT_DESCRIPTION, "Store field value");
@@ -166,9 +172,12 @@ public class PreambleEditor extends JDialog {
         }
     }
 
+
     UndoAction undoAction = new UndoAction();
 
+
     class UndoAction extends AbstractAction {
+
         public UndoAction() {
             super("Undo", GUIGlobals.getImage("undo"));
             putValue(SHORT_DESCRIPTION, "Undo");
@@ -182,9 +191,12 @@ public class PreambleEditor extends JDialog {
         }
     }
 
+
     RedoAction redoAction = new RedoAction();
 
+
     class RedoAction extends AbstractAction {
+
         public RedoAction() {
             super("Undo", GUIGlobals.getImage("redo"));
             putValue(SHORT_DESCRIPTION, "Redo");
@@ -198,10 +210,13 @@ public class PreambleEditor extends JDialog {
         }
     }
 
+
     // The action concerned with closing the window.
     CloseAction closeAction = new CloseAction();
 
+
     class CloseAction extends AbstractAction {
+
         public CloseAction() {
             super(Globals.lang("Close window"));
             //, new ImageIcon(GUIGlobals.closeIconFile));
@@ -214,6 +229,7 @@ public class PreambleEditor extends JDialog {
             dispose();
         }
     }
+
 
     public FieldEditor getFieldEditor() {
         return ed;

@@ -28,7 +28,9 @@ import net.sf.jabref.Util;
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
+
     public static final int CURRENT_VERSION = 3;
+
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
@@ -66,8 +68,10 @@ public class VersionHandling {
         }
     }
 
+
     /** Imports groups version 0 and 1. */
     private static class Version0_1 {
+
         /**
          * Parses the textual representation obtained from
          * GroupTreeNode.toString() and recreates that node and all of its
@@ -163,8 +167,9 @@ public class VersionHandling {
             return -1;
         }
     }
-    
+
     private static class Version2_3 {
+
         private static GroupTreeNode fromString(Vector<String> data, BibtexDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
@@ -176,12 +181,12 @@ public class VersionHandling {
             String s;
             for (int i = 0; i < data.size(); ++i) {
                 s = data.elementAt(i);
-                
+
                 // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();
                 if (s.length() == 0)
-                	continue;
-                
+                    continue;
+
                 spaceIndex = s.indexOf(' ');
                 if (spaceIndex <= 0)
                     throw new Exception("bad format"); // JZTODO lyrics

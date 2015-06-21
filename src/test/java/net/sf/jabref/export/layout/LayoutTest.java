@@ -63,7 +63,8 @@ public class LayoutTest {
         assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testHTMLChar() throws Exception {
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\ntext}}");
@@ -94,7 +95,8 @@ public class LayoutTest {
      *
      * @throws Exception
      */
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testLayout() throws Exception {
 
         String layoutText = layout(

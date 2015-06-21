@@ -34,6 +34,7 @@ public class URLDownload {
 
     public static URLDownload buildMonitoredDownload(final Component component, URL source) {
         return new URLDownload(source) {
+
             @Override
             protected InputStream monitorInputStream(InputStream in) {
                 return new ProgressMonitorInputStream(component, "Downloading " + this.getSource().toString(), in);
@@ -41,7 +42,9 @@ public class URLDownload {
         };
     }
 
+
     private final URL source;
+
 
     /**
      * URL download to a string.
@@ -167,7 +170,8 @@ public class URLDownload {
         byte[] buffer = new byte[512];
         while (true) {
             int bytesRead = monitorInputStream.read(buffer);
-            if (bytesRead == -1) break;
+            if (bytesRead == -1)
+                break;
             out.write(buffer, 0, bytesRead);
         }
     }

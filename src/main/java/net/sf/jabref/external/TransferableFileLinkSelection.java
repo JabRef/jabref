@@ -36,6 +36,7 @@ public class TransferableFileLinkSelection implements Transferable {
 
     List<File> fileList = new ArrayList<File>();
 
+
     public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
@@ -56,15 +57,15 @@ public class TransferableFileLinkSelection implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-        System.out.println("Query: "+dataFlavor.getHumanPresentableName()+" , "+
-            dataFlavor.getDefaultRepresentationClass()+" , "+dataFlavor.getMimeType());
+        System.out.println("Query: " + dataFlavor.getHumanPresentableName() + " , " +
+                dataFlavor.getDefaultRepresentationClass() + " , " + dataFlavor.getMimeType());
         return dataFlavor.equals(DataFlavor.javaFileListFlavor)
                 || dataFlavor.equals(DataFlavor.stringFlavor);
     }
 
     public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
         //if (dataFlavor.equals(DataFlavor.javaFileListFlavor))
-            return fileList;
+        return fileList;
         //else
         //    return "test";
     }

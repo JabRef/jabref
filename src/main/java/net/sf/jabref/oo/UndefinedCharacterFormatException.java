@@ -23,6 +23,7 @@ public class UndefinedCharacterFormatException extends Exception {
 
     String formatName;
 
+
     public UndefinedCharacterFormatException(String formatName) {
         super();
         this.formatName = formatName;

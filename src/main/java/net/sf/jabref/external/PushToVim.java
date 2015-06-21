@@ -34,13 +34,14 @@ public class PushToVim implements PushToApplication {
 
     private JPanel settings = null;
     private JTextField vimPath = new JTextField(30),
-        vimServer = new JTextField(30),
-        citeCommand = new JTextField(30);
+            vimServer = new JTextField(30),
+            citeCommand = new JTextField(30);
 
-    private boolean couldNotConnect=false, couldNotRunClient=false;
+    private boolean couldNotConnect = false, couldNotRunClient = false;
+
 
     public String getName() {
-        return Globals.lang("Insert selected citations into Vim") ;
+        return Globals.lang("Insert selected citations into Vim");
     }
 
     public String getApplicationName() {
@@ -67,7 +68,7 @@ public class PushToVim implements PushToApplication {
         citeCommand.setText(Globals.prefs.get("citeCommandVim"));
         return settings;
     }
-    
+
     public void storeSettings() {
         Globals.prefs.put("vim", vimPath.getText());
         Globals.prefs.put("vimServer", vimServer.getText());
@@ -94,18 +95,19 @@ public class PushToVim implements PushToApplication {
     }
 
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys,
-                            MetaData metaData) {
+            MetaData metaData) {
 
-        couldNotConnect=false;
-        couldNotRunClient=false;
+        couldNotConnect = false;
+        couldNotRunClient = false;
         try {
-                String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
-                "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
-                       "{" + keys + "}"};
+            String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
+                    "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
+                            "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
 
             Runnable errorListener = new Runnable() {
+
                 public void run() {
                     InputStream out = p.getErrorStream();
                     int c;
@@ -118,7 +120,7 @@ public class PushToVim implements PushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (sb.toString().trim().length() > 0) {
-			System.out.println(sb.toString());
+                        System.out.println(sb.toString());
                         couldNotConnect = true;
                     }
                 }
@@ -126,8 +128,7 @@ public class PushToVim implements PushToApplication {
             Thread t = new Thread(errorListener);
             t.start();
             t.join();
-        }
-        catch (IOException excep) {
+        } catch (IOException excep) {
             couldNotRunClient = true;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -135,21 +136,20 @@ public class PushToVim implements PushToApplication {
 
     }
 
-
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect)
             JOptionPane.showMessageDialog(
-                panel.frame(),
-                "<HTML>"+
-                Globals.lang("Could not connect to Vim server. Make sure that "
-														 +"Vim is running<BR>with correct server name.")
-                +"</HTML>",
-                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    panel.frame(),
+                    "<HTML>" +
+                            Globals.lang("Could not connect to Vim server. Make sure that "
+                                    + "Vim is running<BR>with correct server name.")
+                            + "</HTML>",
+                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
         else if (couldNotRunClient)
             JOptionPane.showMessageDialog(
-                panel.frame(),
-                Globals.lang("Could not run the 'vim' program."),
-                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    panel.frame(),
+                    Globals.lang("Could not run the 'vim' program."),
+                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
         else {
             panel.output(Globals.lang("Pushed citations to Vim"));
         }

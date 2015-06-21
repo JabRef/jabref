@@ -18,6 +18,7 @@ public class SplDatabaseChangeListener implements DatabaseChangeListener {
     private MainTable entryTable;
     private String fileName;
 
+
     public SplDatabaseChangeListener(JabRefFrame frame, BasePanel panel, MainTable entryTable, String fileName) {
         this.frame = frame;
         this.panel = panel;
@@ -27,7 +28,7 @@ public class SplDatabaseChangeListener implements DatabaseChangeListener {
 
     @Override
     public void databaseChanged(DatabaseChangeEvent e) {
-        if(e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY){
+        if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
             dfh.linkPdfToEntry(fileName, entryTable, e.getEntry());
             panel.database().removeDatabaseChangeListener(this);

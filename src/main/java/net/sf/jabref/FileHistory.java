@@ -31,6 +31,7 @@ public class FileHistory extends JMenu implements ActionListener {
     LinkedList<String> history = new LinkedList<String>();
     JabRefFrame frame;
 
+
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {
         String name = Globals.menuTitle("Recent files");
         int i = name.indexOf('&');
@@ -95,7 +96,7 @@ public class FileHistory extends JMenu implements ActionListener {
     }
 
     private void removeItem(String filename) {
-        int i=0;
+        int i = 0;
         while (i < history.size()) {
             if (history.get(i).equals(filename)) {
                 history.remove(i);
@@ -123,18 +124,18 @@ public class FileHistory extends JMenu implements ActionListener {
         final File fileToOpen = new File(name);
 
         if (!fileToOpen.exists()) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+": "+fileToOpen.getName(),
+            JOptionPane.showMessageDialog(frame, Globals.lang("File not found") + ": " + fileToOpen.getName(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             removeItem(name);
             return;
         }
         (new Thread() {
+
             public void run() {
                 frame.open.openIt(fileToOpen, true);
             }
         }).start();
 
     }
-
 
 }

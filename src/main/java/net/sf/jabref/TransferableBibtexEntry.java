@@ -33,18 +33,18 @@ public class TransferableBibtexEntry implements Transferable {
     private BibtexEntry[] data;
     public static DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
 
+
     public TransferableBibtexEntry(BibtexEntry[] data) {
         this.data = data;
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{TransferableBibtexEntry.entryFlavor,
+        return new DataFlavor[] {TransferableBibtexEntry.entryFlavor,
                 DataFlavor.stringFlavor};
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return (flavor.equals(entryFlavor) ||
-                flavor.equals(DataFlavor.stringFlavor));
+        return (flavor.equals(entryFlavor) || flavor.equals(DataFlavor.stringFlavor));
     }
 
     public Object getTransferData(DataFlavor flavor)

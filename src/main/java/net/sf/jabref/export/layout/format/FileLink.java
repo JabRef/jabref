@@ -33,6 +33,7 @@ public class FileLink implements ParamLayoutFormatter {
 
     String fileType = null;
 
+
     public String format(String field) {
         FileListTableModel tableModel = new FileListTableModel();
         if (field == null)
@@ -47,7 +48,7 @@ public class FileLink implements ParamLayoutFormatter {
         }
         else {
             // A file type is specified:
-            for (int i=0; i< tableModel.getRowCount(); i++) {
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
                 FileListEntry flEntry = tableModel.getEntry(i);
                 if (flEntry.getType().getName().toLowerCase().equals(fileType)) {
                     link = flEntry.getLink();
@@ -55,10 +56,9 @@ public class FileLink implements ParamLayoutFormatter {
                 }
             }
         }
-        
+
         if (link == null)
             return "";
-
 
         String[] dirs;
         // We need to resolve the file directory from the database's metadata,
@@ -69,15 +69,15 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = Globals.prefs.fileDirForDatabase;
         else
             dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
-        
-		File f = Util.expandFilename(link, dirs);
+
+        File f = Util.expandFilename(link, dirs);
 
         /*
-		 * Stumbled over this while investigating
-		 *
-		 * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-		 */
-		if (f != null) {
+         * Stumbled over this while investigating
+         *
+         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+         */
+        if (f != null) {
             try {
                 return f.getCanonicalPath();//f.toURI().toString();
             } catch (IOException e) {
@@ -85,9 +85,8 @@ public class FileLink implements ParamLayoutFormatter {
                 return f.getPath();
             }
         } else {
-			return link;
-		}
-
+            return link;
+        }
 
     }
 

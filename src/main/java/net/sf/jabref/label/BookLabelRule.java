@@ -42,10 +42,10 @@ public class BookLabelRule extends DefaultLabelRule {
         try {
             if (oldEntry.getField("author") != null) {
                 authorTokens = new StringTokenizer(oldEntry.getField("author"),
-                    ",");
+                        ",");
             } else if (oldEntry.getField("editor") != null) {
                 authorTokens = new StringTokenizer(oldEntry.getField("editor"),
-                    ",");
+                        ",");
             }
             if (authorTokens != null)
                 newLabel += authorTokens.nextToken().toLowerCase();

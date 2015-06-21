@@ -25,6 +25,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         return new LatexFieldFormatter(true);
     }
 
+
     StringBuffer sb;
     int col; // First line usually starts about so much further to the right.
     final int STARTCOL = 4;
@@ -36,6 +37,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     private final char valueDelimitersOne;
     private final boolean writefieldWrapfield;
     private final String[] doNotResolveStringsFors;
+
 
     public LatexFieldFormatter() {
         this(true);
@@ -54,7 +56,8 @@ public class LatexFieldFormatter implements FieldFormatter {
     public String format(String text, String fieldName)
             throws IllegalArgumentException {
 
-        if (text == null) return valueDelimitersZero + "" + valueDelimitersOne;
+        if (text == null)
+            return valueDelimitersZero + "" + valueDelimitersOne;
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
             text = Util.putBracesAroundCapitals(text);
@@ -91,8 +94,10 @@ public class LatexFieldFormatter implements FieldFormatter {
             for (int i = 0; i < text.length(); i++) {
                 char c = text.charAt(i);
                 //Util.pr(""+c);
-                if (c == '{') brc++;
-                if (c == '}') brc--;
+                if (c == '{')
+                    brc++;
+                if (c == '}')
+                    brc--;
                 if (brc < 0) {
                     ok = false;
                     break;
@@ -106,10 +111,10 @@ public class LatexFieldFormatter implements FieldFormatter {
             sb = new StringBuffer(
                     valueDelimitersZero + "");
             // No formatting at all for these fields, to allow custom formatting?
-//            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
-//              sb.append(text);
-//            else
-//             currently, we do not do any more wrapping
+            //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
+            //              sb.append(text);
+            //            else
+            //             currently, we do not do any more wrapping
             if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName))
                 sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
             else
@@ -131,7 +136,6 @@ public class LatexFieldFormatter implements FieldFormatter {
         // jan # { - } # feb
         checkBraces(text);
 
-
         while (pivot < text.length()) {
             int goFrom = pivot;
             pos1 = pivot;
@@ -151,10 +155,9 @@ public class LatexFieldFormatter implements FieldFormatter {
                 pos2 = text.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
                     if (!neverFailOnHashes) {
-                        throw new IllegalArgumentException
-                                (Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n" +
-                                        Globals.lang("In JabRef, use pairs of # characters to indicate a string.") + "\n" +
-                                        Globals.lang("Note that the entry causing the problem has been selected."));
+                        throw new IllegalArgumentException(Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n" +
+                                Globals.lang("In JabRef, use pairs of # characters to indicate a string.") + "\n" +
+                                Globals.lang("Note that the entry causing the problem has been selected."));
                     } else {
                         pos1 = text.length(); // just write out the rest of the text, and throw no exception
                     }
@@ -170,30 +173,30 @@ public class LatexFieldFormatter implements FieldFormatter {
                 writeStringLabel(text, pos1 + 1, pos2, (pos1 == pivot),
                         (pos2 + 1 == text.length()));
 
-            if (pos2 > -1) pivot = pos2 + 1;
-            else pivot = pos1 + 1;
+            if (pos2 > -1)
+                pivot = pos2 + 1;
+            else
+                pivot = pos1 + 1;
             //if (tell++ > 10) System.exit(0);
         }
 
         // currently, we do not add newlines and new formatting
         if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
-//             introduce a line break to be read at the parser
+            //             introduce a line break to be read at the parser
             return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
 
         } else
             return sb.toString();
 
-
     }
 
     private void writeText(String text, int start_pos,
-                           int end_pos) {
+            int end_pos) {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
         sb.append(valueDelimitersZero);
-        boolean escape = false, inCommandName = false, inCommand = false,
-                inCommandOption = false;
+        boolean escape = false, inCommandName = false, inCommand = false, inCommandOption = false;
         int nestedEnvironments = 0;
         StringBuffer commandName = new StringBuffer();
         char c;
@@ -216,7 +219,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 // Or the end of an argument:
                 else if (inCommandOption && (c == ']'))
                     inCommandOption = false;
-                    // Or the beginning of the command body:
+                // Or the beginning of the command body:
                 else if (!inCommandOption && (c == '{')) {
                     //System.out.println("Read command: '"+commandName.toString()+"'");
                     inCommandName = false;
@@ -248,7 +251,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape &&
+if ((c == '&') && !escape &&
                     !(inCommand && commandName.toString().equals("url")) &&
                     (nestedEnvironments == 0)) {
                 sb.append("\\&");
@@ -260,7 +263,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
-                                  boolean first, boolean last) {
+            boolean first, boolean last) {
         //sb.append(Util.wrap2((first ? "" : " # ") + text.substring(start_pos, end_pos)
         //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
         putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
@@ -271,12 +274,9 @@ public class LatexFieldFormatter implements FieldFormatter {
         sb.append(Util.wrap2(s, GUIGlobals.LINE_LENGTH));
     }
 
-
     private void checkBraces(String text) throws IllegalArgumentException {
 
-        Vector<Integer>
-                left = new Vector<Integer>(5, 3),
-                right = new Vector<Integer>(5, 3);
+        Vector<Integer> left = new Vector<Integer>(5, 3), right = new Vector<Integer>(5, 3);
         int current = -1;
 
         // First we collect all occurences:
@@ -287,15 +287,12 @@ public class LatexFieldFormatter implements FieldFormatter {
 
         // Then we throw an exception if the error criteria are met.
         if ((right.size() > 0) && (left.size() == 0))
-            throw new IllegalArgumentException
-                    ("'}' character ends string prematurely.");
+            throw new IllegalArgumentException("'}' character ends string prematurely.");
         if ((right.size() > 0) && (right.elementAt(0)
                 < left.elementAt(0)))
-            throw new IllegalArgumentException
-                    ("'}' character ends string prematurely.");
+            throw new IllegalArgumentException("'}' character ends string prematurely.");
         if (left.size() != right.size())
-            throw new IllegalArgumentException
-                    ("Braces don't match.");
+            throw new IllegalArgumentException("Braces don't match.");
 
     }
 

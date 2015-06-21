@@ -31,25 +31,24 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class ScienceDirectFetcher implements EntryFetcher {
 
     protected static int MAX_PAGES_TO_LOAD = 8;
     protected static final String WEBSITE_URL = "http://www.sciencedirect.com";
-    protected static final String SEARCH_URL = WEBSITE_URL +"/science/quicksearch?query=";
+    protected static final String SEARCH_URL = WEBSITE_URL + "/science/quicksearch?query=";
 
-    protected static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&" ;
+    protected static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
     protected static final Pattern linkPattern = Pattern.compile(
-            "<a href=\""+
-            linkPrefix.replaceAll("\\?", "\\\\?")+
-            "([^\"]+)\"\"");
+            "<a href=\"" +
+                    linkPrefix.replaceAll("\\?", "\\\\?") +
+                    "([^\"]+)\"\"");
 
     protected static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next &gt;");
 
-
     protected boolean stopFetching = false;
     protected boolean noAccessFound = false;
+
 
     public String getHelpPage() {
         return "ScienceDirect.html";
@@ -83,14 +82,14 @@ public class ScienceDirectFetcher implements EntryFetcher {
             List<String> citations = getCitations(query);
             if (citations == null)
                 return false;
-            if (citations.size() == 0){
+            if (citations.size() == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                    query),
-                    Globals.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
+                        query),
+                        Globals.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
-            int i=0;
+            int i = 0;
             for (String cit : citations) {
                 if (stopFetching)
                     break;
@@ -141,7 +140,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
         Matcher m = linkPattern.matcher(cont);
         if (m.find()) {
             while (m.find()) {
-                ids.add(linkPrefix+m.group(1));
+                ids.add(linkPrefix + m.group(1));
                 cont = cont.substring(m.end());
                 m = linkPattern.matcher(cont);
             }
@@ -156,8 +155,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
             return newQuery;
         }
         else*/
-            return null;
+        return null;
     }
-
 
 }

@@ -24,26 +24,25 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.event.UndoableEditListener;
 
-
 /**
  * FieldEditors is a common interface between the FieldTextField and FieldTextArea.
  */
 public interface FieldEditor {
 
-	public String getFieldName();
+    public String getFieldName();
 
-	/*
-	 * Returns the component to be added to a container. Might be a JScrollPane
-	 * or the component itself.
-	 */
-	public JComponent getPane();
+    /*
+     * Returns the component to be added to a container. Might be a JScrollPane
+     * or the component itself.
+     */
+    public JComponent getPane();
 
-	/*
-	 * Returns the text component itself.
-	 */
-	public JComponent getTextComponent();
+    /*
+     * Returns the text component itself.
+     */
+    public JComponent getTextComponent();
 
-	public JLabel getLabel();
+    public JLabel getLabel();
 
     public void setActiveBackgroundColor();
 
@@ -51,44 +50,44 @@ public interface FieldEditor {
 
     public void setInvalidBackgroundColor();
 
-	public void setLabelColor(Color c);
+    public void setLabelColor(Color c);
 
-	public void setBackground(Color c);
+    public void setBackground(Color c);
 
     public void updateFontColor();
 
-	public String getText();
+    public String getText();
 
-	/**
-	 * Sets the given text on the current field editor and marks this text
-	 * editor as modified.
-	 * 
-	 * @param newText
-	 */
-	public void setText(String newText);
+    /**
+     * Sets the given text on the current field editor and marks this text
+     * editor as modified.
+     * 
+     * @param newText
+     */
+    public void setText(String newText);
 
-	public void append(String text);
+    public void append(String text);
 
-	public Container getParent();
+    public Container getParent();
 
-	public void requestFocus();
+    public void requestFocus();
 
-	public void setEnabled(boolean enabled);
+    public void setEnabled(boolean enabled);
 
     public void updateFont();
+
     /**
-	 * paste text into component, it should also take some selected text into
-	 * account
-	 */
-	public void paste(String textToInsert);
+     * paste text into component, it should also take some selected text into
+     * account
+     */
+    public void paste(String textToInsert);
 
-	/**
-	 * normally implemented in JTextArea and JTextField
-	 * 
-	 * @return
-	 */
-	public String getSelectedText();
-
+    /**
+     * normally implemented in JTextArea and JTextField
+     * 
+     * @return
+     */
+    public String getSelectedText();
 
     public boolean hasUndoInformation();
 

@@ -32,6 +32,7 @@ public class OAI2ImportTest {
 
     protected SAXParser saxParser;
 
+
     @Before
     public void setUp() throws Exception {
         parserFactory = SAXParserFactory.newInstance();
@@ -119,7 +120,8 @@ public class OAI2ImportTest {
         assertEquals("", OAI2Fetcher.fixKey("arXiv:"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testOnline() throws InterruptedException {
 
         {

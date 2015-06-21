@@ -17,6 +17,7 @@ public class EntryFromPDFCreatorTest {
 
     private EntryFromPDFCreator entryCreator = new EntryFromPDFCreator();
 
+
     @Before
     public void setUp() throws Exception {
         // externalFileTypes are needed for the EntryFromPDFCreator
@@ -30,7 +31,8 @@ public class EntryFromPDFCreatorTest {
         assertFalse(entryCreator.accept(new File("foo.jpg")));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testCreationOfEntry() {
         BibtexEntry entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
         assertNull(entry);
@@ -41,4 +43,4 @@ public class EntryFromPDFCreatorTest {
         assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
 
     }
-} 
+}

@@ -32,43 +32,42 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
     private String oldValue, newValue;
     private BasePanel panel;
 
+
     public UndoablePreambleChange(BibtexDatabase base, BasePanel panel,
-				  String oldValue, String newValue) {
-	this.base = base;
-	this.oldValue = oldValue;
-	this.newValue = newValue;
-	this.panel = panel;
+            String oldValue, String newValue) {
+        this.base = base;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.panel = panel;
     }
 
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+Globals.lang("change preamble");
+        return Globals.lang("Undo") + ": " + Globals.lang("change preamble");
     }
 
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+Globals.lang("change preamble");
+        return Globals.lang("Redo") + ": " + Globals.lang("change preamble");
     }
 
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
-	base.setPreamble(oldValue);
+        super.undo();
 
-	// If the preamble editor is open, update it.
-	panel.updatePreamble();
+        // Revert the change.
+        base.setPreamble(oldValue);
+
+        // If the preamble editor is open, update it.
+        panel.updatePreamble();
     }
 
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	base.setPreamble(newValue);
+        // Redo the change.
+        base.setPreamble(newValue);
 
-	// If the preamble editor is open, update it.
-	panel.updatePreamble();
+        // If the preamble editor is open, update it.
+        panel.updatePreamble();
 
     }
-
-
 
 }

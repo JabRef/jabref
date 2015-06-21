@@ -32,14 +32,15 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     private JMenuItem menuItem;
     private int besLength = 0;
 
+
     public MarkEntriesAction(JabRefFrame frame, int level) {
         this.frame = frame;
         this.level = level;
 
         //menuItem = new JMenuItem(Globals.menuTitle("Mark entries").replaceAll("&",""));
         menuItem = new JMenuItem("               ");
-        menuItem.setMnemonic(String.valueOf(level+1).charAt(0));
-        menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground"+this.level));
+        menuItem.setMnemonic(String.valueOf(level + 1).charAt(0));
+        menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground" + this.level));
         menuItem.setOpaque(true);
         menuItem.addActionListener(this);
     }

@@ -18,13 +18,13 @@ package net.sf.jabref.export;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 
-
 /**
  * Exception thrown if saving goes wrong. If caused by a specific
  * entry, keeps track of which entry caused the problem.
  */
 public class SaveException extends Exception
 {
+
     //~ Instance fields ////////////////////////////////////////////////////////
 
     public static final SaveException FILE_LOCKED = new SaveException
@@ -34,6 +34,8 @@ public class SaveException extends Exception
 
     private BibtexEntry entry;
     private int status = 0;
+
+
     //~ Constructors ///////////////////////////////////////////////////////////
 
     public SaveException(String message)
@@ -43,12 +45,11 @@ public class SaveException extends Exception
     }
 
     public SaveException(String message, int status)
-        {
-            super(message);
-            entry = null;
-            this.status = status;
-        }
-
+    {
+        super(message);
+        entry = null;
+        this.status = status;
+    }
 
     public SaveException(String message, BibtexEntry entry)
     {

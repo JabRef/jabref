@@ -32,41 +32,42 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     public static final String NAME = "fileUpdate";
 
-	JButton test = new JButton(Globals.lang("Review changes"));
+    JButton test = new JButton(Globals.lang("Review changes"));
 
-	BasePanel panel;
+    BasePanel panel;
 
-	JabRefFrame frame;
+    JabRefFrame frame;
 
-	SidePaneManager manager;
+    SidePaneManager manager;
 
-	JLabel message;
+    JLabel message;
 
-	ChangeScanner scanner;
+    ChangeScanner scanner;
 
-	public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,
-		ChangeScanner scanner) {
-		super(manager, GUIGlobals.getIconUrl("save"), Globals.lang("File changed"));
+
+    public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,
+            ChangeScanner scanner) {
+        super(manager, GUIGlobals.getIconUrl("save"), Globals.lang("File changed"));
         close.setEnabled(false);
         this.panel = panel;
-		this.frame = frame;
-		this.manager = manager;
-		this.scanner = scanner;
+        this.frame = frame;
+        this.manager = manager;
+        this.scanner = scanner;
 
-		JPanel main = new JPanel();
-		main.setLayout(new BorderLayout());
+        JPanel main = new JPanel();
+        main.setLayout(new BorderLayout());
 
-		message = new JLabel("<html><center>"
-			+ Globals.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
-			+ "</center></html>", JLabel.CENTER);
+        message = new JLabel("<html><center>"
+                + Globals.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
+                + "</center></html>", JLabel.CENTER);
 
-		main.add(message, BorderLayout.CENTER);
-		main.add(test, BorderLayout.SOUTH);
-		main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        main.add(message, BorderLayout.CENTER);
+        main.add(test, BorderLayout.SOUTH);
+        main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-		add(main, BorderLayout.CENTER);
-		test.addActionListener(this);
-	}
+        add(main, BorderLayout.CENTER);
+        test.addActionListener(this);
+    }
 
     /**
      * We include a getter for the BasePanel this component refers to, because this
@@ -78,31 +79,31 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     }
 
     /**
-	 * Unregister when this component closes. We need that to avoid showing
-	 * two such external change warnings at the same time, only the latest one.
-	 */
-	public void componentClosing() {
-	    manager.unregisterComponent(NAME);
+     * Unregister when this component closes. We need that to avoid showing
+     * two such external change warnings at the same time, only the latest one.
+     */
+    public void componentClosing() {
+        manager.unregisterComponent(NAME);
     }
 
-	/**
-	 * actionPerformed
-	 * 
-	 * @param e
-	 *            ActionEvent
-	 */
-	public void actionPerformed(ActionEvent e) {
+    /**
+     * actionPerformed
+     * 
+     * @param e
+     *            ActionEvent
+     */
+    public void actionPerformed(ActionEvent e) {
 
-		// ChangeScanner scanner = new ChangeScanner(frame, panel); //,
-		// panel.database(), panel.metaData());
-		// try {
-		scanner.displayResult(this);
-		// scanner.changeScan(panel.file());
+        // ChangeScanner scanner = new ChangeScanner(frame, panel); //,
+        // panel.database(), panel.metaData());
+        // try {
+        scanner.displayResult(this);
+        // scanner.changeScan(panel.file());
 
-		// } catch (IOException ex) {
-		// ex.printStackTrace();
-		// }
-	}
+        // } catch (IOException ex) {
+        // ex.printStackTrace();
+        // }
+    }
 
     /**
      * Callback method for signalling that the change scanner has displayed the

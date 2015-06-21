@@ -22,6 +22,7 @@ public class TextPrefixFunctionTest {
 
     private void assertPrefix(final String string, final String string2) {
         assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, new Warn() {
+
             public void warn(String s) {
                 fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2);
             }

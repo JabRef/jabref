@@ -31,9 +31,10 @@ public abstract class AbstractWorker implements Worker, CallBack {
     private Worker worker;
     private CallBack callBack;
 
+
     public AbstractWorker() {
-	worker = (Worker)Spin.off(this);
-	callBack = (CallBack)Spin.over(this);
+        worker = (Worker) Spin.off(this);
+        callBack = (CallBack) Spin.over(this);
 
     }
 
@@ -46,7 +47,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
      * whose methods will automatically be run off the EDT (Swing) thread.
      */
     public Worker getWorker() {
-	return worker;
+        return worker;
     }
 
     /**
@@ -54,7 +55,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
      * whose methods will automatically be run on the EDT (Swing) thread.
      */
     public CallBack getCallBack() {
-	return callBack;
+        return callBack;
     }
 
     /**

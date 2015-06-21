@@ -44,13 +44,14 @@ public class AttachFileDialog extends JDialog {
     String fieldName;
     JPanel main;
     JButton browse = new JButton(Globals.lang("Browse")),
-        download = new JButton(Globals.lang("Download")),
-        auto = new JButton(Globals.lang("Auto")),
-        ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+            download = new JButton(Globals.lang("Download")),
+            auto = new JButton(Globals.lang("Auto")),
+            ok = new JButton(Globals.lang("Ok")),
+            cancel = new JButton(Globals.lang("Cancel"));
     BibtexEntry entry;
     MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
+
 
     public AttachFileDialog(Frame parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);
@@ -83,28 +84,31 @@ public class AttachFileDialog extends JDialog {
     private void initGui() {
 
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
-                      editor, Util.getFileFilterForField(fieldName));
+                editor, Util.getFileFilterForField(fieldName));
 
-        browse.addActionListener(new ActionListener () {
+        browse.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 extPan.browseFile(fieldName, editor);
             }
         });
 
-        download.addActionListener(new ActionListener () {
+        download.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 extPan.downLoadFile(fieldName, editor, ths);
             }
         });
 
-        auto.addActionListener(new ActionListener () {
-                    public void actionPerformed(ActionEvent event) {
-                        extPan.autoSetFile(fieldName, editor);
-                    }
-                });
+        auto.addActionListener(new ActionListener() {
 
+            public void actionPerformed(ActionEvent event) {
+                extPan.autoSetFile(fieldName, editor);
+            }
+        });
 
-        ActionListener okListener = new ActionListener () {
+        ActionListener okListener = new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 cancelled = false;
                 dispose();
@@ -112,9 +116,10 @@ public class AttachFileDialog extends JDialog {
         };
 
         ok.addActionListener(okListener);
-        ((JTextField)editor.getTextComponent()).addActionListener(okListener);
+        ((JTextField) editor.getTextComponent()).addActionListener(okListener);
 
-        AbstractAction cancelListener = new AbstractAction () {
+        AbstractAction cancelListener = new AbstractAction() {
+
             public void actionPerformed(ActionEvent event) {
                 cancelled = true;
                 dispose();
@@ -123,10 +128,10 @@ public class AttachFileDialog extends JDialog {
 
         cancel.addActionListener(cancelListener);
         editor.getTextComponent().getInputMap().put(Globals.prefs.getKey("Close dialog"), "close");
-	    editor.getTextComponent().getActionMap().put("close", cancelListener);
+        editor.getTextComponent().getActionMap().put("close", cancelListener);
 
-        FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref","");
-	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.nCase(fieldName));//(editor.getLabel());
         builder.appendSeparator(Util.nCase(fieldName));
         builder.append(editor.getTextComponent());
@@ -142,14 +147,13 @@ public class AttachFileDialog extends JDialog {
 
         main = builder.getPanel();
 
-        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-
 
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

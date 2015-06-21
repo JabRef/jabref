@@ -29,7 +29,8 @@ import net.sf.jabref.AuthorList;
  * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class AuthorFirstAbbrLastCommas implements LayoutFormatter {
-	public String format(String fieldText) {
-		return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, true, false);
-	}
+
+    public String format(String fieldText) {
+        return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, true, false);
+    }
 }

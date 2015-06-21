@@ -23,7 +23,9 @@ import net.sf.jabref.Globals;
  * used for graceful degradation if a layout uses an undefined format.
  */
 public class NotFoundFormatter implements LayoutFormatter {
+
     private String notFound;
+
 
     public NotFoundFormatter(String notFound) {
 
@@ -35,6 +37,6 @@ public class NotFoundFormatter implements LayoutFormatter {
     }
 
     public String format(String fieldText) {
-        return "["+Globals.lang("Formatter not found: %0", notFound)+"] "+fieldText;
+        return "[" + Globals.lang("Formatter not found: %0", notFound) + "] " + fieldText;
     }
 }

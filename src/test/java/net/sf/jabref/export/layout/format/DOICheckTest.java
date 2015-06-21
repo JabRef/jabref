@@ -8,7 +8,8 @@ import static org.junit.Assert.assertEquals;
 
 public class DOICheckTest {
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testFormat() {
         LayoutFormatter lf = new DOICheck();
 

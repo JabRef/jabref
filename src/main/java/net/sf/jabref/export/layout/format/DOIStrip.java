@@ -27,11 +27,11 @@ import net.sf.jabref.Util;
  */
 public class DOIStrip implements LayoutFormatter {
 
-	public String format(String fieldText) {
-        if (fieldText == null){
+    public String format(String fieldText) {
+        if (fieldText == null) {
             return null;
         } else {
             return Util.getDOI(fieldText);
         }
-	}
+    }
 }

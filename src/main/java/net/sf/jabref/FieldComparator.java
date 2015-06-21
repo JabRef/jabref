@@ -46,93 +46,94 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     static {
         try {
             collator = new RuleBasedCollator(
-                        ((RuleBasedCollator) Collator.getInstance()).getRules()
-                                .replaceAll("<'\u005f'", "<' '<'\u005f'"));
+                    ((RuleBasedCollator) Collator.getInstance()).getRules()
+                            .replaceAll("<'\u005f'", "<' '<'\u005f'"));
         } catch (ParseException e) {
             collator = Collator.getInstance();
         }
     }
 
-	private String[] field;
+    private String[] field;
     private String fieldName;
 
     boolean isNameField, isTypeHeader, isYearField, isMonthField, isNumeric;
 
-	int multiplier;
+    int multiplier;
 
-	public FieldComparator(String field) {
-		this(field, false);
-	}
 
-	public FieldComparator(String field, boolean reversed) {
+    public FieldComparator(String field) {
+        this(field, false);
+    }
+
+    public FieldComparator(String field, boolean reversed) {
         this.fieldName = field;
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-		multiplier = reversed ? -1 : 1;
-		isTypeHeader = this.field[0].equals(GUIGlobals.TYPE_HEADER);
+        multiplier = reversed ? -1 : 1;
+        isTypeHeader = this.field[0].equals(GUIGlobals.TYPE_HEADER);
         isNameField = (this.field[0].equals("author")
                 || this.field[0].equals("editor"));
-		isYearField = this.field[0].equals("year");
-		isMonthField = this.field[0].equals("month");
+        isYearField = this.field[0].equals("year");
+        isMonthField = this.field[0].equals("month");
         isNumeric = BibtexFields.isNumeric(this.field[0]);
     }
 
-	public int compare(BibtexEntry e1, BibtexEntry e2) {
-		Object f1, f2;
+    public int compare(BibtexEntry e1, BibtexEntry e2) {
+        Object f1, f2;
 
-		if (isTypeHeader) {
-			// Sort by type.
-			f1 = e1.getType().getName();
-			f2 = e2.getType().getName();
-		} else {
+        if (isTypeHeader) {
+            // Sort by type.
+            f1 = e1.getType().getName();
+            f2 = e2.getType().getName();
+        } else {
 
-			// If the field is author or editor, we rearrange names so they are
-			// sorted according to last name.
-			f1 = getField(e1);
-			f2 = getField(e2);
-		}
+            // If the field is author or editor, we rearrange names so they are
+            // sorted according to last name.
+            f1 = getField(e1);
+            f2 = getField(e2);
+        }
 
-		/*
-		 * [ 1598777 ] Month sorting
-		 * 
-		 * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
-		 */
-		int localMultiplier = multiplier;
-		if (isMonthField)
-			localMultiplier = -localMultiplier;
-		
-		// Catch all cases involving null:
-		if (f1 == null)
-			return f2 == null ? 0 : localMultiplier;
+        /*
+         * [ 1598777 ] Month sorting
+         * 
+         * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
+         */
+        int localMultiplier = multiplier;
+        if (isMonthField)
+            localMultiplier = -localMultiplier;
 
-		if (f2 == null)
-			return -localMultiplier;
+        // Catch all cases involving null:
+        if (f1 == null)
+            return f2 == null ? 0 : localMultiplier;
 
-		// Now we now that both f1 and f2 are != null
-		if (isNameField) {
-			f1 = AuthorList.fixAuthorForAlphabetization((String) f1);
-			f2 = AuthorList.fixAuthorForAlphabetization((String) f2);
-		} else if (isYearField) {
-			/*
-			 * [ 1285977 ] Impossible to properly sort a numeric field
-			 * 
-			 * http://sourceforge.net/tracker/index.php?func=detail&aid=1285977&group_id=92314&atid=600307
-			 */
-			f1 = Util.toFourDigitYear((String) f1);
-			f2 = Util.toFourDigitYear((String) f2);
-		} else if (isMonthField) {
-			/*
-			 * [ 1535044 ] Month sorting
-			 * 
-			 * http://sourceforge.net/tracker/index.php?func=detail&aid=1535044&group_id=92314&atid=600306
-			 */
-			f1 = MonthUtil.getMonth((String) f1).number;
-			f2 = MonthUtil.getMonth((String) f2).number;
-		}
+        if (f2 == null)
+            return -localMultiplier;
+
+        // Now we now that both f1 and f2 are != null
+        if (isNameField) {
+            f1 = AuthorList.fixAuthorForAlphabetization((String) f1);
+            f2 = AuthorList.fixAuthorForAlphabetization((String) f2);
+        } else if (isYearField) {
+            /*
+             * [ 1285977 ] Impossible to properly sort a numeric field
+             * 
+             * http://sourceforge.net/tracker/index.php?func=detail&aid=1285977&group_id=92314&atid=600307
+             */
+            f1 = Util.toFourDigitYear((String) f1);
+            f2 = Util.toFourDigitYear((String) f2);
+        } else if (isMonthField) {
+            /*
+             * [ 1535044 ] Month sorting
+             * 
+             * http://sourceforge.net/tracker/index.php?func=detail&aid=1535044&group_id=92314&atid=600306
+             */
+            f1 = MonthUtil.getMonth((String) f1).number;
+            f2 = MonthUtil.getMonth((String) f2).number;
+        }
 
         if (isNumeric) {
             Integer i1 = null, i2 = null;
             try {
-                i1 = Util.intValueOf((String)f1);
+                i1 = Util.intValueOf((String) f1);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
@@ -162,21 +163,21 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         }
 
         int result = 0;
-		if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-			result = (((Integer) f1).compareTo((Integer) f2));
-		} else if (f2 instanceof Integer) {
-			Integer f1AsInteger = new Integer(f1.toString());
-			result = -((f1AsInteger).compareTo((Integer) f2));
-		} else if (f1 instanceof Integer) {
-			Integer f2AsInteger = new Integer(f2.toString());
-			result = -(((Integer) f1).compareTo(f2AsInteger));
-		} else {
-			String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
+        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
+            result = (((Integer) f1).compareTo((Integer) f2));
+        } else if (f2 instanceof Integer) {
+            Integer f1AsInteger = new Integer(f1.toString());
+            result = -((f1AsInteger).compareTo((Integer) f2));
+        } else if (f1 instanceof Integer) {
+            Integer f2AsInteger = new Integer(f2.toString());
+            result = -(((Integer) f1).compareTo(f2AsInteger));
+        } else {
+            String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
             result = collator.compare(ours, theirs);//ours.compareTo(theirs);
-		}
+        }
 
-		return result * localMultiplier;
-	}
+        return result * localMultiplier;
+    }
 
     private Object getField(BibtexEntry entry) {
         for (String aField : field) {
@@ -188,11 +189,11 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     }
 
     /**
-	 * Returns the field this Comparator compares by.
-	 * 
-	 * @return The field name.
-	 */
-	public String getFieldName() {
-		return fieldName;
-	}
+     * Returns the field this Comparator compares by.
+     * 
+     * @return The field name.
+     */
+    public String getFieldName() {
+        return fieldName;
+    }
 }

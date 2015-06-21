@@ -28,15 +28,14 @@ import javax.swing.*;
  */
 public class HandleDuplicateWarnings implements PostOpenAction {
 
-
     public boolean isActionNecessary(ParserResult pr) {
         return pr.hasDuplicateKeys();
     }
 
     public void performAction(BasePanel panel, ParserResult pr) {
         int answer = JOptionPane.showConfirmDialog(null,
-                "<html><p>"+Globals.lang("This database contains one or more duplicated BibTeX keys.")
-                +"</p><p>"+Globals.lang("Do you want to resolve duplicate keys now?"),
+                "<html><p>" + Globals.lang("This database contains one or more duplicated BibTeX keys.")
+                        + "</p><p>" + Globals.lang("Do you want to resolve duplicate keys now?"),
                 Globals.lang("Duplicate BibTeX key"), JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {
             panel.runCommand("resolveDuplicateKeys");

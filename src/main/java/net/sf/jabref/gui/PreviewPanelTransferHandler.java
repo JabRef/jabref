@@ -32,7 +32,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
 public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
-    
+
     public PreviewPanelTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
         super(frame, entryContainer, textTransferHandler);
     }
@@ -49,7 +49,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
     protected Transferable createTransferable(JComponent c) {
         if (c instanceof JEditorPane) {
             // this method should be called from the preview panel only
-            
+
             // the default TransferHandler implementation is aware of HTML
             // and returns an appropriate Transferable
             // as textTransferHandler.createTransferable() is not available and
@@ -65,7 +65,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             } catch (BadLocationException e1) {
                 e1.printStackTrace();
             }
-            
+
             // Second, return the HTML (and text as fallback)
             return new HtmlTransferable(sw.toString(), e.getSelectedText());
         } else {

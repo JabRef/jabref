@@ -30,7 +30,9 @@ import java.awt.event.ActionEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class PluginInstallerAction extends MnemonicAwareAction {
+
     private JabRefFrame frame;
+
 
     public PluginInstallerAction(JabRefFrame frame) {
         super(GUIGlobals.getImage("plugin"));
@@ -39,11 +41,10 @@ public class PluginInstallerAction extends MnemonicAwareAction {
         putValue(NAME, Globals.menuTitle("Manage plugins"));
 
     }
-    
+
     public void actionPerformed(ActionEvent actionEvent) {
         ManagePluginsDialog mpd = new ManagePluginsDialog(frame);
         mpd.setVisible(true);
     }
 
-    
 }

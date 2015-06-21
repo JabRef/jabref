@@ -40,6 +40,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
+
     private static Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
 
     boolean showDialog;
@@ -60,6 +61,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         postOpenActions.add(new HandleDuplicateWarnings());
     }
 
+
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(GUIGlobals.getImage("open"));
         this.frame = frame;
@@ -77,10 +79,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                     true);
-            if (chosen != null) for (String aChosen : chosen) {
-                if (aChosen != null)
-                    filesToOpen.add(new File(aChosen));
-            }
+            if (chosen != null)
+                for (String aChosen : chosen) {
+                    if (aChosen != null)
+                        filesToOpen.add(new File(aChosen));
+                }
 
             /*
             String chosenFile = Globals.getNewFile(frame,
@@ -98,11 +101,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         BasePanel toRaise = null;
         int initialCount = filesToOpen.size(), removed = 0;
-        
+
         // Check if any of the files are already open:
         for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             File file = iterator.next();
-            for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
+            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = frame.baseAt(i);
                 if ((bp.getFile() != null) && bp.getFile().equals(file)) {
                     iterator.remove();
@@ -117,18 +120,20 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
         }
 
-
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (filesToOpen.size() > 0) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
             (new Thread() {
+
                 public void run() {
-                    for (File theFile : theFiles) openIt(theFile, true);
+                    for (File theFile : theFiles)
+                        openIt(theFile, true);
 
                 }
             }).start();
-            for (File theFile : theFiles) frame.getFileHistory().newFile(theFile.getPath());
+            for (File theFile : theFiles)
+                frame.getFileHistory().newFile(theFile.getPath());
         }
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
@@ -138,10 +143,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
+
     class OpenItSwingHelper implements Runnable {
+
         BasePanel bp;
         boolean raisePanel;
         File file;
+
 
         OpenItSwingHelper(BasePanel bp, File file, boolean raisePanel) {
             this.bp = bp;
@@ -154,6 +162,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         }
     }
+
 
     public void openIt(File file, boolean raisePanel) {
         if ((file != null) && (file.exists())) {
@@ -169,10 +178,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } else if (autoSaveFound) {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
-                int answer = JOptionPane.showConfirmDialog(null,"<html>"+
+                int answer = JOptionPane.showConfirmDialog(null, "<html>" +
                         Globals.lang("An autosave file was found for this database. This could indicate ")
-                            +Globals.lang("that JabRef didn't shut down cleanly last time the file was used.")+"<br>"
-                        +Globals.lang("Do you want to recover the database from the autosave file?")+"</html>",
+                        + Globals.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
+                        + Globals.lang("Do you want to recover the database from the autosave file?") + "</html>",
                         Globals.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
@@ -192,22 +201,22 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     if ((modTime != -1) && (System.currentTimeMillis() - modTime
                             > SaveSession.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
-                        int answer = JOptionPane.showConfirmDialog(null, "<html>"+Globals.lang("Error opening file")
-                            +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance.")
-                            +"<p>"+Globals.lang("Do you want to override the file lock?"),
-                            Globals.lang("File locked"), JOptionPane.YES_NO_OPTION);
+                        int answer = JOptionPane.showConfirmDialog(null, "<html>" + Globals.lang("Error opening file")
+                                + " '" + fileName + "'. " + Globals.lang("File is locked by another JabRef instance.")
+                                + "<p>" + Globals.lang("Do you want to override the file lock?"),
+                                Globals.lang("File locked"), JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
                             Util.deleteLockFile(file);
                         }
-                        else return;
+                        else
+                            return;
                     }
                     else if (!Util.waitForFileLock(file, 10)) {
                         JOptionPane.showMessageDialog(null, Globals.lang("Error opening file")
-                            +" '"+fileName+"'. "+Globals.lang("File is locked by another JabRef instance."),
-                            Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                                + " '" + fileName + "'. " + Globals.lang("File is locked by another JabRef instance."),
+                                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-
 
                 }
                 ParserResult pr;
@@ -224,9 +233,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                             Globals.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
 
-                    String message = "<html>"+errorMessage+"<p>"+
+                    String message = "<html>" + errorMessage + "<p>" +
                             (tryingAutosave ? Globals.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())
-                            : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)+"</html>";
+                                    : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/) + "</html>";
                     JOptionPane.showMessageDialog(null, message, Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
 
                     if (tryingAutosave) {
@@ -236,7 +245,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     else
                         done = true;
                     continue;
-                } else done = true;
+                } else
+                    done = true;
 
                 final BasePanel panel = addNewDatabase(pr, file, raisePanel);
                 if (tryingAutosave)
@@ -249,13 +259,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // in this version of JabRef:
                 final ParserResult prf = pr;
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         performPostOpenActions(panel, prf, true);
                     }
                 });
             }
 
-            
         }
     }
 
@@ -266,7 +276,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * @param pr The result of the bib file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult pr,
-                                              boolean mustRaisePanel) {
+            boolean mustRaisePanel) {
         for (PostOpenAction action : postOpenActions) {
             if (action.isActionNecessary(pr)) {
                 if (mustRaisePanel)
@@ -277,7 +287,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     public BasePanel addNewDatabase(ParserResult pr, final File file,
-                               boolean raisePanel) {
+            boolean raisePanel) {
 
         String fileName = file.getPath();
         BibtexDatabase db = pr.getDatabase();
@@ -286,6 +296,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if (pr.hasWarnings()) {
             final String[] wrns = pr.warnings();
             (new Thread() {
+
                 public void run() {
                     StringBuffer wrn = new StringBuffer();
                     for (int i = 0; i < wrns.length; i++)
@@ -299,7 +310,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Globals.lang("Warnings")+" ("+file.getName()+")",
+                            Globals.lang("Warnings") + " (" + file.getName() + ")",
                             JOptionPane.WARNING_MESSAGE);
                 }
             }).start();
@@ -346,13 +357,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         //System.out.println(suppliedEncoding != null ? "Encoding: '"+suppliedEncoding+"' Len: "+suppliedEncoding.length() : "no supplied encoding");
 
         if ((suppliedEncoding != null)) {
-           try {
-               reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
-               encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
-           } catch (Exception ex) {
-               ex.printStackTrace();
-               reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
-           }
+            try {
+                reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
+                encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+            }
         } else {
             // We couldn't find a header with info about encoding. Use default:
             reader = ImportFormatReader.getReader(fileToOpen, encoding);
@@ -365,10 +376,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         pr.setFile(fileToOpen);
 
         if (SpecialFieldsUtils.keywordSyncEnabled()) {
-        	for (BibtexEntry entry: pr.getDatabase().getEntries()) {
-        		SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
-        	}
-        	logger.fine(Globals.lang("Synchronized special fields based on keywords"));
+            for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+            }
+            logger.fine(Globals.lang("Synchronized special fields based on keywords"));
         }
 
         if (!pr.getMetaData().isGroupTreeValid())
@@ -387,34 +398,34 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             while (keepon) {
                 c = reader.read();
-                if ((piv == 0) && ((c == '%') || (Character.isWhitespace((char)c))))
+                if ((piv == 0) && ((c == '%') || (Character.isWhitespace((char) c))))
                     offset++;
                 else {
                     headerText.append((char) c);
                     if (c == GUIGlobals.SIGNATURE.charAt(piv))
                         piv++;
-                    else //if (((char)c) == '@')
+                    else
+                        //if (((char)c) == '@')
                         keepon = false;
                 }
                 //System.out.println(headerText.toString());
-                found:
-                if (piv == GUIGlobals.SIGNATURE.length()) {
+                found: if (piv == GUIGlobals.SIGNATURE.length()) {
                     keepon = false;
 
                     //if (headerText.length() > GUIGlobals.SIGNATURE.length())
                     //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
                     // Found the signature. The rest of the line is unknown, so we skip
                     // it:
-                    while (reader.read() != '\n'){
+                    while (reader.read() != '\n') {
                         // keep reading
                     }
                     // If the next line starts with something like "% ", handle this:
-                    while (((c =reader.read()) == '%') || (Character.isWhitespace((char)c))){
+                    while (((c = reader.read()) == '%') || (Character.isWhitespace((char) c))) {
                         // keep reading
                     }
                     // Then we must skip the "Encoding: ". We may already have read the first
                     // character:
-                    if ((char)c != GUIGlobals.encPrefix.charAt(0))
+                    if ((char) c != GUIGlobals.encPrefix.charAt(0))
                         break found;
 
                     for (int i = 1; i < GUIGlobals.encPrefix.length(); i++) {
@@ -426,7 +437,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         // to
                         // match.
                     }
-                    
+
                     // If ok, then read the rest of the line, which should contain the
                     // name
                     // of the encoding:
@@ -435,7 +446,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     while ((c = reader.read()) != '\n') {
                         sb.append((char) c);
                     }
-
 
                     suppliedEncoding = sb.toString();
                 }

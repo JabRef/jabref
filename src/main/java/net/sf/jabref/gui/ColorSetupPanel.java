@@ -35,8 +35,9 @@ import net.sf.jabref.Globals;
  */
 public class ColorSetupPanel extends JPanel {
 
-    private final static int ICON_WIDTH=30, ICON_HEIGHT=20;
+    private final static int ICON_WIDTH = 30, ICON_HEIGHT = 20;
     private ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+
 
     public ColorSetupPanel() {
 
@@ -75,7 +76,6 @@ public class ColorSetupPanel extends JPanel {
 
         setValues();
 
-
     }
 
     public void setValues() {
@@ -91,12 +91,16 @@ public class ColorSetupPanel extends JPanel {
         }
     }
 
+
     class ColorButtonListener implements ActionListener {
+
         private ColorButton button;
+
 
         public ColorButtonListener(ColorButton button) {
             this.button = button;
         }
+
         public void actionPerformed(ActionEvent e) {
             Color chosen = JColorChooser.showDialog(null, button.getName(), button.getColor());
             if (chosen != null)
@@ -109,8 +113,10 @@ public class ColorSetupPanel extends JPanel {
      * Includes a method to produce a Default button for this setting.
      */
     class ColorButton extends JButton implements Icon {
+
         private Color color = Color.white;
         private String key, name;
+
 
         public ColorButton(String key, String name) {
             setIcon(this);
@@ -122,6 +128,7 @@ public class ColorSetupPanel extends JPanel {
         public JButton getDefaultButton() {
             JButton toDefault = new JButton(Globals.lang("Default"));
             toDefault.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     setColor(Globals.prefs.getDefaultColor(key));
                     repaint();
@@ -129,7 +136,6 @@ public class ColorSetupPanel extends JPanel {
             });
             return toDefault;
         }
-
 
         public String getKey() {
             return key;

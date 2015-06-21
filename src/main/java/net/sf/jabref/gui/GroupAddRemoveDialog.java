@@ -34,6 +34,7 @@ public class GroupAddRemoveDialog extends BaseAction {
     JTree tree;
     JButton ok;
 
+
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
         this.panel = panel;
         this.add = add;
@@ -50,28 +51,25 @@ public class GroupAddRemoveDialog extends BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog(panel.frame(),
-                Globals.lang(add ? (move ? "Move to group" : "Add to group" )
+                Globals.lang(add ? (move ? "Move to group" : "Add to group")
                         : "Remove from group"), true);
         ok = new JButton(Globals.lang("Ok"));
         JButton cancel = new JButton(Globals.lang("Cancel"));
         tree = new JTree(groups);
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
         tree.setVisibleRowCount(22);
-        
-//        tree.setPreferredSize(new Dimension(200, tree.getPreferredSize().height));
-//      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly. 
+
+        //        tree.setPreferredSize(new Dimension(200, tree.getPreferredSize().height));
+        //      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly. 
         //tree.setSelectionModel(new VetoableTreeSelectionModel());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(new SelectionListener());
-        
-        
-        
+
         //STA add expand and collapse all buttons
         JButton jbExpandAll = new JButton("Expand All");
-        
+
         jbExpandAll.addActionListener(new ActionListener() {
-            
-            
+
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, true);
             }
@@ -80,36 +78,38 @@ public class GroupAddRemoveDialog extends BaseAction {
 
         JButton jbCollapseAll = new JButton("Collapse All");
         jbCollapseAll.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, false);
             }
         });
         //END add expand and collapse all buttons
-            
+
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
-        
+
         bb.addButton(jbExpandAll);
         bb.addButton(jbCollapseAll);
-        
+
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         ok.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 if (doAddOrRemove())
                     diag.dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
         });
         ok.setEnabled(false);
-        
 
         JScrollPane sp = new JScrollPane(tree);
 
@@ -118,28 +118,26 @@ public class GroupAddRemoveDialog extends BaseAction {
         InputMap im = sp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
         });
 
         diag.getContentPane().add(sp, BorderLayout.CENTER);
-        
 
-
-        
-        
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
         diag.setLocationRelativeTo(panel.frame());
         diag.setVisible(true);
 
-
     }
+
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
     public void expandAll(final JTree tree, final boolean expand) {
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 TreeNode root = ((TreeNode) tree.getModel().getRoot());
                 // walk through the tree, beginning at the root:
@@ -148,6 +146,7 @@ public class GroupAddRemoveDialog extends BaseAction {
             }
         });
     }
+
     private void expandAll(final JTree tree, final TreePath parent, final boolean expand) {
         // walk through the children:
         TreeNode node = (TreeNode) parent.getLastPathComponent();
@@ -166,16 +165,19 @@ public class GroupAddRemoveDialog extends BaseAction {
         }
     }
 
+
     class SelectionListener implements TreeSelectionListener {
+
         public void valueChanged(TreeSelectionEvent e) {
-            GroupTreeNode node = (GroupTreeNode)e.getNewLeadSelectionPath().getLastPathComponent();
+            GroupTreeNode node = (GroupTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
             AbstractGroup group = node.getGroup();
             ok.setEnabled(checkGroupEnable(group));
         }
     }
 
+
     protected boolean doAddOrRemove() {
-        GroupTreeNode node = (GroupTreeNode)tree.getSelectionPath().getLastPathComponent();
+        GroupTreeNode node = (GroupTreeNode) tree.getSelectionPath().getLastPathComponent();
         AbstractGroup group = node.getGroup();
         if (checkGroupEnable(group)) {
 
@@ -208,37 +210,38 @@ public class GroupAddRemoveDialog extends BaseAction {
     }
 
 
-/*    private class VetoableTreeSelectionModel extends DefaultTreeSelectionModel {
+    /*    private class VetoableTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        @Override
-        public void addSelectionPath(TreePath path) {
-            if (checkPath(path))
-                super.addSelectionPath(path);
+            @Override
+            public void addSelectionPath(TreePath path) {
+                if (checkPath(path))
+                    super.addSelectionPath(path);
+            }
+
+            public void setSelectionPath(TreePath path){
+                if (checkPath(path))
+                    super.setSelectionPath(path);
+
+            }
+
+            private boolean checkPath(TreePath path) {
+                GroupTreeNode node = (GroupTreeNode)path.getLastPathComponent();
+                AbstractGroup group = node.getGroup();
+                return (add ? group.supportsAdd() && !group.containsAll(GroupAddRemoveDialog.this.selection)
+                        : group.supportsRemove() && group.containsAny(GroupAddRemoveDialog.this.selection));
+            }
         }
+        {
 
-        public void setSelectionPath(TreePath path){
-            if (checkPath(path))
-                super.setSelectionPath(path);
-
-        }
-
-        private boolean checkPath(TreePath path) {
-            GroupTreeNode node = (GroupTreeNode)path.getLastPathComponent();
-            AbstractGroup group = node.getGroup();
-            return (add ? group.supportsAdd() && !group.containsAll(GroupAddRemoveDialog.this.selection)
-                    : group.supportsRemove() && group.containsAny(GroupAddRemoveDialog.this.selection));
-        }
-    }
-    {
-
-    } */
+        } */
 
     class AddRemoveGroupTreeCellRenderer extends GroupTreeCellRenderer {
+
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
-            GroupTreeNode node = (GroupTreeNode)value;
+            GroupTreeNode node = (GroupTreeNode) value;
             AbstractGroup group = node.getGroup();
             if (checkGroupEnable(group))
                 c.setForeground(Color.black);
@@ -249,7 +252,4 @@ public class GroupAddRemoveDialog extends BaseAction {
         }
     }
 
-
 }
-
-

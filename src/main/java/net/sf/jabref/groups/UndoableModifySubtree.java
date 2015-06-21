@@ -23,6 +23,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.Globals;
 
 public class UndoableModifySubtree extends AbstractUndoableEdit {
+
     /** A backup of the groups before the modification */
     private final GroupTreeNode m_groupRoot, m_subtreeBackup;
     /** The path to the global groups root node */
@@ -32,6 +33,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private Vector<TreeNode> m_modifiedSubtree = new Vector<TreeNode>();
     private boolean m_revalidate = true;
     private final String m_name;
+
 
     /**
      * 

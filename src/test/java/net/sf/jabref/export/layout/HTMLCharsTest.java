@@ -46,7 +46,7 @@ public class HTMLCharsTest {
         assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
     }
 
-	/*
+    /*
      * Is missing a lot of test cases for the individual chars...
-	 */
+     */
 }

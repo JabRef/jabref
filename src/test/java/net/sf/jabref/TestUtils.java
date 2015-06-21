@@ -9,6 +9,7 @@ import java.awt.*;
  * @author Dennis Hartrampf, Ines Moosdorf
  */
 public class TestUtils {
+
     /**
      * Get a Component by name.
      *

@@ -25,43 +25,42 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
     private BibtexString string;
     private BasePanel panel;
 
+
     public UndoableRemoveString(BasePanel panel,
-				BibtexDatabase base, BibtexString string) {
-	this.base = base;
-	this.string = string;
-	this.panel = panel;
+            BibtexDatabase base, BibtexString string) {
+        this.base = base;
+        this.string = string;
+        this.panel = panel;
     }
 
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+Globals.lang("remove string ");
+        return Globals.lang("Undo") + ": " + Globals.lang("remove string ");
     }
 
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+Globals.lang("remove string ");
+        return Globals.lang("Redo") + ": " + Globals.lang("remove string ");
     }
 
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
-	try {
-	    base.addString(string);
-	} catch (KeyCollisionException ex) {
-	    ex.printStackTrace();
-	}
+        super.undo();
 
-	panel.updateStringDialog();
+        // Revert the change.
+        try {
+            base.addString(string);
+        } catch (KeyCollisionException ex) {
+            ex.printStackTrace();
+        }
+
+        panel.updateStringDialog();
     }
 
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	base.removeString(string.getId());
+        // Redo the change.
+        base.removeString(string.getId());
 
-	panel.updateStringDialog();
+        panel.updateStringDialog();
     }
-
-
 
 }

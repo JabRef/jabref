@@ -38,12 +38,12 @@ import net.sf.jabref.net.URLDownload;
 public class FindFullText {
 
     public final static int
-        FOUND_PDF = 0,
-        WRONG_MIME_TYPE = 1,
-        UNKNOWN_DOMAIN = 2,
-        LINK_NOT_FOUND = 3,
-        IO_EXCEPTION = 4,
-        NO_URLS_DEFINED = 5;
+            FOUND_PDF = 0,
+            WRONG_MIME_TYPE = 1,
+            UNKNOWN_DOMAIN = 2,
+            LINK_NOT_FOUND = 3,
+            IO_EXCEPTION = 4,
+            NO_URLS_DEFINED = 5;
 
     List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
 
@@ -60,7 +60,7 @@ public class FindFullText {
         // First try the DOI link, if defined:
         if ((doiText != null) && (doiText.trim().length() > 0)) {
             doiText = Util.getDOI(doiText);
-            FindResult resDoi = lookForFullTextAtURL(Globals.DOI_LOOKUP_PREFIX+doiText);
+            FindResult resDoi = lookForFullTextAtURL(Globals.DOI_LOOKUP_PREFIX + doiText);
             if (resDoi.status == FOUND_PDF)
                 return resDoi;
             // The DOI link failed, try falling back on the URL link, if defined:
@@ -73,14 +73,16 @@ public class FindFullText {
                                    // probably the most relevant.
                 }
             }
-            else return resDoi;
+            else
+                return resDoi;
         }
         // No DOI? Try URL:
         else if ((urlText != null) && (urlText.trim().length() > 0)) {
             return lookForFullTextAtURL(urlText);
         }
         // No URL either? Return error code.
-        else return new FindResult(NO_URLS_DEFINED, null);
+        else
+            return new FindResult(NO_URLS_DEFINED, null);
     }
 
     private FindResult lookForFullTextAtURL(String urlText) {
@@ -93,7 +95,7 @@ public class FindFullText {
                     domainKnown = true;
                     URL result = finder.findFullTextURL(url);
                     if (result != null) {
-                        
+
                         // Check the MIME type of this URL to see if it is a PDF. If not,
                         // it could be because the user doesn't have access:
                         try {
@@ -121,7 +123,7 @@ public class FindFullText {
             e.printStackTrace();
 
         } catch (IOException e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
 
         return null;
@@ -139,7 +141,7 @@ public class FindFullText {
     private URL resolveRedirects(URL url, int redirectCount) throws IOException {
         URLConnection uc = url.openConnection();
         if (uc instanceof HttpURLConnection) {
-            HttpURLConnection huc = (HttpURLConnection)uc;
+            HttpURLConnection huc = (HttpURLConnection) uc;
             huc.setInstanceFollowRedirects(false);
             huc.connect();
             int responseCode = huc.getResponseCode();
@@ -150,7 +152,7 @@ public class FindFullText {
                 //System.out.println(location);
                 try {
                     URL newUrl = new URL(location);
-                    return resolveRedirects(newUrl, redirectCount+1);
+                    return resolveRedirects(newUrl, redirectCount + 1);
                 } catch (MalformedURLException ex) {
                     return url; // take the previous one, since this one didn't make sense.
                     // TODO: this could be caused by location being a relative link, but this would just give
@@ -158,10 +160,12 @@ public class FindFullText {
                 }
 
             }
-            else return url;
+            else
+                return url;
 
         }
-        else return url;
+        else
+            return url;
     }
 
     public static String loadPage(URL url) throws IOException {
@@ -171,7 +175,7 @@ public class FindFullText {
         try {
             uc = url.openConnection();
             if (uc instanceof HttpURLConnection) {
-                huc = (HttpURLConnection)uc;
+                huc = (HttpURLConnection) uc;
                 huc.setInstanceFollowRedirects(false);
                 huc.connect();
 
@@ -179,24 +183,31 @@ public class FindFullText {
                 StringBuilder sb = new StringBuilder();
                 int c;
                 while ((c = in.read()) != -1)
-                    sb.append((char)c);
+                    sb.append((char) c);
                 return sb.toString();
             }
             else
                 return null; // TODO: are other types of connection (https?) relevant?
         } finally {
             try {
-                if (in != null) in.close();
-                if (huc != null) huc.disconnect();
-            } catch (IOException ex) { ex.printStackTrace(); }
+                if (in != null)
+                    in.close();
+                if (huc != null)
+                    huc.disconnect();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
     }
 
+
     public static class FindResult {
+
         public URL url;
         public String host = null;
         public int status;
+
 
         public FindResult(URL url, URL originalUrl) {
             this.url = url;
@@ -204,6 +215,7 @@ public class FindFullText {
             if (originalUrl != null)
                 host = originalUrl.getHost();
         }
+
         public FindResult(int status, URL originalUrl) {
             this.url = null;
             this.status = status;
@@ -214,13 +226,13 @@ public class FindFullText {
 
 
     public static void dumpToFile(String text, File f) {
-         try {
-             FileWriter fw = new FileWriter(f);
-             fw.write(text);
-             fw.close();
-         } catch (IOException e) {
-             e.printStackTrace();
+        try {
+            FileWriter fw = new FileWriter(f);
+            fw.write(text);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
 
-         }
+        }
     }
 }

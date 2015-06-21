@@ -45,7 +45,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     public void performExport(final BibtexDatabase database, final MetaData metaData,
-                              final String file, final String encoding, Set<String> keySet) throws Exception {
+            final String file, final String encoding, Set<String> keySet) throws Exception {
         exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
@@ -53,7 +53,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
         try {
-            
+
             //addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
@@ -63,7 +63,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             crc.update(mime.getBytes());
             ze.setCrc(crc.getValue());
             out.putNextEntry(ze);
-            for (int i=0; i<mime.length(); i++) {
+            for (int i = 0; i < mime.length(); i++) {
                 out.write(mime.charAt(i));
             }
             out.closeEntry();
@@ -142,7 +142,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
                 synchronized (out) {
                     while (true) {
                         int bytesRead = in.read(buffer);
-                        if (bytesRead == -1) break;
+                        if (bytesRead == -1)
+                            break;
                         out.write(buffer, 0, bytesRead);
                     }
                 }

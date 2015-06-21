@@ -62,15 +62,13 @@ public class MedlinePlainImporter extends ImportFormat {
      */
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-    	// Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line 
-    	// (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
+        // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line 
+        // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("PMID.*-.*"),
-                pat2 = Pattern.compile("PMC.*-.*"),
-                pat3 = Pattern.compile("PMCR.*-.*");
+        Pattern pat1 = Pattern.compile("PMID.*-.*"), pat2 = Pattern.compile("PMC.*-.*"), pat3 = Pattern.compile("PMCR.*-.*");
 
         String str;
-        while ((str = in.readLine()) != null){
+        while ((str = in.readLine()) != null) {
             if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find())
                 return true;
         }
@@ -87,7 +85,7 @@ public class MedlinePlainImporter extends ImportFormat {
         StringBuffer sb = new StringBuffer();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
-        while ((str = in.readLine()) != null){
+        while ((str = in.readLine()) != null) {
             sb.append(str);
             sb.append("\n");
         }
@@ -100,7 +98,6 @@ public class MedlinePlainImporter extends ImportFormat {
 
             String type = "", author = "", editor = "", comment = "";
             HashMap<String, String> hm = new HashMap<String, String>();
-
 
             String[] fields = entry1.split("\n");
 
@@ -129,20 +126,27 @@ public class MedlinePlainImporter extends ImportFormat {
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
                 if (lab.equals("PT")) {
                     val = val.toLowerCase();
-                    if (val.equals("BOOK")) type = "book";
+                    if (val.equals("BOOK"))
+                        type = "book";
                     else if (val.equals("journal article")
                             || val.equals("classical article")
                             || val.equals("corrected and republished article")
                             || val.equals("historical article")
                             || val.equals("introductory journal article")
-                            || val.equals("newspaper article")) type = "article";
+                            || val.equals("newspaper article"))
+                        type = "article";
                     else if (val.equals("clinical conference")
                             || val.equals("consensus development conference")
-                            || val.equals("consensus development conference, NIH")) type = "conference";
-                    else if (val.equals("technical report")) type = "techreport";
-                    else if (val.equals("editorial")) type = "inproceedings";//"incollection";"inbook";
-                    else if (val.equals("overall")) type = "proceedings";
-                    else if (type.equals("")) type = "other";
+                            || val.equals("consensus development conference, NIH"))
+                        type = "conference";
+                    else if (val.equals("technical report"))
+                        type = "techreport";
+                    else if (val.equals("editorial"))
+                        type = "inproceedings";//"incollection";"inbook";
+                    else if (val.equals("overall"))
+                        type = "proceedings";
+                    else if (type.equals(""))
+                        type = "other";
 
                 } else if (lab.equals("TI")) {
                     String oldVal = hm.get("title");
@@ -162,11 +166,13 @@ public class MedlinePlainImporter extends ImportFormat {
                 } else if (lab.equals("FAU")) {
                     if (author.equals("")) // don't add " and " for the first author
                         author = val;
-                    else author += " and " + val;
+                    else
+                        author += " and " + val;
                 } else if (lab.equals("FED")) {
                     if (editor.equals("")) // don't add " and " for the first editor
                         editor = val;
-                    else editor += " and " + val;
+                    else
+                        editor += " and " + val;
                 } else if (lab.equals("JT")) {
                     if (type.equals("inproceedings"))
                         hm.put("booktitle", val);
@@ -175,20 +181,20 @@ public class MedlinePlainImporter extends ImportFormat {
                 } else if (lab.equals("PG"))
                     hm.put("pages", val);
 
-//                else if (lab.equals("STAT")) {
-//                    if (val.equals("MEDLINE"))
-//                        hm.put("publisher", "PubMed");
-//                    else
-//                        hm.put("publisher", val);
-//                }
+                //                else if (lab.equals("STAT")) {
+                //                    if (val.equals("MEDLINE"))
+                //                        hm.put("publisher", "PubMed");
+                //                    else
+                //                        hm.put("publisher", val);
+                //                }
                 else if (lab.equals("PL"))
                     hm.put("address", val);
                 else if (lab.equals("IS"))
                     hm.put("issn", val);
                 else if (lab.equals("VI"))
                     hm.put("volume", val);
-//                else if (lab.equals("")) 
-//                	hm.put("number", val);
+                //                else if (lab.equals("")) 
+                //                	hm.put("number", val);
                 else if (lab.equals("AB")) {
                     String oldAb = hm.get("abstract");
                     if (oldAb == null)
@@ -202,7 +208,8 @@ public class MedlinePlainImporter extends ImportFormat {
                         hm.put("month", parts[1]);
                     }
                 } else if (lab.equals("MH") || lab.equals("OT")) {
-                    if (!hm.containsKey("keywords")) hm.put("keywords", val);
+                    if (!hm.containsKey("keywords"))
+                        hm.put("keywords", val);
                     else {
                         String kw = hm.get("keywords");
                         hm.put("keywords", kw + ", " + val);
@@ -217,10 +224,10 @@ public class MedlinePlainImporter extends ImportFormat {
                         comment = comment + "\n";
                     comment = comment + val;
                 }
-//                // Added ID import 2005.12.01, Morten Alver:
-//                else if (lab.equals("ID"))
-//                    hm.put("refid", val);
-//                    // Added doi import (sciencedirect.com) 2011.01.10, Alexander Hug <alexander@alexanderhug.info>
+                //                // Added ID import 2005.12.01, Morten Alver:
+                //                else if (lab.equals("ID"))
+                //                    hm.put("refid", val);
+                //                    // Added doi import (sciencedirect.com) 2011.01.10, Alexander Hug <alexander@alexanderhug.info>
                 else if (lab.equals("AID")) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
@@ -252,7 +259,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 if ((content == null) || (content.trim().length() == 0))
                     toRemove.add(key);
             }
-            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext(); ) {
+            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
                 hm.remove(iterator.next());
 
             }

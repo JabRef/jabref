@@ -28,12 +28,14 @@ import net.sf.jabref.Globals;
  * 
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
+
     private final Set<BibtexEntry> m_previousAssignmentBackup;
     private final Set<BibtexEntry> m_newAssignmentBackup;
     /** The path to the edited node */
     private int[] m_pathToNode = null;
     /** The root of the global groups tree */
     private GroupTreeNode m_groupsRootHandle = null;
+
 
     /**
      * Constructor for use in a group itself, where the enclosing node is
@@ -92,6 +94,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) group.addEntry(aM_newAssignmentBackup);
+        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup)
+            group.addEntry(aM_newAssignmentBackup);
     }
 }

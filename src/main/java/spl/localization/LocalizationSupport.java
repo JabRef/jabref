@@ -11,8 +11,7 @@ import net.sf.jabref.Globals;
  */
 public class LocalizationSupport {
 
-
-    public static String message(String key){
+    public static String message(String key) {
         return Globals.lang(key);
     }
 

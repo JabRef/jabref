@@ -42,7 +42,8 @@ public class CopacImporterTest {
                 .getResourceAsStream("IsiImporterTestMedline.isi")));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testImportEntries() throws IOException {
         CopacImporter importer = new CopacImporter();
 

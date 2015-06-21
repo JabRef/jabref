@@ -24,8 +24,9 @@ import java.io.IOException;
  */
 public class ACSPdfDownload implements FullTextFinder {
 
-	private static final String BASE_URL = "http://pubs.acs.org/doi/pdf/";
-	
+    private static final String BASE_URL = "http://pubs.acs.org/doi/pdf/";
+
+
     public ACSPdfDownload() {
 
     }
@@ -36,7 +37,7 @@ public class ACSPdfDownload implements FullTextFinder {
 
     public URL findFullTextURL(URL url) throws IOException {
         try {
-            return new URL(BASE_URL+url.getPath().substring("/doi/abs/".length()));
+            return new URL(BASE_URL + url.getPath().substring("/doi/abs/".length()));
         } catch (MalformedURLException e) {
             return null;
         }

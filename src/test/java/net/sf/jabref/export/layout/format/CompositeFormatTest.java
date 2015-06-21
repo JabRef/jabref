@@ -15,7 +15,7 @@ public class CompositeFormatTest {
             assertEquals("No Change", f.format("No Change"));
         }
         {
-            LayoutFormatter f = new CompositeFormat(new LayoutFormatter[]{new LayoutFormatter() {
+            LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {new LayoutFormatter() {
 
                 public String format(String fieldText) {
                     return fieldText + fieldText;

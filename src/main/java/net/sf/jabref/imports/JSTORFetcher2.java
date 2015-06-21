@@ -46,7 +46,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     // to be improved...
 
     //"http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
-            //+"%3Dtrue%26suffix%3D";
+    //+"%3Dtrue%26suffix%3D";
     protected static final Pattern idPattern = Pattern.compile(
             "<a class=\"title\" href=\"/stable/(\\d+)\\?");
     protected static final Pattern numberofhits = Pattern.compile(
@@ -56,6 +56,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     protected static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
     protected boolean stopFetching = false;
     protected boolean noAccessFound = false;
+
 
     public String getHelpPage() {
         return "JSTOR.html";
@@ -95,12 +96,12 @@ public class JSTORFetcher2 implements EntryFetcher {
             if (citations.size() == 0) {
                 if (!noAccessFound) {
                     status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        query),
-                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                            query),
+                            Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     status.showMessage(Globals.lang("No entries found. It looks like you do not have access to search JStor.",
-                        query),
-                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                            query),
+                            Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 return false;
             }
@@ -118,7 +119,7 @@ public class JSTORFetcher2 implements EntryFetcher {
             }
 
             return true;
-            
+
         } catch (IOException e) {
             e.printStackTrace();
             status.showMessage(Globals.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
@@ -153,7 +154,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
                 refsRequested = Integer.valueOf(numberOfRefs[1]);
                 //System.out.println("JSTORFetcher2 getCitations refsRequested=" + Integer.valueOf(refsRequested));
-                numberOfPagesRequested = ((refsRequested -1) - (refsRequested -1) % REFS_PER_PAGE) / REFS_PER_PAGE + 1;
+                numberOfPagesRequested = ((refsRequested - 1) - (refsRequested - 1) % REFS_PER_PAGE) / REFS_PER_PAGE + 1;
                 //System.out.println("JSTORFetcher2 getCitations numberOfPagesRequested=" + Integer.valueOf(numberOfPagesRequested));
                 urlQuery = nextPage;
                 //System.out.println("JSTORFetcher2 getcitations count=" + Integer.valueOf(count) + " ids=" + ids);
@@ -176,8 +177,6 @@ public class JSTORFetcher2 implements EntryFetcher {
 
         int countOfRefs = 0;
         int refsRequested = 0;
-
-
 
         if (count == 1) { //  Readin the numberofhits (only once)
             Matcher mn = numberofhits.matcher(pageEntire);
@@ -211,10 +210,10 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
         countOfRefs = Integer.valueOf(numberOfRefs[0]);
         refsRequested = Integer.valueOf(numberOfRefs[1]);
-        
+
         Matcher m = idPattern.matcher(cont);
 
-        if (m.find() && (ids.size() + 1 <= refsRequested) ) {
+        if (m.find() && (ids.size() + 1 <= refsRequested)) {
             do {
                 ids.add(m.group(1));
                 cont = cont.substring(m.end());
@@ -228,13 +227,12 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
         m = nextPagePattern.matcher(entirePage);
 
-
         if (m.find()) {
             String newQuery = JSTOR_URL + m.group(1);
             return newQuery;
         } else {
             return null;
-    }
+        }
     }
 
     protected BibtexEntry getSingleCitation(String cit) {

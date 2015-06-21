@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class URLDownloadTest {
 
     @Test
-     public void testStringDownloadWithSetEncoding() throws IOException {
+    public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue("google.com should contain google", dl.downloadToString("UTF8").contains("Google"));

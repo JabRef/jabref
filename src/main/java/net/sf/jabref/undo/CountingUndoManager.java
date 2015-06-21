@@ -24,37 +24,37 @@ import net.sf.jabref.BasePanel;
 public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint = 0,
-	current = 0;
+            current = 0;
     private BasePanel panel = null;
 
-    public CountingUndoManager(BasePanel basePanel) {
-    	super();
-	    panel = basePanel;
-    }
 
+    public CountingUndoManager(BasePanel basePanel) {
+        super();
+        panel = basePanel;
+    }
 
     public synchronized boolean addEdit(UndoableEdit edit) {
-	    current++;
+        current++;
         return super.addEdit(edit);
     }
-    
+
     public synchronized void undo() throws CannotUndoException {
-	    super.undo();
-	    current--;
+        super.undo();
+        current--;
         panel.updateEntryEditorIfShowing();
     }
 
     public synchronized void redo() throws CannotUndoException {
-	    super.redo();
-	    current++;
+        super.redo();
+        current++;
         panel.updateEntryEditorIfShowing();
     }
 
     public synchronized void markUnchanged() {
-    	unchangedPoint = current;
+        unchangedPoint = current;
     }
 
     public boolean hasChanged() {
-    	return !(current == unchangedPoint);
+        return !(current == unchangedPoint);
     }
 }

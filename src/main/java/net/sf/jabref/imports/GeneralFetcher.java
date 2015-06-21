@@ -65,9 +65,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
-			GUIGlobals.getImage("helpSmall")), reset = new JButton(
-                                Globals.lang("Reset"));
-	JComboBox fetcherChoice;
+            GUIGlobals.getImage("helpSmall")), reset = new JButton(
+            Globals.lang("Reset"));
+    JComboBox fetcherChoice;
     CardLayout optionsCards = new CardLayout();
     JPanel optionsPanel = new JPanel(optionsCards);
     JPanel optPanel = new JPanel(new BorderLayout());
@@ -79,6 +79,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     EntryFetcher activeFetcher;
     EntryFetcher[] fetcherArray;
 
+
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame, final List<EntryFetcher> fetchers) {
         super(p0, GUIGlobals.getIconUrl("www"), Globals.lang("Web search"));
         this.sidePaneManager = p0;
@@ -87,7 +88,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];
         String[] choices = new String[fetcherArray.length];
-        for (int i=0; i<fetcherArray.length; i++) {
+        for (int i = 0; i < fetcherArray.length; i++) {
             choices[i] = fetcherArray[i].getTitle();
             //choices[i] = new JLabel(fetchers.get(i).getTitle(), new ImageIcon(fetchers.get(i).getIcon()),
             //        JLabel.HORIZONTAL);
@@ -96,7 +97,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-		fetcherChoice = new JComboBox(choices);
+        fetcherChoice = new JComboBox(choices);
         int defaultFetcher = Globals.prefs.getInt("selectedFetcherIndex");
         if (defaultFetcher >= fetcherArray.length)
             defaultFetcher = 0;
@@ -126,6 +127,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             }
         });*/
         fetcherChoice.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
                 Globals.prefs.putInt("selectedFetcherIndex", fetcherChoice.getSelectedIndex());
@@ -149,16 +151,17 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));
-        tf.setPreferredSize(new Dimension(1,tf.getPreferredSize().height));
-        
+        tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
+
         tf.setName("tf");
-		// add action to reset-button. resets tf and requests focus
-		reset.addActionListener(new AbstractAction() {
-			public void actionPerformed(ActionEvent event) {
-				tf.setText("");
-				new FocusRequester(tf);
-			}
-		});
+        // add action to reset-button. resets tf and requests focus
+        reset.addActionListener(new AbstractAction() {
+
+            public void actionPerformed(ActionEvent event) {
+                tf.setText("");
+                new FocusRequester(tf);
+            }
+        });
 
         JPanel main = new JPanel();
         main.setLayout(gbl);
@@ -180,12 +183,12 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         con.gridwidth = 1;
         gbl.setConstraints(go, con);
         main.add(go);
-        
+
         // Reset Button
-		reset.setName("reset");
-		gbl.setConstraints(reset, con);
-		main.add(reset);
-        
+        reset.setName("reset");
+        gbl.setConstraints(reset, con);
+        main.add(reset);
+
         // Help Button
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(helpBut, con);
@@ -215,99 +218,105 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (tf.getText().trim().length() == 0) {    
-	    frame.output(Globals.lang("Please enter a search string")); 
-	    return;
-	}
+        if (tf.getText().trim().length() == 0) {
+            frame.output(Globals.lang("Please enter a search string"));
+            return;
+        }
 
-	if(frame.basePanel() == null) {
-	    frame.output(Globals.lang("Please open or start a new database before searching")); 
-	    return;
-	} 
+        if (frame.basePanel() == null) {
+            frame.output(Globals.lang("Please open or start a new database before searching"));
+            return;
+        }
 
         // We have two categories of fetchers. One category can show previews first and ask the
         // user which ones to download:
-	if (activeFetcher instanceof PreviewEntryFetcher) {
-	    frame.output(Globals.lang("Searching..."));
-	    frame.setProgressBarIndeterminate(true);
-	    frame.setProgressBarVisible(true);
-	    final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher)activeFetcher;
-	    final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
-									 pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
-	    new Thread(new Runnable(){
-		    public void run(){
-			final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-				    frame.setProgressBarVisible(false);
-				    frame.output("");
-				    if (!result)
-					return;
-				    dialog.setLocationRelativeTo(frame);
-				    dialog.setVisible(true);
-				    if (dialog.isOkPressed()) {
-					final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.basePanel(),
-												     BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
-					d2.addCallBack(activeFetcher);
-					Util.placeDialog(d2, frame);
-					d2.setVisible(true);
-					new Thread(new Runnable() {
-						public void run() {
-						    pFetcher.getEntries(dialog.getSelection(), d2);
-						    d2.entryListComplete();
-						}
-					    }).start();
-					
-				    }
-				}
-			    });
-			
-			
-		    }
-		}).start();
-	}
-	
-	// The other category downloads the entries first, then asks the user which ones to keep:
-	else {
-	    final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
-									     BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
-	    dialog.addCallBack(activeFetcher);
-	    Util.placeDialog(dialog, frame);
-	    dialog.setVisible(true);
-	    
-	    new Thread(new Runnable(){
-		    public void run(){
-			
-			if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)){
-			    dialog.entryListComplete();
-			} else {
-			    dialog.dispose();
-			}
-		    }
-		}).start();
-	}
+        if (activeFetcher instanceof PreviewEntryFetcher) {
+            frame.output(Globals.lang("Searching..."));
+            frame.setProgressBarIndeterminate(true);
+            frame.setProgressBarVisible(true);
+            final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
+            final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
+                    pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
+            new Thread(new Runnable() {
+
+                public void run() {
+                    final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            frame.setProgressBarVisible(false);
+                            frame.output("");
+                            if (!result)
+                                return;
+                            dialog.setLocationRelativeTo(frame);
+                            dialog.setVisible(true);
+                            if (dialog.isOkPressed()) {
+                                final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.basePanel(),
+                                        BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                                d2.addCallBack(activeFetcher);
+                                Util.placeDialog(d2, frame);
+                                d2.setVisible(true);
+                                new Thread(new Runnable() {
+
+                                    public void run() {
+                                        pFetcher.getEntries(dialog.getSelection(), d2);
+                                        d2.entryListComplete();
+                                    }
+                                }).start();
+
+                            }
+                        }
+                    });
+
+                }
+            }).start();
+        }
+
+        // The other category downloads the entries first, then asks the user which ones to keep:
+        else {
+            final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
+                    BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+            dialog.addCallBack(activeFetcher);
+            Util.placeDialog(dialog, frame);
+            dialog.setVisible(true);
+
+            new Thread(new Runnable() {
+
+                public void run() {
+
+                    if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
+                        dialog.entryListComplete();
+                    } else {
+                        dialog.dispose();
+                    }
+                }
+            }).start();
+        }
     }
 
 
     class FetcherAction extends AbstractAction {
+
         public FetcherAction() {
             super(Globals.lang("Web search"), GUIGlobals.getImage("www"));
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
         }
+
         public void actionPerformed(ActionEvent e) {
-        	if (!sidePaneManager.hasComponent(GeneralFetcher.this.getTitle())){
-        		sidePaneManager.register(GeneralFetcher.this.getTitle(), GeneralFetcher.this);
-        	}
-        	
-        	if (frame.getTabbedPane().getTabCount() > 0) {
-				sidePaneManager.toggle(GeneralFetcher.this.getTitle());
-				if (sidePaneManager.isComponentVisible(GeneralFetcher.this.getTitle())) {
-					new FocusRequester(getTextField());
-				}
-			}        	
+            if (!sidePaneManager.hasComponent(GeneralFetcher.this.getTitle())) {
+                sidePaneManager.register(GeneralFetcher.this.getTitle(), GeneralFetcher.this);
+            }
+
+            if (frame.getTabbedPane().getTabCount() > 0) {
+                sidePaneManager.toggle(GeneralFetcher.this.getTitle());
+                if (sidePaneManager.isComponentVisible(GeneralFetcher.this.getTitle())) {
+                    new FocusRequester(getTextField());
+                }
+            }
         }
     }
+
 
     @Override
     public void componentClosing() {
@@ -321,7 +330,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         Globals.prefs.putBoolean("webSearchVisible", Boolean.TRUE);
     }
 
+
     static class EntryFetcherComparator implements Comparator<EntryFetcher> {
+
         public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {
             return entryFetcher.getTitle().compareTo(entryFetcher1.getTitle());
         }

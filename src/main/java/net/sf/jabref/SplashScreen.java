@@ -35,9 +35,11 @@ import java.net.URL;
  */
 
 public class SplashScreen extends Window {
+
     private Image splashImage;
     private boolean paintCalled = false;
-    
+
+
     public SplashScreen(Frame owner) {
         super(owner);
         URL imageURL = SplashScreen.class.getResource("/images/splash.png");
@@ -45,19 +47,19 @@ public class SplashScreen extends Window {
 
         // Load the image
         MediaTracker mt = new MediaTracker(this);
-        mt.addImage(splashImage,0);
+        mt.addImage(splashImage, 0);
         try {
             mt.waitForID(0);
-        } catch(InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
 
-                                                                                
         // Center the window on the screen.
         int imgWidth = splashImage.getWidth(this);
-        int imgHeight = splashImage.getHeight(this);  
+        int imgHeight = splashImage.getHeight(this);
 
         setSize(imgWidth, imgHeight);
         setLocationRelativeTo(null);
-        
+
         /* Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(
             (screenDim.width - imgWidth) / 2,
@@ -66,8 +68,7 @@ public class SplashScreen extends Window {
         */
 
     }
-    
-    
+
     /**
      * Updates the display area of the window.
      */
@@ -80,6 +81,7 @@ public class SplashScreen extends Window {
         g.setColor(getForeground());
         paint(g);
     }
+
     /**
      * Paints the image on the window.
      */
@@ -89,13 +91,15 @@ public class SplashScreen extends Window {
 
         // Notify method splash that the window
         // has been painted.
-        if (! paintCalled) {
+        if (!paintCalled) {
             paintCalled = true;
-            synchronized (this) { notifyAll(); }
+            synchronized (this) {
+                notifyAll();
+            }
         }
     }
-    
-      /**
+
+    /**
      * Constructs and displays a SplashWindow.<p>
      * This method is useful for startup splashs.
      * Dispose the returned frame to get rid of the splash window.<p>
@@ -118,12 +122,13 @@ public class SplashScreen extends Window {
         // sebwills adds: However, just in case the paint method never gets called
         // (e.g. if the splashscreen is completely obscured by an 'always on top'
         // window of some other application), we time-out after 5 seconds.
-        if (! EventQueue.isDispatchThread()) {
+        if (!EventQueue.isDispatchThread()) {
             synchronized (w) {
-                if (! w.paintCalled) {
-                    try { 
+                if (!w.paintCalled) {
+                    try {
                         w.wait(5000);
-                    } catch (InterruptedException ignored) {}
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             }
         }

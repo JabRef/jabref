@@ -20,47 +20,46 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.*;
 
 public class UndoableInsertString extends AbstractUndoableEdit {
-    
+
     private BibtexDatabase base;
     private BasePanel panel;
     private BibtexString string;
 
+
     public UndoableInsertString(BasePanel panel, BibtexDatabase base,
-				BibtexString string) {
-	this.base = base;
-	this.panel = panel;
-	this.string = string;
+            BibtexString string) {
+        this.base = base;
+        this.panel = panel;
+        this.string = string;
     }
 
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+Globals.lang("insert string ");
+        return Globals.lang("Undo") + ": " + Globals.lang("insert string ");
     }
 
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+Globals.lang("insert string ");
+        return Globals.lang("Redo") + ": " + Globals.lang("insert string ");
     }
 
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
-	base.removeString(string.getId());
-	panel.updateStringDialog();
+        super.undo();
+
+        // Revert the change.
+        base.removeString(string.getId());
+        panel.updateStringDialog();
     }
 
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	try {
-	    base.addString(string);
-	} catch (KeyCollisionException ex) {
-	    ex.printStackTrace();
-	}
+        // Redo the change.
+        try {
+            base.addString(string);
+        } catch (KeyCollisionException ex) {
+            ex.printStackTrace();
+        }
 
-	panel.updateStringDialog();
+        panel.updateStringDialog();
     }
-
-
 
 }

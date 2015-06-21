@@ -32,25 +32,25 @@ public class RankingFieldComparator implements Comparator<BibtexEntry> {
     public int compare(BibtexEntry e1, BibtexEntry e2) {
         String val1 = e1.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         String val2 = e2.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
-		if (val1 == null) {
-			if (val2 != null) {
-				return 1;
-			} else {
-		        return 0;
-			}
-		} else {
-			if (val2 == null) {
-				return -1;
-			} else {
-				// val1 is not null AND val2 is not null
-				int compareToRes = val1.compareTo(val2);
-				if (compareToRes != 0) {
-					return compareToRes*-1;
-				} else {
-			        return 0;
-				}
-			}
-		}
+        if (val1 == null) {
+            if (val2 != null) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            if (val2 == null) {
+                return -1;
+            } else {
+                // val1 is not null AND val2 is not null
+                int compareToRes = val1.compareTo(val2);
+                if (compareToRes != 0) {
+                    return compareToRes * -1;
+                } else {
+                    return 0;
+                }
+            }
+        }
     }
 
 }

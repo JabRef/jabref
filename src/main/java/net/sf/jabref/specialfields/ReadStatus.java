@@ -23,43 +23,44 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 
 public class ReadStatus extends SpecialField {
-	
-	private static ReadStatus INSTANCE = null;
-	
-	private ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
-	
-	public ReadStatus() {
-		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-		values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
-		ImageIcon icon;
-		icon = GUIGlobals.getImage("readStatusRead");
-		values.add(new SpecialFieldValue(this, Globals.lang("read"), "setReadStatusToRead", Globals.lang("Set read status to read"), icon, Globals.lang("Read status read")));
-		icon = GUIGlobals.getImage("readStatusSkimmed");
-		values.add(new SpecialFieldValue(this, Globals.lang("skimmed"), "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
-		this.setValues(values);
-		TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
-	}
-	
-	public static ReadStatus getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new ReadStatus();
-		}
-		return INSTANCE;
-	}
-	
-	public String getFieldName() {
-		return SpecialFieldsUtils.FIELDNAME_READ;
-	}
-	
-	public ImageIcon getRepresentingIcon() {
-		return this.icon;
-	}
-	
-	public String getToolTip() {
-		return Globals.lang("Read status");
-	}
-	
-	public String getMenuString() {
-		return Globals.lang("Read status");
-	}
+
+    private static ReadStatus INSTANCE = null;
+
+    private ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
+
+
+    public ReadStatus() {
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
+        ImageIcon icon;
+        icon = GUIGlobals.getImage("readStatusRead");
+        values.add(new SpecialFieldValue(this, Globals.lang("read"), "setReadStatusToRead", Globals.lang("Set read status to read"), icon, Globals.lang("Read status read")));
+        icon = GUIGlobals.getImage("readStatusSkimmed");
+        values.add(new SpecialFieldValue(this, Globals.lang("skimmed"), "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
+        this.setValues(values);
+        TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
+    }
+
+    public static ReadStatus getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ReadStatus();
+        }
+        return INSTANCE;
+    }
+
+    public String getFieldName() {
+        return SpecialFieldsUtils.FIELDNAME_READ;
+    }
+
+    public ImageIcon getRepresentingIcon() {
+        return this.icon;
+    }
+
+    public String getToolTip() {
+        return Globals.lang("Read status");
+    }
+
+    public String getMenuString() {
+        return Globals.lang("Read status");
+    }
 }

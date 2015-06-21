@@ -39,7 +39,8 @@ public class RTFCharsTest {
         assertEquals("{\\b hallo}", layout.format("{\\textbf hallo}"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testComplicated() {
         LayoutFormatter layout = new RTFChars();
 
@@ -48,7 +49,8 @@ public class RTFCharsTest {
         assertEquals("h\\u225all{\\uc2\\u339oe}", layout.format("h\\'all\\oe "));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testSpecialCharacters() {
 
         LayoutFormatter layout = new RTFChars();

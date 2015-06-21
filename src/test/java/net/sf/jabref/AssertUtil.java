@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class AssertUtil {
+
     /**
      * Will check if two paths are the same.
      */

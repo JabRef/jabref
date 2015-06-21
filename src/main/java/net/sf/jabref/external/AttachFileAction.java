@@ -18,6 +18,7 @@ public class AttachFileAction extends BaseAction {
     BibtexEntry entry = null;
     private BasePanel panel;
 
+
     public AttachFileAction(BasePanel panel) {
         this.panel = panel;
     }
@@ -45,6 +46,5 @@ public class AttachFileAction extends BaseAction {
             panel.markBaseChanged();
         }
     }
-
 
 }

@@ -27,9 +27,11 @@ import net.sf.jabref.util.QuotedStringTokenizer;
  *
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
+
     public static final String ID = "ExplicitGroup:";
 
     private final Set<BibtexEntry> m_entries;
+
 
     public ExplicitGroup(String name, int context) {
         super(name, context);
@@ -108,7 +110,8 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             return null; // nothing to do
 
         HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(m_entries);
-        for (BibtexEntry entry : entries) m_entries.remove(entry);
+        for (BibtexEntry entry : entries)
+            m_entries.remove(entry);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }
@@ -207,12 +210,12 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     public static String getDescriptionForPreview() {
         return Globals.lang("This group contains entries based on manual assignment. "
-                        + "Entries can be assigned to this group by selecting them "
-                        + "then using either drag and drop or the context menu. "
-                        + "Entries can be removed from this group by selecting them "
-                        + "then using the context menu. Every entry assigned to this group "
-                        + "must have a unique key. The key may be changed at any time "
-                        + "as long as it remains unique.");
+                + "Entries can be assigned to this group by selecting them "
+                + "then using either drag and drop or the context menu. "
+                + "Entries can be removed from this group by selecting them "
+                + "then using the context menu. Every entry assigned to this group "
+                + "must have a unique key. The key may be changed at any time "
+                + "as long as it remains unique.");
     }
 
     public String getShortDescription() {
@@ -223,7 +226,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             sb.append(", ").append(Globals.lang("includes subgroups"));
             break;
         case AbstractGroup.REFINING:
-        	sb.append(", ").append(Globals.lang("refines supergroup"));
+            sb.append(", ").append(Globals.lang("refines supergroup"));
             break;
         default:
             break;
@@ -240,31 +243,31 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
      *
      * @param db The database to refresh for.
      */
-        public void refreshForNewDatabase(BibtexDatabase db) {
-            Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
-            for (BibtexEntry entry : m_entries) {
-                BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
-                /*if (sameEntry == null) {
-                    System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
-                } else {
-                    System.out.println("'"+entry.getCiteKey()+"' ok");
-                }*/
-                newSet.add(sameEntry);
-            }
-            m_entries.clear();
-            m_entries.addAll(newSet);
+    public void refreshForNewDatabase(BibtexDatabase db) {
+        Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
+        for (BibtexEntry entry : m_entries) {
+            BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
+            /*if (sameEntry == null) {
+                System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
+            } else {
+                System.out.println("'"+entry.getCiteKey()+"' ok");
+            }*/
+            newSet.add(sameEntry);
         }
+        m_entries.clear();
+        m_entries.addAll(newSet);
+    }
 
-		public Set<BibtexEntry> getEntries(){
-			return m_entries;
-		}
+    public Set<BibtexEntry> getEntries() {
+        return m_entries;
+    }
 
     public String getTypeId() {
         return ID;
     }
 
-	public int getNumEntries() {
-		return m_entries.size();
-	}
+    public int getNumEntries() {
+        return m_entries.size();
+    }
 
 }

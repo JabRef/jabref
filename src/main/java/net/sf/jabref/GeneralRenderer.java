@@ -23,16 +23,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 /**
  * Renderer for table cells, which supports both Icons, JLabels and plain text.
  */
-public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
+public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/extends DefaultTableCellRenderer {
 
     Color background, selBackground = null;
+
 
     public GeneralRenderer(Color c) {
         super();
         this.background = c;
         setBackground(c);
     }
-
 
     /**
      * Renderer with specified foreground and background colors, and default selected
@@ -60,7 +60,7 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
     }
 
     public Component getTableCellRendererComponent(JTable table, Object o, boolean isSelected,
-                                                   boolean hasFocus, int row, int column) {
+            boolean hasFocus, int row, int column) {
         if (selBackground == null)
             return super.getTableCellRendererComponent(table, o, isSelected, hasFocus, row, column);
         else {
@@ -73,23 +73,26 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
         }
     }
 
-    public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
-    public void firePropertyChange(String propertyName, Object old, Object newV) {}
+    public void firePropertyChange(String propertyName, boolean old, boolean newV) {
+    }
+
+    public void firePropertyChange(String propertyName, Object old, Object newV) {
+    }
 
     /* For enabling the renderer to handle icons. */
     protected void setValue(Object value) {
         //System.out.println(""+value);
         if (value instanceof Icon) {
-            setIcon((Icon)value);
+            setIcon((Icon) value);
             setText(null);
             //super.setValue(null);
         } else if (value instanceof JLabel) {
-          JLabel lab = (JLabel)value;
-          setIcon(lab.getIcon());
-          //table.setToolTipText(lab.getToolTipText());
-          setToolTipText(lab.getToolTipText());
-          if (lab.getIcon() != null)
-            setText(null);
+            JLabel lab = (JLabel) value;
+            setIcon(lab.getIcon());
+            //table.setToolTipText(lab.getToolTipText());
+            setToolTipText(lab.getToolTipText());
+            if (lab.getIcon() != null)
+                setText(null);
         } else {
 
             setIcon(null);

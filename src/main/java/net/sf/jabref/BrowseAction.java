@@ -28,13 +28,14 @@ import javax.swing.*;
  */
 public class BrowseAction extends AbstractAction implements ActionListener {
 
-	private static final long serialVersionUID = 3007593430933681310L;
+    private static final long serialVersionUID = 3007593430933681310L;
 
     JComponent focusTarget = null;
-	JFrame frame=null;
+    JFrame frame = null;
     //JDialog dialog=null;
     JTextField comp;
     boolean dir;
+
 
     public BrowseAction(JFrame frame, JTextField tc, boolean dir) {
         super(Globals.lang("Browse"));

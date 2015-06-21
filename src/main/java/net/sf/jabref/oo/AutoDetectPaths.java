@@ -40,6 +40,7 @@ public class AutoDetectPaths extends AbstractWorker {
     JDialog prog;
     private JDialog parent;
 
+
     public AutoDetectPaths(JDialog parent) {
         this.parent = parent;
     }
@@ -72,7 +73,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
     public void init() throws Throwable {
         prog = showProgressDialog(parent, Globals.lang("Autodetecting paths..."),
-            Globals.lang("Please wait..."), true);
+                Globals.lang("Please wait..."), true);
     }
 
     public void update() {
@@ -97,6 +98,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 JFileChooser jfc = new JFileChooser(new File("C:\\"));
                 jfc.setDialogType(JFileChooser.OPEN_DIALOG);
                 jfc.setFileFilter(new javax.swing.filechooser.FileFilter() {
+
                     public boolean accept(File file) {
                         return file.isDirectory();
                     }
@@ -125,7 +127,8 @@ public class AutoDetectPaths extends AbstractWorker {
                 Globals.prefs.put("ooJurtPath", jurt.getPath());
                 return true;
             }
-            else return false;
+            else
+                return false;
 
         }
         else if (Globals.ON_MAC) {
@@ -160,9 +163,11 @@ public class AutoDetectPaths extends AbstractWorker {
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
                 }
-                else return false;
+                else
+                    return false;
             }
-            else return false;
+            else
+                return false;
         }
         else {
             // Linux:
@@ -172,7 +177,8 @@ public class AutoDetectPaths extends AbstractWorker {
                 return false;
             if (inUsr == null) {
                 inUsr = findFileDir(new File("/usr/lib64"), "soffice");
-                if (inUsr != null) usrRoot = "/usr/lib64";
+                if (inUsr != null)
+                    usrRoot = "/usr/lib64";
             }
 
             if (fileSearchCancelled)
@@ -192,7 +198,8 @@ public class AutoDetectPaths extends AbstractWorker {
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
                 }
-                else return false;
+                else
+                    return false;
             }
             else if (inOpt != null) { // Found both
                 JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
@@ -218,9 +225,9 @@ public class AutoDetectPaths extends AbstractWorker {
 
                 }
             }
-            else return false;
+            else
+                return false;
         }
-
 
     }
 
@@ -237,7 +244,8 @@ public class AutoDetectPaths extends AbstractWorker {
             Globals.prefs.put("ooJurtPath", jurt.getPath());
             return true;
         }
-        else return false;
+        else
+            return false;
     }
 
     /**
@@ -250,6 +258,7 @@ public class AutoDetectPaths extends AbstractWorker {
         List<File> dirList = new ArrayList<File>();
         File root = new File("C:\\");
         File[] dirs = root.listFiles(new FileFilter() {
+
             public boolean accept(File file) {
                 return file.isDirectory();
             }
@@ -271,7 +280,8 @@ public class AutoDetectPaths extends AbstractWorker {
                     && new File(Globals.prefs.get("ooJurtPath"), "jurt.jar").exists()
                     && new File(Globals.prefs.get("ooExecutablePath")).exists();
         }
-        else return false;
+        else
+            return false;
     }
 
     /**
@@ -308,9 +318,10 @@ public class AutoDetectPaths extends AbstractWorker {
         JProgressBar bar = new JProgressBar(JProgressBar.HORIZONTAL);
         JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent event) {
                 fileSearchCancelled = true;
-                ((JButton)event.getSource()).setEnabled(false);
+                ((JButton) event.getSource()).setEnabled(false);
             }
         });
         prog = new JDialog(parent, title, false);
@@ -324,7 +335,7 @@ public class AutoDetectPaths extends AbstractWorker {
         prog.setLocationRelativeTo(null);//parent);
         //SwingUtilities.invokeLater(new Runnable() {
         //    public void run() {
-                prog.setVisible(true);
+        prog.setVisible(true);
         //    }
         //});
         return prog;

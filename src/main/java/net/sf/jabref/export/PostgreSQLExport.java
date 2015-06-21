@@ -48,12 +48,11 @@ public class PostgreSQLExport extends ExportFormat {
      *             error message is shown to the user.
      */
     public void performExport(final BibtexDatabase database,
-        final MetaData metaData, final String file, final String encoding,
-        Set<String> keySet) throws Exception {
+            final MetaData metaData, final String file, final String encoding,
+            Set<String> keySet) throws Exception {
 
-    	new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet, file);
+        new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, keySet, file);
 
     }
-
 
 }

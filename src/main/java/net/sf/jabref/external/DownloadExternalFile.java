@@ -39,12 +39,14 @@ import java.net.URL;
  * If the download is cancelled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
+
     private JabRefFrame frame;
     private MetaData metaData;
     private String bibtexKey;
     private FileListEntryEditor editor;
     private boolean downloadFinished = false;
     private boolean dontShowDialog = false;
+
 
     public DownloadExternalFile(JabRefFrame frame, MetaData metaData, String bibtexKey) {
 
@@ -79,7 +81,6 @@ public class DownloadExternalFile {
         download(url, callback);
     }
 
-
     /**
      * Start a download.
      *
@@ -89,7 +90,6 @@ public class DownloadExternalFile {
     public void download(URL url, final DownloadCallback callback) throws IOException {
 
         String res = url.toString();
-
 
         String mimeType;
 
@@ -106,7 +106,7 @@ public class DownloadExternalFile {
             mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                            + ex.getMessage(), Globals.lang("Download file"),
+                    + ex.getMessage(), Globals.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
             Globals.logger("Error while downloading " + "'" + res + "'");
             return;
@@ -115,6 +115,7 @@ public class DownloadExternalFile {
         final URLDownload udlF = udl;
         //System.out.println("Time: "+(System.currentTimeMillis()-time));
         (new Thread() {
+
             public void run() {
 
                 try {
@@ -124,7 +125,7 @@ public class DownloadExternalFile {
                     if ((editor != null) && (editor.isVisible()))
                         editor.setVisible(false, false);
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                                    + e2.getMessage(), Globals.lang("Download file"),
+                            + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
                     Globals.logger("Error while downloading " + "'" + urlF.toString() + "'");
                     return;
@@ -132,6 +133,7 @@ public class DownloadExternalFile {
 
                 // Download finished: call the method that stops the progress bar etc.:
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         downloadFinished();
                     }
@@ -171,6 +173,7 @@ public class DownloadExternalFile {
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
+
             public boolean confirmClose(FileListEntry entry) {
                 File f = directory != null ? expandFilename(directory, entry.getLink())
                         : new File(entry.getLink());
@@ -184,7 +187,7 @@ public class DownloadExternalFile {
                     return JOptionPane.showConfirmDialog
                             (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                                     Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
-                            == JOptionPane.OK_OPTION;
+                    == JOptionPane.OK_OPTION;
                 } else
                     return true;
             }
@@ -309,7 +312,8 @@ public class DownloadExternalFile {
         int index = strippedLink.lastIndexOf('.');
         if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
             suffix = null;
-        else suffix = strippedLink.substring(index + 1);
+        else
+            suffix = strippedLink.substring(index + 1);
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
@@ -340,11 +344,13 @@ public class DownloadExternalFile {
         return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
     }
 
+
     /**
      * Callback interface that users of this class must implement in order to receive
      * notification when download is complete.
      */
     public interface DownloadCallback {
+
         public void downloadComplete(FileListEntry file);
     }
 }

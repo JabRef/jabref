@@ -21,6 +21,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     protected boolean considerRefs;
 
+
     /**
      * @param considerRefs Indicates whether the strings should be
      *                     sorted according to internal references in addition to
@@ -35,8 +36,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         int res = 0;
 
         // First check their names:
-        String name1 = s1.getName().toLowerCase(),
-                name2 = s2.getName().toLowerCase();
+        String name1 = s1.getName().toLowerCase(), name2 = s2.getName().toLowerCase();
 
         res = name1.compareTo(name2);
 
@@ -59,8 +59,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
             // Then see if "pre" refers to "post", which is the only
             // situation when we must change the ordering:
-            String namePost = post.getName().toLowerCase(),
-                    textPre = pre.getContent().toLowerCase();
+            String namePost = post.getName().toLowerCase(), textPre = pre.getContent().toLowerCase();
 
             // If that is the case, reverse the order found:
             if (textPre.contains("#" + namePost + "#")) {

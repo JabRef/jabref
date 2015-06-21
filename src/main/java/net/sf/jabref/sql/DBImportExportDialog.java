@@ -53,147 +53,159 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class DBImportExportDialog implements MouseListener, KeyListener {
 
-	private JDialog diag;
-	private JTable table;
+    private JDialog diag;
+    private JTable table;
 
     // IMPORT
-	public List<String> listOfDBs = new ArrayList<String>();
-	public boolean moreThanOne = false;
-	// EXPORT
-	public String selectedDB = "";
-	public boolean hasDBSelected = false;
-	public boolean removeAction = false;
-	public int selectedInt = -1;
-	private DialogType dialogType;
+    public List<String> listOfDBs = new ArrayList<String>();
+    public boolean moreThanOne = false;
+    // EXPORT
+    public String selectedDB = "";
+    public boolean hasDBSelected = false;
+    public boolean removeAction = false;
+    public int selectedInt = -1;
+    private DialogType dialogType;
 
-	public DialogType getDialogType() {
-		return dialogType;
-	}
 
-	public void setDialogType(DialogType dialogType) {
-		this.dialogType = dialogType;
-	}
+    public DialogType getDialogType() {
+        return dialogType;
+    }
 
-	public enum DialogType {
-		IMPORTER("IMPORTER"), EXPORTER("EXPORTER");
-		private String dialogType;
+    public void setDialogType(DialogType dialogType) {
+        this.dialogType = dialogType;
+    }
 
-		private DialogType(String dialogType) {
-			this.dialogType = dialogType;
-		}
 
-		public String getDialogType() {
-			return this.dialogType;
-		}
-	}
+    public enum DialogType {
+        IMPORTER("IMPORTER"), EXPORTER("EXPORTER");
+
+        private String dialogType;
+
+
+        private DialogType(String dialogType) {
+            this.dialogType = dialogType;
+        }
+
+        public String getDialogType() {
+            return this.dialogType;
+        }
+    }
+
 
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
-		this.dialogType = dialogType;
+        this.dialogType = dialogType;
 
-		Vector<String> columns = new Vector<String>();
-		columns.add("Databases");
-		table = new JTable();
-		DefaultTableModel model = new DefaultTableModel(rows,columns){
-			private static final long serialVersionUID = 1L;
-			public boolean isCellEditable(int row, int column){
-				return false;
-			}
-		};
-		
-		table.setModel (model);
+        Vector<String> columns = new Vector<String>();
+        columns.add("Databases");
+        table = new JTable();
+        DefaultTableModel model = new DefaultTableModel(rows, columns) {
 
+            private static final long serialVersionUID = 1L;
+
+
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        table.setModel(model);
 
         String dialogTitle;
         String dialogTopMessage;
         int tableSelectionModel;
-        if (dialogType.equals(DialogType.EXPORTER)){
+        if (dialogType.equals(DialogType.EXPORTER)) {
             dialogTitle = Globals.lang("SQL Database Exporter");
             dialogTopMessage = Globals.lang("Select target SQL database:");
             tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
-			table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0)), "exportAction");
-			table.getActionMap().put("exportAction",new AbstractAction() {
-			    public void actionPerformed(ActionEvent e) {
-			        exportAction();
-			    }
-			});
-		}
-		else{
-			this.dialogType = dialogType;
-			dialogTitle = Globals.lang("SQL Database Importer");
-			dialogTopMessage = Globals.lang("Please select which JabRef databases do you want to import:");
-			tableSelectionModel = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
-			table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0)), "importAction");
-			table.getActionMap().put("importAction",new AbstractAction() {
-			    public void actionPerformed(ActionEvent e) {
-			        importAction();
-			    }
-			});
-		}		
-		
-		diag = new JDialog(frame, dialogTitle, false);
-		JPanel pan = new JPanel();
-		pan.setLayout(new BorderLayout());
+            table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "exportAction");
+            table.getActionMap().put("exportAction", new AbstractAction() {
 
-		
-		JLabel lab = new JLabel(dialogTopMessage);
-		lab.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		pan.add(lab, BorderLayout.NORTH);
+                public void actionPerformed(ActionEvent e) {
+                    exportAction();
+                }
+            });
+        }
+        else {
+            this.dialogType = dialogType;
+            dialogTitle = Globals.lang("SQL Database Importer");
+            dialogTopMessage = Globals.lang("Please select which JabRef databases do you want to import:");
+            tableSelectionModel = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+            table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "importAction");
+            table.getActionMap().put("importAction", new AbstractAction() {
 
-		table.setSelectionMode(tableSelectionModel);
-		table.setPreferredScrollableViewportSize(new Dimension(100, 100));
-		table.setTableHeader(null);
-		table.setRowSelectionInterval(0, 0);
-		
-		pan.add(new JScrollPane(table), BorderLayout.CENTER);
-		diag.getContentPane().add(pan, BorderLayout.NORTH);
-		pan = new JPanel();
-		pan.setLayout(new BorderLayout());
+                public void actionPerformed(ActionEvent e) {
+                    importAction();
+                }
+            });
+        }
 
-		diag.getContentPane().add(pan, BorderLayout.CENTER);
+        diag = new JDialog(frame, dialogTitle, false);
+        JPanel pan = new JPanel();
+        pan.setLayout(new BorderLayout());
 
-		ButtonBarBuilder b = new ButtonBarBuilder();
-		b.addGlue();
+        JLabel lab = new JLabel(dialogTopMessage);
+        lab.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        pan.add(lab, BorderLayout.NORTH);
+
+        table.setSelectionMode(tableSelectionModel);
+        table.setPreferredScrollableViewportSize(new Dimension(100, 100));
+        table.setTableHeader(null);
+        table.setRowSelectionInterval(0, 0);
+
+        pan.add(new JScrollPane(table), BorderLayout.CENTER);
+        diag.getContentPane().add(pan, BorderLayout.NORTH);
+        pan = new JPanel();
+        pan.setLayout(new BorderLayout());
+
+        diag.getContentPane().add(pan, BorderLayout.CENTER);
+
+        ButtonBarBuilder b = new ButtonBarBuilder();
+        b.addGlue();
         JButton importButton = new JButton(Globals.lang("Import"));
         JButton exportButton = new JButton(Globals.lang("Export"));
         if (dialogType.equals(DialogType.IMPORTER))
-			b.addButton(importButton);
-		else
-			b.addButton(exportButton);
+            b.addButton(importButton);
+        else
+            b.addButton(exportButton);
 
-		b.addRelatedGap();
+        b.addRelatedGap();
         JButton cancelButton = new JButton(Globals.lang("Cancel"));
         b.addButton(cancelButton);
-		b.addRelatedGap();
+        b.addRelatedGap();
         JButton removeButton = new JButton(Globals.lang("Remove Selected"));
         b.addButton(removeButton);
 
-		b.addGlue();
-		b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		diag.getContentPane().add(b.getPanel(), BorderLayout.SOUTH);
-		diag.pack();
-		diag.setLocationRelativeTo(frame);
-		table.addMouseListener(this);
+        b.addGlue();
+        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        diag.getContentPane().add(b.getPanel(), BorderLayout.SOUTH);
+        diag.pack();
+        diag.setLocationRelativeTo(frame);
+        table.addMouseListener(this);
 
-		importButton.addActionListener(new ActionListener() {
+        importButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 importAction();
             }
         });
 
-		exportButton.addActionListener(new ActionListener() {
+        exportButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 exportAction();
             }
         });
 
-		cancelButton.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 moreThanOne = false;
                 hasDBSelected = false;
                 diag.dispose();
             }
         });
-		removeButton.addActionListener(new ActionListener() {
+        removeButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent arg0) {
                 moreThanOne = false;
                 hasDBSelected = true;
@@ -206,77 +218,76 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
                 }
             }
         });
-		diag.setModal(true);
-		diag.setVisible(true);
-	}
+        diag.setModal(true);
+        diag.setVisible(true);
+    }
 
-	public JDialog getDiag() {
-		return this.diag;
-	}
+    public JDialog getDiag() {
+        return this.diag;
+    }
 
-	private void exportAction() {
-		selectedInt = table.getSelectedRow();
-		selectedDB = (String) table.getValueAt(selectedInt, 0);
-		hasDBSelected = true;
-		diag.dispose();
-	}
+    private void exportAction() {
+        selectedInt = table.getSelectedRow();
+        selectedDB = (String) table.getValueAt(selectedInt, 0);
+        hasDBSelected = true;
+        diag.dispose();
+    }
 
-	private void importAction() {
-		int[] selectedInt = table.getSelectedRows();
+    private void importAction() {
+        int[] selectedInt = table.getSelectedRows();
         for (int aSelectedInt : selectedInt) {
             listOfDBs.add((String) table.getValueAt(aSelectedInt, 0));
             moreThanOne = true;
         }
-		diag.dispose();
-	}
-	
+        diag.dispose();
+    }
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if ((e.getClickCount() == 2)
-				&& this.dialogType.equals(DialogType.EXPORTER)) {
-			this.exportAction();
-		}
-	}
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if ((e.getClickCount() == 2)
+                && this.dialogType.equals(DialogType.EXPORTER)) {
+            this.exportAction();
+        }
+    }
 
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+    }
 
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void keyPressed(KeyEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void keyReleased(KeyEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

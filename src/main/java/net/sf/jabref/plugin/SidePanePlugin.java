@@ -31,7 +31,7 @@ import javax.swing.*;
 public interface SidePanePlugin {
 
     public void init(JabRefFrame frame, SidePaneManager manager);
-    
+
     public SidePaneComponent getSidePaneComponent();
 
     public JMenuItem getMenuItem();

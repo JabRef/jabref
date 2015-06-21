@@ -23,22 +23,24 @@ import java.io.File;
  * export to. Contains a reference to the ExportFormat in question.
  */
 public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
+
     private IExportFormat format;
     private String extension, name;
 
+
     public ExportFileFilter(IExportFormat format, String extension) {
-		this.format = format;
-		this.extension = extension;
-		this.name = format.getDisplayName() + " (*" + extension
-				+ ")";
-	}
+        this.format = format;
+        this.extension = extension;
+        this.name = format.getDisplayName() + " (*" + extension
+                + ")";
+    }
 
     public IExportFormat getExportFormat() {
         return format;
     }
-    
-    public String getExtension(){
-    	return extension;
+
+    public String getExtension() {
+        return extension;
     }
 
     public boolean accept(File file) {

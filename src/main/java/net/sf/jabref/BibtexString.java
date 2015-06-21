@@ -55,25 +55,26 @@ public class BibtexString {
      * @author Jan Kubovy <jan@kubovy.eu>
      */
     public enum Type {
-		AUTHOR("a"),
+        AUTHOR("a"),
         INSTITUTION("i"),
         PUBLISHER("p"),
         OTHER("");
 
         private String prefix;
 
+
         Type(String prefix) {
             this.prefix = prefix;
         }
 
         public static final Type get(String name) {
-        	if (name.length() <= 1) {
-        		return OTHER;
-        	}
+            if (name.length() <= 1) {
+                return OTHER;
+            }
             if (!(name.charAt(1) + "").toUpperCase().equals(
                     (name.charAt(1) + "")))
                 return OTHER;
-            for(Type t : Type.values()) {
+            for (Type t : Type.values()) {
                 if (t.prefix.equals(name.charAt(0) + ""))
                     return t;
             }
@@ -81,50 +82,52 @@ public class BibtexString {
         }
     }
 
+
     String _name, _content, _id;
     Type _type;
 
+
     public BibtexString(String id, String name, String content) {
-	_id = id;
-	_name = name;
-	_content = content;
-	_type = Type.get(name);
+        _id = id;
+        _name = name;
+        _content = content;
+        _type = Type.get(name);
     }
 
     public BibtexString(String id, String name, String content, Type type) {
-	_id = id;
-	_name = name;
-	_content = content;
-	_type = type;
+        _id = id;
+        _name = name;
+        _content = content;
+        _type = type;
     }
 
     public String getId() {
-	return _id;
+        return _id;
     }
 
     public void setId(String id) {
-	_id = id;
+        _id = id;
     }
 
     public String getName() {
-	return _name;
+        return _name;
     }
 
     public void setName(String name) {
-	_name = name;
-	_type = Type.get(name);
+        _name = name;
+        _type = Type.get(name);
     }
 
     public String getContent() {
-	return ((_content == null) ? "" : _content);
+        return ((_content == null) ? "" : _content);
     }
 
     public void setContent(String content) {
-	_content = content;
+        _content = content;
     }
 
     public Object clone() {
-      return new BibtexString(_id, _name, _content);
+        return new BibtexString(_id, _name, _content);
     }
 
     public Type getType() {

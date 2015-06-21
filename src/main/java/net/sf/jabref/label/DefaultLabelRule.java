@@ -20,11 +20,9 @@ import net.sf.jabref.BibtexFields;
 
 public class DefaultLabelRule implements LabelRule {
 
-
     // the default rule is that oit simply returns what it was given
-    public String applyRule(BibtexEntry oldEntry){
+    public String applyRule(BibtexEntry oldEntry) {
         return oldEntry.getField(BibtexFields.KEY_FIELD);
     }
-
 
 }

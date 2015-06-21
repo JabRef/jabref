@@ -1,20 +1,31 @@
-apply plugin: "java"
-apply plugin: "eclipse"
-apply plugin: "idea"
-apply plugin: "application"
-apply plugin: 'project-report'
-
-
-// enables fatjar, the creation of a jar with all dependencies bundled inside
+// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
 buildscript {
     repositories {
         jcenter()
     }
+
     dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
     }
 }
-apply plugin: 'fatjar'
+
+plugins {
+    id "com.github.youribonnaffe.gradle.format" version "1.2"
+    id "eu.appsatori.fatjar" version "0.3"
+}
+
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "application"
+apply plugin: "project-report"
+
+format {
+    configurationFile = file('formatter_settings.xml')
+    // default: reformat main and test
+    //files = sourceSets.main.java
+}
+
 fatJar {
     classifier 'fat'
     manifest {
@@ -249,16 +260,6 @@ idea.project.ipr {
 
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-    }
-}
 
 jacocoTestReport {
     reports {

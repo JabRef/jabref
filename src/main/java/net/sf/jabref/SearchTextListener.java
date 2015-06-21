@@ -25,10 +25,11 @@ import java.util.ArrayList;
  * 
  */
 interface SearchTextListener {
-	/**
-	 * Array of words that were searched for
-	 * 
-	 * @param words null if nothing is searched for
-	 */
-	public void searchText(ArrayList<String> words);
+
+    /**
+     * Array of words that were searched for
+     * 
+     * @param words null if nothing is searched for
+     */
+    public void searchText(ArrayList<String> words);
 }

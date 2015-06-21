@@ -26,12 +26,14 @@ import net.sf.jabref.Globals;
  * Preferences - Java - Code Style - Code Templates
  */
 public class UndoableMoveGroup extends AbstractUndoableEdit {
+
     private final GroupSelector m_groupSelector;
     private final GroupTreeNode m_groupsRootHandle;
     private final int[] m_pathToNewParent;
     private final int m_newChildIndex;
     private final int[] m_pathToOldParent;
     private final int m_oldChildIndex;
+
 
     /**
      * @param moveNode
@@ -55,13 +57,13 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " 
-            + Globals.lang("move group");
+        return Globals.lang("Undo") + ": "
+                + Globals.lang("move group");
     }
 
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " 
-            + Globals.lang("move group");
+        return Globals.lang("Redo") + ": "
+                + Globals.lang("move group");
     }
 
     public void undo() {

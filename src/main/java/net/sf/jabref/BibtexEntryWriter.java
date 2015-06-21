@@ -56,6 +56,7 @@ public class BibtexEntryWriter {
     private final boolean includeEmptyFields = Globals.prefs.getBoolean("includeEmptyFields");
     private final int writeFieldSortStype = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
+
     public BibtexEntryWriter(FieldFormatter fieldFormatter, boolean write) {
         this.fieldFormatter = fieldFormatter;
         this.write = write;
@@ -63,15 +64,15 @@ public class BibtexEntryWriter {
 
     public void write(BibtexEntry entry, Writer out) throws IOException {
         switch (writeFieldSortStype) {
-            case 0:
-                writeSorted(entry, out);
-                break;
-            case 1:
-                writeUnsorted(entry, out);
-                break;
-            case 2:
-                writeUserDefinedOrder(entry, out);
-                break;
+        case 0:
+            writeSorted(entry, out);
+            break;
+        case 1:
+            writeUnsorted(entry, out);
+            break;
+        case 2:
+            writeUserDefinedOrder(entry, out);
+            break;
         }
     }
 
@@ -156,19 +157,21 @@ public class BibtexEntryWriter {
         boolean hasWritten = false;
         // Write required fields first.
         String[] s = entry.getRequiredFields();
-        if (s != null) for (String value : s) {
-            hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
-            written.put(value, null);
-        }
-        // Then optional fields.
-        s = entry.getOptionalFields();
-        if (s != null) for (String value : s) {
-            if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                //writeField(s[i], out, fieldFormatter);
+        if (s != null)
+            for (String value : s) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
                 written.put(value, null);
             }
-        }
+        // Then optional fields.
+        s = entry.getOptionalFields();
+        if (s != null)
+            for (String value : s) {
+                if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
+                    //writeField(s[i], out, fieldFormatter);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                    written.put(value, null);
+                }
+            }
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
@@ -255,8 +258,7 @@ public class BibtexEntryWriter {
             try {
                 out.write(fieldFormatter.format(o, name));
             } catch (Throwable ex) {
-                throw new IOException
-                        (Globals.lang("Error in field") + " '" + name + "': " + ex.getMessage());
+                throw new IOException(Globals.lang("Error in field") + " '" + name + "': " + ex.getMessage());
             }
             return true;
         } else

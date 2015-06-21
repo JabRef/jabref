@@ -47,9 +47,9 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     protected Object highlightBorderCell = null;
 
     public static ImageIcon
-      groupRefiningIcon = GUIGlobals.getImage("groupRefining"),
-      groupIncludingIcon = GUIGlobals.getImage("groupIncluding"),
-      groupRegularIcon = null;
+            groupRefiningIcon = GUIGlobals.getImage("groupRefining"),
+            groupIncludingIcon = GUIGlobals.getImage("groupIncluding"),
+            groupRegularIcon = null;
 
 
     public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -73,7 +73,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         else
             label.setBorder(BorderFactory.createEmptyBorder());
         boolean italics = Globals.prefs.getBoolean("groupShowDynamic")
-        && group.isDynamic();
+                && group.isDynamic();
         boolean red = false;
         if (highlight2Cells != null) {
             for (Object highlight2Cell : highlight2Cells) {
@@ -95,7 +95,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         String name = group.getName();
         if (name.length() > MAX_DISPLAYED_LETTERS)
-            name = name.substring(0, MAX_DISPLAYED_LETTERS-2)+"...";
+            name = name.substring(0, MAX_DISPLAYED_LETTERS - 2) + "...";
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
         if (red)
@@ -106,16 +106,16 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             sb.append("<i>");
         sb.append(Util.quoteForHTML(name));
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
-        	if (group instanceof ExplicitGroup) {
-        	    sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
-        	} else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
-        		int hits = 0;
-        		for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()){
-        		    if (group.contains(entry))
-        			hits++;
-        		}
-        		sb.append(" [").append(hits).append("]");
-        	}
+            if (group instanceof ExplicitGroup) {
+                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
+            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+                int hits = 0;
+                for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
+                    if (group.contains(entry))
+                        hits++;
+                }
+                sb.append(" [").append(hits).append("]");
+            }
         }
         if (italics)
             sb.append("</i>");

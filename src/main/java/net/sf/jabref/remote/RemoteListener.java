@@ -38,6 +38,7 @@ public class RemoteListener extends Thread {
     private boolean active = true, toStop = false;
     private static final String IDENTIFIER = "jabref";
 
+
     public RemoteListener(JabRef jabref, ServerSocket socket) {
         this.jabref = jabref;
         this.socket = socket;
@@ -74,7 +75,7 @@ public class RemoteListener extends Thread {
                 StringBuffer sb = new StringBuffer();
                 try {
                     while (((c = in.read()) != '\0') && (c >= 0)) {
-                        sb.append((char)c);
+                        sb.append((char) c);
                     }
                     if (sb.length() == 0) {
                         continue;
@@ -87,14 +88,15 @@ public class RemoteListener extends Thread {
                     // --> Globals.prefs.getBoolean("useImportInspectionDialog")
                     // this dialog has to be shown AFTER JabRef has been brought to front
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             JabRef.jrf.showIfMinimizedToSysTray();
                         }
                     });
 
-                    for (int i=0; i<loaded.size(); i++) {
+                    for (int i = 0; i < loaded.size(); i++) {
                         ParserResult pr = loaded.elementAt(i);
-                        JabRef.jrf.addParserResult(pr, (i==0));
+                        JabRef.jrf.addParserResult(pr, (i == 0));
                     }
 
                     in.close();
@@ -106,8 +108,6 @@ public class RemoteListener extends Thread {
                     out.close();
                     newSocket.close();
                 }
-
-
 
             } catch (SocketException ex) {
                 active = false;
@@ -150,14 +150,14 @@ public class RemoteListener extends Thread {
             StringBuffer sb = new StringBuffer();
             try {
                 while (((c = in.read()) != '\0') && (c >= 0)) {
-                    sb.append((char)c);
+                    sb.append((char) c);
                 }
             } catch (SocketTimeoutException ex) {
-                 System.out.println("Connection timed out.");
+                System.out.println("Connection timed out.");
             }
 
             if (!IDENTIFIER.equals(sb.toString())) {
-            	String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
+                String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
                 String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
                 System.out.println(error);
                 return false;

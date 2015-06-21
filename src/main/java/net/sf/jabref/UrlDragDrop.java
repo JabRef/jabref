@@ -60,6 +60,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     private JabRefFrame frame;
 
+
     public UrlDragDrop(EntryEditor _editor, JabRefFrame _frame,
             FieldEditor _feditor) {
         editor = _editor;
@@ -99,11 +100,13 @@ public class UrlDragDrop implements DropTargetListener {
     public void dragExit(DropTargetEvent dte) {
     }
 
+
     private static class JOptionChoice {
 
         private String label;
 
         private int id;
+
 
         public JOptionChoice(String _label, int _id) {
             label = _label;
@@ -120,24 +123,25 @@ public class UrlDragDrop implements DropTargetListener {
 
     }
 
+
     /*
      * (non-Javadoc)
      *
      * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
      */
-    
-	public void drop(DropTargetDropEvent dtde) {
+
+    public void drop(DropTargetDropEvent dtde) {
         Transferable tsf = dtde.getTransferable();
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
         //try with an URL
         DataFlavor dtURL = null;
-        try{
+        try {
             dtURL = new DataFlavor("application/x-java-url; class=java.net.URL");
-        }catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             logger.log(Level.WARNING,
                     "Class not found for DnD... should not happen", e);
         }
-        try{
+        try {
             URL url = (URL) tsf.getTransferData(dtURL);
             JOptionChoice res = (JOptionChoice) JOptionPane
                     .showInputDialog(editor, "",
@@ -147,7 +151,7 @@ public class UrlDragDrop implements DropTargetListener {
                                     new JOptionChoice(
                                             Globals.lang("Insert URL"), 0),
                                     new JOptionChoice(
-                                            Globals.lang("Download file"), 1) },
+                                            Globals.lang("Download file"), 1)},
                             new JOptionChoice(Globals.lang("Insert URL"), 0));
             switch (res.getId()) {
             //insert URL
@@ -157,7 +161,7 @@ public class UrlDragDrop implements DropTargetListener {
                 break;
             //download file
             case 1:
-                try{
+                try {
                     //auto file name:
                     File file = new File(new File(Globals.prefs
                             .get("pdfDirectory")), editor.getEntry()
@@ -169,10 +173,10 @@ public class UrlDragDrop implements DropTargetListener {
                     feditor.setText(file.toURI().toURL().toString());
                     editor.updateField(feditor);
 
-                }catch (IOException ioex){
+                } catch (IOException ioex) {
                     logger.log(Level.SEVERE, "Error while downloading file",
                             ioex);
-                    JOptionPane.showMessageDialog(editor, 
+                    JOptionPane.showMessageDialog(editor,
                             Globals.lang("File download"),
                             Globals.lang("Error while downloading file:"
                                     + ioex.getMessage()),
@@ -181,18 +185,18 @@ public class UrlDragDrop implements DropTargetListener {
                 break;
             }
             return;
-        }catch (UnsupportedFlavorException nfe){
+        } catch (UnsupportedFlavorException nfe) {
             // not an URL then...
-        }catch (IOException ioex){
+        } catch (IOException ioex) {
             logger.log(Level.WARNING, "!should not happen!", ioex);
         }
-        
-        try{
+
+        try {
             //try with a File List
-        	@SuppressWarnings("unchecked")
-        	List<File> filelist = (List<File>) tsf
+            @SuppressWarnings("unchecked")
+            List<File> filelist = (List<File>) tsf
                     .getTransferData(DataFlavor.javaFileListFlavor);
-            if (filelist.size() > 1){
+            if (filelist.size() > 1) {
                 JOptionPane
                         .showMessageDialog(editor,
                                 Globals.lang("Only one item is supported"),
@@ -204,12 +208,12 @@ public class UrlDragDrop implements DropTargetListener {
             feditor.setText(fl.toURI().toURL().toString());
             editor.updateField(feditor);
 
-        }catch (UnsupportedFlavorException nfe){
+        } catch (UnsupportedFlavorException nfe) {
             JOptionPane.showMessageDialog(editor,
                     Globals.lang("Operation not supported"),
                     Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             logger.log(Level.WARNING, "Transfer exception", nfe);
-        }catch (IOException ioex){
+        } catch (IOException ioex) {
             logger.log(Level.WARNING, "Transfer exception", ioex);
         }
 

@@ -29,9 +29,12 @@ import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
+
     protected GroupTreeNode m_node;
     protected final boolean m_move;
     protected BasePanel m_panel;
+
+
     /**
      * @param move If true, remove node from all other groups.
      */
@@ -42,21 +45,25 @@ public class AddToGroupAction extends AbstractAction {
         m_move = move;
         m_panel = panel;
     }
+
     public AddToGroupAction(boolean move) {
-        super(move?Globals.lang("Assign entry selection exclusively to this group")
-                  :Globals.lang("Add entry selection to this group"));
+        super(move ? Globals.lang("Assign entry selection exclusively to this group")
+                : Globals.lang("Add entry selection to this group"));
         m_move = move;
     }
+
     public void setBasePanel(BasePanel panel) {
         m_panel = panel;
     }
+
     public void setNode(GroupTreeNode node) {
         m_node = node;
     }
+
     public void actionPerformed(ActionEvent evt) {
         final BibtexEntry[] entries = m_panel.getSelectedEntries();
         final Vector<GroupTreeNode> removeGroupsNodes = new Vector<GroupTreeNode>(); // used only when moving
-        
+
         if (m_move) {
             // collect warnings for removal
             Enumeration<GroupTreeNode> e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
@@ -72,27 +79,27 @@ public class AddToGroupAction extends AbstractAction {
             }
             // warning for all groups from which the entries are removed, and 
             // for the one to which they are added! hence the magical +1
-            AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size()+1];
+            AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size() + 1];
             for (int i = 0; i < removeGroupsNodes.size(); ++i)
                 groups[i] = removeGroupsNodes.elementAt(i).getGroup();
-            groups[groups.length-1] = m_node.getGroup();
+            groups[groups.length - 1] = m_node.getGroup();
             if (!Util.warnAssignmentSideEffects(groups,
                     entries, m_panel.getDatabase(), m_panel.frame()))
                 return; // user aborted operation
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[]{m_node.getGroup()},
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
                     entries, m_panel.getDatabase(), m_panel.frame()))
                 return; // user aborted operation
         }
-        
+
         // if an editor is showing, its fields must be updated
         // after the assignment, and before that, the current
         // edit has to be stored:
         m_panel.storeCurrentEdit();
-        
-        NamedCompound undoAll = new NamedCompound(Globals.lang("change assignment of entries")); 
-        
+
+        NamedCompound undoAll = new NamedCompound(Globals.lang("change assignment of entries"));
+
         if (m_move) {
             // first remove
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
@@ -110,9 +117,9 @@ public class AddToGroupAction extends AbstractAction {
                 return; // no changed made
             undoAll.addEdit(undoAdd);
         }
-        
+
         undoAll.end();
-        
+
         m_panel.undoManager.addEdit(undoAll);
         m_panel.markBaseChanged();
         m_panel.updateEntryEditorIfShowing();

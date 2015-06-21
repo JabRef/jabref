@@ -16,6 +16,14 @@ In case you have any questions, you can use our [GITTER channel](https://gitter.
 ## Formal requirements for a pull request
 
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
+Nevertheless we aim to keep the code consistently formatted, therefore we additionally have a requirement regarding the source formatter.
+
+
+### Ensure consistent formatting
+
+Ensure your code is formatted according the JabRef formatting guidelines.
+These are provided as Eclipse formatting configuration in [formatter_settings.xml](formatter_settings.xml).
+
 
 ### Add your change to the CHANGELOG
 You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the JabRef source.

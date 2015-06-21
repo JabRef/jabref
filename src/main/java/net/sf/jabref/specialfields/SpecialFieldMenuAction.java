@@ -22,17 +22,18 @@ import javax.swing.AbstractAction;
 import net.sf.jabref.JabRefFrame;
 
 public class SpecialFieldMenuAction extends AbstractAction {
-	private JabRefFrame frame;
-	private String actionName;
 
-	public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
-		super(val.getMenuString(), val.getIcon());
-		this.frame = frame;
-		this.actionName = val.getActionName();
-	}
-	
-	public void actionPerformed(ActionEvent evt) {
-		frame.basePanel().runCommand(actionName);
-	}
+    private JabRefFrame frame;
+    private String actionName;
+
+
+    public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
+        super(val.getMenuString(), val.getIcon());
+        this.frame = frame;
+        this.actionName = val.getActionName();
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        frame.basePanel().runCommand(actionName);
+    }
 }
-

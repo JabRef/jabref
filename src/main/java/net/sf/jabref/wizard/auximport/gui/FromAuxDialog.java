@@ -32,7 +32,6 @@
 // modified : 18.04.2006 r.nagel
 //            insert a "short info" section
 
-
 package net.sf.jabref.wizard.auximport.gui;
 
 import java.awt.BorderLayout;
@@ -73,6 +72,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class FromAuxDialog
         extends JDialog {
+
     private JPanel statusPanel = new JPanel();
     private JPanel buttons = new JPanel();
     private JButton selectInDBButton = new JButton();
@@ -80,10 +80,10 @@ public class FromAuxDialog
     private JButton cancelButton = new JButton();
     private JButton parseButton = new JButton();
 
-	private JComboBox dbChooser = new JComboBox();
+    private JComboBox dbChooser = new JComboBox();
     private JTextField auxFileField;
 
-	private JList notFoundList;
+    private JList notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
@@ -93,8 +93,9 @@ public class FromAuxDialog
 
     private AuxSubGenerator auxParser;
 
+
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
-                         JTabbedPane viewedDBs) {
+            JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
@@ -117,11 +118,12 @@ public class FromAuxDialog
         selectInDBButton.setText(Globals.lang("Select"));
         selectInDBButton.setEnabled(false);
         selectInDBButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				FromAuxDialog.this.select_actionPerformed();
-			}
-		});
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                FromAuxDialog.this.select_actionPerformed();
+            }
+        });
         generateButton.setText(Globals.lang("Generate"));
         generateButton.setEnabled(false);
         generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));
@@ -147,11 +149,11 @@ public class FromAuxDialog
         this.setModal(true);
         this.setResizable(true);
         this.setTitle(Globals.lang("AUX file import"));
-        JLabel desc = new JLabel("<html><h3>"+Globals.lang("AUX file import")+"</h3><p>"
-                    +Globals.lang("This feature generates a new database based on which entries "
-                    +"are needed in an existing LaTeX document.")+"</p>"
-                    +"<p>"+Globals.lang("You need to select one of your open databases from which to choose "
-                    +"entries, as well as the AUX file produced by LaTeX when compiling your document.")+"</p></html>");
+        JLabel desc = new JLabel("<html><h3>" + Globals.lang("AUX file import") + "</h3><p>"
+                + Globals.lang("This feature generates a new database based on which entries "
+                        + "are needed in an existing LaTeX document.") + "</p>"
+                + "<p>" + Globals.lang("You need to select one of your open databases from which to choose "
+                        + "entries, as well as the AUX file produced by LaTeX when compiling your document.") + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel1.add(desc, BorderLayout.NORTH);
 
@@ -168,6 +170,7 @@ public class FromAuxDialog
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -179,7 +182,7 @@ public class FromAuxDialog
         // collect the names of all open databases
         int len = parentTabbedPane.getTabCount();
         int toSelect = -1;
-        for (int i = 0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
             if (parent.baseAt(i) == parent.basePanel())
                 toSelect = i;
@@ -190,7 +193,7 @@ public class FromAuxDialog
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-		notFoundList = new JList();
+        notFoundList = new JList();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
@@ -208,17 +211,17 @@ public class FromAuxDialog
         b.append(Globals.lang("LaTeX AUX file") + ":");
         b.append(auxFileField);
         b.append(browseAuxFileButton);
-        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         b = new DefaultFormBuilder(new FormLayout(
                 "fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"), statusPanel);
         b.appendSeparator(Globals.lang("Result"));
-        b.append(Globals.lang("Unknown bibtex entries")+":");
-        b.append(Globals.lang("Messages")+":");
+        b.append(Globals.lang("Unknown bibtex entries") + ":");
+        b.append(Globals.lang("Messages") + ":");
         b.nextLine();
         b.append(listScrollPane);
         b.append(statusScrollPane);
-        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
     void generate_actionPerformed(ActionEvent e) {
@@ -231,18 +234,18 @@ public class FromAuxDialog
     }
 
     private void select_actionPerformed() {
-    	BibtexDatabase db = getGenerateDB();
-    	MainTable mainTable = JabRef.jrf.basePanel().mainTable;
-    	BibtexDatabase database = JabRef.jrf.basePanel().getDatabase();
-    	mainTable.clearSelection();
-    	for (BibtexEntry newEntry: db.getEntries()) {
-    		// the entries are not the same objects as in the original database
-    		// therefore, we have to search for the entries in the original database
-    		// to be able to find them in the maintable
-    		BibtexEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
-    		int row = mainTable.findEntry(origEntry);
-    		mainTable.addSelection(row);
-    	}
+        BibtexDatabase db = getGenerateDB();
+        MainTable mainTable = JabRef.jrf.basePanel().mainTable;
+        BibtexDatabase database = JabRef.jrf.basePanel().getDatabase();
+        mainTable.clearSelection();
+        for (BibtexEntry newEntry : db.getEntries()) {
+            // the entries are not the same objects as in the original database
+            // therefore, we have to search for the entries in the original database
+            // to be able to find them in the maintable
+            BibtexEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
+            int row = mainTable.findEntry(origEntry);
+            mainTable.addSelection(row);
+        }
     }
 
     void parse_actionPerformed(ActionEvent e) {
@@ -270,7 +273,6 @@ public class FromAuxDialog
                 statusInfos.append("\n" + Globals.lang("crossreferenced entries included") + " " +
                         auxParser.getCrossreferencedEntriesCount());
 
-
                 int nested = auxParser.getNestedAuxCounter();
                 if (nested > 0) {
                     statusInfos.append("\n" + Globals.lang("nested_aux_files") + " " +
@@ -290,7 +292,7 @@ public class FromAuxDialog
 
         parseButton.setEnabled(true);
     }
-    
+
     public boolean generatePressed() {
         return generatePressed;
     }
@@ -299,15 +301,18 @@ public class FromAuxDialog
         return auxParser.getGeneratedDatabase();
     }
 
-// ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
 
     /**
      * Action used to produce a "Browse" button for one of the text fields.
      */
     static class BrowseAction
             extends AbstractAction {
+
         private JTextField comp;
         private JabRefFrame _frame;
+
 
         public BrowseAction(JTextField tc, JabRefFrame frame) {
             super(Globals.lang("Browse"));
@@ -332,7 +337,9 @@ public class FromAuxDialog
 // ----------- helper class -------------------
 class FromAuxDialog_generate_actionAdapter
         implements java.awt.event.ActionListener {
+
     FromAuxDialog adaptee;
+
 
     FromAuxDialog_generate_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;
@@ -345,7 +352,9 @@ class FromAuxDialog_generate_actionAdapter
 
 class FromAuxDialog_Cancel_actionAdapter
         implements java.awt.event.ActionListener {
+
     FromAuxDialog adaptee;
+
 
     FromAuxDialog_Cancel_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;
@@ -358,7 +367,9 @@ class FromAuxDialog_Cancel_actionAdapter
 
 class FromAuxDialog_parse_actionAdapter
         implements java.awt.event.ActionListener {
+
     FromAuxDialog adaptee;
+
 
     FromAuxDialog_parse_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;

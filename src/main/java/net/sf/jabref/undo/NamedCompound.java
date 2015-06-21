@@ -25,9 +25,10 @@ public class NamedCompound extends CompoundEdit {
     String name;
     boolean hasEdits = false;
 
+
     public NamedCompound(String name) {
-	super();
-	this.name = name;
+        super();
+        this.name = name;
     }
 
     public boolean addEdit(UndoableEdit undoableEdit) {
@@ -40,17 +41,17 @@ public class NamedCompound extends CompoundEdit {
     }
 
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+name;
+        return Globals.lang("Undo") + ": " + name;
     }
 
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+name;
+        return Globals.lang("Redo") + ": " + name;
     }
 
     /**
      * Returns the name of this compound, without the Undo or Redo prefix.
      */
     public String getNameOnly() {
-      return name;
+        return name;
     }
 }

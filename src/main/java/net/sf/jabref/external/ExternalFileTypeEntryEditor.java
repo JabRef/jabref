@@ -42,20 +42,21 @@ public class ExternalFileTypeEntryEditor {
     JDialog dParent = null;
     JDialog diag;
     JTextField extension = new JTextField(),
-        name = new JTextField(),
-        mimeType = new JTextField(),
-        application = new JTextField();
+            name = new JTextField(),
+            mimeType = new JTextField(),
+            application = new JTextField();
     String selectedIcon = null;
     JButton icon = new JButton(GUIGlobals.getImage("picture"));
     JButton ok = new JButton(Globals.lang("Ok")),
             cancel = new JButton(Globals.lang("Cancel"));
     JRadioButton useDefault = new JRadioButton(Globals.lang("Default")),
-        other = new JRadioButton("");
-    final String emptyMessage = "<"+Globals.lang("Use default viewer")+">";
+            other = new JRadioButton("");
+    final String emptyMessage = "<" + Globals.lang("Use default viewer") + ">";
     boolean applicationFieldEmpty = false;
 
     private ExternalFileType entry;
     private boolean okPressed = false;
+
 
     public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
         fParent = parent;
@@ -88,7 +89,7 @@ public class ExternalFileTypeEntryEditor {
         builder.nextLine();
         builder.append(Globals.lang("MIME type"));
         builder.append(mimeType);
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.nextLine();
         builder.append(Globals.lang("Application"));
         JButton browseBut = new JButton(Globals.lang("Browse"));
@@ -117,20 +118,23 @@ public class ExternalFileTypeEntryEditor {
         bb.addGlue();
 
         ok.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 okPressed = true;
                 storeSettings(ExternalFileTypeEntryEditor.this.entry);
                 diag.dispose();
-                                
+
             }
         });
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
         });
 
         icon.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
                 if (selectedIcon != null)
@@ -147,6 +151,7 @@ public class ExternalFileTypeEntryEditor {
 
         if (Globals.ON_WIN) {
             application.getDocument().addDocumentListener(new DocumentListener() {
+
                 private void handle(DocumentEvent e) {
                     if (application.getText().length() == 0) {
                         useDefault.setSelected(true);
@@ -154,6 +159,7 @@ public class ExternalFileTypeEntryEditor {
                         other.setSelected(true);
                     }
                 }
+
                 public void insertUpdate(DocumentEvent e) {
                     handle(e);
                 }
@@ -221,7 +227,7 @@ public class ExternalFileTypeEntryEditor {
             entry.setExtension(ext.substring(1));
         else
             entry.setExtension(ext);
-        
+
         if (selectedIcon != null)
             entry.setIconName(selectedIcon);
         if (!Globals.ON_WIN) {
@@ -240,8 +246,11 @@ public class ExternalFileTypeEntryEditor {
         return okPressed;
     }
 
+
     class BrowseListener implements ActionListener {
+
         private JTextField comp;
+
 
         public BrowseListener(JDialog parent, JTextField comp) {
             this.comp = comp;
@@ -254,7 +263,7 @@ public class ExternalFileTypeEntryEditor {
                 initial = new File(Globals.prefs.get("fileWorkingDirectory"));
             }
             String chosen = FileDialogs.getNewFile(/*parent*/null, initial, Globals.NONE,
-                JFileChooser.OPEN_DIALOG, false);
+                    JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:

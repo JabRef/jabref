@@ -28,6 +28,7 @@ public class AutoCompleterTest {
 
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
 
+
     @Test
     public void testAutoCompleterFactory() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -141,7 +142,8 @@ public class AutoCompleterTest {
         Globals.prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, oldACFM);
     }
 
-    @Test @Ignore(value = "works on windows and ubuntu, but not on travis")
+    @Test
+    @Ignore(value = "works on windows and ubuntu, but not on travis")
     public void testEntryEditorForNameFieldAutoCompleter() {
         // construct an EntryEditor ...
         TestUtils.initJabRef();
@@ -159,7 +161,8 @@ public class AutoCompleterTest {
         TestUtils.closeJabRef();
     }
 
-    @Test @Ignore(value = "works on windows and ubuntu, but not on travis")
+    @Test
+    @Ignore(value = "works on windows and ubuntu, but not on travis")
     public void testEntryEditorForFieldAnotherAutoCompleter() {
         // construct an EntryEditor ...
         TestUtils.initJabRef();

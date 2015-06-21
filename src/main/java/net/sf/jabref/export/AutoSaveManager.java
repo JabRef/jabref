@@ -29,8 +29,10 @@ import java.io.File;
  * Background task and utilities for autosave feature.
  */
 public class AutoSaveManager {
+
     private JabRefFrame frame;
     private Timer t = null;
+
 
     public AutoSaveManager(JabRefFrame frame) {
 
@@ -40,7 +42,7 @@ public class AutoSaveManager {
     public void startAutoSaveTimer() {
         TimerTask task = new AutoSaveTask();
         t = new Timer();
-        long interval = (long)(60000*Globals.prefs.getInt("autoSaveInterval"));
+        long interval = (long) (60000 * Globals.prefs.getInt("autoSaveInterval"));
         t.scheduleAtFixedRate(task, interval, interval);
     }
 
@@ -48,16 +50,18 @@ public class AutoSaveManager {
         t.cancel();
     }
 
+
     class AutoSaveTask extends TimerTask {
+
         public void run() {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
             List<BasePanel> panels = new ArrayList<BasePanel>();
-            for (int i=0; i<frame.baseCount(); i++)
+            for (int i = 0; i < frame.baseCount(); i++)
                 panels.add(frame.baseAt(i));
 
-            int i=0;
+            int i = 0;
             for (BasePanel panel : panels) {
                 if (panel.isBaseChanged()) {
                     if (panel.getFile() != null) {
@@ -71,6 +75,7 @@ public class AutoSaveManager {
         }
     }
 
+
     /**
      * Get a File object pointing to the autosave file corresponding to the given file.
      * @param f The database file.
@@ -78,7 +83,7 @@ public class AutoSaveManager {
      */
     public static File getAutoSaveFile(File f) {
         String n = f.getName();
-        return new File(f.getParentFile(), ".$"+n+"$");
+        return new File(f.getParentFile(), ".$" + n + "$");
     }
 
     /**
@@ -115,7 +120,8 @@ public class AutoSaveManager {
         if (backupFile.exists()) {
             return backupFile.delete();
         }
-        else return true;
+        else
+            return true;
     }
 
     /**
@@ -124,7 +130,7 @@ public class AutoSaveManager {
      */
     public void clearAutoSaves() {
         List<BasePanel> panels = new ArrayList<BasePanel>();
-        for (int i=0; i<frame.baseCount(); i++)
+        for (int i = 0; i < frame.baseCount(); i++)
             panels.add(frame.baseAt(i));
         for (BasePanel panel : panels) {
             deleteAutoSaveFile(panel);

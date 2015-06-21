@@ -70,7 +70,8 @@ public class UtilTest {
 
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testPlaceDialog() {
         Dialog d = new JDialog();
         d.setSize(50, 50);
@@ -119,7 +120,8 @@ public class UtilTest {
         assertEquals("\"{a\"}", Util.shaveString("  \"{a\"}    "));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testCheckLegalKey() {
 
         assertEquals("AAAA", Util.checkLegalKey("AA AA"));
@@ -128,7 +130,8 @@ public class UtilTest {
         assertEquals("", Util.checkLegalKey("\n\t\r"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testReplaceSpecialCharacters() {
         // Shouldn't German ï¿½ be resolved to Ae
         assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
@@ -146,7 +149,7 @@ public class UtilTest {
 
         assertEquals("", Util.join(s, "\\", 3, s.length));
 
-        assertEquals("", Util.join(new String[]{}, "\\", 0, 0));
+        assertEquals("", Util.join(new String[] {}, "\\", 0, 0));
     }
 
     @Test
@@ -169,8 +172,10 @@ public class UtilTest {
         }
     }
 
+
     BibtexDatabase database;
     BibtexEntry entry;
+
 
     @Before
     public void setUp() {
@@ -189,7 +194,7 @@ public class UtilTest {
                         "  issn = {1526-5455}," + "\n" +
                         "  publisher = {INFORMS}" + "\n" +
                         "}"
-        );
+                );
 
         BibtexParser parser = new BibtexParser(reader);
         ParserResult result = null;
@@ -217,7 +222,6 @@ public class UtilTest {
         assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
         assertEquals("_bla.bla.blub", ((Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
 
-
         assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
         assertEquals("bla", ((Util.parseMethodsCalls("bla,foo").get(0)))[0]);
         assertEquals("foo", ((Util.parseMethodsCalls("bla,foo").get(1)))[0]);
@@ -235,8 +239,8 @@ public class UtilTest {
         assertEquals("fark", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
     }
 
-
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testFieldAndFormat() {
         assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("[author]", entry, database));
 
@@ -255,16 +259,17 @@ public class UtilTest {
         assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey:]", entry, database));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testUserFieldAndFormat() {
 
         String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
         if (names == null)
-            names = new String[]{};
+            names = new String[] {};
 
         String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
         if (formats == null)
-            formats = new String[]{};
+            formats = new String[] {};
 
         try {
 
@@ -287,7 +292,6 @@ public class UtilTest {
             Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
         }
     }
-
 
     @Test
     public void testExpandBrackets() {

@@ -28,9 +28,10 @@ import java.util.Comparator;
 public class AlphanumericComparator implements Comparator<BibtexEntry> {
 
     FieldComparator authComp = new FieldComparator("author"),
-        editorComp = new FieldComparator("editor"),
-        yearComp = new FieldComparator("year"),
-        titleComp = new FieldComparator("title");
+            editorComp = new FieldComparator("editor"),
+            yearComp = new FieldComparator("year"),
+            titleComp = new FieldComparator("title");
+
 
     public AlphanumericComparator() {
 
@@ -56,7 +57,6 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
         // Bibtex key as next criterion:
         return compare(o1.getCiteKey(), o2.getCiteKey());
 
-
     }
 
     private int compare(String k1, String k2) {
@@ -68,6 +68,7 @@ public class AlphanumericComparator implements Comparator<BibtexEntry> {
         }
         else if (k2 != null)
             return -1;
-        else return 0;
+        else
+            return 0;
     }
 }

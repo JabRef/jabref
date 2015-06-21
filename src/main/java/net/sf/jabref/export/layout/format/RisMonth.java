@@ -25,7 +25,7 @@ public class RisMonth implements LayoutFormatter {
             return "";
 
         MonthUtil.Month m = MonthUtil.getMonthByShortName(month);
-        if(m.isValid()) {
+        if (m.isValid()) {
             return m.twoDigitNumber;
         } else {
             return month.toLowerCase();

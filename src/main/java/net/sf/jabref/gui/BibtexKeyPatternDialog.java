@@ -39,61 +39,65 @@ import net.sf.jabref.labelPattern.LabelPatternPanel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class BibtexKeyPatternDialog extends JDialog {
-	private MetaData metaData;
-	private BasePanel panel;
-	private LabelPatternPanel labelPatternPanel;
 
-	public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-		super(parent, Globals.lang("Bibtex key patterns"), true);
-        this.labelPatternPanel= new LabelPatternPanel(parent.helpDiag);
-		setPanel(panel);
-		init();
-	}
+    private MetaData metaData;
+    private BasePanel panel;
+    private LabelPatternPanel labelPatternPanel;
 
-	/**
-	 * Used for updating an existing Dialog
-	 * 
-	 * @param panel the panel to read the data from
-	 */
-	public void setPanel(BasePanel panel) {
-		this.panel = panel;
-		this.metaData = panel.metaData();
+
+    public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
+        super(parent, Globals.lang("Bibtex key patterns"), true);
+        this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag);
+        setPanel(panel);
+        init();
+    }
+
+    /**
+     * Used for updating an existing Dialog
+     * 
+     * @param panel the panel to read the data from
+     */
+    public void setPanel(BasePanel panel) {
+        this.panel = panel;
+        this.metaData = panel.metaData();
         LabelPattern keypatterns = metaData.getLabelPattern();
         labelPatternPanel.setValues(keypatterns);
-	}
+    }
 
     private void init() {
-		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(labelPatternPanel, BorderLayout.CENTER);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(labelPatternPanel, BorderLayout.CENTER);
 
-		JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Globals.lang("Ok"));
         JButton cancel = new JButton(); // label of "cancel" is set later as the label is overwritten by assigning an action to the button
-		
-		JPanel lower = new JPanel();
-		lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		ButtonBarBuilder bb = new ButtonBarBuilder(lower);
-		bb.addGlue();
+
+        JPanel lower = new JPanel();
+        lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        ButtonBarBuilder bb = new ButtonBarBuilder(lower);
+        bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
-		bb.addGlue();
-		
-		getContentPane().add(lower, BorderLayout.SOUTH);
-		
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		getContentPane().setPreferredSize(new Dimension(500, 600));
-		pack();
+        bb.addGlue();
 
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
-			    panel.markNonUndoableBaseChanged();
-				dispose();
-			}
-		});
+        getContentPane().add(lower, BorderLayout.SOUTH);
 
-		final JDialog dialog = this;
-		
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        getContentPane().setPreferredSize(new Dimension(500, 600));
+        pack();
+
+        ok.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
+                panel.markNonUndoableBaseChanged();
+                dispose();
+            }
+        });
+
+        final JDialog dialog = this;
+
         Action cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
@@ -101,13 +105,13 @@ public class BibtexKeyPatternDialog extends JDialog {
         };
         cancel.setAction(cancelAction);
         cancel.setText(Globals.lang("Cancel"));
-        
-        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
-	}
 
-	public void setVisible(boolean visible) {
-		if (visible)
-			super.setVisible(visible);
-	}
+        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
+    }
+
+    public void setVisible(boolean visible) {
+        if (visible)
+            super.setVisible(visible);
+    }
 
 }

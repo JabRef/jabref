@@ -23,8 +23,10 @@ import java.io.File;
  * export to. Contains a reference to the ExportFormat in question.
  */
 public class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
+
     private ImportFormat format;
     private String name;
+
 
     public ImportFileFilter(ImportFormat format) {
         this.format = format;

@@ -39,7 +39,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-
 /**
  * Remove brackets formatter.
  *
@@ -48,6 +47,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class RemoveBrackets implements LayoutFormatter
 {
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
     public String format(String fieldText)

@@ -21,5 +21,6 @@ package net.sf.jabref;
  * appropriate BaseAction object, and runs its action() method.
  */
 public abstract class BaseAction {//implements Runnable {
+
     public abstract void action() throws Throwable;
 }
