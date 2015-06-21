@@ -97,7 +97,12 @@ dependencies {
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
 // add jars from this classpath to the classpath for the ant build
-ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
+if (org.gradle.internal.os.OperatingSystem.current().windows) {
+    // according to the discussion at https://github.com/JabRef/jabref/pull/58, the separators are different on Windows and Linux
+    ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
+} else {
+    ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
+}
 
 sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
