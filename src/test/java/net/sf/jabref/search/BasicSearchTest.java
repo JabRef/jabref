@@ -41,7 +41,6 @@ public class BasicSearchTest {
         assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
         assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
 
-
     }
 
     public BibtexEntry makeBibtexEntry() {
@@ -56,4 +55,3 @@ public class BasicSearchTest {
         return e;
     }
 }
-

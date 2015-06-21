@@ -32,28 +32,28 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  *
  */
 public class IfPlural extends AbstractParamLayoutFormatter {
-  
-  protected String pluralText, singularText;
-  
-  public void setArgument(String arg) {
-    String[] parts = parseArgument(arg);
 
-    if (parts.length < 2)
-        return; // TODO: too few arguments. Print an error message here?
-    pluralText = parts[0];
-    singularText = parts[1];
+    protected String pluralText, singularText;
 
-}
 
-public String format(String fieldText) {
-    if (pluralText == null)
-        return fieldText; // TODO: argument missing or invalid. Print an error message here?
-    if (fieldText.matches(".*\\sand\\s.*"))
-      return pluralText;
-    else 
-      return singularText;
+    public void setArgument(String arg) {
+        String[] parts = parseArgument(arg);
 
-}
+        if (parts.length < 2)
+            return; // TODO: too few arguments. Print an error message here?
+        pluralText = parts[0];
+        singularText = parts[1];
 
+    }
+
+    public String format(String fieldText) {
+        if (pluralText == null)
+            return fieldText; // TODO: argument missing or invalid. Print an error message here?
+        if (fieldText.matches(".*\\sand\\s.*"))
+            return pluralText;
+        else
+            return singularText;
+
+    }
 
 }

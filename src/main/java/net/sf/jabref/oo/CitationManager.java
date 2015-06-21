@@ -44,7 +44,8 @@ public class CitationManager {
     JTable table;
     EventTableModel<CitEntry> tableModel;
     JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+            cancel = new JButton(Globals.lang("Cancel"));
+
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
         diag = new JDialog(frame, Globals.lang("Manage citations"), true);
@@ -68,13 +69,14 @@ public class CitationManager {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.add(bb.getPanel(), BorderLayout.SOUTH);
 
         diag.pack();
         diag.setSize(700, 400);
 
         Action okAction = new AbstractAction() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
                     storeSettings();
@@ -88,6 +90,7 @@ public class CitationManager {
         ok.addActionListener(okAction);
 
         Action cancelAction = new AbstractAction() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -117,9 +120,12 @@ public class CitationManager {
         diag.setVisible(true);
     }
 
+
     class CitEntry implements Comparable<CitEntry> {
+
         String refMarkName, pageInfo, keyString, context, origPageInfo;
         List<String> keys;
+
 
         public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
             this.refMarkName = refMarkName;
@@ -128,9 +134,9 @@ public class CitationManager {
             this.pageInfo = pageInfo;
             this.origPageInfo = pageInfo;
             StringBuilder sb = new StringBuilder();
-            for (int j=0; j<keys.size(); j++) {
+            for (int j = 0; j < keys.size(); j++) {
                 sb.append(keys.get(j));
-                if (j < keys.size()-1)
+                if (j < keys.size() - 1)
                     sb.append(", ");
             }
             keyString = sb.toString();
@@ -138,11 +144,12 @@ public class CitationManager {
 
         public boolean pageInfoChanged() {
             if (((pageInfo != null) && (origPageInfo == null))
-                || ((pageInfo == null) && (origPageInfo != null)))
+                    || ((pageInfo == null) && (origPageInfo != null)))
                 return true;
             if (pageInfo != null)
                 return pageInfo.compareTo(origPageInfo) != 0;
-            else return false;
+            else
+                return false;
         }
 
         public int compareTo(CitEntry other) {
@@ -158,17 +165,21 @@ public class CitationManager {
 
         public String getColumnName(int i) {
             switch (i) {
-                case 0: return Globals.lang("Citation");
+            case 0:
+                return Globals.lang("Citation");
                 //case 1: return Globals.lang("Context");
-                default: return Globals.lang("Extra information");
+            default:
+                return Globals.lang("Extra information");
             }
         }
 
         public Object getColumnValue(CitEntry citEntry, int i) {
             switch (i) {
-                //case 0: return citEntry.keyString;
-                case 0: return citEntry.context;
-                default: return citEntry.pageInfo != null ? citEntry.pageInfo : "";
+            //case 0: return citEntry.keyString;
+            case 0:
+                return citEntry.context;
+            default:
+                return citEntry.pageInfo != null ? citEntry.pageInfo : "";
             }
         }
     }
@@ -189,12 +200,14 @@ public class CitationManager {
     }
 
     class SingleCitDialog {
+
         JDialog diag;
         JTextField pageInfo = new JTextField(20);
         JLabel title;
         JButton ok = new JButton(Globals.lang("Ok")),
                 cancel = new JButton(Globals.lang("Cancel"));
         CitEntry _entry;
+
 
         public SingleCitDialog(CitEntry entry) {
             this._entry = entry;
@@ -209,7 +222,7 @@ public class CitationManager {
             b.nextLine();
             b.append(Globals.lang("Extra information (e.g. page number)"));
             b.append(pageInfo);
-            b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
             ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -217,11 +230,11 @@ public class CitationManager {
             bb.addButton(ok);
             bb.addButton(cancel);
             bb.addGlue();
-            bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             diag.add(bb.getPanel(), BorderLayout.SOUTH);
 
-
             Action okAction = new AbstractAction() {
+
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (pageInfo.getText().trim().length() > 0) {
                         _entry.pageInfo = pageInfo.getText().trim();
@@ -235,6 +248,7 @@ public class CitationManager {
             ok.addActionListener(okAction);
 
             Action cancelAction = new AbstractAction() {
+
                 public void actionPerformed(ActionEvent actionEvent) {
                     diag.dispose();
                 }

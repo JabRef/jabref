@@ -38,7 +38,6 @@ public interface PushToApplication {
 
     public String getKeyStrokeName();
 
-
     /**
      * This method asks the implementing class to return a JPanel populated
      * with the imlementation's options panel, if necessary. If the JPanel
@@ -67,7 +66,7 @@ public interface PushToApplication {
      * @param metaData
      */
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries,
-                            String keyString, MetaData metaData);
+            String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after
@@ -81,7 +80,5 @@ public interface PushToApplication {
      * @return true if BibTeX keys are required for this operation.
      */
     public boolean requiresBibtexKeys();
-
-
 
 }

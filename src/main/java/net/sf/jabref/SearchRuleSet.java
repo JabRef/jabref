@@ -32,7 +32,9 @@ import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
 public class SearchRuleSet implements SearchRule {
+
     protected Vector<SearchRule> ruleSet = new Vector<SearchRule>();
+
 
     public void addRule(SearchRule newRule) {
         ruleSet.add(newRule);
@@ -42,7 +44,7 @@ public class SearchRuleSet implements SearchRule {
         ruleSet.clear();
     }
 
-    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException{
+    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
         int score = 0;
         Enumeration<SearchRule> e = ruleSet.elements();
         while (e.hasMoreElements()) {

@@ -20,5 +20,6 @@ package net.sf.jabref;
  * Entry containers work on a single entry, which can be asked for 
  */
 public interface EntryContainer {
+
     public BibtexEntry getEntry();
 }

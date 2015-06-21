@@ -35,7 +35,6 @@ import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
-
 /**
  * This class handles the task of looking up all external files linked for a set
  * of entries. This is useful for tasks where the user wants e.g. to send a database
@@ -82,21 +81,23 @@ public class AccessLinksForEntries {
      *  This parameter can be null if no callback is needed.
      */
     public static void copyExternalLinksToDirectory(final List<FileListEntry> files, File toDir,
-                                                    MetaData metaData, final JProgressBar prog,
-                                                    boolean deleteOriginalFiles,
-                                                    final ActionListener callback) {
+            MetaData metaData, final JProgressBar prog,
+            boolean deleteOriginalFiles,
+            final ActionListener callback) {
 
-        if (prog != null) SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                prog.setMaximum(files.size());
-                prog.setValue(0);
-                prog.setIndeterminate(false);
-            }
-        });
+        if (prog != null)
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    prog.setMaximum(files.size());
+                    prog.setValue(0);
+                    prog.setIndeterminate(false);
+                }
+            });
 
         Set<String> fileNames = new HashSet<String>();
 
-        int i=0;
+        int i = 0;
 
         for (FileListEntry entry : files) {
             File file = new File(entry.getLink());
@@ -113,8 +114,12 @@ public class AccessLinksForEntries {
             String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
             // Include the directory of the bib file:
             ArrayList<String> al = new ArrayList<String>();
-            for (String aDir : dir) if (!al.contains(aDir)) al.add(aDir);
-            for (String aFileDir : fileDir) if (!al.contains(aFileDir)) al.add(aFileDir);
+            for (String aDir : dir)
+                if (!al.contains(aDir))
+                    al.add(aDir);
+            for (String aFileDir : fileDir)
+                if (!al.contains(aFileDir))
+                    al.add(aFileDir);
 
             String[] dirs = al.toArray(new String[al.size()]);
             File tmp = Util.expandFilename(entry.getLink(), dirs);
@@ -148,11 +153,13 @@ public class AccessLinksForEntries {
                     i++;
                     final int j = i;
 
-                    if (prog != null) SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            prog.setValue(j);
-                        }
-                    });
+                    if (prog != null)
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                                prog.setValue(j);
+                            }
+                        });
                 }
             } else {
                 // The link could not be resolved to an existing file.
@@ -167,7 +174,9 @@ public class AccessLinksForEntries {
 
 
     public static class SaveWithLinkedFiles extends BaseAction {
+
         private BasePanel panel;
+
 
         public SaveWithLinkedFiles(BasePanel panel) {
 
@@ -194,10 +203,12 @@ public class AccessLinksForEntries {
             diag.setLocationRelativeTo(panel.frame());
             diag.setVisible(true);
             Thread t = new Thread(new Runnable() {
+
                 public void run() {
                     AccessLinksForEntries.copyExternalLinksToDirectory(links,
                             new File("/home/alver/tmp"), panel.metaData(), prog, false,
                             new ActionListener() {
+
                                 public void actionPerformed(ActionEvent actionEvent) {
                                     diag.dispose();
                                 }
@@ -206,9 +217,7 @@ public class AccessLinksForEntries {
             });
             t.start();
 
-            
         }
     }
-
 
 }

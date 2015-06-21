@@ -30,8 +30,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     protected ImageIcon icon;
     protected JLabel label = new JLabel();
 
+
     public ExternalFileType(String name, String extension, String mimeType,
-                            String openWith, String iconName) {
+            String openWith, String iconName) {
         label.setText(null);
         this.name = name;
         label.setToolTipText(this.name);
@@ -184,7 +185,6 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return new ExternalFileType(name, extension, mimeType, openWith, iconName);
     }
 
-
     public int hashCode() {
         return name.hashCode();
     }
@@ -197,13 +197,13 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @return true if the file types are equal.
      */
     public boolean equals(Object object) {
-        ExternalFileType other = (ExternalFileType)object;
+        ExternalFileType other = (ExternalFileType) object;
         if (other == null)
             return false;
         return (name == null ? other.name == null : name.equals(other.name))
                 && (extension == null ? other.extension == null : extension.equals(other.extension))
                 && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
-                && (openWith== null ? other.openWith == null : openWith.equals(other.openWith))
-                && (iconName== null ? other.iconName == null : iconName.equals(other.iconName));
+                && (openWith == null ? other.openWith == null : openWith.equals(other.openWith))
+                && (iconName == null ? other.iconName == null : iconName.equals(other.iconName));
     }
 }

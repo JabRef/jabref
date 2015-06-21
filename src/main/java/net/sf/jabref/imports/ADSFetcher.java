@@ -55,6 +55,7 @@ import net.sf.jabref.imports.BibtexParser;
  * @version $Id$
  */
 public class ADSFetcher implements EntryFetcher {
+
     public JPanel getOptionsPanel() {
         // No option panel
         return null;
@@ -116,12 +117,12 @@ public class ADSFetcher implements EntryFetcher {
             return pr.getDatabase();
         } catch (IOException e) {
             status.showMessage(Globals.lang(
-                "An Exception ocurred while accessing '%0'", url)
-                + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
+                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -160,16 +161,16 @@ public class ADSFetcher implements EntryFetcher {
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while parsing abstract"),
-                Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while parsing abstract"),
+                    Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(Globals.lang(
-                "An Exception ocurred while accessing '%0'", url)
-                + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
+                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
     }
 }

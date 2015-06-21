@@ -31,7 +31,9 @@ import net.sf.jabref.MnemonicAwareAction;
  * in alphabetical order.
  */
 public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
+
     private JabRefFrame frame;
+
 
     public SortTabsAction(JabRefFrame frame) {
         putValue(NAME, "Sort tabs");
@@ -41,11 +43,11 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
 
     public void actionPerformed(ActionEvent e) {
         JTabbedPane tabbedPane = frame.getTabbedPane();
-       // Make a sorted Map that compares case-insensitively:
+        // Make a sorted Map that compares case-insensitively:
         TreeMap<String, BasePanel> map = new TreeMap<String, BasePanel>(this);
 
-        for (int i=0; i<tabbedPane.getTabCount(); i++) {
-            BasePanel panel = (BasePanel)tabbedPane.getComponent(i);
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            BasePanel panel = (BasePanel) tabbedPane.getComponent(i);
             map.put(tabbedPane.getTitleAt(i), panel);
         }
         tabbedPane.removeAll();

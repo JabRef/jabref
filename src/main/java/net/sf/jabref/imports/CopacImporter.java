@@ -39,83 +39,86 @@ import net.sf.jabref.OutputPrinter;
  * 
  */
 public class CopacImporter extends ImportFormat {
-	/**
-	 * Return the name of this import format.
-	 */
-	public String getFormatName() {
-		return "Copac";
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-	 */
-	public String getCLIId() {
-		return "cpc";
-	}
+    /**
+     * Return the name of this import format.
+     */
+    public String getFormatName() {
+        return "Copac";
+    }
 
-	static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+        return "cpc";
+    }
 
-	/**
-	 * Check whether the source is in the correct format for this importer.
-	 */
-	public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+    static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
 
-		String str;
 
-		while ((str = in.readLine()) != null) {
-			if (copacPattern.matcher(str).find())
-				return true;
-		}
+    /**
+     * Check whether the source is in the correct format for this importer.
+     */
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-		return false;
-	}
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-	/**
-	 * Parse the entries in the source, and return a List of BibtexEntry
-	 * objects.
-	 */
-	public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-		if (stream == null)
-			throw new IOException("No stream given.");
+        String str;
 
-		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        while ((str = in.readLine()) != null) {
+            if (copacPattern.matcher(str).find())
+                return true;
+        }
 
-		List<String> entries = new LinkedList<String>();
+        return false;
+    }
 
-		{ // Preprocess entries
-			String str;
-			StringBuffer sb = new StringBuffer();
+    /**
+     * Parse the entries in the source, and return a List of BibtexEntry
+     * objects.
+     */
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        if (stream == null)
+            throw new IOException("No stream given.");
 
-			while ((str = in.readLine()) != null) {
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-				if (str.length() < 4)
-					continue;
+        List<String> entries = new LinkedList<String>();
 
-				String code = str.substring(0, 4);
+        { // Preprocess entries
+            String str;
+            StringBuffer sb = new StringBuffer();
 
-				if (code.equals("    ")) {
-					sb.append(" ").append(str.trim());
-				} else {
+            while ((str = in.readLine()) != null) {
 
-					// begining of a new item
-					if (str.substring(0, 4).equals("TI- ")) {
-						if (sb.length() > 0) {
-							entries.add(sb.toString());
-						}
-						sb = new StringBuffer();
-					}
-					sb.append('\n').append(str);
-				}
-			}
-			if (sb.length() > 0)
-				entries.add(sb.toString());
-		}
+                if (str.length() < 4)
+                    continue;
 
-		List<BibtexEntry> results = new LinkedList<BibtexEntry>();
+                String code = str.substring(0, 4);
+
+                if (code.equals("    ")) {
+                    sb.append(" ").append(str.trim());
+                } else {
+
+                    // begining of a new item
+                    if (str.substring(0, 4).equals("TI- ")) {
+                        if (sb.length() > 0) {
+                            entries.add(sb.toString());
+                        }
+                        sb = new StringBuffer();
+                    }
+                    sb.append('\n').append(str);
+                }
+            }
+            if (sb.length() > 0)
+                entries.add(sb.toString());
+        }
+
+        List<BibtexEntry> results = new LinkedList<BibtexEntry>();
 
         for (String entry : entries) {
 
@@ -158,14 +161,14 @@ public class CopacImporter extends ImportFormat {
             results.add(b);
         }
 
-		return results;
-	}
+        return results;
+    }
 
-	void setOrAppend(BibtexEntry b, String field, String value, String separator) {
-		String o = b.getField(field);
-		if (o != null)
-			b.setField(field, o + separator + value);
-		else
-			b.setField(field, value);
-	}
+    void setOrAppend(BibtexEntry b, String field, String value, String separator) {
+        String o = b.getField(field);
+        if (o != null)
+            b.setField(field, o + separator + value);
+        else
+            b.setField(field, value);
+    }
 }

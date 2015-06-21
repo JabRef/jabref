@@ -33,7 +33,6 @@ public class BibtexDatabaseTest {
     @Test
     public void testResolveStrings() throws IOException {
 
-
         ParserResult result = BibtexParser.parse(new FileReader("src/test/resources/net/sf/jabref/util/twente.bib"));
 
         BibtexDatabase db = result.getDatabase();
@@ -46,6 +45,5 @@ public class BibtexDatabaseTest {
         assertEquals("#unknown#", db.resolveForStrings("#unknown#"));
 
     }
-
 
 }

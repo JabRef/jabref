@@ -36,13 +36,14 @@ public class WaitForSaveOperation implements ActionListener {
     Timer t = new Timer(500, this);
     boolean cancelled = false;
 
+
     public WaitForSaveOperation(JabRefFrame frame) {
         this.frame = frame;
 
         cancel = new JButton(Globals.lang("Cancel"));
         prog = new JProgressBar(0);
         prog.setIndeterminate(true);
-        prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag = new JDialog(frame, Globals.lang("Please wait..."), true);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -50,6 +51,7 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addButton(cancel);
         bb.addGlue();
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 cancelled = true;
                 t.stop();
@@ -57,9 +59,9 @@ public class WaitForSaveOperation implements ActionListener {
             }
         });
 
-        JLabel message = new JLabel(Globals.lang("Waiting for save operation to finish")+"...");
-        message.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        
+        JLabel message = new JLabel(Globals.lang("Waiting for save operation to finish") + "...");
+        message.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
         diag.getContentPane().add(message, BorderLayout.NORTH);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.getContentPane().add(prog, BorderLayout.CENTER);
@@ -79,7 +81,7 @@ public class WaitForSaveOperation implements ActionListener {
 
     public void actionPerformed(ActionEvent actionEvent) {
         boolean anySaving = false;
-        for (int i=0; i<frame.baseCount(); i++) {
+        for (int i = 0; i < frame.baseCount(); i++) {
             if (frame.baseAt(i).isSaving()) {
                 anySaving = true;
                 break;

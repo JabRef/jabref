@@ -27,11 +27,12 @@ import java.util.Hashtable;
 public class LabelPattern extends Hashtable<String, ArrayList<String>> {
 
     private ArrayList<String> defaultPattern = null;
-    
+
     /**
      * The parent of this LabelPattern.
      */
     protected LabelPattern parent = null;
+
 
     public LabelPattern() {
     }
@@ -124,7 +125,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
         Object _obj = get(key);
         return _obj == null;
     }
-    
+
     /**
      * This method is called "...Value" to be in line with the other methods
      * @return

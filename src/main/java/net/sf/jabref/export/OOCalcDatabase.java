@@ -41,10 +41,12 @@ import ca.odell.glazedlists.SortedList;
  *
  */
 public class OOCalcDatabase {
+
     protected Collection<BibtexEntry> entries;
 
+
     @SuppressWarnings("unchecked")
-	public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
+    public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
         comparators.add(new FieldComparator("author"));
@@ -60,10 +62,11 @@ public class OOCalcDatabase {
             for (String key : keySet)
                 entryList.add(bibtex.getEntryById(key));
         }
-        
+
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
 
     }
+
     public Document getDOMrepresentation() {
         Document result = null;
         try {
@@ -101,8 +104,7 @@ public class OOCalcDatabase {
             el.appendChild(el2);
             collection.appendChild(el);
 
-            Element body = result.createElement("office:body"),
-                    table = result.createElement("table:table");
+            Element body = result.createElement("office:body"), table = result.createElement("table:table");
             table.setAttribute("table:name", "biblio");
             table.setAttribute("table.style-name", "ta1");
 
@@ -149,7 +151,7 @@ public class OOCalcDatabase {
             addTableCell(result, row, "Custom5");
             table.appendChild(row);
 
-            for(BibtexEntry e : entries){
+            for (BibtexEntry e : entries) {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "isbn"));
@@ -210,10 +212,9 @@ public class OOCalcDatabase {
     }
 
     protected void addTableCell(Document doc, Element parent, String content) {
-        Element cell = doc.createElement("table:table-cell"),
-                text = doc.createElement("text:p");
-    Text textNode = doc.createTextNode(content);
-    text.appendChild(textNode);
+        Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
+        Text textNode = doc.createTextNode(content);
+        text.appendChild(textNode);
         //text.setTextContent(content);
         cell.appendChild(text);
         parent.appendChild(cell);

@@ -46,11 +46,12 @@ public class SynchronizeFileField extends AbstractWorker {
     private SynchronizeFileField.OptionsDialog optDiag = null;
 
     Object[] brokenLinkOptions =
-            {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
-                    Globals.lang("Remove all broken links"),
-                    Globals.lang("Quit synchronization")};
+    {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
+            Globals.lang("Remove all broken links"),
+            Globals.lang("Quit synchronization")};
 
     private boolean goOn = true, autoSet = true, checkExisting = true;
+
 
     public SynchronizeFileField(BasePanel panel) {
         this.panel = panel;
@@ -73,7 +74,7 @@ public class SynchronizeFileField extends AbstractWorker {
         }
         autoSet = !optDiag.autoSetNone.isSelected();
         checkExisting = optDiag.checkLinks.isSelected();
-        
+
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
@@ -133,14 +134,13 @@ public class SynchronizeFileField extends AbstractWorker {
             }    */
 
         }
-        progress += sel.length*weightAutoSet;
+        progress += sel.length * weightAutoSet;
         panel.frame().setProgressBarValue(progress);
         //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             boolean removeAllBroken = false;
-            mainLoop:
-            for (BibtexEntry aSel : sel) {
+            mainLoop: for (BibtexEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
@@ -151,7 +151,8 @@ public class SynchronizeFileField extends AbstractWorker {
                     // We need to specify which directories to search in for Util.expandFilename:
                     String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<File>();
-                    for (String dirs1 : dirsS) dirs.add(new File(dirs1));
+                    for (String dirs1 : dirsS)
+                        dirs.add(new File(dirs1));
 
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
@@ -171,37 +172,37 @@ public class SynchronizeFileField extends AbstractWorker {
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{flEntry.getLink(), aSel.getCiteKey()}),
+                                                new String[] {flEntry.getLink(), aSel.getCiteKey()}),
                                         Globals.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
-                                );
+                                        );
                             } else {
                                 answer = 2; // We should delete this link.
                             }
                             switch (answer) {
-                                case 1:
-                                    // Assign new file.
-                                    FileListEntryEditor flEditor = new FileListEntryEditor
-                                            (panel.frame(), flEntry, false, true, panel.metaData());
-                                    flEditor.setVisible(true, true);
-                                    break;
-                                case 2:
-                                    // Clear field:
-                                    tableModel.removeEntry(j);
-                                    deleted = true; // Make sure we don't investigate this link further.
-                                    j--; // Step back in the iteration, because we removed an entry.
-                                    break;
-                                case 3:
-                                    // Clear field:
-                                    tableModel.removeEntry(j);
-                                    deleted = true; // Make sure we don't investigate this link further.
-                                    j--; // Step back in the iteration, because we removed an entry.
-                                    removeAllBroken = true; // Notify for further cases.
-                                    break;
-                                case 4:
-                                    // Cancel
-                                    break mainLoop;
+                            case 1:
+                                // Assign new file.
+                                FileListEntryEditor flEditor = new FileListEntryEditor
+                                        (panel.frame(), flEntry, false, true, panel.metaData());
+                                flEditor.setVisible(true, true);
+                                break;
+                            case 2:
+                                // Clear field:
+                                tableModel.removeEntry(j);
+                                deleted = true; // Make sure we don't investigate this link further.
+                                j--; // Step back in the iteration, because we removed an entry.
+                                break;
+                            case 3:
+                                // Clear field:
+                                tableModel.removeEntry(j);
+                                deleted = true; // Make sure we don't investigate this link further.
+                                j--; // Step back in the iteration, because we removed an entry.
+                                removeAllBroken = true; // Notify for further cases.
+                                break;
+                            case 4:
+                                // Cancel
+                                break mainLoop;
                             }
                             brokenLinks++;
                         }
@@ -209,14 +210,14 @@ public class SynchronizeFileField extends AbstractWorker {
                         // Unless we deleted this link, see if its file type is recognized:
                         if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
                             String[] options = new String[]
-                                    {Globals.lang("Define '%0'", flEntry.getType().getName()),
-                                            Globals.lang("Change file type"), Globals.lang("Cancel")};
+                            {Globals.lang("Define '%0'", flEntry.getType().getName()),
+                                    Globals.lang("Change file type"), Globals.lang("Cancel")};
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                            flEntry.getType().getName()),
+                                    flEntry.getType().getName()),
                                     Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
-                            );
+                                    );
                             if (answer == JOptionPane.CANCEL_OPTION) {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
@@ -256,13 +257,12 @@ public class SynchronizeFileField extends AbstractWorker {
                         //System.out.println("Changed to: "+tableModel.getStringRepresentation());
                     }
 
-
                 }
             }
         }
 
-	//for (BibtexEntry entr : changedEntries)
-	//    System.out.println(entr.getCiteKey());
+        //for (BibtexEntry entr : changedEntries)
+        //    System.out.println(entr.getCiteKey());
         if (!changedEntries.isEmpty()) {
             // Add the undo edit:
             ce.end();
@@ -271,21 +271,22 @@ public class SynchronizeFileField extends AbstractWorker {
         }
     }
 
-
     public void update() {
         if (!goOn)
             return;
 
         int entriesChangedCount = 0;
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
+                new String[] {fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
         panel.frame().setProgressBarVisible(false);
         if (entriesChangedCount > 0) {
             panel.markBaseChanged();
         }
     }
 
+
     static class OptionsDialog extends JDialog {
+
         JRadioButton autoSetUnset, autoSetAll, autoSetNone;
         JCheckBox checkLinks;
         JButton ok = new JButton(Globals.lang("Ok")),
@@ -294,11 +295,13 @@ public class SynchronizeFileField extends AbstractWorker {
         private boolean canceled = true;
         private MetaData metaData;
 
+
         public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Globals.lang("file");
             ok.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
                     dispose();
@@ -306,11 +309,11 @@ public class SynchronizeFileField extends AbstractWorker {
             });
 
             Action closeAction = new AbstractAction() {
+
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
             };
-
 
             cancel.addActionListener(closeAction);
 
@@ -354,7 +357,6 @@ public class SynchronizeFileField extends AbstractWorker {
             builder.append(checkLinks);
             builder.nextLine();
             builder.appendSeparator();
-
 
             JPanel main = builder.getPanel();
             main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

@@ -34,11 +34,10 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 
-
 public class ChangeScanner extends Thread {
 
     final double MATCH_THRESHOLD = 0.4;
-    final String[] sortBy = new String[] {"year", "author", "title" };
+    final String[] sortBy = new String[] {"year", "author", "title"};
     File f;
     BibtexDatabase inMem, inTemp = null;
     MetaData mdInMem, mdInTemp;
@@ -52,6 +51,7 @@ public class ChangeScanner extends Thread {
      */
     //ArrayList changes = new ArrayList();
     DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
@@ -76,7 +76,7 @@ public class ChangeScanner extends Thread {
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
-            Globals.prefs.get("defaultEncoding"));
+                    Globals.prefs.get("defaultEncoding"));
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
@@ -103,17 +103,14 @@ public class ChangeScanner extends Thread {
             scanPreamble(inMem, inTemp, onDisk);
             scanStrings(inMem, inTemp, onDisk);
 
-
             scanEntries(sInMem, sInTemp, sOnDisk);
-            
-            scanGroups(mdInMem, mdInTemp, mdOnDisk);
 
+            scanGroups(mdInMem, mdInTemp, mdOnDisk);
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-
 
     public boolean changesFound() {
         return changes.getChildCount() > 0;
@@ -122,6 +119,7 @@ public class ChangeScanner extends Thread {
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
+
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
                     Util.placeDialog(dial, frame);
@@ -136,23 +134,23 @@ public class ChangeScanner extends Thread {
 
         } else {
             JOptionPane.showMessageDialog(frame, Globals.lang("No actual changes found."),
-            Globals.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+                    Globals.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
             fup.scanResultsResolved(true);
         }
     }
 
     private void storeTempDatabase() {
         new Thread(new Runnable() {
+
             public void run() {
                 try {
                     SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
-                        Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
-                        false, false, panel.getEncoding(), true);
+                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
+                            false, false, panel.getEncoding(), true);
                     ss.commit();
                 } catch (SaveException ex) {
                     System.out.println("Problem updating tmp file after accepting external changes");
                 }
-
 
             }
         }).start();
@@ -189,7 +187,6 @@ public class ChangeScanner extends Thread {
             changes.add(mdc);
     }
 
-
     private void scanEntries(EntrySorter mem, EntrySorter tmp, EntrySorter disk) {
 
         // Create pointers that are incremented as the entries of each base are used in
@@ -205,25 +202,25 @@ public class ChangeScanner extends Thread {
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
-        mainLoop: for (piv1=0; piv1<tmp.getEntryCount(); piv1++) {
+        mainLoop: for (piv1 = 0; piv1 < tmp.getEntryCount(); piv1++) {
 
             // First check if the similarly placed entry in the other base matches exactly.
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains(""+piv2) && (piv2<disk.getEntryCount())) {
+            if (!used.contains("" + piv2) && (piv2 < disk.getEntryCount())) {
                 comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
             }
             if (comp > 1) {
-                used.add(""+piv2);
+                used.add("" + piv2);
                 piv2++;
                 continue;
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < disk.getEntryCount()-1) {
-                for (int i = piv2+1; i < disk.getEntryCount(); i++) {
-                    if (!used.contains(""+i))
+            if (piv2 < disk.getEntryCount() - 1) {
+                for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
+                    if (!used.contains("" + i))
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
                     else
                         comp = -1;
@@ -239,16 +236,14 @@ public class ChangeScanner extends Thread {
             notMatched.add(piv1);
         }
 
-
         // Now we've found all exact matches, look through the remaining entries, looking
         // for close matches.
         if (notMatched.size() > 0) {
 
-            for (Iterator<Integer> it=notMatched.iterator(); it.hasNext();) {
+            for (Iterator<Integer> it = notMatched.iterator(); it.hasNext();) {
 
                 Integer integ = it.next();
                 piv1 = integ;
-
 
                 // These two variables will keep track of which entry most closely matches the
                 // one we're looking at, in case none matches completely.
@@ -256,11 +251,11 @@ public class ChangeScanner extends Thread {
                 double bestMatch = 0;
                 double comp = -1;
 
-                if (piv2 < disk.getEntryCount()-1) {
+                if (piv2 < disk.getEntryCount() - 1) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
-                        if (!used.contains(""+i)) {
+                        if (!used.contains("" + i)) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
-                            disk.getEntryAt(i));
+                                    disk.getEntryAt(i));
                         }
                         else
                             comp = -1;
@@ -273,11 +268,11 @@ public class ChangeScanner extends Thread {
                 }
 
                 if (bestMatch > MATCH_THRESHOLD) {
-                    used.add(""+bestMatchI);
+                    used.add("" + bestMatchI);
                     it.remove();
 
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
-                    disk.getEntryAt(bestMatchI));
+                            disk.getEntryAt(bestMatchI));
                     changes.add(ec);
 
                     // Create an undo edit to represent this change:
@@ -294,10 +289,10 @@ public class ChangeScanner extends Thread {
                 else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
                     changes.add(ec);
-          /*NamedCompound ce = new NamedCompound("Removed entry");
-          ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-          ce.end();
-          changes.add(ce);*/
+                    /*NamedCompound ce = new NamedCompound("Removed entry");
+                    ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
+                    ce.end();
+                    changes.add(ce);*/
 
                 }
 
@@ -308,14 +303,14 @@ public class ChangeScanner extends Thread {
         // Finally, look if there are still untouched entries in the disk database. These
         // mayhave been added.
         if (used.size() < disk.getEntryCount()) {
-            for (int i=0; i<disk.getEntryCount(); i++) {
-                if (!used.contains(""+i)) {
+            for (int i = 0; i < disk.getEntryCount(); i++) {
+                if (!used.contains("" + i)) {
 
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;
                     for (int j = 0; j < mem.getEntryCount(); j++) {
                         if (DuplicateCheck.compareEntriesStrictly(mem.getEntryAt(j),
-                            disk.getEntryAt(i)) >= 1) {
+                                disk.getEntryAt(i)) >= 1) {
                             hasAlready = true;
                             break;
                         }
@@ -324,10 +319,10 @@ public class ChangeScanner extends Thread {
                         EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
                         changes.add(ec);
                     }
-          /*NamedCompound ce = new NamedCompound("Added entry");
-          ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
-          ce.end();
-          changes.add(ce);*/
+                    /*NamedCompound ce = new NamedCompound("Added entry");
+                    ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
+                    ce.end();
+                    changes.add(ce);*/
                 }
             }
             //System.out.println("Suspected new entries in file: "+(disk.getEntryCount()-used.size()));
@@ -359,9 +354,7 @@ public class ChangeScanner extends Thread {
     }
 
     private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        String mem = inMem.getPreamble(),
-        tmp = onTmp.getPreamble(),
-        disk = onDisk.getPreamble();
+        String mem = inMem.getPreamble(), tmp = onTmp.getPreamble(), disk = onDisk.getPreamble();
         if (tmp != null) {
             if ((disk == null) || !tmp.equals(disk))
                 changes.add(new PreambleChange(tmp, mem, disk));
@@ -372,8 +365,7 @@ public class ChangeScanner extends Thread {
     }
 
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        int nTmp = onTmp.getStringCount(),
-        nDisk = onDisk.getStringCount();
+        int nTmp = onTmp.getStringCount(), nDisk = onDisk.getStringCount();
         if ((nTmp == 0) && (nDisk == 0))
             return;
 
@@ -383,11 +375,11 @@ public class ChangeScanner extends Thread {
 
         // First try to match by string names.
         //int piv2 = -1;
-        mainLoop: for (String key : onTmp.getStringKeySet()){
+        mainLoop: for (String key : onTmp.getStringKeySet()) {
             BibtexString tmp = onTmp.getString(key);
 
             //      for (int j=piv2+1; j<nDisk; j++)
-            for (String diskId : onDisk.getStringKeySet()){
+            for (String diskId : onDisk.getStringKeySet()) {
                 if (!used.contains(diskId)) {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
@@ -397,8 +389,8 @@ public class ChangeScanner extends Thread {
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                             if (mem != null)
                                 changes.add(new StringChange(mem, tmp, tmp.getName(),
-                                mem.getContent(),
-                                tmp.getContent(), disk.getContent()));
+                                        mem.getContent(),
+                                        tmp.getContent(), disk.getContent()));
                             else
                                 changes.add(new StringChange(null, tmp, tmp.getName(), null, tmp.getContent(), disk.getContent()));
                         }
@@ -416,14 +408,14 @@ public class ChangeScanner extends Thread {
 
         // See if we can detect a name change for those entries that we couldn't match.
         if (notMatched.size() > 0) {
-            for (Iterator<String> i = notMatched.iterator(); i.hasNext();){
+            for (Iterator<String> i = notMatched.iterator(); i.hasNext();) {
                 BibtexString tmp = onTmp.getString(i.next());
 
                 // If we get to this point, we found no string with matching name. See if we
                 // can find one with matching content.
-                for (String diskId : onDisk.getStringKeySet()){
+                for (String diskId : onDisk.getStringKeySet()) {
 
-                	if (!used.contains(diskId)) {
+                    if (!used.contains(diskId)) {
                         BibtexString disk = onDisk.getString(diskId);
 
                         if (disk.getContent().equals(tmp.getContent())) {
@@ -432,11 +424,11 @@ public class ChangeScanner extends Thread {
 
                             // Try to find the matching one in memory:
                             BibtexString bsMem = null;
-                            
-                            for (String memId : inMem.getStringKeySet()){
+
+                            for (String memId : inMem.getStringKeySet()) {
                                 BibtexString bsMem_cand = inMem.getString(memId);
                                 if (bsMem_cand.getContent().equals(disk.getContent()) &&
-                                !usedInMem.contains(memId)) {
+                                        !usedInMem.contains(memId)) {
                                     usedInMem.add(memId);
                                     bsMem = bsMem_cand;
                                     break;
@@ -444,8 +436,8 @@ public class ChangeScanner extends Thread {
                             }
 
                             changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(),
-                            tmp.getName(), disk.getName(),
-                            tmp.getContent()));
+                                    tmp.getName(), disk.getName(),
+                                    tmp.getContent()));
                             i.remove();
                             used.add(diskId);
 
@@ -465,7 +457,6 @@ public class ChangeScanner extends Thread {
                 }
             }
         }
-
 
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.
@@ -513,6 +504,7 @@ public class ChangeScanner extends Thread {
 
 
     public static interface DisplayResultCallback {
+
         public void scanResultsResolved(boolean resolved);
     }
 }

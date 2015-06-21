@@ -17,7 +17,6 @@ public class LabelPatternUtilTest {
         LabelPatternUtil.setDataBase(new BibtexDatabase());
     }
 
-
     @Test
     public void testAndInAuthorName() {
         BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
@@ -34,20 +33,20 @@ public class LabelPatternUtilTest {
     /**
      * Test for https://sourceforge.net/forum/message.php?msg_id=4498555
      * Test the Labelmaker and all kind of accents
-     * Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
+     * �? á Ć ć É é �? í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú �? ý Ź ź
      */
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
         BibtexEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
         assertEquals("Koen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas �?öning}, year={2000}}");
         assertEquals("Aoen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}");
         assertEquals("Eoen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas �?öning}, year={2000}}");
         assertEquals("Ioen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}");
@@ -68,7 +67,7 @@ public class LabelPatternUtilTest {
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}");
         assertEquals("Uoen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas �?öning}, year={2000}}");
         assertEquals("Yoen", net.sf.jabref.Util.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}");
@@ -106,15 +105,15 @@ public class LabelPatternUtilTest {
     @Test
     public void testCheckLegalKey() {
         // not tested/ not in hashmap UNICODE_CHARS:
-        // Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů	Ǣ ǣ ǖ ǘ ǚ ǜ
+        // �? ł   �? ő Ű ű   Ŀ ŀ   Ħ ħ   �? ð Þ þ   Œ œ   Æ æ Ø ø Å å   �? ə �? đ   Ů ů	Ǣ ǣ ǖ ǘ ǚ ǜ
         //" Ǣ ǣ ǖ ǘ ǚ ǜ   " +
-        //"Đ đ   Ů ů  " +
-        //"Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
-        String accents = "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ";
+        //"�? đ   Ů ů  " +
+        //"�? ł   �? ő Ű ű   Ŀ ŀ   Ħ ħ   �? ð Þ þ   Œ œ   Æ æ Ø ø Å å   �? ə
+        String accents = "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ �? Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ �? Û û Ŵ ŵ Ŷ ŷ";
         String expectedResult = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        accents = "ÄäËëÏïÖöÜüŸÿ";
+        accents = "ÄäËë�?ïÖöÜüŸÿ";
         expectedResult = "AeaeEeIiOeoeUeueYy";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
@@ -122,7 +121,7 @@ public class LabelPatternUtilTest {
         expectedResult = "CcGgKkLlNnRrSsTt";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        accents = "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ";
+        accents = "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ �? Ŭ ŭ";
         expectedResult = "AaEeGgIiOoUu";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
@@ -134,11 +133,11 @@ public class LabelPatternUtilTest {
         expectedResult = "AaEeIiOoUu"; // O or Q? o or q?
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        accents = "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ";
+        accents = "Ā �? Ē ē Ī ī Ō �? Ū ū Ȳ ȳ";
         expectedResult = "AaEeIiOoUuYy";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        accents = "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž";
+        accents = "�? ǎ Č �? Ď �? Ě ě �? �? Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž";
         expectedResult = "AaCcDdEeIiLlNnOoRrSsTtUuZz";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
@@ -146,17 +145,17 @@ public class LabelPatternUtilTest {
         accents = "ÃãẼẽĨĩÑñÕõŨũỸỹ";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        accents = "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ";
+        accents = "Ḍ �? Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ �? Ṣ ṣ Ṭ ṭ";
         expectedResult = "DdHhLlLlMmNnRrRrSsTt";
         assertEquals(expectedResult, net.sf.jabref.Util.checkLegalKey(accents));
 
-        String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    " +
+        String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ �? Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ �? Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë �? ï Ö ö Ü ü Ÿ ÿ    " +
                 "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ" +
-                " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   " +
-                "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ" +
-                "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   " +
+                " �? ǎ Č �? Ď �? Ě ě �? �? Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   " +
+                "Ā �? Ē ē Ī ī Ō �? Ū ū Ȳ ȳ" +
+                "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ �? Ŭ ŭ   " +
                 "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   " +
-                "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ";
+                "Ḍ �? Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ �? Ṣ ṣ Ṭ ṭ   ";
         String expectedResults = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy" +
                 "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt" +
                 "AaCcDdEeIiLlNnOoRrSsTtUuZz" +
@@ -172,8 +171,7 @@ public class LabelPatternUtilTest {
         assertEquals(
                 "Newton",
                 LabelPatternUtil
-                        .firstAuthor("I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown")
-        );
+                        .firstAuthor("I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"));
         assertEquals("Newton", LabelPatternUtil.firstAuthor("I. Newton"));
 
         // https://sourceforge.net/forum/message.php?msg_id=4498555
@@ -197,8 +195,7 @@ public class LabelPatternUtilTest {
                 LabelPatternUtil
                         .authIniN(
                                 "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown",
-                                4)
-        );
+                                4));
         assertEquals("NMEB", LabelPatternUtil.authIniN(
                 "I. Newton and J. Maxwell and A. Einstein and N. Bohr", 4));
         assertEquals("NeME", LabelPatternUtil.authIniN(

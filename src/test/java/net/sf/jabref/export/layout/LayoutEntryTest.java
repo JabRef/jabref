@@ -37,7 +37,9 @@ import static org.junit.Assert.assertTrue;
  */
 
 public class LayoutEntryTest {
+
     private BibtexEntry mBTE;
+
 
     /**
      * Initialize Preferences.
@@ -92,7 +94,8 @@ public class LayoutEntryTest {
     /**
      * @throws Exception
      */
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testNoHighlighting() throws Exception {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
@@ -153,7 +156,6 @@ public class LayoutEntryTest {
         assertTrue(result.contains(containing));
         assertTrue(result.contains(containing2));
     }
-
 
     /**
      * @throws Exception

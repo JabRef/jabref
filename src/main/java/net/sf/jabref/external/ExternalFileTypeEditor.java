@@ -48,12 +48,13 @@ public class ExternalFileTypeEditor extends JDialog {
     private ExternalFileTypeEntryEditor entryEditor = null;
     private FileTypeTableModel tableModel;
     private JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+            cancel = new JButton(Globals.lang("Cancel"));
     private JButton add = new JButton(GUIGlobals.getImage("add")),
-        remove = new JButton(GUIGlobals.getImage("remove")),
-        edit = new JButton(GUIGlobals.getImage("edit")),
-        toDefaults = new JButton(Globals.lang("Default"));
+            remove = new JButton(GUIGlobals.getImage("remove")),
+            edit = new JButton(GUIGlobals.getImage("edit")),
+            toDefaults = new JButton(Globals.lang("Default"));
     private EditListener editListener = new EditListener();
+
 
     public ExternalFileTypeEditor(JFrame frame) {
         super(frame, Globals.lang("Manage external file types"), true);
@@ -90,12 +91,14 @@ public class ExternalFileTypeEditor extends JDialog {
     private void init() {
 
         ok.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 storeSettings();
                 dispose();
             }
         });
         AbstractAction cancelAction = new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -103,30 +106,29 @@ public class ExternalFileTypeEditor extends JDialog {
         cancel.addActionListener(cancelAction);
         // The toDefaults resets the entire list to its default values.
         toDefaults.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
                         Globals.lang("All custom file types will be lost. Proceed?"),
                         Globals.lang("Reset file type definitons"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);*/
                 //if (reply == JOptionPane.YES_OPTION) {
-                    java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
-                    fileTypes.clear();
-                    fileTypes.addAll(list);
-                    Collections.sort(fileTypes);
-                    //Globals.prefs.resetExternalFileTypesToDefault();
-                    //setValues();
-                    tableModel.fireTableDataChanged();
+                java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
+                fileTypes.clear();
+                fileTypes.addAll(list);
+                Collections.sort(fileTypes);
+                //Globals.prefs.resetExternalFileTypesToDefault();
+                //setValues();
+                tableModel.fireTableDataChanged();
                 //}
             }
         });
-
 
         add.addActionListener(new AddListener());
         remove.addActionListener(new RemoveListener());
         edit.addActionListener(editListener);
         fileTypes = new ArrayList<ExternalFileType>();
         setValues();
-        
 
         tableModel = new FileTypeTableModel();
         table = new JTable(tableModel);
@@ -139,12 +141,12 @@ public class ExternalFileTypeEditor extends JDialog {
         table.getColumnModel().getColumn(2).setMinWidth(60);
         table.getColumnModel().getColumn(3).setMinWidth(100);
         table.getColumnModel().getColumn(0).setResizable(false);
-        
+
         JScrollPane sp = new JScrollPane(table);
 
         JPanel upper = new JPanel();
         upper.setLayout(new BorderLayout());
-        upper.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        upper.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         upper.add(sp, BorderLayout.CENTER);
         getContentPane().add(upper, BorderLayout.CENTER);
 
@@ -161,7 +163,7 @@ public class ExternalFileTypeEditor extends JDialog {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
@@ -183,7 +185,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
     private ExternalFileTypeEntryEditor getEditor(ExternalFileType type) {
         if (entryEditor == null)
-            entryEditor = new ExternalFileTypeEntryEditor(ExternalFileTypeEditor.this,  type);
+            entryEditor = new ExternalFileTypeEntryEditor(ExternalFileTypeEditor.this, type);
         else
             entryEditor.setEntry(type);
         return entryEditor;
@@ -207,7 +209,9 @@ public class ExternalFileTypeEditor extends JDialog {
         return new EditExternalFileTypesAction(dialog);
     }
 
+
     class AddListener implements ActionListener {
+
         public void actionPerformed(ActionEvent e) {
             // Generate a new file type:
             ExternalFileType type = new ExternalFileType("", "", "", "", "new");
@@ -227,12 +231,12 @@ public class ExternalFileTypeEditor extends JDialog {
             int[] rows = table.getSelectedRows();
             if (rows.length == 0)
                 return;
-            for (int i=rows.length-1; i>=0; i--) {
+            for (int i = rows.length - 1; i >= 0; i--) {
                 fileTypes.remove(rows[i]);
             }
             tableModel.fireTableDataChanged();
             if (fileTypes.size() > 0) {
-                int row = Math.min(rows[0], fileTypes.size()-1);
+                int row = Math.min(rows[0], fileTypes.size() - 1);
                 table.setRowSelectionInterval(row, row);
             }
         }
@@ -251,11 +255,13 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     class IconRenderer implements TableCellRenderer {
+
         JLabel lab = new JLabel();
+
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             lab.setText(null);
-            lab.setIcon((ImageIcon)value);
+            lab.setIcon((ImageIcon) value);
             return lab;
         }
     }
@@ -272,42 +278,43 @@ public class ExternalFileTypeEditor extends JDialog {
 
         public String getColumnName(int column) {
             switch (column) {
-                case 0:
-                    return " ";
-                case 1:
-                    return Globals.lang("Name");
-                case 2:
-                    return Globals.lang("Extension");
-                case 3:
-                    return Globals.lang("MIME type");
-                case 4:
-                    return Globals.lang("Application");
-                default:
-                    return null;
+            case 0:
+                return " ";
+            case 1:
+                return Globals.lang("Name");
+            case 2:
+                return Globals.lang("Extension");
+            case 3:
+                return Globals.lang("MIME type");
+            case 4:
+                return Globals.lang("Application");
+            default:
+                return null;
             }
         }
 
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0)
                 return ImageIcon.class;
-            else return String.class;
+            else
+                return String.class;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             ExternalFileType type = fileTypes.get(rowIndex);
             switch (columnIndex) {
-                case 0:
-                    return type.getIcon();
-                case 1:
-                    return type.getName();
-                case 2:
-                    return type.getExtension();
-                case 3:
-                    return type.getMimeType();
-                case 4:
-                    return type.getOpenWith();
-                default:
-                    return null;
+            case 0:
+                return type.getIcon();
+            case 1:
+                return type.getName();
+            case 2:
+                return type.getExtension();
+            case 3:
+                return type.getMimeType();
+            case 4:
+                return type.getOpenWith();
+            default:
+                return null;
             }
         }
     }
@@ -334,9 +341,11 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
+
         private JabRefFrame frame = null;
         private JDialog dialog = null;
         ExternalFileTypeEditor editor = null;
+
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
             super();

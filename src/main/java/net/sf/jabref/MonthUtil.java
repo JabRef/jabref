@@ -17,6 +17,7 @@ public class MonthUtil {
         public final int number;
         public final int index;
 
+
         public Month(String fullName, String shortName, String twoDigitNumber, String bibtexFormat, int number, int index) {
             this.fullName = fullName;
             this.shortName = shortName;
@@ -43,6 +44,7 @@ public class MonthUtil {
         }
     }
 
+
     private static final Month NULL_OBJECT = new UnknownMonth();
 
     private static final List<Month> months = Arrays.asList(
@@ -58,7 +60,8 @@ public class MonthUtil {
             new Month("October", "oct", "10", "#oct#", 10, 9),
             new Month("November", "nov", "11", "#nov#", 11, 10),
             new Month("December", "dec", "12", "#dec#", 12, 11)
-    );
+            );
+
 
     /**
      * Find month by number

@@ -25,6 +25,7 @@ public class ComparableMark implements Comparable<ComparableMark> {
     String name;
     Point position;
 
+
     public ComparableMark(String name, Point position) {
         this.name = name;
         this.position = position;
@@ -32,9 +33,9 @@ public class ComparableMark implements Comparable<ComparableMark> {
 
     public int compareTo(ComparableMark other) {
         if (position.Y != other.position.Y)
-            return position.Y-other.position.Y;
+            return position.Y - other.position.Y;
         else
-            return position.X-other.position.X;
+            return position.X - other.position.X;
     }
 
     public String getName() {

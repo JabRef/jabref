@@ -15,16 +15,14 @@
 */
 package net.sf.jabref.label;
 
-
 public class IncollectionLabelRule extends ArticleLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)
 
     // Same thing as the ArticleLabelRule
-//    public BibtexEntry applyRule(BibtexEntry oldEntry){
-//    }
-//
+    //    public BibtexEntry applyRule(BibtexEntry oldEntry){
+    //    }
+    //
 
-    
 }

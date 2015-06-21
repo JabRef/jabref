@@ -31,10 +31,11 @@ import net.sf.jabref.external.UnknownExternalFileType;
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
  * Doubles as a table model for the file list editor.
-*/
+ */
 public class FileListTableModel extends AbstractTableModel {
 
     private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
+
 
     public FileListTableModel() {
     }
@@ -57,9 +58,12 @@ public class FileListTableModel extends AbstractTableModel {
         synchronized (list) {
             FileListEntry entry = list.get(rowIndex);
             switch (columnIndex) {
-                case 0: return entry.getDescription();
-                case 1: return entry.getLink();
-                default: return entry.getType() != null ?
+            case 0:
+                return entry.getDescription();
+            case 1:
+                return entry.getLink();
+            default:
+                return entry.getType() != null ?
                         entry.getType().getName() : "";
             }
         }
@@ -90,6 +94,7 @@ public class FileListTableModel extends AbstractTableModel {
             list.add(index, entry);
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         fireTableRowsInserted(index, index);
                     }
@@ -123,7 +128,7 @@ public class FileListTableModel extends AbstractTableModel {
         ArrayList<String> thisEntry = new ArrayList<String>();
         boolean inXmlChar = false;
         boolean escaped = false;
-        for (int i=0; i<value.length(); i++) {
+        for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             if (!escaped && (c == '\\')) {
                 escaped = true;
@@ -133,7 +138,7 @@ public class FileListTableModel extends AbstractTableModel {
             // as "&#44;", because we need to know in order to ignore the semicolon.
             else if (!escaped && (c == '&') && !inXmlChar) {
                 sb.append(c);
-                if ((value.length() > i+1) && (value.charAt(i+1) == '#'))
+                if ((value.length() > i + 1) && (value.charAt(i + 1) == '#'))
                     inXmlChar = true;
             }
             // Check if we are exiting an XML special character construct:
@@ -155,7 +160,8 @@ public class FileListTableModel extends AbstractTableModel {
                     thisEntry.clear();
                 }
             }
-            else sb.append(c);
+            else
+                sb.append(c);
             escaped = false;
         }
         if (sb.length() > 0)
@@ -166,7 +172,7 @@ public class FileListTableModel extends AbstractTableModel {
             else
                 newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
         }
-          
+
         synchronized (list) {
             list.clear();
             list.addAll(newList);
@@ -188,29 +194,28 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if (entry == null || entry.getType()==null )
+        if (entry == null || entry.getType() == null)
             return null;
         return entry.getType().getIconLabel();
     }
 
-    
     private FileListEntry decodeEntry(ArrayList<String> contents, boolean deduceUnknownType) {
         ExternalFileType type = Globals.prefs.getExternalFileTypeByName
-                        (getElementIfAvailable(contents, 2));
+                (getElementIfAvailable(contents, 2));
 
         if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
             type = Globals.prefs.getExternalFileTypeByMimeType
-                        (getElementIfAvailable(contents, 2));
+                    (getElementIfAvailable(contents, 2));
             if (type == null) {
                 // No type could be found from mime type on the extension:
                 //System.out.println("Not found by mime: '"+getElementIfAvailable(contents, 2));
                 ExternalFileType typeGuess = null;
                 String link = getElementIfAvailable(contents, 1);
                 int index = link.lastIndexOf('.');
-                if ((index >= 0) && (index < link.length()-1)) {
-                    String extension = link.substring(index+1);
+                if ((index >= 0) && (index < link.length() - 1)) {
+                    String extension = link.substring(index + 1);
                     typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
                 }
                 if (typeGuess != null)
@@ -223,11 +228,11 @@ public class FileListTableModel extends AbstractTableModel {
                 type);
     }
 
-
     private String getElementIfAvailable(ArrayList<String> contents, int index) {
         if (index < contents.size())
             return contents.get(index);
-        else return "";
+        else
+            return "";
     }
 
     /**
@@ -275,5 +280,4 @@ public class FileListTableModel extends AbstractTableModel {
         System.out.println("----");
     }
 
-   
 }

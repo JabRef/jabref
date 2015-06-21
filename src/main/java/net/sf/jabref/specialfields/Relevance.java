@@ -24,40 +24,41 @@ import net.sf.jabref.Globals;
 
 public class Relevance extends SpecialField {
 
-	private static Relevance INSTANCE;
-	
-	public Relevance() {
-		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-    	// action directly set by JabRefFrame
-		values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Globals.lang("Toggle relevance"), GUIGlobals.getImage("relevant"), Globals.lang("Toggle relevance")));
-		this.setValues(values);
-		TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
-	}
+    private static Relevance INSTANCE;
 
-	public String getFieldName() {
-		return SpecialFieldsUtils.FIELDNAME_RELEVANCE;
-	}
 
-	public static Relevance getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new Relevance();
-		}
-		return INSTANCE;
-	}	
-	
-	public ImageIcon getRepresentingIcon() {
-		return this.getValues().get(0).getIcon();
-	}
-	
-	public String getToolTip() {
-		return this.getValues().get(0).getToolTipText();
-	}
+    public Relevance() {
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        // action directly set by JabRefFrame
+        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Globals.lang("Toggle relevance"), GUIGlobals.getImage("relevant"), Globals.lang("Toggle relevance")));
+        this.setValues(values);
+        TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
+    }
 
-	public String getMenuString() {
-		return Globals.lang("Relevance");
-	}
-	
-	public boolean isSingleValueField() {
-		return true;
-	}
+    public String getFieldName() {
+        return SpecialFieldsUtils.FIELDNAME_RELEVANCE;
+    }
+
+    public static Relevance getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Relevance();
+        }
+        return INSTANCE;
+    }
+
+    public ImageIcon getRepresentingIcon() {
+        return this.getValues().get(0).getIcon();
+    }
+
+    public String getToolTip() {
+        return this.getValues().get(0).getToolTipText();
+    }
+
+    public String getMenuString() {
+        return Globals.lang("Relevance");
+    }
+
+    public boolean isSingleValueField() {
+        return true;
+    }
 }

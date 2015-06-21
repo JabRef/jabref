@@ -36,6 +36,7 @@ public class SimpleSearchRule implements SearchRule {
     //static RemoveBrackets removeBrackets = new RemoveBrackets();
     static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
+
     public SimpleSearchRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;
     }
@@ -53,8 +54,8 @@ public class SimpleSearchRule implements SearchRule {
         int counter = 0;
         Object fieldContentAsObject;
         String fieldContent;
-        for (String field : bibtexEntry.getAllFields()){
-            fieldContentAsObject = bibtexEntry.getField(field); 
+        for (String field : bibtexEntry.getAllFields()) {
+            fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null)
                 try {
                     fieldContent = removeBrackets.format(fieldContentAsObject.toString());

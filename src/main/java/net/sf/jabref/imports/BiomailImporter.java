@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 import net.sf.jabref.BibtexFields;
 
-
 /**
  * Importer for the ISI Web of Science format.
  */
 public class BiomailImporter extends ImportFormat {
+
     /**
      * Return the name of this import format.
      */
@@ -46,7 +46,7 @@ public class BiomailImporter extends ImportFormat {
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
     public String getCLIId() {
-      return "biomail";
+        return "biomail";
     }
 
     /**
@@ -69,7 +69,6 @@ public class BiomailImporter extends ImportFormat {
 
         return false;
     }
-
 
     /**
      * Parse the entries in the source, and return a List of BibtexEntry
@@ -202,6 +201,5 @@ public class BiomailImporter extends ImportFormat {
 
         return bibitems;
     }
-
 
 }

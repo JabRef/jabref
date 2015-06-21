@@ -17,10 +17,9 @@ package net.sf.jabref.label;
 
 import net.sf.jabref.BibtexEntry;
 
-public interface LabelRule{
+public interface LabelRule {
 
     // the default rule is that it simply returns what it was given
-    public String applyRule(BibtexEntry oldEntry) ;
-
+    public String applyRule(BibtexEntry oldEntry);
 
 }

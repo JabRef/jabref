@@ -49,58 +49,63 @@ import net.sf.jabref.util.CaseChangers;
  * 
  */
 public class IsiImporter extends ImportFormat {
-	/**
-	 * Return the name of this import format.
-	 */
-	public String getFormatName() {
-		return "ISI";
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-	 */
-	public String getCLIId() {
-		return "isi";
-	}
+    /**
+     * Return the name of this import format.
+     */
+    public String getFormatName() {
+        return "ISI";
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+        return "isi";
+    }
+
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
     static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
-	/**
-	 * Check whether the source is in the correct format for this importer.
-	 */
-	public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+    /**
+     * Check whether the source is in the correct format for this importer.
+     */
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-		String str;
-        int i=0;
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+        String str;
+        int i = 0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-			/**
-			 * The following line gives false positives for RIS files, so it
-			 * should not be uncommented. The hypen is a characteristic of the
-			 * RIS format.
-			 * 
-			 * str = str.replace(" - ", "")
-			 */
-			if (isiPattern.matcher(str).find())
-				return true;
+            /**
+             * The following line gives false positives for RIS files, so it
+             * should not be uncommented. The hypen is a characteristic of the
+             * RIS format.
+             * 
+             * str = str.replace(" - ", "")
+             */
+            if (isiPattern.matcher(str).find())
+                return true;
 
             i++;
         }
 
-		return false;
-	}
+        return false;
+    }
 
-	static Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
-	static public void processSubSup(HashMap<String, String> map) {
+    static Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
-		String[] subsup = { "title", "abstract", "review", "notes" };
+
+    static public void processSubSup(HashMap<String, String> map) {
+
+        String[] subsup = {"title", "abstract", "review", "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -127,11 +132,11 @@ public class IsiImporter extends ImportFormat {
                 map.put(aSubsup, sb.toString());
             }
         }
-	}
+    }
 
-	static public void processCapitalization(HashMap<String, String> map) {
+    static public void processCapitalization(HashMap<String, String> map) {
 
-		String[] subsup = { "title", "journal", "publisher" };
+        String[] subsup = {"title", "journal", "publisher"};
 
         for (String aSubsup : subsup) {
 
@@ -144,54 +149,54 @@ public class IsiImporter extends ImportFormat {
                 }
             }
         }
-	}
+    }
 
-	/**
-	 * Parse the entries in the source, and return a List of BibtexEntry
-	 * objects.
-	 */
-	public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-		if (stream == null) {
-			throw new IOException("No stream given.");
-		}
+    /**
+     * Parse the entries in the source, and return a List of BibtexEntry
+     * objects.
+     */
+    public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+        if (stream == null) {
+            throw new IOException("No stream given.");
+        }
 
-		ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-		StringBuffer sb = new StringBuffer();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        StringBuffer sb = new StringBuffer();
 
-		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-		// Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
-		// |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
-		String str;
+        // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
+        // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
+        String str;
 
-		while ((str = in.readLine()) != null) {
-			if (str.length() < 3)
-				continue;
+        while ((str = in.readLine()) != null) {
+            if (str.length() < 3)
+                continue;
 
-			// begining of a new item
-			if (str.substring(0, 3).equals("PT "))
-				sb.append("::").append(str);
-			else {
-				String beg = str.substring(0, 3).trim();
+            // begining of a new item
+            if (str.substring(0, 3).equals("PT "))
+                sb.append("::").append(str);
+            else {
+                String beg = str.substring(0, 3).trim();
 
-				// I could have used the fieldPattern regular expression instead
-				// however this seems to be
-				// quick and dirty and it works!
-				if (beg.length() == 2) {
-					sb.append(" ## "); // mark the begining of each field
-					sb.append(str);
-				} else {
-					sb.append("EOLEOL"); // mark the end of each line
-					sb.append(str.trim()); // remove the initial spaces
-				}
-			}
-		}
+                // I could have used the fieldPattern regular expression instead
+                // however this seems to be
+                // quick and dirty and it works!
+                if (beg.length() == 2) {
+                    sb.append(" ## "); // mark the begining of each field
+                    sb.append(str);
+                } else {
+                    sb.append("EOLEOL"); // mark the end of each line
+                    sb.append(str.trim()); // remove the initial spaces
+                }
+            }
+        }
 
-		String[] entries = sb.toString().split("::");
+        String[] entries = sb.toString().split("::");
 
-		HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<String, String>();
 
-		// skip the first entry as it is either empty or has document header
+        // skip the first entry as it is either empty or has document header
         for (String entry : entries) {
             String[] fields = entry.split(" ## ");
 
@@ -338,17 +343,17 @@ public class IsiImporter extends ImportFormat {
             bibitems.add(b);
         }
 
-		return bibitems;
-	}
+        return bibitems;
+    }
 
-	public static String parsePages(String value) {
-		int lastDash = value.lastIndexOf("-");
-		return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
-	}
+    public static String parsePages(String value) {
+        int lastDash = value.lastIndexOf("-");
+        return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
+    }
 
-	public static String parseMonth(String value) {
+    public static String parseMonth(String value) {
 
-		String[] parts = value.split("\\s|\\-");
+        String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
             MonthUtil.Month month = MonthUtil.getMonthByShortName(part1.toLowerCase());
             if (month.isValid()) {
@@ -356,7 +361,7 @@ public class IsiImporter extends ImportFormat {
             }
         }
 
-		// Try two digit month
+        // Try two digit month
         for (String part : parts) {
             try {
                 int number = Integer.parseInt(part);
@@ -368,67 +373,67 @@ public class IsiImporter extends ImportFormat {
 
             }
         }
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Will expand ISI first names.
-	 * 
-	 * Fixed bug from:
-	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
-	 * 
-	 */
-	public static String isiAuthorConvert(String author) {
+    /**
+     * Will expand ISI first names.
+     * 
+     * Fixed bug from:
+     * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
+     * 
+     */
+    public static String isiAuthorConvert(String author) {
 
-		String[] s = author.split(",");
-		if (s.length != 2)
-			return author;
+        String[] s = author.split(",");
+        if (s.length != 2)
+            return author;
 
-		StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-		String last = s[0].trim();
-		sb.append(last).append(", ");
+        String last = s[0].trim();
+        sb.append(last).append(", ");
 
-		String first = s[1].trim();
+        String first = s[1].trim();
 
-		String[] firstParts = first.split("\\s+");
+        String[] firstParts = first.split("\\s+");
 
-		for (int i = 0; i < firstParts.length; i++) {
+        for (int i = 0; i < firstParts.length; i++) {
 
-			first = firstParts[i];
+            first = firstParts[i];
 
-			// Do we have only uppercase chars?
-			if (first.toUpperCase().equals(first)) {
-				first = first.replaceAll("\\.", "");
-				for (int j = 0; j < first.length(); j++) {
-					sb.append(first.charAt(j)).append(".");
+            // Do we have only uppercase chars?
+            if (first.toUpperCase().equals(first)) {
+                first = first.replaceAll("\\.", "");
+                for (int j = 0; j < first.length(); j++) {
+                    sb.append(first.charAt(j)).append(".");
 
-					if (j < first.length() - 1)
-						sb.append(" ");
-				}
-			} else {
-				sb.append(first);
-			}
-			if (i < firstParts.length - 1) {
-				sb.append(" ");
-			}
-		}
-		return sb.toString();
+                    if (j < first.length() - 1)
+                        sb.append(" ");
+                }
+            } else {
+                sb.append(first);
+            }
+            if (i < firstParts.length - 1) {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
 
-	}
+    }
 
-	public static String[] isiAuthorsConvert(String[] authors) {
+    public static String[] isiAuthorsConvert(String[] authors) {
 
-		String[] result = new String[authors.length];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = isiAuthorConvert(authors[i]);
-		}
-		return result;
-	}
+        String[] result = new String[authors.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = isiAuthorConvert(authors[i]);
+        }
+        return result;
+    }
 
-	public static String isiAuthorsConvert(String authors) {
-		String[] s = isiAuthorsConvert(authors.split(" and |;"));
-		return Util.join(s, " and ");
-	}
+    public static String isiAuthorsConvert(String authors) {
+        String[] s = isiAuthorsConvert(authors.split(" and |;"));
+        return Util.join(s, " and ");
+    }
 
 }

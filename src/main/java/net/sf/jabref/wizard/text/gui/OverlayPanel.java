@@ -39,6 +39,7 @@ public class OverlayPanel extends JPanel {
 
     private JLabel label;
 
+
     public OverlayPanel(JComponent overlay, String text) {
         OverlayLayout layout = new OverlayLayout(this);
         this.setLayout(layout);

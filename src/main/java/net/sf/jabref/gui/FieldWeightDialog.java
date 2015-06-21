@@ -44,16 +44,17 @@ public class FieldWeightDialog extends JDialog {
     JabRefFrame frame;
     HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
     JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+            cancel = new JButton(Globals.lang("Cancel"));
 
-   public static void main(String[] args) {
+
+    public static void main(String[] args) {
         new FieldWeightDialog(null).setVisible(true);
     }
 
     public FieldWeightDialog(JabRefFrame frame) {
         this.frame = frame;
         JPanel main = buildMainPanel();
-        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buildButtonPanel(), BorderLayout.SOUTH);
         pack();
@@ -61,8 +62,8 @@ public class FieldWeightDialog extends JDialog {
 
     public JPanel buildMainPanel() {
         FormLayout layout = new FormLayout
-            ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-             "");
+                ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Globals.lang("Field sizes"));
@@ -71,7 +72,7 @@ public class FieldWeightDialog extends JDialog {
         TreeSet<String> fields = new TreeSet<String>();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
-        for (int i=0, len=BibtexFields.numberOfPublicFields(); i<len; i++)
+        for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; i++)
         {
             fields.add(BibtexFields.getFieldName(i));
         }
@@ -97,12 +98,14 @@ public class FieldWeightDialog extends JDialog {
     public JPanel buildButtonPanel() {
 
         ok.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 storeSettings();
                 dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 dispose();
             }
@@ -128,13 +131,17 @@ public class FieldWeightDialog extends JDialog {
         frame.removeCachedEntryEditors();
     }
 
+
     /**
      * "Struct" class to hold the necessary info about one of our JSliders:
      * which field it represents, and what value it started out with.
      */
     static class SliderInfo {
+
         String fieldName;
         int originalValue;
+
+
         public SliderInfo(String fieldName, int originalValue) {
             this.fieldName = fieldName;
             this.originalValue = originalValue;

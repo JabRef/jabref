@@ -29,20 +29,20 @@ import net.sf.jabref.Util;
  */
 public class DOICheck implements LayoutFormatter {
 
-	public String format(String fieldText) {
-		
-		if (fieldText == null){
-			return null;
-		}
-		
-		if (fieldText.trim().isEmpty()) {
-		    return "";
-		}
+    public String format(String fieldText) {
 
-            if (Util.checkForDOIwithHTTPprefix(fieldText)) {
-		    return fieldText;
-		} else {
-		    return Globals.DOI_LOOKUP_PREFIX.concat(Util.getDOI(fieldText));
-		}
-	}
+        if (fieldText == null) {
+            return null;
+        }
+
+        if (fieldText.trim().isEmpty()) {
+            return "";
+        }
+
+        if (Util.checkForDOIwithHTTPprefix(fieldText)) {
+            return fieldText;
+        } else {
+            return Globals.DOI_LOOKUP_PREFIX.concat(Util.getDOI(fieldText));
+        }
+    }
 }

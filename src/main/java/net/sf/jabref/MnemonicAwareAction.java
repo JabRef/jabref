@@ -15,10 +15,10 @@
 */
 package net.sf.jabref;
 
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+
 /**
  * This class extends {@link AbstractAction} with the ability to set
  * the mnemonic key based on a '&' character inserted in front of
@@ -29,26 +29,26 @@ import javax.swing.ImageIcon;
 public abstract class MnemonicAwareAction extends AbstractAction {
 
     public MnemonicAwareAction() {
-	//super("");
+        //super("");
     }
 
     public MnemonicAwareAction(ImageIcon icon) {
-	//super(icon);
-        
+        //super(icon);
+
         putValue(SMALL_ICON, icon);
     }
 
     public void putValue(String key, Object value) {
-	if (key.equals(Action.NAME)) {
-	    String name = Globals.menuTitle(value.toString());
-	    int i = name.indexOf('&');
-	    if (i >= 0) {
-		char mnemonic = Character.toUpperCase(name.charAt(i+1));
-		putValue(Action.MNEMONIC_KEY, new Integer(mnemonic));
-		value = name.substring(0, i) + name.substring(i+1);
-	    } else
+        if (key.equals(Action.NAME)) {
+            String name = Globals.menuTitle(value.toString());
+            int i = name.indexOf('&');
+            if (i >= 0) {
+                char mnemonic = Character.toUpperCase(name.charAt(i + 1));
+                putValue(Action.MNEMONIC_KEY, new Integer(mnemonic));
+                value = name.substring(0, i) + name.substring(i + 1);
+            } else
                 value = name;
-	}
-	super.putValue(key, value);
+        }
+        super.putValue(key, value);
     }
 }

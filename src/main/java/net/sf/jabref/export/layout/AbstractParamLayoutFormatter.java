@@ -26,6 +26,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
 
     private static final char SEPARATOR = ',';
 
+
     /**
      * Parse an argument string and return the parts of the argument. The parts are
      * separated by commas, and escaped commas are reduced to literal commas.
@@ -36,7 +37,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
         List<String> parts = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
-        for (int i=0; i<arg.length(); i++) {
+        for (int i = 0; i < arg.length(); i++) {
             if ((arg.charAt(i) == SEPARATOR) && !escaped) {
                 parts.add(current.toString());
                 current = new StringBuilder();
@@ -48,9 +49,9 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
                     escaped = true;
             } else if (escaped) {
                 // Handle newline and tab:
-                if (arg.charAt(i)=='n')
+                if (arg.charAt(i) == 'n')
                     current.append('\n');
-                else if (arg.charAt(i)=='t')
+                else if (arg.charAt(i) == 't')
                     current.append('\t');
                 else {
                     if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"'))
@@ -62,7 +63,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
                 current.append(arg.charAt(i));
         }
         parts.add(current.toString());
-	    return parts.toArray(new String[parts.size()]);
+        return parts.toArray(new String[parts.size()]);
     }
 
 }

@@ -24,46 +24,45 @@ import net.sf.jabref.undo.UndoableInsertString;
 
 public class StringAddChange extends Change {
 
-  BibtexString string;
+    BibtexString string;
 
-  InfoPane tp = new InfoPane();
-  JScrollPane sp = new JScrollPane(tp);
+    InfoPane tp = new InfoPane();
+    JScrollPane sp = new JScrollPane(tp);
 
-  public StringAddChange(BibtexString string) {
-    name = Globals.lang("Added string")+": '"+string.getName()+"'";
-    this.string = string;
 
-      tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+    public StringAddChange(BibtexString string) {
+        name = Globals.lang("Added string") + ": '" + string.getName() + "'";
+        this.string = string;
 
-  }
+        tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
-  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-
-    if (panel.database().hasStringLabel(string.getName())) {
-      // The name to change to is already in the database, so we can't comply.
-      Globals.logger("Cannot add string '"+string.getName()+"' because the name "
-                     +"is already in use.");
     }
 
-    try {
-      panel.database().addString(string);
-      undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
-    } catch (KeyCollisionException ex) {
-      Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+
+        if (panel.database().hasStringLabel(string.getName())) {
+            // The name to change to is already in the database, so we can't comply.
+            Globals.logger("Cannot add string '" + string.getName() + "' because the name "
+                    + "is already in use.");
+        }
+
+        try {
+            panel.database().addString(string);
+            undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
+        } catch (KeyCollisionException ex) {
+            Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+        }
+        try {
+            secondary.addString(new BibtexString(Util.createNeutralId(), string.getName(),
+                    string.getContent()));
+        } catch (KeyCollisionException ex) {
+            Globals.logger("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());
+        }
+        return true;
     }
-    try {
-        secondary.addString(new BibtexString(Util.createNeutralId(), string.getName(),
-                string.getContent()));
-    } catch (KeyCollisionException ex) {
-        Globals.logger("Error: could not add string '"+string.getName()+"' to tmp database: "+ex.getMessage());
+
+    JComponent description() {
+        return sp;
     }
-    return true;
-  }
-
-
-  JComponent description() {
-    return sp;
-  }
-
 
 }

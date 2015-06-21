@@ -40,122 +40,129 @@ import net.sf.jabref.GUIGlobals;
  * @author kleinms, strassfn
  */
 public class DragDropPane extends JTabbedPane {
-	private boolean draggingState = false; // State var if we are at dragging or not
-	private int indexDraggedTab; // The index of the tab we drag at the moment
-	MarkerPane markerPane; // The glass panel for painting the position marker
 
-	public DragDropPane() {
-		super();
-		indexDraggedTab = -1;
-		markerPane = new MarkerPane();
-		markerPane.setVisible(false);
+    private boolean draggingState = false; // State var if we are at dragging or not
+    private int indexDraggedTab; // The index of the tab we drag at the moment
+    MarkerPane markerPane; // The glass panel for painting the position marker
 
-		// -------------------------------------------
-		// Adding listeners for Drag&Drop Actions
-		// -------------------------------------------
-		addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseDragged(MouseEvent e) { // Mouse is dragging
-											// Calculates the tab index based on the mouse position
-				int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
-						e.getX(), e.getY());
-				if (!draggingState) { // We are not at tab dragging
-					if (indexActTab >= 0) { // Mouse is above a tab, otherwise tabNumber would be -1
-											// -->Now we are at tab tragging
-						draggingState = true; // Mark now we are at dragging
-						indexDraggedTab = indexActTab; // Set draggedTabIndex to the tabNumber where we are now
-						repaint();
-					}
 
-				} else { //We are at tab tragging
-					if (indexDraggedTab >= 0 && indexActTab >= 0) { //Is it a valid scenario?
-						boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
-						DragDropPane.this.getRootPane().setGlassPane(markerPane); //Set the MarkerPane as glass Pane
-						Rectangle actTabRect = SwingUtilities.convertRectangle(DragDropPane.this, getBoundsAt(indexActTab),
-								DragDropPane.this.markerPane); //Rectangle with the same dimensions as the tab at the mouse position
-						if (toTheLeft)
-							markerPane.setPicLocation(new Point(actTabRect.x, actTabRect.y
-									+ actTabRect.height)); //Set pic to the left of the tab at the mouse position
-						else
-							markerPane.setPicLocation(new Point(actTabRect.x + actTabRect.width, actTabRect.y
-									+ actTabRect.height)); //Set pic to the right of the tab at the mouse position
+    public DragDropPane() {
+        super();
+        indexDraggedTab = -1;
+        markerPane = new MarkerPane();
+        markerPane.setVisible(false);
 
-						markerPane.setVisible(true);
-						markerPane.repaint();
-						repaint();
-					} else { //We have no valid tab tragging scenario
-						markerPane.setVisible(false);
-						markerPane.repaint();
-					}
-				}
-				super.mouseDragged(e);
-			}
-		});
+        // -------------------------------------------
+        // Adding listeners for Drag&Drop Actions
+        // -------------------------------------------
+        addMouseMotionListener(new MouseMotionAdapter() {
 
-		addMouseListener(new MouseAdapter() {
-			public void mouseReleased(MouseEvent e) {
-				DragDropPane.this.markerPane.setVisible(false); //Set MarkerPane invisible
-				int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
-						e.getX(), e.getY());
-				if (indexDraggedTab >= 0 && indexActTab >= 0 && indexDraggedTab != indexActTab) { //Is it a valid scenario?
-					if (draggingState) { //We are at tab tragging
-						boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
-						DragDropPane.this.markerPane.setVisible(false);
+            public void mouseDragged(MouseEvent e) { // Mouse is dragging
+                // Calculates the tab index based on the mouse position
+                int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
+                        e.getX(), e.getY());
+                if (!draggingState) { // We are not at tab dragging
+                    if (indexActTab >= 0) { // Mouse is above a tab, otherwise tabNumber would be -1
+                                            // -->Now we are at tab tragging
+                        draggingState = true; // Mark now we are at dragging
+                        indexDraggedTab = indexActTab; // Set draggedTabIndex to the tabNumber where we are now
+                        repaint();
+                    }
 
-						Component actTab = getComponentAt(indexDraggedTab); //Save dragged tab
-						String actTabTitle = getTitleAt(indexDraggedTab); //Save Title of the dragged tab
-						removeTabAt(indexDraggedTab); //Remove dragged tab
-						int newTabPos;
-						if(indexActTab < indexDraggedTab) { //We are dragging the tab to the left of its the position
-							if(toTheLeft && indexActTab<(DragDropPane.this.getTabCount())) // The mouse is at the left side of a tab except the last one
-								newTabPos = indexActTab;
-							else
-								newTabPos = indexActTab+1;
-						}
-						else { //We are dragging the tab to the right of the old position
-							if(toTheLeft && indexActTab>0) // The mouse is at the left side of a tab except the first one
-								newTabPos = indexActTab-1;
-							else
-								newTabPos = indexActTab;
-						}
-						insertTab(actTabTitle, null, actTab, null, newTabPos); //Insert dragged tab at new position
-						DragDropPane.this.setSelectedIndex(newTabPos); //Set selection back to the tab (at the new tab position
-					}
-				}
-				draggingState = false;
-			}
-		});
-	}
+                } else { //We are at tab tragging
+                    if (indexDraggedTab >= 0 && indexActTab >= 0) { //Is it a valid scenario?
+                        boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
+                        DragDropPane.this.getRootPane().setGlassPane(markerPane); //Set the MarkerPane as glass Pane
+                        Rectangle actTabRect = SwingUtilities.convertRectangle(DragDropPane.this, getBoundsAt(indexActTab),
+                                DragDropPane.this.markerPane); //Rectangle with the same dimensions as the tab at the mouse position
+                        if (toTheLeft)
+                            markerPane.setPicLocation(new Point(actTabRect.x, actTabRect.y
+                                    + actTabRect.height)); //Set pic to the left of the tab at the mouse position
+                        else
+                            markerPane.setPicLocation(new Point(actTabRect.x + actTabRect.width, actTabRect.y
+                                    + actTabRect.height)); //Set pic to the right of the tab at the mouse position
 
-	/**
-	 * A glass panel which sets the marker for Dragging of Tabs.
-	 * 
-	 */
-	class MarkerPane extends JPanel {
-		private Point locationP;
-		private Image markerImg;
+                        markerPane.setVisible(true);
+                        markerPane.repaint();
+                        repaint();
+                    } else { //We have no valid tab tragging scenario
+                        markerPane.setVisible(false);
+                        markerPane.repaint();
+                    }
+                }
+                super.mouseDragged(e);
+            }
+        });
 
-		public MarkerPane() {
-			setOpaque(false);
-			markerImg = Toolkit.getDefaultToolkit().getImage(
-					GUIGlobals.getIconUrl("dragNdropArrow")); // Sets the marker image
-		}
+        addMouseListener(new MouseAdapter() {
 
-		@Override
-		public void paintComponent(Graphics g) {
-			((Graphics2D) g).setComposite(AlphaComposite.getInstance(
-					AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
-			g.drawImage(markerImg, locationP.x - (markerImg.getWidth(null) / 2),
-					locationP.y, null); // draw the image at the middle of the given location
-		}
+            public void mouseReleased(MouseEvent e) {
+                DragDropPane.this.markerPane.setVisible(false); //Set MarkerPane invisible
+                int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
+                        e.getX(), e.getY());
+                if (indexDraggedTab >= 0 && indexActTab >= 0 && indexDraggedTab != indexActTab) { //Is it a valid scenario?
+                    if (draggingState) { //We are at tab tragging
+                        boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
+                        DragDropPane.this.markerPane.setVisible(false);
 
-		/**
-		 * Sets the new location, where the marker should be placed.
-		 * 
-		 * @param pt the point for the marker
-		 */
-		public void setPicLocation(Point pt) {
-			this.locationP = pt;
-		}
+                        Component actTab = getComponentAt(indexDraggedTab); //Save dragged tab
+                        String actTabTitle = getTitleAt(indexDraggedTab); //Save Title of the dragged tab
+                        removeTabAt(indexDraggedTab); //Remove dragged tab
+                        int newTabPos;
+                        if (indexActTab < indexDraggedTab) { //We are dragging the tab to the left of its the position
+                            if (toTheLeft && indexActTab < (DragDropPane.this.getTabCount())) // The mouse is at the left side of a tab except the last one
+                                newTabPos = indexActTab;
+                            else
+                                newTabPos = indexActTab + 1;
+                        }
+                        else { //We are dragging the tab to the right of the old position
+                            if (toTheLeft && indexActTab > 0) // The mouse is at the left side of a tab except the first one
+                                newTabPos = indexActTab - 1;
+                            else
+                                newTabPos = indexActTab;
+                        }
+                        insertTab(actTabTitle, null, actTab, null, newTabPos); //Insert dragged tab at new position
+                        DragDropPane.this.setSelectedIndex(newTabPos); //Set selection back to the tab (at the new tab position
+                    }
+                }
+                draggingState = false;
+            }
+        });
+    }
 
-	}
+
+    /**
+     * A glass panel which sets the marker for Dragging of Tabs.
+     * 
+     */
+    class MarkerPane extends JPanel {
+
+        private Point locationP;
+        private Image markerImg;
+
+
+        public MarkerPane() {
+            setOpaque(false);
+            markerImg = Toolkit.getDefaultToolkit().getImage(
+                    GUIGlobals.getIconUrl("dragNdropArrow")); // Sets the marker image
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
+            g.drawImage(markerImg, locationP.x - (markerImg.getWidth(null) / 2),
+                    locationP.y, null); // draw the image at the middle of the given location
+        }
+
+        /**
+         * Sets the new location, where the marker should be placed.
+         * 
+         * @param pt the point for the marker
+         */
+        public void setPicLocation(Point pt) {
+            this.locationP = pt;
+        }
+
+    }
 }

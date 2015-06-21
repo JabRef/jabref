@@ -100,7 +100,7 @@ public class FreeCiteImporter extends ImportFormat {
         // new InputStreamReader(conn.getInputStream())
 
         List<BibtexEntry> res = new ArrayList<BibtexEntry>();
-        
+
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try {
             XMLStreamReader parser = factory.createXMLStreamReader(conn.getInputStream());
@@ -108,15 +108,15 @@ public class FreeCiteImporter extends ImportFormat {
                 if ((parser.getEventType() == XMLStreamConstants.START_ELEMENT)
                         && (parser.getLocalName().equals("citation"))) {
                     parser.nextTag();
-                    
+
                     StringBuilder noteSB = new StringBuilder();
 
                     BibtexEntry e = new BibtexEntry();
                     // fallback type
                     BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
 
-                    while (! (   parser.getEventType() == XMLStreamConstants.END_ELEMENT
-                              && parser.getLocalName().equals("citation"))) {
+                    while (!(parser.getEventType() == XMLStreamConstants.END_ELEMENT
+                    && parser.getLocalName().equals("citation"))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();
                             if (ln.equals("authors")) {
@@ -136,8 +136,8 @@ public class FreeCiteImporter extends ImportFormat {
                                         sb.append(" and ");
                                         sb.append(author);
                                     }
-                                    assert(parser.getEventType() == XMLStreamConstants.END_ELEMENT);
-                                    assert(parser.getLocalName().equals("author"));
+                                    assert (parser.getEventType() == XMLStreamConstants.END_ELEMENT);
+                                    assert (parser.getLocalName().equals("author"));
                                     parser.nextTag();
                                     // current tag is either begin:author or
                                     // end:authors
@@ -155,16 +155,16 @@ public class FreeCiteImporter extends ImportFormat {
                                 type = BibtexEntryType.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
-                            } else if ( ln.equals("doi")
-                                     || ln.equals("institution")
-                                     || ln.equals("location")
-                                     || ln.equals("number")
-                                     || ln.equals("note") 
-                                     || ln.equals("title") 
-                                     || ln.equals("pages")
-                                     || ln.equals("publisher")
-                                     || ln.equals("volume")
-                                     || ln.equals("year")) {
+                            } else if (ln.equals("doi")
+                                    || ln.equals("institution")
+                                    || ln.equals("location")
+                                    || ln.equals("number")
+                                    || ln.equals("note")
+                                    || ln.equals("title")
+                                    || ln.equals("pages")
+                                    || ln.equals("publisher")
+                                    || ln.equals("volume")
+                                    || ln.equals("year")) {
                                 e.setField(ln, parser.getElementText());
                             } else if (ln.equals("booktitle")) {
                                 String booktitle = parser.getElementText();
@@ -186,7 +186,7 @@ public class FreeCiteImporter extends ImportFormat {
                         }
                         parser.next();
                     }
-                    
+
                     if (noteSB.length() > 0) {
                         String note = e.getField("note");
                         if (note != null) {
@@ -197,14 +197,14 @@ public class FreeCiteImporter extends ImportFormat {
                         }
                         e.setField("note", note);
                     }
-                    
+
                     // type has been derived from "genre"
                     // has to be done before label generation as label generation is dependent on entry type
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
                     e = LabelPatternUtil.makeLabel(JabRef.jrf.basePanel().metaData(), JabRef.jrf.basePanel().database(), e);
-                    
+
                     res.add(e);
                 }
                 parser.next();

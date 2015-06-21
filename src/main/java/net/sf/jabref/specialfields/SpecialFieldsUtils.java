@@ -25,169 +25,170 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.undo.NamedCompound;
 
 public class SpecialFieldsUtils {
-	
-	public final static String FIELDNAME_PRIORITY = "priority";
-	public final static String FIELDNAME_RANKING = "ranking";
-	public final static String FIELDNAME_RELEVANCE = "relevance";
-	public final static String FIELDNAME_QUALITY = "qualityassured";
-	public final static String FIELDNAME_READ = "readstatus";
-	public final static String FIELDNAME_PRINTED = "printed";
 
-	public final static String  PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
-	public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
-	public final static Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
-	
-	public final static String  PREF_RANKING_COMPACT = "compactRankingColumn";
-	public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
+    public final static String FIELDNAME_PRIORITY = "priority";
+    public final static String FIELDNAME_RANKING = "ranking";
+    public final static String FIELDNAME_RELEVANCE = "relevance";
+    public final static String FIELDNAME_QUALITY = "qualityassured";
+    public final static String FIELDNAME_READ = "readstatus";
+    public final static String FIELDNAME_PRINTED = "printed";
 
-	public final static String  PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
-	public final static Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
+    public final static String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
 
-	public final static String  PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
-	public final static Boolean PREF_SHOWCOLUMN_RELEVANCE_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
-	public final static Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_SHOWCOLUMN_READ = "showReadColumn";
-	public final static Boolean PREF_SHOWCOLUMN_READ_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
-	public final static Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
-	public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
-	
-	public final static String  PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-	public final static Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
-	
-	/****************************************************/
-	/** generic treatment                              **/
-	/** no special treatment any more, thanks to enums **/
-	/****************************************************/
+    public final static String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
+    public final static Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
 
-	/**
-	 * @param e - Field to be handled
-	 * @param value - may be null to state that field should be emptied
-	 * @param be - BibTeXEntry to be handled
-	 * @param ce - Filled with undo info (if necessary)
-	 * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
-	 */
-	public static void updateField(SpecialField e, String value, BibtexEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
-		Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
-		// we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-		exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
-	}
-	
-	private static void exportFieldToKeywords(SpecialField e, BibtexEntry be, NamedCompound ce) {
-		exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
-	}
-	
-	private static void exportFieldToKeywords(SpecialField e, String newValue, BibtexEntry be, NamedCompound ce) {
-		if (!SpecialFieldsUtils.keywordSyncEnabled()) return;
-		ArrayList<String> keywordList = Util.getSeparatedKeywords(be);
-		List<String> values = e.getKeyWords();
-		
-		int foundPos = -1;
-		
-		// cleanup keywords
-		for (Object value: values) {
-			int pos = keywordList.indexOf(value);
-			if (pos >= 0) {
-				foundPos = pos;
-				keywordList.remove(pos);
-			}
-		}
-		
-		if (newValue != null) {
-			if (foundPos == -1) {
-				keywordList.add(newValue);
-			} else {
-				keywordList.add(foundPos, newValue);
-			}
-		}
-		Util.putKeywords(be, keywordList, ce);
-	}
-	
-	
-	/**
-	 * Update keywords according to values of special fields
-	 * 
-	 * @param nc indicates the undo named compound. May be null
-	 */
-	public static void syncKeywordsFromSpecialFields(BibtexEntry be, NamedCompound nc) {
-		exportFieldToKeywords(Priority.getInstance(), be, nc);
-		exportFieldToKeywords(Rank.getInstance(), be, nc);
-		exportFieldToKeywords(Relevance.getInstance(), be, nc);
-		exportFieldToKeywords(Quality.getInstance(), be, nc);
-		exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
-		exportFieldToKeywords(Printed.getInstance(), be, nc);
-	}
-	
-	private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibtexEntry be, NamedCompound nc) {
-		List<String> values = c.getKeyWords();
-		String newValue = null;
-		for (String val: values) {
-			if (keywordList.contains(val)) {
-				newValue = val;
-				break;
-			}
-		}
-		Util.updateField(be, c.getFieldName(), newValue, nc);
-	}
+    public final static String PREF_RANKING_COMPACT = "compactRankingColumn";
+    public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
 
-	/**
-	 * updates field values according to keywords
-	 * 
-	 * @param ce indicates the undo named compound. May be null
-	 */
-	public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
-		if (be.getField("keywords") == null)
-			return;
-		ArrayList<String> keywordList = Util.getSeparatedKeywords(be.getField("keywords"));
-		importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
-		importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
-		importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
-		importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
-		importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
-		importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
-	}
-	
-	/**
-	 * @param fieldName the fieldName
-	 * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
-	 */
-	public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
-		if (fieldName.equals(FIELDNAME_PRIORITY)) {
-			return Priority.getInstance();
-		} else if (fieldName.equals(FIELDNAME_QUALITY)) {
-			return Quality.getInstance();
-		} else if (fieldName.equals(FIELDNAME_RANKING)) {
-			return Rank.getInstance();
-		} else if (fieldName.equals(FIELDNAME_RELEVANCE)) {
-			return Relevance.getInstance();
-		} else if (fieldName.equals(FIELDNAME_READ)) {
-			return ReadStatus.getInstance();
-		} else if (fieldName.equals(FIELDNAME_PRINTED)) {
-			return Printed.getInstance();
-		} else {
-			return null;
-		}
-	}
-	
-	/**
-	 * @param fieldName the name of the field to check
-	 * @return true if given field is a special field, false otherwise
-	 */
-	public static boolean isSpecialField(String fieldName) {
-		return (getSpecialFieldInstanceFromFieldName(fieldName) != null);
-	}
-	
-	public static boolean keywordSyncEnabled() {
-		return  Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED) &&
-				Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
-	}
+    public final static String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
+    public final static Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
+    public final static Boolean PREF_SHOWCOLUMN_RELEVANCE_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
+    public final static Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_SHOWCOLUMN_READ = "showReadColumn";
+    public final static Boolean PREF_SHOWCOLUMN_READ_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
+    public final static Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+    public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
+
+    public final static String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
+    public final static Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
+
+
+    /****************************************************/
+    /** generic treatment                              **/
+    /** no special treatment any more, thanks to enums **/
+    /****************************************************/
+
+    /**
+     * @param e - Field to be handled
+     * @param value - may be null to state that field should be emptied
+     * @param be - BibTeXEntry to be handled
+     * @param ce - Filled with undo info (if necessary)
+     * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
+     */
+    public static void updateField(SpecialField e, String value, BibtexEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
+        Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
+        // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
+        exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+    }
+
+    private static void exportFieldToKeywords(SpecialField e, BibtexEntry be, NamedCompound ce) {
+        exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+    }
+
+    private static void exportFieldToKeywords(SpecialField e, String newValue, BibtexEntry be, NamedCompound ce) {
+        if (!SpecialFieldsUtils.keywordSyncEnabled())
+            return;
+        ArrayList<String> keywordList = Util.getSeparatedKeywords(be);
+        List<String> values = e.getKeyWords();
+
+        int foundPos = -1;
+
+        // cleanup keywords
+        for (Object value : values) {
+            int pos = keywordList.indexOf(value);
+            if (pos >= 0) {
+                foundPos = pos;
+                keywordList.remove(pos);
+            }
+        }
+
+        if (newValue != null) {
+            if (foundPos == -1) {
+                keywordList.add(newValue);
+            } else {
+                keywordList.add(foundPos, newValue);
+            }
+        }
+        Util.putKeywords(be, keywordList, ce);
+    }
+
+    /**
+     * Update keywords according to values of special fields
+     * 
+     * @param nc indicates the undo named compound. May be null
+     */
+    public static void syncKeywordsFromSpecialFields(BibtexEntry be, NamedCompound nc) {
+        exportFieldToKeywords(Priority.getInstance(), be, nc);
+        exportFieldToKeywords(Rank.getInstance(), be, nc);
+        exportFieldToKeywords(Relevance.getInstance(), be, nc);
+        exportFieldToKeywords(Quality.getInstance(), be, nc);
+        exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
+        exportFieldToKeywords(Printed.getInstance(), be, nc);
+    }
+
+    private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibtexEntry be, NamedCompound nc) {
+        List<String> values = c.getKeyWords();
+        String newValue = null;
+        for (String val : values) {
+            if (keywordList.contains(val)) {
+                newValue = val;
+                break;
+            }
+        }
+        Util.updateField(be, c.getFieldName(), newValue, nc);
+    }
+
+    /**
+     * updates field values according to keywords
+     * 
+     * @param ce indicates the undo named compound. May be null
+     */
+    public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
+        if (be.getField("keywords") == null)
+            return;
+        ArrayList<String> keywordList = Util.getSeparatedKeywords(be.getField("keywords"));
+        importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
+        importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
+        importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
+        importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
+        importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
+        importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
+    }
+
+    /**
+     * @param fieldName the fieldName
+     * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
+     */
+    public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
+        if (fieldName.equals(FIELDNAME_PRIORITY)) {
+            return Priority.getInstance();
+        } else if (fieldName.equals(FIELDNAME_QUALITY)) {
+            return Quality.getInstance();
+        } else if (fieldName.equals(FIELDNAME_RANKING)) {
+            return Rank.getInstance();
+        } else if (fieldName.equals(FIELDNAME_RELEVANCE)) {
+            return Relevance.getInstance();
+        } else if (fieldName.equals(FIELDNAME_READ)) {
+            return ReadStatus.getInstance();
+        } else if (fieldName.equals(FIELDNAME_PRINTED)) {
+            return Printed.getInstance();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param fieldName the name of the field to check
+     * @return true if given field is a special field, false otherwise
+     */
+    public static boolean isSpecialField(String fieldName) {
+        return (getSpecialFieldInstanceFromFieldName(fieldName) != null);
+    }
+
+    public static boolean keywordSyncEnabled() {
+        return Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED) &&
+                Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+    }
 
 }

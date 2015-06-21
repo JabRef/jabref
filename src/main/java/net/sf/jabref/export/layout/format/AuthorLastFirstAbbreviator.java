@@ -33,10 +33,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 
-	/**
-	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-	 */
-	public String format(String fieldText) {
+    /**
+     * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
+     */
+    public String format(String fieldText) {
 
         /**
          * This formatter is a duplicate of AuthorAbbreviator, so we simply
@@ -44,5 +44,5 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
          */
         return (new AuthorAbbreviator()).format(fieldText);
 
-	}
+    }
 }

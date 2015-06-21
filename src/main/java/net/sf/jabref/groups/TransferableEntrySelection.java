@@ -24,12 +24,13 @@ import java.io.IOException;
 import net.sf.jabref.BibtexEntry;
 
 public class TransferableEntrySelection implements Transferable {
+
     public static final DataFlavor flavorInternal;
     public static final DataFlavor flavorExternal;
     public static final DataFlavor[] flavors;
     public final BibtexEntry[] selectedEntries;
     public final String selectedEntriesCiteKeys;
-    
+
     protected boolean includeCiteKeyword = false;
 
     static {
@@ -44,8 +45,9 @@ public class TransferableEntrySelection implements Transferable {
         }
         flavorInternal = df1;
         flavorExternal = df2;
-        flavors = new DataFlavor[] { flavorInternal, flavorExternal };
+        flavors = new DataFlavor[] {flavorInternal, flavorExternal};
     }
+
 
     public TransferableEntrySelection(BibtexEntry[] selectedEntries) {
         this.selectedEntries = selectedEntries;
@@ -74,7 +76,7 @@ public class TransferableEntrySelection implements Transferable {
         if (someFlavor.equals(flavorInternal))
             return this;
         String s = includeCiteKeyword ?
-                "\\cite{" + selectedEntriesCiteKeys + "}" 
+                "\\cite{" + selectedEntriesCiteKeys + "}"
                 : selectedEntriesCiteKeys;
         return new ByteArrayInputStream(s.getBytes(
                 flavorExternal.getParameter("charset").trim()));
@@ -87,6 +89,5 @@ public class TransferableEntrySelection implements Transferable {
     public void setIncludeCiteKeyword(boolean includeCiteKeyword) {
         this.includeCiteKeyword = includeCiteKeyword;
     }
-    
 
 }

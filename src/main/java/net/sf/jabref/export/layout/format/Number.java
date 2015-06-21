@@ -23,6 +23,7 @@ import net.sf.jabref.export.ExportFormats;
  * tied to the entry's position in the order, not to the number of calls to this formatter.
  */
 public class Number implements ParamLayoutFormatter {
+
     public void setArgument(String arg) {
         // No effect currently.
     }

@@ -16,7 +16,7 @@
 // function : wrapper and service class for the DatePicker handling at the
 //            EntryEditor
 
-package net.sf.jabref.gui.date ;
+package net.sf.jabref.gui.date;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -33,9 +33,11 @@ import net.sf.jabref.Util;
 import com.michaelbaranov.microba.calendar.DatePicker;
 
 public class DatePickerButton implements ActionListener {
+
     private DatePicker datePicker = new DatePicker();
     private JPanel panel = new JPanel();
     private FieldEditor editor;
+
 
     public DatePickerButton(FieldEditor pEditor) {
         datePicker.showButtonOnly(true);

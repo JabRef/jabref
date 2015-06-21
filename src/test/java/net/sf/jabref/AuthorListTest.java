@@ -244,8 +244,7 @@ public class AuthorListTest {
 
         assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
                 AuthorList.fixAuthor_lastNameFirst(
-                        "John von Neumann and John Smith and Black Brown, Peter", true)
-        );
+                        "John von Neumann and John Smith and Black Brown, Peter", true));
 
         assertEquals("von Last, Jr, F.", AuthorList.fixAuthor_lastNameFirst("von Last, Jr ,First",
                 true));
@@ -298,8 +297,7 @@ public class AuthorListTest {
         assertEquals(
                 "Neumann, J. and Smith, J. and Black Brown, Jr., P.",
                 AuthorList
-                        .fixAuthorForAlphabetization("John von Neumann and John Smith and de Black Brown, Jr., Peter")
-        );
+                        .fixAuthorForAlphabetization("John von Neumann and John Smith and de Black Brown, Jr., Peter"));
     }
 
     public static int size(String bibtex) {
@@ -383,9 +381,9 @@ public class AuthorListTest {
         assertEquals("von Neumann et al.", AuthorList.getAuthorList(
                 "John von Neumann and John Smith and Black Brown, Peter").getAuthorsNatbib());
 
-		/*
-		 * [ 1465610 ] (Double-)Names containing hyphen (-) not handled correctly
-		 */
+        /*
+         * [ 1465610 ] (Double-)Names containing hyphen (-) not handled correctly
+         */
         assertEquals("Last-Name et al.", AuthorList.getAuthorList(
                 "First Second Last-Name" + " and John Smith and Black Brown, Peter").getAuthorsNatbib());
 

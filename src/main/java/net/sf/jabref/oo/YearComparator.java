@@ -27,8 +27,9 @@ import java.util.Comparator;
 public class YearComparator implements Comparator<BibtexEntry> {
 
     FieldComparator authComp = new FieldComparator("author"),
-        editorComp = new FieldComparator("editor"),
-        yearComp = new FieldComparator("year");
+            editorComp = new FieldComparator("editor"),
+            yearComp = new FieldComparator("year");
+
 
     public YearComparator() {
 

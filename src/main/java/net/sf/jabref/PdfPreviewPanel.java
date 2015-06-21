@@ -38,120 +38,121 @@ public class PdfPreviewPanel extends JPanel {
 
     private JLabel picLabel;
     private final MetaData metaData;
-	
-	public PdfPreviewPanel(MetaData metaData) {
-		this.metaData = metaData;
-        picLabel = new JLabel();
-		add(picLabel);
-	}
 
-	private void renderPDFFile(File file) {
-		InputStream input;
-		try {
-			input = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+
+    public PdfPreviewPanel(MetaData metaData) {
+        this.metaData = metaData;
+        picLabel = new JLabel();
+        add(picLabel);
+    }
+
+    private void renderPDFFile(File file) {
+        InputStream input;
+        try {
+            input = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
 
         PDDocument document = null;
         try {
-			document = PDDocument.load(input);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		@SuppressWarnings("unchecked")
-		List<PDPage> pages = document.getDocumentCatalog().getAllPages();
+            document = PDDocument.load(input);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
-		PDPage page = pages.get(0);
-		BufferedImage image = null;
-		try {
-			image = page.convertToImage();
-		} catch (Exception e1) {
-		    // silently ignores all rendering exceptions
-		    image = null;
-		}
-		
-		if (image != null) {
-			int width = this.getParent().getWidth();
-			int height = this.getParent().getHeight();
-			BufferedImage resImage = resizeImage(image, width, height, BufferedImage.TYPE_INT_RGB);
-			ImageIcon icon = new ImageIcon(resImage);
-			picLabel.setText(null);
-			picLabel.setIcon(icon);
-		} else {
-		    clearPreview();
-		}
-		
-		try {
-			document.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private BufferedImage resizeImage(BufferedImage originalImage, int width,
-			int height, int type) {
-		int h = originalImage.getHeight();
-		int w = originalImage.getWidth();
-		if ((height == 0) || (width == 0)) {
-			height = h;
-			width = w;
-		} else {
-			float factorH = (float) height / (float) h;
-			float factorW = (float) width / (float) w;
+        PDPage page = pages.get(0);
+        BufferedImage image = null;
+        try {
+            image = page.convertToImage();
+        } catch (Exception e1) {
+            // silently ignores all rendering exceptions
+            image = null;
+        }
 
-			if (factorH < factorW) {
-				// use factorH, only width has to be changed as height is
-				// already correct
-				width = Math.round(w * factorH);
-			} else {
-				width = Math.round(h * factorW);
-			}
-		}
-		
-		BufferedImage resizedImage = new BufferedImage(width, height, type);
-		Graphics2D g = resizedImage.createGraphics();
-		g.drawImage(originalImage, 0, 0, width, height, null);
-		return resizedImage;
-	}
-	
-	public void updatePanel (BibtexEntry entry) {	
-		if (entry == null) {
-			clearPreview();
-			return;
-		}
+        if (image != null) {
+            int width = this.getParent().getWidth();
+            int height = this.getParent().getHeight();
+            BufferedImage resImage = resizeImage(image, width, height, BufferedImage.TYPE_INT_RGB);
+            ImageIcon icon = new ImageIcon(resImage);
+            picLabel.setText(null);
+            picLabel.setIcon(icon);
+        } else {
+            clearPreview();
+        }
+
+        try {
+            document.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private BufferedImage resizeImage(BufferedImage originalImage, int width,
+            int height, int type) {
+        int h = originalImage.getHeight();
+        int w = originalImage.getWidth();
+        if ((height == 0) || (width == 0)) {
+            height = h;
+            width = w;
+        } else {
+            float factorH = (float) height / (float) h;
+            float factorW = (float) width / (float) w;
+
+            if (factorH < factorW) {
+                // use factorH, only width has to be changed as height is
+                // already correct
+                width = Math.round(w * factorH);
+            } else {
+                width = Math.round(h * factorW);
+            }
+        }
+
+        BufferedImage resizedImage = new BufferedImage(width, height, type);
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, width, height, null);
+        return resizedImage;
+    }
+
+    public void updatePanel(BibtexEntry entry) {
+        if (entry == null) {
+            clearPreview();
+            return;
+        }
         picLabel.setText("rendering preview...");
         picLabel.setIcon(null);
-		FileListTableModel tm = new FileListTableModel();
+        FileListTableModel tm = new FileListTableModel();
         tm.setContent(entry.getField("file"));
         FileListEntry flEntry = null;
-        for (int i=0; i< tm.getRowCount(); i++) {
+        for (int i = 0; i < tm.getRowCount(); i++) {
             flEntry = tm.getEntry(i);
             if (flEntry.getType().getName().toLowerCase().equals("pdf")) {
                 break;
             }
         }
-		
-		if (flEntry != null) {
-		    File pdfFile = Util.expandFilename(metaData, flEntry.getLink());
-		    if (pdfFile != null) {
-		        renderPDFFile(pdfFile);
-		    } else {
-		        clearPreview();
-		    }
-		} else {
-			clearPreview();
-		}
-	}
 
-	private void clearPreview() {
-	    this.picLabel.setIcon(null);
-	    this.picLabel.setText(Globals.lang("no preview available"));
-	}
+        if (flEntry != null) {
+            File pdfFile = Util.expandFilename(metaData, flEntry.getLink());
+            if (pdfFile != null) {
+                renderPDFFile(pdfFile);
+            } else {
+                clearPreview();
+            }
+        } else {
+            clearPreview();
+        }
+    }
+
+    private void clearPreview() {
+        this.picLabel.setIcon(null);
+        this.picLabel.setText(Globals.lang("no preview available"));
+    }
 
 }

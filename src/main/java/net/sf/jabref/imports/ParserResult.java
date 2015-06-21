@@ -32,7 +32,6 @@ public class ParserResult {
     private MetaData metaData;
     private HashMap<String, BibtexEntryType> entryTypes;
 
-
     private File file = null;
     private ArrayList<String> warnings = new ArrayList<String>();
     private ArrayList<String> duplicateKeys = new ArrayList<String>();
@@ -49,14 +48,15 @@ public class ParserResult {
     private int jabrefMinor2Version = 0; // Numeric version representation
     private boolean toOpenTab = false;
 
-    public ParserResult(Collection<BibtexEntry> entries){
-    	this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
+
+    public ParserResult(Collection<BibtexEntry> entries) {
+        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
     }
-    
+
     public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, BibtexEntryType> entryTypes) {
-		this.base = base;
-		this.metaData = metaData;
-		this.entryTypes = entryTypes;
+        this.base = base;
+        this.metaData = metaData;
+        this.entryTypes = entryTypes;
     }
 
     /**
@@ -70,7 +70,6 @@ public class ParserResult {
     public void setToOpenTab(boolean toOpenTab) {
         this.toOpenTab = toOpenTab;
     }
-
 
     /**
      * Find which version of JabRef, if any, produced this bib file.
@@ -87,7 +86,6 @@ public class ParserResult {
     public void setJabrefVersion(String jabrefVersion) {
         this.jabrefVersion = jabrefVersion;
     }
-
 
     public int getJabrefMajorVersion() {
         return jabrefMajorVersion;
@@ -112,13 +110,13 @@ public class ParserResult {
     public void setJabrefMinor2Version(int jabrefMinor2Version) {
         this.jabrefMinor2Version = jabrefMinor2Version;
     }
-    
+
     public BibtexDatabase getDatabase() {
-    	return base;
+        return base;
     }
 
     public MetaData getMetaData() {
-	    return metaData;
+        return metaData;
     }
 
     public void setMetaData(MetaData md) {
@@ -126,15 +124,15 @@ public class ParserResult {
     }
 
     public HashMap<String, BibtexEntryType> getEntryTypes() {
-    	return entryTypes;
+        return entryTypes;
     }
 
     public File getFile() {
-      return file;
+        return file;
     }
 
     public void setFile(File f) {
-      file = f;
+        file = f;
     }
 
     /**
@@ -143,7 +141,7 @@ public class ParserResult {
      * @param enc String the name of the encoding.
      */
     public void setEncoding(String enc) {
-      encoding = enc;
+        encoding = enc;
     }
 
     /**
@@ -151,7 +149,7 @@ public class ParserResult {
      * (indicates that prefs.get("defaultEncoding") was used).
      */
     public String getEncoding() {
-      return encoding;
+        return encoding;
     }
 
     /**
@@ -165,14 +163,14 @@ public class ParserResult {
     }
 
     public boolean hasWarnings() {
-      return (warnings.size() > 0);
+        return (warnings.size() > 0);
     }
 
     public String[] warnings() {
-      String[] s = new String[warnings.size()];
-      for (int i=0; i<warnings.size(); i++)
-        s[i] = warnings.get(i);
-      return s;
+        String[] s = new String[warnings.size()];
+        for (int i = 0; i < warnings.size(); i++)
+            s[i] = warnings.get(i);
+        return s;
     }
 
     /**
@@ -199,7 +197,6 @@ public class ParserResult {
     public String[] getDuplicateKeys() {
         return duplicateKeys.toArray(new String[duplicateKeys.size()]);
     }
-    
 
     public boolean isPostponedAutosaveFound() {
         return postponedAutosaveFound;

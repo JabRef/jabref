@@ -28,25 +28,27 @@ public class MarkedComparator implements Comparator<BibtexEntry> {
 
     Comparator<BibtexEntry> next;
 
+
     public MarkedComparator(Comparator<BibtexEntry> next) {
         this.next = next;
     }
+
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
         if (e1 == e2)
             return 0;
 
-        int mrk1 = Util.isMarked(e1),
-                mrk2 = Util.isMarked(e2);
+        int mrk1 = Util.isMarked(e1), mrk2 = Util.isMarked(e2);
 
         if (mrk1 == mrk2)
             return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
 
-        else return mrk2-mrk1;
-        
+        else
+            return mrk2 - mrk1;
+
     }
 
     private int idCompare(BibtexEntry b1, BibtexEntry b2) {
-	    return ((b1.getId())).compareTo((b2.getId()));
+        return ((b1.getId())).compareTo((b2.getId()));
     }
 }

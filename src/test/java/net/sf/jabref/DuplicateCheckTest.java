@@ -21,7 +21,8 @@ public class DuplicateCheckTest {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testDuplicateDetection() {
         BibtexEntry one = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
 

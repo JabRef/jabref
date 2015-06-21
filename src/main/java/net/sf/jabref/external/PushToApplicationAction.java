@@ -31,11 +31,13 @@ import net.sf.jabref.JabRefFrame;
  * An Action class representing the process of invoking a PushToApplication operation.
  */
 public class PushToApplicationAction extends AbstractAction implements Runnable {
+
     private PushToApplication operation;
     private JabRefFrame frame;
     private BasePanel panel;
     private BibtexEntry[] entries;
-    
+
+
     public PushToApplicationAction(JabRefFrame frame, PushToApplication operation) {
         this.frame = frame;
         putValue(SMALL_ICON, operation.getIcon());
@@ -57,7 +59,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         entries = panel.getSelectedEntries();
         if (entries.length == 0) {
             JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires one or more entries to be selected."),
-                    (String)getValue(NAME), JOptionPane.ERROR_MESSAGE);
+                    (String) getValue(NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -83,6 +85,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
 
         // Call the operationCompleted() method on the event dispatch thread:
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 operation.operationCompleted(panel);
             }

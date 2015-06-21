@@ -31,9 +31,9 @@ import java.util.ArrayList;
 public class MetaDataChange extends Change {
 
     static final int
-        ADD = 1,
-        REMOVE = 2,
-        MODIFY = 3;
+            ADD = 1,
+            REMOVE = 2,
+            MODIFY = 3;
 
     InfoPane tp = new InfoPane();
     JScrollPane sp = new JScrollPane(tp);
@@ -41,12 +41,13 @@ public class MetaDataChange extends Change {
     private MetaData mdSecondary;
     ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
 
+
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
         super(Globals.lang("Metadata change"));
         this.md = md;
         this.mdSecondary = mdSecondary;
 
-        tp.setText("<html>"+Globals.lang("Metadata change")+"</html>");
+        tp.setText("<html>" + Globals.lang("Metadata change") + "</html>");
     }
 
     public int getChangeCount() {
@@ -66,7 +67,7 @@ public class MetaDataChange extends Change {
     }
 
     JComponent description() {
-        StringBuilder sb = new StringBuilder("<html>"+Globals.lang("Changes have been made to the following metadata elements")+":<p>");
+        StringBuilder sb = new StringBuilder("<html>" + Globals.lang("Changes have been made to the following metadata elements") + ":<p>");
         for (MetaDataChangeUnit unit : changes) {
             sb.append("<br>&nbsp;&nbsp;");
             sb.append(unit.key);
@@ -90,27 +91,30 @@ public class MetaDataChange extends Change {
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         for (MetaDataChangeUnit unit : changes) {
             switch (unit.type) {
-                case ADD:
-                    md.putData(unit.key, unit.value);
-                    mdSecondary.putData(unit.key, unit.value);
-                    break;
-                case REMOVE:
-                    md.remove(unit.key);
-                    mdSecondary.remove(unit.key);
-                    break;
-                case MODIFY:
-                    md.putData(unit.key, unit.value);
-                    mdSecondary.putData(unit.key, unit.value);
-                    break;
+            case ADD:
+                md.putData(unit.key, unit.value);
+                mdSecondary.putData(unit.key, unit.value);
+                break;
+            case REMOVE:
+                md.remove(unit.key);
+                mdSecondary.remove(unit.key);
+                break;
+            case MODIFY:
+                md.putData(unit.key, unit.value);
+                mdSecondary.putData(unit.key, unit.value);
+                break;
             }
         }
         return true;
     }
 
+
     class MetaDataChangeUnit {
+
         int type;
         String key;
         Vector<String> value;
+
 
         public MetaDataChangeUnit(int type, String key, Vector<String> value) {
             this.type = type;

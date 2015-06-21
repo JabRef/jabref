@@ -90,10 +90,10 @@ import java.io.IOException;
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
-
     private String fileType = null;
     private List<FormatEntry> format = null;
     private Map<String, String> replacements = new HashMap<String, String>();
+
 
     public void setArgument(String arg) {
         String[] parts = parseArgument(arg);
@@ -101,8 +101,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         if ((parts.length > 1) && (parts[1].trim().length() > 0))
             fileType = parts[1];
         if (parts.length > 2) {
-            for (int i = 2; i < parts.length-1; i+=2) {
-                replacements.put(parts[i], parts[i+1]);
+            for (int i = 2; i < parts.length - 1; i += 2) {
+                replacements.put(parts[i], parts[i + 1]);
             }
         }
     }
@@ -124,70 +124,70 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
-                        case STRING:
-                            sb.append(entry.getString());
+                    case STRING:
+                        sb.append(entry.getString());
+                        break;
+                    case ITERATION_COUNT:
+                        sb.append(String.valueOf(piv));
+                        break;
+                    case FILE_PATH:
+                        if (flEntry.getLink() == null)
                             break;
-                        case ITERATION_COUNT:
-                            sb.append(String.valueOf(piv));
-                            break;
-                        case FILE_PATH:
-                            if (flEntry.getLink() == null)
-                                break;
 
-                            String[] dirs;
-                            // We need to resolve the file directory from the database's metadata,
-                            // but that is not available from a formatter. Therefore, as an
-                            // ugly hack, the export routine has set a global variable before
-                            // starting the export, which contains the database's file directory:
-                            if (Globals.prefs.fileDirForDatabase != null)
-                                dirs = Globals.prefs.fileDirForDatabase;
-                            else
-                                dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+                        String[] dirs;
+                        // We need to resolve the file directory from the database's metadata,
+                        // but that is not available from a formatter. Therefore, as an
+                        // ugly hack, the export routine has set a global variable before
+                        // starting the export, which contains the database's file directory:
+                        if (Globals.prefs.fileDirForDatabase != null)
+                            dirs = Globals.prefs.fileDirForDatabase;
+                        else
+                            dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
 
-                            File f = Util.expandFilename(flEntry.getLink(), dirs);
+                        File f = Util.expandFilename(flEntry.getLink(), dirs);
 
-                            /*
-                             * Stumbled over this while investigating
-                             *
-                             * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                             */
-                            if (f != null) {
-                                try {
-                                    sb.append(replaceStrings(f.getCanonicalPath()));//f.toURI().toString();
-                                } catch (IOException ex) {
-                                    ex.printStackTrace();
-                                    sb.append(replaceStrings(f.getPath()));
-                                }
-                            } else {
-                                sb.append(replaceStrings(flEntry.getLink()));
+                        /*
+                         * Stumbled over this while investigating
+                         *
+                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+                         */
+                        if (f != null) {
+                            try {
+                                sb.append(replaceStrings(f.getCanonicalPath()));//f.toURI().toString();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                                sb.append(replaceStrings(f.getPath()));
                             }
+                        } else {
+                            sb.append(replaceStrings(flEntry.getLink()));
+                        }
 
+                        break;
+                    case RELATIVE_FILE_PATH:
+                        if (flEntry.getLink() == null)
                             break;
-                        case RELATIVE_FILE_PATH:
-                            if (flEntry.getLink() == null)
-                                break;
 
-                            /*
-                             * Stumbled over this while investigating
-                             *
-                             * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                             */
-                            sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
+                        /*
+                         * Stumbled over this while investigating
+                         *
+                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+                         */
+                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
 
+                        break;
+                    case FILE_EXTENSION:
+                        if (flEntry.getLink() == null)
                             break;
-                        case FILE_EXTENSION:
-                            if (flEntry.getLink() == null)
-                                break;
-                            int index = flEntry.getLink().lastIndexOf('.');
-                            if ((index >= 0) && (index < flEntry.getLink().length() - 1))
-                                sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
-                            break;
-                        case FILE_TYPE:
-                            sb.append(replaceStrings(flEntry.getType().getName()));
-                            break;
-                        case FILE_DESCRIPTION:
-                            sb.append(replaceStrings(flEntry.getDescription()));
-                            break;
+                        int index = flEntry.getLink().lastIndexOf('.');
+                        if ((index >= 0) && (index < flEntry.getLink().length() - 1))
+                            sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
+                        break;
+                    case FILE_TYPE:
+                        sb.append(replaceStrings(flEntry.getType().getName()));
+                        break;
+                    case FILE_DESCRIPTION:
+                        sb.append(replaceStrings(flEntry.getDescription()));
+                        break;
                     }
                 }
 
@@ -198,14 +198,13 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         return sb.toString();
     }
 
-
     protected String replaceStrings(String text) {
         for (String from : replacements.keySet()) {
             String to = replacements.get(from);
             text = text.replaceAll(from, to);
         }
         return text;
-        
+
     }
 
 
@@ -224,6 +223,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         ESCAPE_SEQ.put('x', FILE_EXTENSION);
         ESCAPE_SEQ.put('d', FILE_DESCRIPTION);
     }
+
 
     /**
      * Parse a format string and return a list of FormatEntry objects. The format
@@ -290,6 +290,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
         private int type;
         private String string = null;
+
 
         public FormatEntry(int type) {
             this.type = type;

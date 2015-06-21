@@ -36,13 +36,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout;
 
-
 /*==========================================================================*
  * IMPORTS
  *========================================================================== */
 import java.util.StringTokenizer;
 import java.util.Vector;
-
 
 /*==========================================================================*
  * CLASS DECLARATION
@@ -56,6 +54,7 @@ import java.util.Vector;
  */
 public class WSITools
 {
+
     //~ Constructors ///////////////////////////////////////////////////////////
 
     private WSITools()
@@ -103,7 +102,7 @@ public class WSITools
      * @return           Description of the Return Value
      */
     public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
-        int limit)
+            int limit)
     {
         System.out.println("Warning: tokenize \"" + s + "\"");
         vcr.clear();

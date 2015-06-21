@@ -16,7 +16,6 @@ import java.util.Vector;
 
 import static org.junit.Assert.*;
 
-
 public class TestVM {
 
     @Test
@@ -209,7 +208,7 @@ public class TestVM {
                             + "\"Johnny!\" add.period$ \"Johnny?\" add.period$ \"Johnny} }}}\" add.period$"
                             + "\"Johnny!}\" add.period$ \"Johnny?}\" add.period$ \"Johnny.}\" add.period$ }"
                             + "EXECUTE {test}"
-            );
+                    );
 
             Vector<BibtexEntry> v = new Vector<BibtexEntry>();
             vm.run(v);
@@ -229,17 +228,17 @@ public class TestVM {
     @Test
     public void testSubstring() throws RecognitionException, IOException {
         VM vm = new VM("FUNCTION {test} " + "{ \"123456789\" #2  #1  substring$ " + // 2
-                "  \"123456789\" #4 global.max$ substring$ " + // 456789
-                "  \"123456789\" #1  #9  substring$ " + // 123456789
-                "  \"123456789\" #1  #10 substring$ " + // 123456789
-                "  \"123456789\" #1  #99 substring$ " + // 123456789
+        "  \"123456789\" #4 global.max$ substring$ " + // 456789
+        "  \"123456789\" #1  #9  substring$ " + // 123456789
+        "  \"123456789\" #1  #10 substring$ " + // 123456789
+        "  \"123456789\" #1  #99 substring$ " + // 123456789
 
-                "  \"123456789\" #-7 #3  substring$ " + // 123
-                "  \"123456789\" #-1 #1  substring$ " + // 9
-                "  \"123456789\" #-1 #3  substring$ " + // 789
-                "  \"123456789\" #-2 #2  substring$ " + // 78
+        "  \"123456789\" #-7 #3  substring$ " + // 123
+        "  \"123456789\" #-1 #1  substring$ " + // 9
+        "  \"123456789\" #-1 #3  substring$ " + // 789
+        "  \"123456789\" #-2 #2  substring$ " + // 78
 
-                "} EXECUTE {test} ");
+        "} EXECUTE {test} ");
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         vm.run(v);
@@ -259,10 +258,10 @@ public class TestVM {
     @Test
     public void testEmpty() throws RecognitionException, IOException {
         VM vm = new VM("ENTRY {title}{}{} READ STRINGS { s } FUNCTION {test} " + "{ s empty$ " + // FALSE
-                "\"\" empty$ " + // FALSE
-                "\"   \" empty$ " + // FALSE
-                " title empty$ " + // FALSE
-                " \" HALLO \" empty$ } ITERATE {test} ");
+        "\"\" empty$ " + // FALSE
+        "\"   \" empty$ " + // FALSE
+        " title empty$ " + // FALSE
+        " \" HALLO \" empty$ } ITERATE {test} ");
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         v.add(bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
@@ -305,7 +304,7 @@ public class TestVM {
                         + "  \"\" format.title "
                         + "  \"{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase\" \"u\" change.case$ format.title "
                         + "}" + "EXECUTE {test} "
-        );
+                );
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         vm.run(v);
@@ -449,7 +448,7 @@ public class TestVM {
                         + "	  while$                                                                  "
                         + "	}                                                                  "
                         + " EXECUTE {n.dashify} "
-        );
+                );
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         vm.run(v);
@@ -465,7 +464,7 @@ public class TestVM {
                 ""
                         + "ENTRY  { title }  { }  { label }"
                         + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT FUNCTION {test} { type$ } ITERATE { test }"
-        );
+                );
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         v.add(bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
@@ -486,12 +485,12 @@ public class TestVM {
 
         VM vm = new VM( //
                 "ENTRY    { title }  { }  { label } " + //
-                        "FUNCTION {presort} { cite$ 'sort.key$ := } " + //
-                        "ITERATE  {presort} " + //
-                        "READ SORT " + //
-                        "FUNCTION {test}{ title missing$ cite$ } " + //
-                        "ITERATE  { test }"
-        );
+                "FUNCTION {presort} { cite$ 'sort.key$ := } " + //
+                "ITERATE  {presort} " + //
+                "READ SORT " + //
+                "FUNCTION {test}{ title missing$ cite$ } " + //
+                "ITERATE  { test }"
+                );
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         v.add(t1BibtexEntry());
@@ -512,7 +511,7 @@ public class TestVM {
             VM vm = new VM(
                     "FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
                             + "EXECUTE {format}"
-            );
+                    );
 
             Vector<BibtexEntry> v = new Vector<BibtexEntry>();
             vm.run(v);
@@ -543,7 +542,7 @@ public class TestVM {
                 "ENTRY  { title }  { }  { label } FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } READ SORT "
                         + "FUNCTION {inproceedings}{ \"InProceedings called on \" title * } "
                         + "FUNCTION {book}{ \"Book called on \" title * } " + " ITERATE { call.type$ }"
-        );
+                );
 
         Vector<BibtexEntry> v = new Vector<BibtexEntry>();
         v.add(t1BibtexEntry());

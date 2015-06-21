@@ -14,9 +14,11 @@ import javax.swing.text.TextAction;
 public class MyEditorKit extends LargeHTMLEditorKit {
 
     public class MyNextVisualPositionAction extends TextAction {
+
         private Action textActn;
 
         private int direction;
+
 
         private MyNextVisualPositionAction(Action textActn, int direction) {
             super((String) textActn.getValue(Action.NAME));
@@ -43,7 +45,9 @@ public class MyEditorKit extends LargeHTMLEditorKit {
         }
     }
 
+
     private Action[] myActions;
+
 
     public Action[] getActions() {
         if (myActions == null) {

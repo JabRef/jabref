@@ -55,10 +55,10 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 Globals.lang("Custom entry types"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
-        
+
         if (answer == JOptionPane.YES_OPTION) {
             // Import
-            for (BibtexEntryType typ : pr.getEntryTypes().values()){
+            for (BibtexEntryType typ : pr.getEntryTypes().values()) {
                 BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
             }
 

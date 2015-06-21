@@ -33,11 +33,13 @@ public class ManageJournalsAction extends MnemonicAwareAction {
 
     JabRefFrame frame;
 
+
     public ManageJournalsAction(JabRefFrame frame) {
         super();
         putValue(NAME, Globals.menuTitle("Manage journal abbreviations"));
         this.frame = frame;
     }
+
     public void actionPerformed(ActionEvent actionEvent) {
         ManageJournalsPanel panel = new ManageJournalsPanel(frame);
         Util.placeDialog(panel.getDialog(), frame);

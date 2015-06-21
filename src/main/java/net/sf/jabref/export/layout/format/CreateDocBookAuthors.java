@@ -43,7 +43,6 @@ import java.util.Vector;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.AuthorList;
 
-
 /**
  * Create DocBook authors formatter.
  *
@@ -52,9 +51,11 @@ import net.sf.jabref.AuthorList;
  */
 public class CreateDocBookAuthors implements LayoutFormatter
 {
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
     static XMLChars xc = new XMLChars();
+
 
     public String format(String fieldText)
     {
@@ -65,12 +66,11 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
         addBody(sb, al, "author");
         return sb.toString();
-        
+
         //		<author><firstname>L.</firstname><surname>Xue</surname></author>
         //     <author><firstname>F.</firstname><othername role="mi">L.</othername><surname>Stahura</surname></author>
         //     <author><firstname>J.</firstname><othername role="mi">W.</othername><surname>Godden</surname></author>
         //     <author><firstname>J.</firstname><surname>Bajorath</surname></author>
-
 
         /*
         if (fieldText.indexOf(" and ") == -1)
@@ -100,7 +100,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
     }
 
     public void addBody(StringBuilder sb, AuthorList al, String tagName) {
-        for (int i=0; i<al.size(); i++) {
+        for (int i = 0; i < al.size(); i++) {
             sb.append("<").append(tagName).append(">");
             AuthorList.Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && (a.getFirst().length() > 0)) {
@@ -122,7 +122,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
                 sb.append("</surname>");
             }
 
-            if (i < al.size()-1)
+            if (i < al.size() - 1)
                 sb.append("</").append(tagName).append(">\n       ");
             else
                 sb.append("</").append(tagName).append(">");

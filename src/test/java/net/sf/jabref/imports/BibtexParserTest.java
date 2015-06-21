@@ -270,7 +270,8 @@ public class BibtexParserTest {
         assertEquals("2002", e.getField("year"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testNewlineHandling() throws IOException {
 
         BibtexEntry e = BibtexParser.singleFromString("@article{canh05," +
@@ -336,7 +337,8 @@ public class BibtexParserTest {
      * @author Uwe Kuehn
      * @author Andrei Haralevich
      */
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testFileNaming3() {
         BibtexEntry e = BibtexParser.singleFromString("@article{canh05,"
                 + "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"

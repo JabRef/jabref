@@ -42,28 +42,29 @@ import net.sf.jabref.imports.UnitFormatter;
  * We are currently working on sorting things out
  */
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
-	
-	private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s"; 
-        final CaseKeeper caseKeeper = new CaseKeeper();
-        final UnitFormatter unitFormatter = new UnitFormatter();
-   
-	@Override
+
+    private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s";
+    final CaseKeeper caseKeeper = new CaseKeeper();
+    final UnitFormatter unitFormatter = new UnitFormatter();
+
+
+    @Override
     public void stopFetching() {
-		// nothing needed as the fetching is a single HTTP GET
+        // nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
+    @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-		String q;
-		try {
-	        q = URLEncoder.encode(query, "UTF-8");
+        String q;
+        try {
+            q = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-        	// this should never happen
-        	status.setStatus(Globals.lang("Error"));
-	        e.printStackTrace();
-	        return false;
+            // this should never happen
+            status.setStatus(Globals.lang("Error"));
+            e.printStackTrace();
+            return false;
         }
-		
+
         String urlString = String.format(URL_PATTERN, q);
 
         // Send the request
@@ -78,72 +79,72 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
         InputStream source;
         try {
-	        source = url.openStream();
+            source = url.openStream();
         } catch (IOException e) {
-	        e.printStackTrace();
-	        return false;
+            e.printStackTrace();
+            return false;
         }
-        
+
         String bibtexString = new Scanner(source).useDelimiter("\\A").next();
         if (bibtexString.startsWith("@comment")) {
-        	// an error occured
-        	// the error is nested in @comment{...}
-        	String errorMsg = bibtexString.substring("@comment{".length());
-        	errorMsg = errorMsg.substring(0, errorMsg.length()-1);
-        	status.showMessage(errorMsg); // showMessage does not work -> NPE
-        	return false;
+            // an error occured
+            // the error is nested in @comment{...}
+            String errorMsg = bibtexString.substring("@comment{".length());
+            errorMsg = errorMsg.substring(0, errorMsg.length() - 1);
+            status.showMessage(errorMsg); // showMessage does not work -> NPE
+            return false;
         }
-        
+
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        if(entry != null)  {
+        if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
             String title = entry.getField("title");
-            if (title != null) {           
+            if (title != null) {
                 // Unit formatting
                 if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
                     title = unitFormatter.format(title);
                 }
-            
+
                 // Case keeping
                 if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
             }
-            
+
             inspector.addEntry(entry);
-	    return true;
+            return true;
         } else {
             return false;
         }
     }
 
-	@Override
+    @Override
     public String getTitle() {
-	    return "ISBN to BibTeX";
+        return "ISBN to BibTeX";
     }
 
-	@Override
+    @Override
     public String getKeyName() {
-	    return "ISBNtoBibTeX";
+        return "ISBNtoBibTeX";
     }
 
-	@Override
+    @Override
     public URL getIcon() {
-		// no special icon for this fetcher available.
-		// Therefore, we return some kind of default icon
-	    return GUIGlobals.getIconUrl("www");
+        // no special icon for this fetcher available.
+        // Therefore, we return some kind of default icon
+        return GUIGlobals.getIconUrl("www");
     }
 
-	@Override
+    @Override
     public String getHelpPage() {
-	    return "ISBNtoBibTeXHelp.html";
+        return "ISBNtoBibTeXHelp.html";
     }
 
-	@Override
+    @Override
     public JPanel getOptionsPanel() {
-		// no additional options available
-	    return null;
+        // no additional options available
+        return null;
     }
 
 }

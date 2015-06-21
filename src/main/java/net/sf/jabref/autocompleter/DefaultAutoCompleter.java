@@ -29,34 +29,35 @@ import net.sf.jabref.Globals;
  */
 public class DefaultAutoCompleter extends AbstractAutoCompleter {
 
-	public String _fieldName;
+    public String _fieldName;
 
-	/**
-	 * @see AutoCompleterFactory
-	 */
-	protected DefaultAutoCompleter(String fieldName) {
-		_fieldName = fieldName;
-	}
 
-	public boolean isSingleUnitField() {
-		return false;
-	}
+    /**
+     * @see AutoCompleterFactory
+     */
+    protected DefaultAutoCompleter(String fieldName) {
+        _fieldName = fieldName;
+    }
 
-	public String[] complete(String s) {
-		return super.complete(s);
-	}
+    public boolean isSingleUnitField() {
+        return false;
+    }
 
-	@Override
-	public void addBibtexEntry(BibtexEntry entry) {
-		if (entry != null) {
-			String fieldValue = entry.getField(_fieldName);
+    public String[] complete(String s) {
+        return super.complete(s);
+    }
+
+    @Override
+    public void addBibtexEntry(BibtexEntry entry) {
+        if (entry != null) {
+            String fieldValue = entry.getField(_fieldName);
             if (fieldValue != null) {
-				StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
-				while (tok.hasMoreTokens()) {
-					String word = tok.nextToken();
-					addWordToIndex(word);
-				}
-			}
+                StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
+                while (tok.hasMoreTokens()) {
+                    String word = tok.nextToken();
+                    addWordToIndex(word);
+                }
+            }
         }
-	}
+    }
 }

@@ -8,6 +8,7 @@ public class JabRefCLI {
     private String[] leftOver;
     private final CommandLine cl;
 
+
     public boolean isHelp() {
         return cl.hasOption("help");
     }
@@ -70,7 +71,6 @@ public class JabRefCLI {
     public String getPreferencesReset() {
         return cl.getOptionValue("prdef");
     }
-
 
     public boolean isFileExport() {
         return cl.hasOption("output");

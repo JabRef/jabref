@@ -50,6 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileListEditor extends JTable implements FieldEditor,
         DownloadExternalFile.DownloadCallback {
+
     private static final Logger logger = Logger.getLogger(FileListEditor.class.getName());
 
     FieldNameLabel label;
@@ -63,8 +64,9 @@ public class FileListEditor extends JTable implements FieldEditor,
     private JButton auto;
     private JPopupMenu menu = new JPopupMenu();
 
+
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
-                          EntryEditor entryEditor) {
+            EntryEditor entryEditor) {
         this.frame = frame;
         this.metaData = metaData;
         this.fieldName = fieldName;
@@ -91,31 +93,37 @@ public class FileListEditor extends JTable implements FieldEditor,
         up.setMargin(new Insets(0, 0, 0, 0));
         down.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 addEntry();
             }
         });
         remove.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 removeEntries();
             }
         });
         up.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 moveEntry(-1);
             }
         });
         down.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 moveEntry(1);
             }
         });
         auto.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 autoSetLinks();
             }
         });
         download.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 downloadFile();
             }
@@ -127,7 +135,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         builder.append(auto);
         builder.append(down);
         builder.append(remove);
-        builder.append(download);        
+        builder.append(download);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
@@ -140,10 +148,11 @@ public class FileListEditor extends JTable implements FieldEditor,
         // Add an input/action pair for deleting entries:
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
         getActionMap().put("delete", new AbstractAction() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 int row = getSelectedRow();
                 removeEntries();
-                row = Math.min(row, getRowCount()-1);
+                row = Math.min(row, getRowCount() - 1);
                 if (row >= 0)
                     setRowSelectionInterval(row, row);
             }
@@ -161,6 +170,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         // Add input/action pair for moving an entry up:
         getInputMap().put(Globals.prefs.getKey("File list editor, move entry up"), "move up");
         getActionMap().put("move up", new AbstractAction() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 moveEntry(-1);
             }
@@ -169,6 +179,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         // Add input/action pair for moving an entry down:
         getInputMap().put(Globals.prefs.getKey("File list editor, move entry down"), "move down");
         getActionMap().put("move down", new AbstractAction() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 moveEntry(1);
             }
@@ -177,6 +188,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
         menu.add(openLink);
         openLink.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent actionEvent) {
                 openSelectedFile();
             }
@@ -185,6 +197,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
         menu.add(openFolder);
         openFolder.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = getSelectedRow();
@@ -261,7 +274,6 @@ public class FileListEditor extends JTable implements FieldEditor,
         tableModel.setContent(newText);
     }
 
-
     public void append(String text) {
 
     }
@@ -295,7 +307,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     private void removeEntries() {
         int[] rows = getSelectedRows();
         if (rows != null)
-            for (int i = rows.length-1; i>=0; i--) {
+            for (int i = rows.length - 1; i >= 0; i--) {
                 tableModel.removeEntry(rows[i]);
             }
         entryEditor.updateField(this);
@@ -305,7 +317,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         int[] sel = getSelectedRows();
         if ((sel.length != 1) || (tableModel.getRowCount() < 2))
             return;
-        int toIdx = sel[0]+i;
+        int toIdx = sel[0] + i;
         if (toIdx >= tableModel.getRowCount())
             toIdx -= tableModel.getRowCount();
         if (toIdx < 0)
@@ -341,14 +353,16 @@ public class FileListEditor extends JTable implements FieldEditor,
         BibtexEntry entry = entryEditor.getEntry();
         JDialog diag = new JDialog(frame, true);
         Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Globals.lang("Finished autosetting external links."));
                 }
-                else frame.output(Globals.lang("Finished autosetting external links.")
-                    +" "+Globals.lang("No files found."));
+                else
+                    frame.output(Globals.lang("Finished autosetting external links.")
+                            + " " + Globals.lang("No files found."));
             }
         }, diag);
 
@@ -389,6 +403,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         entryEditor.updateField(this);
     }
 
+
     class TableClickListener extends MouseAdapter {
 
         public void mouseClicked(MouseEvent e) {
@@ -403,16 +418,15 @@ public class FileListEditor extends JTable implements FieldEditor,
                 processPopupTrigger(e);
         }
 
-
         public void mousePressed(MouseEvent e) {
             if (e.isPopupTrigger())
                 processPopupTrigger(e);
         }
+
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger())
                 processPopupTrigger(e);
         }
-
 
         private void processPopupTrigger(MouseEvent e) {
             int row = rowAtPoint(e.getPoint());
@@ -422,6 +436,7 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         }
     }
+
 
     public boolean hasUndoInformation() {
         return false;

@@ -48,14 +48,17 @@ import net.sf.jabref.JabRefFrame;
  * To change this template use File | Settings | File Templates.
  */
 public class ExportToClipboardAction extends AbstractWorker {
+
     String message = null;
     private JabRefFrame frame;
     private BibtexDatabase database;
+
 
     public ExportToClipboardAction(JabRefFrame frame, BibtexDatabase database) {
         this.frame = frame;
         this.database = database;
     }
+
     public void run() {
         BasePanel panel = frame.basePanel();
         if (panel == null)
@@ -69,23 +72,23 @@ public class ExportToClipboardAction extends AbstractWorker {
         Map<String, IExportFormat> m = ExportFormats.getExportFormats();
         IExportFormat[] formats = new ExportFormat[m.size()];
         String[] array = new String[formats.length];
-        
+
         int piv = 0;
-		for (IExportFormat format : m.values()) {
-			formats[piv] = format;
-			array[piv] = format.getDisplayName();
-			piv++;
-		}
-        
-		JList list = new JList(array);
+        for (IExportFormat format : m.values()) {
+            formats[piv] = format;
+            array[piv] = format.getDisplayName();
+            piv++;
+        }
+
+        JList list = new JList(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int answer = JOptionPane.showOptionDialog(frame, list, Globals.lang("Select format"),
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null,
-            new String[]{Globals.lang("Ok"), Globals.lang("Cancel")},
-            Globals.lang("Ok"));
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null,
+                new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
+                Globals.lang("Ok"));
 
         if (answer == JOptionPane.NO_OPTION)
             return;
@@ -100,7 +103,6 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Also store the database's file in a global variable:
         Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 
-        
         /*final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
         String dir = null;
         if (custom) {
@@ -126,7 +128,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             HashSet<String> entries = new HashSet<String>(bes.length);
             for (BibtexEntry be : bes)
                 entries.add(be.getId());
-            
+
             // Write to file:
             format.performExport(database, panel.metaData(),
                     tmp.getPath(), panel.getEncoding(), entries);
@@ -135,9 +137,10 @@ public class ExportToClipboardAction extends AbstractWorker {
             reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());
             int s;
             while ((s = reader.read()) != -1) {
-                sb.append((char)s);
+                sb.append((char) s);
             }
             ClipboardOwner owner = new ClipboardOwner() {
+
                 public void lostOwnership(Clipboard clipboard, Transferable content) {
                 }
             };
@@ -148,14 +151,18 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Globals.lang("Entries exported to clipboard") + ": " + bes.length;
 
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
             message = Globals.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if (tmp != null)
                 tmp.delete();
             if (reader != null)
-                try { reader.close(); } catch (IOException ex) { ex.printStackTrace(); }
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
         }
 
     }

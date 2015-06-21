@@ -30,36 +30,37 @@ import java.util.TreeSet;
  */
 public class VerifyingWriter extends OutputStreamWriter {
 
-	CharsetEncoder encoder;
-	private boolean couldEncodeAll = true;
-	private TreeSet<Character> problemCharacters = new TreeSet<Character>();
+    CharsetEncoder encoder;
+    private boolean couldEncodeAll = true;
+    private TreeSet<Character> problemCharacters = new TreeSet<Character>();
 
-	public VerifyingWriter(OutputStream out, String encoding)
-			throws UnsupportedEncodingException {
-		super(out, encoding);
-		encoder = Charset.forName(encoding).newEncoder();
-	}
 
-	public void write(String str) throws IOException {
-		super.write(str);
-		if (!encoder.canEncode(str)) {
-			for (int i = 0; i < str.length(); i++) {
-				if (!encoder.canEncode(str.charAt(i)))
-					problemCharacters.add(str.charAt(i));
-			}
-			couldEncodeAll = false;
-		}
-	}
+    public VerifyingWriter(OutputStream out, String encoding)
+            throws UnsupportedEncodingException {
+        super(out, encoding);
+        encoder = Charset.forName(encoding).newEncoder();
+    }
 
-	public boolean couldEncodeAll() {
-		return couldEncodeAll;
-	}
+    public void write(String str) throws IOException {
+        super.write(str);
+        if (!encoder.canEncode(str)) {
+            for (int i = 0; i < str.length(); i++) {
+                if (!encoder.canEncode(str.charAt(i)))
+                    problemCharacters.add(str.charAt(i));
+            }
+            couldEncodeAll = false;
+        }
+    }
 
-	public String getProblemCharacters() {
-		StringBuilder chars = new StringBuilder();
-		for (Character ch : problemCharacters) {
-			chars.append(ch.charValue());
-		}
-		return chars.toString();
-	}
+    public boolean couldEncodeAll() {
+        return couldEncodeAll;
+    }
+
+    public String getProblemCharacters() {
+        StringBuilder chars = new StringBuilder();
+        for (Character ch : problemCharacters) {
+            chars.append(ch.charValue());
+        }
+        return chars.toString();
+    }
 }

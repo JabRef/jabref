@@ -28,11 +28,12 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class PushToLatexEditor implements PushToApplication {
 
-    private boolean couldNotCall=false;
-    private boolean notDefined=false;
+    private boolean couldNotCall = false;
+    private boolean notDefined = false;
     private JPanel settings = null;
     private JTextField ledPath = new JTextField(30),
-        citeCommand = new JTextField(30);
+            citeCommand = new JTextField(30);
+
 
     public String getName() {
         return Globals.menuTitle("Insert selected citations into LatexEditor");
@@ -79,12 +80,12 @@ public class PushToLatexEditor implements PushToApplication {
 
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            panel.output(Globals.lang("Error") + ": "+
-                    Globals.lang("Path to %0 not defined", getApplicationName())+".");
+            panel.output(Globals.lang("Error") + ": " +
+                    Globals.lang("Path to %0 not defined", getApplicationName()) + ".");
         }
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
-                    +Globals.prefs.get("latexEditorPath") + "'.");
+                    + Globals.prefs.get("latexEditorPath") + "'.");
         }
         else
             Globals.lang("Pushed citations to %0", "LatexEditor");

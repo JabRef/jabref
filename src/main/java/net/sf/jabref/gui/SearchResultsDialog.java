@@ -58,14 +58,15 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  * TODO: should be possible to save or export the list.
  */
 public class SearchResultsDialog {
+
     private JabRefFrame frame;
 
     private JDialog diag;
-    private String[] fields = new String[]{
-            "author", "title", "year", "journal" 
+    private String[] fields = new String[] {
+            "author", "title", "year", "journal"
     };
     protected final int FILE_COL = 0, URL_COL = 1,
-        PAD = 2;
+            PAD = 2;
     private JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall")),
             urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
@@ -79,6 +80,7 @@ public class SearchResultsDialog {
     private JTable entryTable;
     protected UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
     PreviewPanel preview;
+
 
     public SearchResultsDialog(JabRefFrame frame, String title) {
 
@@ -104,7 +106,7 @@ public class SearchResultsDialog {
         setWidths();
         TableComparatorChooser<BibtexEntry> tableSorter =
                 TableComparatorChooser.install(entryTable, sortedEntries,
-                TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                        TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
@@ -118,9 +120,10 @@ public class SearchResultsDialog {
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
-          public void actionPerformed(ActionEvent e) {
-            diag.dispose();
-          }
+
+            public void actionPerformed(ActionEvent e) {
+                diag.dispose();
+            }
         };
         ActionMap am = contentPane.getActionMap();
         InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -128,23 +131,25 @@ public class SearchResultsDialog {
         am.put("close", closeAction);
 
         entryTable.getActionMap().put("copy", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    if (selectionModel.getSelected().size() > 0) {
-                        BibtexEntry[] bes = selectionModel.getSelected().toArray
-                                (new BibtexEntry[selectionModel.getSelected().size()]);
-                        TransferableBibtexEntry trbe
-                                = new TransferableBibtexEntry(bes);
-                            // ! look at ClipBoardManager
-                            Toolkit.getDefaultToolkit().getSystemClipboard()
-                                .setContents(trbe, frame.basePanel());
-                        frame.output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
-                                                           +Globals.lang("entries")
-                                                           : "1 "+Globals.lang("entry")+"."));
-                    }
+
+            public void actionPerformed(ActionEvent e) {
+                if (selectionModel.getSelected().size() > 0) {
+                    BibtexEntry[] bes = selectionModel.getSelected().toArray
+                            (new BibtexEntry[selectionModel.getSelected().size()]);
+                    TransferableBibtexEntry trbe
+                    = new TransferableBibtexEntry(bes);
+                    // ! look at ClipBoardManager
+                    Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .setContents(trbe, frame.basePanel());
+                    frame.output(Globals.lang("Copied") + " " + (bes.length > 1 ? bes.length + " "
+                            + Globals.lang("entries")
+                            : "1 " + Globals.lang("entry") + "."));
                 }
-            });
+            }
+        });
 
         diag.addWindowListener(new WindowAdapter() {
+
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
             }
@@ -158,7 +163,7 @@ public class SearchResultsDialog {
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
         // Remember and default to last size:
         diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
-            .getInt("searchDialogHeight")));
+                .getInt("searchDialogHeight")));
         diag.setLocationRelativeTo(frame);
     }
 
@@ -172,7 +177,7 @@ public class SearchResultsDialog {
 
     public void selectFirstEntry() {
         if (entryTable.getRowCount() > 0)
-            entryTable.setRowSelectionInterval(0,0);
+            entryTable.setRowSelectionInterval(0, 0);
         else {
             contentPane.setDividerLocation(1.0f);
         }
@@ -195,7 +200,7 @@ public class SearchResultsDialog {
     protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
-            .getComparatorsForColumn(0);
+                .getComparatorsForColumn(0);
         comparators.clear();
 
         comparators = comparatorChooser.getComparatorsForColumn(1);
@@ -206,9 +211,9 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL)
-                comparators.add(new IconComparator(new String[] { GUIGlobals.FILE_FIELD }));
+                comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
             else if (i == URL_COL)
-                comparators.add(new IconComparator(new String[] { "url" }));
+                comparators.add(new IconComparator(new String[] {"url"}));
 
         }
         // Remaining columns:
@@ -231,20 +236,20 @@ public class SearchResultsDialog {
     protected void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
-        	// Check if the Column is a RankingColumn
-        	// If this is the case, set a certain Column-width,
-        	// because the RankingIconColumn needs some more width
-        	if (frame.basePanel().tableFormat.isRankingColumn(i)) {
-        		// Lock the width of ranking icon column.
+            // Check if the Column is a RankingColumn
+            // If this is the case, set a certain Column-width,
+            // because the RankingIconColumn needs some more width
+            if (frame.basePanel().tableFormat.isRankingColumn(i)) {
+                // Lock the width of ranking icon column.
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-        	} else {
-        		// Lock the width of icon columns.
+            } else {
+                // Lock the width of icon columns.
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);	
-        	}
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+            }
         }
 
         for (int i = 0; i < fields.length; i++) {
@@ -274,6 +279,7 @@ public class SearchResultsDialog {
         entries.add(entry);
         entryHome.put(entry, panel);
     }
+
 
     /**
      * Mouse listener for the entry table. Processes icon clicks to open external
@@ -315,33 +321,32 @@ public class SearchResultsDialog {
                 return;
             }
             //if (e.)
-            final int col = entryTable.columnAtPoint(e.getPoint()),
-                    row = entryTable.rowAtPoint(e.getPoint());
+            final int col = entryTable.columnAtPoint(e.getPoint()), row = entryTable.rowAtPoint(e.getPoint());
             if (col < PAD) {
                 BibtexEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
-                    case FILE_COL:
-                        Object o = entry.getField(GUIGlobals.FILE_FIELD);
-                        if (o != null) {
-                            FileListTableModel tableModel = new FileListTableModel();
-                            tableModel.setContent((String) o);
-                            if (tableModel.getRowCount() == 0)
-                                return;
-                            FileListEntry fl = tableModel.getEntry(0);
-                            (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
+                case FILE_COL:
+                    Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                    if (o != null) {
+                        FileListTableModel tableModel = new FileListTableModel();
+                        tableModel.setContent((String) o);
+                        if (tableModel.getRowCount() == 0)
+                            return;
+                        FileListEntry fl = tableModel.getEntry(0);
+                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
                                 p.metaData(), fl.getType())).actionPerformed(null);
-                        }
-                        break;
-                    case URL_COL:
-                        Object link = entry.getField("url");
-                        try {
-                            if (link != null)
-                                Util.openExternalViewer(p.metaData(), (String) link, "url");
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        break;
+                    }
+                    break;
+                case URL_COL:
+                    Object link = entry.getField("url");
+                    try {
+                        if (link != null)
+                            Util.openExternalViewer(p.metaData(), (String) link, "url");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    break;
 
                 }
             }
@@ -365,9 +370,9 @@ public class SearchResultsDialog {
                 // We use a FileListTableModel to parse the field content:
                 Object o = entry.getField(GUIGlobals.FILE_FIELD);
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent((String)o);
+                fileList.setContent((String) o);
                 // If there are one or more links, open the first one:
-                for (int i=0; i<fileList.getRowCount(); i++) {
+                for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
                     String description = flEntry.getDescription();
                     if ((description == null) || (description.trim().length() == 0))
@@ -391,24 +396,25 @@ public class SearchResultsDialog {
      */
     class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
-            public void listChanged(ListEvent<BibtexEntry> listEvent) {
-                if (listEvent.getSourceList().size() == 1) {
-                    BibtexEntry entry = listEvent.getSourceList().get(0);
-                    // Find out which BasePanel the selected entry belongs to:
-                    BasePanel p = entryHome.get(entry);
-                    // Update the preview's metadata reference:
-                    preview.setMetaData(p.metaData());
-                    // Update the preview's entry:
-                    preview.setEntry(entry);
-                    contentPane.setDividerLocation(0.5f);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            preview.scrollRectToVisible(toRect);
-                        }
-                    });
-                }
+        public void listChanged(ListEvent<BibtexEntry> listEvent) {
+            if (listEvent.getSourceList().size() == 1) {
+                BibtexEntry entry = listEvent.getSourceList().get(0);
+                // Find out which BasePanel the selected entry belongs to:
+                BasePanel p = entryHome.get(entry);
+                // Update the preview's metadata reference:
+                preview.setMetaData(p.metaData());
+                // Update the preview's entry:
+                preview.setEntry(entry);
+                contentPane.setDividerLocation(0.5f);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        preview.scrollRectToVisible(toRect);
+                    }
+                });
             }
         }
+    }
 
     /**
      * TableFormat for the table shown in the dialog. Handles the display of entry
@@ -417,43 +423,44 @@ public class SearchResultsDialog {
     public class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
 
         public int getColumnCount() {
-            return PAD+fields.length;
+            return PAD + fields.length;
         }
 
         public String getColumnName(int column) {
             if (column >= PAD)
-                return Util.nCase(fields[column-PAD]);
-            else return "";
+                return Util.nCase(fields[column - PAD]);
+            else
+                return "";
         }
 
         public Object getColumnValue(BibtexEntry entry, int column) {
             if (column < PAD) {
                 Object o;
                 switch (column) {
-                    case FILE_COL:
-                        o = entry.getField(GUIGlobals.FILE_FIELD);
-                        if (o != null) {
-                            FileListTableModel model = new FileListTableModel();
-                            model.setContent((String) o);
-                            fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                            if (model.getRowCount() > 0)
-                                fileLabel.setIcon(model.getEntry(0).getType().getIcon());
-                            return fileLabel;
-                        } else
-                            return null;
-                    case URL_COL:
-                        o = entry.getField("url");
-                        if (o != null) {
-                            urlLabel.setToolTipText((String) o);
-                            return urlLabel;
-                        } else
-                            return null;
-                    default:
+                case FILE_COL:
+                    o = entry.getField(GUIGlobals.FILE_FIELD);
+                    if (o != null) {
+                        FileListTableModel model = new FileListTableModel();
+                        model.setContent((String) o);
+                        fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
+                        if (model.getRowCount() > 0)
+                            fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                        return fileLabel;
+                    } else
                         return null;
+                case URL_COL:
+                    o = entry.getField("url");
+                    if (o != null) {
+                        urlLabel.setToolTipText((String) o);
+                        return urlLabel;
+                    } else
+                        return null;
+                default:
+                    return null;
                 }
             }
             else {
-                String field = fields[column-PAD];
+                String field = fields[column - PAD];
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:

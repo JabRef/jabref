@@ -46,10 +46,10 @@ import com.sun.star.uno.UnoRuntime;
  */
 public class OOUtil {
 
-    
     static Pattern htmlTag = Pattern.compile("</?[a-z]+>");
 
     static OOPreFormatter postformatter = new OOPreFormatter();
+
 
     /**
      * Insert a reference, formatted using a Layout, at the position of a given cursor.
@@ -86,7 +86,7 @@ public class OOUtil {
 
     /**
      * Insert a text with formatting indicated by HTML-like tags, into a text at
-         * the position given by a cursor.
+     * the position given by a cursor.
      * @param text The text to insert in.
      * @param cursor The cursor giving the insert location.
      * @param lText The marked-up text to insert.
@@ -94,19 +94,19 @@ public class OOUtil {
      * @throws Exception
      */
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-              String lText, String parStyle) throws Exception {
+            String lText, String parStyle) throws Exception {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
-            XParagraphCursor.class, cursor);
+                XParagraphCursor.class, cursor);
         XPropertySet props = UnoRuntime.queryInterface(
-            XPropertySet.class, parCursor);
+                XPropertySet.class, parCursor);
 
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
         } catch (com.sun.star.lang.IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
-        
+
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
         int italic = 0, bold = 0, sup = 0, sub = 0, mono = 0, smallCaps = 0;
@@ -148,14 +148,12 @@ public class OOUtil {
                 sub = 1;
 
             piv = m.end();
-            
+
         }
 
         if (piv < lText.length())
-            insertTextAtCurrentLocation(text, cursor,lText.substring(piv),
+            insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
                     (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
-
-
 
         cursor.collapseToEnd();
     }
@@ -166,13 +164,13 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-                   boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
-                   boolean subscript) throws Exception {
+            boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
+            boolean subscript) throws Exception {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
-            XPropertySet.class, cursor);
+                XPropertySet.class, cursor);
         if (bold)
             xCursorProps.setPropertyValue("CharWeight",
                     com.sun.star.awt.FontWeight.BOLD);
@@ -182,18 +180,18 @@ public class OOUtil {
 
         if (italic)
             xCursorProps.setPropertyValue("CharPosture",
-                            com.sun.star.awt.FontSlant.ITALIC);
+                    com.sun.star.awt.FontSlant.ITALIC);
         else
             xCursorProps.setPropertyValue("CharPosture",
-                            com.sun.star.awt.FontSlant.NONE);
+                    com.sun.star.awt.FontSlant.NONE);
 
         if (smallCaps) {
             xCursorProps.setPropertyValue("CharCaseMap",
-                            com.sun.star.style.CaseMap.SMALLCAPS);
+                    com.sun.star.style.CaseMap.SMALLCAPS);
         }
         else {
             xCursorProps.setPropertyValue("CharCaseMap",
-                            com.sun.star.style.CaseMap.NONE);
+                    com.sun.star.style.CaseMap.NONE);
         }
 
         // TODO: the <monospace> tag doesn't work
@@ -208,21 +206,21 @@ public class OOUtil {
         } */
         if (subscript) {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)-101);
+                    (byte) -101);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)58);
+                    (byte) 58);
         }
         else if (superscript) {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)101);
+                    (byte) 101);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)58);
+                    (byte) 58);
         }
         else {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)0);
+                    (byte) 0);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)100);
+                    (byte) 100);
         }
 
         cursor.collapseToEnd();
@@ -230,14 +228,14 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-                                                   String parStyle) throws Exception {
+            String parStyle) throws Exception {
         text.insertString(cursor, string, true);
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
-            XParagraphCursor.class, cursor);
+                XParagraphCursor.class, cursor);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
         XPropertySet props = UnoRuntime.queryInterface(
-            XPropertySet.class, parCursor);
+                XPropertySet.class, parCursor);
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
         } catch (com.sun.star.lang.IllegalArgumentException ex) {
@@ -246,8 +244,6 @@ public class OOUtil {
         cursor.collapseToEnd();
 
     }
-
-
 
     public static Object getProperty(Object o, String property) throws Exception {
         XPropertySet props = UnoRuntime.queryInterface(
@@ -266,11 +262,11 @@ public class OOUtil {
 
     public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {
         String[] values = new String[list.size()];
-        int ii=0;
+        int ii = 0;
         for (XTextDocument doc : list) {
             values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
         }
-		JList sel = new JList(values);
+        JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),
@@ -278,7 +274,8 @@ public class OOUtil {
         if (ans == JOptionPane.OK_OPTION) {
             return list.get(sel.getSelectedIndex());
         }
-        else return null;
+        else
+            return null;
     }
 
     /**
@@ -292,7 +289,7 @@ public class OOUtil {
     public static BibtexEntry createAdaptedEntry(BibtexEntry entry) {
         if (entry == null)
             return null;
-        BibtexEntry e = (BibtexEntry)entry.clone();
+        BibtexEntry e = (BibtexEntry) entry.clone();
         for (String field : e.getAllFields()) {
             if (field.equals(BibtexFields.KEY_FIELD))
                 continue;

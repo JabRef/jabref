@@ -25,120 +25,120 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 
-
 // created by : r.nagel 09.12.2004
 //
 // function : a class for wrapping a IntegrityCheck message
 //
 // modified :
 
-package net.sf.jabref.wizard.integrity ;
+package net.sf.jabref.wizard.integrity;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 
 public class IntegrityMessage implements Cloneable
 {
-  // Hints and Infos < 1000 :-)
-  public static final int
-      GENERIC_HINT             = 1,
-      UPPER_AND_LOWER_HINT     = 10,
-      FOUR_DIGITS_HINT         = 11
 
-      ;
+    // Hints and Infos < 1000 :-)
+    public static final int
+            GENERIC_HINT = 1,
+            UPPER_AND_LOWER_HINT = 10,
+            FOUR_DIGITS_HINT = 11
 
-  // > 1000 Warnings
-  public static final int
-      GENERIC_WARNING                = 1001,
-      NAME_START_WARNING             = 1010,
-      NAME_END_WARNING               = 1011,
-      NAME_SEMANTIC_WARNING          = 1012
-      ;
+            ;
 
-  // > 2000 Failure Messages
-  public static final int
-      UNKNONW_FAILURE                    = 2001,
-      UNEXPECTED_CLOSING_BRACE_FAILURE   = 2010
-      ;
+    // > 1000 Warnings
+    public static final int
+            GENERIC_WARNING = 1001,
+            NAME_START_WARNING = 1010,
+            NAME_END_WARNING = 1011,
+            NAME_SEMANTIC_WARNING = 1012
+            ;
 
-  public static int
-      FULL_MODE    = 1,  // print with Bibtex Entry
-      SINLGE_MODE  = 2   // print only Message
-      ;
+    // > 2000 Failure Messages
+    public static final int
+            UNKNONW_FAILURE = 2001,
+            UNEXPECTED_CLOSING_BRACE_FAILURE = 2010
+            ;
 
-  private static int printMode = SINLGE_MODE ;
+    public static int
+            FULL_MODE = 1, // print with Bibtex Entry
+            SINLGE_MODE = 2 // print only Message
+            ;
 
-  private int type ;
-  private BibtexEntry entry ;
-  private String fieldName ;
-  private Object additionalInfo ;
-  private String msg ;
-  private boolean fixed ; // the user has changed sometings on BibtexEntry
+    private static int printMode = SINLGE_MODE;
 
-  public final synchronized static void setPrintMode(int newMode)
-  {
-    printMode = newMode ;
-  }
+    private int type;
+    private BibtexEntry entry;
+    private String fieldName;
+    private Object additionalInfo;
+    private String msg;
+    private boolean fixed; // the user has changed sometings on BibtexEntry
 
 
-  public IntegrityMessage(int pType, BibtexEntry pEntry, String pFieldName, Object pAdditionalInfo)
-  {
-    this.type = pType;
-    this.entry = pEntry;
-    this.fieldName = pFieldName;
-    this.additionalInfo = pAdditionalInfo;
-    fixed = false ;
-
-    msg = getMessage() ;
-  }
-
-  public String getMessage()
-  {
-    String back = Globals.getIntegrityMessage("ITEXT_"+type) ;
-    if ((back != null) && (fieldName != null))
+    public final synchronized static void setPrintMode(int newMode)
     {
-      back = back.replaceAll( "\\$FIELD", fieldName ) ;
+        printMode = newMode;
     }
-    return back ;
-  }
 
-  public String toString()
-  {
-    String back = msg ;
-    if (printMode == FULL_MODE)
+    public IntegrityMessage(int pType, BibtexEntry pEntry, String pFieldName, Object pAdditionalInfo)
     {
-      back = "[" + entry.getCiteKey() + "] " + msg ;
+        this.type = pType;
+        this.entry = pEntry;
+        this.fieldName = pFieldName;
+        this.additionalInfo = pAdditionalInfo;
+        fixed = false;
+
+        msg = getMessage();
     }
-    return back ;
-  }
 
-  public int getType()
-  {
-    return type;
-  }
+    public String getMessage()
+    {
+        String back = Globals.getIntegrityMessage("ITEXT_" + type);
+        if ((back != null) && (fieldName != null))
+        {
+            back = back.replaceAll("\\$FIELD", fieldName);
+        }
+        return back;
+    }
 
-  public BibtexEntry getEntry()
-  {
-    return entry;
-  }
+    public String toString()
+    {
+        String back = msg;
+        if (printMode == FULL_MODE)
+        {
+            back = "[" + entry.getCiteKey() + "] " + msg;
+        }
+        return back;
+    }
 
-  public String getFieldName()
-  {
-    return fieldName;
-  }
+    public int getType()
+    {
+        return type;
+    }
 
-  public Object getAdditionalInfo()
-  {
-    return additionalInfo;
-  }
+    public BibtexEntry getEntry()
+    {
+        return entry;
+    }
 
-  public boolean getFixed()
-  {
-    return fixed;
-  }
+    public String getFieldName()
+    {
+        return fieldName;
+    }
 
-  public void setFixed(boolean pFixed)
-  {
-    this.fixed = pFixed;
-  }
+    public Object getAdditionalInfo()
+    {
+        return additionalInfo;
+    }
+
+    public boolean getFixed()
+    {
+        return fixed;
+    }
+
+    public void setFixed(boolean pFixed)
+    {
+        this.fixed = pFixed;
+    }
 }

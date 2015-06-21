@@ -26,11 +26,12 @@ import net.sf.jabref.*;
 
 public class PushToLyx implements PushToApplication {
 
-    private JTextField lyxPipe=new JTextField(30);
+    private JTextField lyxPipe = new JTextField(30);
     private JPanel settings = null;
 
-    private boolean couldNotFindPipe=false;
-    private boolean couldNotWrite=false;
+    private boolean couldNotFindPipe = false;
+    private boolean couldNotWrite = false;
+
 
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
@@ -39,12 +40,12 @@ public class PushToLyx implements PushToApplication {
 
         String lyxpipeSetting = Globals.prefs.get("lyxpipe");
         if (!lyxpipeSetting.endsWith(".in"))
-            lyxpipeSetting = lyxpipeSetting+".in";
+            lyxpipeSetting = lyxpipeSetting + ".in";
         File lp = new File(lyxpipeSetting); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-        if( !lp.exists() || !lp.canWrite()){
+        if (!lp.exists() || !lp.canWrite()) {
             // See if it helps to append ".in":
-            lp = new File(lyxpipeSetting+".in");
-            if( !lp.exists() || !lp.canWrite()){
+            lp = new File(lyxpipeSetting + ".in");
+            if (!lp.exists() || !lp.canWrite()) {
                 couldNotFindPipe = true;
                 return;
             }
@@ -52,6 +53,7 @@ public class PushToLyx implements PushToApplication {
 
         final File lyxpipe = lp;
         Thread t = new Thread(new Runnable() {
+
             public void run() {
                 try {
                     FileWriter fw = new FileWriter(lyxpipe);
@@ -69,10 +71,9 @@ public class PushToLyx implements PushToApplication {
             }
         });
 
-
-	    t.start();
-	    //new Timeout(2000, t, Globals.lang("Error")+": "+
-            //Globals.lang("unable to access LyX-pipe"));
+        t.start();
+        //new Timeout(2000, t, Globals.lang("Error")+": "+
+        //Globals.lang("unable to access LyX-pipe"));
         try {
             t.join();
         } catch (InterruptedException e) {
@@ -99,7 +100,6 @@ public class PushToLyx implements PushToApplication {
     public String getKeyStrokeName() {
         return "Push to LyX";
     }
-
 
     public void operationCompleted(BasePanel panel) {
         if (couldNotFindPipe) {

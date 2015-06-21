@@ -30,6 +30,7 @@ public class XMPUtilTest {
 
     public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
 
+
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
      *
@@ -209,10 +210,12 @@ public class XMPUtilTest {
                 + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
     }
 
+
     /**
      * The PDF file that basically all operations are done upon.
      */
     File pdfFile;
+
 
     /**
      * Create a temporary PDF-file with a single empty page.
@@ -247,11 +250,13 @@ public class XMPUtilTest {
         prefs.putBoolean("useXmpPrivacyFilter", false);
     }
 
+
     JabRefPreferences prefs;
 
     boolean use;
 
     String[] privacyFilters;
+
 
     /**
      * Delete the temporary file.
@@ -330,7 +335,7 @@ public class XMPUtilTest {
             BibtexEntry e = t1BibtexEntry();
 
             prefs.putBoolean("useXmpPrivacyFilter", true);
-            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, new String[]{"author", "title", "note"});
+            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, new String[] {"author", "title", "note"});
 
             XMPUtil.writeXMP(pdfFile, e, null);
 
@@ -348,7 +353,7 @@ public class XMPUtilTest {
             prefs
                     .putStringArray(
                             JabRefPreferences.XMP_PRIVACY_FILTERS,
-                            new String[]{"author;title;note;booktitle;year;owner;timestamp"});
+                            new String[] {"author;title;note;booktitle;year;owner;timestamp"});
 
             BibtexEntry e = t1BibtexEntry();
 
@@ -890,14 +895,14 @@ public class XMPUtilTest {
                         + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo,"
                         + "  author={Norton Bar}}"
-        ));
+                ));
 
         Collection<BibtexEntry> c = result.getDatabase().getEntries();
         assertEquals(2, c.size());
 
         String xmp = XMPUtil.toXMP(c, null);
 
-		/* Test minimal syntaxical completeness */
+        /* Test minimal syntaxical completeness */
         assertTrue(0 < xmp.indexOf("xpacket"));
         assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
         assertTrue(0 < xmp
@@ -909,12 +914,12 @@ public class XMPUtilTest {
         assertTrue(0 < xmp
                 .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
                 || 0 < xmp
-                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
+                        .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
         assertTrue(0 < xmp.indexOf("<rdf:Description"));
         assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>")
                 || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
-		/* Test contents of string */
+        /* Test contents of string */
         writeManually(pdfFile, xmp);
 
         List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
@@ -1234,7 +1239,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[]{tempBib.getAbsolutePath()});
+            XMPUtil.main(new String[] {tempBib.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
             String xmp = s.toString();
@@ -1267,7 +1272,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[]{pdfFile.getAbsolutePath()});
+            XMPUtil.main(new String[] {pdfFile.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
             String bibtex = s.toString();
@@ -1288,12 +1293,12 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[]{"-x", pdfFile.getAbsolutePath()});
+            XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
             String xmp = s.toString();
 
-			/* Test minimal syntaxical completeness */
+            /* Test minimal syntaxical completeness */
             assertTrue(0 < xmp.indexOf("xpacket"));
             assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
             assertTrue(0 < xmp
@@ -1305,12 +1310,12 @@ public class XMPUtilTest {
             assertTrue(0 < xmp
                     .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
                     || 0 < xmp
-                    .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
+                            .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
             assertTrue(0 < xmp.indexOf("<rdf:Description"));
             assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>")
                     || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
-			/* Test contents of string */
+            /* Test contents of string */
             writeManually(pdfFile, xmp);
             List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
             assertEquals(1, l.size());
@@ -1325,7 +1330,8 @@ public class XMPUtilTest {
      *
      * @throws Exception
      */
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testCommandLineByKey() throws Exception {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
@@ -1341,13 +1347,12 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
                 try {
-                    XMPUtil.main(new String[]{"canh05",
+                    XMPUtil.main(new String[] {"canh05",
                             tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
                     s.close();
                 }
-
 
                 // PDF should be annotated:
                 List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
@@ -1359,7 +1364,7 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
                 try {
-                    XMPUtil.main(new String[]{"OezbekC06",
+                    XMPUtil.main(new String[] {"OezbekC06",
                             tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
@@ -1383,7 +1388,8 @@ public class XMPUtilTest {
      * Test whether the command-line client can deal with several bibtex
      * entries.
      */
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testCommandLineSeveral() throws Exception {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
@@ -1397,7 +1403,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[]{tempBib.getAbsolutePath(),
+            XMPUtil.main(new String[] {tempBib.getAbsolutePath(),
                     pdfFile.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
@@ -1476,8 +1482,7 @@ public class XMPUtilTest {
         assertEquals(
                 AuthorList
                         .getAuthorList("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-                AuthorList.getAuthorList(x.getField("author"))
-        );
+                AuthorList.getAuthorList(x.getField("author")));
     }
 
     /**

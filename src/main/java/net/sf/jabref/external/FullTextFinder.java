@@ -33,7 +33,7 @@ public interface FullTextFinder {
      */
     public boolean supportsSite(URL url);
 
-       /**
+    /**
      * Take the source HTML for an article page, and try to find the URL to the
      * full text for this article.
      *

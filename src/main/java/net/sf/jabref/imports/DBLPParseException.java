@@ -17,14 +17,15 @@ package net.sf.jabref.imports;
 
 public class DBLPParseException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public DBLPParseException(final String msg) {
-		super(msg);
-	}
 
-	public DBLPParseException(final Exception e) {
-		super(e);
-	}
+    public DBLPParseException(final String msg) {
+        super(msg);
+    }
+
+    public DBLPParseException(final Exception e) {
+        super(e);
+    }
 
 }

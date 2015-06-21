@@ -22,7 +22,7 @@ import net.sf.jabref.Globals;
  * @author pattonlk
  */
 public class DBStrings {
-   
+
     private String serverType;
     private String serverHostname;
     private String database;
@@ -32,6 +32,7 @@ public class DBStrings {
     private String[] serverTypes;
     private boolean isInitialized;
     private boolean configValid;
+
 
     /** Creates a new instance of DBStrings */
     public DBStrings() {
@@ -44,11 +45,11 @@ public class DBStrings {
         this.isConfigValid(false);
     }
 
-   /**
-    * Initializes the variables needed with defaults
-    */
+    /**
+     * Initializes the variables needed with defaults
+     */
     public void initialize() {
-        String [] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
+        String[] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
         setServerTypes(servers);
         setServerType(Globals.prefs.get("dbConnectServerType"));
         setServerHostname(Globals.prefs.get("dbConnectHostname"));

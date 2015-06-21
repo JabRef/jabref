@@ -1,7 +1,5 @@
 package spl;
 
-
-
 import java.awt.*;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -21,8 +19,9 @@ public class Tools {
     public static int WEBSERVICE_APP_ID = 9;
     public static String WEBSERVICE_VERSION_SHORT = "0.1";
 
-    public static byte[] zip(File file){
-        try{
+
+    public static byte[] zip(File file) {
+        try {
             FileInputStream fileInputStream = new FileInputStream(file);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             GZIPOutputStream out = new GZIPOutputStream(bos);
@@ -38,7 +37,7 @@ public class Tools {
             out.close();
             bos.close();
             return bos.toByteArray();
-        }catch(IOException e){
+        } catch (IOException e) {
             //Todo logging
             return null;
         }
@@ -55,55 +54,55 @@ public class Tools {
         return sw.toString();
     }
 
-    public static void centerRelativeToWindow (java.awt.Dialog diag, java.awt.Container win) {
-          int x;
-          int y;
+    public static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
+        int x;
+        int y;
 
-          Point topLeft = win.getLocationOnScreen();
-          Dimension parentSize = win.getSize();
+        Point topLeft = win.getLocationOnScreen();
+        Dimension parentSize = win.getSize();
 
-          Dimension mySize = diag.getSize();
+        Dimension mySize = diag.getSize();
 
-          if (parentSize.width > mySize.width)
-            x = ((parentSize.width - mySize.width)/2) + topLeft.x;
-          else
+        if (parentSize.width > mySize.width)
+            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
+        else
             x = topLeft.x;
 
-          if (parentSize.height > mySize.height)
-            y = ((parentSize.height - mySize.height)/2) + topLeft.y;
-          else
+        if (parentSize.height > mySize.height)
+            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
+        else
             y = topLeft.y;
 
-          diag.setLocation (x, y);
+        diag.setLocation(x, y);
     }
 
-    public static String getLink(String link, URL mindmapUrl){
-        if(link == null || link.isEmpty()){
+    public static String getLink(String link, URL mindmapUrl) {
+        if (link == null || link.isEmpty()) {
             return null;
         }
-        if(!Tools.isAbsolutePath(link)){
-            try{
-                if(link.startsWith("\\\\")){
+        if (!Tools.isAbsolutePath(link)) {
+            try {
+                if (link.startsWith("\\\\")) {
                     link = link.replace("\\\\", "file://");
-                    link = link.replace('\\', '/').replaceAll(" ","%20");
+                    link = link.replace('\\', '/').replaceAll(" ", "%20");
                     URL url = new URL(link);
                     File file = new File(url.toURI());
                     return file.getPath();
                 }
-                else if(mindmapUrl != null){
+                else if (mindmapUrl != null) {
                     URL url = new URL(mindmapUrl, link);
                     File file = new File(url.toURI());
                     return file.getPath();
                 }
-            } catch(MalformedURLException e){
+            } catch (MalformedURLException e) {
                 return link;
             } catch (URISyntaxException e) {
                 return link;
-            }catch(IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 return link;
             }
         }
-        else{
+        else {
             return link;
         }
         return link;

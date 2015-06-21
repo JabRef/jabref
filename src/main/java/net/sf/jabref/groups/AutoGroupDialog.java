@@ -42,17 +42,18 @@ import com.jgoodies.forms.layout.FormLayout;
  * containing group information.
  */
 class AutoGroupDialog extends JDialog implements CaretListener {
+
     JTextField remove = new JTextField(60), field = new JTextField(60),
             deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
     JRadioButton
-        keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field")),
-        authors = new JRadioButton(Globals.lang("Generate groups for author last names")),
-        editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
+            keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field")),
+            authors = new JRadioButton(Globals.lang("Generate groups for author last names")),
+            editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
     JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
-    JButton ok = new JButton(Globals.lang("Ok")), 
-    		cancel = new JButton(Globals.lang("Cancel"));
+    JButton ok = new JButton(Globals.lang("Ok")),
+            cancel = new JButton(Globals.lang("Cancel"));
     JPanel main = new JPanel(), opt = new JPanel();
     private boolean ok_pressed = false;
     private GroupTreeNode m_groupsRoot;
@@ -62,6 +63,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private String oldRemove, oldField;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
+
 
     /**
      * @param groupsRoot
@@ -81,13 +83,14 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         deliminator.setText(defaultDeliminator);
         nd.setSelected(true);
         ActionListener okListener = new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 ok_pressed = true;
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
                         new ExplicitGroup(Globals.lang("Automatically created groups"),
-                        		AbstractGroup.INCLUDING));
+                                AbstractGroup.INCLUDING));
                 Set<String> hs = null;
                 String field = field();
                 if (keywords.isSelected()) {
@@ -115,7 +118,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     field = "editor";
                 }
 
-                for (String keyword : hs){
+                for (String keyword : hs) {
                     KeywordGroup group = new KeywordGroup(keyword, field,
                             keyword, false, false, AbstractGroup.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
@@ -140,6 +143,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.addActionListener(okListener);
         field.addCaretListener(this);
         AbstractAction cancelAction = new AbstractAction() {
+
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -162,11 +166,11 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.append(keywords, 5);
         b.nextLine();
         b.append(new JPanel());
-        b.append(Globals.lang("Field to group by")+":");
+        b.append(Globals.lang("Field to group by") + ":");
         b.append(field);
         b.nextLine();
         b.append(new JPanel());
-        b.append(Globals.lang("Characters to ignore")+":");
+        b.append(Globals.lang("Characters to ignore") + ":");
         b.append(remove);
         b.nextLine();
         b.append(new JPanel());
@@ -177,13 +181,12 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.nextLine();
         b.append(editors, 5);
         b.nextLine();
-        
+
         ButtonBarBuilder bb = new ButtonBarBuilder(opt);
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-
 
         // Layout starts here.
         /*main.setLayout(gbl);
@@ -232,8 +235,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(cancel, con);
         opt.add(cancel);*/
-        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        opt.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        opt.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(opt, BorderLayout.SOUTH);
         // pack();
@@ -265,7 +268,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     public void caretUpdate(CaretEvent e) {
         updateComponents();
     }
-    
+
     protected void updateComponents() {
         String groupField = field.getText().trim();
         ok.setEnabled(groupField.matches("\\w+"));

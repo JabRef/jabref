@@ -41,18 +41,18 @@ public class ImportFormats {
     public static JFileChooser createImportFileChooser(String currentDir) {
 
         SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
-        
+
         String lastUsedFormat = Globals.prefs.get("lastUsedImport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<ImportFileFilter> filters = new TreeSet<ImportFileFilter>();
-        for (ImportFormat format : importers){
+        for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
             if (format.getFormatName().equals(lastUsedFormat))
                 defaultFilter = filter;
         }
-        for (ImportFileFilter filter : filters){
+        for (ImportFileFilter filter : filters) {
             fc.addChoosableFileFilter(filter);
         }
 
@@ -73,6 +73,7 @@ public class ImportFormats {
     public static AbstractAction getImportAction(JabRefFrame frame, boolean openInNew) {
 
         class ImportAction extends MnemonicAwareAction {
+
             private JabRefFrame frame;
             private boolean openInNew;
 
@@ -97,21 +98,20 @@ public class ImportFormats {
                 FileFilter ff = fc.getFileFilter();
                 ImportFormat format = null;
                 if (ff instanceof ImportFileFilter)
-                    format = ((ImportFileFilter)ff).getImportFormat();
+                    format = ((ImportFileFilter) ff).getImportFormat();
 
                 try {
                     if (!file.exists()) {
                         // Warn that the file doesn't exists:
                         JOptionPane.showMessageDialog(frame,
-                                Globals.lang("File not found")+
-                                ": '"+file.getName()+"'.",
+                                Globals.lang("File not found") +
+                                        ": '" + file.getName() + "'.",
                                 Globals.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ImportMenuItem imi = new ImportMenuItem(frame,
                             openInNew, format);
                     imi.automatedImport(new String[] {file.getAbsolutePath()});
-
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:

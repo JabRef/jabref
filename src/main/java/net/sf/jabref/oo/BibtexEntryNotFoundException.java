@@ -23,7 +23,9 @@ package net.sf.jabref.oo;
  * To change this template use File | Settings | File Templates.
  */
 public class BibtexEntryNotFoundException extends Exception {
+
     private String bibtexKey;
+
 
     public BibtexEntryNotFoundException(String bibtexKey, String message) {
         super(message);

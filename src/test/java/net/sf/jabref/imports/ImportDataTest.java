@@ -20,6 +20,7 @@ public class ImportDataTest {
     public static final File NOT_EXISTING_PDF = new File("src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder/null.pdf");
     public static final File UNLINKED_FILES_TEST_BIB = new File("src/test/resources/net/sf/jabref/util/unlinkedFilesTestBib.bib");
 
+
     /**
      * Tests the testing environment.
      */

@@ -39,13 +39,15 @@ import net.sf.jabref.*;
 import net.sf.jabref.config.SaveOrderConfig;
 
 public class FileActions {
-	
-	public enum DatabaseSaveType {
-		DEFAULT, PLAIN_BIBTEX
-	}
-	
+
+    public enum DatabaseSaveType {
+        DEFAULT, PLAIN_BIBTEX
+    }
+
+
     private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
+
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
         if (preamble != null) {
@@ -126,7 +128,7 @@ public class FileActions {
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
                         Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n"
-                        + Globals.lang("Before saving, please edit any strings containing the # character."));
+                                + Globals.lang("Before saving, please edit any strings containing the # character."));
             }
 
         } else {
@@ -176,7 +178,7 @@ public class FileActions {
             if (encoding != null) {
                 System.err.println("Error from encoding: '" + encoding + "' Len: " + encoding.length());
             }
-			// we must catch all exceptions to be able notify users that
+            // we must catch all exceptions to be able notify users that
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
             // everyting worked and loosing data)
@@ -186,7 +188,7 @@ public class FileActions {
 
         try {
 
-			// Get our data stream. This stream writes only to a temporary file,
+            // Get our data stream. This stream writes only to a temporary file,
             // until committed.
             VerifyingWriter fw = session.getWriter();
 
@@ -199,7 +201,7 @@ public class FileActions {
             // Write strings if there are any.
             writeStrings(fw, database);
 
-			// Write database entries. Take care, using CrossRefEntry-
+            // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
@@ -210,7 +212,7 @@ public class FileActions {
             for (BibtexEntry be : sorter) {
                 exceptionCause = be;
 
-				// Check if we must write the type definition for this
+                // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
                 // types (*not* customized standard types) must be written.
                 BibtexEntryType tp = be.getType();
@@ -266,9 +268,12 @@ public class FileActions {
 
     }
 
+
     private static class SaveSettings {
+
         public final String pri, sec, ter;
         public final boolean priD, secD, terD;
+
 
         public SaveSettings(boolean isSaveOperation, MetaData metaData) {
             /* three options:
@@ -277,51 +282,52 @@ public class FileActions {
              * 3. ordered by specified order
              */
 
-			Vector<String> storedSaveOrderConfig = null;
-			if (isSaveOperation) {
-				storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
-			}
-			
-			// This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
-			assert (storedSaveOrderConfig == null) && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
-			assert (storedSaveOrderConfig == null) && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+            Vector<String> storedSaveOrderConfig = null;
+            if (isSaveOperation) {
+                storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+            }
 
-			if (storedSaveOrderConfig != null) {
-				// follow the metaData
-				SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-				assert (!saveOrderConfig.saveInOriginalOrder);
-				assert (saveOrderConfig.saveInSpecifiedOrder);
-				pri = saveOrderConfig.sortCriteria[0].field;
-				sec = saveOrderConfig.sortCriteria[1].field;
-				ter = saveOrderConfig.sortCriteria[2].field;
-				priD = saveOrderConfig.sortCriteria[0].descending;
-				secD = saveOrderConfig.sortCriteria[1].descending;
-				terD = saveOrderConfig.sortCriteria[2].descending;
-			} else if (isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
-				pri = Globals.prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
-				sec = Globals.prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD);
-				ter = Globals.prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD);
-				priD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING);
-				secD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING);
-				terD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING);
-			} else if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
-				pri = Globals.prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
-				sec = Globals.prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
-				ter = Globals.prefs.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
-				priD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
-				secD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
-				terD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
-			} else {
-				// The setting is to save according to the current table order.
-				pri = Globals.prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD);
-				sec = Globals.prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD);
-				ter = Globals.prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD);
-				priD = Globals.prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING);
-				secD = Globals.prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING);
-				terD = Globals.prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING);
-			}
+            // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
+            assert (storedSaveOrderConfig == null) && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
+            assert (storedSaveOrderConfig == null) && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+
+            if (storedSaveOrderConfig != null) {
+                // follow the metaData
+                SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
+                assert (!saveOrderConfig.saveInOriginalOrder);
+                assert (saveOrderConfig.saveInSpecifiedOrder);
+                pri = saveOrderConfig.sortCriteria[0].field;
+                sec = saveOrderConfig.sortCriteria[1].field;
+                ter = saveOrderConfig.sortCriteria[2].field;
+                priD = saveOrderConfig.sortCriteria[0].descending;
+                secD = saveOrderConfig.sortCriteria[1].descending;
+                terD = saveOrderConfig.sortCriteria[2].descending;
+            } else if (isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
+                pri = Globals.prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
+                sec = Globals.prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD);
+                ter = Globals.prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD);
+                priD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING);
+                secD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING);
+                terD = Globals.prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING);
+            } else if (!isSaveOperation && Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                pri = Globals.prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
+                sec = Globals.prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
+                ter = Globals.prefs.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
+                priD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
+                secD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
+                terD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
+            } else {
+                // The setting is to save according to the current table order.
+                pri = Globals.prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD);
+                sec = Globals.prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD);
+                ter = Globals.prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD);
+                priD = Globals.prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING);
+                secD = Globals.prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING);
+                terD = Globals.prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING);
+            }
         }
     }
+
 
     private static List<Comparator<BibtexEntry>> getSaveComparators(boolean isSaveOperation, MetaData metaData) {
         SaveSettings saveSettings = new SaveSettings(isSaveOperation, metaData);
@@ -371,10 +377,10 @@ public class FileActions {
             VerifyingWriter fw = session.getWriter();
 
             if (saveType != DatabaseSaveType.PLAIN_BIBTEX) {
-            	// Write signature.
-            	writeBibFileHeader(fw, encoding);
+                // Write signature.
+                writeBibFileHeader(fw, encoding);
             }
-            
+
             // Write preamble if there is one.
             writePreamble(fw, database.getPreamble());
 
@@ -474,16 +480,16 @@ public class FileActions {
     public static List<BibtexEntry> getSortedEntries(BibtexDatabase database, MetaData metaData, Set<String> keySet, boolean isSaveOperation) {
         boolean inOriginalOrder;
         if (isSaveOperation) {
-			Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
-			if (storedSaveOrderConfig == null) {
-				inOriginalOrder = Globals.prefs.getBoolean("saveInOriginalOrder");
-			} else {
-				SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-				inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
-			}
-		} else {
-			inOriginalOrder = Globals.prefs.getBoolean("exportInOriginalOrder");
-		}
+            Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
+            if (storedSaveOrderConfig == null) {
+                inOriginalOrder = Globals.prefs.getBoolean("saveInOriginalOrder");
+            } else {
+                SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
+                inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
+            }
+        } else {
+            inOriginalOrder = Globals.prefs.getBoolean("exportInOriginalOrder");
+        }
         List<Comparator<BibtexEntry>> comparators;
         if (inOriginalOrder) {
             // Sort entries based on their creation order, utilizing the fact

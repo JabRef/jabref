@@ -11,7 +11,7 @@ import java.util.Map;
 public interface PreviewEntryFetcher extends EntryFetcher {
 
     public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview,
-                                                      OutputPrinter status);
+            OutputPrinter status);
 
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector);
 

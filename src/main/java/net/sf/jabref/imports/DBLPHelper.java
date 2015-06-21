@@ -22,84 +22,84 @@ import net.sf.jabref.BibtexEntry;
 
 public class DBLPHelper {
 
-	private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
-
-	/*
-	 * This is a small helper class that cleans the user submitted query. Right
-	 * now, we cannot search for ":" on dblp.org. So, we remove colons from the
-	 * user submitted search string. Also, the search is case sensitive if we
-	 * use capitals. So, we better change the text to lower case.
-	 */
-
-	class DBLPQueryCleaner {
-
-		public String cleanQuery(final String query) {
-			String cleaned = query;
-
-			cleaned = cleaned.replaceAll("-", " ");
-			cleaned = cleaned.replaceAll(" ", "%20");
-			cleaned = cleaned.replaceAll(":", "");
-			cleaned = cleaned.toLowerCase();
-
-			return cleaned;
-		}
-	}
-
-	/**
-	 *
-	 * @param query
-	 *            string with the user query
-	 * @return a string with the user query, but compatible with dblp.org
-	 */
-	public String cleanDBLPQuery(String query) {
-		return cleaner.cleanQuery(query);
-	}
-
-	/**
-	 * Takes an HTML file (as String) as input and extracts the bibtex
-	 * information. After that, it will convert it into a BibtexEntry and return
-	 * it (them).
-	 *
-	 * @param page
-	 *            page as String
-	 * @return list of BibtexEntry
-	 */
-	public List<BibtexEntry> getBibTexFromPage(final String page) {
-		final List<BibtexEntry> bibtexList = new ArrayList<BibtexEntry>();
-		final String startPattern = "<pre class=\"verbatim select-on-click\">";
-		final String endPattern = "</pre>";
-
-		String tmpStr = page;
-		int startIdx = tmpStr.indexOf(startPattern);
-		int endIdx = tmpStr.indexOf(endPattern);
-
-		// this entry exists for sure
-		String entry1 = tmpStr.substring(startIdx + startPattern.length(),
-				endIdx);
-		entry1 = cleanEntry(entry1);
-		bibtexList.add(BibtexParser.singleFromString(entry1));
-		// System.out.println("'" + entry1 + "'");
-
-		// let's see whether there is another entry (crossref)
-		tmpStr = tmpStr
-				.substring(endIdx + endPattern.length(), tmpStr.length());
-		startIdx = tmpStr.indexOf(startPattern);
-		if (startIdx != -1) {
-			endIdx = tmpStr.indexOf(endPattern);
-			// this entry exists for sure
-			String entry2 = tmpStr.substring(startIdx + startPattern.length(),
-					endIdx);
-			entry2 = cleanEntry(entry2);
-			bibtexList.add(BibtexParser.singleFromString(entry2));
-		}
-
-		return bibtexList;
-	}
+    private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
 
 
+    /*
+     * This is a small helper class that cleans the user submitted query. Right
+     * now, we cannot search for ":" on dblp.org. So, we remove colons from the
+     * user submitted search string. Also, the search is case sensitive if we
+     * use capitals. So, we better change the text to lower case.
+     */
 
-	private String cleanEntry(final String bibEntry) {
-		return bibEntry.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
-	}
+    class DBLPQueryCleaner {
+
+        public String cleanQuery(final String query) {
+            String cleaned = query;
+
+            cleaned = cleaned.replaceAll("-", " ");
+            cleaned = cleaned.replaceAll(" ", "%20");
+            cleaned = cleaned.replaceAll(":", "");
+            cleaned = cleaned.toLowerCase();
+
+            return cleaned;
+        }
+    }
+
+
+    /**
+     *
+     * @param query
+     *            string with the user query
+     * @return a string with the user query, but compatible with dblp.org
+     */
+    public String cleanDBLPQuery(String query) {
+        return cleaner.cleanQuery(query);
+    }
+
+    /**
+     * Takes an HTML file (as String) as input and extracts the bibtex
+     * information. After that, it will convert it into a BibtexEntry and return
+     * it (them).
+     *
+     * @param page
+     *            page as String
+     * @return list of BibtexEntry
+     */
+    public List<BibtexEntry> getBibTexFromPage(final String page) {
+        final List<BibtexEntry> bibtexList = new ArrayList<BibtexEntry>();
+        final String startPattern = "<pre class=\"verbatim select-on-click\">";
+        final String endPattern = "</pre>";
+
+        String tmpStr = page;
+        int startIdx = tmpStr.indexOf(startPattern);
+        int endIdx = tmpStr.indexOf(endPattern);
+
+        // this entry exists for sure
+        String entry1 = tmpStr.substring(startIdx + startPattern.length(),
+                endIdx);
+        entry1 = cleanEntry(entry1);
+        bibtexList.add(BibtexParser.singleFromString(entry1));
+        // System.out.println("'" + entry1 + "'");
+
+        // let's see whether there is another entry (crossref)
+        tmpStr = tmpStr
+                .substring(endIdx + endPattern.length(), tmpStr.length());
+        startIdx = tmpStr.indexOf(startPattern);
+        if (startIdx != -1) {
+            endIdx = tmpStr.indexOf(endPattern);
+            // this entry exists for sure
+            String entry2 = tmpStr.substring(startIdx + startPattern.length(),
+                    endIdx);
+            entry2 = cleanEntry(entry2);
+            bibtexList.add(BibtexParser.singleFromString(entry2));
+        }
+
+        return bibtexList;
+    }
+
+    private String cleanEntry(final String bibEntry) {
+        return bibEntry.replaceFirst("<a href=\".*\">DBLP</a>", "DBLP");
+    }
 
 }

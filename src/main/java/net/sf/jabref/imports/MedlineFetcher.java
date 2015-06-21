@@ -48,6 +48,7 @@ public class MedlineFetcher implements EntryFetcher {
 
         public String ids = "";
 
+
         public void addID(String id) {
             if (ids.equals(""))
                 ids = id;
@@ -55,6 +56,7 @@ public class MedlineFetcher implements EntryFetcher {
                 ids += "," + id;
         }
     }
+
 
     /**
      * How many entries to query in one request
@@ -66,6 +68,7 @@ public class MedlineFetcher implements EntryFetcher {
     OutputPrinter frame;
 
     ImportInspector dialog;
+
 
     public String toSearchTerm(String in) {
         Pattern part1 = Pattern.compile(", ");
@@ -89,8 +92,8 @@ public class MedlineFetcher implements EntryFetcher {
 
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils";
         String medlineUrl = baseUrl + "/esearch.fcgi?db=pubmed&retmax=" + Integer.toString(pacing) +
-            "&retstart=" + Integer.toString(start) + "&term=";
-        
+                "&retstart=" + Integer.toString(start) + "&term=";
+
         Pattern idPattern = Pattern.compile("<Id>(\\d+)</Id>");
         Pattern countPattern = Pattern.compile("<Count>(\\d+)<\\/Count>");
         Pattern retMaxPattern = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
@@ -172,10 +175,10 @@ public class MedlineFetcher implements EntryFetcher {
             List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frame);
 
             if (bibs.size() == 0) {
-            	frame.showMessage(Globals.lang("No references found"));
+                frame.showMessage(Globals.lang("No references found"));
             }
-            
-            for (BibtexEntry entry : bibs){
+
+            for (BibtexEntry entry : bibs) {
                 dialog.addEntry(entry);
             }
             return true;
@@ -190,18 +193,18 @@ public class MedlineFetcher implements EntryFetcher {
             SearchResult result = getIds(searchTerm, 0, 1);
 
             if (result.count == 0) {
-            	frame.showMessage(Globals.lang("No references found"));
+                frame.showMessage(Globals.lang("No references found"));
                 return false;
             }
 
             int numberToFetch = result.count;
             if (numberToFetch > PACING) {
-                
+
                 while (true) {
                     String strCount = JOptionPane.showInputDialog(Globals.lang("References found") +
-                        ": " + numberToFetch + "  " +
-                        Globals.lang("Number of references to fetch?"), Integer
-                        .toString(numberToFetch));
+                            ": " + numberToFetch + "  " +
+                            Globals.lang("Number of references to fetch?"), Integer
+                            .toString(numberToFetch));
 
                     if (strCount == null) {
                         frame.setStatus(Globals.lang("Medline import canceled"));
@@ -222,12 +225,12 @@ public class MedlineFetcher implements EntryFetcher {
                     break;
 
                 int noToFetch = Math.min(PACING, numberToFetch - i);
-                
+
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);
 
                 List<BibtexEntry> bibs = MedlineImporter.fetchMedline(result.ids, frame);
-                for (BibtexEntry entry : bibs){
+                for (BibtexEntry entry : bibs) {
                     dialog.addEntry(entry);
                 }
                 dialog.setProgress(i + noToFetch, numberToFetch);
@@ -235,8 +238,8 @@ public class MedlineFetcher implements EntryFetcher {
             return true;
         }
         frame.showMessage(
-            Globals.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
-            Globals.lang("Input error"), JOptionPane.ERROR_MESSAGE);
+                Globals.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
+                Globals.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }
 }

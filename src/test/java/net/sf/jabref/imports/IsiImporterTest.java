@@ -26,7 +26,6 @@ public class IsiImporterTest {
         }
     }
 
-
     @Test
     public void testIsRecognizedFormat() throws IOException {
 
@@ -164,25 +163,25 @@ public class IsiImporterTest {
                 + "waveguide pumped by 153 mW at 556 nm.".replaceFirst("266", "\n"), a.getField(
                 "abstract"));
         /*
-		 * DE Experimental/ barium compounds; ion implantation; optical harmonic
-		 * generation; optical losses; optical pumping; photolithography; solid
-		 * lasers; sputter etching; ultraviolet sources; waveguide lasers/
-		 * second harmonic generation; continuous-wave light; beta -BaB/sub
-		 * 2/O/sub 4/ optical waveguides; UV laser light; optical frequency
-		 * doubling; visible light; ridge-type waveguides; He/sup +/
-		 * implantation; photolithography masking; plasma etching; transmission
-		 * losses; optical pumping; 278 nm; 532 nm; 266 nm; 24 muW; 8 mm; 153
-		 * mW; 556 nm; BaB/sub 2/O/sub 4// A4265K Optical harmonic generation,
-		 * frequency conversion, parametric oscillation and amplification A4255R
-		 * Lasing action in other solids A4260B Design of specific laser systems
-		 * B4340K Optical harmonic generation, frequency conversion, parametric
-		 * oscillation and amplification B4320G Solid lasers/ wavelength
-		 * 2.78E-07 m; wavelength 5.32E-07 m; wavelength 2.66E-07 m; power
-		 * 2.4E-05 W; size 8.0E-03 m; power 1.53E-01 W; wavelength 5.56E-07 m/
-		 * BaB2O4/ss B2/ss Ba/ss O4/ss B/ss O/ss C1 Degl'Innocenti, R.; Guarino,
-		 * A.; Poberaj, G.; Gunter, P.; Nonlinear Opt. Lab., Inst. of Quantum
-		 * Electron., Zurich, Switzerland
-		 */
+         * DE Experimental/ barium compounds; ion implantation; optical harmonic
+         * generation; optical losses; optical pumping; photolithography; solid
+         * lasers; sputter etching; ultraviolet sources; waveguide lasers/
+         * second harmonic generation; continuous-wave light; beta -BaB/sub
+         * 2/O/sub 4/ optical waveguides; UV laser light; optical frequency
+         * doubling; visible light; ridge-type waveguides; He/sup +/
+         * implantation; photolithography masking; plasma etching; transmission
+         * losses; optical pumping; 278 nm; 532 nm; 266 nm; 24 muW; 8 mm; 153
+         * mW; 556 nm; BaB/sub 2/O/sub 4// A4265K Optical harmonic generation,
+         * frequency conversion, parametric oscillation and amplification A4255R
+         * Lasing action in other solids A4260B Design of specific laser systems
+         * B4340K Optical harmonic generation, frequency conversion, parametric
+         * oscillation and amplification B4320G Solid lasers/ wavelength
+         * 2.78E-07 m; wavelength 5.32E-07 m; wavelength 2.66E-07 m; power
+         * 2.4E-05 W; size 8.0E-03 m; power 1.53E-01 W; wavelength 5.56E-07 m/
+         * BaB2O4/ss B2/ss Ba/ss O4/ss B/ss O/ss C1 Degl'Innocenti, R.; Guarino,
+         * A.; Poberaj, G.; Gunter, P.; Nonlinear Opt. Lab., Inst. of Quantum
+         * Electron., Zurich, Switzerland
+         */
         assertEquals("Aip", a.getField("publisher"));
         // PV USA
         // NR 11
@@ -230,14 +229,12 @@ public class IsiImporterTest {
         assertEquals(
                 "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
                 IsiImporter
-                        .isiAuthorsConvert("James Brown and James Marc Brown and Brown, J.M. and Brown, J. and Brown, J.M. and Brown, J.")
-        );
+                        .isiAuthorsConvert("James Brown and James Marc Brown and Brown, J.M. and Brown, J. and Brown, J.M. and Brown, J."));
 
         assertEquals(
                 "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
                 IsiImporter
-                        .isiAuthorsConvert("Joffe, Hadine; Hall, Janet E; Gruber, Staci; Sarmiento, Ingrid A; Cohen, Lee S; Yurgelun-Todd, Deborah; Martin, Kathryn A")
-        );
+                        .isiAuthorsConvert("Joffe, Hadine; Hall, Janet E; Gruber, Staci; Sarmiento, Ingrid A; Cohen, Lee S; Yurgelun-Todd, Deborah; Martin, Kathryn A"));
 
     }
 
@@ -289,8 +286,7 @@ public class IsiImporterTest {
                 "Improving Urban Road Extraction in High-Resolution " +
                         "Images Exploiting Directional Filtering, Perceptual " +
                         "Grouping, and Simple Topological Concepts",
-                a.getField("title")
-        );
+                a.getField("title"));
 
         assertEquals("4", a.getField("volume"));
         assertEquals("3", a.getField("number"));

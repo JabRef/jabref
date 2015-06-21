@@ -70,11 +70,9 @@ public class SearchTextListenerTest {
         highlighter = ta.getHighlighter();
         highlight = highlighter.getHighlights();
 
-
         //there should be none areas to highlight!
         assertEquals("Expected no highlighting area ", 0, highlight.length);
     }
-
 
     @Test
     public void testHighlightingContentIndependence() {

@@ -22,6 +22,7 @@ public class BibtexPurifyTest {
 
     private void assertPurify(final String string, final String string2) {
         assertEquals(string, BibtexPurify.purify(string2, new Warn() {
+
             public void warn(String s) {
                 fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2);
             }

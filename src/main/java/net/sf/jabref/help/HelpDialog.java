@@ -38,123 +38,129 @@ import net.sf.jabref.Util;
  */
 public class HelpDialog extends JDialog implements HyperlinkListener {
 
-	private JabRefFrame frame;
+    private JabRefFrame frame;
 
-	private HelpContent content;
+    private HelpContent content;
 
-	private BackAction back = new BackAction();
+    private BackAction back = new BackAction();
 
-	private ForwardAction forward = new ForwardAction();
+    private ForwardAction forward = new ForwardAction();
+
 
     // Initializes, but does not show the help dialog.
-	public HelpDialog(JabRefFrame bf) {
-		super(bf, Globals.lang("JabRef help"), false);
-		frame = bf;
-		content = new HelpContent(bf.prefs());
-		content.addHyperlinkListener(this);
-		setSize(GUIGlobals.helpSize);
+    public HelpDialog(JabRefFrame bf) {
+        super(bf, Globals.lang("JabRef help"), false);
+        frame = bf;
+        content = new HelpContent(bf.prefs());
+        content.addHyperlinkListener(this);
+        setSize(GUIGlobals.helpSize);
 
-		JToolBar tlb = new JToolBar();
-		tlb.add(back);
-		tlb.add(forward);
-		tlb.addSeparator();
+        JToolBar tlb = new JToolBar();
+        tlb.add(back);
+        tlb.add(forward);
+        tlb.addSeparator();
         ContentsAction contents = new ContentsAction();
         tlb.add(contents);
-		tlb.setFloatable(false);
+        tlb.setFloatable(false);
 
-		// Make ESC close dialog, and set shortkeys for back and forward.
-		InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionMap am = tlb.getActionMap();
-		im.put(bf.prefs().getKey("Close dialog"), "close");
-		am.put("close", new CloseAction());
-		im.put(bf.prefs().getKey("Back, help dialog"), "left");
-		am.put("left", back);
-		im.put(bf.prefs().getKey("Forward, help dialog"), "right");
-		am.put("right", forward);
+        // Make ESC close dialog, and set shortkeys for back and forward.
+        InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = tlb.getActionMap();
+        im.put(bf.prefs().getKey("Close dialog"), "close");
+        am.put("close", new CloseAction());
+        im.put(bf.prefs().getKey("Back, help dialog"), "left");
+        am.put("left", back);
+        im.put(bf.prefs().getKey("Forward, help dialog"), "right");
+        am.put("right", forward);
 
-		// Set shortkeys for back and forward specifically for the EditorPane.
-		im = content.getInputMap(JComponent.WHEN_FOCUSED);
-		am = content.getActionMap();
-		im.put(bf.prefs().getKey("Back, help dialog"), "left");
-		am.put("left", back);
-		im.put(bf.prefs().getKey("Forward, help dialog"), "right");
-		am.put("right", forward);
+        // Set shortkeys for back and forward specifically for the EditorPane.
+        im = content.getInputMap(JComponent.WHEN_FOCUSED);
+        am = content.getActionMap();
+        im.put(bf.prefs().getKey("Back, help dialog"), "left");
+        am.put("left", back);
+        im.put(bf.prefs().getKey("Forward, help dialog"), "right");
+        am.put("right", forward);
 
-		getContentPane().add(tlb, BorderLayout.NORTH);
-		getContentPane().add(content.getPane());
-		forward.setEnabled(false);
-		back.setEnabled(false);
-	}
+        getContentPane().add(tlb, BorderLayout.NORTH);
+        getContentPane().add(content.getPane());
+        forward.setEnabled(false);
+        back.setEnabled(false);
+    }
 
     public void showPage(String url) {
         showPage(url, JabRef.class);
     }
 
-	public void showPage(String url, Class resourceOwner) {
-		if (!isVisible()) {
-			Util.placeDialog(this, frame);
-			content.reset();
-			back.setEnabled(false);
-			setVisible(true);
-		} else {
-			back.setEnabled(true);
-		}
-		forward.setEnabled(false);
-		content.setPage(url, resourceOwner);
-		content.requestFocus();
-	}
+    public void showPage(String url, Class resourceOwner) {
+        if (!isVisible()) {
+            Util.placeDialog(this, frame);
+            content.reset();
+            back.setEnabled(false);
+            setVisible(true);
+        } else {
+            back.setEnabled(true);
+        }
+        forward.setEnabled(false);
+        content.setPage(url, resourceOwner);
+        content.requestFocus();
+    }
 
-	public void hyperlinkUpdate(HyperlinkEvent e) {
-		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-			content.setPage(e.getURL());
-			back.setEnabled(true);
-			forward.setEnabled(false);
-		}
-	}
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            content.setPage(e.getURL());
+            back.setEnabled(true);
+            forward.setEnabled(false);
+        }
+    }
 
-	class CloseAction extends AbstractAction {
-		public CloseAction() {
-			super(Globals.lang("Close"));
-			// , new ImageIcon(GUIGlobals.closeIconFile));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Close the help window"));
-		}
 
-		public void actionPerformed(ActionEvent e) {
-			dispose();
-		}
-	}
+    class CloseAction extends AbstractAction {
 
-	class BackAction extends AbstractAction {
-		public BackAction() {
-			super("Back", GUIGlobals.getImage("left"));
-			// putValue(SHORT_DESCRIPTION, "Show the previous page");
-		}
+        public CloseAction() {
+            super(Globals.lang("Close"));
+            // , new ImageIcon(GUIGlobals.closeIconFile));
+            putValue(SHORT_DESCRIPTION, Globals.lang("Close the help window"));
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			setEnabled(content.back());
-			forward.setEnabled(true);
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+        }
+    }
 
-	class ForwardAction extends AbstractAction {
-		public ForwardAction() {
-			super("Forward", GUIGlobals.getImage("right"));
-		}
+    class BackAction extends AbstractAction {
 
-		public void actionPerformed(ActionEvent e) {
-			setEnabled(content.forward());
-			back.setEnabled(true);
-		}
-	}
+        public BackAction() {
+            super("Back", GUIGlobals.getImage("left"));
+            // putValue(SHORT_DESCRIPTION, "Show the previous page");
+        }
 
-	class ContentsAction extends AbstractAction {
-		public ContentsAction() {
-			super("Contents", GUIGlobals.getImage("helpContents"));
-		}
+        public void actionPerformed(ActionEvent e) {
+            setEnabled(content.back());
+            forward.setEnabled(true);
+        }
+    }
 
-		public void actionPerformed(ActionEvent e) {
-			content.setPage(GUIGlobals.helpContents, JabRef.class);
-			back.setEnabled(true);
-		}
-	}
+    class ForwardAction extends AbstractAction {
+
+        public ForwardAction() {
+            super("Forward", GUIGlobals.getImage("right"));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            setEnabled(content.forward());
+            back.setEnabled(true);
+        }
+    }
+
+    class ContentsAction extends AbstractAction {
+
+        public ContentsAction() {
+            super("Contents", GUIGlobals.getImage("helpContents"));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            content.setPage(GUIGlobals.helpContents, JabRef.class);
+            back.setEnabled(true);
+        }
+    }
 }

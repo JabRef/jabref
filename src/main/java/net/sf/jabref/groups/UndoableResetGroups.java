@@ -20,12 +20,14 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.Globals;
 
 class UndoableResetGroups extends AbstractUndoableEdit {
+
     /** A backup of the groups before the modification */
     private final GroupTreeNode m_groupsBackup;
     /** A handle to the global groups root node */
     private final GroupTreeNode m_groupsRootHandle;
     private final GroupSelector m_groupSelector;
     private boolean m_revalidate = true;
+
 
     public UndoableResetGroups(GroupSelector groupSelector,
             GroupTreeNode groupsRoot) {
@@ -35,13 +37,13 @@ class UndoableResetGroups extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " 
-            + Globals.lang("clear all groups");
+        return Globals.lang("Undo") + ": "
+                + Globals.lang("clear all groups");
     }
 
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " 
-            + Globals.lang("clear all groups");
+        return Globals.lang("Redo") + ": "
+                + Globals.lang("clear all groups");
     }
 
     public void undo() {

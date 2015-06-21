@@ -65,20 +65,20 @@ public class PreventDraggingJTableHeader extends JTableHeader {
             if (isUnnamed(column)) {
                 return;
             }
-            
+
             // prevent dragging of special field columns
             String headerValue = column.getHeaderValue().toString();
             if (headerValue.equals("P") || headerValue.equals("Q") || headerValue.equals("R")) {
-            	// the letters are guessed. Don't know, where they are set in the code.
-            	return;
+                // the letters are guessed. Don't know, where they are set in the code.
+                return;
             }
-            
+
             // other icon columns should also not be dragged
             // note that "P" is used for "PDF" and "Priority"
             if (headerValue.equals("F") || headerValue.equals("U")) {
-            	return;
+                return;
             }
-            
+
         }
 
         super.setDraggedColumn(column);
@@ -121,23 +121,23 @@ public class PreventDraggingJTableHeader extends JTableHeader {
         }
 
         if (Globals.prefs.getBoolean("extraFileColumns")) {
-            count+=Globals.prefs.getStringArray("listOfFileColumns").length;
+            count += Globals.prefs.getStringArray("listOfFileColumns").length;
         }
-        
+
         // special field columns may also not be dragged
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
-	            count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
+                count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
+                count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
+                count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
+                count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
+                count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
+                count++;
         }
 
         return count;

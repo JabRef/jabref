@@ -1,6 +1,5 @@
 package spl.gui;
 
-
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -34,6 +33,7 @@ import spl.localization.LocalizationSupport;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class MetaDataListDialog extends JDialog {
+
     private JPanel contentPane;
     private JTable tableMetadata;
     private JButton buttonOK;
@@ -53,6 +53,7 @@ public class MetaDataListDialog extends JDialog {
     private boolean showBlankButton;
     private CardLayout cardLayou = new CardLayout();
 
+
     public MetaDataListDialog(String fileName, boolean showBlankButton) {
         $$$setupUI$$$();
         this.showBlankButton = showBlankButton;
@@ -67,24 +68,28 @@ public class MetaDataListDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
 
         blankButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 onBlank();
             }
         });
 
         moreInformationButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 onInfo();
             }
@@ -92,12 +97,14 @@ public class MetaDataListDialog extends JDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+
             public void windowClosing(WindowEvent e) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -135,6 +142,7 @@ public class MetaDataListDialog extends JDialog {
 
     public void showDialog() {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
             @Override
             public Void doInBackground() {
                 System.out.println("Starting Webclient...");
@@ -233,7 +241,6 @@ public class MetaDataListDialog extends JDialog {
         panelMetadata = new JPanel();
         panelMetadata.setLayout(cardLayou);
 
-
         panelMetadata.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
@@ -279,12 +286,12 @@ public class MetaDataListDialog extends JDialog {
         contentPane.add(bb.getPanel(), BorderLayout.SOUTH);
         iconLabel.setLabelFor(scrollPane);
 
-
     }
 
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
 
     public static class MyTableModel extends DefaultTableModel {
 

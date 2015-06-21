@@ -33,122 +33,118 @@ import net.sf.jabref.OutputPrinter;
 
 public class DBLPFetcher implements EntryFetcher {
 
-
     private final static String URL_START = "http://www.dblp.org/search/api/";
     private final static String URL_PART1 = "?q=";
-    private final static String URL_END   = "&h=1000&c=4&f=0&format=json";
+    private final static String URL_END = "&h=1000&c=4&f=0&format=json";
 
-	private volatile boolean shouldContinue = false;
-	private String query;
-	private final DBLPHelper helper = new DBLPHelper();
-
-
-	@Override
-	public void stopFetching() {
-	    shouldContinue  = false;
-	}
-
-	@Override
-	public boolean processQuery(String query, ImportInspector inspector,
-			OutputPrinter status) {
-
-		final HashMap<String, Boolean> bibentryKnown = new HashMap<String, Boolean>();
-
-		boolean res = false;
-		this.query = query;
-
-		shouldContinue = true;
-
-		try {
-
-			String address = makeSearchURL();
-			//System.out.println(address);
-			URL url = new URL(address);
-	        String page = readFromURL(url);
-
-	        //System.out.println(page);
-	        String[] lines = page.split("\n");
-	        List<String> bibtexUrlList = new ArrayList<String>();
-	        for(final String line : lines) {
-	        	if( line.startsWith("\"url\"") ) {
-	        		String addr = line.replace("\"url\":\"", "");
-	        		addr = addr.substring(0, addr.length()-2);
-	        		//System.out.println("key address: " + addr);
-	        		bibtexUrlList.add(addr);
-	        	}
-	        }
+    private volatile boolean shouldContinue = false;
+    private String query;
+    private final DBLPHelper helper = new DBLPHelper();
 
 
-	        // we save the duplicate check threshold
-	        // we need to overcome the "smart" approach of this heuristic
-	        // and we will set it back afterwards, so maybe someone is happy again
-    		double saveThreshold = DuplicateCheck.duplicateThreshold;
-    		DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
+    @Override
+    public void stopFetching() {
+        shouldContinue = false;
+    }
 
-	        // 2014-11-08
-	        // DBLP now shows the BibTeX entry using ugly HTML entities
-	        // but they also offer the download of a bib file
-	        // we find this in the page which we get from "url"
-	        // and this bib file is then in "biburl"
+    @Override
+    public boolean processQuery(String query, ImportInspector inspector,
+            OutputPrinter status) {
 
-	        int count = 1;
-	        for(String urlStr : bibtexUrlList) {
-	        	if( ! shouldContinue ) {
-	        		break;
-	        	}
+        final HashMap<String, Boolean> bibentryKnown = new HashMap<String, Boolean>();
 
-	        	final URL bibUrl = new URL(urlStr);
+        boolean res = false;
+        this.query = query;
 
-		        final String bibtexHTMLPage = readFromURL(bibUrl);
+        shouldContinue = true;
 
-		        final String[] htmlLines = bibtexHTMLPage.split("\n");
+        try {
 
+            String address = makeSearchURL();
+            //System.out.println(address);
+            URL url = new URL(address);
+            String page = readFromURL(url);
 
-		        for(final String line : htmlLines) {
-		        	if( line.contains("biburl") ) {
-		        		int sidx = line.indexOf("{");
-		        		int eidx = line.indexOf("}");
-		        		// now we take everything within the curley braces
-		        		String bibtexUrl = line.substring(sidx+1, eidx);
+            //System.out.println(page);
+            String[] lines = page.split("\n");
+            List<String> bibtexUrlList = new ArrayList<String>();
+            for (final String line : lines) {
+                if (line.startsWith("\"url\"")) {
+                    String addr = line.replace("\"url\":\"", "");
+                    addr = addr.substring(0, addr.length() - 2);
+                    //System.out.println("key address: " + addr);
+                    bibtexUrlList.add(addr);
+                }
+            }
 
-		        		// we do not access dblp.uni-trier.de as they will complain
-		        		bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
+            // we save the duplicate check threshold
+            // we need to overcome the "smart" approach of this heuristic
+            // and we will set it back afterwards, so maybe someone is happy again
+            double saveThreshold = DuplicateCheck.duplicateThreshold;
+            DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
 
-			        	final URL bibFileURL = new URL(bibtexUrl);
-			        	//System.out.println("URL:|"+bibtexUrl+"|");
-				        final String bibtexPage = readFromURL(bibFileURL);
+            // 2014-11-08
+            // DBLP now shows the BibTeX entry using ugly HTML entities
+            // but they also offer the download of a bib file
+            // we find this in the page which we get from "url"
+            // and this bib file is then in "biburl"
 
-				        Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
+            int count = 1;
+            for (String urlStr : bibtexUrlList) {
+                if (!shouldContinue) {
+                    break;
+                }
 
-				        for(BibtexEntry be : bibtexEntries) {
+                final URL bibUrl = new URL(urlStr);
 
-				        	if( ! bibentryKnown.containsKey( be.getCiteKey() ) ) {
+                final String bibtexHTMLPage = readFromURL(bibUrl);
 
-					        	inspector.addEntry(be);
-					        	bibentryKnown.put(be.getCiteKey(), true);
-				        	}
+                final String[] htmlLines = bibtexHTMLPage.split("\n");
 
-				        }
-		        	}
-		        }
+                for (final String line : htmlLines) {
+                    if (line.contains("biburl")) {
+                        int sidx = line.indexOf("{");
+                        int eidx = line.indexOf("}");
+                        // now we take everything within the curley braces
+                        String bibtexUrl = line.substring(sidx + 1, eidx);
 
-		        inspector.setProgress(count, bibtexUrlList.size());
-	        	count++;
-	        }
+                        // we do not access dblp.uni-trier.de as they will complain
+                        bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
 
-	        DuplicateCheck.duplicateThreshold = saveThreshold;
+                        final URL bibFileURL = new URL(bibtexUrl);
+                        //System.out.println("URL:|"+bibtexUrl+"|");
+                        final String bibtexPage = readFromURL(bibFileURL);
 
-	        // everything went smooth
-	        res = true;
+                        Collection<BibtexEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			status.showMessage(e.getMessage());
-		}
+                        for (BibtexEntry be : bibtexEntries) {
+
+                            if (!bibentryKnown.containsKey(be.getCiteKey())) {
+
+                                inspector.addEntry(be);
+                                bibentryKnown.put(be.getCiteKey(), true);
+                            }
+
+                        }
+                    }
+                }
+
+                inspector.setProgress(count, bibtexUrlList.size());
+                count++;
+            }
+
+            DuplicateCheck.duplicateThreshold = saveThreshold;
+
+            // everything went smooth
+            res = true;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            status.showMessage(e.getMessage());
+        }
 
         return res;
-	}
-
+    }
 
     private String readFromURL(final URL source) throws IOException {
         final InputStream in = source.openStream();
@@ -157,43 +153,43 @@ public class DBLPFetcher implements EntryFetcher {
 
         char[] cbuf = new char[256];
         int read;
-        while( (read = ir.read(cbuf)) != -1 ) {
-        	sbuf.append(cbuf, 0, read);
+        while ((read = ir.read(cbuf)) != -1) {
+            sbuf.append(cbuf, 0, read);
         }
         return sbuf.toString();
     }
 
-	private String makeSearchURL() {
+    private String makeSearchURL() {
         StringBuffer sb = new StringBuffer(URL_START).append(URL_PART1);
         String cleanedQuery = helper.cleanDBLPQuery(query);
         sb.append(cleanedQuery);
         sb.append(URL_END);
         return sb.toString();
-	}
+    }
 
-	@Override
-	public String getTitle() {
-		return "DBLP";
-	}
+    @Override
+    public String getTitle() {
+        return "DBLP";
+    }
 
-	@Override
-	public String getKeyName() {
-		return "DBLP";
-	}
+    @Override
+    public String getKeyName() {
+        return "DBLP";
+    }
 
-	@Override
-	public URL getIcon() {
-	    return GUIGlobals.getIconUrl("www");
-	}
+    @Override
+    public URL getIcon() {
+        return GUIGlobals.getIconUrl("www");
+    }
 
-	@Override
-	public String getHelpPage() {
-		return null;
-	}
+    @Override
+    public String getHelpPage() {
+        return null;
+    }
 
-	@Override
-	public JPanel getOptionsPanel() {
-		return null;
-	}
+    @Override
+    public JPanel getOptionsPanel() {
+        return null;
+    }
 
 }

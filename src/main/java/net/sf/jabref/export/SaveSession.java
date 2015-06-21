@@ -53,8 +53,9 @@ public class SaveSession {
     boolean backup, useLockFile;
     VerifyingWriter writer;
 
+
     public SaveSession(File file, String encoding, boolean backup) throws IOException,
-        UnsupportedCharsetException {
+            UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean("useLockFiles");
@@ -111,7 +112,7 @@ public class SaveSession {
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
             // repeating the action will have a different result.
             // On the other hand, our temporary file should still be clean, and won't be deleted.
-            throw new SaveException(Globals.lang("Save failed while committing changes")+": "+ex2.getMessage());
+            throw new SaveException(Globals.lang("Save failed while committing changes") + ": " + ex2.getMessage());
         } finally {
             if (useLockFile) {
                 deleteLockFile();
@@ -125,14 +126,13 @@ public class SaveSession {
         tmp.delete();
     }
 
-
     /**
      * Check if a lock file exists, and create it if it doesn't.
      * @return true if the lock file already existed
      * @throws IOException if something happens during creation.
      */
     private boolean createLockFile() throws IOException {
-        File lock = new File(file.getPath()+LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
         if (lock.exists()) {
             return true;
         }
@@ -154,7 +154,7 @@ public class SaveSession {
      * @throws IOException if something goes wrong.
      */
     private boolean deleteLockFile() {
-        File lock = new File(file.getPath()+LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;
         }

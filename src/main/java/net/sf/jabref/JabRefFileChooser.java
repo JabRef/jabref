@@ -14,6 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 package net.sf.jabref;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -36,7 +37,7 @@ public class JabRefFileChooser extends JFileChooser
         super();
     }
 
-    public JabRefFileChooser(File file){
+    public JabRefFileChooser(File file) {
         super(file);
     }
 
@@ -65,11 +66,12 @@ public class JabRefFileChooser extends JFileChooser
     //========================================================
 
     protected void setUI(ComponentUI newUI) {
-      if (Globals.osName.equals(Globals.MAC))
-        super.setUI(newUI);
-      else
-        super.setUI(new JabRefUI(this));
-     }
+        if (Globals.osName.equals(Globals.MAC))
+            super.setUI(newUI);
+        else
+            super.setUI(new JabRefUI(this));
+    }
+
     //========================================================
     //
     //========================================================
@@ -84,18 +86,25 @@ public class JabRefFileChooser extends JFileChooser
 }
 
 class JabRefUI extends MetalFileChooserUI {
+
     public JabRefUI(JFileChooser filechooser) {
         super(filechooser);
     }
+
+
     protected class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
+
         JList list;
+
+
         public DoubleClickListener(JList list) {
             super(list);
             this.list = list;
         }
+
         public void mouseEntered(MouseEvent e) {
             //System.out.println("mouse entered");
-            MouseListener [] l = list.getMouseListeners();
+            MouseListener[] l = list.getMouseListeners();
             for (MouseListener aL : l) {
                 if (aL instanceof SingleClickListener) {
                     list.removeMouseListener(aL);
@@ -104,6 +113,8 @@ class JabRefUI extends MetalFileChooserUI {
             super.mouseEntered(e);
         }
     }
+
+
     protected MouseListener createDoubleClickListener(JFileChooser fc, JList list) {
         return new DoubleClickListener(list);
     }

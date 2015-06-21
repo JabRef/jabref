@@ -29,13 +29,15 @@ import java.io.IOException;
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
  */
 public class MoveFileAction extends AbstractAction {
+
     private JabRefFrame frame;
     private EntryEditor eEditor;
     private FileListEditor editor;
     private boolean toFileDir;
 
+
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor,
-                          boolean toFileDir) {
+            boolean toFileDir) {
         this.frame = frame;
         this.eEditor = eEditor;
         this.editor = editor;
@@ -58,7 +60,7 @@ public class MoveFileAction extends AbstractAction {
         // Get an absolute path representation:
         String[] dirs = frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         int found = -1;
-        for (int i=0; i<dirs.length; i++)
+        for (int i = 0; i < dirs.length; i++)
             if (new File(dirs[i]).exists()) {
                 found = i;
                 break;
@@ -88,7 +90,7 @@ public class MoveFileAction extends AbstractAction {
                     String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry()).
                             concat(".").concat(flEntry.getType().extension);
                     CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Move file to file directory?"),
-                            Globals.lang("Rename to '%0'",suggName),
+                            Globals.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean("renameOnMoveFileToFileDir"));
                     int answer;
                     // Only ask about renaming file if the file doesn't have the proper name already:
@@ -124,7 +126,7 @@ public class MoveFileAction extends AbstractAction {
                 if (newFile.exists() && (JOptionPane.showConfirmDialog
                         (frame, "'" + newFile.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Move/Rename file"), JOptionPane.OK_CANCEL_OPTION)
-                        != JOptionPane.OK_OPTION)) {
+                            != JOptionPane.OK_OPTION)) {
                     if (!toFileDir)
                         repeat = true;
                     else
@@ -146,10 +148,9 @@ public class MoveFileAction extends AbstractAction {
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
                             if ((newFile.getCanonicalPath().length() > canPath.length()) &&
                                     (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar))
-                                flEntry.setLink(newFile.getCanonicalPath().substring(1+canPath.length()));
+                                flEntry.setLink(newFile.getCanonicalPath().substring(1 + canPath.length()));
                             else
                                 flEntry.setLink(newFile.getCanonicalPath().substring(canPath.length()));
-
 
                         }
                         else
@@ -180,7 +181,7 @@ public class MoveFileAction extends AbstractAction {
             // File doesn't exist, so we can't move it.
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not find file '%0'.", flEntry.getLink()),
                     Globals.lang("File not found"), JOptionPane.ERROR_MESSAGE);
-            
+
         }
 
     }

@@ -38,45 +38,45 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 public class SplWebClient {
 
     private static Client CLIENT = Client.create();
-    static{
+    static {
         CLIENT.setConnectTimeout(1000);
         CLIENT.setReadTimeout(70000);
     }
-    private static WebResource WEBRESOURCE = CLIENT.resource( "http://api.mr-dlib.org/" );
-    private static WebResource INTERNETRESOURCE = CLIENT.resource( "http://www.google.com" );
+    private static WebResource WEBRESOURCE = CLIENT.resource("http://api.mr-dlib.org/");
+    private static WebResource INTERNETRESOURCE = CLIENT.resource("http://www.google.com");
     //private static WebResource WEBRESOURCE = CLIENT.resource( "http://localhost:8080/rest/" );
 
     public static Document metadata;
 
-    public static WebServiceStatus getMetaData(File file){
-        try{
-            if(!isWebServiceAvailable()){
-                if(isInternetAvailable()){
-                    return  WebServiceStatus.WEBSERVICE_DOWN;
+
+    public static WebServiceStatus getMetaData(File file) {
+        try {
+            if (!isWebServiceAvailable()) {
+                if (isInternetAvailable()) {
+                    return WebServiceStatus.WEBSERVICE_DOWN;
                 }
-                else{
-                    return  WebServiceStatus.NO_INTERNET;
+                else {
+                    return WebServiceStatus.NO_INTERNET;
                 }
             }
-            if(isWebServiceOutDated()){
-                return  WebServiceStatus.OUTDATED;
+            if (isWebServiceOutDated()) {
+                return WebServiceStatus.OUTDATED;
             }
-            if(!isMetaDataServiceAvailable()){
-                return  WebServiceStatus.UNAVAILABLE;
+            if (!isMetaDataServiceAvailable()) {
+                return WebServiceStatus.UNAVAILABLE;
             }
-            FileInputStream fin = new FileInputStream(file);      
-            byte[] data = new byte[(int)file.length()];          
-            fin.read(data);           
-            
-            FormDataMultiPart formDataMultiPart = new FormDataMultiPart();            
-            formDataMultiPart.field("file", data,  MediaType.APPLICATION_OCTET_STREAM_TYPE);            
-            formDataMultiPart.field("source", "jabref",  MediaType.TEXT_PLAIN_TYPE);
+            FileInputStream fin = new FileInputStream(file);
+            byte[] data = new byte[(int) file.length()];
+            fin.read(data);
+
+            FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+            formDataMultiPart.field("file", data, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            formDataMultiPart.field("source", "jabref", MediaType.TEXT_PLAIN_TYPE);
             formDataMultiPart.field("filename", file.getName(), MediaType.TEXT_PLAIN_TYPE);
-           
-           
+
             ClientResponse response = WEBRESOURCE.path("documents").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
             //System.out.println(response.getEntity(String.class));
-            if(response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()){
+            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = new byte[0];
                 try {
@@ -85,58 +85,58 @@ public class SplWebClient {
                     return null;
                 }
                 InputStream is = new ByteArrayInputStream(bytes);
-                if(is != null){
-                	ObjectCreatorMapper resourceMapper = new ObjectCreatorMapper();
-                	ObjectCreator stringCreator = new DefaultStringCreator();
-                	// initialize Mapper    
-	            	  resourceMapper.addCreator("documents", new DocumentsBeanCreator());
-	            	  resourceMapper.addCreator("authors", new AuthorsBeanCreator());
-	            	  resourceMapper.addCreator("document", new DocumentBeanCreator());
-	            	  resourceMapper.addCreator("title", new TitleBeanCreator());
-	            	  resourceMapper.addCreator("year", new YearBeanCreator());
-	            	  resourceMapper.addCreator("author", new AuthorBeanCreator());
-	            	  
-	            	  resourceMapper.addCreator("name_first", stringCreator);
-	            	  resourceMapper.addCreator("name_middle", stringCreator);
-	            	  resourceMapper.addCreator("name_last", stringCreator);
-	            	  resourceMapper.addCreator("name_last_prefix", stringCreator);
-	            	  resourceMapper.addCreator("name_last_suffix", stringCreator);
-	            	  
-	            	  // initialize xml reader
-	            	  XmlResourceReader<?> reader = new XmlResourceReader(resourceMapper);
-	            	  
-	            	  // parse given file -> create object tree
-	            	  Document docs =  (Document)reader.parse(is);
-	            	  for(Bean author : docs.getAuthors().getCollection()){
-	            		  Author temp = (Author)author;
-	            		  System.out.println(((SimpleTypeElementBean)temp.getName_Last()).getValue() + " " + temp.getRank());
-	            	  }
-                   // XmlDocuments documents = JAXB.unmarshal(is, XmlDocuments.class);
+                if (is != null) {
+                    ObjectCreatorMapper resourceMapper = new ObjectCreatorMapper();
+                    ObjectCreator stringCreator = new DefaultStringCreator();
+                    // initialize Mapper    
+                    resourceMapper.addCreator("documents", new DocumentsBeanCreator());
+                    resourceMapper.addCreator("authors", new AuthorsBeanCreator());
+                    resourceMapper.addCreator("document", new DocumentBeanCreator());
+                    resourceMapper.addCreator("title", new TitleBeanCreator());
+                    resourceMapper.addCreator("year", new YearBeanCreator());
+                    resourceMapper.addCreator("author", new AuthorBeanCreator());
+
+                    resourceMapper.addCreator("name_first", stringCreator);
+                    resourceMapper.addCreator("name_middle", stringCreator);
+                    resourceMapper.addCreator("name_last", stringCreator);
+                    resourceMapper.addCreator("name_last_prefix", stringCreator);
+                    resourceMapper.addCreator("name_last_suffix", stringCreator);
+
+                    // initialize xml reader
+                    XmlResourceReader<?> reader = new XmlResourceReader(resourceMapper);
+
+                    // parse given file -> create object tree
+                    Document docs = (Document) reader.parse(is);
+                    for (Bean author : docs.getAuthors().getCollection()) {
+                        Author temp = (Author) author;
+                        System.out.println(((SimpleTypeElementBean) temp.getName_Last()).getValue() + " " + temp.getRank());
+                    }
+                    // XmlDocuments documents = JAXB.unmarshal(is, XmlDocuments.class);
                     SplWebClient.metadata = docs;
                     return WebServiceStatus.OK;
                 }
-                else{
+                else {
                     return WebServiceStatus.NO_METADATA;
                 }
             }
-            if(response.getClientResponseStatus() == ClientResponse.Status.SERVICE_UNAVAILABLE){
-                return  WebServiceStatus.UNAVAILABLE;
+            if (response.getClientResponseStatus() == ClientResponse.Status.SERVICE_UNAVAILABLE) {
+                return WebServiceStatus.UNAVAILABLE;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(Tools.getStackTraceAsString(e));
             //Todo logging
         }
         return WebServiceStatus.NO_METADATA;
     }
 
-    public static boolean isWebServiceOutDated(){
-        try{
-            ClientResponse response =  WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
-            if(response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()){
+    public static boolean isWebServiceOutDated() {
+        try {
+            ClientResponse response = WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
+            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = entity.getBytes();
                 InputStream is = new ByteArrayInputStream(bytes);
-                if(is != null){
+                if (is != null) {
                     /*XmlApplication app = JAXB.unmarshal(is, XmlApplication.class);
                     if(app != null){
                         if(app.getVersion() != null && !app.getVersion().equalsIgnoreCase(Tools.WEBSERVICE_VERSION_SHORT)){
@@ -145,44 +145,45 @@ public class SplWebClient {
                     }*/
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             //Todo logging
         }
         return false;
     }
 
-    public static boolean isMetaDataServiceAvailable(){
-        try{
-            ClientResponse response =  WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
-            if(response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()){
+    public static boolean isMetaDataServiceAvailable() {
+        try {
+            ClientResponse response = WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
+            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
-                if(entity != null && entity.equalsIgnoreCase("false")){
+                if (entity != null && entity.equalsIgnoreCase("false")) {
                     return false;
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             //Todo logging
         }
         return true;
     }
 
-    public static boolean isWebServiceAvailable(){
-        try{
-            ClientResponse response =  WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
-        }catch(Exception e){
+    public static boolean isWebServiceAvailable() {
+        try {
+            ClientResponse response = WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
 
-    public static boolean isInternetAvailable(){
-        try{
-            ClientResponse response =  INTERNETRESOURCE.get(ClientResponse.class);
-        }catch(Exception e){
+    public static boolean isInternetAvailable() {
+        try {
+            ClientResponse response = INTERNETRESOURCE.get(ClientResponse.class);
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
+
 
     public enum WebServiceStatus {
         OK,

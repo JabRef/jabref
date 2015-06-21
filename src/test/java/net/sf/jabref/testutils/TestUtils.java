@@ -13,6 +13,7 @@ public class TestUtils {
 
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
 
+
     /**
      * Initialize JabRef. Can be cleaned up with
      * {@link TestUtils#closeJabRef()}
@@ -41,12 +42,15 @@ public class TestUtils {
         }
     }
 
+
     @SuppressWarnings("serial")
     private static class ExitException extends SecurityException {
     }
 
+
     private static void disableSystemExit() {
         final SecurityManager securityManager = new SecurityManager() {
+
             public void checkPermission(Permission permission) {
                 if (permission.getName().contains("exitVM")) {
                     throw new ExitException();

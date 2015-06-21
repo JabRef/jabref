@@ -41,105 +41,103 @@ import java.io.InputStreamReader;
 
 public class TBuildInfo
 {
-  private String BUILD_DATE = "" ;
-  private String BUILD_VERSION = "devel - 1st edition family" ;
-  private String BUILD_NUMBER = "1" ;
 
-//  private TBuilderInfo runtime = new TBuildInfo() ;
-  public TBuildInfo(String path)
-  {
-    readBuildVersionData(path) ;
-  }
+    private String BUILD_DATE = "";
+    private String BUILD_VERSION = "devel - 1st edition family";
+    private String BUILD_NUMBER = "1";
 
-// --------------------------------------------------------------------------
-  // some informations from extern build file
-  private void readBuildVersionData(String path)
-  {
-    String buf = null ;
-    int sep = 0 ;
-    String Key, Value ;
-    BufferedReader input = null ;
 
-    try
+    //  private TBuilderInfo runtime = new TBuildInfo() ;
+    public TBuildInfo(String path)
     {
-
-      input = new BufferedReader(
-          new InputStreamReader( getClass().getResourceAsStream( path) ), 100 ) ;
-    }
-    catch ( Exception e1 )
-    {
-//      System.out.println( e1 ) ;
-//      e1.printStackTrace();
-//      Logger.global.info( e1.getMessage() ) ;
-        return ;
+        readBuildVersionData(path);
     }
 
-    try
+    // --------------------------------------------------------------------------
+    // some informations from extern build file
+    private void readBuildVersionData(String path)
     {
-      while ( ( buf = input.readLine() ) != null )
-      {
-        if ( buf.length() > 0 )
-        { // no empty lines
-          if ( buf.charAt( 0 ) != '#' )
-          { // data line, comments - first char = #
-            sep = buf.indexOf( '=' ) ;
-            if ( sep > 0 )
-            { // = found
-              Key = buf.substring( 0, sep ) ;
-              Value = buf.substring( sep + 1 ) ;
-              if ( Key.equals( "builddate" ) )
-              {
-                BUILD_DATE = Value ;
-              }
-              else if ( Key.equals( "build" ) )
-              {
-                BUILD_NUMBER = Value ;
-              }
-              else if ( Key.equals( "version" ) )
-              {
-                BUILD_VERSION = Value ;
-              }
+        String buf = null;
+        int sep = 0;
+        String Key, Value;
+        BufferedReader input = null;
 
-            }
-          } // data line
+        try
+        {
+
+            input = new BufferedReader(
+                    new InputStreamReader(getClass().getResourceAsStream(path)), 100);
+        } catch (Exception e1)
+        {
+            //      System.out.println( e1 ) ;
+            //      e1.printStackTrace();
+            //      Logger.global.info( e1.getMessage() ) ;
+            return;
         }
-      } // while
+
+        try
+        {
+            while ((buf = input.readLine()) != null)
+            {
+                if (buf.length() > 0)
+                { // no empty lines
+                    if (buf.charAt(0) != '#')
+                    { // data line, comments - first char = #
+                        sep = buf.indexOf('=');
+                        if (sep > 0)
+                        { // = found
+                            Key = buf.substring(0, sep);
+                            Value = buf.substring(sep + 1);
+                            if (Key.equals("builddate"))
+                            {
+                                BUILD_DATE = Value;
+                            }
+                            else if (Key.equals("build"))
+                            {
+                                BUILD_NUMBER = Value;
+                            }
+                            else if (Key.equals("version"))
+                            {
+                                BUILD_VERSION = Value;
+                            }
+
+                        }
+                    } // data line
+                }
+            } // while
+        } catch (IOException iex)
+        {
+            //      System.err.println(iex.getMessage());
+            //      Logger.global.info( iex.getMessage() ) ;
+        }
+
+        try
+        {
+            input.close();
+        } catch (Exception e)
+        {
+            //      System.out.println(e.getMessage());
+            //      Logger.global.info( e.getMessage() ) ;
+        }
     }
-    catch ( IOException iex )
+
+    // --------------------------------------------------------------------------
+
+    public String getBUILD_DATE()
     {
-//      System.err.println(iex.getMessage());
-//      Logger.global.info( iex.getMessage() ) ;
+        return BUILD_DATE;
     }
 
-    try
+    public String getBUILD_VERSION()
     {
-      input.close() ;
+        return BUILD_VERSION;
     }
-    catch ( Exception e )
+
+    public String getBUILD_NUMBER()
     {
-//      System.out.println(e.getMessage());
-//      Logger.global.info( e.getMessage() ) ;
+        return BUILD_NUMBER;
     }
-  }
 
-  // --------------------------------------------------------------------------
-
-  public String getBUILD_DATE()
-  {
-    return BUILD_DATE;
-  }
-
-  public String getBUILD_VERSION()
-  {
-    return BUILD_VERSION;
-  }
-
-  public String getBUILD_NUMBER()
-  {
-    return BUILD_NUMBER;
-  }
-
-
-// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
 }

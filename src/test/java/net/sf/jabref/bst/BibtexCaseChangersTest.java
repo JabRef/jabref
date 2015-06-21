@@ -117,6 +117,7 @@ public class BibtexCaseChangersTest {
 
     private void assertCaseChangerU(final String string, final String string2) {
         assertEquals(string, BibtexCaseChanger.changeCase(string2, 'u', new Warn() {
+
             public void warn(String s) {
                 fail("Should not Warn (" + s + ")! changeCase('u') should be " + string + " for "
                         + string2);

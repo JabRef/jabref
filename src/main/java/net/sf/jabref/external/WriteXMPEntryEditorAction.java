@@ -30,9 +30,11 @@ import java.util.ArrayList;
  * Write XMP action for EntryEditor toolbar.
  */
 public class WriteXMPEntryEditorAction extends AbstractAction {
+
     private BasePanel panel;
     private EntryEditor editor;
     private String message = null;
+
 
     public WriteXMPEntryEditorAction(BasePanel panel, EntryEditor editor) {
         this.panel = panel;
@@ -93,6 +95,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         private List<File> files;
         private BibtexEntry entry;
+
 
         public WriteXMPWorker(List<File> files, BibtexEntry entry) {
 

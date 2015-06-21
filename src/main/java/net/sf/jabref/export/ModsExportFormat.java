@@ -33,12 +33,13 @@ import java.io.File;
  * ExportFormat for exporting in MODS XML format.
  */
 class ModsExportFormat extends ExportFormat {
+
     public ModsExportFormat() {
         super(Globals.lang("MODS"), "mods", null, null, ".xml");
     }
 
     public void performExport(final BibtexDatabase database, final MetaData metaData,
-                              final String file, final String encoding, Set<String> keySet) throws IOException {
+            final String file, final String encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
@@ -49,8 +50,7 @@ class ModsExportFormat extends ExportFormat {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new Error(e);
         }
 

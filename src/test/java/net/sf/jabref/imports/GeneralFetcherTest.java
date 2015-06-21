@@ -20,10 +20,12 @@ import static org.junit.Assert.assertNotNull;
  * @author Dennis Hartrampf, Ines Moosdorf
  */
 public class GeneralFetcherTest {
+
     static JabRefFrame jrf;
     static SidePaneManager spm;
     static GeneralFetcher gf;
     static ACMPortalFetcher acmpf;
+
 
     /**
      * Tests the reset-button. Types a text into tf, pushs reset and check tf's

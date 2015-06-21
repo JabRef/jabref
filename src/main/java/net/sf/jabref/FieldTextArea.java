@@ -33,157 +33,158 @@ import javax.swing.event.UndoableEditListener;
  */
 public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
-	Dimension PREFERRED_SIZE;
+    Dimension PREFERRED_SIZE;
 
-	JScrollPane sp;
+    JScrollPane sp;
 
-	FieldNameLabel label;
+    FieldNameLabel label;
 
-	String fieldName;
+    String fieldName;
 
-	final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
+    final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
 
-	final static Pattern indent = Pattern.compile("\\s+.*");
+    final static Pattern indent = Pattern.compile("\\s+.*");
 
-	private AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener = null;
+
 
     // protected UndoManager undo = new UndoManager();
 
-	public FieldTextArea(String fieldName_, String content) {
-		super(content);
+    public FieldTextArea(String fieldName_, String content) {
+        super(content);
 
-		// Listen for undo and redo events
-		/*
-		 * getDocument().addUndoableEditListener(new UndoableEditListener() {
-		 * public void undoableEditHappened(UndoableEditEvent evt) {
-		 * undo.addEdit(evt.getEdit()); } });
-		 */
+        // Listen for undo and redo events
+        /*
+         * getDocument().addUndoableEditListener(new UndoableEditListener() {
+         * public void undoableEditHappened(UndoableEditEvent evt) {
+         * undo.addEdit(evt.getEdit()); } });
+         */
 
-		updateFont();
+        updateFont();
 
-		// Add the global focus listener, so a menu item can see if this field
-		// was focused when an action was called.
-		addFocusListener(Globals.focusListener);
-		addFocusListener(new FieldEditorFocusListener());
-		sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		sp.setMinimumSize(new Dimension(200, 1));
+        // Add the global focus listener, so a menu item can see if this field
+        // was focused when an action was called.
+        addFocusListener(Globals.focusListener);
+        addFocusListener(new FieldEditorFocusListener());
+        sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.setMinimumSize(new Dimension(200, 1));
 
-		setLineWrap(true);
-		setWrapStyleWord(true);
-		fieldName = fieldName_;
+        setLineWrap(true);
+        setWrapStyleWord(true);
+        fieldName = fieldName_;
 
-		label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
-		setBackground(GUIGlobals.validFieldBackgroundColor);
-		setForeground(GUIGlobals.editorTextColor);
+        label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setForeground(GUIGlobals.editorTextColor);
 
-		// setFont(new Font("Times", Font.PLAIN, 10));
+        // setFont(new Font("Times", Font.PLAIN, 10));
 
-		FieldTextMenu popMenu = new FieldTextMenu(this);
-		this.addMouseListener(popMenu);
-		label.addMouseListener(popMenu);
+        FieldTextMenu popMenu = new FieldTextMenu(this);
+        this.addMouseListener(popMenu);
+        label.addMouseListener(popMenu);
 
     }
 
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
 
-	/*
-	 * public void paint(Graphics g) { Graphics2D g2 = (Graphics2D) g; if
-	 * (antialias) g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-	 * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
-	 */
+    /*
+     * public void paint(Graphics g) { Graphics2D g2 = (Graphics2D) g; if
+     * (antialias) g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+     * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
+     */
 
     public String getFieldName() {
-		return fieldName;
-	}
+        return fieldName;
+    }
 
-	public void setFieldName(String newName) {
-		fieldName = newName;
-	}
+    public void setFieldName(String newName) {
+        fieldName = newName;
+    }
 
-	public JLabel getLabel() {
-		return label;
-	}
+    public JLabel getLabel() {
+        return label;
+    }
 
-	public void setLabelColor(Color c) {
-		label.setForeground(c);
-	}
+    public void setLabelColor(Color c) {
+        label.setForeground(c);
+    }
 
-	public JComponent getPane() {
-		return sp;
-	}
+    public JComponent getPane() {
+        return sp;
+    }
 
-	public JComponent getTextComponent() {
-		return this;
-	}
+    public JComponent getTextComponent() {
+        return this;
+    }
 
-	public void setActiveBackgroundColor() {
-		setBackground(GUIGlobals.activeBackground);
-	}
+    public void setActiveBackgroundColor() {
+        setBackground(GUIGlobals.activeBackground);
+    }
 
-	public void setValidBackgroundColor() {
-		setBackground(GUIGlobals.validFieldBackgroundColor);
-	}
+    public void setValidBackgroundColor() {
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+    }
 
-	public void setInvalidBackgroundColor() {
-		setBackground(GUIGlobals.invalidFieldBackgroundColor);
-	}
+    public void setInvalidBackgroundColor() {
+        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+    }
 
-	public void updateFontColor() {
-		setForeground(GUIGlobals.editorTextColor);
-	}
+    public void updateFontColor() {
+        setForeground(GUIGlobals.editorTextColor);
+    }
 
-	public void updateFont() {
-		setFont(GUIGlobals.CURRENTFONT);
-	}
+    public void updateFont() {
+        setFont(GUIGlobals.CURRENTFONT);
+    }
 
-	public void paste(String textToInsert) {
-		int sel = getSelectionEnd() - getSelectionStart();
-		if (sel > 0) // selected text available
-			replaceSelection(textToInsert);
-		else {
-			int cPos = this.getCaretPosition();
-			this.insert(textToInsert, cPos);
-		}
-	}
+    public void paste(String textToInsert) {
+        int sel = getSelectionEnd() - getSelectionStart();
+        if (sel > 0) // selected text available
+            replaceSelection(textToInsert);
+        else {
+            int cPos = this.getCaretPosition();
+            this.insert(textToInsert, cPos);
+        }
+    }
 
-	public boolean hasUndoInformation() {
-		return false;// undo.canUndo();
-	}
+    public boolean hasUndoInformation() {
+        return false;// undo.canUndo();
+    }
 
-	public void undo() {
-		/*
-		 * try { if (undo.canUndo()) { undo.undo(); } } catch
-		 * (CannotUndoException e) { }
-		 */
+    public void undo() {
+        /*
+         * try { if (undo.canUndo()) { undo.undo(); } } catch
+         * (CannotUndoException e) { }
+         */
 
-	}
+    }
 
-	public boolean hasRedoInformation() {
-		return false;// undo.canRedo();
-	}
+    public boolean hasRedoInformation() {
+        return false;// undo.canRedo();
+    }
 
-	public void redo() {
-		/*
-		 * try { if (undo.canRedo()) { undo.redo(); } } catch
-		 * (CannotUndoException e) { }
-		 */
+    public void redo() {
+        /*
+         * try { if (undo.canRedo()) { undo.redo(); } } catch
+         * (CannotUndoException e) { }
+         */
 
-	}
+    }
 
-	public void addUndoableEditListener(UndoableEditListener listener) {
-		getDocument().addUndoableEditListener(listener);
-	}
+    public void addUndoableEditListener(UndoableEditListener listener) {
+        getDocument().addUndoableEditListener(listener);
+    }
 
-	public void setAutoCompleteListener(AutoCompleteListener listener) {
-		autoCompleteListener = listener;
-	}
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        autoCompleteListener = listener;
+    }
 
-	public void clearAutoCompleteSuggestion() {
-		if (autoCompleteListener != null) {
-			autoCompleteListener.clearCurrentSuggestion(this);
-		}
-	}
+    public void clearAutoCompleteSuggestion() {
+        if (autoCompleteListener != null) {
+            autoCompleteListener.clearCurrentSuggestion(this);
+        }
+    }
 }

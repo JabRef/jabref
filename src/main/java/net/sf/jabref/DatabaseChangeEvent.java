@@ -15,31 +15,34 @@
 */
 package net.sf.jabref;
 
-
 public class DatabaseChangeEvent {
 
-    public enum ChangeType {ADDED_ENTRY, REMOVED_ENTRY, CHANGED_ENTRY, CHANGING_ENTRY}
+    public enum ChangeType {
+        ADDED_ENTRY, REMOVED_ENTRY, CHANGED_ENTRY, CHANGING_ENTRY
+    }
+
 
     private BibtexEntry entry;
     private ChangeType type;
     private BibtexDatabase source;
 
-    public DatabaseChangeEvent(BibtexDatabase source, ChangeType type, 
-			       BibtexEntry entry) {
-	this.source = source;
-	this.type = type;
-	this.entry = entry;
+
+    public DatabaseChangeEvent(BibtexDatabase source, ChangeType type,
+            BibtexEntry entry) {
+        this.source = source;
+        this.type = type;
+        this.entry = entry;
     }
 
     public BibtexDatabase getSource() {
-	return source;
+        return source;
     }
 
     public BibtexEntry getEntry() {
-	return entry;
+        return entry;
     }
 
     public ChangeType getType() {
-	return type;
+        return type;
     }
 }

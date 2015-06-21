@@ -23,6 +23,7 @@ public class UndefinedParagraphFormatException extends Exception {
 
     String formatName;
 
+
     public UndefinedParagraphFormatException(String formatName) {
         super();
         this.formatName = formatName;

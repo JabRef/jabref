@@ -31,58 +31,58 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
 
-
 public class DOItoBibTeXFetcher implements EntryFetcher {
-	
-    private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
+
+    private static final String URL_PATTERN = "http://dx.doi.org/%s";
     final CaseKeeper caseKeeper = new CaseKeeper();
     final UnitFormatter unitFormatter = new UnitFormatter();
-    
-	@Override
+
+
+    @Override
     public void stopFetching() {
-		// nothing needed as the fetching is a single HTTP GET
+        // nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
+    @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
 
-       BibtexEntry entry = getEntryFromDOI(query, status);
-       if (entry != null)
-       {
+        BibtexEntry entry = getEntryFromDOI(query, status);
+        if (entry != null)
+        {
             inspector.addEntry(entry);
-	    return true;
+            return true;
         } else {
             return false;
         }
-        
+
     }
 
-	@Override
+    @Override
     public String getTitle() {
-	    return "DOI to BibTeX";
+        return "DOI to BibTeX";
     }
 
-	@Override
+    @Override
     public String getKeyName() {
-	    return "DOItoBibTeX";
+        return "DOItoBibTeX";
     }
 
-	@Override
+    @Override
     public URL getIcon() {
-		// no special icon for this fetcher available.
-		// Therefore, we return some kind of default icon
-	    return GUIGlobals.getIconUrl("www");
+        // no special icon for this fetcher available.
+        // Therefore, we return some kind of default icon
+        return GUIGlobals.getIconUrl("www");
     }
 
-	@Override
+    @Override
     public String getHelpPage() {
-	    return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp.html";
     }
 
-	@Override
+    @Override
     public JPanel getOptionsPanel() {
-		// no additional options available
-	    return null;
+        // no additional options available
+        return null;
     }
 
     public BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
@@ -116,7 +116,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         conn.setRequestProperty("Accept", "application/x-bibtex");
 
-
         String bibtexString;
         try {
             bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
@@ -132,7 +131,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             e.printStackTrace();
             return null;
         }
-
 
         //Usually includes an en-dash in the page range. Char is in cp1252 but not 
         // ISO 8859-1 (which is what latex expects). For convenience replace here.

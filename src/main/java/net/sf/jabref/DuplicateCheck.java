@@ -31,7 +31,7 @@ public class DuplicateCheck {
     final static double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
-    static HashMap<String,Double> fieldWeights = new HashMap<String, Double>();
+    static HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
 
     static {
         fieldWeights.put("author", 2.5);
@@ -39,6 +39,7 @@ public class DuplicateCheck {
         fieldWeights.put("title", 3.);
         fieldWeights.put("journal", 2.);
     }
+
 
     /**
      * Checks if the two entries represent the same publication.
@@ -71,7 +72,7 @@ public class DuplicateCheck {
             fields = one.getType().getOptionalFields();
             if (fields != null) {
                 double[] opt = compareFieldSet(fields, one, two);
-                double totValue = (reqWeight*req[0]*req[1] + opt[0]*opt[1]) / (req[1]*reqWeight+opt[1]);
+                double totValue = (reqWeight * req[0] * req[1] + opt[0] * opt[1]) / (req[1] * reqWeight + opt[1]);
                 return totValue >= duplicateThreshold;
             } else {
                 return (req[0] >= duplicateThreshold);
@@ -99,7 +100,8 @@ public class DuplicateCheck {
         }
         if (totWeights > 0)
             return new double[] {res / totWeights, totWeights};
-        else // no fields present. This points to a possible duplicate?
+        else
+            // no fields present. This points to a possible duplicate?
             return new double[] {0.5, 0.0};
     }
 
@@ -117,8 +119,7 @@ public class DuplicateCheck {
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase(),
-                    auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
+            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase(), auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
             //System.out.println(auth1);
             //System.out.println(auth2);
             //System.out.println(correlateByWords(auth1, auth2));
@@ -132,8 +133,8 @@ public class DuplicateCheck {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:
-            s1 = s1.replaceAll("[- ]+","-");
-            s2 = s2.replaceAll("[- ]+","-");
+            s1 = s1.replaceAll("[- ]+", "-");
+            s2 = s2.replaceAll("[- ]+", "-");
             if (s1.equals(s2))
                 return Util.EQUAL;
             else
@@ -182,8 +183,8 @@ public class DuplicateCheck {
         }
         if (score == allFields.size())
             return 1.01; // Just to make sure we can
-            // use score>1 without
-            // trouble.
+        // use score>1 without
+        // trouble.
         else
             return ((double) score) / allFields.size();
     }
@@ -204,7 +205,7 @@ public class DuplicateCheck {
                 return other; // Duplicate found.
         }
         return null; // No duplicate found.
-	}
+    }
 
     /**
      * Compare two strings on the basis of word-by-word correlation analysis.
@@ -215,19 +216,18 @@ public class DuplicateCheck {
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
     public static double correlateByWords(String s1, String s2, boolean truncate) {
-        String[] w1 = s1.split("\\s"),
-                w2 = s2.split("\\s");
+        String[] w1 = s1.split("\\s"), w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
             /*if (!w1[i].equalsIgnoreCase(w2[i]))
                 misses++;*/
             double corr = correlateStrings(w1[i], w2[i], truncate);
             if (corr < 0.75)
                 misses++;
         }
-        double missRate = ((double)misses)/((double)n);
-        return 1-missRate;
+        double missRate = ((double) misses) / ((double) n);
+        return 1 - missRate;
     }
 
     public static double correlateStrings(String s1, String s2, boolean truncate) {
@@ -249,8 +249,7 @@ public class DuplicateCheck {
             if (s2.length() > minLength)
                 s2 = s2.substring(0, minLength);
         }
-        double[] n1 = numberizeString(s1),
-                n2 = numberizeString(s2);
+        double[] n1 = numberizeString(s1), n2 = numberizeString(s2);
         // If truncation is disabled, harmonize length by interpolation:
         if (!truncate) {
             if (n1.length < n2.length)
@@ -264,56 +263,52 @@ public class DuplicateCheck {
     private static double corrCoef(double[] n1, double[] n2) {
         // Calculate mean values:
         double mean1 = 0, mean2 = 0;
-        for (int i=0; i<n1.length; i++) {
+        for (int i = 0; i < n1.length; i++) {
             mean1 += n1[i];
             mean2 += n2[i];
         }
-        mean1 /= (double)n1.length;
-        mean2 /= (double)n2.length;
+        mean1 /= (double) n1.length;
+        mean2 /= (double) n2.length;
         double sigma1 = 0, sigma2 = 0;
         // Calculate correlation coefficient:
         double corr = 0;
-        for (int i=0; i<n1.length; i++) {
-            sigma1 += (n1[i] - mean1)*(n1[i] - mean1);
-            sigma2 += (n2[i] - mean2)*(n2[i] - mean2);
-            corr += (n1[i] - mean1)*(n2[i] - mean2);
+        for (int i = 0; i < n1.length; i++) {
+            sigma1 += (n1[i] - mean1) * (n1[i] - mean1);
+            sigma2 += (n2[i] - mean2) * (n2[i] - mean2);
+            corr += (n1[i] - mean1) * (n2[i] - mean2);
         }
         sigma1 = Math.sqrt(sigma1);
         sigma2 = Math.sqrt(sigma2);
         if (sigma1 > 0 && sigma2 > 0)
-            return corr/(sigma1*sigma2);
+            return corr / (sigma1 * sigma2);
         else
             return 0;
     }
 
-
     private static double[] numberizeString(String s) {
         double[] res = new double[s.length()];
-        for (int i=0; i<s.length(); i++)
-            res[i] = (double)s.charAt(i);
+        for (int i = 0; i < s.length(); i++)
+            res[i] = (double) s.charAt(i);
         return res;
     }
 
     private static double[] stretchArray(double[] array, int length) {
         if (length <= array.length || array.length == 0)
             return array;
-        double multip = ((double)array.length)/((double)length);
+        double multip = ((double) array.length) / ((double) length);
         double[] newArray = new double[length];
-        for (int i=0; i<newArray.length; i++) {
-            double index = ((double)i)*multip;
-            int baseInd = (int)Math.floor(index);
+        for (int i = 0; i < newArray.length; i++) {
+            double index = ((double) i) * multip;
+            int baseInd = (int) Math.floor(index);
             double dist = index - Math.floor(index);
-            newArray[i] = dist*array[Math.min(array.length-1, baseInd+1)]
-                + (1.0 - dist)*array[baseInd];
+            newArray[i] = dist * array[Math.min(array.length - 1, baseInd + 1)]
+                    + (1.0 - dist) * array[baseInd];
         }
         return newArray;
     }
 
-
     public static void main(String[] args) {
-        String d1 =  "Characterization of Calanus finmarchicus habitat in the North Sea",
-                d2 = "Characterization of Calunus finmarchicus habitat in the North Sea",
-                d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
+        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea", d2 = "Characterization of Calunus finmarchicus habitat in the North Sea", d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
         System.out.println(correlateByWords(d1, d2, false));
         System.out.println(correlateByWords(d1, d3, false));
         System.out.println(correlateByWords(d2, d3, false));

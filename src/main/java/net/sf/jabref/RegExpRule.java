@@ -40,6 +40,7 @@ public class RegExpRule implements SearchRule {
     //static RemoveBrackets removeBrackets = new RemoveBrackets();
     static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
+
     public RegExpRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;
     }
@@ -76,14 +77,14 @@ public class RegExpRule implements SearchRule {
     }
 
     protected int searchFields(Set<String> fields, BibtexEntry bibtexEntry,
-                               Pattern pattern) {
+            Pattern pattern) {
         int score = 0;
         if (fields != null) {
-        	for (String field : fields){
+            for (String field : fields) {
                 try {
                     Object value = bibtexEntry.getField(field);
                     if (value != null) {
-                        Matcher m = pattern.matcher(removeBrackets.format((String)value));
+                        Matcher m = pattern.matcher(removeBrackets.format((String) value));
                         if (m.find())
                             score++;
                     }

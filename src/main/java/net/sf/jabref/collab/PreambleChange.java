@@ -26,40 +26,41 @@ import net.sf.jabref.undo.UndoablePreambleChange;
 
 public class PreambleChange extends Change {
 
-  String tmp, mem, disk;
-  InfoPane tp = new InfoPane();
-  JScrollPane sp = new JScrollPane(tp);
+    String tmp, mem, disk;
+    InfoPane tp = new InfoPane();
+    JScrollPane sp = new JScrollPane(tp);
 
-  public PreambleChange(String tmp, String mem, String disk) {
-    super("Changed preamble");
-    this.disk = disk;
-    this.mem = mem;
-    this.tmp = tmp;
 
-    StringBuffer text = new StringBuffer();
-    text.append("<FONT SIZE=3>");
-      text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
+    public PreambleChange(String tmp, String mem, String disk) {
+        super("Changed preamble");
+        this.disk = disk;
+        this.mem = mem;
+        this.tmp = tmp;
 
-    if ((disk != null) && !disk.equals(""))
-        text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
-    else
-        text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+        StringBuffer text = new StringBuffer();
+        text.append("<FONT SIZE=3>");
+        text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
 
-    if ((mem != null) && !mem.equals(""))
-        text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+        if ((disk != null) && !disk.equals(""))
+            text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
+        else
+            text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
 
-      //tp.setContentType("text/html");
-      tp.setText(text.toString());
-  }
+        if ((mem != null) && !mem.equals(""))
+            text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
 
-  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-      panel.database().setPreamble(disk);
-      undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
-      secondary.setPreamble(disk);
-      return true;
-  }
+        //tp.setContentType("text/html");
+        tp.setText(text.toString());
+    }
 
-  JComponent description() {
-    return sp;
-  }
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+        panel.database().setPreamble(disk);
+        undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
+        secondary.setPreamble(disk);
+        return true;
+    }
+
+    JComponent description() {
+        return sp;
+    }
 }

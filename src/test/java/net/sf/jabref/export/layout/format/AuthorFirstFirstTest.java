@@ -42,8 +42,7 @@ public class AuthorFirstFirstTest {
     public void testFormat() {
         assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
                 new AuthorFirstFirst()
-                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter")
-        );
+                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
     }
 
 }

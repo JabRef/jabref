@@ -20,6 +20,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.Globals;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
+
     /** The root of the global groups tree */
     private final GroupTreeNode m_groupsRootHandle;
     /** The subtree that was added or removed */
@@ -44,6 +45,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
     /** Removal of a node and all of its children. */
     public static final int REMOVE_NODE_AND_CHILDREN = 2;
+
 
     /**
      * Creates an object that can undo/redo an edit event.

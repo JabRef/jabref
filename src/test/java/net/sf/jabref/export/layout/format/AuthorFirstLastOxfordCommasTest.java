@@ -60,5 +60,4 @@ public class AuthorFirstLastOxfordCommasTest {
                 .format("John von Neumann and John Smith and Black Brown, Peter"));
     }
 
-
 }

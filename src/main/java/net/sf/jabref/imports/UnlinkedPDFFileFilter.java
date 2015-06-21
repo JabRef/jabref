@@ -20,8 +20,10 @@ import net.sf.jabref.BibtexEntry;
  * 
  */
 public class UnlinkedPDFFileFilter implements FileFilter {
+
     private final DatabaseFileLookup lookup;
     private final FileFilter fileFilter;
+
 
     public UnlinkedPDFFileFilter(FileFilter aFileFilter, BibtexDatabase database) {
         this.fileFilter = aFileFilter;

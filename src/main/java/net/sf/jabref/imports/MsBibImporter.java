@@ -28,7 +28,6 @@ import net.sf.jabref.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
 
-
 /**
  * Importer for the MS Office 2007 XML bibliography format
  * By S. M. Mahbub Murshed
@@ -49,33 +48,33 @@ public class MsBibImporter extends ImportFormat {
             not of the MsBib type, and true otherwise. Returning true is the safe choice
             if not certain.
          */
-    	Document docin = null;
-    	try {
-    	DocumentBuilder dbuild = DocumentBuilderFactory.
-    								newInstance().
-    								newDocumentBuilder();
-   		docin = dbuild.parse(in);   		
-    	} catch (Exception e) {
-	   		return false;
-    	}
-    	if(docin!= null && !docin.getDocumentElement().getTagName().contains("Sources"))
-    		return false;
-//   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
-//   		if(rootLst.getLength()==0)
-//   			rootLst = docin.getElementsByTagName("Sources");
-//   		if(rootLst.getLength()==0)
-//   			return false;
-    	// System.out.println(docin.getDocumentElement().getTagName());
+        Document docin = null;
+        try {
+            DocumentBuilder dbuild = DocumentBuilderFactory.
+                    newInstance().
+                    newDocumentBuilder();
+            docin = dbuild.parse(in);
+        } catch (Exception e) {
+            return false;
+        }
+        if (docin != null && !docin.getDocumentElement().getTagName().contains("Sources"))
+            return false;
+        //   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
+        //   		if(rootLst.getLength()==0)
+        //   			rootLst = docin.getElementsByTagName("Sources");
+        //   		if(rootLst.getLength()==0)
+        //   			return false;
+        // System.out.println(docin.getDocumentElement().getTagName());
         return true;
     }
 
     /**
-	 * String used to identify this import filter on the command line.
-	 * @return "msbib"
-	 */
-	public String getCLIid() {
-		return "msbib";
-	}
+     * String used to identify this import filter on the command line.
+     * @return "msbib"
+     */
+    public String getCLIid() {
+        return "msbib";
+    }
 
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 

@@ -27,6 +27,7 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
     private static final String BASE_URL = "http://www.springerlink.com";
     private static final String CONTENT_BASE_URL = "http://www.springerlink.com/content/";
 
+
     public SpringerLinkPdfDownload() {
 
     }
@@ -35,13 +36,11 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
         return url.getHost().toLowerCase().contains("www.springerlink.com");
     }
 
-
-
     public URL findFullTextURL(URL url) throws IOException {
         // If the url contains a 'id=' component, we will try to
         int idIndex = url.toString().indexOf("id=");
         if (idIndex > -1) {
-            url = new URL(CONTENT_BASE_URL+url.toString().substring(idIndex+3));
+            url = new URL(CONTENT_BASE_URL + url.toString().substring(idIndex + 3));
         }
         //System.out.println("URL NOW: "+url);
         String pageSource = FindFullText.loadPage(url);
@@ -51,11 +50,11 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
             String leading = pageSource.substring(0, index);
             String marker = "href=";
             index = leading.toLowerCase().lastIndexOf(marker);
-            if ((index > -1) && (index+marker.length()+1 < leading.length())) {
-                int endIndex = leading.indexOf("\"", index+marker.length()+1);
+            if ((index > -1) && (index + marker.length() + 1 < leading.length())) {
+                int endIndex = leading.indexOf("\"", index + marker.length() + 1);
 
                 try {
-                    URL pdfUrl = new URL(BASE_URL+leading.substring(index+marker.length()+1, endIndex));
+                    URL pdfUrl = new URL(BASE_URL + leading.substring(index + marker.length() + 1, endIndex));
                     System.out.println(pdfUrl.toString());
                     return pdfUrl;
                 } catch (MalformedURLException e) {

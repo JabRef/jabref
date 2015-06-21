@@ -29,15 +29,16 @@ import net.sf.jabref.undo.NamedCompound;
  * To browseOld this template use File | Settings | File Templates.
  */
 public class AbbreviateAction extends AbstractWorker {
+
     BasePanel panel;
     String message = "";
     boolean iso;
+
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
         this.iso = iso;
     }
-
 
     public void init() {
         //  new FieldWeightDialog(frame).setVisible(true);
@@ -46,7 +47,6 @@ public class AbbreviateAction extends AbstractWorker {
 
     public void run() {
         //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
-
 
         BibtexEntry[] entries = panel.getSelectedEntries();
         if (entries == null)

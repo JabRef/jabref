@@ -21,11 +21,12 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-
 public class RtfSelection implements Transferable {
+
     DataFlavor rtfFlavor;
     DataFlavor[] supportedFlavors;
     private String content;
+
 
     public RtfSelection(String s) {
         content = s;

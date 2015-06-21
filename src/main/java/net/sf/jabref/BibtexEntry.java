@@ -45,14 +45,14 @@ import java.util.*;
 
 import net.sf.jabref.export.FieldFormatter;
 
-
 public class BibtexEntry
 {
-    public final static String ID_FIELD = "id";
-    public static Map<String,String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
-    public static Map<String,String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 
-    static{
+    public final static String ID_FIELD = "id";
+    public static Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
+    public static Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
+
+    static {
         FieldAliasesOldToNew.put("address", "location");
         FieldAliasesNewToOld.put("location", "address");
 
@@ -78,7 +78,6 @@ public class BibtexEntry
         FieldAliasesNewToOld.put("institution", "school");
     }
 
-    
     private String _id;
     private BibtexEntryType _type;
     private Map<String, String> _fields = new HashMap<String, String>();
@@ -88,13 +87,10 @@ public class BibtexEntry
     private boolean searchHit, groupHit;
 
 
-
-
-
-    public BibtexEntry(){
-    	this(Util.createNeutralId());
+    public BibtexEntry() {
+        this(Util.createNeutralId());
     }
-    
+
     public BibtexEntry(String id)
     {
         this(id, BibtexEntryType.OTHER);
@@ -126,10 +122,10 @@ public class BibtexEntry
     {
         return _type.getRequiredFields();
     }
-    
+
     public String[] getUserDefinedFields()
     {
-        
+
         return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
     }
 
@@ -174,7 +170,7 @@ public class BibtexEntry
         if (type == null)
         {
             throw new NullPointerException(
-                "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
+                    "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
         }
 
         BibtexEntryType oldType = _type;
@@ -190,7 +186,6 @@ public class BibtexEntry
         } catch (PropertyVetoException pve) {
             pve.printStackTrace();
         }
-
 
     }
 
@@ -221,15 +216,13 @@ public class BibtexEntry
     public void setId(String id) throws KeyCollisionException {
 
         if (id == null) {
-            throw new
-                NullPointerException("Every BibtexEntry must have an ID");
+            throw new NullPointerException("Every BibtexEntry must have an ID");
         }
 
         try
         {
             firePropertyChangedEvent(ID_FIELD, _id, id);
-        }
-        catch (PropertyVetoException pv)
+        } catch (PropertyVetoException pv)
         {
             throw new KeyCollisionException("Couldn't change ID: " + pv);
         }
@@ -251,53 +244,53 @@ public class BibtexEntry
     public String getField(String name) {
         return _fields.get(name);
     }
-    
-	/**
-	 * Returns the contents of the given field, its alias or null if both are
-	 * not set.
-	 * 
-	 * The following aliases are considered (old bibtex <-> new biblatex) based
-	 * on the BibLatex documentation, chapter 2.2.5:
-	 *  address 		<-> location
-	 *  annote			<-> annotation 
-	 *  archiveprefix 	<-> eprinttype 
-	 *  journal 		<-> journaltitle 
-	 *  key				<-> sortkey 
-	 * 	pdf 			<-> file 
-	 * 	primaryclass 	<-> eprintclass 
-	 * 	school 			<-> institution 
-	 * These work bidirectional.
-	 * 
-	 * Special attention is paid to dates: (see the BibLatex documentation,
-	 * chapter 2.3.8) 
-	 * 	The fields 'year' and 'month' are used if the 'date'
-	 * 	field is empty. Conversely, getFieldOrAlias("year") also tries to
-	 * 	extract the year from the 'date' field (analogously for 'month').
-	 */
+
+    /**
+     * Returns the contents of the given field, its alias or null if both are
+     * not set.
+     * 
+     * The following aliases are considered (old bibtex <-> new biblatex) based
+     * on the BibLatex documentation, chapter 2.2.5:
+     *  address 		<-> location
+     *  annote			<-> annotation 
+     *  archiveprefix 	<-> eprinttype 
+     *  journal 		<-> journaltitle 
+     *  key				<-> sortkey 
+     * 	pdf 			<-> file 
+     * 	primaryclass 	<-> eprintclass 
+     * 	school 			<-> institution 
+     * These work bidirectional.
+     * 
+     * Special attention is paid to dates: (see the BibLatex documentation,
+     * chapter 2.3.8) 
+     * 	The fields 'year' and 'month' are used if the 'date'
+     * 	field is empty. Conversely, getFieldOrAlias("year") also tries to
+     * 	extract the year from the 'date' field (analogously for 'month').
+     */
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
-        if (fieldValue != null && fieldValue.length() > 0) 
-        	return fieldValue;
-        
+        if (fieldValue != null && fieldValue.length() > 0)
+            return fieldValue;
+
         // No value of this field found, so look at the alias
-        
+
         // Create bidirectional dictionary between field names and their aliases
-        Map<String,String> aliases = new HashMap<String, String>();
+        Map<String, String> aliases = new HashMap<String, String>();
         aliases.putAll(FieldAliasesOldToNew);
         aliases.putAll(FieldAliasesNewToOld);
-        
+
         String aliasForField = aliases.get(name);
-        if(aliasForField != null)
-        	return getField(aliasForField);
-       
+        if (aliasForField != null)
+            return getField(aliasForField);
+
         // So we did not found the field itself or its alias...
         // Finally, handle dates
-        if(name.equals("date"))
+        if (name.equals("date"))
         {
-        	String year = getField("year");
-        	MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
-        	if(year != null)
-        	{
+            String year = getField("year");
+            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
+            if (year != null)
+            {
                 if (month.isValid()) {
                     return year + "-" + month.twoDigitNumber;
                 } else {
@@ -305,58 +298,61 @@ public class BibtexEntry
                 }
             }
         }
-        if(name.equals("year") || name.equals("month"))
+        if (name.equals("year") || name.equals("month"))
         {
-        	String date = getField("date");
-        	if(date == null)
-        		return null;
-        	
-        	// Create date format matching dates with year and month
-        	DateFormat df = new DateFormat() {
-        	    static final String FORMAT1 = "yyyy-MM-dd";
-        	    static final String FORMAT2 = "yyyy-MM";
-        	    final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
-        	    final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
-        	    @Override
-        	    public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
-        	        throw new UnsupportedOperationException();
-        	    }
+            String date = getField("date");
+            if (date == null)
+                return null;
 
-        	    @Override
-        	    public Date parse(String source, ParsePosition pos) {
-        	        if (source.length() - pos.getIndex() == FORMAT1.length())
-        	            return sdf1.parse(source, pos);
-        	        return sdf2.parse(source, pos);
-        	    }
-        	};
-        	
-        	try {
-				Date parsedDate = df.parse(date);
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(parsedDate);
-				if(name.equals("year"))
-					return Integer.toString(calendar.get(Calendar.YEAR));
-				if(name.equals("month"))
-					return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
-			} catch (ParseException e) {
-				// So not a date with year and month, try just to parse years
-				df = new SimpleDateFormat("yyyy");
-				
-				try {
-					Date parsedDate = df.parse(date);
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(parsedDate);
-					if(name.equals("year"))
-						return Integer.toString(calendar.get(Calendar.YEAR));
-				} catch (ParseException e2) {
-				return null; // Date field not in valid format
-				}
-			}	
+            // Create date format matching dates with year and month
+            DateFormat df = new DateFormat() {
+
+                static final String FORMAT1 = "yyyy-MM-dd";
+                static final String FORMAT2 = "yyyy-MM";
+                final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
+                final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
+
+
+                @Override
+                public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Date parse(String source, ParsePosition pos) {
+                    if (source.length() - pos.getIndex() == FORMAT1.length())
+                        return sdf1.parse(source, pos);
+                    return sdf2.parse(source, pos);
+                }
+            };
+
+            try {
+                Date parsedDate = df.parse(date);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(parsedDate);
+                if (name.equals("year"))
+                    return Integer.toString(calendar.get(Calendar.YEAR));
+                if (name.equals("month"))
+                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
+            } catch (ParseException e) {
+                // So not a date with year and month, try just to parse years
+                df = new SimpleDateFormat("yyyy");
+
+                try {
+                    Date parsedDate = df.parse(date);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(parsedDate);
+                    if (name.equals("year"))
+                        return Integer.toString(calendar.get(Calendar.YEAR));
+                } catch (ParseException e2) {
+                    return null; // Date field not in valid format
+                }
+            }
         }
-        	
+
         return null;
-    }    
-    
+    }
+
     public String getCiteKey() {
         return (_fields.containsKey(BibtexFields.KEY_FIELD) ?
                 _fields.get(BibtexFields.KEY_FIELD) : null);
@@ -369,7 +365,7 @@ public class BibtexEntry
      * be used for entries that are being displayed in the GUI. Furthermore, it
      * does not check values for content, so e.g. empty strings will be set as such.
      */
-    public void setField(Map<String, String> fields){
+    public void setField(Map<String, String> fields) {
         _fields.putAll(fields);
     }
 
@@ -383,7 +379,7 @@ public class BibtexEntry
 
         if (ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
-                                               "' is reserved");
+                    "' is reserved");
         }
 
         String oldValue = _fields.get(name);
@@ -410,18 +406,17 @@ public class BibtexEntry
      */
     public void clearField(String name) {
 
-      if (ID_FIELD.equals(name)) {
-           throw new IllegalArgumentException("The field name '" + name +
-                                              "' is reserved");
-       }
-       Object oldValue = _fields.get(name);
-       _fields.remove(name);
-       try {
-           firePropertyChangedEvent(name, oldValue, null);
-       } catch (PropertyVetoException pve) {
-           throw new IllegalArgumentException("Change rejected: " + pve);
-       }
-
+        if (ID_FIELD.equals(name)) {
+            throw new IllegalArgumentException("The field name '" + name +
+                    "' is reserved");
+        }
+        Object oldValue = _fields.get(name);
+        _fields.remove(name);
+        try {
+            firePropertyChangedEvent(name, oldValue, null);
+        } catch (PropertyVetoException pve) {
+            throw new IllegalArgumentException("Change rejected: " + pve);
+        }
 
     }
 
@@ -456,7 +451,7 @@ public class BibtexEntry
     }
 
     private void firePropertyChangedEvent(String fieldName, Object oldValue,
-        Object newValue) throws PropertyVetoException
+            Object newValue) throws PropertyVetoException
     {
         _changeSupport.fireVetoableChange(new PropertyChangeEvent(this,
                 fieldName, oldValue, newValue));
@@ -496,12 +491,12 @@ public class BibtexEntry
      */
     public Object clone() {
         BibtexEntry clone = new BibtexEntry(_id, _type);
-        clone._fields = new HashMap<String, String>(_fields); 
+        clone._fields = new HashMap<String, String>(_fields);
         return clone;
     }
 
     public String toString() {
-        return getType().getName()+":"+getField(BibtexFields.KEY_FIELD);
+        return getType().getName() + ":" + getField(BibtexFields.KEY_FIELD);
     }
 
     public boolean isSearchHit() {

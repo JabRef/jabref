@@ -58,5 +58,5 @@ public interface PrefsTab {
      * 
      * @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
      */
-    public String getTabName();  
+    public String getTabName();
 }

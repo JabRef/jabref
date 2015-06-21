@@ -29,6 +29,7 @@ public class NameListNormalizer {
     static Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     static Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
+
     /*public static void main(String[] args) {
         normalizeAuthorList("Staci D. Bilbo and Smith SH and Jaclyn M Schwarz");
         //System.out.println(normalizeAuthorList("Ølver MA"));
@@ -38,10 +39,10 @@ public class NameListNormalizer {
         //System.out.println(normalizeAuthorList("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
     }*/
 
-    public static String normalizeAuthorList(String in){
+    public static String normalizeAuthorList(String in) {
         boolean andSep = false, semicolonSep = false, commaSep = false;
         String author;
-        String[] authors = in.split("( |,)and ",-1);
+        String[] authors = in.split("( |,)and ", -1);
         if (authors.length > 1)
             andSep = true;
         else {
@@ -75,7 +76,7 @@ public class NameListNormalizer {
         }
 
         // Remove leading and trailing whitespaces from each name:
-        for (int i = 0; i < authors.length; i++){
+        for (int i = 0; i < authors.length; i++) {
             authors[i] = authors[i].trim();
         }
 
@@ -83,13 +84,13 @@ public class NameListNormalizer {
         // comma separation before the last separator. If there are two or more
         // and separators, we can dismiss this possibility.
         // If there is only a single and separator, check closer:
-        if(andSep && (authors.length == 2)){
+        if (andSep && (authors.length == 2)) {
             // Check if the first part is semicolon separated:
             String[] semiSep = authors[0].split("; ");
             if (semiSep.length > 1) {
                 // Ok, it looks like this is the case. Use separation by semicolons:
-                String[] newAuthors = new String[1+semiSep.length];
-                for (int i=0; i<semiSep.length; i++) {
+                String[] newAuthors = new String[1 + semiSep.length];
+                for (int i = 0; i < semiSep.length; i++) {
                     newAuthors[i] = semiSep[i].trim();
                 }
                 newAuthors[semiSep.length] = authors[1];
@@ -105,8 +106,8 @@ public class NameListNormalizer {
                         // This means that the last name doesn't contain a comma, but the first
                         // one contains one or more. This indicates that the names leading up to
                         // the single "and" are comma separated:
-                        String[] newAuthors = new String[1+cmSep.length];
-                        for (int i=0; i<cmSep.length; i++) {
+                        String[] newAuthors = new String[1 + cmSep.length];
+                        for (int i = 0; i < cmSep.length; i++) {
                             newAuthors[i] = cmSep[i].trim();
                         }
                         newAuthors[cmSep.length] = authors[1];
@@ -118,15 +119,14 @@ public class NameListNormalizer {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (int i=0; i<authors.length; i++) {
+        for (int i = 0; i < authors.length; i++) {
             String norm = normalizeName(authors[i]);
             sb.append(norm);
-            if (i < authors.length-1)
+            if (i < authors.length - 1)
                 sb.append(" and ");
         }
         return sb.toString();
     }
-
 
     public static String normalizeName(String name) {
         Matcher m = lastFF.matcher(name);
@@ -134,10 +134,10 @@ public class NameListNormalizer {
             String initials = m.group(2);
             StringBuilder sb = new StringBuilder(m.group(1));
             sb.append(", ");
-            for (int i=0; i<initials.length(); i++) {
+            for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length()-1)
+                if (i < initials.length() - 1)
                     sb.append(' ');
             }
             return sb.toString();
@@ -147,10 +147,10 @@ public class NameListNormalizer {
             String initials = m.group(2).replaceAll("[\\. ]+", "");
             StringBuilder sb = new StringBuilder(m.group(1));
             sb.append(", ");
-            for (int i=0; i<initials.length(); i++) {
+            for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length()-1)
+                if (i < initials.length() - 1)
                     sb.append(' ');
             }
             return sb.toString();
@@ -161,10 +161,10 @@ public class NameListNormalizer {
             String initials = m.group(1);
             StringBuilder sb = new StringBuilder(m.group(2));
             sb.append(", ");
-            for (int i=0; i<initials.length(); i++) {
+            for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length()-1)
+                if (i < initials.length() - 1)
                     sb.append(' ');
             }
             return sb.toString();
@@ -174,10 +174,10 @@ public class NameListNormalizer {
             String initials = m.group(1).replaceAll("[\\. ]+", "");
             StringBuilder sb = new StringBuilder(m.group(2));
             sb.append(", ");
-            for (int i=0; i<initials.length(); i++) {
+            for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length()-1)
+                if (i < initials.length() - 1)
                     sb.append(' ');
             }
             return sb.toString();
@@ -188,20 +188,21 @@ public class NameListNormalizer {
             int index = name.lastIndexOf(',');
             // If the comma is at the end of the name, just remove it to prevent index error:
             if (index == name.length() - 1)
-                name = name.substring(0, name.length()-1);
+                name = name.substring(0, name.length() - 1);
 
             StringBuilder sb = new StringBuilder(name.substring(0, index));
             sb.append(", ");
             // Check if the remainder is a single name:
-            String fName = name.substring(index+1).trim();
+            String fName = name.substring(index + 1).trim();
             String[] fParts = fName.split(" ");
             if (fParts.length > 1) {
                 // Multiple parts. Add all of them, and add a dot if they are single letter parts:
-                for (int i=0; i<fParts.length; i++) {
+                for (int i = 0; i < fParts.length; i++) {
                     if (fParts[i].length() == 1)
                         sb.append(fParts[i]).append(".");
-                    else sb.append(fParts[i]);
-                    if (i < fParts.length-1)
+                    else
+                        sb.append(fParts[i]);
+                    if (i < fParts.length - 1)
                         sb.append(" ");
                 }
             } else {
@@ -212,10 +213,10 @@ public class NameListNormalizer {
                 else {
                     // It looks like initials.
                     String initials = fParts[0].replaceAll("[\\.]+", "");
-                    for (int i=0; i<initials.length(); i++) {
+                    for (int i = 0; i < initials.length(); i++) {
                         sb.append(initials.charAt(i));
                         sb.append('.');
-                        if (i < initials.length()-1)
+                        if (i < initials.length() - 1)
                             sb.append(' ');
                     }
                 }
@@ -236,10 +237,10 @@ public class NameListNormalizer {
             if (allNames) {
                 // Looks like a name written in full with first name first.
                 // Change into last name first format:
-                StringBuilder sb = new StringBuilder(parts[parts.length-1]);
+                StringBuilder sb = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
                     sb.append(",");
-                    for (int i = 0; i < parts.length-1; i++) {
+                    for (int i = 0; i < parts.length - 1; i++) {
                         sb.append(" ").append(parts[i]);
                         if (parts[i].length() == 1)
                             sb.append(".");

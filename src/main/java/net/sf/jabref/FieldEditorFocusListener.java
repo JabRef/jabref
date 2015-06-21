@@ -19,7 +19,6 @@ import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-
 /**
  * Focus listener that changes the color of the text area when it has focus.
  * Created by IntelliJ IDEA.
@@ -35,17 +34,16 @@ public class FieldEditorFocusListener implements FocusListener {
 
     public void focusGained(FocusEvent event) {
         if (event.getSource() instanceof FieldEditor)
-            ((FieldEditor)event.getSource()).setActiveBackgroundColor();
+            ((FieldEditor) event.getSource()).setActiveBackgroundColor();
         else
-            ((JComponent)event.getSource()).setBackground(GUIGlobals.activeBackground);
+            ((JComponent) event.getSource()).setBackground(GUIGlobals.activeBackground);
     }
-
 
     public void focusLost(FocusEvent event) {
         if (event.getSource() instanceof FieldEditor)
-            ((FieldEditor)event.getSource()).setValidBackgroundColor();
+            ((FieldEditor) event.getSource()).setValidBackgroundColor();
         else
-            ((JComponent)event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
+            ((JComponent) event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
     }
 
 }

@@ -24,9 +24,11 @@ import ca.odell.glazedlists.matchers.Matcher;
  * active.
  */
 public class NoSearchMatcher implements Matcher<BibtexEntry> {
-	public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
 
-	public boolean matches(BibtexEntry object) {
-		return true;
-	}
+    public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
+
+
+    public boolean matches(BibtexEntry object) {
+        return true;
+    }
 }

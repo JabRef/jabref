@@ -23,7 +23,9 @@ import net.sf.jabref.Util;
  * be found in JabRef's current database.
  */
 public class UndefinedBibtexEntry extends BibtexEntry {
+
     private String key;
+
 
     public UndefinedBibtexEntry(String key) {
         super(Util.createNeutralId());

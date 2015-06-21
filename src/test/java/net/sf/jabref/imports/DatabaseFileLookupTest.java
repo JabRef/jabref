@@ -32,6 +32,7 @@ public class DatabaseFileLookupTest {
     private BibtexEntry entry1;
     private BibtexEntry entry2;
 
+
     /* (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
@@ -56,7 +57,8 @@ public class DatabaseFileLookupTest {
         assertNotNull(entry2);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testInsertTestData() throws Exception {
 
         entry1 = new BibtexEntry();
@@ -77,7 +79,6 @@ public class DatabaseFileLookupTest {
         CheckableTreeNode treeNode = crawler.searchDirectory(ImportDataTest.EXISTING_FOLDER, new EntryFromPDFCreator());
 
         assertNotNull(treeNode);
-
 
         /**
          * Select all nodes manually.
@@ -172,6 +173,7 @@ public class DatabaseFileLookupTest {
     private static <T> Constructor<? extends T>[] orderByParamCount(Constructor<? extends T>[] constructors) {
         List<Constructor<? extends T>> list = Arrays.asList(constructors);
         Collections.sort(list, new Comparator<Constructor<? extends T>>() {
+
             public int compare(Constructor<? extends T> c1, Constructor<? extends T> c2) {
                 return new Integer(c1.getParameterTypes().length).compareTo(c2.getParameterTypes().length);
             }

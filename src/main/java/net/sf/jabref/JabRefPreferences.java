@@ -95,15 +95,13 @@ public class JabRefPreferences {
             EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending",
             WRITEFIELD_SORTSTYLE = "writefieldSortStyle",
             WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder",
-            WRITEFIELD_WRAPFIELD="wrapFieldLine";
-    
+            WRITEFIELD_WRAPFIELD = "wrapFieldLine";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    private static final char[][] VALUE_DELIMITERS
-            = new char[][]{{'"', '"'}, {'{', '}'}};
+    private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
@@ -132,8 +130,7 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
-    public final ExternalFileType HTML_FALLBACK_TYPE
-            = new ExternalFileType("URL", "html", "text/html", "", "www");
+    public final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
 
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
@@ -154,6 +151,7 @@ public class JabRefPreferences {
 
     // The only instance of this class:
     private static JabRefPreferences singleton = null;
+
 
     public static JabRefPreferences getInstance() {
         if (singleton == null) {
@@ -187,7 +185,7 @@ public class JabRefPreferences {
                 putBoolean(SAVE_TERTIARY_SORT_DESCENDING, false);
             }
         }
-        
+
         if (prefs.get(EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
                 putBoolean(EXPORT_IN_SPECIFIED_ORDER, true);
@@ -278,7 +276,7 @@ public class JabRefPreferences {
         defaults.put("namesAsIs", Boolean.FALSE); // "Show names unchanged"
         defaults.put("namesFf", Boolean.FALSE); // "Show 'Firstname Lastname'"
         defaults.put("namesLf", Boolean.FALSE); // "Show 'Lastname, Firstname'"
-        defaults.put("namesNatbib", Boolean.TRUE);  // "Natbib style"
+        defaults.put("namesNatbib", Boolean.TRUE); // "Natbib style"
         defaults.put("abbrAuthorNames", Boolean.TRUE); // "Abbreviate names"
         defaults.put("namesLastOnly", Boolean.TRUE); // "Show last names only"
         defaults.put("language", "en");
@@ -309,7 +307,7 @@ public class JabRefPreferences {
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
         defaults.put(NEWLINE, System.getProperty("line.separator"));
-        
+
         defaults.put("sidePaneComponentNames", "");
         defaults.put("sidePaneComponentPreferredPositions", "");
 
@@ -435,7 +433,7 @@ public class JabRefPreferences {
         defaults.put("arxivColumn", Boolean.FALSE);
 
         defaults.put("extraFileColumns", Boolean.FALSE);
-        defaults.put("listOfFileColumns","");
+        defaults.put("listOfFileColumns", "");
 
         defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
@@ -519,7 +517,7 @@ public class JabRefPreferences {
         defaults.put("useTimeStamp", Boolean.FALSE);
         defaults.put("overwriteTimeStamp", Boolean.FALSE);
         defaults.put("timeStampFormat", "yyyy.MM.dd");
-//        defaults.put("timeStampField", "timestamp");
+        //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
@@ -527,7 +525,7 @@ public class JabRefPreferences {
         // behavior of JabRef before 2.10: both: false
         defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
         defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
-        
+
         //behavior of JabRef before LWang_AdjustableFieldOrder 1
         //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
         defaults.put(WRITEFIELD_SORTSTYLE, 0);
@@ -649,6 +647,7 @@ public class JabRefPreferences {
 
     }
 
+
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
@@ -658,6 +657,7 @@ public class JabRefPreferences {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
 
     public static final String GROUP_SHOW_NUMBER_OF_ELEMENTS = "groupShowNumberOfElements";
+
 
     public boolean putBracesAroundCapitals(String fieldName) {
         return putBracesAroundCapitalsFields.contains(fieldName);
@@ -688,8 +688,7 @@ public class JabRefPreferences {
     }
 
     public char[] getValueDelimiters() {
-        return VALUE_DELIMITERS[getInt(
-                "valueDelimiters")];
+        return VALUE_DELIMITERS[getInt("valueDelimiters")];
     }
 
     /**
@@ -985,8 +984,7 @@ public class JabRefPreferences {
     public void setNewKeyBindings(HashMap<String, String> newBindings) {
         if (!newBindings.equals(keyBinds)) {
             // This confirms that the bindings have actually changed.
-            String[] bindNames = new String[newBindings.size()],
-                    bindings = new String[newBindings.size()];
+            String[] bindNames = new String[newBindings.size()], bindings = new String[newBindings.size()];
             int index = 0;
             for (String nm : newBindings.keySet()) {
                 String bnd = newBindings.get(nm);
@@ -1054,8 +1052,7 @@ public class JabRefPreferences {
         defineDefaultKeyBindings();
 
         // First read the bindings, and their names.
-        String[] bindNames = getStringArray("bindNames"),
-                bindings = getStringArray("bindings");
+        String[] bindNames = getStringArray("bindNames"), bindings = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
         if ((bindNames == null) || (bindings == null)
@@ -1256,9 +1253,7 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
         String name = get(CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(CUSTOM_TYPE_REQ + nr),
-                opt = getStringArray(CUSTOM_TYPE_OPT + nr),
-                priOpt = getStringArray(CUSTOM_TYPE_PRIOPT + nr);
+        String[] req = getStringArray(CUSTOM_TYPE_REQ + nr), opt = getStringArray(CUSTOM_TYPE_OPT + nr), priOpt = getStringArray(CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
         }
@@ -1439,7 +1434,7 @@ public class JabRefPreferences {
             i++;
         }
         for (ExternalFileType type : defTypes) {
-            array[i] = new String[]{type.getName(), FILE_TYPE_REMOVED_FLAG};
+            array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
         //System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
