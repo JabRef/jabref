@@ -34,15 +34,21 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 
-public class ChangeScanner extends Thread {
+public class ChangeScanner implements Runnable {
 
     final double MATCH_THRESHOLD = 0.4;
     final String[] sortBy = new String[] {"year", "author", "title"};
-    File f;
-    BibtexDatabase inMem, inTemp = null;
-    MetaData mdInMem, mdInTemp;
-    BasePanel panel;
-    JabRefFrame frame;
+
+    final File f;
+
+    final BibtexDatabase inMem;
+    final MetaData mdInMem;
+    final BasePanel panel;
+    final JabRefFrame frame;
+
+    BibtexDatabase inTemp = null;
+    MetaData mdInTemp;
+
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form
@@ -55,18 +61,12 @@ public class ChangeScanner extends Thread {
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp) { //, BibtexDatabase inMem, MetaData mdInMem) {
-        panel = bp;
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibtexDatabase inMem, MetaData mdInMem) {
+        this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
         this.mdInMem = bp.metaData();
-        // Set low priority:
-        setPriority(Thread.MIN_PRIORITY);
-    }
-
-    public void changeScan(File f) {
-        this.f = f;
-        start();
+        this.f = file;
     }
 
     public void run() {
@@ -140,7 +140,7 @@ public class ChangeScanner extends Thread {
     }
 
     private void storeTempDatabase() {
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
                 try {
@@ -153,7 +153,7 @@ public class ChangeScanner extends Thread {
                 }
 
             }
-        }).start();
+        });
     }
 
     private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
@@ -503,8 +503,7 @@ public class ChangeScanner extends Thread {
     }
 
 
-    public static interface DisplayResultCallback {
-
-        public void scanResultsResolved(boolean resolved);
+    public interface DisplayResultCallback {
+        void scanResultsResolved(boolean resolved);
     }
 }

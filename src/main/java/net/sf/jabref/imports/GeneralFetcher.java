@@ -36,14 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.FocusRequester;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.SidePaneComponent;
-import net.sf.jabref.SidePaneManager;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.help.HelpAction;
@@ -237,7 +230,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
             final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
                     pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
-            new Thread(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
@@ -256,20 +249,20 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 d2.addCallBack(activeFetcher);
                                 Util.placeDialog(d2, frame);
                                 d2.setVisible(true);
-                                new Thread(new Runnable() {
+                                JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                                     public void run() {
                                         pFetcher.getEntries(dialog.getSelection(), d2);
                                         d2.entryListComplete();
                                     }
-                                }).start();
+                                });
 
                             }
                         }
                     });
 
                 }
-            }).start();
+            });
         }
 
         // The other category downloads the entries first, then asks the user which ones to keep:
@@ -280,17 +273,16 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             Util.placeDialog(dialog, frame);
             dialog.setVisible(true);
 
-            new Thread(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
-
                     if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
                         dialog.entryListComplete();
                     } else {
                         dialog.dispose();
                     }
                 }
-            }).start();
+            });
         }
     }
 

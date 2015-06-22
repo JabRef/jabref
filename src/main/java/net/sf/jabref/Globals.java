@@ -245,8 +245,7 @@ public class Globals {
         errorConsole = ErrorConsole.getInstance();
 
         fileUpdateMonitor = new FileUpdateMonitor();
-        fileUpdateMonitor.start();
-
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(fileUpdateMonitor);
     }
 
     /**

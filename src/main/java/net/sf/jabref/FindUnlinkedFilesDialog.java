@@ -498,7 +498,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         final FileFilter selectedFileFilter = (FileFilter) comboBoxFileTypeSelection.getSelectedItem();
 
         threadState = new int[] {1};
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
                 UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
@@ -513,7 +513,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 });
                 searchFinishedHandler(rootNode);
             }
-        }).start();
+        });
 
     }
 
@@ -558,7 +558,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         final BibtexEntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
 
         threadState = new int[] {1};
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
                 List<String> errors = new LinkedList<String>();
@@ -576,7 +576,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         }, errors);
                 importFinishedHandler(count, errors);
             }
-        }).start();
+        });
 
     }
 

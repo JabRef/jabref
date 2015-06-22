@@ -21,11 +21,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.*;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -74,9 +70,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
             }
 
         // All set, call the operation in a new thread:
-        Thread t = new Thread(this);
-        t.start();
-
+        JabRefExecutorService.INSTANCE.execute(this);
     }
 
     public void run() {

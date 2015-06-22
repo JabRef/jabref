@@ -1115,7 +1115,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("openFile", new BaseAction() {
 
             public void action() {
-                (new Thread() {
+                JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
@@ -1180,8 +1180,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
                                         String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                                         result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
-                                    }
-                                    else
+                                    } else
                                         result = Util.findAssociatedFiles(entries, extensions, dirs);
                                     if (result.get(bes[0]) != null) {
                                         List<File> res = result.get(bes[0]);
@@ -1234,8 +1233,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 try {
                                     Util.openExternalViewer(metaData(), filepath, field);
                                     output(Globals.lang("External viewer called") + ".");
-                                }
-                                catch (IOException ex) {
+                                } catch (IOException ex) {
                                     output(Globals.lang("Error") + ": " + ex.getMessage());
                                 }
                             } else
@@ -1245,7 +1243,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         } else
                             output(Globals.lang("No entries or multiple entries selected."));
                     }
-                }).start();
+                });
             }
         });
 
@@ -1254,7 +1252,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("openExternalFile", new BaseAction() {
 
             public void action() {
-                (new Thread() {
+                JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
@@ -1280,14 +1278,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         } else
                             output(Globals.lang("No entries or multiple entries selected."));
                     }
-                }).start();
+                });
             }
         });
 
         actions.put("openFolder", new BaseAction() {
 
             public void action() {
-                (new Thread() {
+                JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
@@ -1300,7 +1298,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
                         }
                     }
-                }).start();
+                });
             }
         });
 
@@ -1441,8 +1439,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("dupliCheck", new BaseAction() {
 
             public void action() {
-                DuplicateSearch ds = new DuplicateSearch(BasePanel.this);
-                ds.start();
+                JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this));
             }
         });
 
@@ -2896,11 +2893,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //Util.pr("File '"+file.getPath()+"' has been modified.");
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this);
+        final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this, BasePanel.this.getFile());
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing
         // thread:
-        Thread t = new Thread() {
+        Runnable t = new Runnable() {
 
             public void run() {
 
@@ -2930,12 +2927,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return;
         }
 
-        scanner.changeScan(BasePanel.this.getFile());
-        try {
-            scanner.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
 
         if (scanner.changesFound()) {
             SwingUtilities.invokeLater(t);

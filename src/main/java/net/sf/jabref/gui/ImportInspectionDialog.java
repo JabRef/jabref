@@ -759,7 +759,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
 
             dispose();
-            SwingUtilities.invokeLater(new Thread() {
+            SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
                     if (newDatabase) {
@@ -1224,7 +1224,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            Util.autoSetLinks(entry, model, metaData, new ActionListener() {
+            JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, model, metaData, new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
                     if (e.getID() > 0) {
@@ -1234,7 +1234,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         glTable.repaint();
                     }
                 }
-            }, diag);
+            }, diag));
 
         }
     }

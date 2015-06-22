@@ -26,12 +26,7 @@ import javax.swing.JDialog;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BaseAction;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -202,7 +197,7 @@ public class AccessLinksForEntries {
             diag.pack();
             diag.setLocationRelativeTo(panel.frame());
             diag.setVisible(true);
-            Thread t = new Thread(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     AccessLinksForEntries.copyExternalLinksToDirectory(links,
@@ -215,8 +210,6 @@ public class AccessLinksForEntries {
                             });
                 }
             });
-            t.start();
-
         }
     }
 

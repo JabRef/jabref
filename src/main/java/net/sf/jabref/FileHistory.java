@@ -129,12 +129,12 @@ public class FileHistory extends JMenu implements ActionListener {
             removeItem(name);
             return;
         }
-        (new Thread() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
                 frame.open.openIt(fileToOpen, true);
             }
-        }).start();
+        });
 
     }
 

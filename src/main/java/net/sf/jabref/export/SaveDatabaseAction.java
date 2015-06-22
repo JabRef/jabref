@@ -77,7 +77,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     cancelled = true;
 
-                    (new Thread(new Runnable() {
+                    JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                         public void run() {
 
@@ -86,13 +86,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                                 System.err.println("File locked, this will be trouble.");
                             }
 
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel);
-                            scanner.changeScan(panel.getFile());
-                            try {
-                                scanner.join();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
                                 scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
 
@@ -112,7 +107,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                                 });
                             }
                         }
-                    })).start();
+                    });
 
                     return;
                 }

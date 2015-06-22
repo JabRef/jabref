@@ -31,7 +31,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
         final NamedCompound nc = new NamedCompound(Globals.lang("Automatically set file links"));
-        Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
+        Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (e.getID() > 0) {
@@ -42,11 +42,11 @@ public class AutoLinkFilesAction extends AbstractAction {
                         JabRef.jrf.basePanel().markBaseChanged();
                     }
                     JabRef.jrf.output(Globals.lang("Finished autosetting external links."));
-                }
-                else
+                } else
                     JabRef.jrf.output(Globals.lang("Finished autosetting external links.")
                             + " " + Globals.lang("No files found."));
             }
         }, diag);
+        JabRefExecutorService.INSTANCE.execute(runnable);
     }
 }

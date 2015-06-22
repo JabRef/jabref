@@ -103,7 +103,7 @@ public class AttachFileDialog extends JDialog {
         auto.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent event) {
-                extPan.autoSetFile(fieldName, editor);
+                JabRefExecutorService.INSTANCE.execute(extPan.autoSetFile(fieldName, editor));
             }
         });
 

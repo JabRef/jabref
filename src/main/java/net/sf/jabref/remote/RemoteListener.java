@@ -31,13 +31,15 @@ import net.sf.jabref.imports.ParserResult;
 
 import javax.swing.*;
 
-public class RemoteListener extends Thread {
+public class RemoteListener implements Runnable {
 
-    private JabRef jabref;
-    private ServerSocket socket;
-    private boolean active = true, toStop = false;
     private static final String IDENTIFIER = "jabref";
 
+    private final JabRef jabref;
+    private final ServerSocket socket;
+
+    private volatile boolean active = true;
+    private volatile boolean toStop = false;
 
     public RemoteListener(JabRef jabref, ServerSocket socket) {
         this.jabref = jabref;
@@ -122,15 +124,12 @@ public class RemoteListener extends Thread {
         try {
             ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"), 1,
                     InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
-            RemoteListener listener = new RemoteListener(jabref, socket);
-            return listener;
+            return new RemoteListener(jabref, socket);
         } catch (IOException e) {
             if (!e.getMessage().startsWith("Address already in use"))
                 e.printStackTrace();
             return null;
-
         }
-
     }
 
     /**

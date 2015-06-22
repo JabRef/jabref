@@ -161,13 +161,9 @@ public class PushToEmacs implements PushToApplication {
                     }
                 }
             };
-            Thread t = new Thread(errorListener);
-            t.start();
-            t.join();
+            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
             couldNotRunClient = true;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
     }

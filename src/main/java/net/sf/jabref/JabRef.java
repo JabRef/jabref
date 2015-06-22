@@ -162,7 +162,7 @@ public class JabRef {
             } else {
                 // No listener found, thus we are the first instance to be
                 // started.
-                remoteListener.start();
+                JabRefExecutorService.INSTANCE.executeInOwnThread(JabRef.remoteListener);
             }
         }
 

@@ -16,7 +16,7 @@
 // created by : ?
 //
 // modified : r.nagel 2.09.2004
-//            - new SearcherThread.setFinish() method
+//            - new SearcherRunnable.setFinish() method
 //            - replace thread.sleep in run() by wait() and notify() mechanism
 
 package net.sf.jabref;
@@ -30,7 +30,7 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import spin.Spin;
 
-public class DuplicateSearch extends Thread {
+public class DuplicateSearch implements Runnable {
 
     BasePanel panel;
     BibtexEntry[] bes;
@@ -55,9 +55,8 @@ public class DuplicateSearch extends Thread {
         for (int i = 0; i < keys.length; i++)
             bes[i] = panel.database.getEntryById((String) keys[i]);
 
-        SearcherThread st = new SearcherThread();
-        st.setPriority(Thread.MIN_PRIORITY);
-        st.start();
+        SearcherRunnable st = new SearcherRunnable();
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st);
         int current = 0;
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
@@ -142,10 +141,9 @@ public class DuplicateSearch extends Thread {
     }
 
 
-    class SearcherThread extends Thread {
+    class SearcherRunnable implements Runnable {
 
-        private boolean finished = false;
-
+        private volatile boolean finished = false;
 
         public void run() {
             for (int i = 0; (i < bes.length - 1) && !finished; i++) {
@@ -153,10 +151,8 @@ public class DuplicateSearch extends Thread {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
                     // If (suspected) duplicates, add them to the duplicates vector.
-                    if (eq)
-                    {
-                        synchronized (duplicates)
-                        {
+                    if (eq) {
+                        synchronized (duplicates) {
                             duplicates.add(new BibtexEntry[] {bes[i], bes[j]});
                             duplicates.notifyAll(); // send wake up all
                         }
@@ -165,8 +161,7 @@ public class DuplicateSearch extends Thread {
             }
             finished = true;
             // if no duplicates found, the graphical thread will never wake up
-            synchronized (duplicates)
-            {
+            synchronized (duplicates) {
                 duplicates.notifyAll();
             }
         }

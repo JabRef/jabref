@@ -34,6 +34,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
@@ -369,7 +370,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // Try to load bib files normally, and import the rest into the current
         // database.
         // This process must be spun off into a background thread:
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
                 // Done by MrDlib
@@ -380,7 +381,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 //loadOrImportFiles(fileNames, dropRow);
                 // Done by MrDlib
             }
-        }).start();
+        });
 
         return true;
     }

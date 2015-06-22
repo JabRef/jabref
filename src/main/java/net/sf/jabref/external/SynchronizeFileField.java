@@ -106,13 +106,8 @@ public class SynchronizeFileField extends AbstractWorker {
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:                
-            Thread t = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
-            // Wait for the autosetting to finish:
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
+            JabRefExecutorService.INSTANCE.executeAndWait(r);
             /*
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);

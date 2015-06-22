@@ -22,17 +22,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BaseAction;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.MergeDialog;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
@@ -79,13 +69,14 @@ public class AppendDatabaseAction extends BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     openIt(md.importEntries(), md.importStrings(),
                             md.importGroups(), md.importSelectorWords());
                 }
-            }).start();
+
+            });
             //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
         }
 

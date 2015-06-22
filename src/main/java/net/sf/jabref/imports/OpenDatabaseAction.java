@@ -124,14 +124,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (filesToOpen.size() > 0) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     for (File theFile : theFiles)
                         openIt(theFile, true);
-
                 }
-            }).start();
+            });
             for (File theFile : theFiles)
                 frame.getFileHistory().newFile(theFile.getPath());
         }
@@ -295,7 +294,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (pr.hasWarnings()) {
             final String[] wrns = pr.warnings();
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     StringBuffer wrn = new StringBuffer();
@@ -313,7 +312,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                             Globals.lang("Warnings") + " (" + file.getName() + ")",
                             JOptionPane.WARNING_MESSAGE);
                 }
-            }).start();
+            });
         }
         BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
 

@@ -115,14 +115,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                     continue;
                 extPan.setEntry(aSel, panel.getDatabase());
                 editor.setText((old != null) ? old : "");
-                Thread t = extPan.autoSetFile(fieldName, editor);
-                // Wait for the autoset process to finish:
-                if (t != null)
-                    try {
-                        t.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                JabRefExecutorService.INSTANCE.executeAndWait(extPan.autoSetFile(fieldName, editor));
                 // If something was found, entriesChanged it:
                 if (!editor.getText().equals("") && !editor.getText().equals(old)) {
                     // Store an undo edit:

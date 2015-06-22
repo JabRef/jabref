@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes
  * in the file's last modification time stamp. The
  */
-public class FileUpdateMonitor extends Thread {
+public class FileUpdateMonitor implements Runnable {
 
     private static Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
@@ -36,12 +36,7 @@ public class FileUpdateMonitor extends Thread {
     static int tmpNum = 0;
     int no = 0;
     HashMap<String, Entry> entries = new HashMap<String, Entry>();
-    boolean running;
-
-
-    public FileUpdateMonitor() {
-        setPriority(MIN_PRIORITY);
-    }
+    volatile boolean running;
 
     public void run() {
         running = true;
@@ -65,7 +60,7 @@ public class FileUpdateMonitor extends Thread {
 
             // Sleep for a while before starting a new polling round.
             try {
-                sleep(WAIT);
+                Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
                 logger.finest("FileUpdateMonitor has been interrupted.");
                 /*  the (?) correct way to interrupt threads, according to

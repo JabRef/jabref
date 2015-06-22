@@ -204,7 +204,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         public void actionPerformed(ActionEvent arg0) {
 
             // Background this, as it takes a while.
-            new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     try {
@@ -222,7 +222,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
-            }.start();
+            });
         }
     }
 

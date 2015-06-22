@@ -352,7 +352,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         auto.setEnabled(false);
         BibtexEntry entry = entryEditor.getEntry();
         JDialog diag = new JDialog(frame, true);
-        Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
@@ -364,7 +364,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     frame.output(Globals.lang("Finished autosetting external links.")
                             + " " + Globals.lang("No files found."));
             }
-        }, diag);
+        }, diag));
 
     }
 

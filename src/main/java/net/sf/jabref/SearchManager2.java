@@ -468,16 +468,18 @@ public class SearchManager2 extends SidePaneComponent
     }
 
     private void clearSearchLater() {
-        if (panel != null) {
-            Thread t = new Thread() {
-
-                public void run() {
-                    clearSearch();
-                }
-            };
-            // do this after the button action is over
-            SwingUtilities.invokeLater(t);
+        if(panel == null) {
+            return;
         }
+
+        Runnable t = new Runnable() {
+
+            public void run() {
+                clearSearch();
+            }
+        };
+        // do this after the button action is over
+        SwingUtilities.invokeLater(t);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -712,7 +714,7 @@ public class SearchManager2 extends SidePaneComponent
     private void goIncremental() {
         incSearch = true;
         escape.setEnabled(true);
-        SwingUtilities.invokeLater(new Thread() {
+        SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
                 String text = searchField.getText();

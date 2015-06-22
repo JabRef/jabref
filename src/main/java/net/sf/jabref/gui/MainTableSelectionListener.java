@@ -29,15 +29,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FocusRequester;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.RightClickMenu;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -214,7 +206,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 SwingUtilities.invokeLater(update);
             }
         };
-        (new Thread(worker)).start();
+        JabRefExecutorService.INSTANCE.execute(worker);
     }
 
     public void editSignalled() {
@@ -316,7 +308,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     panel.output(Globals.lang("External viewer called") + ".");
@@ -396,7 +388,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                     //}
                 }
 
-            }).start();
+            });
         }
     }
 

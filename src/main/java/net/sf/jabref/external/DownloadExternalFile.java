@@ -114,7 +114,7 @@ public class DownloadExternalFile {
         final URL urlF = url;
         final URLDownload udlF = udl;
         //System.out.println("Time: "+(System.currentTimeMillis()-time));
-        (new Thread() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
 
@@ -125,7 +125,7 @@ public class DownloadExternalFile {
                     if ((editor != null) && (editor.isVisible()))
                         editor.setVisible(false, false);
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                            + e2.getMessage(), Globals.lang("Download file"),
+                                    + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
                     Globals.logger("Error while downloading " + "'" + urlF.toString() + "'");
                     return;
@@ -139,7 +139,7 @@ public class DownloadExternalFile {
                     }
                 });
             }
-        }).start();
+        });
 
         ExternalFileType suggestedType = null;
         if (mimeType != null) {

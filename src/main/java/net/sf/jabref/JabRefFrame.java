@@ -665,12 +665,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             final File theFile = new File(filePath);
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     open.openIt(theFile, true);
                 }
-            }).start();
+            });
         }
     }
 
@@ -2408,11 +2408,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class LoadSessionAction
-            extends MnemonicAwareAction {
+    class LoadSessionAction extends MnemonicAwareAction {
 
-        boolean running = false;
-
+        volatile boolean running = false;
 
         public LoadSessionAction() {
             super(GUIGlobals.getImage("loadSession"));
@@ -2429,8 +2427,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 return;
             else
                 running = true;
+
             output(Globals.lang("Loading session..."));
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
                 public void run() {
                     HashSet<String> currentFiles = new HashSet<String>();
@@ -2456,13 +2455,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             (tabbedPane.getTabCount() - i0));
                     running = false;
                 }
-            }).start();
+            });
 
         }
     }
 
-    class ChangeTabAction
-            extends MnemonicAwareAction {
+    class ChangeTabAction extends MnemonicAwareAction {
 
         private boolean next;
 
@@ -2493,11 +2491,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * kept track of by Globals.focusListener, and we call the action stored under the
      * relevant name in its action map.
      */
-    class EditAction
-            extends MnemonicAwareAction {
+    class EditAction extends MnemonicAwareAction {
 
         private String command;
-
 
         public EditAction(String command, URL icon) {
             super(new ImageIcon(icon));

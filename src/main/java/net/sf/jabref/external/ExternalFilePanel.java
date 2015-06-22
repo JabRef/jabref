@@ -108,7 +108,7 @@ public class ExternalFilePanel extends JPanel {
         auto.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                autoSetFile(fieldName, editor);
+                JabRefExecutorService.INSTANCE.execute(autoSetFile(fieldName, editor));
             }
         });
         xmp.addActionListener(new ActionListener() {
@@ -157,7 +157,7 @@ public class ExternalFilePanel extends JPanel {
 
     public void pushXMP(final String fieldName, final FieldEditor editor) {
 
-        (new Thread() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public void run() {
 
@@ -199,7 +199,7 @@ public class ExternalFilePanel extends JPanel {
                     output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }
-        }).start();
+        });
     }
 
     public void browseFile(final String fieldName, final FieldEditor editor) {
@@ -265,7 +265,7 @@ public class ExternalFilePanel extends JPanel {
         else
             targetEntry = entry;
 
-        (new Thread() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public String getPlannedFileName(String res) {
                 String suffix = off.getSuffix(res);
@@ -335,7 +335,7 @@ public class ExternalFilePanel extends JPanel {
                         URLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
                     } catch (IOException e2) {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
-                                + e2.getMessage(), Globals.lang("Download file"),
+                                        + e2.getMessage(), Globals.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
                         Globals.logger("Error while downloading " + url.toString());
                         return;
@@ -381,7 +381,7 @@ public class ExternalFilePanel extends JPanel {
                         fieldEditor.setText(textToSet);
                         fieldEditor.setEnabled(true);
                         updateEditor = false;
-                        SwingUtilities.invokeLater(new Thread() {
+                        SwingUtilities.invokeLater(new Runnable() {
 
                             public void run() {
                                 entryEditor.updateField(fieldEditor);
@@ -401,22 +401,21 @@ public class ExternalFilePanel extends JPanel {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     /**
-     * Starts a thread that searches the external file directory for the given
+     * Creates a Runnable that searches the external file directory for the given
      * field name, including subdirectories, and looks for files named after the
-     * current entry's bibtex key. Returns a reference to the thread for callers
-     * that may want to wait for the thread to finish (using join()).
+     * current entry's bibtex key.
      * 
      * @param fieldName
      *            The field to set.
      * @param editor
      *            An EntryEditor instance where to set the value found.
-     * @return A reference to the Thread that performs the operation.
+     * @return A reference to the Runnable that can perform the operation.
      */
-    public Thread autoSetFile(final String fieldName, final FieldEditor editor) {
+    public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
         if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
             output(Globals.lang("You must set both BibTeX key and %0 directory", fieldName
@@ -426,16 +425,17 @@ public class ExternalFilePanel extends JPanel {
         }
         output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + "."
                 + fieldName + "'...");
-        Thread t = (new Thread() {
+
+        return new Runnable() {
 
             public void run() {
                 /*
                  * Find the following directories to look in for:
-                 * 
+                 *
                  * default directory for this field type.
-                 * 
+                 *
                  * directory of bibtex-file. // NOT POSSIBLE at the moment.
-                 * 
+                 *
                  * JabRef-directory.
                  */
                 LinkedList<String> list = new LinkedList<String>();
@@ -459,11 +459,7 @@ public class ExternalFilePanel extends JPanel {
                 }
 
             }
-        });
-
-        t.start();
-        return t;
-
+        };
     }
 
 }

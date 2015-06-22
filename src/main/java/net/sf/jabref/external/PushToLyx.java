@@ -52,7 +52,8 @@ public class PushToLyx implements PushToApplication {
         }
 
         final File lyxpipe = lp;
-        Thread t = new Thread(new Runnable() {
+
+        JabRefExecutorService.INSTANCE.executeAndWait(new Runnable() {
 
             public void run() {
                 try {
@@ -70,15 +71,6 @@ public class PushToLyx implements PushToApplication {
                 }
             }
         });
-
-        t.start();
-        //new Timeout(2000, t, Globals.lang("Error")+": "+
-        //Globals.lang("unable to access LyX-pipe"));
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public String getName() {
