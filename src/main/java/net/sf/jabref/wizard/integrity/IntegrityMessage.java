@@ -76,7 +76,7 @@ public class IntegrityMessage implements Cloneable
     private boolean fixed; // the user has changed sometings on BibtexEntry
 
 
-    public final synchronized static void setPrintMode(int newMode)
+    public synchronized static void setPrintMode(int newMode)
     {
         printMode = newMode;
     }

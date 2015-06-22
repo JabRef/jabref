@@ -67,7 +67,7 @@ public class BibtexString {
             this.prefix = prefix;
         }
 
-        public static final Type get(String name) {
+        public static Type get(String name) {
             if (name.length() <= 1) {
                 return OTHER;
             }
