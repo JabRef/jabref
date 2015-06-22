@@ -1443,13 +1443,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        /*actions.put("strictDupliCheck", new BaseAction() {
-          public void action() {
-            StrictDuplicateSearch ds = new StrictDuplicateSearch(BasePanel.this);
-            ds.start();
-          }
-        });*/
-
         actions.put("plainTextImport", new BaseAction() {
 
             public void action()
