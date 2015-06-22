@@ -653,10 +653,10 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         ooPath.setText(Globals.prefs.get("ooPath"));
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Globals.lang("Browse"));
-        browseOOExec.addActionListener(new BrowseAction(null, ooExec, false));
+        browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
         final JTextField ooJars = new JTextField(30);
         JButton browseOOJars = new JButton(Globals.lang("Browse"));
-        browseOOJars.addActionListener(new BrowseAction(null, ooJars, true));
+        browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooExec.setText(Globals.prefs.get("ooExecutablePath"));
         ooJars.setText(Globals.prefs.get("ooJarsPath"));
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));

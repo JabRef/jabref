@@ -104,10 +104,10 @@ public class DatabasePropertiesDialog extends JDialog {
         JButton browseFileIndv = new JButton(Globals.lang("Browse"));
         JButton browsePdf = new JButton(Globals.lang("Browse"));
         JButton browsePs = new JButton(Globals.lang("Browse"));
-        browseFile.addActionListener(new BrowseAction(parent, fileDir, true));
-        browseFileIndv.addActionListener(new BrowseAction(parent, fileDirIndv, true));
-        browsePdf.addActionListener(new BrowseAction(parent, pdfDir, true));
-        browsePs.addActionListener(new BrowseAction(parent, psDir, true));
+        browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
+        browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
+        browsePdf.addActionListener(BrowseAction.buildForDir(parent, pdfDir));
+        browsePs.addActionListener(BrowseAction.buildForDir(parent, psDir));
 
         setupSortOrderConfiguration();
 

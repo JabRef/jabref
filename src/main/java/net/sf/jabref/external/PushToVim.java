@@ -81,7 +81,7 @@ public class PushToVim implements PushToApplication {
 
         builder.append(new JLabel(Globals.lang("Path to Vim") + ":"));
         builder.append(vimPath);
-        BrowseAction action = new BrowseAction(null, vimPath, false);
+        BrowseAction action = BrowseAction.buildForFile(vimPath);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);

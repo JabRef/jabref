@@ -105,7 +105,7 @@ public class PushToWinEdt implements PushToApplication {
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
         builder.append(winEdtPath);
-        BrowseAction action = new BrowseAction(null, winEdtPath, false);
+        BrowseAction action = BrowseAction.buildForFile(winEdtPath);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);

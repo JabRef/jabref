@@ -115,12 +115,12 @@ public class StyleSelectDialog {
 
         popup.add(edit);
 
-        BrowseAction dfBrowse = new BrowseAction(null, directFile, false);
-        dfBrowse.setFocusTarget(directFile);
+        BrowseAction dfBrowse = BrowseAction.buildForFile(directFile, directFile);
         browseDirectFile.addActionListener(dfBrowse);
-        BrowseAction sdBrowse = new BrowseAction(null, styleDir, true);
-        sdBrowse.setFocusTarget(setDirectory);
+
+        BrowseAction sdBrowse = BrowseAction.buildForDir(styleDir, setDirectory);
         browseStyleDir.addActionListener(sdBrowse);
+
         showDefaultAuthoryearStyle.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent actionEvent) {

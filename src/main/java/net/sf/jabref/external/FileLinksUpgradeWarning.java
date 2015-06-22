@@ -113,7 +113,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             pan.add(setFileDir);
             pan.add(fileDir);
             JButton browse = new JButton(Globals.lang("Browse"));
-            browse.addActionListener(new BrowseAction(null, fileDir, true));
+            browse.addActionListener(BrowseAction.buildForDir(fileDir));
             pan.add(browse);
             b.append(pan);
             b.nextLine();
