@@ -33,15 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -1465,7 +1457,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 if (tidialog.okPressed())
                 {
-                    Util.setAutomaticFields(Arrays.asList(bibEntry),
+                    Util.setAutomaticFields(Collections.singletonList(bibEntry),
                             false, false, false);
                     insertEntry(bibEntry);
                 }

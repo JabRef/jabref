@@ -269,7 +269,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(entry.getOptionalFields(),
                         entry.getType().getPrimaryOptionalFields());
                 optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(optionalFieldsNotPrimaryOrDeprecated,
-                        deprecatedFields.toArray(new String[0]));
+                        deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases
                 Set<String> optionalFieldsAndAliases = new HashSet<String>();
@@ -297,7 +297,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (!usedOptionalFieldsDeprecated.isEmpty())
                 {
                     optPan = new EntryEditorTab(frame, panel,
-                            java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[0])), this,
+                            java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[usedOptionalFieldsDeprecated.size()])), this,
                             false, true, Globals.lang("Deprecated fields"));
                     if (optPan.fileListEditor != null)
                         fileListEditor = optPan.fileListEditor;

@@ -21,10 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import net.sf.jabref.BibtexFields;
 
@@ -43,7 +40,7 @@ import net.sf.jabref.BibtexFields;
 public class SQLUtil {
 
     private static final ArrayList<String> reservedDBWords = new ArrayList<String>(
-            Arrays.asList("key"));
+            Collections.singletonList("key"));
 
     private static ArrayList<String> allFields = null;
 

@@ -184,7 +184,8 @@ public class SidePaneManager {
         }
 
         // Split the map into a pair of parallel String arrays suitable for storage
-        String[] componentNames = preferredPositions.keySet().toArray(new String[0]);
+        Set<String> var = preferredPositions.keySet();
+        String[] componentNames = var.toArray(new String[var.size()]);
         String[] componentPositions = new String[preferredPositions.size()];
 
         for (int i = 0; i < componentNames.length; ++i) {
