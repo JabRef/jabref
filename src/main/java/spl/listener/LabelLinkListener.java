@@ -8,21 +8,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Christoph Arbeit
- * Date: 28.09.2010
- * Time: 12:06:57
- * To change this template use File | Settings | File Templates.
- */
 public class LabelLinkListener implements MouseListener {
 
-    private String link;
-    private Component component;
-
+    private final Component component;
 
     public LabelLinkListener(Component c, String link) {
-        this.link = link;
         this.component = c;
     }
 

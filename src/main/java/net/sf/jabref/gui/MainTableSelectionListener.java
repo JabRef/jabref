@@ -65,7 +65,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private int[] lastPressed = new int[20];
     private int lastPressedCount = 0;
     private long lastPressedTime = 0;
-    private long QUICK_JUMP_TIMEOUT = 2000;
 
 
     //private int lastCharPressed = -1;
@@ -538,6 +537,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
+            long QUICK_JUMP_TIMEOUT = 2000;
             if (time - lastPressedTime > QUICK_JUMP_TIMEOUT)
                 lastPressedCount = 0; // Reset last pressed character
             // Update timestamp:

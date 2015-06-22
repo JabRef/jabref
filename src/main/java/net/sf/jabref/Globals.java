@@ -143,8 +143,6 @@ public class Globals {
             ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/",
             FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
-    private static Handler consoleHandler;
-
     public static String[] ENCODINGS, ALL_ENCODINGS = // (String[])
             // Charset.availableCharsets().keySet().toArray(new
             // String[]{});
@@ -280,7 +278,7 @@ public class Globals {
      * Should be only called once
      */
     public static void turnOnConsoleLogging() {
-        consoleHandler = new java.util.logging.ConsoleHandler();
+        Handler consoleHandler = new ConsoleHandler();
         logger.addHandler(consoleHandler);
     }
 

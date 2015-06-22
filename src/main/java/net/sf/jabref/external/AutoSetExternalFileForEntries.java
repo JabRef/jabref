@@ -50,7 +50,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
 
-    private int entriesChanged = 0, brokenLinks = 0;
+    private int entriesChanged = 0;
 
 
     public AutoSetExternalFileForEntries(BasePanel panel, String fieldName) {
@@ -92,7 +92,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         entriesChanged = 0;
-        brokenLinks = 0;
+        int brokenLinks = 0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);

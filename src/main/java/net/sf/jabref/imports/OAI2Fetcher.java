@@ -59,8 +59,6 @@ public class OAI2Fetcher implements EntryFetcher {
 
     public static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
 
-    private SAXParserFactory parserFactory;
-
     private SAXParser saxParser;
 
     private String oai2Host;
@@ -115,7 +113,7 @@ public class OAI2Fetcher implements EntryFetcher {
         this.oai2ArchiveName = oai2ArchiveName;
         this.waitTime = waitTimeMs;
         try {
-            parserFactory = SAXParserFactory.newInstance();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

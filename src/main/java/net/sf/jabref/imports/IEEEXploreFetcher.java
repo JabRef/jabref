@@ -69,8 +69,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
     private JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
 
-    private CookieManager cm = new CookieManager();
-
     private static final int MAX_FETCH = 100;
     private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
     private int piv = 0;
@@ -79,10 +77,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private boolean importBibtex = false;
 
     private String terms;
-    private final String startUrl = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
     private final String endUrl = "&rowsPerPage=" + Integer.toString(perPage) + "&pageNumber=";
     private String searchUrl;
-    private final String importUrl = "http://ieeexplore.ieee.org/xpls/downloadCitations";
 
     private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
     private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" +
@@ -103,13 +99,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
     Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
+    public static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
+    public static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
 
     // Common words in IEEE Xplore that should always be 
 
     public IEEEXploreFetcher() {
         super();
-        CookieHandler.setDefault(cm);
+        CookieHandler.setDefault(new CookieManager());
 
         fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         //fieldPatterns.put("author", "</h3>\\s*(.+)");
@@ -250,7 +248,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        return startUrl + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
+        return START_URL + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
     }
 
     private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
@@ -293,11 +291,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private BibtexDatabase parseBibtexDatabase(List<String> id, boolean abs) throws IOException {
         if (id.isEmpty())
             return null;
-        URL url;
         URLConnection conn;
         try {
-            url = new URL(importUrl);
-            conn = url.openConnection();
+            conn = new URL(IMPORT_URL).openConnection();
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;

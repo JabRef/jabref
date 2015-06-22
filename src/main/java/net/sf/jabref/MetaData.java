@@ -30,7 +30,6 @@ public class MetaData implements Iterable<String> {
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
     private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
-    private StringReader data;
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
     private boolean groupTreeValid = true;
@@ -56,7 +55,7 @@ public class MetaData implements Iterable<String> {
 
         if (inData != null)
             for (String key : inData.keySet()) {
-                data = new StringReader(inData.get(key));
+                StringReader data = new StringReader(inData.get(key));
                 String unit;
                 Vector<String> orderedData = new Vector<String>();
                 // We must allow for ; and \ in escape sequences.

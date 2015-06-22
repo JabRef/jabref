@@ -64,9 +64,7 @@ public class MergeEntriesDialog extends JDialog {
     private BasePanel panel;
     private JabRefFrame frame;
     private JRadioButton[][] rb;
-    private ButtonGroup[] rbg;
     private Boolean[] identical;
-    private boolean block = true;
     private CellConstraints cc = new CellConstraints();
     private BibtexEntry mergedEntry = new BibtexEntry();
     private BibtexEntry one;
@@ -124,7 +122,7 @@ public class MergeEntriesDialog extends JDialog {
 
         // Create storage arrays
         rb = new JRadioButton[3][joint.size() + 1];
-        rbg = new ButtonGroup[joint.size() + 1];
+        ButtonGroup[] rbg = new ButtonGroup[joint.size() + 1];
         identical = new Boolean[joint.size() + 1];
         jointStrings = new String[joint.size()];
 
@@ -424,9 +422,5 @@ public class MergeEntriesDialog extends JDialog {
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
-    }
-
-    public boolean isBlocking() {
-        return block;
     }
 }

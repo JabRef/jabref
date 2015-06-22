@@ -37,7 +37,8 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 public class LabelPatternUtil {
 
     // All single characters that we can use for extending a key to make it unique:
-    private static String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+
 
     public static ArrayList<String> DEFAULT_LABELPATTERN;
     static {
@@ -45,7 +46,6 @@ public class LabelPatternUtil {
     }
 
     private static BibtexDatabase _db;
-
 
     public static void updateDefaultPattern() {
         DEFAULT_LABELPATTERN = split(JabRefPreferences.getInstance().get("defaultLabelPattern"));

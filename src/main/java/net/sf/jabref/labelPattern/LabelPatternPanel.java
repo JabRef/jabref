@@ -47,10 +47,6 @@ public class LabelPatternPanel extends JPanel {
 
     private HelpAction help;
 
-    private JButton btnDefaultAll, btnDefault;
-
-    private JLabel lblEntryType, lblKeyPattern;
-
     // default pattern
     protected JTextField defaultPat = new JTextField();
 
@@ -71,7 +67,7 @@ public class LabelPatternPanel extends JPanel {
         pan.setLayout(gbl);
         setLayout(gbl);
         // The header - can be removed
-        lblEntryType = new JLabel(Globals.lang("Entry type"));
+        JLabel lblEntryType = new JLabel(Globals.lang("Entry type"));
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
         con.gridx = 0;
@@ -84,7 +80,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(lblEntryType, con);
         pan.add(lblEntryType);
 
-        lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
+        JLabel lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
@@ -105,7 +101,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(defaultPat, con);
         pan.add(defaultPat);
         con.insets = new Insets(5, 5, 10, 5);
-        btnDefault = new JButton(Globals.lang("Default"));
+        JButton btnDefault = new JButton(Globals.lang("Default"));
         btnDefault.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent event) {
@@ -148,7 +144,7 @@ public class LabelPatternPanel extends JPanel {
         hlb.addActionListener(help);
 
         // And finally a button to reset everything
-        btnDefaultAll = new JButton(Globals.lang("Reset all"));
+        JButton btnDefaultAll = new JButton(Globals.lang("Reset all"));
         con.gridx = 2;
         con.gridy = 2;
 
