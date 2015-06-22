@@ -215,7 +215,7 @@ public class SidePaneManager {
             int pos1 = (preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0);
             int pos2 = (preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0);
 
-            return Integer.valueOf(pos1).compareTo(Integer.valueOf(pos2));
+            return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
 
