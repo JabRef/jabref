@@ -66,7 +66,6 @@ import javax.swing.undo.CompoundEdit;
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.ErrorMessageDisplay;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -83,7 +82,7 @@ import net.sf.jabref.undo.NamedCompound;
  * The whole UI component holding the groups tree and the buttons
  */
 public class GroupSelector extends SidePaneComponent implements
-        TreeSelectionListener, ActionListener, ErrorMessageDisplay {
+        TreeSelectionListener, ActionListener {
 
     private static Logger logger = Logger.getLogger(GroupSelector.class.getName());
 
@@ -1479,28 +1478,6 @@ public class GroupSelector extends SidePaneComponent implements
             validateTree();
         }
 
-    }
-
-    /**
-     * This method is required by the ErrorMessageDisplay interface, and lets this class
-     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
-     * @param errorMessage
-     */
-    public void reportError(String errorMessage) {
-        // this should never happen, since regular expressions are checked for
-        // correctness by the edit group dialog, and no other errors should
-        // occur in a search
-        System.err.println("Error in group search: " + errorMessage
-                + ". Please report this on www.sf.net/projects/jabref");
-    }
-
-    /**
-     * This method is required by the ErrorMessageDisplay interface, and lets this class
-     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
-     * @param errorMessage
-     */
-    public void reportError(String errorMessage, Exception exception) {
-        reportError(errorMessage);
     }
 
     /**

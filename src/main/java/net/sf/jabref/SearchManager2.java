@@ -40,7 +40,7 @@ import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
 
 public class SearchManager2 extends SidePaneComponent
-        implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
+        implements ActionListener, KeyListener, ItemListener, CaretListener {
 
     private JabRefFrame frame;
 
@@ -781,25 +781,6 @@ public class SearchManager2 extends SidePaneComponent
                         regExpSearch.isSelected()) != null
                 ? Globals.lang("Search specified field(s)")
                 : Globals.lang("Search all fields"));
-    }
-
-    /**
-     * This method is required by the ErrorMessageDisplay interface, and lets this class
-     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
-     * @param errorMessage
-     */
-    public void reportError(String errorMessage) {
-        JOptionPane.showMessageDialog(panel, errorMessage, Globals.lang("Search error"),
-                JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
-     * This method is required by the ErrorMessageDisplay interface, and lets this class
-     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
-     * @param errorMessage
-     */
-    public void reportError(String errorMessage, Exception exception) {
-        reportError(errorMessage);
     }
 
     public void setActiveBasePanel(BasePanel panel) {
