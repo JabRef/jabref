@@ -38,13 +38,13 @@ import java.util.List;
  */
 public class CitationManager {
 
-    OOBibBase ooBase;
-    JDialog diag;
-    EventList<CitEntry> list;
+    final OOBibBase ooBase;
+    final JDialog diag;
+    final EventList<CitEntry> list;
     JTable table;
     EventTableModel<CitEntry> tableModel;
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
@@ -123,8 +123,12 @@ public class CitationManager {
 
     class CitEntry implements Comparable<CitEntry> {
 
-        String refMarkName, pageInfo, keyString, context, origPageInfo;
-        List<String> keys;
+        final String refMarkName;
+        String pageInfo;
+        final String keyString;
+        final String context;
+        final String origPageInfo;
+        final List<String> keys;
 
 
         public CitEntry(String refMarkName, List<String> keys, String context, String pageInfo) {
@@ -201,12 +205,12 @@ public class CitationManager {
 
     class SingleCitDialog {
 
-        JDialog diag;
-        JTextField pageInfo = new JTextField(20);
-        JLabel title;
-        JButton ok = new JButton(Globals.lang("Ok")),
-                cancel = new JButton(Globals.lang("Cancel"));
-        CitEntry _entry;
+        final JDialog diag;
+        final JTextField pageInfo = new JTextField(20);
+        final JLabel title;
+        final JButton ok = new JButton(Globals.lang("Ok"));
+        final JButton cancel = new JButton(Globals.lang("Cancel"));
+        final CitEntry _entry;
 
 
         public SingleCitDialog(CitEntry entry) {

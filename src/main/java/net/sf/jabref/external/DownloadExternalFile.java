@@ -40,9 +40,9 @@ import java.net.URL;
  */
 public class DownloadExternalFile {
 
-    private JabRefFrame frame;
-    private MetaData metaData;
-    private String bibtexKey;
+    private final JabRefFrame frame;
+    private final MetaData metaData;
+    private final String bibtexKey;
     private FileListEntryEditor editor;
     private boolean downloadFinished = false;
     private boolean dontShowDialog = false;

@@ -29,10 +29,13 @@ import net.sf.jabref.JabRefPreferences;
  */
 public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
-    private String[] fieldNames;
-    private boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "
+    private final String[] fieldNames;
+    private final boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "
     private String prefix = "";
-    private boolean autoCompFF, autoCompLF, autoCompFullFirstOnly, autoCompShortFirstOnly;
+    private final boolean autoCompFF;
+    private final boolean autoCompLF;
+    private final boolean autoCompFullFirstOnly;
+    private final boolean autoCompShortFirstOnly;
 
 
     /**

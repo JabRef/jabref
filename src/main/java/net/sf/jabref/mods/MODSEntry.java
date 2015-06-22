@@ -55,17 +55,17 @@ public class MODSEntry {
 
     protected String title = null;
     // should really be handled with an enum
-    protected String type = "text";
+    protected final String type = "text";
 
     protected String number;
     protected String volume;
     protected String genre = null;
-    protected Set<String> handledExtensions;
+    protected final Set<String> handledExtensions;
 
     protected MODSEntry host;
-    Map<String, String> extensionFields;
+    final Map<String, String> extensionFields;
 
-    public static String BIBTEX = "bibtex_";
+    public static final String BIBTEX = "bibtex_";
 
     private final boolean CHARFORMAT = false;
 

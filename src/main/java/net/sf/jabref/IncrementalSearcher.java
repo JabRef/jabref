@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class IncrementalSearcher {
 
-    JabRefPreferences prefs;
+    final JabRefPreferences prefs;
     private String hitInField;
 
 

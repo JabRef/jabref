@@ -26,9 +26,11 @@ import net.sf.jabref.undo.UndoablePreambleChange;
 
 public class PreambleChange extends Change {
 
-    String tmp, mem, disk;
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
+    final String tmp;
+    final String mem;
+    final String disk;
+    final InfoPane tp = new InfoPane();
+    final JScrollPane sp = new JScrollPane(tp);
 
 
     public PreambleChange(String tmp, String mem, String disk) {

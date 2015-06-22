@@ -84,50 +84,52 @@ import net.sf.jabref.undo.NamedCompound;
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener {
 
-    private static Logger logger = Logger.getLogger(GroupSelector.class.getName());
+    private static final Logger logger = Logger.getLogger(GroupSelector.class.getName());
 
-    JButton newButton = new JButton(GUIGlobals.getImage("new")),
-            helpButton = new JButton(
-                    GUIGlobals.getImage("help")),
-            refresh = new JButton(
-                    GUIGlobals.getImage("refresh")),
-            autoGroup = new JButton(GUIGlobals.getImage("autoGroup")),
-            openset = new JButton(Globals.lang("Settings"));
+    final JButton newButton = new JButton(GUIGlobals.getImage("new"));
+    final JButton helpButton = new JButton(
+                    GUIGlobals.getImage("help"));
+    final JButton refresh = new JButton(
+                    GUIGlobals.getImage("refresh"));
+    final JButton autoGroup = new JButton(GUIGlobals.getImage("autoGroup"));
+    final JButton openset = new JButton(Globals.lang("Settings"));
     Color bgColor = Color.white;
     GroupsTree groupsTree;
     DefaultTreeModel groupsTreeModel;
     GroupTreeNode groupsRoot;
-    JScrollPane sp;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JabRefFrame frame;
+    final JScrollPane sp;
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    final JabRefFrame frame;
     String searchField;
-    JPopupMenu groupsContextMenu = new JPopupMenu();
-    JPopupMenu settings = new JPopupMenu();
-    private JRadioButtonMenuItem hideNonHits, grayOut;
-    JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Globals.lang("Intersection"), true);
-    JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
+    final JPopupMenu groupsContextMenu = new JPopupMenu();
+    final JPopupMenu settings = new JPopupMenu();
+    private final JRadioButtonMenuItem hideNonHits;
+    private final JRadioButtonMenuItem grayOut;
+    final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Globals.lang("Intersection"), true);
+    final JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
             false);
-    JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Globals.lang("Float"), true);
-    JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
-    JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Globals.lang("Inverted"),
-            false), select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
-    JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
+    final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Globals.lang("Float"), true);
+    final JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
+    final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Globals.lang("Inverted"),
+            false);
+    final JCheckBoxMenuItem select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
+    final JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
             Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
-    JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
+    final JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
             Globals.lang("Show number of elements contained in each group"));
-    JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
+    final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Globals.lang("Automatically assign new entry to selected groups"));
-    ButtonGroup bgr = new ButtonGroup();
-    ButtonGroup visMode = new ButtonGroup();
-    ButtonGroup nonHits = new ButtonGroup();
-    JButton expand = new JButton(GUIGlobals.getImage("down")),
-            reduce = new JButton(GUIGlobals.getImage("up"));
-    JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Globals.lang("Edit Group Membership"), false);
-    Border editModeBorder = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
+    final ButtonGroup bgr = new ButtonGroup();
+    final ButtonGroup visMode = new ButtonGroup();
+    final ButtonGroup nonHits = new ButtonGroup();
+    final JButton expand = new JButton(GUIGlobals.getImage("down"));
+    final JButton reduce = new JButton(GUIGlobals.getImage("up"));
+    final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Globals.lang("Edit Group Membership"), false);
+    final Border editModeBorder = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
             "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP, Font.getFont("Default"), Color.RED);
     boolean editModeIndicator;
-    SidePaneManager manager;
+    final SidePaneManager manager;
 
 
     /**
@@ -770,10 +772,10 @@ public class GroupSelector extends SidePaneComponent implements
 
     class GroupingWorker extends AbstractWorker {
 
-        private SearchRuleSet rules;
-        private Hashtable<String, String> searchTerm;
-        private ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
-        private boolean showOverlappingGroupsP;
+        private final SearchRuleSet rules;
+        private final Hashtable<String, String> searchTerm;
+        private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
+        private final boolean showOverlappingGroupsP;
         int hits = 0;
 
 
@@ -1434,8 +1436,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
 
-    JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
-    JMenu sortSubmenu = new JMenu(Globals.lang("Sort alphabetically")); // JZTODO lyrics
+    final JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
+    final JMenu sortSubmenu = new JMenu(Globals.lang("Sort alphabetically")); // JZTODO lyrics
 
 
     public GroupTreeNode getGroupTreeRoot() {

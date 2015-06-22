@@ -33,9 +33,9 @@ import java.io.InputStream;
 public class PushToVim implements PushToApplication {
 
     private JPanel settings = null;
-    private JTextField vimPath = new JTextField(30),
-            vimServer = new JTextField(30),
-            citeCommand = new JTextField(30);
+    private final JTextField vimPath = new JTextField(30);
+    private final JTextField vimServer = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
     private boolean couldNotConnect = false, couldNotRunClient = false;
 

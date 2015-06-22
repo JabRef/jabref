@@ -30,8 +30,8 @@ import java.io.StringWriter;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private BibtexEntry[] data;
-    public static DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
+    private final BibtexEntry[] data;
+    public static final DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
 
 
     public TransferableBibtexEntry(BibtexEntry[] data) {

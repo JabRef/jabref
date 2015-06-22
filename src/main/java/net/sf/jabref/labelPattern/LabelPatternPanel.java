@@ -42,16 +42,16 @@ import net.sf.jabref.help.HelpDialog;
 public class LabelPatternPanel extends JPanel {
 
     // used by both LabelPatternPanel and TabLabelPAttern
-    protected GridBagLayout gbl = new GridBagLayout();
-    protected GridBagConstraints con = new GridBagConstraints();
+    protected final GridBagLayout gbl = new GridBagLayout();
+    protected final GridBagConstraints con = new GridBagConstraints();
 
-    private HelpAction help;
+    private final HelpAction help;
 
     // default pattern
-    protected JTextField defaultPat = new JTextField();
+    protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
+    private final HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {

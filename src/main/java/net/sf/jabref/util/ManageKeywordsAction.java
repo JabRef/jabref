@@ -71,7 +71,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
     private JDialog diag = null;
 
@@ -85,7 +85,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private boolean cancelled;
 
-    private TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
+    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {

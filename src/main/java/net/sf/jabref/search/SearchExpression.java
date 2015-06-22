@@ -29,7 +29,7 @@ import antlr.collections.AST;
 
 public class SearchExpression implements SearchRule {
 
-    private SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
+    private final SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
     private AST ast = null;
 
 

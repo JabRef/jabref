@@ -59,12 +59,12 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     String layoutFile;
 
-    public JEditorPane previewPane;
+    public final JEditorPane previewPane;
 
-    JScrollPane scrollPane;
-    PdfPreviewPanel pdfPreviewPanel;
+    final JScrollPane scrollPane;
+    final PdfPreviewPanel pdfPreviewPanel;
 
-    BasePanel panel;
+    final BasePanel panel;
 
 
     /**

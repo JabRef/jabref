@@ -47,13 +47,13 @@ public class ExternalFileTypeEditor extends JDialog {
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor = null;
     private FileTypeTableModel tableModel;
-    private JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    private JButton add = new JButton(GUIGlobals.getImage("add")),
-            remove = new JButton(GUIGlobals.getImage("remove")),
-            edit = new JButton(GUIGlobals.getImage("edit")),
-            toDefaults = new JButton(Globals.lang("Default"));
-    private EditListener editListener = new EditListener();
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton add = new JButton(GUIGlobals.getImage("add"));
+    private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
+    private final JButton edit = new JButton(GUIGlobals.getImage("edit"));
+    private final JButton toDefaults = new JButton(Globals.lang("Default"));
+    private final EditListener editListener = new EditListener();
 
 
     public ExternalFileTypeEditor(JFrame frame) {
@@ -256,7 +256,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
     class IconRenderer implements TableCellRenderer {
 
-        JLabel lab = new JLabel();
+        final JLabel lab = new JLabel();
 
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

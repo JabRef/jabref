@@ -227,7 +227,7 @@ public class EmacsKeyBindings
             new JEditorPane(),
     };
 
-    private static Log logger = LogFactory.getLog(EmacsKeyBindings.class);
+    private static final Log logger = LogFactory.getLog(EmacsKeyBindings.class);
 
 
     /**
@@ -623,7 +623,7 @@ public class EmacsKeyBindings
     {
 
         private JTextComponent jtc;
-        private LinkedList<String> ring = new LinkedList<String>();
+        private final LinkedList<String> ring = new LinkedList<String>();
         Iterator<String> iter = ring.iterator();
 
         private static final KillRing instance = new KillRing();

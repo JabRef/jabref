@@ -1151,7 +1151,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         private static final long serialVersionUID = 3737245079578074387L;
 
-        protected FileSystemView fsv = FileSystemView.getFileSystemView();
+        protected final FileSystemView fsv = FileSystemView.getFileSystemView();
 
 
         public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,

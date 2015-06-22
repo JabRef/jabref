@@ -41,10 +41,10 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FieldWeightDialog extends JDialog {
 
-    JabRefFrame frame;
-    HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    final JabRefFrame frame;
+    final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public static void main(String[] args) {
@@ -138,8 +138,8 @@ public class FieldWeightDialog extends JDialog {
      */
     static class SliderInfo {
 
-        String fieldName;
-        int originalValue;
+        final String fieldName;
+        final int originalValue;
 
 
         public SliderInfo(String fieldName, int originalValue) {

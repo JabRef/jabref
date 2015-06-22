@@ -49,7 +49,7 @@ public class VerticalLabelUI extends BasicLabelUI {
     Rectangle verticalViewR = new Rectangle();
     Rectangle verticalIconR = new Rectangle();
     Rectangle verticalTextR = new Rectangle();
-    protected static VerticalLabelUI verticalLabelUI =
+    protected static final VerticalLabelUI verticalLabelUI =
             new VerticalLabelUI();
     private final static VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
             new VerticalLabelUI();

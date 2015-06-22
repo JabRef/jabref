@@ -67,7 +67,7 @@ public class MSBibEntry {
     protected String bibTexEntry = null;
 
     protected String tag = null;
-    protected String GUID = null;
+    protected final String GUID = null;
     protected int LCID = -1;
 
     protected List<PersonName> authors = null;

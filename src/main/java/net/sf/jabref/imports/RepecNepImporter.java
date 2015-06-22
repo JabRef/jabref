@@ -162,7 +162,7 @@ import net.sf.jabref.Util;
  */
 public class RepecNepImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
+    private static final Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
 
     private final static Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 

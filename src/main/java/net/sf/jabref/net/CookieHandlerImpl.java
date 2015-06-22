@@ -27,7 +27,7 @@ public class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance
-    private List<Cookie> cache = new LinkedList<Cookie>();
+    private final List<Cookie> cache = new LinkedList<Cookie>();
 
 
     /**

@@ -40,13 +40,13 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 public class JournalAbbreviations {
 
-    static String TOOLTIPTEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
+    static final String TOOLTIPTEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
             + "if the journal name is known.")
             + "<BR>" + Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
-    TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
-    HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
-    HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
-    TreeMap<String, String> all = new TreeMap<String, String>();
+    final TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
+    final HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
+    final HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
+    final TreeMap<String, String> all = new TreeMap<String, String>();
 
 
     public JournalAbbreviations() {

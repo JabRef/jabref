@@ -41,10 +41,10 @@ import net.sf.jabref.undo.UndoableRemoveEntry;
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
-    JabRefFrame frame;
-    boolean openInNew;
+    final JabRefFrame frame;
+    final boolean openInNew;
     MyWorker worker = null;
-    ImportFormat importer;
+    final ImportFormat importer;
     IOException importError = null;
 
 

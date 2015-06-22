@@ -21,7 +21,7 @@ public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
     final ArrayList<BibtexEntry> set;
-    Comparator<BibtexEntry> comp;
+    final Comparator<BibtexEntry> comp;
     String[] idArray;
     BibtexEntry[] entryArray;
     private boolean changed = false;

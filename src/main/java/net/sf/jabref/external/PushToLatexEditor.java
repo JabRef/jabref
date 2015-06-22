@@ -31,8 +31,8 @@ public class PushToLatexEditor implements PushToApplication {
     private boolean couldNotCall = false;
     private boolean notDefined = false;
     private JPanel settings = null;
-    private JTextField ledPath = new JTextField(30),
-            citeCommand = new JTextField(30);
+    private final JTextField ledPath = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
 
     public String getName() {

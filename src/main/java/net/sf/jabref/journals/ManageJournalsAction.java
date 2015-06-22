@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
  */
 public class ManageJournalsAction extends MnemonicAwareAction {
 
-    JabRefFrame frame;
+    final JabRefFrame frame;
 
 
     public ManageJournalsAction(JabRefFrame frame) {

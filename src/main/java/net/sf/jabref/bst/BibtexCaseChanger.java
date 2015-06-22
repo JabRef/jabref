@@ -17,15 +17,15 @@ package net.sf.jabref.bst;
 
 public class BibtexCaseChanger {
 
-    String s;
+    final String s;
 
-    char format;
+    final char format;
 
     boolean prevColon = true;
 
-    int n;
+    final int n;
 
-    Warn warn;
+    final Warn warn;
 
 
     BibtexCaseChanger(String s, char format, Warn warn) {

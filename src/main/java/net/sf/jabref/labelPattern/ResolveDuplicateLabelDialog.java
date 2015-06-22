@@ -32,10 +32,10 @@ import java.util.List;
  */
 public class ResolveDuplicateLabelDialog {
 
-    JDialog diag;
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    List<JCheckBox> cbs = new ArrayList<JCheckBox>();
+    final JDialog diag;
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
     private boolean okPressed = false;
 
     final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +

@@ -54,25 +54,35 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    final JabRefPreferences _prefs;
     private boolean tableChanged = false;
-    private JTable colSetup;
+    private final JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
-    private Vector<TableRow> tableRows = new Vector<TableRow>(10);
-    private JabRefFrame frame;
+    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
+    private final JabRefFrame frame;
 
-    private JCheckBox pdfColumn, urlColumn, fileColumn, arxivColumn;
+    private final JCheckBox pdfColumn;
+    private final JCheckBox urlColumn;
+    private final JCheckBox fileColumn;
+    private final JCheckBox arxivColumn;
 
-    private JCheckBox extraFileColumns;
+    private final JCheckBox extraFileColumns;
     private JList listOfFileColumns;
 
-    private JRadioButton preferUrl, preferDoi;
+    private final JRadioButton preferUrl;
+    private final JRadioButton preferDoi;
 
-    private JCheckBox showOneLetterHeadingForIconColumns;
+    private final JCheckBox showOneLetterHeadingForIconColumns;
 
     /*** begin: special fields ***/
-    private JCheckBox specialFieldsEnabled, rankingColumn, compactRankingColumn, qualityColumn, priorityColumn,
-            relevanceColumn, printedColumn, readStatusColumn;
+    private final JCheckBox specialFieldsEnabled;
+    private JCheckBox rankingColumn;
+    private JCheckBox compactRankingColumn;
+    private JCheckBox qualityColumn;
+    private JCheckBox priorityColumn;
+    private JCheckBox relevanceColumn;
+    private JCheckBox printedColumn;
+    private JCheckBox readStatusColumn;
     private JRadioButton syncKeywords, writeSpecialFields;
     private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldCompcatRankingColumn, oldQualityColumn,
             oldPriorityColumn, oldRelevanceColumn, oldPrintedColumn, oldReadStatusColumn, oldSyncKeyWords,

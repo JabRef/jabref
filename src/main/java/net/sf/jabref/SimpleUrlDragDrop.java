@@ -47,12 +47,12 @@ import net.sf.jabref.EntryEditor.StoreFieldAction;
 
 public class SimpleUrlDragDrop implements DropTargetListener {
 
-    private static Logger logger = Logger.getLogger(SimpleUrlDragDrop.class
+    private static final Logger logger = Logger.getLogger(SimpleUrlDragDrop.class
             .getName());
 
-    private FieldEditor editor;
+    private final FieldEditor editor;
 
-    private StoreFieldAction storeFieldAction;
+    private final StoreFieldAction storeFieldAction;
 
 
     public SimpleUrlDragDrop(FieldEditor _editor,

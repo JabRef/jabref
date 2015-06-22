@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class SearchFixDuplicateLabels extends AbstractWorker {
 
-    private BasePanel panel;
+    private final BasePanel panel;
     HashMap<String, List<BibtexEntry>> dupes = null;
 
 

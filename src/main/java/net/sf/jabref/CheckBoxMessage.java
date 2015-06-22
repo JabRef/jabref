@@ -26,9 +26,9 @@ import java.awt.Insets;
 public class CheckBoxMessage extends JPanel {
 
     BorderLayout borderLayout1 = new BorderLayout();
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JCheckBox cb;
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    final JCheckBox cb;
 
 
     public CheckBoxMessage(String message, String cbText, boolean defaultValue) {

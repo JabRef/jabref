@@ -38,7 +38,7 @@ public class AutoDetectPaths extends AbstractWorker {
     boolean foundPaths = false;
     boolean fileSearchCancelled = false;
     JDialog prog;
-    private JDialog parent;
+    private final JDialog parent;
 
 
     public AutoDetectPaths(JDialog parent) {

@@ -47,8 +47,8 @@ import net.sf.jabref.*;
 
 public class IntegrityWizard extends JDialog implements ActionListener {
 
-    private BibtexDatabase dbase;
-    private BasePanel basePanel;
+    private final BibtexDatabase dbase;
+    private final BasePanel basePanel;
     private JButton closeButton;
     private JButton startButton;
     private IntegrityMessagePanel warnPanel;

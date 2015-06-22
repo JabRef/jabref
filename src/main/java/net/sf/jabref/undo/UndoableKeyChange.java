@@ -27,9 +27,10 @@ import net.sf.jabref.Globals;
  */
 public class UndoableKeyChange extends AbstractUndoableEdit {
 
-    private String entryId;
-    private BibtexDatabase base;
-    private String oldValue, newValue;
+    private final String entryId;
+    private final BibtexDatabase base;
+    private final String oldValue;
+    private final String newValue;
 
 
     public UndoableKeyChange(BibtexDatabase base, String entryId,

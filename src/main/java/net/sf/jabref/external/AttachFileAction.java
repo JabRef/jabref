@@ -16,7 +16,7 @@ import net.sf.jabref.undo.UndoableFieldChange;
 public class AttachFileAction extends BaseAction {
 
     BibtexEntry entry = null;
-    private BasePanel panel;
+    private final BasePanel panel;
 
 
     public AttachFileAction(BasePanel panel) {

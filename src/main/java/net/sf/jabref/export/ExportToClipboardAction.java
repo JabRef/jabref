@@ -50,8 +50,8 @@ import net.sf.jabref.JabRefFrame;
 public class ExportToClipboardAction extends AbstractWorker {
 
     String message = null;
-    private JabRefFrame frame;
-    private BibtexDatabase database;
+    private final JabRefFrame frame;
+    private final BibtexDatabase database;
 
 
     public ExportToClipboardAction(JabRefFrame frame, BibtexDatabase database) {

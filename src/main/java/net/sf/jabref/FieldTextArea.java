@@ -35,9 +35,9 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     Dimension PREFERRED_SIZE;
 
-    JScrollPane sp;
+    final JScrollPane sp;
 
-    FieldNameLabel label;
+    final FieldNameLabel label;
 
     String fieldName;
 

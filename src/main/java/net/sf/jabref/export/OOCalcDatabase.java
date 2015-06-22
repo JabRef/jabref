@@ -42,7 +42,7 @@ import ca.odell.glazedlists.SortedList;
  */
 public class OOCalcDatabase {
 
-    protected Collection<BibtexEntry> entries;
+    protected final Collection<BibtexEntry> entries;
 
 
     @SuppressWarnings("unchecked")

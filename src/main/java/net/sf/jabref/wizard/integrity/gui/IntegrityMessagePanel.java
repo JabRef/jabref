@@ -70,14 +70,14 @@ public class IntegrityMessagePanel
 
 {
 
-    private JList warnings;
-    private HintListModel warningData;
+    private final JList warnings;
+    private final HintListModel warningData;
 
-    private IntegrityCheck validChecker;
+    private final IntegrityCheck validChecker;
 
-    private JTextField content;
-    private JButton applyButton;
-    private BasePanel basePanel;
+    private final JTextField content;
+    private final JButton applyButton;
+    private final BasePanel basePanel;
 
 
     public IntegrityMessagePanel(BasePanel basePanel)

@@ -45,16 +45,16 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class EntryEditorTab {
 
-    private JPanel panel = new JPanel();
+    private final JPanel panel = new JPanel();
 
-    private JScrollPane scrollPane = new JScrollPane(panel,
+    private final JScrollPane scrollPane = new JScrollPane(panel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-    private String[] fields;
+    private final String[] fields;
 
-    private EntryEditor parent;
+    private final EntryEditor parent;
 
-    private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
+    private final HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
     private FieldEditor activeField = null;
 
@@ -386,6 +386,6 @@ public class EntryEditorTab {
     }
 
 
-    FocusListener fieldListener = new EntryEditorTabFocusListener(this);
+    final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
 }

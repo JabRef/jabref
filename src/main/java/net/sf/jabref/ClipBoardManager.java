@@ -33,7 +33,7 @@ import java.io.IOException;
 public class ClipBoardManager implements ClipboardOwner
 {
 
-    public static ClipBoardManager clipBoard = new ClipBoardManager();
+    public static final ClipBoardManager clipBoard = new ClipBoardManager();
 
 
     /**

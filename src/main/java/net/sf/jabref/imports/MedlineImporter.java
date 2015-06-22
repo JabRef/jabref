@@ -37,7 +37,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class MedlineImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(MedlineImporter.class.toString());
+    private static final Logger logger = Logger.getLogger(MedlineImporter.class.toString());
 
 
     /**

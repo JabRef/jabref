@@ -129,17 +129,18 @@ import java.util.WeakHashMap;
  */
 public class AuthorList {
 
-    private Vector<Author> authors;
+    private final Vector<Author> authors;
 
     // Variables for storing computed strings, so they only need be created
     // once:
     private String authorsNatbib = null, authorsFirstFirstAnds = null,
             authorsAlph = null;
 
-    private String[] authorsFirstFirst = new String[4], authorsLastOnly = new String[2],
-            authorLastFirstAnds = new String[2],
-            authorsLastFirst = new String[4],
-            authorsLastFirstFirstLast = new String[2];
+    private final String[] authorsFirstFirst = new String[4];
+    private final String[] authorsLastOnly = new String[2];
+    private final String[] authorLastFirstAnds = new String[2];
+    private final String[] authorsLastFirst = new String[4];
+    private final String[] authorsLastFirstFirstLast = new String[2];
 
     // The following variables are used only during parsing
 
@@ -222,7 +223,7 @@ public class AuthorList {
         tex_names.add("j");
     }
 
-    static WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
+    static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
 
 
     /**

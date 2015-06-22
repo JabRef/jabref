@@ -30,12 +30,12 @@ import java.util.logging.Logger;
  */
 public class FileUpdateMonitor implements Runnable {
 
-    private static Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
+    private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
     final int WAIT = 4000;
     static int tmpNum = 0;
     int no = 0;
-    HashMap<String, Entry> entries = new HashMap<String, Entry>();
+    final HashMap<String, Entry> entries = new HashMap<String, Entry>();
     volatile boolean running;
 
     public void run() {
@@ -172,9 +172,9 @@ public class FileUpdateMonitor implements Runnable {
      */
     class Entry {
 
-        FileUpdateListener listener;
+        final FileUpdateListener listener;
         File file;
-        File tmpFile;
+        final File tmpFile;
         long timeStamp, fileSize;
 
 

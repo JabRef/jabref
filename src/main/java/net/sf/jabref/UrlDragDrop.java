@@ -51,14 +51,14 @@ import net.sf.jabref.net.URLDownload;
 
 public class UrlDragDrop implements DropTargetListener {
 
-    private static Logger logger = Logger
+    private static final Logger logger = Logger
             .getLogger(UrlDragDrop.class.getName());
 
-    private FieldEditor feditor;
+    private final FieldEditor feditor;
 
-    private EntryEditor editor;
+    private final EntryEditor editor;
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public UrlDragDrop(EntryEditor _editor, JabRefFrame _frame,
@@ -103,9 +103,9 @@ public class UrlDragDrop implements DropTargetListener {
 
     private static class JOptionChoice {
 
-        private String label;
+        private final String label;
 
-        private int id;
+        private final int id;
 
 
         public JOptionChoice(String _label, int _id) {

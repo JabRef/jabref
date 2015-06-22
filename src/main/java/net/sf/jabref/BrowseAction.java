@@ -33,8 +33,8 @@ public class BrowseAction extends AbstractAction implements ActionListener {
     JComponent focusTarget = null;
     JFrame frame = null;
     //JDialog dialog=null;
-    JTextField comp;
-    boolean dir;
+    final JTextField comp;
+    final boolean dir;
 
 
     public BrowseAction(JFrame frame, JTextField tc, boolean dir) {

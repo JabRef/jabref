@@ -20,7 +20,7 @@ import java.awt.Component;
 
 public class FocusRequester implements Runnable {
 
-    private Component comp;
+    private final Component comp;
 
 
     public FocusRequester(Component comp) {

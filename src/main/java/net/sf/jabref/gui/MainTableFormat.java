@@ -73,12 +73,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             READ = {SpecialFieldsUtils.FIELDNAME_READ},
             FILE = {GUIGlobals.FILE_FIELD};
 
-    BasePanel panel;
+    final BasePanel panel;
 
     private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
-    private HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
+    private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
     int[][] nameCols = null;
     boolean namesAsIs, abbr_names, namesNatbib, namesFf, namesLf, namesLastOnly, showShort;
 
@@ -460,8 +460,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     static class SearchMatcher implements Matcher<BibtexEntry> {
 
-        private SearchRuleSet ruleSet;
-        private Hashtable<String, String> searchOptions;
+        private final SearchRuleSet ruleSet;
+        private final Hashtable<String, String> searchOptions;
 
 
         public SearchMatcher(SearchRuleSet ruleSet, Hashtable<String, String> searchOptions) {

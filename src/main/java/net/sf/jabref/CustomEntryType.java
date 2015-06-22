@@ -26,8 +26,10 @@ import java.util.Collections;
  */
 public class CustomEntryType extends BibtexEntryType {
 
-    private String name;
-    private String[] req, opt, priOpt;
+    private final String name;
+    private String[] req;
+    private final String[] opt;
+    private String[] priOpt;
     private String[][] reqSets = null; // Sets of either-or required fields, if any
 
 

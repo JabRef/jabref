@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
  */
 public class PluginInstallerAction extends MnemonicAwareAction {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public PluginInstallerAction(JabRefFrame frame) {

@@ -45,7 +45,7 @@ import net.sf.jabref.BibtexEntry;
 public class IntegrityCheck
 {
 
-    private Vector<IntegrityMessage> messages;
+    private final Vector<IntegrityMessage> messages;
 
 
     public IntegrityCheck()

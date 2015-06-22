@@ -28,7 +28,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     protected String name, extension, openWith, iconName, mimeType;
     protected ImageIcon icon;
-    protected JLabel label = new JLabel();
+    protected final JLabel label = new JLabel();
 
 
     public ExternalFileType(String name, String extension, String mimeType,

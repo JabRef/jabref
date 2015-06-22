@@ -28,9 +28,10 @@ import net.sf.jabref.Util;
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
 
-    private BibtexEntry entry;
-    private String field;
-    private String oldValue, newValue;
+    private final BibtexEntry entry;
+    private final String field;
+    private final String oldValue;
+    private final String newValue;
 
 
     public UndoableFieldChange(BibtexEntry entry, String field,

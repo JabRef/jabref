@@ -39,12 +39,12 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AutoSetExternalFileForEntries extends AbstractWorker {
 
-    private String fieldName;
-    private BasePanel panel;
+    private final String fieldName;
+    private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
 
-    Object[] brokenLinkOptions =
+    final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
             Globals.lang("Quit synchronization")};
 
@@ -199,13 +199,15 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     class OptionsDialog extends JDialog {
 
-        JRadioButton autoSetUnset, autoSetAll, autoSetNone;
-        JCheckBox checkLinks;
-        JButton ok = new JButton(Globals.lang("Ok")),
-                cancel = new JButton(Globals.lang("Cancel"));
+        final JRadioButton autoSetUnset;
+        final JRadioButton autoSetAll;
+        final JRadioButton autoSetNone;
+        final JCheckBox checkLinks;
+        final JButton ok = new JButton(Globals.lang("Ok"));
+        final JButton cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
-        private String fieldName;
+        private final String fieldName;
 
 
         public OptionsDialog(JFrame parent, String fieldName) {

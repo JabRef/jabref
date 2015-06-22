@@ -51,9 +51,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     PreviewPanel[] previewPanel = null;
     int activePreview = Globals.prefs.getInt("activePreview");
     PreviewPanel preview;
-    MainTable table;
-    BasePanel panel;
-    EventList<BibtexEntry> tableRows;
+    final MainTable table;
+    final BasePanel panel;
+    final EventList<BibtexEntry> tableRows;
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
 
@@ -62,7 +62,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
-    private int[] lastPressed = new int[20];
+    private final int[] lastPressed = new int[20];
     private int lastPressedCount = 0;
     private long lastPressedTime = 0;
 

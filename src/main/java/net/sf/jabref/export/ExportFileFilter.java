@@ -24,8 +24,9 @@ import java.io.File;
  */
 public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
 
-    private IExportFormat format;
-    private String extension, name;
+    private final IExportFormat format;
+    private final String extension;
+    private final String name;
 
 
     public ExportFileFilter(IExportFormat format, String extension) {

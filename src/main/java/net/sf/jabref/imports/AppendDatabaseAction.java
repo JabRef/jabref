@@ -41,9 +41,9 @@ import net.sf.jabref.undo.UndoableInsertString;
  */
 public class AppendDatabaseAction extends BaseAction {
 
-    private JabRefFrame frame;
-    private BasePanel panel;
-    private List<File> filesToOpen = new ArrayList<File>();
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final List<File> filesToOpen = new ArrayList<File>();
 
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {

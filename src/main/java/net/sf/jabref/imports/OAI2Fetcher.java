@@ -61,15 +61,15 @@ public class OAI2Fetcher implements EntryFetcher {
 
     private SAXParser saxParser;
 
-    private String oai2Host;
+    private final String oai2Host;
 
-    private String oai2Script;
+    private final String oai2Script;
 
-    private String oai2MetaDataPrefix;
+    private final String oai2MetaDataPrefix;
 
-    private String oai2PrefixIdentifier;
+    private final String oai2PrefixIdentifier;
 
-    private String oai2ArchiveName;
+    private final String oai2ArchiveName;
 
     private boolean shouldContinue = true;
 

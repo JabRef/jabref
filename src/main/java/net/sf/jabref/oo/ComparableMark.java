@@ -22,8 +22,8 @@ import com.sun.star.awt.Point;
  */
 public class ComparableMark implements Comparable<ComparableMark> {
 
-    String name;
-    Point position;
+    final String name;
+    final Point position;
 
 
     public ComparableMark(String name, Point position) {

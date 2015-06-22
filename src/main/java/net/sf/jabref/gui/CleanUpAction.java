@@ -100,8 +100,8 @@ public class CleanUpAction extends AbstractWorker {
     private JCheckBox cleanUpBiblatex;
 
     private JPanel optionsPanel = new JPanel();
-    private BasePanel panel;
-    private JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
 
     // global variable to count unsuccessful renames
     int unsuccesfullRenames = 0;

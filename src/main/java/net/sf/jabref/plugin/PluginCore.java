@@ -54,7 +54,7 @@ public class PluginCore {
 
     static PluginManager singleton;
 
-    static File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
+    static final File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 
 
     static PluginLocation getLocationInsideJar(String context, String manifest) {

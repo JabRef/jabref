@@ -69,7 +69,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     /** idle time after which the node below is expanded. */
     private static final long idleTimeToExpandNode = 1000L;
 
-    private GroupSelector groupSelector;
+    private final GroupSelector groupSelector;
 
     private GroupTreeNode dragNode = null;
 

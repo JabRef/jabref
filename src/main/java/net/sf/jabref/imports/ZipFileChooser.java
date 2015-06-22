@@ -79,7 +79,7 @@ class ZipFileChooser extends JDialog {
      */
     class ZipFileChooserTableModel extends AbstractTableModel {
 
-        private String[] columnNames = new String[] {
+        private final String[] columnNames = new String[] {
                 Globals.lang("Name"),
                 Globals.lang("Last modified"),
                 Globals.lang("Size")
@@ -159,11 +159,11 @@ class ZipFileChooser extends JDialog {
     /** table of Zip entries */
     private JTable table;
     /** shortcut to preferences */
-    private JabRefPreferences prefs = Globals.prefs;
+    private final JabRefPreferences prefs = Globals.prefs;
     /** this */
-    private ZipFileChooser zipFileChooser;
+    private final ZipFileChooser zipFileChooser;
     /** import customization dialog, owner of this dialog */
-    private ImportCustomizationDialog importCustomizationDialog;
+    private final ImportCustomizationDialog importCustomizationDialog;
 
 
     /*

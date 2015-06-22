@@ -32,7 +32,7 @@ public class VerifyingWriter extends OutputStreamWriter {
 
     CharsetEncoder encoder;
     private boolean couldEncodeAll = true;
-    private TreeSet<Character> problemCharacters = new TreeSet<Character>();
+    private final TreeSet<Character> problemCharacters = new TreeSet<Character>();
 
 
     public VerifyingWriter(OutputStream out, String encoding)

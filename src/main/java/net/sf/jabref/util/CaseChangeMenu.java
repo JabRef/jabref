@@ -44,7 +44,7 @@ import java.awt.event.ActionListener;
 
 public class CaseChangeMenu extends JMenu {
 
-    private JTextComponent parent;
+    private final JTextComponent parent;
 
 
     public CaseChangeMenu(JTextComponent opener) {

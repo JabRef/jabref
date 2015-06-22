@@ -30,16 +30,16 @@ import javax.swing.event.ChangeListener;
  */
 public class SidePaneManager {
 
-    JabRefFrame frame;
+    final JabRefFrame frame;
 
     BasePanel panel;
 
-    SidePane sidep;
+    final SidePane sidep;
 
-    Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
-    Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
+    final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
+    final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
 
-    List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
+    final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
 
 
     public SidePaneManager(JabRefFrame frame) {
@@ -199,7 +199,7 @@ public class SidePaneManager {
     // Helper class for sorting visible componenys based on their preferred position
     private class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
-        private Map<String, Integer> preferredPositions;
+        private final Map<String, Integer> preferredPositions;
 
 
         public PreferredIndexSort() {

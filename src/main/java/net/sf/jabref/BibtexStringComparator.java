@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
 
-    protected boolean considerRefs;
+    protected final boolean considerRefs;
 
 
     /**

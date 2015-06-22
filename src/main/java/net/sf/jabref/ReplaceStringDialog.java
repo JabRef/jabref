@@ -33,32 +33,32 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 class ReplaceStringDialog extends JDialog {
 
-    JTextField
-            fields = new JTextField("", 30),
-            from = new JTextField("", 30),
-            to = new JTextField("", 30);
-    JLabel
-            fl = new JLabel(Globals.lang("Search for") + ":"),
-            tl = new JLabel(Globals.lang("Replace with") + ":");
+    final JTextField
+            fields = new JTextField("", 30);
+    final JTextField from = new JTextField("", 30);
+    final JTextField to = new JTextField("", 30);
+    final JLabel
+            fl = new JLabel(Globals.lang("Search for") + ":");
+    final JLabel tl = new JLabel(Globals.lang("Replace with") + ":");
 
-    JButton
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    JPanel
-            settings = new JPanel(),
-            main = new JPanel(),
-            opt = new JPanel();
-    JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
-    JRadioButton
-            allFi = new JRadioButton(Globals.lang("All fields"), true),
-            field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
-    ButtonGroup bg = new ButtonGroup();
+    final JButton
+            ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JPanel
+            settings = new JPanel();
+    final JPanel main = new JPanel();
+    final JPanel opt = new JPanel();
+    final JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
+    final JRadioButton
+            allFi = new JRadioButton(Globals.lang("All fields"), true);
+    final JRadioButton field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
+    final ButtonGroup bg = new ButtonGroup();
     private boolean ok_pressed = false;
     String[] flds = null;
     String s1, s2;
 
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
 
 
     public ReplaceStringDialog(JabRefFrame parent_) {

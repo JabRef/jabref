@@ -61,18 +61,18 @@ public class IntegrityMessage implements Cloneable
             UNEXPECTED_CLOSING_BRACE_FAILURE = 2010
             ;
 
-    public static int
-            FULL_MODE = 1, // print with Bibtex Entry
-            SINLGE_MODE = 2 // print only Message
+    public static final int
+            FULL_MODE = 1; // print with Bibtex Entry
+            public static final int SINLGE_MODE = 2 // print only Message
             ;
 
     private static int printMode = SINLGE_MODE;
 
-    private int type;
-    private BibtexEntry entry;
-    private String fieldName;
-    private Object additionalInfo;
-    private String msg;
+    private final int type;
+    private final BibtexEntry entry;
+    private final String fieldName;
+    private final Object additionalInfo;
+    private final String msg;
     private boolean fixed; // the user has changed sometings on BibtexEntry
 
 

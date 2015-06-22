@@ -53,7 +53,7 @@ public class DbImportAction extends AbstractWorker {
     MetaData metaData = null;
     String errorMessage = null;
     boolean connectToDB = false;
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private DBStrings dbs = null;
     ArrayList<Object[]> databases = null;
 

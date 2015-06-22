@@ -29,7 +29,7 @@ import net.sf.jabref.undo.NamedCompound;
 public class GroupChange extends Change {
 
     private final GroupTreeNode m_changedGroups;
-    private GroupTreeNode tmpGroupRoot;
+    private final GroupTreeNode tmpGroupRoot;
 
 
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {

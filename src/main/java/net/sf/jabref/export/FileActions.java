@@ -45,7 +45,7 @@ public class FileActions {
     }
 
 
-    private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+    private static final Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
 
 

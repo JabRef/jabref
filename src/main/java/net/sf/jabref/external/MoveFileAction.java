@@ -30,10 +30,10 @@ import java.io.IOException;
  */
 public class MoveFileAction extends AbstractAction {
 
-    private JabRefFrame frame;
-    private EntryEditor eEditor;
-    private FileListEditor editor;
-    private boolean toFileDir;
+    private final JabRefFrame frame;
+    private final EntryEditor eEditor;
+    private final FileListEditor editor;
+    private final boolean toFileDir;
 
 
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor,

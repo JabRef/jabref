@@ -26,7 +26,7 @@ import java.util.Comparator;
  */
 public class MarkedComparator implements Comparator<BibtexEntry> {
 
-    Comparator<BibtexEntry> next;
+    final Comparator<BibtexEntry> next;
 
 
     public MarkedComparator(Comparator<BibtexEntry> next) {

@@ -51,10 +51,10 @@ import net.sf.jabref.Util;
  */
 public class PdfContentImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
+    private static final Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
 
     // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
-    private static DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
+    private static final DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
 
     /* global variables holding the state of the current parse run
      * needed to be able to generate methods such as "fillCurStringWithNonEmptyLines"

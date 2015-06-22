@@ -59,37 +59,37 @@ class GroupDialog extends JDialog {
     private static final int INDEX_SEARCHGROUP = 2;
     private static final int TEXTFIELD_LENGTH = 30;
     // for all types
-    private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
-    private JRadioButton m_explicitRadioButton = new JRadioButton(
+    private final JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
+    private final JRadioButton m_explicitRadioButton = new JRadioButton(
             Globals.lang("Statically group entries by manual assignment"));
-    private JRadioButton m_keywordsRadioButton = new JRadioButton(
+    private final JRadioButton m_keywordsRadioButton = new JRadioButton(
             Globals.lang("Dynamically group entries by searching a field for a keyword"));
-    private JRadioButton m_searchRadioButton = new JRadioButton(
+    private final JRadioButton m_searchRadioButton = new JRadioButton(
             Globals.lang("Dynamically group entries by a free-form search expression"));
-    private JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
     Globals.lang("Independent group: When selected, view only this group's entries"));
-    private JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
     Globals.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
-    private JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
+    private final JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
     Globals.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
-    private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
-    private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
+    private final JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
+    private final FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
             false);
-    private JCheckBox m_kgCaseSensitive = new JCheckBox(
+    private final JCheckBox m_kgCaseSensitive = new JCheckBox(
             Globals.lang("Case sensitive"));
-    private JCheckBox m_kgRegExp = new JCheckBox(
+    private final JCheckBox m_kgRegExp = new JCheckBox(
             Globals.lang("Regular Expression"));
     // for SearchGroup
-    private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
-    private JCheckBox m_sgCaseSensitive = new JCheckBox(
+    private final JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
+    private final JCheckBox m_sgCaseSensitive = new JCheckBox(
             Globals.lang("Case sensitive"));
-    private JCheckBox m_sgRegExp = new JCheckBox(
+    private final JCheckBox m_sgRegExp = new JCheckBox(
             Globals.lang("Regular Expression"));
     // for all types
-    private JButton m_ok = new JButton(Globals.lang("Ok"));
-    private JPanel m_optionsPanel = new JPanel();
-    private JLabel m_description = new JLabel() {
+    private final JButton m_ok = new JButton(Globals.lang("Ok"));
+    private final JPanel m_optionsPanel = new JPanel();
+    private final JLabel m_description = new JLabel() {
 
         public Dimension getPreferredSize() {
             Dimension d = super.getPreferredSize();
@@ -110,7 +110,7 @@ class GroupDialog extends JDialog {
 
     private final AbstractGroup m_editedGroup;
 
-    private CardLayout m_optionsLayout = new CardLayout();
+    private final CardLayout m_optionsLayout = new CardLayout();
 
 
     /**

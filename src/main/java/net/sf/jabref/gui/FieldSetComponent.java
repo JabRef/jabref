@@ -52,18 +52,22 @@ import net.sf.jabref.Util;
  */
 public class FieldSetComponent extends JPanel implements ActionListener {
 
-    protected Set<ActionListener> additionListeners = new HashSet<ActionListener>();
-    protected JList list;
+    protected final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
+    protected final JList list;
     protected JScrollPane sp = null;
     protected DefaultListModel listModel;
     protected JComboBox sel;
     protected JTextField input;
     protected JLabel title = null;
-    protected JButton add, remove, up = null, down = null;
-    protected GridBagLayout gbl = new GridBagLayout();
-    protected GridBagConstraints con = new GridBagConstraints();
-    protected boolean forceLowerCase, changesMade = false;
-    protected Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
+    protected final JButton add;
+    protected final JButton remove;
+    protected JButton up = null;
+    protected JButton down = null;
+    protected final GridBagLayout gbl = new GridBagLayout();
+    protected final GridBagConstraints con = new GridBagConstraints();
+    protected final boolean forceLowerCase;
+    protected boolean changesMade = false;
+    protected final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
 
 
     /** 

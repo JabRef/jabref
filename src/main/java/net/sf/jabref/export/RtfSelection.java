@@ -25,7 +25,7 @@ public class RtfSelection implements Transferable {
 
     DataFlavor rtfFlavor;
     DataFlavor[] supportedFlavors;
-    private String content;
+    private final String content;
 
 
     public RtfSelection(String s) {

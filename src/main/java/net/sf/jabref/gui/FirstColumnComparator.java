@@ -22,7 +22,7 @@ import net.sf.jabref.BibtexDatabase;
 
 public class FirstColumnComparator implements Comparator<BibtexEntry> {
 
-    private BibtexDatabase database;
+    private final BibtexDatabase database;
 
 
     public FirstColumnComparator(BibtexDatabase database) {

@@ -92,7 +92,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private String fileType = null;
     private List<FormatEntry> format = null;
-    private Map<String, String> replacements = new HashMap<String, String>();
+    private final Map<String, String> replacements = new HashMap<String, String>();
 
 
     public void setArgument(String arg) {
@@ -288,7 +288,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      */
     protected class FormatEntry {
 
-        private int type;
+        private final int type;
         private String string = null;
 
 

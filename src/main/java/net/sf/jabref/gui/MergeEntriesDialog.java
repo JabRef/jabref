@@ -53,7 +53,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntriesDialog extends JDialog {
 
     // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
-    private String[] columnHeadings = {Globals.lang("Field"),
+    private final String[] columnHeadings = {Globals.lang("Field"),
             Globals.lang("First entry"),
             Globals.lang("Use 1st"),
             Globals.lang("None"),
@@ -61,12 +61,12 @@ public class MergeEntriesDialog extends JDialog {
             Globals.lang("Second entry")};
     private final Dimension DIM = new Dimension(800, 800);
     private PreviewPanel preview;
-    private BasePanel panel;
-    private JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
     private JRadioButton[][] rb;
     private Boolean[] identical;
-    private CellConstraints cc = new CellConstraints();
-    private BibtexEntry mergedEntry = new BibtexEntry();
+    private final CellConstraints cc = new CellConstraints();
+    private final BibtexEntry mergedEntry = new BibtexEntry();
     private BibtexEntry one;
     private BibtexEntry two;
     private JTextArea jta;

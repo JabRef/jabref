@@ -33,7 +33,7 @@ import java.io.Reader;
  */
 public class SPIRESBibtexFilterReader extends FilterReader {
 
-    protected BufferedReader in;
+    protected final BufferedReader in;
 
     private String line;
     private int pos;

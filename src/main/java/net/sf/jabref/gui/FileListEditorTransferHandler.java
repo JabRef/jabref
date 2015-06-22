@@ -40,10 +40,10 @@ import net.sf.jabref.groups.EntryTableTransferHandler;
 public class FileListEditorTransferHandler extends TransferHandler {
 
     protected DataFlavor urlFlavor;
-    protected DataFlavor stringFlavor;
-    protected JabRefFrame frame;
-    protected EntryContainer entryContainer;
-    private TransferHandler textTransferHandler;
+    protected final DataFlavor stringFlavor;
+    protected final JabRefFrame frame;
+    protected final EntryContainer entryContainer;
+    private final TransferHandler textTransferHandler;
     private DroppedFileHandler dfh = null;
 
 

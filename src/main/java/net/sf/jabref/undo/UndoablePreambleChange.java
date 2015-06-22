@@ -28,9 +28,10 @@ import net.sf.jabref.Globals;
  */
 public class UndoablePreambleChange extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private String oldValue, newValue;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final String oldValue;
+    private final String newValue;
+    private final BasePanel panel;
 
 
     public UndoablePreambleChange(BibtexDatabase base, BasePanel panel,

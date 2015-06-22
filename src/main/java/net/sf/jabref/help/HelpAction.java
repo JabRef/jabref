@@ -33,7 +33,7 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private HelpDialog diag;
+    private final HelpDialog diag;
 
     private Class resourceOwner = null;
 

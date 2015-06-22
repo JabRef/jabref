@@ -54,7 +54,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    static XMLChars xc = new XMLChars();
+    static final XMLChars xc = new XMLChars();
 
 
     public String format(String fieldText)

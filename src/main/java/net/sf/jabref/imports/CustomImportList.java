@@ -139,7 +139,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     }
 
 
-    private JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
 
 
     public CustomImportList(JabRefPreferences prefs) {

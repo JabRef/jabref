@@ -41,13 +41,13 @@ public abstract class AbstractAutoCompleter {
     public static final int SHORTEST_WORD = 4;
 
     // stores the strings as is
-    private TreeSet<String> _index_casesensitive = new TreeSet<String>();
+    private final TreeSet<String> _index_casesensitive = new TreeSet<String>();
 
     // stores strings in lowercase
-    private TreeSet<String> _index_caseinsensitive = new TreeSet<String>();
+    private final TreeSet<String> _index_caseinsensitive = new TreeSet<String>();
 
     // stores for a lowercase string the possible expanded strings
-    private HashMap<String, TreeSet<String>> _possibleStringsForSearchString = new HashMap<String, TreeSet<String>>();
+    private final HashMap<String, TreeSet<String>> _possibleStringsForSearchString = new HashMap<String, TreeSet<String>>();
 
 
     /**

@@ -32,7 +32,7 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public SortTabsAction(JabRefFrame frame) {

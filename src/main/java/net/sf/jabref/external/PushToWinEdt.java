@@ -28,8 +28,8 @@ public class PushToWinEdt implements PushToApplication {
     private boolean couldNotCall = false;
     private boolean notDefined = false;
     private JPanel settings = null;
-    private JTextField winEdtPath = new JTextField(30),
-            citeCommand = new JTextField(30);
+    private final JTextField winEdtPath = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
 
     public String getName() {

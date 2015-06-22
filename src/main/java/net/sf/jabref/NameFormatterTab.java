@@ -68,11 +68,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private boolean tableChanged = false;
 
-    private JTable table;
+    private final JTable table;
 
     private int rowCount = -1;
 
-    private Vector<TableRow> tableRows = new Vector<TableRow>(10);
+    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
 
 
     class TableRow {

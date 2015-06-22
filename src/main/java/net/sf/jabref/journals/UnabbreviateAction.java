@@ -30,7 +30,7 @@ import net.sf.jabref.undo.NamedCompound;
  */
 public class UnabbreviateAction extends AbstractWorker {
 
-    BasePanel panel;
+    final BasePanel panel;
     String message = "";
 
 

@@ -34,7 +34,7 @@ import java.awt.event.ActionEvent;
  */
 public class DbConnectAction extends BaseAction {
 
-    private BasePanel panel;
+    private final BasePanel panel;
 
 
     public DbConnectAction(BasePanel panel) {

@@ -23,16 +23,16 @@ import java.util.Map;
  */
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
-    protected EventList<TableEntry> entries = new BasicEventList<TableEntry>();
+    protected final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
-    protected JTable glTable;
-    protected JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    protected JButton selectAll = new JButton(Globals.lang("Select all"));
-    protected JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    protected final JTable glTable;
+    protected final JButton ok = new JButton(Globals.lang("Ok"));
+    protected final JButton cancel = new JButton(Globals.lang("Cancel"));
+    protected final JButton selectAll = new JButton(Globals.lang("Select all"));
+    protected final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
     protected boolean okPressed = false;
-    private JabRefFrame frame;
-    private int warningLimit;
+    private final JabRefFrame frame;
+    private final int warningLimit;
 
 
     public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
@@ -164,8 +164,8 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     class TableEntry {
 
-        private String id;
-        private JLabel preview;
+        private final String id;
+        private final JLabel preview;
         private boolean wanted = false;
 
 
@@ -190,7 +190,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     class PreviewRenderer implements TableCellRenderer {
 
-        JLabel label = new JLabel();
+        final JLabel label = new JLabel();
 
 
         public Component getTableCellRendererComponent(JTable table, Object value,
@@ -204,7 +204,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     class EntryTable extends JTable {
 
-        PreviewRenderer renderer = new PreviewRenderer();
+        final PreviewRenderer renderer = new PreviewRenderer();
 
 
         public EntryTable(TableModel model) {

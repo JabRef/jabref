@@ -56,12 +56,12 @@ import org.antlr.runtime.tree.Tree;
 
 public class VM implements Warn {
 
-    PrintStream out = System.out;
+    final PrintStream out = System.out;
 
 
     public class Identifier {
 
-        public String name;
+        public final String name;
 
 
         public Identifier(String name) {
@@ -75,7 +75,7 @@ public class VM implements Warn {
 
     public class Variable {
 
-        public String name;
+        public final String name;
 
 
         public Variable(String name) {
@@ -97,7 +97,7 @@ public class VM implements Warn {
 
     public static final Integer TRUE = 1;
 
-    private HashMap<String, BstFunction> buildInFunctions;
+    private final HashMap<String, BstFunction> buildInFunctions;
 
     public File file;
 
@@ -286,7 +286,7 @@ public class VM implements Warn {
 
         buildInFunctions.put("add.period$", new BstFunction() {
 
-            Pattern p = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
+            final Pattern p = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
 
             /**
@@ -939,7 +939,7 @@ public class VM implements Warn {
     }
 
 
-    CommonTree tree;
+    final CommonTree tree;
 
     private StringBuffer bbl;
 
@@ -1069,7 +1069,7 @@ public class VM implements Warn {
 
     public class MacroFunction implements BstFunction {
 
-        String replacement;
+        final String replacement;
 
 
         public MacroFunction(String replacement) {
@@ -1183,7 +1183,7 @@ public class VM implements Warn {
 
     public class StackFunction implements BstFunction {
 
-        Tree tree;
+        final Tree tree;
 
 
         public Tree getTree() {
@@ -1324,13 +1324,13 @@ public class VM implements Warn {
         }
 
 
-        BibtexEntry entry;
+        final BibtexEntry entry;
 
-        Map<String, String> strings = new HashMap<String, String>();
+        final Map<String, String> strings = new HashMap<String, String>();
 
-        Map<String, String> fields = new HashMap<String, String>();
+        final Map<String, String> fields = new HashMap<String, String>();
 
-        Map<String, Integer> integers = new HashMap<String, Integer>();
+        final Map<String, Integer> integers = new HashMap<String, Integer>();
 
 
         public Map<String, String> getFields() {

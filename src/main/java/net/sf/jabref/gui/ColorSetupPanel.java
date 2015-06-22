@@ -36,7 +36,7 @@ import net.sf.jabref.Globals;
 public class ColorSetupPanel extends JPanel {
 
     private final static int ICON_WIDTH = 30, ICON_HEIGHT = 20;
-    private ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
 
 
     public ColorSetupPanel() {
@@ -94,7 +94,7 @@ public class ColorSetupPanel extends JPanel {
 
     class ColorButtonListener implements ActionListener {
 
-        private ColorButton button;
+        private final ColorButton button;
 
 
         public ColorButtonListener(ColorButton button) {
@@ -115,7 +115,8 @@ public class ColorSetupPanel extends JPanel {
     class ColorButton extends JButton implements Icon {
 
         private Color color = Color.white;
-        private String key, name;
+        private final String key;
+        private final String name;
 
 
         public ColorButton(String key, String name) {

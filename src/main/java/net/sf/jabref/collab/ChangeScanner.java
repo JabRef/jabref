@@ -56,7 +56,7 @@ public class ChangeScanner implements Runnable {
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
     //ArrayList changes = new ArrayList();
-    DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+    final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
 
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")

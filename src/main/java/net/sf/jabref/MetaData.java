@@ -29,7 +29,7 @@ public class MetaData implements Iterable<String> {
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
-    private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
+    private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
     private boolean groupTreeValid = true;

@@ -53,8 +53,8 @@ public class ImportCustomizationDialog extends JDialog {
     private final JabRefFrame frame;
 
     private JTable customImporterTable;
-    private JabRefPreferences prefs = Globals.prefs;
-    private ImportCustomizationDialog importCustomizationDialog;
+    private final JabRefPreferences prefs = Globals.prefs;
+    private final ImportCustomizationDialog importCustomizationDialog;
 
 
     /*
@@ -278,7 +278,7 @@ public class ImportCustomizationDialog extends JDialog {
      */
     class ImportTableModel extends AbstractTableModel {
 
-        private String[] columnNames = new String[] {
+        private final String[] columnNames = new String[] {
                 Globals.lang("Import name"),
                 Globals.lang("Command line id"),
                 Globals.lang("ImportFormat class"),

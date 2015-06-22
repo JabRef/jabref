@@ -245,7 +245,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    public static HashSet<String> preserveWhiteSpace = new HashSet<String>();
+    public static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
     static {
         preserveWhiteSpace.add("abstract");
         preserveWhiteSpace.add("note");

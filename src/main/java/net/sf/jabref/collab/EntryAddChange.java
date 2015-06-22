@@ -24,10 +24,10 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 
 public class EntryAddChange extends Change {
 
-    BibtexEntry diskEntry;
+    final BibtexEntry diskEntry;
     //  boolean isModifiedLocally, modificationsAgree;[[[[[[
-    PreviewPanel pp;
-    JScrollPane sp;
+    final PreviewPanel pp;
+    final JScrollPane sp;
 
 
     public EntryAddChange(BibtexEntry diskEntry) {

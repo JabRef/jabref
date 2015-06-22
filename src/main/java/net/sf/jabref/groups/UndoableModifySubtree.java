@@ -30,7 +30,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private final int[] m_subtreeRootPath;
     private final GroupSelector m_groupSelector;
     /** This holds the new subtree (the root's modified children) to allow redo. */
-    private Vector<TreeNode> m_modifiedSubtree = new Vector<TreeNode>();
+    private final Vector<TreeNode> m_modifiedSubtree = new Vector<TreeNode>();
     private boolean m_revalidate = true;
     private final String m_name;
 

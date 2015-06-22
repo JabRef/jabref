@@ -37,13 +37,13 @@ import com.sun.jersey.multipart.FormDataMultiPart;
  */
 public class SplWebClient {
 
-    private static Client CLIENT = Client.create();
+    private static final Client CLIENT = Client.create();
     static {
         CLIENT.setConnectTimeout(1000);
         CLIENT.setReadTimeout(70000);
     }
-    private static WebResource WEBRESOURCE = CLIENT.resource("http://api.mr-dlib.org/");
-    private static WebResource INTERNETRESOURCE = CLIENT.resource("http://www.google.com");
+    private static final WebResource WEBRESOURCE = CLIENT.resource("http://api.mr-dlib.org/");
+    private static final WebResource INTERNETRESOURCE = CLIENT.resource("http://www.google.com");
     //private static WebResource WEBRESOURCE = CLIENT.resource( "http://localhost:8080/rest/" );
 
     public static Document metadata;

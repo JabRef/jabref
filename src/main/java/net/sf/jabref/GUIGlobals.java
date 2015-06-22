@@ -46,16 +46,16 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class GUIGlobals {
 
     // Frame titles.
-    public static String
-            frameTitle = "JabRef",
-            version = Globals.VERSION,
-            stringsTitle = "Strings for database",
-            //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
-            untitledTitle = "untitled",
-            helpTitle = "JabRef help",
-            TYPE_HEADER = "entrytype",
-            NUMBER_COL = "#",
-            encPrefix = "Encoding: "; // Part of the signature in written bib files.
+    public static final String
+            frameTitle = "JabRef";
+    public static final String version = Globals.VERSION;
+    public static final String stringsTitle = "Strings for database";
+    public static final String//untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
+            untitledTitle = "untitled";
+    public static String helpTitle = "JabRef help";
+    public static final String TYPE_HEADER = "entrytype";
+    public static final String NUMBER_COL = "#";
+    public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
     public static Font CURRENTFONT,
             typeNameFont,
@@ -84,21 +84,21 @@ public class GUIGlobals {
             MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
 
     // File names.
-    public static String //configFile = "preferences.dat",
+    public static final String //configFile = "preferences.dat",
     backupExt = ".bak";
 
     // Image paths.
-    public static String
-            imageSize = "24",
-            extension = ".gif",
-            ex = imageSize + extension,
-            pre = "/images/",
-            helpPre = "/help/",
-            fontPath = "/images/font/";
+    public static final String
+            imageSize = "24";
+    public static final String extension = ".gif";
+    public static String ex = imageSize + extension;
+    public static String pre = "/images/";
+    public static final String helpPre = "/help/";
+    public static String fontPath = "/images/font/";
 
-    static HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
+    static final HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
     // further below.
-    public static Color activeEditor = new Color(230, 230, 255);
+    public static final Color activeEditor = new Color(230, 230, 255);
 
     static HashMap<String, String> iconMap;
 
@@ -147,25 +147,25 @@ public class GUIGlobals {
 
     //	Colors.
     public static Color
-            lightGray = new Color(230, 30, 30), // Light gray background
-            entryEditorLabelColor = new Color(100, 100, 150), // Empty field, blue.
-            nullFieldColor = new Color(75, 130, 95), // Valid field, green.
-            gradientGray = new Color(112, 121, 165), // Title bar gradient color, sidepaneheader
-            gradientBlue = new Color(0, 27, 102), // Title bar gradient color, sidepaneheader
-            //activeTabbed = Color.black,  // active Database (JTabbedPane)
+            lightGray = new Color(230, 30, 30); // Light gray background
+            public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.
+            public static final Color nullFieldColor = new Color(75, 130, 95); // Valid field, green.
+            public static Color gradientGray = new Color(112, 121, 165); // Title bar gradient color, sidepaneheader
+            public static Color gradientBlue = new Color(0, 27, 102); // Title bar gradient color, sidepaneheader
+            public static final Color//activeTabbed = Color.black,  // active Database (JTabbedPane)
             //inActiveTabbed = Color.gray.darker(),  // inactive Database
-            activeTabbed = entryEditorLabelColor.darker(), // active Database (JTabbedPane)
-            inActiveTabbed = Color.black, // inactive Database
-            infoField = new Color(254, 255, 225) // color for an info field
+            activeTabbed = entryEditorLabelColor.darker(); // active Database (JTabbedPane)
+            public static final Color inActiveTabbed = Color.black; // inactive Database
+            public static final Color infoField = new Color(254, 255, 225) // color for an info field
             ;
 
     public static Color
             editorTextColor = null, validFieldBackgroundColor = null,
             activeBackground = null, invalidFieldBackgroundColor = null;
 
-    public static String META_FLAG = "jabref-meta: ";
-    public static String META_FLAG_OLD = "bibkeeper-meta: ";
-    public static String ENTRYTYPE_FLAG = "jabref-entrytype: ";
+    public static final String META_FLAG = "jabref-meta: ";
+    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
 
     // some fieldname constants
     public static final double
@@ -191,18 +191,18 @@ public class GUIGlobals {
     public static final double PE_HEIGHT = 2;
 
     //	Size constants for EntryTypeForm; small, medium and large.
-    public static int[] FORM_WIDTH = new int[] {500, 650, 820};
-    public static int[] FORM_HEIGHT = new int[] {90, 110, 130};
+    public static final int[] FORM_WIDTH = new int[] {500, 650, 820};
+    public static final int[] FORM_HEIGHT = new int[] {90, 110, 130};
 
     //	Constants controlling formatted bibtex output.
     public static final int
             INDENT = 4,
             LINE_LENGTH = 65; // Maximum
 
-    public static int DEFAULT_FIELD_LENGTH = 100,
-            NUMBER_COL_LENGTH = 32,
-            WIDTH_ICON_COL_RANKING = 35, // Width of Ranking Icon Column
-            WIDTH_ICON_COL = 19;
+    public static final int DEFAULT_FIELD_LENGTH = 100;
+    public static final int NUMBER_COL_LENGTH = 32;
+    public static final int WIDTH_ICON_COL_RANKING = 35; // Width of Ranking Icon Column
+            public static final int WIDTH_ICON_COL = 19;
 
     // Column widths for export customization dialog table:
     public static final int

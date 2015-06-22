@@ -34,9 +34,9 @@ import com.michaelbaranov.microba.calendar.DatePicker;
 
 public class DatePickerButton implements ActionListener {
 
-    private DatePicker datePicker = new DatePicker();
-    private JPanel panel = new JPanel();
-    private FieldEditor editor;
+    private final DatePicker datePicker = new DatePicker();
+    private final JPanel panel = new JPanel();
+    private final FieldEditor editor;
 
 
     public DatePickerButton(FieldEditor pEditor) {

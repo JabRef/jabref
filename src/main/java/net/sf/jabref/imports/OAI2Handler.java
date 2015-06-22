@@ -33,7 +33,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Handler extends DefaultHandler {
 
-    BibtexEntry entry;
+    final BibtexEntry entry;
 
     StringBuffer authors;
 

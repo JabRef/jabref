@@ -46,20 +46,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
     String name = null;
-    SortedSet<String> journals = new TreeSet<String>();
+    final SortedSet<String> journals = new TreeSet<String>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
-    LayoutFormatter fieldFormatter = new OOPreFormatter();
+    final LayoutFormatter fieldFormatter = new OOPreFormatter();
 
     Layout defaultBibLayout;
 
     // reference layout mapped from entry type number:
-    HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
+    final HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
 
-    HashMap<String, Object> properties = new HashMap<String, Object>();
-    HashMap<String, Object> citProperties = new HashMap<String, Object>();
+    final HashMap<String, Object> properties = new HashMap<String, Object>();
+    final HashMap<String, Object> citProperties = new HashMap<String, Object>();
 
-    Pattern numPattern = Pattern.compile("-?\\d+");
+    final Pattern numPattern = Pattern.compile("-?\\d+");
 
     boolean valid = false;
 
@@ -75,7 +75,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String COMBINED_ENTRIES_SEPARATOR = "-";
 
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
-    private Pattern quoted = Pattern.compile("\".*\"");
+    private final Pattern quoted = Pattern.compile("\".*\"");
 
 
     public OOBibStyle(File styleFile) throws Exception {

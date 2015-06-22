@@ -66,9 +66,9 @@ import net.sf.jabref.*;
 public class AuxSubGenerator
 {
 
-    private HashSet<String> mySet; // all unique bibtex keys in aux file
+    private final HashSet<String> mySet; // all unique bibtex keys in aux file
 
-    private Vector<String> notFoundList; // all not solved bibtex keys
+    private final Vector<String> notFoundList; // all not solved bibtex keys
 
     private BibtexDatabase db; // reference database
     private BibtexDatabase auxDB; // contains only the bibtex keys who found in aux file

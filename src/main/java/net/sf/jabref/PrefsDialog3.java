@@ -55,9 +55,9 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 public class PrefsDialog3 extends JDialog {
 
-    JPanel main;
+    final JPanel main;
 
-    JabRefFrame frame;
+    final JabRefFrame frame;
 
 
     public PrefsDialog3(JabRefFrame parent) {

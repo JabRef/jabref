@@ -23,10 +23,11 @@ import net.sf.jabref.Globals;
 
 public class UndoableStringChange extends AbstractUndoableEdit {
 
-    private BibtexString string;
-    private String oldValue, newValue;
-    private boolean nameChange;
-    private BasePanel panel;
+    private final BibtexString string;
+    private final String oldValue;
+    private final String newValue;
+    private final boolean nameChange;
+    private final BasePanel panel;
 
 
     public UndoableStringChange(BasePanel panel,

@@ -51,15 +51,17 @@ public class DuplicateResolverDialog extends JDialog {
 
     PreviewPanel p1, p2;
     JTextArea ta1, ta2;
-    JTabbedPane tabbed = new JTabbedPane();
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JButton first, second, both,
-            cancel = new JButton(Globals.lang("Cancel")),
-            removeExact = null;
-    JPanel options = new JPanel(),
-            main = new JPanel(),
-            source = new JPanel();
+    final JTabbedPane tabbed = new JTabbedPane();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    JButton first;
+    JButton second;
+    JButton both;
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    JButton removeExact = null;
+    final JPanel options = new JPanel();
+    final JPanel main = new JPanel();
+    final JPanel source = new JPanel();
     int status = NOT_CHOSEN;
     boolean block = true;
     TitleLabel lab;

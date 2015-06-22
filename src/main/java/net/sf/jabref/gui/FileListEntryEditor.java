@@ -69,22 +69,23 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FileListEntryEditor {
 
     JDialog diag;
-    JTextField link = new JTextField(), description = new JTextField();
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel")),
-            open = new JButton(Globals.lang("Open"));
+    final JTextField link = new JTextField();
+    final JTextField description = new JTextField();
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JButton open = new JButton(Globals.lang("Open"));
 
-    JComboBox types;
-    JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
-    JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
+    final JComboBox types;
+    final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
+    final JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
     ConfirmCloseFileListEntryEditor externalConfirm = null;
 
     private FileListEntry entry;
-    private MetaData metaData;
+    private final MetaData metaData;
     private boolean okPressed = false, okDisabledExternally = false,
             openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
 
-    public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    public static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
@@ -343,8 +344,8 @@ public class FileListEntryEditor {
 
     class BrowseListener implements ActionListener {
 
-        private JFrame parent;
-        private JTextField comp;
+        private final JFrame parent;
+        private final JTextField comp;
 
 
         public BrowseListener(JFrame parent, JTextField comp) {

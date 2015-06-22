@@ -66,7 +66,7 @@ public class StringInt implements java.io.Serializable
     /**
      *  Description of the Field
      */
-    public int i;
+    public final int i;
 
 
     //~ Constructors ///////////////////////////////////////////////////////////

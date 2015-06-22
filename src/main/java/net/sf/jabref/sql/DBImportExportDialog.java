@@ -53,11 +53,11 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class DBImportExportDialog implements MouseListener, KeyListener {
 
-    private JDialog diag;
-    private JTable table;
+    private final JDialog diag;
+    private final JTable table;
 
     // IMPORT
-    public List<String> listOfDBs = new ArrayList<String>();
+    public final List<String> listOfDBs = new ArrayList<String>();
     public boolean moreThanOne = false;
     // EXPORT
     public String selectedDB = "";
@@ -79,7 +79,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     public enum DialogType {
         IMPORTER("IMPORTER"), EXPORTER("EXPORTER");
 
-        private String dialogType;
+        private final String dialogType;
 
 
         DialogType(String dialogType) {

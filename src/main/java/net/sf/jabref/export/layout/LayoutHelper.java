@@ -47,7 +47,7 @@ public class LayoutHelper {
     private static String currentGroup = null;
 
     private PushbackReader _in;
-    private Vector<StringInt> parsedEntries = new Vector<StringInt>();
+    private final Vector<StringInt> parsedEntries = new Vector<StringInt>();
 
     private boolean _eof = false;
     private int line = 1;

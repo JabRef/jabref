@@ -46,9 +46,9 @@ import com.sun.star.uno.UnoRuntime;
  */
 public class OOUtil {
 
-    static Pattern htmlTag = Pattern.compile("</?[a-z]+>");
+    static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
 
-    static OOPreFormatter postformatter = new OOPreFormatter();
+    static final OOPreFormatter postformatter = new OOPreFormatter();
 
 
     /**

@@ -23,12 +23,12 @@ import net.sf.jabref.undo.NamedCompound;
 
 public class SpecialFieldAction extends BaseAction {
 
-    private JabRefFrame frame;
-    private String doneTextPattern;
-    private SpecialField c;
-    String value;
-    private boolean nullFieldIfValueIsTheSame;
-    private String undoText;
+    private final JabRefFrame frame;
+    private final String doneTextPattern;
+    private final SpecialField c;
+    final String value;
+    private final boolean nullFieldIfValueIsTheSame;
+    private final String undoText;
 
 
     /**

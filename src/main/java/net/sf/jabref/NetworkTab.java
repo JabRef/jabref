@@ -30,10 +30,11 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
-    private JCheckBox useProxy;
-    private JTextField defProxyHostname, defProxyPort;
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
+    private final JCheckBox useProxy;
+    private final JTextField defProxyHostname;
+    private final JTextField defProxyPort;
+    final JabRefPreferences _prefs;
+    final JabRefFrame _frame;
 
 
     //    private HelpAction ownerHelp, timeStampHelp;

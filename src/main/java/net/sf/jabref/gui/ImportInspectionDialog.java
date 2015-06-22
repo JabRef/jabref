@@ -111,57 +111,59 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     protected BasePanel panel;
 
-    protected JabRefFrame frame;
+    protected final JabRefFrame frame;
 
-    protected MetaData metaData;
+    protected final MetaData metaData;
 
-    protected UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    protected final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
 
-    protected JTable glTable;
+    protected final JTable glTable;
 
-    protected TableComparatorChooser<BibtexEntry> comparatorChooser;
+    protected final TableComparatorChooser<BibtexEntry> comparatorChooser;
 
-    protected EventSelectionModel<BibtexEntry> selectionModel;
+    protected final EventSelectionModel<BibtexEntry> selectionModel;
 
-    protected String[] fields;
+    protected final String[] fields;
 
-    protected JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+    protected final JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
 
-    protected JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(
-            Globals.lang("Cancel")), generate = new JButton(Globals.lang("Generate now"));
+    protected final JButton ok = new JButton(Globals.lang("Ok"));
+    protected final JButton cancel = new JButton(
+            Globals.lang("Cancel"));
+    protected final JButton generate = new JButton(Globals.lang("Generate now"));
 
-    protected EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    protected final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
 
-    protected SortedList<BibtexEntry> sortedList;
+    protected final SortedList<BibtexEntry> sortedList;
 
     /**
      * Duplicate resolving may require deletion of old entries.
      */
-    protected List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>();
+    protected final List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>();
 
-    protected String undoName;
+    protected final String undoName;
 
-    protected ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
+    protected final ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
 
-    protected boolean newDatabase;
+    protected final boolean newDatabase;
 
-    protected JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
+    protected final JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
 
-    protected JPopupMenu popup = new JPopupMenu();
+    protected final JPopupMenu popup = new JPopupMenu();
 
-    protected JButton selectAll = new JButton(Globals.lang("Select all"));
+    protected final JButton selectAll = new JButton(Globals.lang("Select all"));
 
-    protected JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    protected final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
 
-    protected JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
+    protected final JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
 
-    protected JButton stop = new JButton(Globals.lang("Stop"));
+    protected final JButton stop = new JButton(Globals.lang("Stop"));
 
-    protected JButton delete = new JButton(Globals.lang("Delete"));
+    protected final JButton delete = new JButton(Globals.lang("Delete"));
 
-    protected JButton help = new JButton(Globals.lang("Help"));
+    protected final JButton help = new JButton(Globals.lang("Help"));
 
-    protected PreviewPanel preview;
+    protected final PreviewPanel preview;
 
     protected boolean generatedKeys = false; // Set to true after keys have
                                              // been
@@ -170,17 +172,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     protected boolean defaultSelected = true;
 
-    protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    protected final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    protected Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
+    protected final Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
 
-    protected JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
+    protected final JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
             .getBoolean("generateKeysAfterInspection"));
 
-    protected JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
-            fileLabel = new JLabel(GUIGlobals.getImage("psSmall")), pdfLabel = new JLabel(GUIGlobals
-                    .getImage("pdfSmall")), psLabel = new JLabel(GUIGlobals.getImage("psSmall")),
-            urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    protected final JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate"));
+    protected final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
+    protected final JLabel pdfLabel = new JLabel(GUIGlobals
+                    .getImage("pdfSmall"));
+    protected final JLabel psLabel = new JLabel(GUIGlobals.getImage("psSmall"));
+    protected final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
     protected final int DUPL_COL = 1, FILE_COL = 2, PDF_COL = -1,// 3,
             PS_COL = -2,// 4,
@@ -590,7 +594,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     class AddToGroupAction extends AbstractAction {
 
-        protected GroupTreeNode node;
+        protected final GroupTreeNode node;
 
 
         public AddToGroupAction(GroupTreeNode node) {
@@ -877,7 +881,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class SelectionButton implements ActionListener {
 
-        protected Boolean enable;
+        protected final Boolean enable;
 
 
         public SelectionButton(boolean enable) {
@@ -1287,7 +1291,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class AttachFile extends JMenuItem implements ActionListener {
 
-        String fileType;
+        final String fileType;
 
 
         public AttachFile(String fileType) {
@@ -1370,7 +1374,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class EntryTable extends JTable {
 
-        GeneralRenderer renderer = new GeneralRenderer(Color.white);
+        final GeneralRenderer renderer = new GeneralRenderer(Color.white);
 
 
         public EntryTable(TableModel model) {

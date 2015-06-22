@@ -37,7 +37,7 @@ import java.awt.*;
  */
 public class OverlayPanel extends JPanel {
 
-    private JLabel label;
+    private final JLabel label;
 
 
     public OverlayPanel(JComponent overlay, String text) {

@@ -33,7 +33,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class SearchRuleSet implements SearchRule {
 
-    protected Vector<SearchRule> ruleSet = new Vector<SearchRule>();
+    protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
 
 
     public void addRule(SearchRule newRule) {

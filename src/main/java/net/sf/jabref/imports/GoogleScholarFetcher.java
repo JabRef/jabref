@@ -32,7 +32,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
     private boolean clearKeys = true; // Should we clear the keys so new ones can be generated?
-    protected static int MAX_ENTRIES_TO_LOAD = 50;
+    protected static final int MAX_ENTRIES_TO_LOAD = 50;
     final static String QUERY_MARKER = "___QUERY___";
     final static String URL_START = "http://scholar.google.com";
     final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
@@ -45,7 +45,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    protected HashMap<String, String> entryLinks = new HashMap<String, String>();
+    protected final HashMap<String, String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -293,7 +293,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
 
-    static Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
+    static final Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
 
     public static HashMap<String, String> getFormElements(String page) {

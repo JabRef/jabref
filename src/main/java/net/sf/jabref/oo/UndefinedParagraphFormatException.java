@@ -21,7 +21,7 @@ package net.sf.jabref.oo;
  */
 public class UndefinedParagraphFormatException extends Exception {
 
-    String formatName;
+    final String formatName;
 
 
     public UndefinedParagraphFormatException(String formatName) {

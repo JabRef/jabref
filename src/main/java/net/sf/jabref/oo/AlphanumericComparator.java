@@ -27,10 +27,10 @@ import java.util.Comparator;
  */
 public class AlphanumericComparator implements Comparator<BibtexEntry> {
 
-    FieldComparator authComp = new FieldComparator("author"),
-            editorComp = new FieldComparator("editor"),
-            yearComp = new FieldComparator("year"),
-            titleComp = new FieldComparator("title");
+    final FieldComparator authComp = new FieldComparator("author");
+    final FieldComparator editorComp = new FieldComparator("editor");
+    final FieldComparator yearComp = new FieldComparator("year");
+    final FieldComparator titleComp = new FieldComparator("title");
 
 
     public AlphanumericComparator() {

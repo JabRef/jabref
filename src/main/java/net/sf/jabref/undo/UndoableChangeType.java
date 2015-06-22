@@ -25,8 +25,9 @@ import net.sf.jabref.BibtexEntryType;
  */
 public class UndoableChangeType extends AbstractUndoableEdit {
 
-    BibtexEntryType oldType, newType;
-    BibtexEntry be;
+    final BibtexEntryType oldType;
+    final BibtexEntryType newType;
+    final BibtexEntry be;
 
 
     public UndoableChangeType(BibtexEntry be, BibtexEntryType oldType,

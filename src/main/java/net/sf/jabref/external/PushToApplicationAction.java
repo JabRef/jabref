@@ -28,8 +28,8 @@ import net.sf.jabref.*;
  */
 public class PushToApplicationAction extends AbstractAction implements Runnable {
 
-    private PushToApplication operation;
-    private JabRefFrame frame;
+    private final PushToApplication operation;
+    private final JabRefFrame frame;
     private BasePanel panel;
     private BibtexEntry[] entries;
 

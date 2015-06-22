@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 public class ScienceDirectFetcher implements EntryFetcher {
 
-    protected static int MAX_PAGES_TO_LOAD = 8;
+    protected static final int MAX_PAGES_TO_LOAD = 8;
     protected static final String WEBSITE_URL = "http://www.sciencedirect.com";
     protected static final String SEARCH_URL = WEBSITE_URL + "/science/quicksearch?query=";
 

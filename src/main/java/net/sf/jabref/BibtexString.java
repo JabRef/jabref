@@ -60,7 +60,7 @@ public class BibtexString {
         PUBLISHER("p"),
         OTHER("");
 
-        private String prefix;
+        private final String prefix;
 
 
         Type(String prefix) {

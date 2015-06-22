@@ -53,16 +53,16 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private static final Logger logger = Logger.getLogger(FileListEditor.class.getName());
 
-    FieldNameLabel label;
+    final FieldNameLabel label;
     FileListEntryEditor editor = null;
-    private JabRefFrame frame;
-    private MetaData metaData;
-    private String fieldName;
-    private EntryEditor entryEditor;
-    private JPanel panel;
-    private FileListTableModel tableModel;
-    private JButton auto;
-    private JPopupMenu menu = new JPopupMenu();
+    private final JabRefFrame frame;
+    private final MetaData metaData;
+    private final String fieldName;
+    private final EntryEditor entryEditor;
+    private final JPanel panel;
+    private final FileListTableModel tableModel;
+    private final JButton auto;
+    private final JPopupMenu menu = new JPopupMenu();
 
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,

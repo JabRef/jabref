@@ -56,20 +56,21 @@ public class DroppedFileHandler {
     public static final String DFH_MOVE = "DroppedFileHandler_MoveFile";
     public static final String DFH_RENAME = "DroppedFileHandler_RenameFile";
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    private BasePanel panel;
+    private final BasePanel panel;
 
-    private JRadioButton linkInPlace = new JRadioButton(), copyRadioButton = new JRadioButton(),
-            moveRadioButton = new JRadioButton();
+    private final JRadioButton linkInPlace = new JRadioButton();
+    private final JRadioButton copyRadioButton = new JRadioButton();
+    private final JRadioButton moveRadioButton = new JRadioButton();
 
-    private JLabel destDirLabel = new JLabel();
+    private final JLabel destDirLabel = new JLabel();
 
-    private JCheckBox renameCheckBox = new JCheckBox();
+    private final JCheckBox renameCheckBox = new JCheckBox();
 
-    private JTextField renameToTextBox = new JTextField(50);
+    private final JTextField renameToTextBox = new JTextField(50);
 
-    private JPanel optionsPanel = new JPanel();
+    private final JPanel optionsPanel = new JPanel();
 
 
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {

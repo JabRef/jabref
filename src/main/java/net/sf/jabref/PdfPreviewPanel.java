@@ -36,7 +36,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 
 public class PdfPreviewPanel extends JPanel {
 
-    private JLabel picLabel;
+    private final JLabel picLabel;
     private final MetaData metaData;
 
 

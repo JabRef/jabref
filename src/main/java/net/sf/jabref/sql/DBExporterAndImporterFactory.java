@@ -41,7 +41,7 @@ public class DBExporterAndImporterFactory {
     public enum DBType {
         MYSQL("MYSQL"), POSTGRESQL("POSTGRESQL");
 
-        private String dbType;
+        private final String dbType;
 
 
         DBType(String dbType) {

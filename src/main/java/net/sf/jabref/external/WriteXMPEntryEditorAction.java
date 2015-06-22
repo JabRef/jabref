@@ -31,8 +31,8 @@ import java.util.ArrayList;
  */
 public class WriteXMPEntryEditorAction extends AbstractAction {
 
-    private BasePanel panel;
-    private EntryEditor editor;
+    private final BasePanel panel;
+    private final EntryEditor editor;
     private String message = null;
 
 
@@ -93,8 +93,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
     class WriteXMPWorker extends AbstractWorker {
 
-        private List<File> files;
-        private BibtexEntry entry;
+        private final List<File> files;
+        private final BibtexEntry entry;
 
 
         public WriteXMPWorker(List<File> files, BibtexEntry entry) {

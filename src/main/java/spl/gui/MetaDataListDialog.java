@@ -47,11 +47,11 @@ public class MetaDataListDialog extends JDialog {
     private DefaultTableModel tableModel;
     private int result;
     private Document xmlDocuments;
-    private String fileName;
+    private final String fileName;
     private SplWebClient.WebServiceStatus webserviceStatus;
-    private Component thisDialog;
-    private boolean showBlankButton;
-    private CardLayout cardLayou = new CardLayout();
+    private final Component thisDialog;
+    private final boolean showBlankButton;
+    private final CardLayout cardLayou = new CardLayout();
 
 
     public MetaDataListDialog(String fileName, boolean showBlankButton) {

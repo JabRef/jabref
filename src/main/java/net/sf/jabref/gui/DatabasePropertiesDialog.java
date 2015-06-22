@@ -61,11 +61,13 @@ public class DatabasePropertiesDialog extends JDialog {
 
     MetaData metaData;
     BasePanel panel = null;
-    JComboBox encoding;
-    JButton ok, cancel;
-    JTextField fileDir = new JTextField(40),
-            fileDirIndv = new JTextField(40),
-            pdfDir = new JTextField(40), psDir = new JTextField(40);
+    final JComboBox encoding;
+    final JButton ok;
+    final JButton cancel;
+    final JTextField fileDir = new JTextField(40);
+    final JTextField fileDirIndv = new JTextField(40);
+    final JTextField pdfDir = new JTextField(40);
+    final JTextField psDir = new JTextField(40);
     String oldFileVal = "", oldFileIndvVal = "", oldPdfVal = "", oldPsVal = ""; // Remember old values to see if they are changed.
     SaveOrderConfig oldSaveOrderConfig;
 
@@ -79,7 +81,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
+    final JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
     boolean oldProtectVal = false;
 
 

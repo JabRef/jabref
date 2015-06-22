@@ -30,13 +30,16 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    private JCheckBox colorCodes, overrideFonts, showGrid;//, useCustomIconTheme;
-    private ColorSetupPanel colorPanel = new ColorSetupPanel();
+    final JabRefPreferences _prefs;
+    private final JCheckBox colorCodes;
+    private final JCheckBox overrideFonts;
+    private final JCheckBox showGrid;//, useCustomIconTheme;
+    private final ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
-    private JTextField fontSize, rowPadding;//, customIconThemeFile;
+    private final JTextField fontSize;
+    private final JTextField rowPadding;//, customIconThemeFile;
 
 
     /**

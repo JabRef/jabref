@@ -53,24 +53,26 @@ import net.sf.jabref.help.HelpAction;
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
-    JTextField tf = new JTextField();
-    JPanel pan = new JPanel();
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JButton go = new JButton(Globals.lang("Fetch")), helpBut = new JButton(
-            GUIGlobals.getImage("helpSmall")), reset = new JButton(
+    final JTextField tf = new JTextField();
+    final JPanel pan = new JPanel();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    final JButton go = new JButton(Globals.lang("Fetch"));
+    final JButton helpBut = new JButton(
+            GUIGlobals.getImage("helpSmall"));
+    final JButton reset = new JButton(
             Globals.lang("Reset"));
-    JComboBox fetcherChoice;
-    CardLayout optionsCards = new CardLayout();
-    JPanel optionsPanel = new JPanel(optionsCards);
-    JPanel optPanel = new JPanel(new BorderLayout());
+    final JComboBox fetcherChoice;
+    final CardLayout optionsCards = new CardLayout();
+    final JPanel optionsPanel = new JPanel(optionsCards);
+    final JPanel optPanel = new JPanel(new BorderLayout());
     HelpAction help;
 
-    SidePaneManager sidePaneManager;
-    Action action;
-    JabRefFrame frame;
+    final SidePaneManager sidePaneManager;
+    final Action action;
+    final JabRefFrame frame;
     EntryFetcher activeFetcher;
-    EntryFetcher[] fetcherArray;
+    final EntryFetcher[] fetcherArray;
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame, final List<EntryFetcher> fetchers) {

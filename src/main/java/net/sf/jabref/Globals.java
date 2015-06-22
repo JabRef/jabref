@@ -92,13 +92,13 @@ public class Globals {
 
 
     private static int SHORTCUT_MASK = -1;
-    public static int
-            FUTURE_YEAR = 2050, // Needs to give a year definitely in the future.
+    public static final int
+            FUTURE_YEAR = 2050; // Needs to give a year definitely in the future.
             // Used for guessing the
             // year field when parsing textual data. :-)
 
-            STANDARD_EXPORT_COUNT = 5, // The number of standard export formats.
-            METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
+            public static int STANDARD_EXPORT_COUNT = 5; // The number of standard export formats.
+            public static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     // used at highlighting in preview area. 
     // Color chosen similar to JTextComponent.getSelectionColor(), which is
@@ -110,7 +110,7 @@ public class Globals {
 
     private static final String buildInfos = "/resource/build.properties";
 
-    public static String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
+    public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
     /*
      * some extra field definitions
      */
@@ -120,11 +120,13 @@ public class Globals {
 
     public static FileUpdateMonitor fileUpdateMonitor;
 
-    public static ImportFormatReader importFormatReader = new ImportFormatReader();
+    public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
     public static ErrorConsole errorConsole;
 
-    public static String VERSION, BUILD, BUILD_DATE;
+    public static final String VERSION;
+    public static final String BUILD;
+    public static final String BUILD_DATE;
 
     static {
         TBuildInfo bi = new TBuildInfo(buildInfos);
@@ -143,7 +145,8 @@ public class Globals {
             ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/",
             FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
-    public static String[] ENCODINGS, ALL_ENCODINGS = // (String[])
+    public static final String[] ENCODINGS;
+    public static final String[] ALL_ENCODINGS = // (String[])
             // Charset.availableCharsets().keySet().toArray(new
             // String[]{});
             new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
@@ -152,7 +155,7 @@ public class Globals {
                     "EUC_JP", // Added Japanese encodings.
                     "Big5", "Big5_HKSCS", "GBK", "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5",
                     "ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
-    public static Map<String, String> ENCODING_NAMES_LOOKUP;
+    public static final Map<String, String> ENCODING_NAMES_LOOKUP;
 
     static {
         // Build list of encodings, by filtering out all that are not supported
@@ -221,7 +224,7 @@ public class Globals {
     public static int NEWLINE_LENGTH = NEWLINE.length();
 
     // Instantiate logger:
-    private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     /**
      * true if we have unix newlines
@@ -435,15 +438,15 @@ public class Globals {
     }
 
 
-    public static String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
     public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>();
-    public static HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
-    public static HashMap<String, String> XML_CHARS = new HashMap<String, String>();
-    public static HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
-    public static HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
-    public static HashMap<String, String> RTFCHARS = new HashMap<String, String>();
-    public static HashMap<String, String> URL_CHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> XML_CHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> RTFCHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> URL_CHARS = new HashMap<String, String>();
 
 
     public static int getShortcutMask() {

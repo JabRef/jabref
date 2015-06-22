@@ -42,12 +42,12 @@ import net.sf.jabref.help.HelpAction;
 public class SearchManager2 extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
 
-    IncrementalSearcher incSearcher;
+    final IncrementalSearcher incSearcher;
     SearchResultsDialog searchDialog = null;
 
     AutoCompleteListener autoCompleteListener = null;
@@ -55,21 +55,30 @@ public class SearchManager2 extends SidePaneComponent
     /**
      * subscribed Objects
      */
-    private Vector<SearchTextListener> listeners = new Vector<SearchTextListener>();
+    private final Vector<SearchTextListener> listeners = new Vector<SearchTextListener>();
 
     //private JabRefFrame frame;
-    private JTextField searchField = new JTextField("", 12);
-    private JPopupMenu settings = new JPopupMenu();
-    private JButton openset = new JButton(Globals.lang("Settings"));
-    private JButton escape = new JButton(Globals.lang("Clear"));
+    private final JTextField searchField = new JTextField("", 12);
+    private final JPopupMenu settings = new JPopupMenu();
+    private final JButton openset = new JButton(Globals.lang("Settings"));
+    private final JButton escape = new JButton(Globals.lang("Clear"));
     /** This button's text will be set later. */
-    private JButton search = new JButton();
-    private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
-            searchAll, caseSensitive, regExpSearch, highLightWords, searchAutoComplete;
+    private final JButton search = new JButton();
+    private final JCheckBoxMenuItem searchReq;
+    private final JCheckBoxMenuItem searchOpt;
+    private final JCheckBoxMenuItem searchGen;
+    private final JCheckBoxMenuItem searchAll;
+    private final JCheckBoxMenuItem caseSensitive;
+    private final JCheckBoxMenuItem regExpSearch;
+    private final JCheckBoxMenuItem highLightWords;
+    private final JCheckBoxMenuItem searchAutoComplete;
 
-    private JRadioButton increment, floatSearch, hideSearch, showResultsInDialog,
-            searchAllBases;
-    private JCheckBoxMenuItem select;
+    private final JRadioButton increment;
+    private final JRadioButton floatSearch;
+    private final JRadioButton hideSearch;
+    private final JRadioButton showResultsInDialog;
+    private final JRadioButton searchAllBases;
+    private final JCheckBoxMenuItem select;
     private boolean incSearch = false, startedFloatSearch = false, startedFilterSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
@@ -537,8 +546,8 @@ public class SearchManager2 extends SidePaneComponent
 
     class SearchWorker extends AbstractWorker {
 
-        private SearchRuleSet rules;
-        Hashtable<String, String> searchTerm;
+        private final SearchRuleSet rules;
+        final Hashtable<String, String> searchTerm;
         int hits = 0;
 
 

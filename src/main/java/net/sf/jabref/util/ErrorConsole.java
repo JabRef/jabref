@@ -43,13 +43,13 @@ import net.sf.jabref.Globals;
  */
 public class ErrorConsole extends Handler {
 
-    ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
-    ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+    final ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
+    final ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
 
-    ArrayList<String> logOutput = new ArrayList<String>();
+    final ArrayList<String> logOutput = new ArrayList<String>();
     String logOutputCache = "";
     boolean logOutputCacheRefreshNeeded = true;
-    SimpleFormatter fmt = new SimpleFormatter();
+    final SimpleFormatter fmt = new SimpleFormatter();
     private static final int MAXLOGLINES = 500;
 
     private static ErrorConsole instance = null;
@@ -123,7 +123,7 @@ public class ErrorConsole extends Handler {
 
     class ErrorConsoleAction extends AbstractAction {
 
-        JFrame frame;
+        final JFrame frame;
 
 
         public ErrorConsoleAction(JFrame frame) {
@@ -146,7 +146,7 @@ public class ErrorConsole extends Handler {
     // All writes to this print stream are copied to two print streams
     public class TeeStream extends PrintStream {
 
-        PrintStream out;
+        final PrintStream out;
 
 
         public TeeStream(PrintStream out1, PrintStream out2) {

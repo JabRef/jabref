@@ -42,8 +42,8 @@ import ca.odell.glazedlists.SortedList;
  */
 public class OpenDocumentRepresentation {
 
-    protected Collection<BibtexEntry> entries;
-    private BibtexDatabase database;
+    protected final Collection<BibtexEntry> entries;
+    private final BibtexDatabase database;
 
 
     @SuppressWarnings("unchecked")

@@ -52,15 +52,21 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  */
 public class MainTable extends JTable {
 
-    private MainTableFormat tableFormat;
-    private BasePanel panel;
-    private SortedList<BibtexEntry> sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
-    private boolean tableColorCodes, showingFloatSearch = false, showingFloatGrouping = false;
-    private EventSelectionModel<BibtexEntry> selectionModel;
-    private TableComparatorChooser<BibtexEntry> comparatorChooser;
-    private JScrollPane pane;
-    private Comparator<BibtexEntry> searchComparator, groupComparator,
-            markingComparator = new IsMarkedComparator();
+    private final MainTableFormat tableFormat;
+    private final BasePanel panel;
+    private final SortedList<BibtexEntry> sortedForMarking;
+    private final SortedList<BibtexEntry> sortedForTable;
+    private final SortedList<BibtexEntry> sortedForSearch;
+    private final SortedList<BibtexEntry> sortedForGrouping;
+    private final boolean tableColorCodes;
+    private boolean showingFloatSearch = false;
+    private boolean showingFloatGrouping = false;
+    private final EventSelectionModel<BibtexEntry> selectionModel;
+    private final TableComparatorChooser<BibtexEntry> comparatorChooser;
+    private final JScrollPane pane;
+    private Comparator<BibtexEntry> searchComparator;
+    private Comparator<BibtexEntry> groupComparator;
+    private final Comparator<BibtexEntry> markingComparator = new IsMarkedComparator();
     private Matcher<BibtexEntry> searchMatcher, groupMatcher;
 
     // needed to activate/deactivate the listener

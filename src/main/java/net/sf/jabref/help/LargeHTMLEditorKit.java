@@ -29,7 +29,7 @@ import net.sf.jabref.GUIGlobals;
  */
 public class LargeHTMLEditorKit extends HTMLEditorKit {
 
-    ViewFactory factory = new MyViewFactory();
+    final ViewFactory factory = new MyViewFactory();
 
 
     @Override

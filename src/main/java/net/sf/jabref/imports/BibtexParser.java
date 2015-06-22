@@ -77,7 +77,7 @@ public class BibtexParser {
 
     private int line = 1;
 
-    private FieldContentParser fieldContentParser = new FieldContentParser();
+    private final FieldContentParser fieldContentParser = new FieldContentParser();
 
     private ParserResult _pr;
 

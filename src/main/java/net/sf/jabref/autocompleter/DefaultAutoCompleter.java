@@ -29,7 +29,7 @@ import net.sf.jabref.Globals;
  */
 public class DefaultAutoCompleter extends AbstractAutoCompleter {
 
-    public String _fieldName;
+    public final String _fieldName;
 
 
     /**

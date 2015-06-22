@@ -36,8 +36,8 @@ import java.util.Vector;
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
-    private BasePanel panel;
-    private JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
     private boolean success = false, cancelled = false, fileLockedError = false;
 
 

@@ -26,7 +26,7 @@ import net.sf.jabref.*;
 
 public class PushToLyx implements PushToApplication {
 
-    private JTextField lyxPipe = new JTextField(30);
+    private final JTextField lyxPipe = new JTextField(30);
     private JPanel settings = null;
 
     private boolean couldNotFindPipe = false;

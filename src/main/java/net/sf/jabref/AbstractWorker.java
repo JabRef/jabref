@@ -28,8 +28,8 @@ import spin.Spin;
  */
 public abstract class AbstractWorker implements Worker, CallBack {
 
-    private Worker worker;
-    private CallBack callBack;
+    private final Worker worker;
+    private final CallBack callBack;
 
 
     public AbstractWorker() {

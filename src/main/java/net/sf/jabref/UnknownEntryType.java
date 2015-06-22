@@ -25,8 +25,8 @@ package net.sf.jabref;
  */
 public class UnknownEntryType extends BibtexEntryType {
 
-    private String name;
-    private String[] fields = new String[0];
+    private final String name;
+    private final String[] fields = new String[0];
 
 
     public UnknownEntryType(String name_) {

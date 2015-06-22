@@ -24,7 +24,7 @@ package net.sf.jabref.oo;
  */
 public class BibtexEntryNotFoundException extends Exception {
 
-    private String bibtexKey;
+    private final String bibtexKey;
 
 
     public BibtexEntryNotFoundException(String bibtexKey, String message) {

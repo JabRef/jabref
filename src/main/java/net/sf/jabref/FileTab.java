@@ -46,26 +46,35 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
+    final JabRefPreferences _prefs;
+    final JabRefFrame _frame;
 
-    private JCheckBox backup, openLast, autoDoubleBraces, autoSave,
-            promptBeforeUsingAutoSave, includeEmptyFields, camelCase, sameColumn;
-    private JComboBox valueDelimiter, newlineSeparator;
-    private JRadioButton
-            resolveStringsStandard, resolveStringsAll;
-    private JTextField bracesAroundCapitalsFields, nonWrappableFields,
-            doNotResolveStringsFor;
-    private JSpinner autoSaveInterval;
+    private final JCheckBox backup;
+    private final JCheckBox openLast;
+    private final JCheckBox autoDoubleBraces;
+    private final JCheckBox autoSave;
+    private final JCheckBox promptBeforeUsingAutoSave;
+    private final JCheckBox includeEmptyFields;
+    private final JCheckBox camelCase;
+    private final JCheckBox sameColumn;
+    private final JComboBox valueDelimiter;
+    private final JComboBox newlineSeparator;
+    private final JRadioButton
+            resolveStringsStandard;
+    private final JRadioButton resolveStringsAll;
+    private final JTextField bracesAroundCapitalsFields;
+    private final JTextField nonWrappableFields;
+    private final JTextField doNotResolveStringsFor;
+    private final JSpinner autoSaveInterval;
     private boolean origAutoSaveSetting = false;
 
     //for LWang_AdjustableFieldOrder 
     //    private JRadioButton sortFieldInAlphabetaOrder,unSortFieldStyle,orderAsUserDefined;
-    private ButtonGroup bgFieldOrderStyle;
+    private final ButtonGroup bgFieldOrderStyle;
     //    int fieldOrderStyle;
     private JTextField userDefinedFieldOrder;
 
-    private JCheckBox wrapFieldLine;
+    private final JCheckBox wrapFieldLine;
 
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {

@@ -25,10 +25,10 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ImportFormatExtension;
 
 public class ImportFormatReader {
 
-    public static String BIBTEX_FORMAT = "BibTeX";
+    public static final String BIBTEX_FORMAT = "BibTeX";
 
     /** all import formats, in the default order of import formats */
-    private SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
+    private final SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
 
 
     public ImportFormatReader() {
@@ -378,8 +378,8 @@ public class ImportFormatReader {
 
     public static class UnknownFormatImport {
 
-        public String format;
-        public ParserResult parserResult;
+        public final String format;
+        public final ParserResult parserResult;
 
 
         public UnknownFormatImport(String format, ParserResult parserResult) {

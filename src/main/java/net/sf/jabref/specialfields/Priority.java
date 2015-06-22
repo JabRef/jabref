@@ -26,7 +26,7 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE = null;
 
-    private ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
+    private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
 
 
     public Priority() {

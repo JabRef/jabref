@@ -512,11 +512,11 @@ public class PluginInstaller {
 
     public static class NameAndVersion implements Comparable<NameAndVersion> {
 
-        String name;
-        VersionNumber version;
+        final String name;
+        final VersionNumber version;
         int status = 0;
-        boolean inUserDirectory;
-        File file;
+        final boolean inUserDirectory;
+        final File file;
 
 
         public NameAndVersion(String name, VersionNumber version, boolean inUserDirectory,
@@ -552,7 +552,7 @@ public class PluginInstaller {
     static class VersionNumber implements Comparable<VersionNumber> {
 
         public static final VersionNumber ZERO = new VersionNumber("0");
-        List<Integer> digits;
+        final List<Integer> digits;
 
 
         public VersionNumber(String number) {

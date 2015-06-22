@@ -26,7 +26,7 @@ import ca.odell.glazedlists.matchers.Matcher;
  */
 public class HitOrMissComparator implements Comparator<BibtexEntry> {
 
-    private Matcher<BibtexEntry> hitOrMiss;
+    private final Matcher<BibtexEntry> hitOrMiss;
 
 
     public HitOrMissComparator(Matcher<BibtexEntry> hitOrMiss) {

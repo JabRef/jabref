@@ -24,10 +24,10 @@ import net.sf.jabref.undo.UndoableInsertString;
 
 public class StringAddChange extends Change {
 
-    BibtexString string;
+    final BibtexString string;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
+    final InfoPane tp = new InfoPane();
+    final JScrollPane sp = new JScrollPane(tp);
 
 
     public StringAddChange(BibtexString string) {

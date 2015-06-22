@@ -32,7 +32,7 @@ class EntryEditorTabFocusListener implements FocusListener {
     JTextComponent c;
 
     DocumentListener d;
-    private EntryEditorTab entryEditorTab;
+    private final EntryEditorTab entryEditorTab;
 
 
     public EntryEditorTabFocusListener(final EntryEditorTab entryEditorTab) {

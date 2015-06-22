@@ -30,9 +30,9 @@ import net.sf.jabref.Util;
  */
 public class UndoableInsertEntry extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private BibtexEntry entry;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final BibtexEntry entry;
+    private final BasePanel panel;
 
 
     public UndoableInsertEntry(BibtexDatabase base, BibtexEntry entry,

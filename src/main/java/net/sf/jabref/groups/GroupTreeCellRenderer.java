@@ -46,10 +46,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     protected Object[] highlight3Cells = null;
     protected Object highlightBorderCell = null;
 
-    public static ImageIcon
-            groupRefiningIcon = GUIGlobals.getImage("groupRefining"),
-            groupIncludingIcon = GUIGlobals.getImage("groupIncluding"),
-            groupRegularIcon = null;
+    public static final ImageIcon
+            groupRefiningIcon = GUIGlobals.getImage("groupRefining");
+    public static final ImageIcon groupIncludingIcon = GUIGlobals.getImage("groupIncluding");
+    public static final ImageIcon groupRegularIcon = null;
 
 
     public Component getTreeCellRendererComponent(JTree tree, Object value,

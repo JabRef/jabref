@@ -24,7 +24,7 @@ import java.util.Comparator;
  */
 public class IconComparator implements Comparator<BibtexEntry> {
 
-    private String[] fields;
+    private final String[] fields;
 
 
     public IconComparator(String[] fields) {

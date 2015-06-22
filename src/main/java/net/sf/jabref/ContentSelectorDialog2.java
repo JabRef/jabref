@@ -48,42 +48,42 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class ContentSelectorDialog2 extends JDialog {
 
     ActionListener wordEditFieldListener = null;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JPanel fieldPan = new JPanel(),
-            wordPan = new JPanel(),
-            buttonPan = new JPanel(),
-            fieldNamePan = new JPanel(),
-            wordEditPan = new JPanel();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    final JPanel fieldPan = new JPanel();
+    final JPanel wordPan = new JPanel();
+    final JPanel buttonPan = new JPanel();
+    final JPanel fieldNamePan = new JPanel();
+    final JPanel wordEditPan = new JPanel();
 
     final String
             WORD_EMPTY_TEXT = Globals.lang("<no field>"),
             WORD_FIRSTLINE_TEXT = Globals.lang("<select word>"),
             FIELD_FIRST_LINE = Globals.lang("<field name>");
-    MetaData metaData;
+    final MetaData metaData;
     String currentField = null;
     TreeSet<String> fieldSet, wordSet;
-    JabRefFrame frame;
-    BasePanel panel;
-    JButton help = new JButton(Globals.lang("Help")),
-            newField = new JButton(Globals.lang("New")),
-            removeField = new JButton(Globals.lang("Remove")),
-            newWord = new JButton(Globals.lang("New")),
-            removeWord = new JButton(Globals.lang("Remove")),
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(),
-            apply = new JButton(Globals.lang("Apply"));
-    DefaultListModel fieldListModel = new DefaultListModel(),
-            wordListModel = new DefaultListModel();
-    JList fieldList = new JList(fieldListModel),
-            wordList = new JList(wordListModel);
-    JTextField fieldNameField = new JTextField("", 20),
-            wordEditField = new JTextField("", 20);
-    JScrollPane fPane = new JScrollPane(fieldList),
-            wPane = new JScrollPane(wordList);
+    final JabRefFrame frame;
+    final BasePanel panel;
+    final JButton help = new JButton(Globals.lang("Help"));
+    final JButton newField = new JButton(Globals.lang("New"));
+    final JButton removeField = new JButton(Globals.lang("Remove"));
+    final JButton newWord = new JButton(Globals.lang("New"));
+    final JButton removeWord = new JButton(Globals.lang("Remove"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton();
+    final JButton apply = new JButton(Globals.lang("Apply"));
+    final DefaultListModel fieldListModel = new DefaultListModel();
+    DefaultListModel wordListModel = new DefaultListModel();
+    final JList fieldList = new JList(fieldListModel);
+    final JList wordList = new JList(wordListModel);
+    final JTextField fieldNameField = new JTextField("", 20);
+    final JTextField wordEditField = new JTextField("", 20);
+    final JScrollPane fPane = new JScrollPane(fieldList);
+    final JScrollPane wPane = new JScrollPane(wordList);
 
-    HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
-    ArrayList<String> removedFields = new ArrayList<String>();
+    final HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
+    final ArrayList<String> removedFields = new ArrayList<String>();
 
 
     /**

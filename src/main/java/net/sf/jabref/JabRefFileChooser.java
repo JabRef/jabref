@@ -94,7 +94,7 @@ class JabRefUI extends MetalFileChooserUI {
 
     protected class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
 
-        JList list;
+        final JList list;
 
 
         public DoubleClickListener(JList list) {

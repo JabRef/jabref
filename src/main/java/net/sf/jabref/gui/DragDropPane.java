@@ -43,7 +43,7 @@ public class DragDropPane extends JTabbedPane {
 
     private boolean draggingState = false; // State var if we are at dragging or not
     private int indexDraggedTab; // The index of the tab we drag at the moment
-    MarkerPane markerPane; // The glass panel for painting the position marker
+    final MarkerPane markerPane; // The glass panel for painting the position marker
 
 
     public DragDropPane() {
@@ -138,7 +138,7 @@ public class DragDropPane extends JTabbedPane {
     class MarkerPane extends JPanel {
 
         private Point locationP;
-        private Image markerImg;
+        private final Image markerImg;
 
 
         public MarkerPane() {

@@ -33,9 +33,9 @@ import ca.odell.glazedlists.BasicEventList;
 
 public class CustomExportList {
 
-    private EventList<String[]> list;
-    private SortedList<String[]> sorted;
-    private TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
+    private final EventList<String[]> list;
+    private final SortedList<String[]> sorted;
+    private final TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
     private Object[] array;
 
 

@@ -34,20 +34,27 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    final JabRefPreferences _prefs;
 
-    JabRefFrame _frame;
+    final JabRefFrame _frame;
 
-    JTextField pdfDir, regExpTextField, fileDir, psDir, emailSubject;
+    final JTextField pdfDir;
+    final JTextField regExpTextField;
+    final JTextField fileDir;
+    final JTextField psDir;
+    final JTextField emailSubject;
 
-    JCheckBox bibLocationAsFileDir, bibLocAsPrimaryDir, runAutoFileSearch,
-            allowFileAutoOpenBrowse, openFoldersOfAttachedFiles;
-    JButton editFileTypes;
-    ItemListener regExpListener;
+    final JCheckBox bibLocationAsFileDir;
+    final JCheckBox bibLocAsPrimaryDir;
+    final JCheckBox runAutoFileSearch;
+    final JCheckBox allowFileAutoOpenBrowse;
+    final JCheckBox openFoldersOfAttachedFiles;
+    final JButton editFileTypes;
+    final ItemListener regExpListener;
 
-    JRadioButton useRegExpComboBox;
-    JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key")),
-            matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
+    final JRadioButton useRegExpComboBox;
+    final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
+    final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
 
     public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs,

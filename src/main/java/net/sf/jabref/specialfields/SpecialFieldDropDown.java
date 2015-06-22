@@ -57,10 +57,10 @@ public class SpecialFieldDropDown {
     private static class MenuButtonActionListener implements ActionListener {
 
         private JPopupMenu popup;
-        private Dimension dim;
-        private JabRefFrame frame;
-        private SpecialField field;
-        private JButton button;
+        private final Dimension dim;
+        private final JabRefFrame frame;
+        private final SpecialField field;
+        private final JButton button;
 
 
         public MenuButtonActionListener(SpecialField field, JabRefFrame frame, JButton button, Dimension dim) {
@@ -88,8 +88,8 @@ public class SpecialFieldDropDown {
 
         private class PopupitemActionListener implements ActionListener {
 
-            private BasePanel panel;
-            private String actionName;
+            private final BasePanel panel;
+            private final String actionName;
 
 
             public PopupitemActionListener(BasePanel panel, String actionName) {

@@ -49,11 +49,11 @@ public class IconSelection extends JDialog {
     JList icons;
     List<String> iconKeys;
     DefaultListModel listModel;
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
     private boolean okPressed = false;
     private int selected = -1;
-    private JDialog parent;
+    private final JDialog parent;
 
 
     public IconSelection(JDialog parent, String initialSelection) {
@@ -109,7 +109,7 @@ public class IconSelection extends JDialog {
         }
         class MyRenderer implements ListCellRenderer {
 
-            JLabel comp = new JLabel();
+            final JLabel comp = new JLabel();
 
 
             public MyRenderer() {

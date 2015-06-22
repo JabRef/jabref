@@ -170,7 +170,7 @@ public class AccessLinksForEntries {
 
     public static class SaveWithLinkedFiles extends BaseAction {
 
-        private BasePanel panel;
+        private final BasePanel panel;
 
 
         public SaveWithLinkedFiles(BasePanel panel) {

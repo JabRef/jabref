@@ -50,31 +50,31 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ManageJournalsPanel extends JPanel {
 
-    JabRefFrame frame;
-    JTextField personalFile = new JTextField();
-    AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
+    final JabRefFrame frame;
+    final JTextField personalFile = new JTextField();
+    final AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
     JTable userTable; // builtInTable
-    JPanel userPanel = new JPanel(),
-            journalEditPanel,
-            externalFilesPanel = new JPanel(),
-            addExtPan = new JPanel();
-    JTextField nameTf = new JTextField(),
-            newNameTf = new JTextField(),
-            abbrTf = new JTextField();
-    List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
-    JDialog dialog;
-    JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
-            oldFile = new JRadioButton(Globals.lang("Existing file"));
+    final JPanel userPanel = new JPanel();
+    final JPanel journalEditPanel;
+    final JPanel externalFilesPanel = new JPanel();
+    final JPanel addExtPan = new JPanel();
+    final JTextField nameTf = new JTextField();
+    final JTextField newNameTf = new JTextField();
+    final JTextField abbrTf = new JTextField();
+    final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    final JDialog dialog;
+    final JRadioButton newFile = new JRadioButton(Globals.lang("New file"));
+    final JRadioButton oldFile = new JRadioButton(Globals.lang("Existing file"));
 
-    JButton add = new JButton(GUIGlobals.getImage("add")),
-            remove = new JButton(GUIGlobals.getImage("remove")),
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel")),
-            help = new JButton(Globals.lang("Help")),
-            browseOld = new JButton(Globals.lang("Browse")),
-            browseNew = new JButton(Globals.lang("Browse")),
-            addExt = new JButton(GUIGlobals.getImage("add")),
-            viewBuiltin = new JButton(Globals.lang("View"));
+    final JButton add = new JButton(GUIGlobals.getImage("add"));
+    final JButton remove = new JButton(GUIGlobals.getImage("remove"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JButton help = new JButton(Globals.lang("Help"));
+    final JButton browseOld = new JButton(Globals.lang("Browse"));
+    final JButton browseNew = new JButton(Globals.lang("Browse"));
+    final JButton addExt = new JButton(GUIGlobals.getImage("add"));
+    final JButton viewBuiltin = new JButton(Globals.lang("View"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -419,7 +419,7 @@ public class ManageJournalsPanel extends JPanel {
 
     class DownloadAction extends AbstractAction {
 
-        JTextField comp;
+        final JTextField comp;
 
 
         public DownloadAction(JTextField tc) {
@@ -453,8 +453,8 @@ public class ManageJournalsPanel extends JPanel {
 
     class BrowseAction extends AbstractAction {
 
-        JTextField comp;
-        boolean dir;
+        final JTextField comp;
+        final boolean dir;
 
 
         public BrowseAction(JTextField tc, boolean dir) {
@@ -480,7 +480,7 @@ public class ManageJournalsPanel extends JPanel {
 
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
-        String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
+        final String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
         ArrayList<JournalEntry> journals = null;
 
 
@@ -586,11 +586,11 @@ public class ManageJournalsPanel extends JPanel {
     class ExternalFileEntry {
 
         private JPanel pan;
-        private JTextField tf;
-        private JButton browse = new JButton(Globals.lang("Browse")),
-                view = new JButton(Globals.lang("Preview")),
-                clear = new JButton(GUIGlobals.getImage("delete")),
-                download = new JButton(Globals.lang("Download"));
+        private final JTextField tf;
+        private final JButton browse = new JButton(Globals.lang("Browse"));
+        private final JButton view = new JButton(Globals.lang("Preview"));
+        private final JButton clear = new JButton(GUIGlobals.getImage("delete"));
+        private final JButton download = new JButton(Globals.lang("Download"));
 
 
         public ExternalFileEntry() {

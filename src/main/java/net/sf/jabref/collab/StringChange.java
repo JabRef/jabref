@@ -25,12 +25,15 @@ import net.sf.jabref.undo.UndoableStringChange;
 
 public class StringChange extends Change {
 
-    BibtexString string;
-    String mem, tmp, disk, label;
+    final BibtexString string;
+    final String mem;
+    final String tmp;
+    final String disk;
+    final String label;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
-    private BibtexString tmpString;
+    final InfoPane tp = new InfoPane();
+    final JScrollPane sp = new JScrollPane(tp);
+    private final BibtexString tmpString;
 
 
     public StringChange(BibtexString string, BibtexString tmpString, String label,

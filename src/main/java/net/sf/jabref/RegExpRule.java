@@ -38,7 +38,7 @@ public class RegExpRule implements SearchRule {
 
     final boolean m_caseSensitiveSearch;
     //static RemoveBrackets removeBrackets = new RemoveBrackets();
-    static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
 
     public RegExpRule(boolean caseSensitive) {

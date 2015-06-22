@@ -32,7 +32,7 @@ public class SaveException extends Exception
     public static final SaveException BACKUP_CREATION = new SaveException
             (Globals.lang("Unable to create backup"));
 
-    private BibtexEntry entry;
+    private final BibtexEntry entry;
     private int status = 0;
 
 

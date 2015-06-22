@@ -7,7 +7,7 @@ import javax.swing.text.html.ParagraphView;
 
 class HTMLParagraphView extends ParagraphView {
 
-    public static int MAX_VIEW_SIZE = 100;
+    public static final int MAX_VIEW_SIZE = 100;
 
 
     public HTMLParagraphView(Element elem) {

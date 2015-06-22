@@ -21,16 +21,16 @@ import java.util.*;
 
 public class Cookie {
 
-    String name;
-    String value;
-    URI uri;
+    final String name;
+    final String value;
+    final URI uri;
     String domain;
     Date expires;
     String path;
 
-    private static DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
+    private static final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
 
-    private static DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    private static final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
 
 
     /**

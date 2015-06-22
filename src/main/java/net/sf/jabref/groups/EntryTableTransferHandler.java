@@ -52,15 +52,15 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     protected final MainTable entryTable;
 
-    protected JabRefFrame frame;
+    protected final JabRefFrame frame;
 
-    private BasePanel panel;
+    private final BasePanel panel;
 
     protected DataFlavor urlFlavor;
 
-    protected DataFlavor stringFlavor;
+    protected final DataFlavor stringFlavor;
 
-    protected static boolean DROP_ALLOWED = true;
+    protected static final boolean DROP_ALLOWED = true;
 
 
     /**

@@ -48,7 +48,9 @@ public class SaveSession {
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
 
-    File file, tmp, backupFile;
+    final File file;
+    File tmp;
+    File backupFile;
     String encoding;
     boolean backup, useLockFile;
     VerifyingWriter writer;

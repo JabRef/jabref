@@ -12,7 +12,7 @@ public class SaveOrderConfig {
     public boolean saveInOriginalOrder, saveInSpecifiedOrder;
 
     // quick hack for outside modifications
-    public SortCriterion sortCriteria[] = new SortCriterion[3];
+    public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
 
     public static class SortCriterion {

@@ -25,7 +25,7 @@ import net.sf.jabref.BibtexEntry;
  */
 public class EntireFieldAutoCompleter extends AbstractAutoCompleter {
 
-    public String _fieldName;
+    public final String _fieldName;
 
 
     /**

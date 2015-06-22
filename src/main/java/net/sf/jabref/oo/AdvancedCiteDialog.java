@@ -34,12 +34,12 @@ public class AdvancedCiteDialog {
 
     static boolean defaultInPar = true;
     boolean okPressed = false;
-    JDialog diag;
-    JRadioButton inPar = new JRadioButton(Globals.lang("Cite selected entries")),
-            inText = new JRadioButton(Globals.lang("Cite selected entries with in-text citation"));
-    JTextField pageInfo = new JTextField(15);
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    final JDialog diag;
+    final JRadioButton inPar = new JRadioButton(Globals.lang("Cite selected entries"));
+    final JRadioButton inText = new JRadioButton(Globals.lang("Cite selected entries with in-text citation"));
+    final JTextField pageInfo = new JTextField(15);
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public AdvancedCiteDialog(JabRefFrame parent) {

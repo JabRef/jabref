@@ -38,7 +38,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class BibteXMLImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
+    private static final Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
 
 
     /**

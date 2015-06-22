@@ -27,7 +27,8 @@ import net.sf.jabref.SearchRuleSet;
  */
 class AndOrSearchRuleSet extends SearchRuleSet {
 
-    private boolean and, invert;
+    private final boolean and;
+    private final boolean invert;
 
 
     public AndOrSearchRuleSet(boolean and, boolean invert) {

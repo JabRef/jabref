@@ -36,7 +36,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class WidthFunction implements BstFunction {
 
-    VM vm;
+    final VM vm;
 
 
     public WidthFunction(VM vm) {

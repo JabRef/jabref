@@ -129,30 +129,30 @@ public class TextInputDialog
         extends JDialog implements ActionListener
 {
 
-    private JButton okButton = new JButton();
-    private JButton cancelButton = new JButton();
-    private JButton insertButton = new JButton();
-    private JButton parseWithFreeCiteButton = new JButton();
-    private JPanel panel1 = new JPanel();
-    private JPanel buttons = new JPanel();
-    private JPanel rawPanel = new JPanel();
-    private JPanel sourcePanel = new JPanel();
-    private IntegrityMessagePanel warnPanel;
+    private final JButton okButton = new JButton();
+    private final JButton cancelButton = new JButton();
+    private final JButton insertButton = new JButton();
+    private final JButton parseWithFreeCiteButton = new JButton();
+    private final JPanel panel1 = new JPanel();
+    private final JPanel buttons = new JPanel();
+    private final JPanel rawPanel = new JPanel();
+    private final JPanel sourcePanel = new JPanel();
+    private final IntegrityMessagePanel warnPanel;
     private JList fieldList;
     private JRadioButton overRadio;
 
-    private BibtexEntry entry;
+    private final BibtexEntry entry;
 
-    public JPopupMenu inputMenu = new JPopupMenu();
+    public final JPopupMenu inputMenu = new JPopupMenu();
     private StyledDocument doc; // content from inputPane
     private JTextPane textPane;
     private JTextArea preview;
 
-    private boolean inputChanged; // input changed, fired by insert buttons
+    private final boolean inputChanged; // input changed, fired by insert buttons
 
-    private TagToMarkedTextStore marked;
+    private final TagToMarkedTextStore marked;
 
-    private JabRefFrame _frame;
+    private final JabRefFrame _frame;
 
     private boolean okPressed = false;
 
@@ -767,10 +767,10 @@ public class TextInputDialog
             extends DefaultListCellRenderer
     {
 
-        private Font baseFont;
-        private Font usedFont;
-        private ImageIcon okIcon = GUIGlobals.getImage("complete");
-        private ImageIcon needIcon = GUIGlobals.getImage("wrong");
+        private final Font baseFont;
+        private final Font usedFont;
+        private final ImageIcon okIcon = GUIGlobals.getImage("complete");
+        private final ImageIcon needIcon = GUIGlobals.getImage("wrong");
 
 
         public SimpleCellRenderer(Font normFont)
@@ -836,7 +836,7 @@ class PopupListener
         extends MouseAdapter
 {
 
-    private JPopupMenu popMenu;
+    private final JPopupMenu popMenu;
 
 
     public PopupListener(JPopupMenu menu)

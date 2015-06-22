@@ -29,7 +29,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class PluginBasedExportFormat extends ExportFormat {
 
-    public ExportFormatTemplateExtension extension;
+    public final ExportFormatTemplateExtension extension;
 
 
     /**

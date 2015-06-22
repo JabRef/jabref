@@ -40,12 +40,12 @@ import java.util.List;
  */
 public class SynchronizeFileField extends AbstractWorker {
 
-    private String fieldName = GUIGlobals.FILE_FIELD;
-    private BasePanel panel;
+    private final String fieldName = GUIGlobals.FILE_FIELD;
+    private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private SynchronizeFileField.OptionsDialog optDiag = null;
 
-    Object[] brokenLinkOptions =
+    final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
             Globals.lang("Remove all broken links"),
             Globals.lang("Quit synchronization")};
@@ -282,13 +282,15 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        JRadioButton autoSetUnset, autoSetAll, autoSetNone;
-        JCheckBox checkLinks;
-        JButton ok = new JButton(Globals.lang("Ok")),
-                cancel = new JButton(Globals.lang("Cancel"));
+        final JRadioButton autoSetUnset;
+        final JRadioButton autoSetAll;
+        final JRadioButton autoSetNone;
+        final JCheckBox checkLinks;
+        final JButton ok = new JButton(Globals.lang("Ok"));
+        final JButton cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
-        private MetaData metaData;
+        private final MetaData metaData;
 
 
         public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {

@@ -35,7 +35,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class PurifyFunction implements BstFunction {
 
-    VM vm;
+    final VM vm;
 
 
     public PurifyFunction(VM vm) {

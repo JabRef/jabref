@@ -36,7 +36,7 @@ import java.net.URL;
 
 public class SplashScreen extends Window {
 
-    private Image splashImage;
+    private final Image splashImage;
     private boolean paintCalled = false;
 
 

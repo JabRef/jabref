@@ -54,22 +54,22 @@ import net.sf.jabref.undo.UndoableStringChange;
 public class StringDialog extends JDialog {
 
     // A reference to the entry this object works on.
-    BibtexDatabase base;
-    JabRefFrame frame;
-    BasePanel panel;
-    JabRefPreferences prefs;
+    final BibtexDatabase base;
+    final JabRefFrame frame;
+    final BasePanel panel;
+    final JabRefPreferences prefs;
     TreeSet<BibtexString> stringsSet; // Our locally sorted set of strings.
     Object[] strings;
 
     // Layout objects.
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    Container conPane = getContentPane();
-    JToolBar tlb = new JToolBar();
-    JPanel pan = new JPanel();
-    StringTable table;
-    HelpAction helpAction;
+    final Container conPane = getContentPane();
+    final JToolBar tlb = new JToolBar();
+    final JPanel pan = new JPanel();
+    final StringTable table;
+    final HelpAction helpAction;
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel,
@@ -158,7 +158,7 @@ public class StringDialog extends JDialog {
 
     class StringTable extends JTable {
 
-        JScrollPane sp = new JScrollPane(this);
+        final JScrollPane sp = new JScrollPane(this);
 
 
         public StringTable(StringTableModel stm) {
@@ -207,8 +207,8 @@ public class StringDialog extends JDialog {
 
     class StringTableModel extends AbstractTableModel {
 
-        BibtexDatabase base;
-        StringDialog parent;
+        final BibtexDatabase base;
+        final StringDialog parent;
 
 
         public StringTableModel(StringDialog parent, BibtexDatabase base) {
@@ -331,12 +331,12 @@ public class StringDialog extends JDialog {
 
 
     // The action concerned with closing the window.
-    CloseAction closeAction = new CloseAction(this);
+    final CloseAction closeAction = new CloseAction(this);
 
 
     class CloseAction extends AbstractAction {
 
-        StringDialog parent;
+        final StringDialog parent;
 
 
         public CloseAction(StringDialog parent) {
@@ -359,12 +359,12 @@ public class StringDialog extends JDialog {
     }
 
 
-    NewStringAction newStringAction = new NewStringAction(this);
+    final NewStringAction newStringAction = new NewStringAction(this);
 
 
     class NewStringAction extends AbstractAction {
 
-        StringDialog parent;
+        final StringDialog parent;
 
 
         public NewStringAction(StringDialog parent) {
@@ -433,7 +433,7 @@ public class StringDialog extends JDialog {
 
     class StoreContentAction extends AbstractAction {
 
-        StringDialog parent;
+        final StringDialog parent;
 
 
         public StoreContentAction(StringDialog parent) {
@@ -448,12 +448,12 @@ public class StringDialog extends JDialog {
     }
 
 
-    RemoveStringAction removeStringAction = new RemoveStringAction(this);
+    final RemoveStringAction removeStringAction = new RemoveStringAction(this);
 
 
     class RemoveStringAction extends AbstractAction {
 
-        StringDialog parent;
+        final StringDialog parent;
 
 
         public RemoveStringAction(StringDialog parent) {
@@ -572,7 +572,7 @@ public class StringDialog extends JDialog {
     }
     }*/
 
-    UndoAction undoAction = new UndoAction();
+    final UndoAction undoAction = new UndoAction();
 
 
     class UndoAction extends AbstractAction {
@@ -591,7 +591,7 @@ public class StringDialog extends JDialog {
     }
 
 
-    RedoAction redoAction = new RedoAction();
+    final RedoAction redoAction = new RedoAction();
 
 
     class RedoAction extends AbstractAction {

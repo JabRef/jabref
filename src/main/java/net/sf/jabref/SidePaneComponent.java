@@ -30,13 +30,13 @@ import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 
-    protected JButton close = new JButton(GUIGlobals.getImage("close"));
-    protected JButton up = new JButton(GUIGlobals.getImage("up"));
-    protected JButton down = new JButton(GUIGlobals.getImage("down"));
+    protected final JButton close = new JButton(GUIGlobals.getImage("close"));
+    protected final JButton up = new JButton(GUIGlobals.getImage("up"));
+    protected final JButton down = new JButton(GUIGlobals.getImage("down"));
 
     protected boolean visible = false;
 
-    protected SidePaneManager manager;
+    protected final SidePaneManager manager;
 
     protected BasePanel panel = null;
 

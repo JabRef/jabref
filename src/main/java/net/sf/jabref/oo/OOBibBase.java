@@ -75,11 +75,11 @@ public class OOBibBase {
     XPropertyContainer userProperties = null;
     XPropertySet propertySet = null;
 
-    private boolean atEnd;
-    private AlphanumericComparator entryComparator = new AlphanumericComparator();
-    private YearComparator yearComparator = new YearComparator();
+    private final boolean atEnd;
+    private final AlphanumericComparator entryComparator = new AlphanumericComparator();
+    private final YearComparator yearComparator = new YearComparator();
 
-    private HashMap<String, String> uniquefiers = new HashMap<String, String>();
+    private final HashMap<String, String> uniquefiers = new HashMap<String, String>();
 
     private String[] sortedReferenceMarks = null;
 

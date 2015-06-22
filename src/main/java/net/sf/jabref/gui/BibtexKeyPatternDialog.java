@@ -42,7 +42,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
     private MetaData metaData;
     private BasePanel panel;
-    private LabelPatternPanel labelPatternPanel;
+    private final LabelPatternPanel labelPatternPanel;
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {

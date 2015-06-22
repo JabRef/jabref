@@ -28,9 +28,11 @@ import java.util.Comparator;
  */
 public class EntryComparator implements Comparator<BibtexEntry> {
 
-    String sortField;
-    boolean descending, binary = false, numeric;
-    Comparator<BibtexEntry> next;
+    final String sortField;
+    final boolean descending;
+    boolean binary = false;
+    final boolean numeric;
+    final Comparator<BibtexEntry> next;
 
 
     public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {

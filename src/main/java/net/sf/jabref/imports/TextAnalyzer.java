@@ -24,7 +24,7 @@ import net.sf.jabref.Util;
 
 public class TextAnalyzer {
 
-    BibtexEntry be = null;
+    final BibtexEntry be = null;
 
 
     public TextAnalyzer(String text) {
@@ -206,7 +206,8 @@ public class TextAnalyzer {
 
     private class Substring implements Comparable<Substring> {
 
-        int begin, end;
+        final int begin;
+        final int end;
 
 
         public Substring(String name, int begin, int end) {

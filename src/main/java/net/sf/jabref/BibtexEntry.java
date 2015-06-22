@@ -49,8 +49,8 @@ public class BibtexEntry
 {
 
     public final static String ID_FIELD = "id";
-    public static Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
-    public static Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
+    public static final Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
+    public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 
     static {
         FieldAliasesOldToNew.put("address", "location");
@@ -81,7 +81,7 @@ public class BibtexEntry
     private String _id;
     private BibtexEntryType _type;
     private Map<String, String> _fields = new HashMap<String, String>();
-    VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
+    final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;

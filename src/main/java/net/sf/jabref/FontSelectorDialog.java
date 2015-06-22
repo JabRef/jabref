@@ -333,15 +333,15 @@ public class FontSelectorDialog extends JDialog {
 
     // private members
     private boolean isOK;
-    private JTextField familyField;
-    private JList familyList;
-    private JTextField sizeField;
-    private JList sizeList;
-    private JTextField styleField;
-    private JList styleList;
-    private JLabel preview;
-    private JButton ok;
-    private JButton cancel;
+    private final JTextField familyField;
+    private final JList familyList;
+    private final JTextField sizeField;
+    private final JList sizeList;
+    private final JTextField styleField;
+    private final JList styleList;
+    private final JLabel preview;
+    private final JButton ok;
+    private final JButton cancel;
 
     /**
      * For some reason the default Java fonts show up in the

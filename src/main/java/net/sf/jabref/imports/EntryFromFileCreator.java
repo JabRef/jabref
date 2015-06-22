@@ -26,7 +26,7 @@ import net.sf.jabref.gui.FileListTableModel;
  */
 public abstract class EntryFromFileCreator implements java.io.FileFilter {
 
-    ExternalFileType externalFileType;
+    final ExternalFileType externalFileType;
 
 
     /**

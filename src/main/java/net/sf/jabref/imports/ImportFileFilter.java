@@ -24,8 +24,8 @@ import java.io.File;
  */
 public class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
 
-    private ImportFormat format;
-    private String name;
+    private final ImportFormat format;
+    private final String name;
 
 
     public ImportFileFilter(ImportFormat format) {

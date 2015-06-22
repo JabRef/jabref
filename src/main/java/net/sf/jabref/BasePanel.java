@@ -125,7 +125,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
-    private static Logger logger = Logger.getLogger(BasePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(BasePanel.class.getName());
 
     public final static int SHOWING_NOTHING = 0, SHOWING_PREVIEW = 1, SHOWING_EDITOR = 2, WILL_SHOW_EDITOR = 3;
 
@@ -157,9 +157,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     // Hashtable indexing the only search auto completer
     // required for the SearchAutoCompleterUpdater
-    HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
+    final HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
 
-    HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
+    final HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -167,12 +167,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     AutoCompleteListener searchCompleteListener = null;
 
     // The undo manager.
-    public CountingUndoManager undoManager = new CountingUndoManager(this);
-    UndoAction undoAction = new UndoAction();
-    RedoAction redoAction = new RedoAction();
+    public final CountingUndoManager undoManager = new CountingUndoManager(this);
+    final UndoAction undoAction = new UndoAction();
+    final RedoAction redoAction = new RedoAction();
 
-    private List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>(),
-            nextEntries = new ArrayList<BibtexEntry>();
+    private final List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>();
+    private final List<BibtexEntry> nextEntries = new ArrayList<BibtexEntry>();
 
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
@@ -196,7 +196,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private boolean backOrForwardInProgress = false;
 
     // To indicate which entry is currently shown.
-    public HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
+    public final HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
     // To contain instantiated entry editors. This is to save time
     // in switching between entries.
 
@@ -236,7 +236,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
 
-    private HashMap<String, Object> actions = new HashMap<String, Object>();
+    private final HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
 
 
@@ -3106,7 +3106,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class SaveSelectedAction extends BaseAction {
 
-        private DatabaseSaveType saveType;
+        private final DatabaseSaveType saveType;
 
 
         public SaveSelectedAction(DatabaseSaveType saveType) {

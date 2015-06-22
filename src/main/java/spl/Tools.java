@@ -16,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Tools {
 
-    public static int WEBSERVICE_APP_ID = 9;
+    public static final int WEBSERVICE_APP_ID = 9;
     public static String WEBSERVICE_VERSION_SHORT = "0.1";
 
 

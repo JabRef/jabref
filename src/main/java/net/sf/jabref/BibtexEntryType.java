@@ -930,8 +930,8 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
     }
 
 
-    public static TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
-    public static TreeMap<String, BibtexEntryType> STANDARD_TYPES = new TreeMap<String, BibtexEntryType>();
+    public static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
+    public static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
     static {
         // Put the standard entry types into the type map.
         if (!Globals.prefs.getBoolean("biblatexMode")) {

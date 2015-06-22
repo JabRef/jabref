@@ -31,8 +31,8 @@ import net.sf.jabref.BasePanel;
  */
 public class AutosaveStartupPrompter implements Runnable {
 
-    private JabRefFrame frame;
-    private List<File> files;
+    private final JabRefFrame frame;
+    private final List<File> files;
 
 
     public AutosaveStartupPrompter(JabRefFrame frame, List<File> files) {

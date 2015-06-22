@@ -46,10 +46,11 @@ import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
  */
 public class ManagePluginsDialog {
 
-    private JabRefFrame frame;
-    private JDialog diag;
+    private final JabRefFrame frame;
+    private final JDialog diag;
     private SortedList<NameAndVersion> plugins;
-    private JTable table, tableOther;
+    private final JTable table;
+    private final JTable tableOther;
 
 
     public ManagePluginsDialog(JabRefFrame frame) {

@@ -41,16 +41,16 @@ public class ExternalFileTypeEntryEditor {
     JFrame fParent = null;
     JDialog dParent = null;
     JDialog diag;
-    JTextField extension = new JTextField(),
-            name = new JTextField(),
-            mimeType = new JTextField(),
-            application = new JTextField();
+    final JTextField extension = new JTextField();
+    final JTextField name = new JTextField();
+    final JTextField mimeType = new JTextField();
+    final JTextField application = new JTextField();
     String selectedIcon = null;
-    JButton icon = new JButton(GUIGlobals.getImage("picture"));
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    JRadioButton useDefault = new JRadioButton(Globals.lang("Default")),
-            other = new JRadioButton("");
+    final JButton icon = new JButton(GUIGlobals.getImage("picture"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JRadioButton useDefault = new JRadioButton(Globals.lang("Default"));
+    final JRadioButton other = new JRadioButton("");
     final String emptyMessage = "<" + Globals.lang("Use default viewer") + ">";
     boolean applicationFieldEmpty = false;
 
@@ -249,7 +249,7 @@ public class ExternalFileTypeEntryEditor {
 
     class BrowseListener implements ActionListener {
 
-        private JTextField comp;
+        private final JTextField comp;
 
 
         public BrowseListener(JDialog parent, JTextField comp) {

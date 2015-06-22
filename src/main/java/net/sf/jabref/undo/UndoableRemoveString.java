@@ -21,9 +21,9 @@ import net.sf.jabref.*;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private BibtexString string;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final BibtexString string;
+    private final BasePanel panel;
 
 
     public UndoableRemoveString(BasePanel panel,

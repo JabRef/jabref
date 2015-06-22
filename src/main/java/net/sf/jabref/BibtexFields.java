@@ -66,7 +66,7 @@ public class BibtexFields
     private static final BibtexFields runtime = new BibtexFields();
 
     // contains all bibtex-field objects (BibtexSingleField)
-    private HashMap<String, BibtexSingleField> fieldSet;
+    private final HashMap<String, BibtexSingleField> fieldSet;
 
     // contains all known (and public) bibtex fieldnames
     private String[] PUBLIC_FIELDS = null;

@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  */
 public class JabRefExecutorService implements Executor {
 
-    public static JabRefExecutorService INSTANCE = new JabRefExecutorService();
+    public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 

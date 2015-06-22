@@ -33,9 +33,9 @@ import java.util.regex.Pattern;
 public class JSTORFetcher2 implements EntryFetcher {
 
     protected static final String CANCELLED = "__CANCELLED__";
-    protected static int MAX_PAGES_TO_LOAD = 8;
+    protected static final int MAX_PAGES_TO_LOAD = 8;
     protected static int MAX_REFS = 7 * 25;
-    protected static int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
+    protected static final int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
     protected static final String JSTOR_URL = "http://www.jstor.org";
     protected static final String SEARCH_URL = JSTOR_URL + "/action/doBasicSearch?Query=";
     protected static final String SEARCH_URL_END = "&x=0&y=0&wc=on";

@@ -37,14 +37,14 @@ public class Authors extends AbstractParamLayoutFormatter {
     EtAlString = [ et al. | EtAl=<string>]
     */
 
-    static ArrayList<String>
-            authorOrder = new ArrayList<String>(),
-            authorAbbr = new ArrayList<String>(),
-            authorPunc = new ArrayList<String>(),
-            separators = new ArrayList<String>(),
-            lastSeparators = new ArrayList<String>();
+    static final ArrayList<String>
+            authorOrder = new ArrayList<String>();
+    static final ArrayList<String> authorAbbr = new ArrayList<String>();
+    static final ArrayList<String> authorPunc = new ArrayList<String>();
+    static final ArrayList<String> separators = new ArrayList<String>();
+    static final ArrayList<String> lastSeparators = new ArrayList<String>();
 
-    static Pattern numberPattern = Pattern.compile("[0-9]+");
+    static final Pattern numberPattern = Pattern.compile("[0-9]+");
 
     static {
         authorOrder.add("firstfirst");
@@ -106,13 +106,13 @@ public class Authors extends AbstractParamLayoutFormatter {
     int maxAuthors = -1;
     int authorNumberEtAl = 1;
 
-    String
-            firstFirstSeparator = " ",
-            lastFirstSeparator = ", ",
-            separator = COMMA,
-            lastSeparator = AND,
-            etAlString = " et al.",
-            jrSeparator = " ";
+    final String
+            firstFirstSeparator = " ";
+    String lastFirstSeparator = ", ";
+    String separator = COMMA;
+    String lastSeparator = AND;
+    String etAlString = " et al.";
+    final String jrSeparator = " ";
 
 
     public void setArgument(String arg) {

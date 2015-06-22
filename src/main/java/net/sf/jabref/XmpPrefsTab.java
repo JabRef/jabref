@@ -44,12 +44,12 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
     int rowCount;
 
-    JTable table;
+    final JTable table;
 
-    JCheckBox privacyFilterCheckBox = new JCheckBox(
+    final JCheckBox privacyFilterCheckBox = new JCheckBox(
             Globals.lang("Do not write the following fields to XMP Metadata:"));
 
-    Vector<Object> tableRows = new Vector<Object>(10);
+    final Vector<Object> tableRows = new Vector<Object>(10);
 
 
     /**

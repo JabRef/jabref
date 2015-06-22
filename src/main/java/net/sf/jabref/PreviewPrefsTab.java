@@ -29,27 +29,33 @@ import net.sf.jabref.help.HelpAction;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    final JabRefPreferences _prefs;
 
     JabRefFrame _frame;
 
     JPanel pan = new JPanel();
 
-    GridBagLayout gbl = new GridBagLayout();
+    final GridBagLayout gbl = new GridBagLayout();
 
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagConstraints con = new GridBagConstraints();
 
-    JTextArea layout1 = new JTextArea("", 1, 1), layout2 = new JTextArea("", 1, 1);
+    final JTextArea layout1 = new JTextArea("", 1, 1);
+    final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    JButton def1 = new JButton(Globals.lang("Default")),
-            def2 = new JButton(Globals.lang("Default")), test1 = new JButton(Globals.lang("Test")),
-            test2 = new JButton(Globals.lang("Test")), help;
+    final JButton def1 = new JButton(Globals.lang("Default"));
+    final JButton def2 = new JButton(Globals.lang("Default"));
+    final JButton test1 = new JButton(Globals.lang("Test"));
+    final JButton test2 = new JButton(Globals.lang("Test"));
+    JButton help;
 
-    JPanel p1 = new JPanel(), p2 = new JPanel(), p3 = new JPanel(new BorderLayout());
+    final JPanel p1 = new JPanel();
+    final JPanel p2 = new JPanel();
+    final JPanel p3 = new JPanel(new BorderLayout());
 
-    JScrollPane sp1 = new JScrollPane(layout1), sp2 = new JScrollPane(layout2);
+    final JScrollPane sp1 = new JScrollPane(layout1);
+    final JScrollPane sp2 = new JScrollPane(layout2);
 
-    JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
+    final JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
 
     private static BibtexEntry entry;
 

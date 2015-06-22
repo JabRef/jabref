@@ -125,12 +125,12 @@ public class Util {
 
     final static NumberFormat idFormat;
 
-    public static Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    public static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
-    public static int MARK_COLOR_LEVELS = 6,
-            MAX_MARKING_LEVEL = MARK_COLOR_LEVELS - 1,
-            IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
-    public static Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
+    public static final int MARK_COLOR_LEVELS = 6;
+    public static final int MAX_MARKING_LEVEL = MARK_COLOR_LEVELS - 1;
+    public static final int IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
+    public static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
     static {
         idFormat = NumberFormat.getInstance();
@@ -1059,7 +1059,7 @@ public class Util {
     }
 
 
-    static Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
+    static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
 
 
     /**
@@ -1784,7 +1784,7 @@ public class Util {
     }
 
 
-    static Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
+    static final Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
 
 
     /**

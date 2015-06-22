@@ -53,7 +53,7 @@ public class JSTORFetcher implements EntryFetcher {
     /**
      * cookies can't save more than 200 citations
      */
-    protected static int MAX_CITATIONS = 200;
+    protected static final int MAX_CITATIONS = 200;
 
     /**
      * Cookie key for Jstor ticket (authentication)

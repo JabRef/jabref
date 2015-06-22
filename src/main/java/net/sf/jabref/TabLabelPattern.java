@@ -39,20 +39,20 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
 
-    private JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
-    private JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys")),
-            warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys")),
-            generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)")),
-            autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
+    private final JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys"));
+    private final JCheckBox warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
+    private final JCheckBox generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
+    private final JCheckBox autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
 
-    private JRadioButton
-            letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)")),
-            letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)")),
-            alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
+    private final JRadioButton
+            letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)"));
+    private final JRadioButton letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)"));
+    private final JRadioButton alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
 
-    private JTextField KeyPatternRegex = new JTextField(20);
-    private JTextField KeyPatternReplacement = new JTextField(20);
+    private final JTextField KeyPatternRegex = new JTextField(20);
+    private final JTextField KeyPatternReplacement = new JTextField(20);
 
 
     public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {

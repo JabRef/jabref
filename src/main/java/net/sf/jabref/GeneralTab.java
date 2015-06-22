@@ -38,18 +38,33 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class GeneralTab extends JPanel implements PrefsTab {
 
-    private JCheckBox
-            defSort, ctrlClick, useOwner, overwriteOwner,
-            keyDuplicateWarningDialog, keyEmptyWarningDialog, enforceLegalKeys,
-            confirmDelete, allowEditing, memoryStick, useImportInspector,
-            useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, updateTimeStamp, overwriteTimeStamp,
-            markImportedEntries, unmarkAllEntriesBeforeImporting;
+    private final JCheckBox
+            defSort;
+    private final JCheckBox ctrlClick;
+    private final JCheckBox useOwner;
+    private final JCheckBox overwriteOwner;
+    private final JCheckBox keyDuplicateWarningDialog;
+    private final JCheckBox keyEmptyWarningDialog;
+    private final JCheckBox enforceLegalKeys;
+    private final JCheckBox confirmDelete;
+    private final JCheckBox allowEditing;
+    private final JCheckBox memoryStick;
+    private final JCheckBox useImportInspector;
+    private final JCheckBox useImportInspectorForSingle;
+    private final JCheckBox inspectionWarnDupli;
+    private final JCheckBox useTimeStamp;
+    private JCheckBox updateTimeStamp;
+    private final JCheckBox overwriteTimeStamp;
+    private final JCheckBox markImportedEntries;
+    private final JCheckBox unmarkAllEntriesBeforeImporting;
 
-    private JTextField defOwnerField, timeStampFormat, timeStampField;
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[0])),
-            encodings = new JComboBox(Globals.ENCODINGS);
+    private final JTextField defOwnerField;
+    private final JTextField timeStampFormat;
+    private final JTextField timeStampField;
+    final JabRefPreferences _prefs;
+    final JabRefFrame _frame;
+    private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[0]));
+    private final JComboBox encodings = new JComboBox(Globals.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {

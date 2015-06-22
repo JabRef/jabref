@@ -28,8 +28,11 @@ import net.sf.jabref.undo.UndoableFieldChange;
 
 public class EntryChange extends Change {
 
-    BibtexEntry memEntry, tmpEntry, diskEntry;
-    boolean isModifiedLocally, modificationsAgree;
+    final BibtexEntry memEntry;
+    final BibtexEntry tmpEntry;
+    final BibtexEntry diskEntry;
+    final boolean isModifiedLocally;
+    final boolean modificationsAgree;
 
 
     public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {
@@ -109,10 +112,14 @@ public class EntryChange extends Change {
 
     class FieldChange extends Change {
 
-        BibtexEntry entry, tmpEntry;
-        String field, inMem, onTmp, onDisk;
-        InfoPane tp = new InfoPane();
-        JScrollPane sp = new JScrollPane(tp);
+        final BibtexEntry entry;
+        final BibtexEntry tmpEntry;
+        final String field;
+        final String inMem;
+        final String onTmp;
+        final String onDisk;
+        final InfoPane tp = new InfoPane();
+        final JScrollPane sp = new JScrollPane(tp);
 
 
         public FieldChange(String field, BibtexEntry memEntry, BibtexEntry tmpEntry, String inMem, String onTmp, String onDisk) {

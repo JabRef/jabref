@@ -26,12 +26,12 @@ public class DuplicateCheck {
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
-    public static double doubtRange = 0.05;
+    public static final double doubtRange = 0.05;
 
     final static double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
-    static HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
+    static final HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
 
     static {
         fieldWeights.put("author", 2.5);

@@ -45,7 +45,7 @@ public class FindFullText {
             IO_EXCEPTION = 4,
             NO_URLS_DEFINED = 5;
 
-    List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
+    final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
 
 
     public FindFullText() {
@@ -204,9 +204,9 @@ public class FindFullText {
 
     public static class FindResult {
 
-        public URL url;
+        public final URL url;
         public String host = null;
-        public int status;
+        public final int status;
 
 
         public FindResult(URL url, URL originalUrl) {

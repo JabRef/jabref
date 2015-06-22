@@ -25,7 +25,7 @@ import net.sf.jabref.undo.UndoableInsertEntry;
  */
 public final class EntryFromFileCreatorManager {
 
-    private List<EntryFromFileCreator> entryCreators;
+    private final List<EntryFromFileCreator> entryCreators;
 
 
     public EntryFromFileCreatorManager() {

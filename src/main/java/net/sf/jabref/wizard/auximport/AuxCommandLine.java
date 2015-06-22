@@ -42,8 +42,8 @@ import net.sf.jabref.Util;
 public class AuxCommandLine
 {
 
-    private String auxName;
-    private BibtexDatabase bib;
+    private final String auxName;
+    private final BibtexDatabase bib;
 
 
     public AuxCommandLine(String auxFileName, BibtexDatabase refDBase)

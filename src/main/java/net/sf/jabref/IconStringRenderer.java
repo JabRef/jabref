@@ -27,7 +27,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class IconStringRenderer extends DefaultTableCellRenderer {
 
-    String toolTip;
+    final String toolTip;
 
 
     public IconStringRenderer(String toolTip) {

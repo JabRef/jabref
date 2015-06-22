@@ -32,13 +32,14 @@ import org.apache.commons.logging.LogFactory;
 
 public class HelpContent extends JTextPane {
 
-    static Log log = LogFactory.getLog(HelpContent.class);
+    static final Log log = LogFactory.getLog(HelpContent.class);
 
-    JScrollPane pane;
+    final JScrollPane pane;
 
-    private Stack<URL> history, forw;
+    private final Stack<URL> history;
+    private final Stack<URL> forw;
 
-    JabRefPreferences prefs;
+    final JabRefPreferences prefs;
 
 
     public HelpContent(JabRefPreferences prefs_) {

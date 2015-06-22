@@ -32,7 +32,7 @@ import spin.Spin;
 
 public class DuplicateSearch implements Runnable {
 
-    BasePanel panel;
+    final BasePanel panel;
     BibtexEntry[] bes;
     final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
     boolean autoRemoveExactDuplicates = false;
@@ -182,10 +182,10 @@ public class DuplicateSearch implements Runnable {
 
         private int reply = -1;
         DuplicateResolverDialog diag;
-        private JabRefFrame frame;
-        private BibtexEntry one;
-        private BibtexEntry two;
-        private int dialogType;
+        private final JabRefFrame frame;
+        private final BibtexEntry one;
+        private final BibtexEntry two;
+        private final int dialogType;
 
 
         public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,

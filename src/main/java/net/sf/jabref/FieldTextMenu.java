@@ -52,9 +52,9 @@ import net.sf.jabref.util.GoogleUrlCleaner;
 public class FieldTextMenu implements MouseListener
 {
 
-    private FieldEditor myFieldName;
-    private JPopupMenu inputMenu = new JPopupMenu();
-    private CopyAction copyAct = new CopyAction();
+    private final FieldEditor myFieldName;
+    private final JPopupMenu inputMenu = new JPopupMenu();
+    private final CopyAction copyAct = new CopyAction();
 
 
     public FieldTextMenu(FieldEditor fieldComponent)

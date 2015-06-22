@@ -49,9 +49,9 @@ public class LayoutEntry {
 
     private LayoutEntry[] layoutEntries;
 
-    private int type;
+    private final int type;
 
-    private String classPrefix;
+    private final String classPrefix;
 
     private ArrayList<String> invalidFormatter = null;
 

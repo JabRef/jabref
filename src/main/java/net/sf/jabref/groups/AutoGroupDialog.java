@@ -43,23 +43,25 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class AutoGroupDialog extends JDialog implements CaretListener {
 
-    JTextField remove = new JTextField(60), field = new JTextField(60),
-            deliminator = new JTextField(60);
+    final JTextField remove = new JTextField(60);
+    final JTextField field = new JTextField(60);
+    final JTextField deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
-    JRadioButton
-            keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field")),
-            authors = new JRadioButton(Globals.lang("Generate groups for author last names")),
-            editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
-    JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    JPanel main = new JPanel(), opt = new JPanel();
+    final JRadioButton
+            keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field"));
+    final JRadioButton authors = new JRadioButton(Globals.lang("Generate groups for author last names"));
+    final JRadioButton editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
+    final JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
+    final JButton ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JPanel main = new JPanel();
+    final JPanel opt = new JPanel();
     private boolean ok_pressed = false;
-    private GroupTreeNode m_groupsRoot;
-    private JabRefFrame frame;
-    private BasePanel panel;
-    private GroupSelector gs;
+    private final GroupTreeNode m_groupsRoot;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final GroupSelector gs;
     private String oldRemove, oldField;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();

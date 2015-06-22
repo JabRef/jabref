@@ -21,9 +21,9 @@ import net.sf.jabref.*;
 
 public class UndoableInsertString extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private BasePanel panel;
-    private BibtexString string;
+    private final BibtexDatabase base;
+    private final BasePanel panel;
+    private final BibtexString string;
 
 
     public UndoableInsertString(BasePanel panel, BibtexDatabase base,

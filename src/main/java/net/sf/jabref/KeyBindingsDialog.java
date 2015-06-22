@@ -56,17 +56,17 @@ class KeyBindingsDialog extends JDialog {
 
     // displays the key binding of the currently selected entry
     // currently not displayed as it does not get updated
-    private JTextField keyTF = new JTextField();
+    private final JTextField keyTF = new JTextField();
 
-    private JButton ok;
-    private JButton cancel;
-    private JButton defB;
+    private final JButton ok;
+    private final JButton cancel;
+    private final JButton defB;
 
     // stores the user-selected key bindings
     private final HashMap<String, String> bindHM;
 
     // stores default key bindings
-    private HashMap<String, String> defBinds;
+    private final HashMap<String, String> defBinds;
 
     private boolean clickedSave = false;
 
@@ -282,7 +282,7 @@ class KeyBindingsDialog extends JDialog {
     @SuppressWarnings("serial")
     private class KeystrokeTableModel extends AbstractTableModel {
 
-        String[][] data;
+        final String[][] data;
 
 
         //String[] trData;

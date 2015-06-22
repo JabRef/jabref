@@ -33,11 +33,11 @@ public class SidePane extends JPanel {
 
     final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
 
-    GridBagLayout gridBagLayout = new GridBagLayout();
+    final GridBagLayout gridBagLayout = new GridBagLayout();
 
-    GridBagConstraints constraint = new GridBagConstraints();
+    final GridBagConstraints constraint = new GridBagConstraints();
 
-    JPanel mainPanel = new JPanel();
+    final JPanel mainPanel = new JPanel();
 
 
     public SidePane() {

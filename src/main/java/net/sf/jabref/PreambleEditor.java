@@ -24,18 +24,18 @@ import net.sf.jabref.undo.UndoablePreambleChange;
 public class PreambleEditor extends JDialog {
 
     // A reference to the entry this object works on.
-    BibtexDatabase base;
-    BasePanel panel;
-    JabRefFrame baseFrame;
-    JabRefPreferences prefs;
+    final BibtexDatabase base;
+    final BasePanel panel;
+    final JabRefFrame baseFrame;
+    final JabRefPreferences prefs;
 
     // Layout objects.
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    Container conPane = getContentPane();
+    final Container conPane = getContentPane();
     //JToolBar tlb = new JToolBar();
-    JPanel pan = new JPanel();
+    final JPanel pan = new JPanel();
     FieldEditor ed;
 
 
@@ -129,7 +129,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    StoreFieldAction storeFieldAction = new StoreFieldAction();
+    final StoreFieldAction storeFieldAction = new StoreFieldAction();
 
 
     class StoreFieldAction extends AbstractAction {
@@ -173,7 +173,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    UndoAction undoAction = new UndoAction();
+    final UndoAction undoAction = new UndoAction();
 
 
     class UndoAction extends AbstractAction {
@@ -192,7 +192,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    RedoAction redoAction = new RedoAction();
+    final RedoAction redoAction = new RedoAction();
 
 
     class RedoAction extends AbstractAction {
@@ -212,7 +212,7 @@ public class PreambleEditor extends JDialog {
 
 
     // The action concerned with closing the window.
-    CloseAction closeAction = new CloseAction();
+    final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {

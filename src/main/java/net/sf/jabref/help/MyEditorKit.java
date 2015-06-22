@@ -15,9 +15,9 @@ public class MyEditorKit extends LargeHTMLEditorKit {
 
     public class MyNextVisualPositionAction extends TextAction {
 
-        private Action textActn;
+        private final Action textActn;
 
-        private int direction;
+        private final int direction;
 
 
         private MyNextVisualPositionAction(Action textActn, int direction) {

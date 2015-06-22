@@ -51,32 +51,32 @@ import java.util.Set;
 public class StyleSelectDialog {
 
     public static final String STYLE_FILE_EXTENSION = ".jstyle";
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
     private JDialog diag;
     private JTable table;
-    private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    private final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
     private EventTableModel<OOBibStyle> tableModel;
     private EventSelectionModel<OOBibStyle> selectionModel;
-    private JPopupMenu popup = new JPopupMenu();
-    private JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
-    private JRadioButton useDefaultAuthoryear = new JRadioButton(Globals.lang("Default style (author-year citations)")),
-            useDefaultNumerical = new JRadioButton(Globals.lang("Default style (numerical citations)")),
-            chooseDirectly = new JRadioButton(Globals.lang("Choose style file directly") + ":"),
-            setDirectory = new JRadioButton(Globals.lang("Choose from a directory") + ":");
-    private JTextField directFile = new JTextField(),
-            styleDir = new JTextField();
-    private JButton browseDirectFile = new JButton(Globals.lang("Browse")),
-            browseStyleDir = new JButton(Globals.lang("Browse")),
-            showDefaultAuthoryearStyle = new JButton(Globals.lang("View")),
-            showDefaultNumericalStyle = new JButton(Globals.lang("View"));
+    private final JPopupMenu popup = new JPopupMenu();
+    private final JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
+    private final JRadioButton useDefaultAuthoryear = new JRadioButton(Globals.lang("Default style (author-year citations)"));
+    private final JRadioButton useDefaultNumerical = new JRadioButton(Globals.lang("Default style (numerical citations)"));
+    private final JRadioButton chooseDirectly = new JRadioButton(Globals.lang("Choose style file directly") + ":");
+    private final JRadioButton setDirectory = new JRadioButton(Globals.lang("Choose from a directory") + ":");
+    private final JTextField directFile = new JTextField();
+    private final JTextField styleDir = new JTextField();
+    private final JButton browseDirectFile = new JButton(Globals.lang("Browse"));
+    private final JButton browseStyleDir = new JButton(Globals.lang("Browse"));
+    private final JButton showDefaultAuthoryearStyle = new JButton(Globals.lang("View"));
+    private final JButton showDefaultNumericalStyle = new JButton(Globals.lang("View"));
 
     PreviewPanel preview;
 
-    private Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    private BibtexEntry prevEntry = new BibtexEntry(Util.createNeutralId());
+    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final BibtexEntry prevEntry = new BibtexEntry(Util.createNeutralId());
 
     private boolean okPressed = false;
     private String initSelection;

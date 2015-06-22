@@ -40,7 +40,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class ExportFormats {
 
-    private static Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
+    private static final Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
 
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber = 0;

@@ -42,8 +42,8 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
             Globals.lang("Automatically hide groups interface when switching to a database that contains no groups"));
     private final JCheckBox autoAssignGroup = new JCheckBox(
             Globals.lang("Automatically assign new entry to selected groups"));
-    private JTextField groupingField = new JTextField(20);
-    private JTextField keywordSeparator = new JTextField(2);
+    private final JTextField groupingField = new JTextField(20);
+    private final JTextField keywordSeparator = new JTextField(2);
 
     private final JabRefPreferences prefs;
 

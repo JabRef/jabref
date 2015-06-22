@@ -42,15 +42,15 @@ import ca.odell.glazedlists.swing.EventTableModel;
 
 public class ExportCustomizationDialog extends JDialog {
 
-    JabRefFrame frame;
-    JButton addExport = new JButton(Globals.lang("Add new")),
-            modify = new JButton(Globals.lang("Modify")),
-            remove = new JButton(Globals.lang("Remove")),
-            close = new JButton(Globals.lang("Close")),
-            help = new JButton(Globals.lang("Help"));
+    final JabRefFrame frame;
+    final JButton addExport = new JButton(Globals.lang("Add new"));
+    final JButton modify = new JButton(Globals.lang("Modify"));
+    final JButton remove = new JButton(Globals.lang("Remove"));
+    final JButton close = new JButton(Globals.lang("Close"));
+    final JButton help = new JButton(Globals.lang("Help"));
 
-    JPanel buttons = new JPanel(),
-            main = new JPanel();
+    final JPanel buttons = new JPanel();
+    final JPanel main = new JPanel();
     JTable table;
 
 

@@ -46,20 +46,20 @@ import java.util.List;
  */
 public class PushToApplicationButton implements ActionListener {
 
-    public static List<PushToApplication> applications;
+    public static final List<PushToApplication> applications;
 
-    private JabRefFrame frame;
-    private List<PushToApplication> pushActions;
+    private final JabRefFrame frame;
+    private final List<PushToApplication> pushActions;
     private JPanel comp;
     private JButton pushButton, menuButton;
     private int selected = 0;
     private JPopupMenu popup = null;
-    private HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
+    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
-    private MenuAction mAction = new MenuAction();
-    private JPopupMenu optPopup = new JPopupMenu();
-    private JMenuItem settings = new JMenuItem(Globals.lang("Settings"));
+    private final MenuAction mAction = new MenuAction();
+    private final JPopupMenu optPopup = new JPopupMenu();
+    private final JMenuItem settings = new JMenuItem(Globals.lang("Settings"));
 
     /**
      * Set up the current available choices:
@@ -271,7 +271,7 @@ public class PushToApplicationButton implements ActionListener {
 
     class PopupItemActionListener implements ActionListener {
 
-        private int index;
+        private final int index;
 
 
         public PopupItemActionListener(int index) {

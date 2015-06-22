@@ -32,7 +32,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
-    protected JabRefFrame frame;
+    protected final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
     protected FieldSetComponent reqComp, optComp, optComp2;
@@ -40,10 +40,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected JButton ok, cancel, apply, helpButton, delete, importTypes, exportTypes;
     protected final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
     protected String lastSelected = null;
-    protected Map<String, List<String>> reqLists = new HashMap<String, List<String>>(),
-            optLists = new HashMap<String, List<String>>(),
-            opt2Lists = new HashMap<String, List<String>>();
-    protected Set<String> defaulted = new HashSet<String>(), changed = new HashSet<String>();
+    protected final Map<String, List<String>> reqLists = new HashMap<String, List<String>>();
+    protected final Map<String, List<String>> optLists = new HashMap<String, List<String>>();
+    protected final Map<String, List<String>> opt2Lists = new HashMap<String, List<String>>();
+    protected final Set<String> defaulted = new HashSet<String>();
+    protected final Set<String> changed = new HashSet<String>();
 
     boolean biblatexMode;
 

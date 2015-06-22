@@ -31,8 +31,9 @@ import net.sf.jabref.imports.*;
 public class SearchManagerNoGUI {
 
     private String searchTerm;
-    private BibtexDatabase database, base = null;
-    Hashtable<String, String> searchOptions = new Hashtable<String, String>();
+    private final BibtexDatabase database;
+    private BibtexDatabase base = null;
+    final Hashtable<String, String> searchOptions = new Hashtable<String, String>();
 
 
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {

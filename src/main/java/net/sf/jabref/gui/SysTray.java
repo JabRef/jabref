@@ -28,8 +28,8 @@ import java.awt.event.MouseEvent;
 
 public class SysTray {
 
-    private JabRefFrame frame;
-    private TrayIcon icon;
+    private final JabRefFrame frame;
+    private final TrayIcon icon;
     private SystemTray tray = null;
 
 

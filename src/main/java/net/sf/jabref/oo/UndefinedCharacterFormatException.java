@@ -21,7 +21,7 @@ package net.sf.jabref.oo;
  */
 public class UndefinedCharacterFormatException extends Exception {
 
-    String formatName;
+    final String formatName;
 
 
     public UndefinedCharacterFormatException(String formatName) {

@@ -29,28 +29,45 @@ import org.xml.sax.helpers.DefaultHandler;
 public class MedlineHandler extends DefaultHandler
 {
 
-    static HTMLConverter htmlConverter = new HTMLConverter();
-    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-    boolean inTitle = false, inYear = false,
-            inJournal = false, inMonth = false,
-            inVolume = false, inAuthorList = false,
-            inAuthor = false, inLastName = false,
-            inSuffix = false,
-            inInitials = false, inMedlinePgn = false,
-            inMedlineID = false, inURL = false,
-            inIssue = false, inPubDate = false,
-            inUrl = false, inForename = false, inAbstractText = false, inMedlineDate = false,
-            inPubMedID = false, inDescriptorName = false, inDoi = false, inPii = false, inPmc = false,
-            inAffiliation = false, inMeshHeader = false, inQualifierName = false,
-            inLanguage = false, inPst = false;
+    static final HTMLConverter htmlConverter = new HTMLConverter();
+    final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+    boolean inTitle = false;
+    boolean inYear = false;
+    boolean inJournal = false;
+    boolean inMonth = false;
+    boolean inVolume = false;
+    boolean inAuthorList = false;
+    boolean inAuthor = false;
+    boolean inLastName = false;
+    boolean inSuffix = false;
+    boolean inInitials = false;
+    boolean inMedlinePgn = false;
+    final boolean inMedlineID = false;
+    final boolean inURL = false;
+    boolean inIssue = false;
+    boolean inPubDate = false;
+    boolean inUrl = false;
+    boolean inForename = false;
+    boolean inAbstractText = false;
+    boolean inMedlineDate = false;
+    boolean inPubMedID = false;
+    boolean inDescriptorName = false;
+    boolean inDoi = false;
+    boolean inPii = false;
+    boolean inPmc = false;
+    boolean inAffiliation = false;
+    boolean inMeshHeader = false;
+    boolean inQualifierName = false;
+    boolean inLanguage = false;
+    boolean inPst = false;
     String title = "", journal = "", keywords = "", author = "",
             lastName = "", suffix = "", year = "", forename = "", abstractText = "", affiliation = "";
     String month = "", volume = "", lastname = "", initials = "", number = "", page = "", medlineID = "", url = "",
             MedlineDate = "";
     String series = "", editor = "", booktitle = "", type = "article", key = "", address = "",
             pubmedid = "", doi = "", pii = "", pmc = "", majorTopic = "", minorTopics = "", language = "", pst = "";
-    ArrayList<String> authors = new ArrayList<String>();
-    TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
+    final ArrayList<String> authors = new ArrayList<String>();
+    final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum = 0;
 
     private static final String KEYWORD_SEPARATOR = "; ";

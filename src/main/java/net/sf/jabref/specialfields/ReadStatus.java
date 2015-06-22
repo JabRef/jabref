@@ -26,7 +26,7 @@ public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE = null;
 
-    private ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
+    private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
 
 
     public ReadStatus() {

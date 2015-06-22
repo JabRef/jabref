@@ -36,7 +36,7 @@ import java.io.Reader;
  */
 public class INSPIREBibtexFilterReader extends FilterReader {
 
-    protected BufferedReader in;
+    protected final BufferedReader in;
 
     private String line;
     private int pos;

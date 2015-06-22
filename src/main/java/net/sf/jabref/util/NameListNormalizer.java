@@ -23,11 +23,11 @@ import java.util.regex.Pattern;
  */
 public class NameListNormalizer {
 
-    static Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
-    static Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
-    static Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    static Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    static Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
+    static final Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
+    static final Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
+    static final Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    static final Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
 
     /*public static void main(String[] args) {

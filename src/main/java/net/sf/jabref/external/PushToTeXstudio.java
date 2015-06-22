@@ -21,8 +21,8 @@ public class PushToTeXstudio implements PushToApplication {
 
     private final String defaultCiteCommand = "\\cite";
     private JPanel settings = null;
-    private JTextField citeCommand = new JTextField(30);
-    private JTextField progPath = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
+    private final JTextField progPath = new JTextField(30);
 
     private boolean couldNotConnect = false, couldNotRunClient = false;
 

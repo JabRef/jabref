@@ -107,28 +107,29 @@ public class JabRefPreferences {
 
     public static final String NEWLINE = "newline";
 
-    public String WRAPPED_USERNAME, MARKING_WITH_NUMBER_PATTERN;
+    public String WRAPPED_USERNAME;
+    public final String MARKING_WITH_NUMBER_PATTERN;
 
-    Preferences prefs;
-    public HashMap<String, Object> defaults = new HashMap<String, Object>();
-    public HashMap<String, String> keyBinds = new HashMap<String, String>(),
-            defKeyBinds = new HashMap<String, String>();
-    private HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
-    private HashSet<String> nonWrappableFields = new HashSet<String>(5);
+    final Preferences prefs;
+    public final HashMap<String, Object> defaults = new HashMap<String, Object>();
+    public HashMap<String, String> keyBinds = new HashMap<String, String>();
+    public final HashMap<String, String> defKeyBinds = new HashMap<String, String>();
+    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
+    private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
     private static LabelPattern keyPattern;
 
     // Object containing custom export formats:
-    public CustomExportList customExports;
+    public final CustomExportList customExports;
 
     /**
      * Set with all custom {@link net.sf.jabref.imports.ImportFormat}s
      */
-    public CustomImportList customImports;
+    public final CustomImportList customImports;
 
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList = null;
     // Map containing all registered external file types:
-    private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
+    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
     public final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
 

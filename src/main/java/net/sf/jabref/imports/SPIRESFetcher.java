@@ -46,7 +46,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class SPIRESFetcher implements EntryFetcher {
 
-    private static String spiresHost = "www-spires.slac.stanford.edu";
+    private static final String spiresHost = "www-spires.slac.stanford.edu";
 
 
     public SPIRESFetcher() {

@@ -25,9 +25,12 @@ import net.sf.jabref.undo.UndoableStringChange;
 
 public class StringNameChange extends Change {
 
-    BibtexString string;
-    String mem, tmp, disk, content;
-    private BibtexString tmpString;
+    final BibtexString string;
+    final String mem;
+    final String tmp;
+    final String disk;
+    final String content;
+    private final BibtexString tmpString;
 
 
     public StringNameChange(BibtexString string, BibtexString tmpString,

@@ -65,12 +65,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
     OutputPrinter status;
     final HTMLConverter htmlConverter = new HTMLConverter();
 
-    private JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
-    private JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
-    private JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
+    private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
+    private final JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
+    private final JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
 
     private static final int MAX_FETCH = 100;
-    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
+    private final int perPage = MAX_FETCH;
+    private int hits = 0;
+    private int unparseable = 0;
+    private int parsed = 0;
     private int piv = 0;
     private boolean shouldContinue = false;
     private boolean includeAbstract = false;
@@ -84,21 +87,21 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" +
             "value=\'\'\\s*id=\'([0-9]+)\'/>");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
-    private HashMap<String, String> fieldPatterns = new HashMap<String, String>();
+    private final HashMap<String, String> fieldPatterns = new HashMap<String, String>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
 
     Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>"
             + "\\s+(.+)");
 
-    Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
-    String abrvPattern = ".*[^,] '?\\d+\\)?";
+    final String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
-    Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
+    final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
     public static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
     public static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 

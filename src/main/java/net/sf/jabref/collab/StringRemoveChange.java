@@ -27,11 +27,12 @@ import net.sf.jabref.undo.UndoableRemoveString;
 
 public class StringRemoveChange extends Change {
 
-    BibtexString string, inMem;
+    final BibtexString string;
+    final BibtexString inMem;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
-    private BibtexString tmpString;
+    final InfoPane tp = new InfoPane();
+    final JScrollPane sp = new JScrollPane(tp);
+    private final BibtexString tmpString;
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {

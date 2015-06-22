@@ -31,11 +31,11 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
  */
 public class BasicSearch implements SearchRule {
 
-    private boolean caseSensitive;
-    private boolean regExp;
+    private final boolean caseSensitive;
+    private final boolean regExp;
     Pattern[] pattern;
     //static RemoveBrackets removeLatexCommands = new RemoveBrackets();
-    static RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
 
     public BasicSearch(boolean caseSensitive, boolean regExp) {

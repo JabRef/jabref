@@ -34,7 +34,7 @@ public class Layout
 
     private LayoutEntry[] layoutEntries;
 
-    private ArrayList<String> missingFormatters = new ArrayList<String>();
+    private final ArrayList<String> missingFormatters = new ArrayList<String>();
 
 
     //~ Constructors ///////////////////////////////////////////////////////////

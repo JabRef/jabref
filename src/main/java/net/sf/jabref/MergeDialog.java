@@ -32,18 +32,18 @@ import javax.swing.*;
 
 public class MergeDialog extends JDialog {
 
-    JPanel panel1 = new JPanel();
-    BorderLayout borderLayout1 = new BorderLayout();
-    JPanel jPanel1 = new JPanel();
-    JPanel jPanel2 = new JPanel();
-    JButton ok = new JButton();
-    JButton Cancel = new JButton();
+    final JPanel panel1 = new JPanel();
+    final BorderLayout borderLayout1 = new BorderLayout();
+    final JPanel jPanel1 = new JPanel();
+    final JPanel jPanel2 = new JPanel();
+    final JButton ok = new JButton();
+    final JButton Cancel = new JButton();
     //TitledBorder titledBorder1;
-    JCheckBox entries = new JCheckBox();
-    JCheckBox strings = new JCheckBox();
-    GridBagLayout gridBagLayout1 = new GridBagLayout();
-    JCheckBox groups = new JCheckBox();
-    JCheckBox selector = new JCheckBox();
+    final JCheckBox entries = new JCheckBox();
+    final JCheckBox strings = new JCheckBox();
+    final GridBagLayout gridBagLayout1 = new GridBagLayout();
+    final JCheckBox groups = new JCheckBox();
+    final JCheckBox selector = new JCheckBox();
 
     boolean okPressed = false;
 
@@ -139,7 +139,7 @@ public class MergeDialog extends JDialog {
 
 class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {
 
-    MergeDialog adaptee;
+    final MergeDialog adaptee;
 
 
     MergeDialog_ok_actionAdapter(MergeDialog adaptee) {
@@ -153,7 +153,7 @@ class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {
 
 class MergeDialog_Cancel_actionAdapter implements java.awt.event.ActionListener {
 
-    MergeDialog adaptee;
+    final MergeDialog adaptee;
 
 
     MergeDialog_Cancel_actionAdapter(MergeDialog adaptee) {

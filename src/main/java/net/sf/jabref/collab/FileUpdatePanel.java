@@ -32,17 +32,17 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     public static final String NAME = "fileUpdate";
 
-    JButton test = new JButton(Globals.lang("Review changes"));
+    final JButton test = new JButton(Globals.lang("Review changes"));
 
-    BasePanel panel;
+    final BasePanel panel;
 
-    JabRefFrame frame;
+    final JabRefFrame frame;
 
-    SidePaneManager manager;
+    final SidePaneManager manager;
 
-    JLabel message;
+    final JLabel message;
 
-    ChangeScanner scanner;
+    final ChangeScanner scanner;
 
 
     public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,

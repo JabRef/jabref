@@ -33,8 +33,8 @@ public class HtmlTransferable implements Transferable {
 
     private static final DataFlavor[] FLAVORS = {HTML_FLAVOR, DataFlavor.stringFlavor};
 
-    private String htmlText;
-    private String plainText;
+    private final String htmlText;
+    private final String plainText;
 
 
     /**

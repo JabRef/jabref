@@ -34,10 +34,10 @@ import com.jgoodies.forms.layout.FormLayout;
 public class PushToEmacs implements PushToApplication {
 
     private JPanel settings = null;
-    private JTextField citeCommand = new JTextField(30);
-    private JTextField emacsPath = new JTextField(30);
-    private JTextField additionalParams = new JTextField(30);
-    private JCheckBox useEmacs23 = new JCheckBox();
+    private final JTextField citeCommand = new JTextField(30);
+    private final JTextField emacsPath = new JTextField(30);
+    private final JTextField additionalParams = new JTextField(30);
+    private final JCheckBox useEmacs23 = new JCheckBox();
 
     private boolean couldNotConnect = false, couldNotRunClient = false;
 

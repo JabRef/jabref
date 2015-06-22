@@ -45,7 +45,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 public class WriteXMPAction extends AbstractWorker {
 
-    BasePanel panel;
+    final BasePanel panel;
 
     BibtexEntry[] entries;
 
@@ -188,12 +188,13 @@ public class WriteXMPAction extends AbstractWorker {
 
         private static final long serialVersionUID = 7459164400811785958L;
 
-        JButton okButton = new JButton(Globals.lang("Ok")), cancelButton = new JButton(
+        final JButton okButton = new JButton(Globals.lang("Ok"));
+        final JButton cancelButton = new JButton(
                 Globals.lang("Cancel"));
 
         boolean canceled;
 
-        JTextArea progressArea;
+        final JTextArea progressArea;
 
 
         public OptionsDialog(JFrame parent) {

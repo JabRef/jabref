@@ -36,13 +36,13 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
      */
 
     BibtexEntryType type = null;
-    CancelAction cancelAction = new CancelAction();
+    final CancelAction cancelAction = new CancelAction();
     private static final int COLNUM = 3;
 
 
     class TypeButton extends JButton implements Comparable<TypeButton> {
 
-        BibtexEntryType type;
+        final BibtexEntryType type;
 
 
         public TypeButton(String label, BibtexEntryType type_) {

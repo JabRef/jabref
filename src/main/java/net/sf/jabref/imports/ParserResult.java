@@ -26,15 +26,15 @@ import net.sf.jabref.MetaData;
 
 public class ParserResult {
 
-    public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
-    public static ParserResult FILE_LOCKED = new ParserResult(null, null, null);
-    private BibtexDatabase base;
+    public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
+    public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
+    private final BibtexDatabase base;
     private MetaData metaData;
-    private HashMap<String, BibtexEntryType> entryTypes;
+    private final HashMap<String, BibtexEntryType> entryTypes;
 
     private File file = null;
-    private ArrayList<String> warnings = new ArrayList<String>();
-    private ArrayList<String> duplicateKeys = new ArrayList<String>();
+    private final ArrayList<String> warnings = new ArrayList<String>();
+    private final ArrayList<String> duplicateKeys = new ArrayList<String>();
 
     private String errorMessage = null;
     private String encoding = null; // Which encoding was used?

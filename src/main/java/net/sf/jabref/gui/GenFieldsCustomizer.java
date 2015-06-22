@@ -39,24 +39,24 @@ import com.jgoodies.forms.layout.Sizes;
 
 public class GenFieldsCustomizer extends JDialog {
 
-    JPanel buttons = new JPanel();
-    JButton ok = new JButton();
-    JButton cancel = new JButton();
+    final JPanel buttons = new JPanel();
+    final JButton ok = new JButton();
+    final JButton cancel = new JButton();
     JButton helpBut = new JButton();
     TitledBorder titledBorder1;
     TitledBorder titledBorder2;
-    JLabel jLabel1 = new JLabel();
-    JPanel jPanel3 = new JPanel();
-    JPanel jPanel4 = new JPanel();
-    GridBagLayout gridBagLayout1 = new GridBagLayout();
-    JScrollPane jScrollPane1 = new JScrollPane();
-    JLabel jLabel2 = new JLabel();
-    JTextArea fieldsArea = new JTextArea();
-    GridBagLayout gridBagLayout2 = new GridBagLayout();
-    JabRefFrame parent;
-    JButton revert = new JButton();
+    final JLabel jLabel1 = new JLabel();
+    final JPanel jPanel3 = new JPanel();
+    final JPanel jPanel4 = new JPanel();
+    final GridBagLayout gridBagLayout1 = new GridBagLayout();
+    final JScrollPane jScrollPane1 = new JScrollPane();
+    final JLabel jLabel2 = new JLabel();
+    final JTextArea fieldsArea = new JTextArea();
+    final GridBagLayout gridBagLayout2 = new GridBagLayout();
+    final JabRefFrame parent;
+    final JButton revert = new JButton();
     //EntryCustomizationDialog diag;
-    HelpAction help;
+    final HelpAction help;
 
 
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
@@ -215,7 +215,7 @@ public class GenFieldsCustomizer extends JDialog {
 
 class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListener {
 
-    GenFieldsCustomizer adaptee;
+    final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_ok_actionAdapter(GenFieldsCustomizer adaptee) {
@@ -229,7 +229,7 @@ class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListe
 
 class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionListener {
 
-    GenFieldsCustomizer adaptee;
+    final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_cancel_actionAdapter(GenFieldsCustomizer adaptee) {
@@ -243,7 +243,7 @@ class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionL
 
 class GenFieldsCustomizer_revert_actionAdapter implements java.awt.event.ActionListener {
 
-    GenFieldsCustomizer adaptee;
+    final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_revert_actionAdapter(GenFieldsCustomizer adaptee) {

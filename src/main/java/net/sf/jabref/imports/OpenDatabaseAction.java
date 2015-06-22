@@ -41,14 +41,14 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    private static Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
+    private static final Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
 
-    boolean showDialog;
-    private JabRefFrame frame;
+    final boolean showDialog;
+    private final JabRefFrame frame;
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static ArrayList<PostOpenAction> postOpenActions =
+    private static final ArrayList<PostOpenAction> postOpenActions =
             new ArrayList<PostOpenAction>();
 
     static {
@@ -145,9 +145,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     class OpenItSwingHelper implements Runnable {
 
-        BasePanel bp;
-        boolean raisePanel;
-        File file;
+        final BasePanel bp;
+        final boolean raisePanel;
+        final File file;
 
 
         OpenItSwingHelper(BasePanel bp, File file, boolean raisePanel) {

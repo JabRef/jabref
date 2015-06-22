@@ -68,22 +68,22 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     OOPanel comp;
     JDialog diag;
     static JButton
-            connect,
-            manualConnect,
-            selectDocument,
-            setStyleFile = new JButton(Globals.lang("Select style")),
-            pushEntries = new JButton(Globals.lang("Cite")),
-            pushEntriesInt = new JButton(Globals.lang("Cite in-text")),
-            pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation")),
-            pushEntriesAdvanced = new JButton(Globals.lang("Cite special")),
-            focus = new JButton("Focus OO document"),
-            update,
-            insertFullRef = new JButton("Insert reference text"),
-            merge = new JButton(Globals.lang("Merge citations")),
-            manageCitations = new JButton(Globals.lang("Manage citations")),
-            settingsB = new JButton(Globals.lang("Settings")),
-            help = new JButton(GUIGlobals.getImage("help")),
-            test = new JButton("Test");
+            connect;
+    static JButton manualConnect;
+    static JButton selectDocument;
+    static final JButton setStyleFile = new JButton(Globals.lang("Select style"));
+    static final JButton pushEntries = new JButton(Globals.lang("Cite"));
+    static final JButton pushEntriesInt = new JButton(Globals.lang("Cite in-text"));
+    static final JButton pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation"));
+    static final JButton pushEntriesAdvanced = new JButton(Globals.lang("Cite special"));
+    static final JButton focus = new JButton("Focus OO document");
+    static JButton update;
+    static final JButton insertFullRef = new JButton("Insert reference text");
+    static final JButton merge = new JButton(Globals.lang("Merge citations"));
+    static final JButton manageCitations = new JButton(Globals.lang("Manage citations"));
+    static final JButton settingsB = new JButton(Globals.lang("Settings"));
+    static final JButton help = new JButton(GUIGlobals.getImage("help"));
+    static final JButton test = new JButton("Test");
     JRadioButton inPar, inText;
     private JPanel settings = null;
     private static String styleFile = null;

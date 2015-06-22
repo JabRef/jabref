@@ -31,7 +31,7 @@ import net.sf.jabref.*;
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
-    private BibtexEntry entry;
+    private final BibtexEntry entry;
     final String link;
     final MetaData metaData;
     ExternalFileType fileType;

@@ -24,7 +24,7 @@ import net.sf.jabref.Util;
  */
 public class UndefinedBibtexEntry extends BibtexEntry {
 
-    private String key;
+    private final String key;
 
 
     public UndefinedBibtexEntry(String key) {

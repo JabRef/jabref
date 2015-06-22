@@ -54,15 +54,15 @@ public class ExternalFilePanel extends JPanel {
 
     private EntryEditor entryEditor;
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    private OpenFileFilter off;
+    private final OpenFileFilter off;
 
     private BibtexEntry entry;
 
     private BibtexDatabase database;
 
-    private MetaData metaData;
+    private final MetaData metaData;
 
 
     public ExternalFilePanel(final String fieldName, final MetaData metaData,

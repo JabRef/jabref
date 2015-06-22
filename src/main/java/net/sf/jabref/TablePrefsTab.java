@@ -39,15 +39,29 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    final JabRefPreferences _prefs;
 
-    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked;
+    private final JCheckBox autoResizeMode;
+    private final JCheckBox priDesc;
+    private final JCheckBox secDesc;
+    private final JCheckBox terDesc;
+    private final JCheckBox floatMarked;
 
-    private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
-            lastNamesOnly;
+    private final JRadioButton namesAsIs;
+    private final JRadioButton namesFf;
+    private final JRadioButton namesFl;
+    private final JRadioButton namesNatbib;
+    private final JRadioButton abbrNames;
+    private final JRadioButton noAbbrNames;
+    private final JRadioButton lastNamesOnly;
 
-    private JTextField priField, secField, terField, numericFields;
-    private JComboBox priSort, secSort, terSort;
+    private final JTextField priField;
+    private final JTextField secField;
+    private final JTextField terField;
+    private final JTextField numericFields;
+    private final JComboBox priSort;
+    private final JComboBox secSort;
+    private final JComboBox terSort;
 
 
     /**

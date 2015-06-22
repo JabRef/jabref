@@ -30,8 +30,8 @@ import javax.swing.undo.UndoManager;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
-    protected String fieldName;
-    protected JLabel label;
+    protected final String fieldName;
+    protected final JLabel label;
     protected UndoManager undo;
     private AutoCompleteListener autoCompleteListener = null;
 

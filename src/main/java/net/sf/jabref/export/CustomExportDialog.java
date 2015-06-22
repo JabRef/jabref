@@ -37,29 +37,29 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 class CustomExportDialog extends JDialog {
 
-    JTextField
-            name = new JTextField(60),
-            layoutFile = new JTextField(60),
-            extension = new JTextField(60);
-    JLabel
-            nl = new JLabel(Globals.lang("Export name") + ":"),
-            nr = new JLabel(Globals.lang("Main layout file") + ":"),
-            nf = new JLabel(Globals.lang("File extension") + ":");
-    JButton
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel")),
-            browse = new JButton(Globals.lang("Browse"));
-    JPanel
-            main = new JPanel(),
-            buttons = new JPanel();
+    final JTextField
+            name = new JTextField(60);
+    final JTextField layoutFile = new JTextField(60);
+    final JTextField extension = new JTextField(60);
+    final JLabel
+            nl = new JLabel(Globals.lang("Export name") + ":");
+    final JLabel nr = new JLabel(Globals.lang("Main layout file") + ":");
+    final JLabel nf = new JLabel(Globals.lang("File extension") + ":");
+    final JButton
+            ok = new JButton(Globals.lang("Ok"));
+    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    final JButton browse = new JButton(Globals.lang("Browse"));
+    final JPanel
+            main = new JPanel();
+    final JPanel buttons = new JPanel();
     private boolean ok_pressed = false;
     private int index;
-    private JabRefFrame parent;
+    private final JabRefFrame parent;
 
     private String oldName, oldRegexp, oldField;
 
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
 
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {

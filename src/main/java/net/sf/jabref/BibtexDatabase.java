@@ -53,15 +53,15 @@ import javax.swing.JOptionPane;
 
 public class BibtexDatabase {
 
-    Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
+    final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
 
     String _preamble = null;
 
-    HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
+    final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 
     Vector<String> _strings_ = new Vector<String>();
 
-    Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
+    final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
     private boolean followCrossrefs = true;
 
@@ -69,7 +69,7 @@ public class BibtexDatabase {
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
-    private HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if

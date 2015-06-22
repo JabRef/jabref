@@ -24,7 +24,7 @@ import net.sf.jabref.Globals;
  */
 public class NotFoundFormatter implements LayoutFormatter {
 
-    private String notFound;
+    private final String notFound;
 
 
     public NotFoundFormatter(String notFound) {

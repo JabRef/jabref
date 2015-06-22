@@ -42,7 +42,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private JDialog diag;
     private JRadioButton all, selected, clear, set, rename;
     private JTextField field, text, renameTo;

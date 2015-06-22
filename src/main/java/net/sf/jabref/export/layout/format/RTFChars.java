@@ -38,7 +38,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class RTFChars implements LayoutFormatter {
 
     // Instantiate logger:
-    private static Logger logger = Logger.getLogger(RTFChars.class.toString());
+    private static final Logger logger = Logger.getLogger(RTFChars.class.toString());
 
 
     public String format(String field) {
@@ -214,9 +214,9 @@ public class RTFChars implements LayoutFormatter {
 
     private class IntAndString {
 
-        public int i;
+        public final int i;
 
-        String s;
+        final String s;
 
 
         public IntAndString(int i, String s) {

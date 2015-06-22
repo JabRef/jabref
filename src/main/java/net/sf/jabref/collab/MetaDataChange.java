@@ -35,11 +35,11 @@ public class MetaDataChange extends Change {
             REMOVE = 2,
             MODIFY = 3;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
-    private MetaData md;
-    private MetaData mdSecondary;
-    ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
+    final InfoPane tp = new InfoPane();
+    final JScrollPane sp = new JScrollPane(tp);
+    private final MetaData md;
+    private final MetaData mdSecondary;
+    final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
@@ -111,9 +111,9 @@ public class MetaDataChange extends Change {
 
     class MetaDataChangeUnit {
 
-        int type;
-        String key;
-        Vector<String> value;
+        final int type;
+        final String key;
+        final Vector<String> value;
 
 
         public MetaDataChangeUnit(int type, String key, Vector<String> value) {

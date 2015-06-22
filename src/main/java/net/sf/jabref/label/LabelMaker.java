@@ -70,6 +70,6 @@ public class LabelMaker {
 
 
     protected LabelRule defaultRule = new ArticleLabelRule();
-    protected Hashtable<String, LabelRule> ruleTable = new Hashtable<String, LabelRule>();
+    protected final Hashtable<String, LabelRule> ruleTable = new Hashtable<String, LabelRule>();
 
 }

@@ -40,14 +40,18 @@ import com.jgoodies.forms.layout.FormLayout;
 @SuppressWarnings("serial")
 public class FileSortTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-    private JRadioButton saveInOriginalOrder, saveInTableOrder, saveInSpecifiedOrder;
+    final JabRefPreferences _prefs;
+    final JabRefFrame _frame;
+    private final JRadioButton saveInOriginalOrder;
+    private final JRadioButton saveInTableOrder;
+    private final JRadioButton saveInSpecifiedOrder;
     private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
     private JTextField savePriField, saveSecField, saveTerField;
     private JComboBox savePriSort, saveSecSort, saveTerSort;
 
-    private JRadioButton exportInOriginalOrder, exportInTableOrder, exportInSpecifiedOrder;
+    private final JRadioButton exportInOriginalOrder;
+    private final JRadioButton exportInTableOrder;
+    private final JRadioButton exportInSpecifiedOrder;
     private JCheckBox exportPriDesc, exportSecDesc, exportTerDesc;
     private JTextField exportPriField, exportSecField, exportTerField;
     private JComboBox exportPriSort, exportSecSort, exportTerSort;

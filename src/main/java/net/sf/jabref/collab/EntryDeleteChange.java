@@ -24,11 +24,13 @@ import net.sf.jabref.undo.UndoableRemoveEntry;
 
 public class EntryDeleteChange extends Change {
 
-    BibtexEntry memEntry, tmpEntry, diskEntry;
-    boolean isModifiedLocally;
-    double matchWithTmp;
-    PreviewPanel pp;
-    JScrollPane sp;
+    final BibtexEntry memEntry;
+    final BibtexEntry tmpEntry;
+    BibtexEntry diskEntry;
+    final boolean isModifiedLocally;
+    final double matchWithTmp;
+    final PreviewPanel pp;
+    final JScrollPane sp;
 
 
     public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {

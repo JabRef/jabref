@@ -49,24 +49,24 @@ import com.jgoodies.forms.layout.FormLayout;
 public class DBConnectDialog extends JDialog {
 
     // labels
-    JLabel lblServerType = new JLabel();
-    JLabel lblServerHostname = new JLabel();
-    JLabel lblDatabase = new JLabel();
-    JLabel lblUsername = new JLabel();
-    JLabel lblPassword = new JLabel();
+    final JLabel lblServerType = new JLabel();
+    final JLabel lblServerHostname = new JLabel();
+    final JLabel lblDatabase = new JLabel();
+    final JLabel lblUsername = new JLabel();
+    final JLabel lblPassword = new JLabel();
 
     // input fields
-    JComboBox cmbServerType = new JComboBox();
-    JTextField txtServerHostname = new JTextField(40);
-    JTextField txtDatabase = new JTextField(40);
-    JTextField txtUsername = new JTextField(40);
-    JPasswordField pwdPassword = new JPasswordField(40);
-    JButton btnConnect = new JButton();
-    JButton btnCancel = new JButton();
+    final JComboBox cmbServerType = new JComboBox();
+    final JTextField txtServerHostname = new JTextField(40);
+    final JTextField txtDatabase = new JTextField(40);
+    final JTextField txtUsername = new JTextField(40);
+    final JPasswordField pwdPassword = new JPasswordField(40);
+    final JButton btnConnect = new JButton();
+    final JButton btnCancel = new JButton();
 
     // array for holding components on left-hand and right-hand sides
-    ArrayList<JLabel> lhs = new ArrayList<JLabel>();
-    ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+    final ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+    final ArrayList<JComponent> rhs = new ArrayList<JComponent>();
 
     DBStrings dbStrings = new DBStrings();
 

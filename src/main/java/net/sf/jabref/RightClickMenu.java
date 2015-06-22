@@ -40,17 +40,19 @@ public class RightClickMenu extends JPopupMenu
 
     private static final Logger logger = Logger.getLogger(RightClickMenu.class.getName());
 
-    BasePanel panel;
-    MetaData metaData;
-    JMenu groupAddMenu = new JMenu(Globals.lang("Add to group")),
-            groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
-            groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")), // JZTODO lyrics
-            rankingMenu = new JMenu(),
-            priorityMenu = new JMenu(),
-            readStatusMenu = new JMenu(),
-            typeMenu = new JMenu(Globals.lang("Change entry type"));
-    JMenuItem groupAdd, groupRemove, groupMoveTo;
-    JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
+    final BasePanel panel;
+    final MetaData metaData;
+    final JMenu groupAddMenu = new JMenu(Globals.lang("Add to group"));
+    final JMenu groupRemoveMenu = new JMenu(Globals.lang("Remove from group"));
+    final JMenu groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")); // JZTODO lyrics
+            final JMenu rankingMenu = new JMenu();
+    final JMenu priorityMenu = new JMenu();
+    final JMenu readStatusMenu = new JMenu();
+    final JMenu typeMenu = new JMenu(Globals.lang("Change entry type"));
+    final JMenuItem groupAdd;
+    final JMenuItem groupRemove;
+    final JMenuItem groupMoveTo;
+    final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
             Globals.prefs.getBoolean("floatMarkedEntries"));
 
 
@@ -548,8 +550,8 @@ public class RightClickMenu extends JPopupMenu
 
     class ChangeTypeAction extends AbstractAction {
 
-        BibtexEntryType type;
-        BasePanel panel;
+        final BibtexEntryType type;
+        final BasePanel panel;
 
 
         public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {

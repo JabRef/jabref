@@ -38,13 +38,13 @@ import net.sf.jabref.Util;
  */
 public class HelpDialog extends JDialog implements HyperlinkListener {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    private HelpContent content;
+    private final HelpContent content;
 
-    private BackAction back = new BackAction();
+    private final BackAction back = new BackAction();
 
-    private ForwardAction forward = new ForwardAction();
+    private final ForwardAction forward = new ForwardAction();
 
 
     // Initializes, but does not show the help dialog.

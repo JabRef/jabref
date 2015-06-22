@@ -59,26 +59,26 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  */
 public class SearchResultsDialog {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
     private JDialog diag;
-    private String[] fields = new String[] {
+    private final String[] fields = new String[] {
             "author", "title", "year", "journal"
     };
     protected final int FILE_COL = 0, URL_COL = 1,
             PAD = 2;
-    private JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall")),
-            urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
+    private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
-    protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    protected final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
-    private EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
     private SortedList<BibtexEntry> sortedEntries;
-    private HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    protected UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    protected final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
     PreviewPanel preview;
 
 

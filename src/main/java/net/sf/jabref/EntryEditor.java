@@ -100,45 +100,45 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // A reference to the entry this object works on.
     private BibtexEntry entry;
 
-    BibtexEntryType type;
+    final BibtexEntryType type;
 
     // The action concerned with closing the window.
-    CloseAction closeAction;
+    final CloseAction closeAction;
 
     // The action that deletes the current entry, and closes the editor.
-    DeleteAction deleteAction = new DeleteAction();
+    final DeleteAction deleteAction = new DeleteAction();
 
     // The action concerned with copying the BibTeX key to the clipboard.
-    CopyKeyAction copyKeyAction;
+    final CopyKeyAction copyKeyAction;
 
     // The action concerned with copying the BibTeX key to the clipboard.
-    AbstractAction nextEntryAction = new NextEntryAction();
+    final AbstractAction nextEntryAction = new NextEntryAction();
 
     // Actions for switching to next/previous entry.
-    AbstractAction prevEntryAction = new PrevEntryAction();
+    final AbstractAction prevEntryAction = new PrevEntryAction();
 
     // The action concerned with storing a field value.
-    public StoreFieldAction storeFieldAction;
+    public final StoreFieldAction storeFieldAction;
 
     // The actions concerned with switching the panels.
-    SwitchLeftAction switchLeftAction = new SwitchLeftAction();
+    final SwitchLeftAction switchLeftAction = new SwitchLeftAction();
 
-    SwitchRightAction switchRightAction = new SwitchRightAction();
+    final SwitchRightAction switchRightAction = new SwitchRightAction();
 
     // The action which generates a bibtexkey for this entry.
-    public GenerateKeyAction generateKeyAction;
+    public final GenerateKeyAction generateKeyAction;
 
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     private FileListEditor fileListEditor = null;
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
-    public AbstractAction writeXmp;
+    public final AbstractAction writeXmp;
 
-    SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
+    final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     JPanel mainPanel = new JPanel();
 
-    JPanel srcPanel = new JPanel();
+    final JPanel srcPanel = new JPanel();
 
     EntryEditorTab genPan, optPan, reqPan, absPan;
 
@@ -150,26 +150,26 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     JToolBar tlb;
 
-    JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
+    final JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
 
     JLabel lab;
 
     TypeButton typeButton;
 
-    JabRefFrame frame;
+    final JabRefFrame frame;
 
-    BasePanel panel;
+    final BasePanel panel;
 
-    EntryEditor ths = this;
+    final EntryEditor ths = this;
 
-    HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
+    final HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
 
-    Logger logger = Logger.getLogger(EntryEditor.class.getName());
+    final Logger logger = Logger.getLogger(EntryEditor.class.getName());
 
     boolean updateSource = true; // This can be set to false to stop the source
     boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
 
-    List<Object> tabs = new ArrayList<Object>();
+    final List<Object> tabs = new ArrayList<Object>();
 
     // text area from gettin updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
@@ -186,15 +186,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // reqW starts at 1 because it needs room for the bibtex key field.
     private int sourceIndex = -1; // The index the source panel has in tabbed.
 
-    JabRefPreferences prefs;
+    final JabRefPreferences prefs;
 
-    HelpAction helpAction;
+    final HelpAction helpAction;
 
-    UndoAction undoAction = new UndoAction();
+    final UndoAction undoAction = new UndoAction();
 
-    RedoAction redoAction = new RedoAction();
+    final RedoAction redoAction = new RedoAction();
 
-    TabListener tabListener = new TabListener();
+    final TabListener tabListener = new TabListener();
 
 
     public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_) {
@@ -1465,7 +1465,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class GenerateKeyAction extends AbstractAction {
 
-        JabRefFrame parent;
+        final JabRefFrame parent;
 
         BibtexEntry selectedEntry;
 
@@ -1611,9 +1611,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class ChangeTypeAction extends AbstractAction {
 
-        BibtexEntryType type;
+        final BibtexEntryType type;
 
-        BasePanel panel;
+        final BasePanel panel;
 
 
         public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {

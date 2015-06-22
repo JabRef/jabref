@@ -27,7 +27,7 @@ import java.util.HashMap;
  */
 public class FormatChars implements LayoutFormatter {
 
-    public static HashMap<String, String> CHARS = new HashMap<String, String>();
+    public static final HashMap<String, String> CHARS = new HashMap<String, String>();
 
     static {
         CHARS.put("`A", "À"); // #192

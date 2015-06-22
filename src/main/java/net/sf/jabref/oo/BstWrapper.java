@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class BstWrapper {
 
-    LayoutFormatter formatter = new FormatChars();
+    final LayoutFormatter formatter = new FormatChars();
     VM vm = null;
 
 
@@ -71,7 +71,7 @@ public class BstWrapper {
     }
 
 
-    static Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
+    static final Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
 
 
     private Map<String, String> parseResult(String result) {

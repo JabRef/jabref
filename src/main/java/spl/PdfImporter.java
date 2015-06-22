@@ -34,8 +34,8 @@ import spl.gui.MetaDataListDialog;
  */
 public class PdfImporter {
 
-    private JabRefFrame frame;
-    private BasePanel panel;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
     private MainTable entryTable;
     private int dropRow;
 

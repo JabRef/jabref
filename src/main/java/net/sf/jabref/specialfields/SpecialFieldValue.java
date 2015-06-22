@@ -31,15 +31,15 @@ public class SpecialFieldValue {
     private final String actionName;
 
     // localized menu string used at menu / button
-    private String menuString;
+    private final String menuString;
 
     private SpecialFieldAction action = null;
 
     private SpecialFieldMenuAction menuAction = null;
 
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
-    private String toolTipText;
+    private final String toolTipText;
 
 
     // value when used in a separate vield

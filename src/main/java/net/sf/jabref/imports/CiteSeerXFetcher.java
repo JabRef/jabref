@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
-    protected static int MAX_PAGES_TO_LOAD = 8;
+    protected static final int MAX_PAGES_TO_LOAD = 8;
     final static String QUERY_MARKER = "___QUERY___";
     final static String URL_START = "http://citeseer.ist.psu.edu";
     final static String SEARCH_URL = URL_START + "/search?q=" + QUERY_MARKER

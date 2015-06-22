@@ -28,8 +28,9 @@ import java.util.Enumeration;
  */
 public class GroupAddRemoveDialog extends BaseAction {
 
-    private BasePanel panel;
-    private boolean add, move = false;
+    private final BasePanel panel;
+    private final boolean add;
+    private boolean move = false;
     private BibtexEntry[] selection = null;
     JTree tree;
     JButton ok;

@@ -32,17 +32,26 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
-    private JCheckBox autoOpenForm, showSource,
-            defSource, emacsMode, emacsRebindCtrlA, disableOnMultiple, autoComplete;
-    private JRadioButton autoCompBoth, autoCompFF, autoCompLF,
-            autoCompFirstNameMode_Full, autoCompFirstNameMode_Abbr, autoCompFirstNameMode_Both;
+    private final JCheckBox autoOpenForm;
+    private final JCheckBox showSource;
+    private final JCheckBox defSource;
+    private final JCheckBox emacsMode;
+    private final JCheckBox emacsRebindCtrlA;
+    private final JCheckBox disableOnMultiple;
+    private final JCheckBox autoComplete;
+    private final JRadioButton autoCompBoth;
+    private final JRadioButton autoCompFF;
+    private final JRadioButton autoCompLF;
+    private final JRadioButton autoCompFirstNameMode_Full;
+    private final JRadioButton autoCompFirstNameMode_Abbr;
+    private final JRadioButton autoCompFirstNameMode_Both;
     boolean oldAutoCompFF, oldAutoCompLF,
             oldAutoCompFModeAbbr, oldAutoCompFModeFull;
-    private JSpinner shortestToComplete;
+    private final JSpinner shortestToComplete;
 
-    private JTextField autoCompFields;
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
+    private final JTextField autoCompFields;
+    final JabRefPreferences _prefs;
+    final JabRefFrame _frame;
 
 
     private void setAutoCompleteElementsEnabled(boolean enabled) {
