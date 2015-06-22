@@ -121,10 +121,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         return "Google Scholar";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
     public String getHelpPage() {
         return "GoogleScholarHelp.html";
     }

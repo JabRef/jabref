@@ -71,10 +71,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
         return "CiteSeerX";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
     public String getHelpPage() {
         return "CiteSeerHelp.html";
     }

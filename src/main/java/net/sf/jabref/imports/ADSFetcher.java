@@ -37,13 +37,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.imports.BibtexParser;
 
 /**
  *
@@ -64,10 +62,6 @@ public class ADSFetcher implements EntryFetcher {
     public String getHelpPage() {
         // TODO: No help page
         return null;
-    }
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     public String getKeyName() {

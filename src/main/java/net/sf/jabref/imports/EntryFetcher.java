@@ -71,13 +71,6 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
     String getKeyName();
 
     /**
-     * Get the appropriate icon URL for this activeFetcher.
-     * 
-     * @return The icon URL
-     */
-    URL getIcon();
-
-    /**
      * Get the name of the help page for this activeFetcher.
      * 
      * If given, a question mark is displayed in the side pane which leads to

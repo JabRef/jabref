@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.FetcherPreviewDialog;
@@ -454,10 +453,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     public String getTitle() {
         return "ACM Portal";
-    }
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     public String getHelpPage() {

@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.OutputPrinter;
 
 public class DBLPFetcher implements EntryFetcher {
@@ -175,11 +174,6 @@ public class DBLPFetcher implements EntryFetcher {
     @Override
     public String getKeyName() {
         return "DBLP";
-    }
-
-    @Override
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     @Override

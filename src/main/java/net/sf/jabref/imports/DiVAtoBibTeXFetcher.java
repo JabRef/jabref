@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
@@ -132,13 +131,6 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     @Override
     public String getKeyName() {
         return "DiVAtoBibTeX";
-    }
-
-    @Override
-    public URL getIcon() {
-        // no special icon for this fetcher available.
-        // Therefore, we return some kind of default icon
-        return GUIGlobals.getIconUrl("www");
     }
 
     @Override

@@ -50,7 +50,6 @@ import javax.swing.JRadioButton;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
@@ -229,10 +228,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     public String getTitle() {
         return "IEEEXplore";
-    }
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     public String getHelpPage() {

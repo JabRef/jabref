@@ -16,7 +16,6 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.net.URLDownload;
@@ -52,10 +51,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     public String getHelpPage() {
         return "ScienceDirect.html";
-    }
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     public String getKeyName() {

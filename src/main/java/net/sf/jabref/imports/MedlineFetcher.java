@@ -146,10 +146,6 @@ public class MedlineFetcher implements EntryFetcher {
         return GUIGlobals.medlineHelp;
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
     public String getKeyName() {
         return "Medline";
     }

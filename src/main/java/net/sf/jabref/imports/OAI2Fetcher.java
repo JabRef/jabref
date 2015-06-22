@@ -243,10 +243,6 @@ public class OAI2Fetcher implements EntryFetcher {
         return null;
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
     public String getKeyName() {
         return oai2ArchiveName;
     }

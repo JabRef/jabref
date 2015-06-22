@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
@@ -158,10 +157,6 @@ public class SPIRESFetcher implements EntryFetcher {
      */
     public String getHelpPage() {
         return "Spires.html";
-    }
-
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     public String getKeyName() {
