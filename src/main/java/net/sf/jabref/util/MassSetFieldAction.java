@@ -46,7 +46,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JDialog diag;
     private JRadioButton all, selected, clear, set, rename;
     private JTextField field, text, renameTo;
-    private JButton ok, cancel;
     boolean cancelled = true;
     private JCheckBox overwrite;
 
@@ -65,8 +64,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
 
         all = new JRadioButton(Globals.lang("All entries"));
         selected = new JRadioButton(Globals.lang("Selected entries"));
