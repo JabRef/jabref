@@ -28,15 +28,15 @@ import javax.swing.*;
  */
 public interface PushToApplication {
 
-    public String getName();
+    String getName();
 
-    public String getApplicationName();
+    String getApplicationName();
 
-    public String getTooltip();
+    String getTooltip();
 
-    public Icon getIcon();
+    Icon getIcon();
 
-    public String getKeyStrokeName();
+    String getKeyStrokeName();
 
     /**
      * This method asks the implementing class to return a JPanel populated
@@ -48,7 +48,7 @@ public interface PushToApplication {
      *
      * @return a JPanel containing options, or null if options are not needed.
      */
-    public JPanel getSettingsPanel();
+    JPanel getSettingsPanel();
 
     /**
      * This method is called to indicate that the settings panel returned from
@@ -56,7 +56,7 @@ public interface PushToApplication {
      * user has indicated that the settings should be stored. This method must
      * store the state of the widgets in the settings panel to Globals.prefs.
      */
-    public void storeSettings();
+    void storeSettings();
 
     /**
      * The actual operation. This method will not be called on the event dispatch
@@ -65,20 +65,20 @@ public interface PushToApplication {
      * @param entries
      * @param metaData
      */
-    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries,
-            String keyString, MetaData metaData);
+    void pushEntries(BibtexDatabase database, BibtexEntry[] entries,
+                     String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after
      * pushEntries() returns.
      */
-    public void operationCompleted(BasePanel panel);
+    void operationCompleted(BasePanel panel);
 
     /**
      * Check whether this operation requires BibTeX keys to be set for the entries.
      * If true is returned an error message will be displayed if keys are missing.
      * @return true if BibTeX keys are required for this operation.
      */
-    public boolean requiresBibtexKeys();
+    boolean requiresBibtexKeys();
 
 }

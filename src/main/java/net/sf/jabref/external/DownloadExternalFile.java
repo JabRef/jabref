@@ -351,6 +351,6 @@ public class DownloadExternalFile {
      */
     public interface DownloadCallback {
 
-        public void downloadComplete(FileListEntry file);
+        void downloadComplete(FileListEntry file);
     }
 }
