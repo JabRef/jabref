@@ -141,10 +141,10 @@ public class JSTORFetcher2 implements EntryFetcher {
             urlQuery = SEARCH_URL + URLEncoder.encode(query, "UTF-8") + SEARCH_URL_END;
             int count = 1;
             String numberOfRefs[] = new String[2];
-            int refsRequested = 0;
+            int refsRequested;
             int numberOfPagesRequested = MAX_PAGES_TO_LOAD;
 
-            String nextPage = null;
+            String nextPage;
             while ((count <= Math.min(MAX_PAGES_TO_LOAD, numberOfPagesRequested))
                     && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
                 // If user has cancelled the import, return null to signal this:
@@ -176,7 +176,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         String pageEntire = cont;
 
         int countOfRefs = 0;
-        int refsRequested = 0;
+        int refsRequested;
 
         if (count == 1) { //  Readin the numberofhits (only once)
             Matcher mn = numberofhits.matcher(pageEntire);

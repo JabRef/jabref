@@ -134,13 +134,13 @@ public class AuxSubGenerator
         Matcher matcher;
 
         // while condition
-        boolean weiter = false;
+        boolean weiter;
 
         // return value -> default: no error
         boolean back = true;
 
         // fileopen status
-        boolean loopFileOpen = false;
+        boolean loopFileOpen;
 
         // the important tag
         pattern = Pattern.compile("\\\\citation\\{.+\\}");

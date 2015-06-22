@@ -53,7 +53,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                 //parte el string author en varios campos, según el separador " "
                 author = authors[i].split(" ");
                 //declaramos y damos un valor para evitar problemas
-                String name = "", surname = "";
+                String name, surname;
 
                 if (author.length == 1) {// Caso 1.0: Sólo un campo
                     sb.append(author[0].trim().toUpperCase());

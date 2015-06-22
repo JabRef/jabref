@@ -42,7 +42,7 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
             s = authors[0] + " & " + authors[1];
             break;
         default:
-            int i = 0,
+            int i,
             x = authors.length;
             StringBuffer sb = new StringBuffer();
 

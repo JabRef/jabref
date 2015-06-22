@@ -33,7 +33,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     public int compare(BibtexString s1, BibtexString s2) {
 
-        int res = 0;
+        int res;
 
         // First check their names:
         String name1 = s1.getName().toLowerCase(), name2 = s2.getName().toLowerCase();

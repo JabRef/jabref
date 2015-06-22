@@ -707,7 +707,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         boolean newSpecialFieldsEnabled = specialFieldsEnabled.isSelected(), newRankingColumn = rankingColumn.isSelected(), newCompactRankingColumn = compactRankingColumn.isSelected(), newQualityColumn = qualityColumn.isSelected(), newPriorityColumn = priorityColumn.isSelected(), newRelevanceColumn = relevanceColumn.isSelected(), newPrintedColumn = printedColumn.isSelected(), newReadStatusColumn = readStatusColumn.isSelected(), newSyncKeyWords = syncKeywords.isSelected(), newWriteSpecialFields = writeSpecialFields.isSelected();
 
-        boolean restartRequired = false;
+        boolean restartRequired;
         restartRequired = (oldSpecialFieldsEnabled != newSpecialFieldsEnabled) ||
                 (oldRankingColumn != newRankingColumn) ||
                 (oldCompcatRankingColumn != newCompactRankingColumn) ||

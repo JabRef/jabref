@@ -96,8 +96,8 @@ public class LayoutEntry {
 
     public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) throws Exception {
         classPrefix = classPrefix_;
-        String blockStart = null;
-        String blockEnd = null;
+        String blockStart;
+        String blockEnd;
         StringInt si;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>();

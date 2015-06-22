@@ -140,7 +140,7 @@ public class OAI2Fetcher implements EntryFetcher {
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
-        String identifier = "";
+        String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException e) {

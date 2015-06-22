@@ -47,7 +47,7 @@ public class AutosaveStartupPrompter implements Runnable {
         Map<ParserResult, Integer> location = new HashMap<ParserResult, Integer>();
         for (File file : files) {
             File fileToLoad = file;
-            boolean tryingAutosave = false;
+            boolean tryingAutosave;
             if (Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
                         Globals.lang("An autosave file was found for this database. This could indicate ")

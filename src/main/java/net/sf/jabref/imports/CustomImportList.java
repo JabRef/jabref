@@ -150,7 +150,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
     private void readPrefs() {
         int i = 0;
-        String[] s = null;
+        String[] s;
         while ((s = prefs.getStringArray("customImportFormat" + i)) != null) {
             try {
                 super.add(new Importer(s));

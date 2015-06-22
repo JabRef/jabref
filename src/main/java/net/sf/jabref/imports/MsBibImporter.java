@@ -48,7 +48,7 @@ public class MsBibImporter extends ImportFormat {
             not of the MsBib type, and true otherwise. Returning true is the safe choice
             if not certain.
          */
-        Document docin = null;
+        Document docin;
         try {
             DocumentBuilder dbuild = DocumentBuilderFactory.
                     newInstance().

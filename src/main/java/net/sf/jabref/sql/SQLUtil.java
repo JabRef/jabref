@@ -82,7 +82,7 @@ public class SQLUtil {
     public static String getFieldStr() {
         // create comma separated list of field names
         String fieldstr = "";
-        String field = "";
+        String field;
         for (int i = 0; i < getAllFields().size(); i++) {
             field = allFields.get(i);
             if (i > 0)
@@ -128,7 +128,7 @@ public class SQLUtil {
      */
     public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
         String str = "";
-        String field = "";
+        String field;
         ListIterator<String> li = fields.listIterator();
         while (li.hasNext()) {
             field = li.next();
@@ -163,7 +163,7 @@ public class SQLUtil {
             List<String> optFields, List<String> utiFields,
             ArrayList<String> origList) {
 
-        String currentField = null;
+        String currentField;
         for (int i = 0; i < allFields.size(); i++) {
             currentField = allFields.get(i);
             if (reqFields.contains(currentField))
@@ -183,7 +183,7 @@ public class SQLUtil {
      *            The SQLException raised
      */
     public static String getExceptionMessage(Exception ex) {
-        String msg = null;
+        String msg;
         if (ex.getMessage() == null) {
             msg = ex.toString();
         } else {
@@ -264,7 +264,7 @@ public class SQLUtil {
      * @return The JDBC url corresponding to the input DBStrings
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
-        String url = "";
+        String url;
         url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://"
                 + dbStrings.getServerHostname()
                 + (withDBName ? "/" + dbStrings.getDatabase() : "");

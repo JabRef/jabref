@@ -428,7 +428,7 @@ public class ManageJournalsPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
+            String chosen;
             chosen = JOptionPane.showInputDialog(Globals.lang("Choose the URL to download. The default value points to a list provided by the JabRef developers."),
                     "http://jabref.sf.net/journals/journal_abbreviations_general.txt");
             if (chosen == null)
@@ -464,7 +464,7 @@ public class ManageJournalsPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
+            String chosen;
             if (dir)
                 chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
                         JFileChooser.OPEN_DIALOG, false);

@@ -69,7 +69,7 @@ public class DownloadExternalFile {
         if (res == null || res.trim().length() == 0)
             return;
 
-        URL url = null;
+        URL url;
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {

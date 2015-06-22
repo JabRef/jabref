@@ -107,7 +107,7 @@ public class BibtexEntryWriter {
         }
         // Then optional fields.
         s = entry.getOptionalFields();
-        boolean first = true, previous = true;
+        boolean first = true, previous;
         previous = false;
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
@@ -210,7 +210,7 @@ public class BibtexEntryWriter {
         }
 
         // Then write remaining fields in alphabetic order.
-        boolean first = true, previous = true;
+        boolean first, previous;
         previous = false;
         //STA get remaining fields
         TreeSet<String> remainingFields = new TreeSet<String>();

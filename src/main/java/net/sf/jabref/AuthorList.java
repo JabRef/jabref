@@ -399,7 +399,7 @@ public class AuthorList {
 
         // the following negatives indicate absence of the corresponding part
         int first_part_start = -1, von_part_start = -1, last_part_start = -1, jr_part_start = -1;
-        int first_part_end = 0, von_part_end = 0, last_part_end = 0, jr_part_end = 0;
+        int first_part_end, von_part_end = 0, last_part_end = 0, jr_part_end = 0;
         boolean jrAsFirstname = false;
         if (comma_first < 0) { // no commas
             if (von_start < 0) { // no 'von part'

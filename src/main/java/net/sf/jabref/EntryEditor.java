@@ -1419,7 +1419,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent e) {
 
             int thisRow = panel.mainTable.findEntry(entry);
-            int newRow = -1;
+            int newRow;
 
             if ((thisRow + 1) < panel.database.getEntryCount())
                 newRow = thisRow + 1;
@@ -1445,7 +1445,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         public void actionPerformed(ActionEvent e) {
             int thisRow = panel.mainTable.findEntry(entry);
-            int newRow = -1;
+            int newRow;
 
             if ((thisRow - 1) >= 0)
                 newRow = thisRow - 1;

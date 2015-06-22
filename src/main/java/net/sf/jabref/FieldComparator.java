@@ -166,7 +166,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
             // Else none of them were parseable, and we can fall back on comparing strings.    
         }
 
-        int result = 0;
+        int result;
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = (((Integer) f1).compareTo((Integer) f2));
         } else if (f2 instanceof Integer) {

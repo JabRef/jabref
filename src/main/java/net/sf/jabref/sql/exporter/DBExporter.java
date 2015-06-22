@@ -122,8 +122,8 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void populateEntriesTable(int database_id,
             List<BibtexEntry> entries, Object out) throws SQLException {
-        String query = "";
-        String val = "";
+        String query;
+        String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, "
                 + fieldStr + ", database_id) VALUES (";
         for (BibtexEntry entry : entries) {
@@ -217,7 +217,7 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private void populateEntryTypesTable(Object out) throws SQLException {
-        String query = "";
+        String query;
         ArrayList<String> fieldRequirement = new ArrayList<String>();
 
         ArrayList<String> existentTypes = new ArrayList<String>();
@@ -454,9 +454,9 @@ public abstract class DBExporter extends DBImporterExporter {
         File outfile = new File(file);
         if (outfile.exists())
             outfile.delete();
-        BufferedOutputStream writer = null;
+        BufferedOutputStream writer;
         writer = new BufferedOutputStream(new FileOutputStream(outfile));
-        PrintStream fout = null;
+        PrintStream fout;
         fout = new PrintStream(writer);
         performExport(database, metaData, keySet, fout, "file");
         fout.close();
@@ -479,7 +479,7 @@ public abstract class DBExporter extends DBImporterExporter {
     public void exportDatabaseToDBMS(final BibtexDatabase database,
             final MetaData metaData, Set<String> keySet, DBStrings dbStrings,
             JabRefFrame frame) throws Exception {
-        String dbName = "";
+        String dbName;
         Connection conn = null;
         boolean redisplay = false;
         try {

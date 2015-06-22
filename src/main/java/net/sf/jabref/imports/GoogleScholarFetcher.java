@@ -181,7 +181,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         try {
             urlQuery = SEARCH_URL.replace(QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
-            String nextPage = null;
+            String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
                     && (count < 2)) {
                 urlQuery = nextPage;
@@ -203,7 +203,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         int lastRegionStart = 0;
         while (m.find()) {
             String link = m.group(1).replaceAll("&amp;", "&");
-            String pText = null;
+            String pText;
             //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = TITLE_START_PATTERN.matcher(part);

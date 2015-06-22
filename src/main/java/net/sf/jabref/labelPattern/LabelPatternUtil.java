@@ -1058,7 +1058,7 @@ public class LabelPatternUtil {
         }
         if (tokens.length <= n)
             return author;
-        return author += "EtAl";
+        return "EtAl";
     }
 
     /**

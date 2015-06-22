@@ -291,9 +291,9 @@ public class RepecNepImporter extends ImportFormat {
         while (this.lastLine != null && !this.lastLine.equals("") && !startsWithKeyword(recognizedFields)) {
 
             // read single author
-            String author = null;
+            String author;
             String institution = null;
-            boolean institutionDone = false;
+            boolean institutionDone;
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
@@ -398,7 +398,7 @@ public class RepecNepImporter extends ImportFormat {
 
                 // parse URL field
             } else if (keyword.startsWith("URL")) {
-                String content = null;
+                String content;
                 if (multilineUrlFieldAllowed) {
                     content = readMultipleLines();
                 } else {

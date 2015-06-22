@@ -215,7 +215,7 @@ public class PdfContentImporter extends ImportFormat {
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
 
-        PDDocument document = null;
+        PDDocument document;
         try {
             document = PDDocument.load(in);
         } catch (IOException e) {
@@ -269,12 +269,12 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            String author = null;
+            String author;
             String editor = null;
             String institution = null;
             String abstractT = null;
             String keywords = null;
-            String title = null;
+            String title;
             String conference = null;
             String DOI = null;
             String series = null;

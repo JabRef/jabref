@@ -100,7 +100,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         try {
             urlQuery = SEARCH_URL.replace(QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
-            String nextPage = null;
+            String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
                     && (count < MAX_PAGES_TO_LOAD)) {
                 urlQuery = nextPage;

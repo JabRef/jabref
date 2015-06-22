@@ -209,7 +209,7 @@ public class ExternalFilePanel extends JPanel {
         if (dirs.length > 0)
             directory = dirs[0]; // Default to the first directory in the list
 
-        String dir = editor.getText(), retVal = null;
+        String dir = editor.getText(), retVal;
 
         if ((directory == null) || !(new File(dir)).isAbsolute()) {
             if (directory != null)
@@ -272,7 +272,7 @@ public class ExternalFilePanel extends JPanel {
                 if (suffix == null)
                     suffix = "." + fieldName.toLowerCase();
 
-                String plannedName = null;
+                String plannedName;
                 if (getKey() != null)
                     plannedName = getKey() + suffix;
                 else {

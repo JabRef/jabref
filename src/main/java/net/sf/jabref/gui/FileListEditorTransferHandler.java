@@ -119,7 +119,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
                         for (File f : theFiles) {
                             // Find the file's extension, if any:
                             String name = f.getAbsolutePath();
-                            String extension = "";
+                            String extension;
                             ExternalFileType fileType = null;
                             int index = name.lastIndexOf('.');
                             if ((index >= 0) && (index < name.length())) {

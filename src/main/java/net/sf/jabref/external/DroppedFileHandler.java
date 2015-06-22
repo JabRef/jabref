@@ -276,7 +276,7 @@ public class DroppedFileHandler {
             return false;
         }
 
-        List<BibtexEntry> xmpEntriesInFile = null;
+        List<BibtexEntry> xmpEntriesInFile;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
         } catch (Exception e) {

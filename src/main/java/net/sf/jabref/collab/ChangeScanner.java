@@ -192,7 +192,7 @@ public class ChangeScanner implements Runnable {
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
         // can also be matched.
-        int piv1 = 0, piv2 = 0;
+        int piv1, piv2 = 0;
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
@@ -249,7 +249,7 @@ public class ChangeScanner implements Runnable {
                 // one we're looking at, in case none matches completely.
                 int bestMatchI = -1;
                 double bestMatch = 0;
-                double comp = -1;
+                double comp;
 
                 if (piv2 < disk.getEntryCount() - 1) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {

@@ -75,7 +75,7 @@ public class BibtexFields
     private BibtexFields()
     {
         fieldSet = new HashMap<String, BibtexSingleField>();
-        BibtexSingleField dummy = null;
+        BibtexSingleField dummy;
 
         // FIRST: all standard fields
         // These are the fields that BibTex might want to treat, so these

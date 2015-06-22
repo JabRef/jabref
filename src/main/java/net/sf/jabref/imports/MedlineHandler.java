@@ -205,7 +205,7 @@ public class MedlineHandler extends DefaultHandler
     }
 
     String makeBibtexString() {
-        String out = "";
+        String out;
         // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
         out = "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
                 "},\n volume = { " + volume + "},\n number = { " + number + "},\n pages = { " + fixPageRange(page) + "},\n abstract = { " + abstractText + "},\n}";

@@ -447,7 +447,7 @@ public class FileActions {
      * unsuccessful (e.g. file not found), an IOException is thrown.
      */
     public static Reader getReader(String name) throws IOException {
-        Reader reader = null;
+        Reader reader;
         // Try loading as a resource first. This works for files inside the jar:
         URL reso = Globals.class.getResource(name);
 

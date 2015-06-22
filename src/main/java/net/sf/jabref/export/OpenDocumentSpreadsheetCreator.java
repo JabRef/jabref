@@ -71,7 +71,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             //zipEntry.setMethod(ZipEntry.DEFLATED);
             out.putNextEntry(zipEntry);
-            int c = -1;
+            int c;
             while ((c = source.read()) >= 0) {
                 out.write(c);
             }

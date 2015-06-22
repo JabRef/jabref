@@ -271,7 +271,6 @@ public class DBConnectDialog extends JDialog {
             tmp = tmp + aPwd;
         }
         dbStrings.setPassword(tmp);
-        tmp = "";
         Arrays.fill(pwd, '0');
 
     }

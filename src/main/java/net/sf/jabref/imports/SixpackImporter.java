@@ -114,8 +114,8 @@ public class SixpackImporter extends ImportFormat {
             return null;
         String[] fieldDef = ln.split(",");
 
-        String s = null;
-        BibtexEntry entry = null;
+        String s;
+        BibtexEntry entry;
         while ((s = in.readLine()) != null) {
             try {
                 s = s.replaceAll("<par>", ""); // What is <par> ????

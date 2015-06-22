@@ -457,7 +457,7 @@ public class BibtexDatabase {
         //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
-            int piv = 0, next = 0;
+            int piv = 0, next;
             while ((next = res.indexOf("#", piv)) >= 0) {
 
                 // We found the next string ref. Append the text
@@ -506,7 +506,7 @@ public class BibtexDatabase {
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
         // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
-        boolean duplicate = false;
+        boolean duplicate;
         if (oldKey == null) {// this is a new entry so don't bother removing oldKey
             duplicate = addKeyToSet(newKey);
         } else {

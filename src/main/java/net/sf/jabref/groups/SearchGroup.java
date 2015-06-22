@@ -70,7 +70,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         m_regExp = regExp;
 
         // create AST
-        AST ast = null;
+        AST ast;
         try {
             SearchExpressionParser parser = new SearchExpressionParser(
                     new SearchExpressionLexer(new StringReader(

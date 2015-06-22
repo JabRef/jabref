@@ -143,7 +143,7 @@ public class CsaImporter extends ImportFormat {
         else if (pm.group(4) != null)
             return fstr; // possible month found in two places
 
-        int idx = -1;
+        int idx;
         if (mon != null) {
             String lmon = mon.toLowerCase();
             idx = MONS.indexOf(lmon);

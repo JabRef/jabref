@@ -349,7 +349,7 @@ public class LayoutHelper {
     {
         int c;
         StringBuffer buffer = null;
-        char firstLetter = ' ';
+        char firstLetter;
         String name;
 
         while (!_eof)
@@ -379,7 +379,6 @@ public class LayoutHelper {
                 }
 
                 //System.out.println("NAME:" + name);
-                buffer = null;
 
                 if (firstLetter == 'b')
                 {

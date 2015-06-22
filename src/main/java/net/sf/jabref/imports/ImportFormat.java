@@ -173,7 +173,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(ImportFormat importer) {
-        int result = 0;
+        int result;
         if (getIsCustomImporter() == importer.getIsCustomImporter()) {
             result = getFormatName().compareTo(importer.getFormatName());
         } else {

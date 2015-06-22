@@ -53,7 +53,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         try {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             out.putNextEntry(zipEntry);
-            int c = -1;
+            int c;
             while ((c = source.read()) >= 0) {
                 out.write(c);
             }

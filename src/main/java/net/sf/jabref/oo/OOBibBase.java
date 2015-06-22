@@ -110,7 +110,7 @@ public class OOBibBase {
 
     public void selectDocument() throws Exception {
         List<XTextDocument> ls = getTextDocuments();
-        XTextDocument selected = null;
+        XTextDocument selected;
         if (ls.size() == 0) {
             // No text documents found.
             throw new Exception("No Writer documents found");

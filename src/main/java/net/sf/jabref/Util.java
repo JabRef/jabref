@@ -1184,7 +1184,7 @@ public class Util {
      */
     public static File expandFilename(String name, String dir) {
 
-        File file = null;
+        File file;
         if (name == null || name.length() == 0)
             return null;
         else {
@@ -1957,7 +1957,7 @@ public class Util {
      */
     public static void markEntry(BibtexEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         Object o = be.getField(BibtexFields.MARKED);
-        int prevMarkLevel = 0;
+        int prevMarkLevel;
         String newValue = null;
         if (o != null) {
             String s = o.toString();
@@ -2982,7 +2982,7 @@ public class Util {
     private static void openFolderAndSelectFileOnLinux(String fileLink) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
 
-        String cmd = "";
+        String cmd;
 
         if (desktopSession.contains("gnome")) {
             cmd = "nautilus " + fileLink;

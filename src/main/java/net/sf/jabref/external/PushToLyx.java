@@ -59,7 +59,7 @@ public class PushToLyx implements PushToApplication {
                 try {
                     FileWriter fw = new FileWriter(lyxpipe);
                     BufferedWriter lyx_out = new BufferedWriter(fw);
-                    String citeStr = "";
+                    String citeStr;
 
                     citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                     lyx_out.write(citeStr + "\n");

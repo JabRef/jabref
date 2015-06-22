@@ -108,7 +108,7 @@ public class WSITools
         vcr.clear();
         s = s + "\n";
 
-        int endpos = 0;
+        int endpos;
         int matched = 0;
 
         StringTokenizer st = new StringTokenizer(s, delimstr);

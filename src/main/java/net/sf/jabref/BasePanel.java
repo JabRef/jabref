@@ -855,7 +855,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             // Run second, on a different thread:
             public void run() {
-                BibtexEntry bes = null;
+                BibtexEntry bes;
                 NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
 
                 // First check if any entries have keys set already. If so, possibly remove
@@ -2981,7 +2981,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public String getKeysForSelection() {
         StringBuilder result = new StringBuilder();
-        String citeKey = "";//, message = "";
+        String citeKey;//, message = "";
         boolean first = true;
         for (BibtexEntry bes : mainTable.getSelected()) {
             citeKey = bes.getField(BibtexFields.KEY_FIELD);

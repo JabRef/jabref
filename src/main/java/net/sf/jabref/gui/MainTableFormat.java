@@ -211,7 +211,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         else if (iconType != null) {
-            int hasField = -1;
+            int hasField;
 
             int[] fieldCount = hasField(be, iconType);
             hasField = fieldCount[0];

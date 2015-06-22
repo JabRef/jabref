@@ -851,7 +851,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
                             (answer == JOptionPane.CLOSED_OPTION)) {
-                        close = false; // The user has cancelled.
                         return false;
                     }
                     if (answer == JOptionPane.YES_OPTION) {

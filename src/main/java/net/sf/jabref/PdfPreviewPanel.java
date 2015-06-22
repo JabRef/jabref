@@ -56,7 +56,7 @@ public class PdfPreviewPanel extends JPanel {
             return;
         }
 
-        PDDocument document = null;
+        PDDocument document;
         try {
             document = PDDocument.load(input);
         } catch (IOException e) {
@@ -68,7 +68,7 @@ public class PdfPreviewPanel extends JPanel {
         List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
         PDPage page = pages.get(0);
-        BufferedImage image = null;
+        BufferedImage image;
         try {
             image = page.convertToImage();
         } catch (Exception e1) {

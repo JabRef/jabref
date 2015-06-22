@@ -104,7 +104,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         if ((f1 == null) && (f2 != null))
             return 1;
 
-        int result = 0;
+        int result;
 
         //String ours = ((String)e1.getField(sortField)).toLowerCase(),
         //    theirs = ((String)e2.getField(sortField)).toLowerCase();

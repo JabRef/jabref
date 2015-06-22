@@ -509,7 +509,7 @@ public class BibtexParser {
     private String parseFieldContent(String key) throws IOException {
         skipWhitespace();
         StringBuilder value = new StringBuilder();
-        int c = '.';
+        int c;
 
         while (((c = peek()) != ',') && (c != '}') && (c != ')')) {
 
@@ -1028,7 +1028,6 @@ public class BibtexParser {
                 read();
             }
             else {
-                keepon = false;
                 return null;
             }
 

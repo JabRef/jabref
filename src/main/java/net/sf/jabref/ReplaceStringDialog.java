@@ -230,7 +230,7 @@ class ReplaceStringDialog extends JDialog {
             return 0;
         String txt = o.toString();
         StringBuffer sb = new StringBuffer();
-        int ind = -1, piv = 0, counter = 0, len1 = s1.length();
+        int ind, piv = 0, counter = 0, len1 = s1.length();
         while ((ind = txt.indexOf(s1, piv)) >= 0) {
             counter++;
             sb.append(txt.substring(piv, ind)); // Text leading up to s1

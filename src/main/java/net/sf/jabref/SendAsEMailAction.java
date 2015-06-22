@@ -103,7 +103,7 @@ public class SendAsEMailAction extends AbstractWorker {
             mailTo = mailTo.concat("\"");
         }
 
-        URI uriMailTo = null;
+        URI uriMailTo;
         try {
             uriMailTo = new URI("mailto", mailTo, null);
         } catch (URISyntaxException e1) {

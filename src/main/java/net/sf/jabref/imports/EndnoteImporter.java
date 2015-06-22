@@ -95,7 +95,7 @@ public class EndnoteImporter extends ImportFormat {
 
         String[] entries = sb.toString().split(ENDOFRECORD);
         HashMap<String, String> hm = new HashMap<String, String>();
-        String author = "", Type = "", editor = "", artnum = "";
+        String author, Type, editor, artnum;
         for (String entry : entries) {
             hm.clear();
             author = "";

@@ -558,7 +558,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             return;
         }
 
-        JMenu submenu = null;
+        JMenu submenu;
         if (node.getGroup() instanceof AllEntriesGroup) {
             for (int i = 0; i < node.getChildCount(); ++i) {
                 insertNodes(menu, (GroupTreeNode) node.getChildAt(i));

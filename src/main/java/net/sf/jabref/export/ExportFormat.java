@@ -186,7 +186,7 @@ public class ExportFormat implements IExportFormat {
         VerifyingWriter ps = ss.getWriter();
 
         Layout beginLayout = null;
-        Reader reader = null;
+        Reader reader;
 
         // Check if this export filter has bundled name formatters:
         HashMap<String, String> customNameFormatters = readFormatterFile(lfFileName);

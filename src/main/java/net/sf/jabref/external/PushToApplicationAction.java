@@ -88,7 +88,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
 
     protected String getKeyString(BibtexEntry[] entries) {
         StringBuffer result = new StringBuffer();
-        String citeKey = "";//, message = "";
+        String citeKey;//, message = "";
         boolean first = true;
         for (BibtexEntry bes : entries) {
             citeKey = bes.getField(BibtexFields.KEY_FIELD);

@@ -1317,7 +1317,7 @@ public class GroupSelector extends SidePaneComponent implements
                 return false; // not possible
             }
         }
-        AbstractUndoableEdit undo = null;
+        AbstractUndoableEdit undo;
         if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" up.", node.getGroup().getName()));
@@ -1342,7 +1342,7 @@ public class GroupSelector extends SidePaneComponent implements
                 return false; // not possible
             }
         }
-        AbstractUndoableEdit undo = null;
+        AbstractUndoableEdit undo;
         if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" down.", node.getGroup().getName()));
@@ -1367,7 +1367,7 @@ public class GroupSelector extends SidePaneComponent implements
                 return false; // not possible
             }
         }
-        AbstractUndoableEdit undo = null;
+        AbstractUndoableEdit undo;
         if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" left.", node.getGroup().getName()));
@@ -1391,7 +1391,7 @@ public class GroupSelector extends SidePaneComponent implements
                 return false; // not possible
             }
         }
-        AbstractUndoableEdit undo = null;
+        AbstractUndoableEdit undo;
         if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" right.", node.getGroup().getName()));

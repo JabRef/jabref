@@ -41,7 +41,7 @@ public class TextAnalyzer {
 
         text = "  " + text + "  ";
 
-        String[] split = null;
+        String[] split;
 
         // Look for the year:
         String year = null;
@@ -86,7 +86,7 @@ public class TextAnalyzer {
         }
 
         // Look for Pages:
-        String pages = null;
+        String pages;
         String pagesRx = "\\s(\\d{1,4})( ??)-( ??)(\\d{1,4})(\\.|,|\\s)";
         cand = getMatches(text, pagesRx);
         if (cand.length == 1) {
@@ -114,7 +114,7 @@ public class TextAnalyzer {
         }
 
         //String journalRx = "(\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((vol\\.|Vol\\.|Volume|volume))??(.??)(\\d{1,3})(\\.|,|\\s)";
-        String journal = null, volume = null;
+        String journal, volume;
         String journalRx = "(,|\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((.){0,2})((vol\\.|Vol\\.|Volume|volume))??\\s??(\\d{1,3})(\\.|,|\\s|:)";
         cand = getMatches(text, journalRx);
         if (cand.length > 0) {
@@ -139,7 +139,6 @@ public class TextAnalyzer {
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
             // No journal found. Maybe the year precedes the volume? Try another regexp:
-            journalRx = "(,|\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((.){0,2})\\s??(\\d{1,3})(\\.|,|\\s|:)";
         }
 
         // Then try to find title and authors.
