@@ -20,6 +20,6 @@ import net.sf.jabref.BibtexEntry;
 public interface LabelRule {
 
     // the default rule is that it simply returns what it was given
-    public String applyRule(BibtexEntry oldEntry);
+    String applyRule(BibtexEntry oldEntry);
 
 }

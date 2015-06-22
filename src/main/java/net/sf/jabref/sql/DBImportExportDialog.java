@@ -82,7 +82,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         private String dialogType;
 
 
-        private DialogType(String dialogType) {
+        DialogType(String dialogType) {
             this.dialogType = dialogType;
         }
 

@@ -21,5 +21,5 @@ package net.sf.jabref;
  */
 public interface EntryContainer {
 
-    public BibtexEntry getEntry();
+    BibtexEntry getEntry();
 }

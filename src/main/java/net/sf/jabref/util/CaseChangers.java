@@ -52,7 +52,7 @@ public class CaseChangers {
     public static final String SPACE_SEPARATOR = " ";
 
 
-    public static interface CaseChanger {
+    public interface CaseChanger {
 
         String getName();
 

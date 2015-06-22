@@ -96,14 +96,14 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  */
 public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
 
-    public static interface CallBack {
+    public interface CallBack {
 
         /**
          * This method is called by the dialog when the user has cancelled or
          * signalled a stop. It is expected that any long-running fetch
          * operations will stop after this method is called.
          */
-        public void stopFetching();
+        void stopFetching();
     }
 
 

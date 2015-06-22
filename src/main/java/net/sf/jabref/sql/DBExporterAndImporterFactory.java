@@ -44,7 +44,7 @@ public class DBExporterAndImporterFactory {
         private String dbType;
 
 
-        private DBType(String dbType) {
+        DBType(String dbType) {
             this.dbType = dbType;
         }
 
