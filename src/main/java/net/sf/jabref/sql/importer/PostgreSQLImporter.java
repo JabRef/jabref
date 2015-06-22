@@ -54,8 +54,7 @@ public class PostgreSQLImporter extends DBImporter {
     protected ResultSet readColumnNames(Connection conn) throws SQLException {
         Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
                 "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';");
-        ResultSet rs = statement.getResultSet();
-        return rs;
+        return statement.getResultSet();
     }
 
     @Override
@@ -64,9 +63,8 @@ public class PostgreSQLImporter extends DBImporter {
         String drv = "org.postgresql.Driver";
 
         Class.forName(drv).newInstance();
-        Connection conn = DriverManager.getConnection(url,
+        return DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
-        return conn;
     }
 
 }

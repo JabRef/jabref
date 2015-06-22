@@ -226,9 +226,9 @@ public class LabelPatternPanel extends JPanel {
 
         // each entry type
         for (String s1 : textFields.keySet()) {
-            String s = s1, text = textFields.get(s).getText();
+            String text = textFields.get(s1).getText();
             if (!"".equals(text.trim()))
-                keypatterns.addLabelPattern(s, text);
+                keypatterns.addLabelPattern(s1, text);
         }
 
         // default value

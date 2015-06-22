@@ -68,8 +68,7 @@ public class BibTeXMLHandler extends DefaultHandler {
     }
 
     public void startElement(String uri, String local, String raw, Attributes atts) {
-        String name = raw;
-        if (name.equals("bibtex:entry")) {
+        if (raw.equals("bibtex:entry")) {
             String articleID = null;
             for (int i = 0; i < atts.getLength(); i++) {
                 if (atts.getQName(i).equals("bibtex:id") ||
@@ -79,20 +78,20 @@ public class BibTeXMLHandler extends DefaultHandler {
             }
             b = new BibtexEntry(Util.createNeutralId());
             b.setField(BibtexFields.KEY_FIELD, articleID);
-        } else if (name.equals("bibtex:article") ||
-                name.equals("bibtex:inbook") ||
-                name.equals("bibtex:book") ||
-                name.equals("bibtex:booklet") ||
-                name.equals("bibtex:incollection") ||
-                name.equals("bibtex:inproceedings") ||
-                name.equals("bibtex:proceedings") ||
-                name.equals("bibtex:manual") ||
-                name.equals("bibtex:mastersthesis") ||
-                name.equals("bibtex:phdthesis") ||
-                name.equals("bibtex:techreport") ||
-                name.equals("bibtex:unpublished") ||
-                name.equals("bibtex:misc") ||
-                name.equals("bibtex:other")) {
+        } else if (raw.equals("bibtex:article") ||
+                raw.equals("bibtex:inbook") ||
+                raw.equals("bibtex:book") ||
+                raw.equals("bibtex:booklet") ||
+                raw.equals("bibtex:incollection") ||
+                raw.equals("bibtex:inproceedings") ||
+                raw.equals("bibtex:proceedings") ||
+                raw.equals("bibtex:manual") ||
+                raw.equals("bibtex:mastersthesis") ||
+                raw.equals("bibtex:phdthesis") ||
+                raw.equals("bibtex:techreport") ||
+                raw.equals("bibtex:unpublished") ||
+                raw.equals("bibtex:misc") ||
+                raw.equals("bibtex:other")) {
             BibtexEntryType tp = BibtexEntryType.getType(local);
             b.setType(tp);
         }
@@ -100,10 +99,9 @@ public class BibTeXMLHandler extends DefaultHandler {
     }
 
     public void endElement(String uri, String local, String raw) {
-        String name = raw;
-        if (name.equals("bibtex:entry")) {
+        if (raw.equals("bibtex:entry")) {
             bibitems.add(b);
-        } else if (name.startsWith("bibtex:")) {
+        } else if (raw.startsWith("bibtex:")) {
             b.setField(local, currentChars);
             // Util.pr(local+ " "+currentChars);
         }

@@ -861,8 +861,7 @@ public class OOBibBase {
             XTextContent xTextContent = UnoRuntime.queryInterface(
                     XTextContent.class, bookmark);
 
-            String name = name1;
-            List<String> newKeys = parseRefMarkName(name);
+            List<String> newKeys = parseRefMarkName(name1);
             for (String key : newKeys)
                 if (!keys.contains(key))
                     keys.add(key);

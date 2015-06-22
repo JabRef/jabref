@@ -348,12 +348,11 @@ public class LabelPatternUtil {
         }
 
         // Putting parts together.
-        String result = (university == null ? rest : university)
+        return (university == null ? rest : university)
                 + (school == null ? "" : school)
                 + ((department == null
                 || (school != null && department.equals(school))) ?
                         "" : department);
-        return result;
     }
 
     /**

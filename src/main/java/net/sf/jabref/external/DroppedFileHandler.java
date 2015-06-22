@@ -251,11 +251,10 @@ public class DroppedFileHandler {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = aXmpEntriesInFile;
-                    entry.setId(Util.createNeutralId());
-                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
-                    panel.getDatabase().insertEntry(entry);
-                    doLink(entry, fileType, destFilename, true, edits);
+                    aXmpEntriesInFile.setId(Util.createNeutralId());
+                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                    panel.getDatabase().insertEntry(aXmpEntriesInFile);
+                    doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
                 } catch (KeyCollisionException ignored) {
 
                 }
@@ -339,11 +338,10 @@ public class DroppedFileHandler {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    BibtexEntry entry = aXmpEntriesInFile;
-                    entry.setId(Util.createNeutralId());
-                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
-                    panel.getDatabase().insertEntry(entry);
-                    doLink(entry, fileType, destFilename, true, edits);
+                    aXmpEntriesInFile.setId(Util.createNeutralId());
+                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                    panel.getDatabase().insertEntry(aXmpEntriesInFile);
+                    doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
                 } catch (KeyCollisionException ignored) {
 
                 }

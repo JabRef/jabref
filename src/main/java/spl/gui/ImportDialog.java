@@ -105,12 +105,11 @@ public class ImportDialog extends JDialog {
             this.radioButtonUpdateEmptyFields.setEnabled(false);
             labelMrDlib2.setEnabled(false);
         }
-        String fileName1 = fileName;
-        String name = new File(fileName1).getName();
+        String name = new File(fileName).getName();
         if (name.length() < 34) {
             labelFileName.setText(name);
         } else {
-            labelFileName.setText(new File(fileName1).getName().substring(0, 33) + "...");
+            labelFileName.setText(new File(fileName).getName().substring(0, 33) + "...");
         }
         labelMrDlib1.addMouseListener(new LabelLinkListener(labelMrDlib1, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));
         labelMrDlib2.addMouseListener(new LabelLinkListener(labelMrDlib2, "www.mr-dlib.org/docs/pdf_metadata_extraction.php"));

@@ -24,9 +24,8 @@ public class EntryFromExternalFileCreator extends EntryFromFileCreator {
         if (!accept(file)) {
             return null;
         }
-        BibtexEntry entry = new BibtexEntry();
 
-        return entry;
+        return new BibtexEntry();
     }
 
     @Override

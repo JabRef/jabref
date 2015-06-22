@@ -55,8 +55,7 @@ public class MySQLImporter extends DBImporter {
     protected ResultSet readColumnNames(Connection conn) throws SQLException {
         Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
                 "SHOW columns FROM entries;");
-        ResultSet rs = statement.getResultSet();
-        return rs;
+        return statement.getResultSet();
     }
 
     protected Connection connectToDB(DBStrings dbstrings) throws Exception {
@@ -64,9 +63,8 @@ public class MySQLImporter extends DBImporter {
         String drv = "com.mysql.jdbc.Driver";
 
         Class.forName(drv).newInstance();
-        Connection conn = DriverManager.getConnection(url,
+        return DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
-        return conn;
     }
 
 }

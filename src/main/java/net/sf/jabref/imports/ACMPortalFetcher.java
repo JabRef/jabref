@@ -96,8 +96,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     public boolean processQueryGetPreview(String query, FetcherPreviewDialog preview, OutputPrinter status) {
-        FetcherPreviewDialog preview1 = preview;
-        OutputPrinter status1 = status;
         this.terms = query;
         piv = 0;
         shouldContinue = true;

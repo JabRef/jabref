@@ -79,9 +79,7 @@ public class LayoutHelper {
             }
         }
 
-        Layout layout = new Layout(parsedEntries, classPrefix);
-
-        return layout;
+        return new Layout(parsedEntries, classPrefix);
     }
 
     public static String getCurrentGroup() {

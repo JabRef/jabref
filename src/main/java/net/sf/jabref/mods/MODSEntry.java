@@ -178,12 +178,11 @@ public class MODSEntry {
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
     protected String getMODSgenre(BibtexEntry bibtex) {
-        String bibtexType = bibtex.getType().getName();
         /**
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>
          */
-        return bibtexType;
+        return bibtex.getType().getName();
     }
 
     public Node getDOMrepresentation() {

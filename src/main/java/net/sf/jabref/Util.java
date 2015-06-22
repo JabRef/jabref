@@ -330,9 +330,8 @@ public class Util {
 
         // Replace non-english characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
-        String newKeyS = replaceSpecialCharacters(newKey.toString());
 
-        return newKeyS;
+        return replaceSpecialCharacters(newKey.toString());
     }
 
     /**
@@ -977,9 +976,8 @@ public class Util {
     public static String getFileExtension(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf('.');
-        String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
+        return ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
                 .trim().toLowerCase() : null;
-        return extension;
     }
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
@@ -1473,10 +1471,9 @@ public class Util {
             for (String field : fields) {
                 String o = entry.getField(field);
                 if (o != null) {
-                    String s = o;
-                    if (s.trim().length() > 0) {
-                        File f = new File(s);
-                        FileListEntry flEntry = new FileListEntry(f.getName(), s,
+                    if (o.trim().length() > 0) {
+                        File f = new File(o);
+                        FileListEntry flEntry = new FileListEntry(f.getName(), o,
                                 Globals.prefs.getExternalFileTypeByExt(field));
                         tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
@@ -2114,8 +2111,7 @@ public class Util {
         Matcher m = markNumberPattern.matcher(s);
         if (m.find()) {
             try {
-                int value = Integer.parseInt(m.group(1));
-                return value;
+                return Integer.parseInt(m.group(1));
             } catch (NumberFormatException ex) {
                 return 1;
             }
@@ -2648,8 +2644,7 @@ public class Util {
         File toFile = new File(destFilename);
 
         // Rename file (or directory)
-        boolean success = fromFile.renameTo(toFile);
-        return success;
+        return fromFile.renameTo(toFile);
     }
 
     public static ArrayList<String> getSeparatedKeywords(String keywords) {

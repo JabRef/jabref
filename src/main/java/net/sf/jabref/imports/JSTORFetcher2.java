@@ -228,8 +228,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         m = nextPagePattern.matcher(entirePage);
 
         if (m.find()) {
-            String newQuery = JSTOR_URL + m.group(1);
-            return newQuery;
+            return JSTOR_URL + m.group(1);
         } else {
             return null;
         }

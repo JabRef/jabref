@@ -78,8 +78,7 @@ public class EntrySorter implements DatabaseChangeListener {
     }
 
     public boolean isOutdated() {
-        boolean outdated = false;
-        return outdated;
+        return false;
     }
 
     public String getIdAt(int pos) {

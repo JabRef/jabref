@@ -80,9 +80,7 @@ public class MsBibImporter extends ImportFormat {
 
         MSBibDatabase dbase = new MSBibDatabase();
 
-        List<BibtexEntry> entries = dbase.importEntries(in);
-
-        return entries;
+        return dbase.importEntries(in);
     }
 
     public String getFormatName() {

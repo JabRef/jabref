@@ -500,19 +500,17 @@ public class MSBibEntry {
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     protected int getLCID(String language)
     {
-        int iLCID = 0;
         // TODO: add lanaguage to LCID mapping
 
-        return iLCID;
+        return 0;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     protected String getLanguage(int LCID)
     {
-        String language = "english";
         // TODO: add lanaguage to LCID mapping
 
-        return language;
+        return "english";
     }
 
     protected List<PersonName> getSpecificAuthors(String type, Element authors, String _bcol) {

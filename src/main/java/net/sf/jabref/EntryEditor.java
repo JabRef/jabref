@@ -535,9 +535,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             else
                 off = new OpenFileFilter(new String[] {ext});
 
-            ExternalFilePanel pan = new ExternalFilePanel(frame, panel.metaData(), this, fieldName,
+            return new ExternalFilePanel(frame, panel.metaData(), this, fieldName,
                     off, ed);
-            return pan;
         }
         /*
          * else if ((s != null) && s.equals("browsePs")) { ExternalFilePanel pan =

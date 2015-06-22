@@ -242,8 +242,7 @@ public class ChangeScanner implements Runnable {
 
             for (Iterator<Integer> it = notMatched.iterator(); it.hasNext();) {
 
-                Integer integ = it.next();
-                piv1 = integ;
+                piv1 = it.next();
 
                 // These two variables will keep track of which entry most closely matches the
                 // one we're looking at, in case none matches completely.

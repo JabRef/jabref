@@ -2209,11 +2209,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
-        final boolean intoNew = intoNew_;
         importMenu.removeAll();
 
         // Add a menu item for autodetecting import format:
-        importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew));
+        importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_));
 
         // Add custom importers
         importMenu.addSeparator();
@@ -2224,7 +2223,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Put in all formatters registered in ImportFormatReader:
         for (ImportFormat imFo : customImporters) {
-            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew, imFo));
+            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
         }
 
         if (customImporters.size() > 0)
@@ -2237,7 +2236,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Put in all formatters registered in ImportFormatReader:
         for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()) {
-            importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew, imFo));
+            importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
         }
     }
 

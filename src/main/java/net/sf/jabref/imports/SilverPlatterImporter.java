@@ -103,9 +103,8 @@ public class SilverPlatterImporter extends ImportFormat {
                 if (field.length() < 6)
                     continue;
                 //System.out.println(">"+fields[j]+"<");
-                String s = field;
-                String f3 = s.substring(0, 2);
-                String frest = s.substring(5);
+                String f3 = field.substring(0, 2);
+                String frest = field.substring(5);
                 if (f3.equals("TI"))
                     h.put("title", frest);
                 //else if(f3.equals("PY")) h.put("year", frest);

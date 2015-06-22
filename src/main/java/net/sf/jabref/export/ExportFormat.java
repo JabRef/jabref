@@ -189,9 +189,8 @@ public class ExportFormat implements IExportFormat {
         Reader reader;
 
         // Check if this export filter has bundled name formatters:
-        HashMap<String, String> customNameFormatters = readFormatterFile(lfFileName);
-        // Set a global field, so all layouts have access to the custom name formatters: 
-        Globals.prefs.customExportNameFormatters = customNameFormatters;
+        // Set a global field, so all layouts have access to the custom name formatters:
+        Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
 
         ArrayList<String> missingFormatters = new ArrayList<String>(1);
 

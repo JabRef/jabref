@@ -321,15 +321,14 @@ public class JournalAbbreviations {
             cells[row][1] = getAbbreviatedName(name, true);
             row++;
         }
-        DefaultTableModel tableModel = new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
+
+        return new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
                 Globals.lang("Abbreviation")}) {
 
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
-        return tableModel;
     }
 
 }

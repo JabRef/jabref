@@ -239,9 +239,7 @@ public class ImportFormatReader {
             sb.append("\n");
         }
 
-        String res = sb.toString();
-
-        return res; //.substring(0, res.length()-1);
+        return sb.toString(); //.substring(0, res.length()-1);
     }
 
     /**

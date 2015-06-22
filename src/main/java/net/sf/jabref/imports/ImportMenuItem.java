@@ -329,8 +329,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            ParserResult pr = new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
-            return pr;
+            return new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
 
         }
     }

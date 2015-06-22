@@ -128,7 +128,6 @@ class GroupDialog extends JDialog {
             AbstractGroup editedGroup) {
         super(jabrefFrame, Globals.lang("Edit group"), true);
         m_basePanel = basePanel;
-        JabRefFrame m_parent = jabrefFrame;
         m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
@@ -159,7 +158,7 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Globals.lang("Keyword"));
         builderKG.append(m_kgSearchTerm);
-        builderKG.append(new FieldContentSelector(m_parent, m_basePanel, this,
+        builderKG.append(new FieldContentSelector(jabrefFrame, m_basePanel, this,
                 m_kgSearchTerm, m_basePanel.metaData(), null, true, ", "));
         builderKG.nextLine();
         builderKG.append(m_kgCaseSensitive, 3);
@@ -259,7 +258,7 @@ class GroupDialog extends JDialog {
         setResizable(false);
         updateComponents();
         setLayoutForSelectedGroup();
-        Util.placeDialog(this, m_parent);
+        Util.placeDialog(this, jabrefFrame);
 
         // add listeners
         ItemListener radioButtonItemListener = new ItemListener() {

@@ -159,8 +159,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         } else {
             str = determinePrefixAndReturnRemainder_AND(str);
         }
-        String[] res = super.complete(str);
-        return res;
+        return super.complete(str);
     }
 
     public String getFieldName() {

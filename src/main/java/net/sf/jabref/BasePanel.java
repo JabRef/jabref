@@ -1669,13 +1669,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param _command The name of the command to run.
      */
     public void runCommand(String _command) {
-        final String command = _command;
         //(new Thread() {
         //  public void run() {
-        if (actions.get(command) == null)
-            Util.pr("No action defined for '" + command + "'");
+        if (actions.get(_command) == null)
+            Util.pr("No action defined for '" + _command + "'");
         else {
-            Object o = actions.get(command);
+            Object o = actions.get(_command);
             try {
                 if (o instanceof BaseAction)
                     ((BaseAction) o).action();

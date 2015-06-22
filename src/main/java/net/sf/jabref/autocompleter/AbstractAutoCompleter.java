@@ -107,8 +107,7 @@ public abstract class AbstractAutoCompleter {
      */
     private static String incrementLastCharacter(String str) {
         char lastChar = str.charAt(str.length() - 1);
-        String ender = str.substring(0, str.length() - 1) + Character.toString((char) (lastChar + 1));
-        return ender;
+        return str.substring(0, str.length() - 1) + Character.toString((char) (lastChar + 1));
     }
 
     private static boolean stringMinLength(String str) {

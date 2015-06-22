@@ -703,9 +703,8 @@ public class JabRefPreferences {
     }
 
     public String get(String key) {
-        String result = prefs.get(key, (String) defaults.get(key));
         //System.out.println("READ PREF [" + key + "]=" + result);
-        return result;
+        return prefs.get(key, (String) defaults.get(key));
     }
 
     public String get(String key, String def) {
