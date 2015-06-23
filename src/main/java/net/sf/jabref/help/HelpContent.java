@@ -44,8 +44,8 @@ class HelpContent extends JTextPane {
 
     public HelpContent(JabRefPreferences prefs_) {
         super();
-        pane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
         prefs = prefs_;
         history = new Stack<URL>();

@@ -20,10 +20,7 @@ import javax.swing.text.BadLocationException;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -275,7 +272,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             return;
         }
 
-        if ((e.getModifiers() | KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {
+        if ((e.getModifiers() | InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             if (Character.isLetter(ch) || Character.isDigit(ch) || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
                 JTextComponent comp = (JTextComponent) e.getSource();

@@ -182,8 +182,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         sp.setPreferredSize(new Dimension(600, 300));

@@ -26,7 +26,7 @@ import javax.swing.SwingConstants;
 public class FieldNameLabel extends JLabel {
 
     public FieldNameLabel(String name) {
-        super(name, JLabel.LEFT);
+        super(name, SwingConstants.LEFT);
         setVerticalAlignment(SwingConstants.TOP);
         //setFont(GUIGlobals.fieldNameFont);
         setForeground(GUIGlobals.entryEditorLabelColor);

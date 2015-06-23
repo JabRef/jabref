@@ -127,7 +127,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         add(p1);
         lab = new JLabel(Globals.lang("Preview") + " 2");
         con.weighty = 0;
-        JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
         gbl.setConstraints(sep, con);
         add(sep);
         gbl.setConstraints(lab, con);

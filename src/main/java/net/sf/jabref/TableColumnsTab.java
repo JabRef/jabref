@@ -24,21 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
@@ -224,8 +210,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
         JScrollPane sp = new JScrollPane
-                (colSetup, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                (colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         tabPanel.add(sp, BorderLayout.CENTER);

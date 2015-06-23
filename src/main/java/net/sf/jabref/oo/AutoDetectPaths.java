@@ -340,7 +340,7 @@ public class AutoDetectPaths extends AbstractWorker {
     public JDialog showProgressDialog(JDialog parent, String title, String message, boolean includeCancelButton) {
         fileSearchCancelled = false;
         final JDialog prog;
-        JProgressBar bar = new JProgressBar(JProgressBar.HORIZONTAL);
+        JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 

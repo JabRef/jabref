@@ -708,8 +708,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 true);
         JEditorPane jp = new JEditorPane();
         JScrollPane sp = new JScrollPane
-                (jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                (jp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jp.setEditable(false);
         try {
             jp.setPage(GUIGlobals.class.getResource("/help/About.html"));//GUIGlobals.aboutPage);
@@ -1863,7 +1863,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             KeyBindingsDialog d = new KeyBindingsDialog
                     (new HashMap<String, String>(prefs.getKeyBindings()),
                             prefs.getDefaultKeys());
-            d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
             Util.placeDialog(d, JabRefFrame.this);
             d.setVisible(true);

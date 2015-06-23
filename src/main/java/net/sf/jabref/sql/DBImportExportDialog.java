@@ -28,17 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import net.sf.jabref.Globals;
@@ -118,7 +108,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             dialogTitle = Globals.lang("SQL Database Exporter");
             dialogTopMessage = Globals.lang("Select target SQL database:");
             tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
-            table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "exportAction");
+            table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "exportAction");
             table.getActionMap().put("exportAction", new AbstractAction() {
 
                 @Override
@@ -132,7 +122,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             dialogTitle = Globals.lang("SQL Database Importer");
             dialogTopMessage = Globals.lang("Please select which JabRef databases do you want to import:");
             tableSelectionModel = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
-            table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "importAction");
+            table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "importAction");
             table.getActionMap().put("importAction", new AbstractAction() {
 
                 @Override

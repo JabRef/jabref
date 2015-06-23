@@ -143,7 +143,7 @@ class GroupDialog extends JDialog {
         groupHierarchy.add(m_independentButton);
         groupHierarchy.add(m_intersectionButton);
         groupHierarchy.add(m_unionButton);
-        m_description.setVerticalAlignment(JLabel.TOP);
+        m_description.setVerticalAlignment(SwingConstants.TOP);
         getRootPane().setDefaultButton(m_ok);
 
         // build individual layout cards for each group
@@ -234,8 +234,8 @@ class GroupDialog extends JDialog {
         builderAll.nextLine();
         builderAll.nextLine();
         JScrollPane sp = new JScrollPane(m_description,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
 
             @Override
             public Dimension getPreferredSize() {

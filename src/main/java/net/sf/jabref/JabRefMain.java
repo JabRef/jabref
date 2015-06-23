@@ -22,10 +22,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 
 /**
  * This is a class compiled under Java 1.4.2 that will start the real JabRef and
@@ -128,7 +125,7 @@ public class JabRefMain {
 
             Component componentToDisplay;
             if (pane.getPreferredSize().getHeight() > 700) {
-                JScrollPane sPane = new JScrollPane(pane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                JScrollPane sPane = new JScrollPane(pane, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
                 sPane.setBorder(BorderFactory.createEmptyBorder());
                 sPane.setPreferredSize(new Dimension((int) pane.getPreferredSize().getWidth() + 30, 700));
                 componentToDisplay = sPane;

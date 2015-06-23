@@ -26,21 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -76,7 +62,7 @@ public class FileListEntryEditor {
     private final JButton open = new JButton(Globals.lang("Open"));
 
     private final JComboBox types;
-    private final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
+    private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
     private ConfirmCloseFileListEntryEditor externalConfirm = null;
 

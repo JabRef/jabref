@@ -46,25 +46,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
@@ -361,7 +343,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupToolBar() {
         JPanel leftPan = new JPanel();
         leftPan.setLayout(new BorderLayout());
-        tlb = new JToolBar(JToolBar.VERTICAL);
+        tlb = new JToolBar(SwingConstants.VERTICAL);
         //tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
@@ -615,8 +597,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         setupJTextComponent(source);
         updateSource();
 
-        JScrollPane sp = new JScrollPane(source, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(source, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         //builder.append(sp);
 
         srcPanel.setLayout(new BorderLayout());

@@ -20,30 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
@@ -115,7 +99,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final MetaData metaData;
 
-    private final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    private final UIFSplitPane contentPane = new UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     private final JTable glTable;
 
@@ -125,7 +109,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final String[] fields;
 
-    private final JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+    private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
     private final JButton ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(
@@ -241,7 +225,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         comparatorChooser = TableComparatorChooser.install(glTable, sortedList,
-                TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 

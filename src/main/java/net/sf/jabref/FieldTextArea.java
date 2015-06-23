@@ -66,8 +66,8 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
         // was focused when an action was called.
         addFocusListener(Globals.focusListener);
         addFocusListener(new FieldEditorFocusListener());
-        sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sp = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setMinimumSize(new Dimension(200, 1));
 
         setLineWrap(true);

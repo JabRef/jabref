@@ -156,8 +156,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         // Set up scroll pane for preview pane
         scrollPane = new JScrollPane(previewPane,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
 
         /*
@@ -277,7 +277,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private JToolBar createToolBar() {
 
-        JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
+        JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Action printAction = getPrintAction();
         Action closeAction = getCloseAction();

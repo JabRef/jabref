@@ -25,12 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
@@ -47,7 +42,7 @@ class EntryEditorTab {
     private final JPanel panel = new JPanel();
 
     private final JScrollPane scrollPane = new JScrollPane(panel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     private final String[] fields;
 

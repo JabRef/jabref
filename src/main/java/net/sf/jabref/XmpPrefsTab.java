@@ -120,8 +120,8 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setPreferredScrollableViewportSize(new Dimension(250, 200));
         scrollPane.setMinimumSize(new Dimension(250, 300));
         tablePanel.add(scrollPane, BorderLayout.CENTER);

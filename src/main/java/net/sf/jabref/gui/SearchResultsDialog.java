@@ -25,18 +25,10 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.BasicEventList;
@@ -79,7 +71,7 @@ public class SearchResultsDialog {
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    private final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    private final UIFSplitPane contentPane = new UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
     private PreviewPanel preview;
 
 
@@ -107,7 +99,7 @@ public class SearchResultsDialog {
         setWidths();
         TableComparatorChooser<BibtexEntry> tableSorter =
                 TableComparatorChooser.install(entryTable, sortedEntries,
-                        TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                        AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 

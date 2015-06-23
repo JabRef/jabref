@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import java.awt.Color;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -917,15 +918,15 @@ public class JabRefPreferences {
             return null;
         }
         int keyCode = ks.getKeyCode();
-        if ((ks.getModifiers() & KeyEvent.CTRL_MASK) == 0) {
+        if ((ks.getModifiers() & InputEvent.CTRL_MASK) == 0) {
             return ks;
         } else {
             int modifiers = 0;
-            if ((ks.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-                modifiers = modifiers | KeyEvent.SHIFT_MASK;
+            if ((ks.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+                modifiers = modifiers | InputEvent.SHIFT_MASK;
             }
-            if ((ks.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                modifiers = modifiers | KeyEvent.ALT_MASK;
+            if ((ks.getModifiers() & InputEvent.ALT_MASK) != 0) {
+                modifiers = modifiers | InputEvent.ALT_MASK;
             }
 
             return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask() + modifiers);
