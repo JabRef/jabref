@@ -23,6 +23,8 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 
 Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](formatter_settings.xml).
+Ensure that JabRef's code cleanup settings are activated.
+Import [cleanup_settings.xml](cleanup_settings.xml).
 
 
 ### Add your change to the CHANGELOG
