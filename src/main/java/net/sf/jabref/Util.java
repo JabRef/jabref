@@ -37,12 +37,9 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,13 +96,6 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class Util {
 
-    /**
-     * A static Object for date formatting. Please do not create the object
-     * here, because there are some references from the Globals class.....
-     * 
-     */
-    private static SimpleDateFormat dateFormatter = null;
-
     /*
      * Integer values for indicating result of duplicate check (for entries):
      * 
@@ -116,12 +106,6 @@ public class Util {
 
 
     private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
-
-    public static final int MARK_COLOR_LEVELS = 6;
-    public static final int MAX_MARKING_LEVEL = Util.MARK_COLOR_LEVELS - 1;
-    private static final int IMPORT_MARK_LEVEL = Util.MARK_COLOR_LEVELS;
-    private static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
-
 
 
     public static void pr(String s) {
@@ -951,8 +935,8 @@ public class Util {
         // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (Util.checkForPlainDOI(link) && !link.startsWith("http://")) {
-            link = Globals.DOI_LOOKUP_PREFIX + Util.getDOI(link);
+        if (DOIUtil.checkForPlainDOI(link) && !link.startsWith("http://")) {
+            link = Globals.DOI_LOOKUP_PREFIX + DOIUtil.getDOI(link);
         }
 
         link = link.replaceAll("\\+", "%2B");
@@ -1314,7 +1298,7 @@ public class Util {
         String timeStampField = Globals.prefs.get("timeStampField");
 
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = Util.easyDateFormat();
+        String timestamp = EasyDateFormat.easyDateFormat();
         boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"), globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
 
         // Do not need to do anything if all options are disabled
@@ -1331,10 +1315,9 @@ public class Util {
             Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
                     timestamp);
             if (markEntries) {
-                Util.markEntry(curEntry, Util.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+                EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
             }
         }
-
     }
 
     /**
@@ -1352,7 +1335,7 @@ public class Util {
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner,
             boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = Util.easyDateFormat();
+        String timestamp = EasyDateFormat.easyDateFormat();
         String timeStampField = Globals.prefs.get("timeStampField");
         boolean setOwner = Globals.prefs.getBoolean("useOwner") &&
                 (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
@@ -1737,14 +1720,6 @@ public class Util {
         // return true; // found no side effects
     }
 
-
-    // ========================================================
-    // lot of abreviations in medline
-    // PKC etc convert to {PKC} ...
-    // ========================================================
-    static Pattern titleCapitalPattern = Pattern.compile("[A-Z]+");
-
-
     /**
      * Wrap all uppercase letters, or sequences of uppercase letters, in curly
      * braces. Ignore letters within a pair of # character, as these are part of
@@ -1952,213 +1927,6 @@ public class Util {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Creates a String containing the current date (and possibly time),
-     * formatted according to the format set in preferences under the key
-     * "timeStampFormat".
-     * 
-     * @return The date string.
-     */
-    public static String easyDateFormat() {
-        // Date today = new Date();
-        return Util.easyDateFormat(new Date());
-    }
-
-    /**
-     * Creates a readable Date string from the parameter date. The format is set
-     * in preferences under the key "timeStampFormat".
-     * 
-     * @return The formatted date string.
-     */
-    public static String easyDateFormat(Date date) {
-        // first use, create an instance
-        if (Util.dateFormatter == null) {
-            String format = Globals.prefs.get("timeStampFormat");
-            Util.dateFormatter = new SimpleDateFormat(format);
-        }
-        return Util.dateFormatter.format(date);
-    }
-
-    /**
-     * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
-     */
-    public static void markEntry(BibtexEntry be, int markIncrement, boolean increment, NamedCompound ce) {
-        Object o = be.getField(BibtexFields.MARKED);
-        int prevMarkLevel;
-        String newValue = null;
-        if (o != null) {
-            String s = o.toString();
-            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
-            if (index >= 0) {
-                // Already marked 1 for this user.
-                prevMarkLevel = 1;
-                newValue = s.substring(0, index)
-                        + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length())
-                        + Globals.prefs.WRAPPED_USERNAME.substring(0,
-                                Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" +
-                        (increment ? Math.min(Util.MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
-                                : markIncrement) + "]";
-            }
-            else {
-                Matcher m = Util.markNumberPattern.matcher(s);
-                if (m.find()) {
-                    try {
-                        prevMarkLevel = Integer.parseInt(m.group(1));
-                        newValue = s.substring(0, m.start(1)) +
-                                (increment ? Math.min(Util.MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
-                                        : markIncrement) +
-                                s.substring(m.end(1));
-                    } catch (NumberFormatException ex) {
-                        // Do nothing.
-                    }
-                }
-            }
-        }
-        if (newValue == null) {
-            newValue = Globals.prefs.WRAPPED_USERNAME.substring(0,
-                    Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
-        }
-
-        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                .getField(BibtexFields.MARKED), newValue));
-        be.setField(BibtexFields.MARKED, newValue);
-    }
-
-    /**
-     * SIDE EFFECT: Unselectes given entry
-     */
-    public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel,
-            BibtexDatabase database, NamedCompound ce) {
-        Object o = be.getField(BibtexFields.MARKED);
-        if (o != null) {
-            String s = o.toString();
-            if (s.equals("0")) {
-                if (!onlyMaxLevel) {
-                    Util.unmarkOldStyle(be, database, ce);
-                }
-                return;
-            }
-            String newValue = null;
-            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
-            if (index >= 0) {
-                // Marked 1 for this user.
-                if (!onlyMaxLevel) {
-                    newValue = s.substring(0, index)
-                            + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
-                } else {
-                    return;
-                }
-            }
-            else {
-                Matcher m = Util.markNumberPattern.matcher(s);
-                if (m.find()) {
-                    try {
-                        int prevMarkLevel = Integer.parseInt(m.group(1));
-                        if (!onlyMaxLevel || (prevMarkLevel == Util.MARK_COLOR_LEVELS)) {
-                            if (prevMarkLevel > 1) {
-                                newValue = s.substring(0, m.start(1)) +
-                                        s.substring(m.end(1));
-                            } else {
-                                String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0,
-                                        Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
-                                index = s.indexOf(toRemove);
-                                if (index >= 0) {
-                                    newValue = s.substring(0, index)
-                                            + s.substring(index + toRemove.length());
-                                }
-                            }
-                        } else {
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        // Do nothing.
-                    }
-                }
-            }
-
-            /*int piv = 0, hit;
-            StringBuffer sb = new StringBuffer();
-            while ((hit = s.indexOf(G047749118118
-            1110lobals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
-            	if (hit > 0)
-            		sb.append(s.substring(piv, hit));
-            	piv = hit + Globals.prefs.WRAPPED_USERNAME.length();
-            }
-            if (piv < s.length() - 1) {
-            	sb.append(s.substring(piv));
-            }
-            String newVal = sb.length() > 0 ? sb.toString() : null;*/
-            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                    .getField(BibtexFields.MARKED), newValue));
-            be.setField(BibtexFields.MARKED, newValue);
-        }
-    }
-
-    /**
-     * An entry is marked with a "0", not in the new style with user names. We
-     * want to unmark it as transparently as possible. Since this shouldn't
-     * happen too often, we do it by scanning the "owner" fields of the entire
-     * database, collecting all user names. We then mark the entry for all users
-     * except the current one. Thus only the user who unmarks will see that it
-     * is unmarked, and we get rid of the old-style marking.
-     * 
-     * @param be
-     * @param ce
-     */
-    private static void unmarkOldStyle(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
-        TreeSet<Object> owners = new TreeSet<Object>();
-        for (BibtexEntry entry : database.getEntries()) {
-            Object o = entry.getField(BibtexFields.OWNER);
-            if (o != null)
-             {
-                owners.add(o);
-            // System.out.println("Owner: "+entry.getField(Globals.OWNER));
-            }
-        }
-        owners.remove(Globals.prefs.get("defaultOwner"));
-        StringBuffer sb = new StringBuffer();
-        for (Object owner : owners) {
-            sb.append('[');
-            sb.append(owner.toString());
-            sb.append(']');
-        }
-        String newVal = sb.toString();
-        if (newVal.length() == 0) {
-            newVal = null;
-        }
-        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                .getField(BibtexFields.MARKED), newVal));
-        be.setField(BibtexFields.MARKED, newVal);
-
-    }
-
-    public static int isMarked(BibtexEntry be) {
-        Object fieldVal = be.getField(BibtexFields.MARKED);
-        if (fieldVal == null) {
-            return 0;
-        }
-        String s = (String) fieldVal;
-        if (s.equals("0")) {
-            return 1;
-        }
-        int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
-        if (index >= 0) {
-            return 1;
-        }
-
-        Matcher m = Util.markNumberPattern.matcher(s);
-        if (m.find()) {
-            try {
-                return Integer.parseInt(m.group(1));
-            } catch (NumberFormatException ex) {
-                return 1;
-            }
-        } else {
-            return 0;
-        }
-
     }
 
     /**
@@ -2555,61 +2323,6 @@ public class Util {
         return targetName;
     }
 
-
-    // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
-    // Some DOI's are not caught by the regexp in the above link, i.e. 10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S
-    // Removed <> from non-permitted characters
-    private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'])\\S)+)\\b";
-    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + Util.REGEXP_PLAINDOI;
-    private static final Pattern PATTERN_PLAINDOI = Pattern.compile(Util.REGEXP_PLAINDOI);
-
-
-    /**
-     * Check if the String matches a DOI (with http://...)
-     */
-    public static boolean checkForDOIwithHTTPprefix(String check) {
-        return (check != null) && check.matches(".*" + Util.REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
-    }
-
-    /**
-     * 
-     * @param check - string to check
-     * @return true if "check" contains a DOI
-     */
-    public static boolean checkForPlainDOI(String check) {
-        return (check != null) && check.matches(".*" + Util.REGEXP_PLAINDOI + ".*");
-    }
-
-    /**
-     * Remove the http://... from DOI
-     * 
-     * @param doi - may not be null
-     * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
-     */
-    public static String getDOI(String doi) {
-        Matcher matcher = Util.PATTERN_PLAINDOI.matcher(doi);
-        if (matcher.find()) {
-            return matcher.group();
-        } else {
-            return doi;
-        }
-    }
-
-    public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
-        String origValue = bes.getField(fieldName);
-        String value = origValue;
-        value = value.replaceAll(Util.REGEXP_DOI_WITH_HTTP_PREFIX, "");
-        value = value.replaceAll(Util.REGEXP_PLAINDOI, "");
-        value = value.trim();
-        if (value.isEmpty()) {
-            value = null;
-        }
-        if (!origValue.equals(value)) {
-            ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
-            bes.setField(fieldName, value);
-        }
-    }
-
     /**
      * 
      * @param fileName
@@ -2766,7 +2479,7 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get("timeStampField");
-        String timestamp = Util.easyDateFormat();
+        String timestamp = EasyDateFormat.easyDateFormat();
         Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }

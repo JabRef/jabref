@@ -1579,7 +1579,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                     NamedCompound ce = new NamedCompound(Globals.lang("Unmark entries"));
                     for (BibtexEntry be : bes) {
-                        Util.unmarkEntry(be, false, database, ce);
+                        EntryMarker.unmarkEntry(be, false, database, ce);
                     }
                     ce.end();
                     undoManager.addEdit(ce);
@@ -1604,7 +1604,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 NamedCompound ce = new NamedCompound(Globals.lang("Unmark all"));
 
                 for (BibtexEntry be : database.getEntries()) {
-                    Util.unmarkEntry(be, false, database, ce);
+                    EntryMarker.unmarkEntry(be, false, database, ce);
                 }
                 ce.end();
                 undoManager.addEdit(ce);

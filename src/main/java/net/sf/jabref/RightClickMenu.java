@@ -148,7 +148,7 @@ public class RightClickMenu extends JPopupMenu
 
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
         JabRefFrame frame = panel.frame;
-        for (int i = 0; i < Util.MAX_MARKING_LEVEL; i++) {
+        for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
         }
 

@@ -30,14 +30,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
-
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -241,7 +236,7 @@ public class PdfContentImporter extends ImportFormat {
             stripper.writeText(document, writer);
             String textResult = writer.toString();
 
-            String doi = Util.getDOI(textResult);
+            String doi = DOIUtil.getDOI(textResult);
             if (doi.length() < textResult.length()) {
                 // A DOI was found in the text
                 // We do NO parsing of the text, but use the DOI fetcher

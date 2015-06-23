@@ -710,7 +710,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 // Check if we should unmark entries before adding the new ones:
                 if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
                     for (BibtexEntry entry : panel.database().getEntries()) {
-                        Util.unmarkEntry(entry, true, panel.database(), ce);
+                        EntryMarker.unmarkEntry(entry, true, panel.database(), ce);
                     }
                 }
 

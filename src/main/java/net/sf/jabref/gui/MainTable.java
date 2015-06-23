@@ -272,7 +272,7 @@ public class MainTable extends JTable {
                 MainTable.compRenderer.setNumber(row);
                 int marking = isMarked(row);
                 if (marking > 0) {
-                    marking = Math.min(marking, Util.MARK_COLOR_LEVELS);
+                    marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
                     renderer = MainTable.markedNumberRenderers[marking - 1];
                     MainTable.markedNumberRenderers[marking - 1].setNumber(row);
                 } else {
@@ -294,7 +294,7 @@ public class MainTable extends JTable {
         // For MARKED feature:
         int marking = isMarked(row);
         if ((column != 0) && (marking > 0)) {
-            marking = Math.min(marking, Util.MARK_COLOR_LEVELS);
+            marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
             renderer = MainTable.markedRenderers[marking - 1];
         }
 
@@ -543,7 +543,7 @@ public class MainTable extends JTable {
     private int isMarked(int row) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
-            return Util.isMarked(be);
+            return EntryMarker.isMarked(be);
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isMarked");
             return 0;
@@ -646,9 +646,9 @@ public class MainTable extends JTable {
                 Globals.prefs.getColor("veryGrayedOutText"), MainTable.mixColors(Globals.prefs.getColor("veryGrayedOutBackground"),
                         sel));
 
-        MainTable.markedRenderers = new GeneralRenderer[Util.MARK_COLOR_LEVELS];
-        MainTable.markedNumberRenderers = new CompleteRenderer[Util.MARK_COLOR_LEVELS];
-        for (int i = 0; i < Util.MARK_COLOR_LEVELS; i++) {
+        MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
+        MainTable.markedNumberRenderers = new CompleteRenderer[EntryMarker.MARK_COLOR_LEVELS];
+        for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
             Color c = Globals.prefs.getColor("markedEntryBackground" + i);
             MainTable.markedRenderers[i] = new GeneralRenderer(c,
                     Globals.prefs.getColor("tableText"), MainTable.mixColors(Globals.prefs.getColor("markedEntryBackground" + i), sel));

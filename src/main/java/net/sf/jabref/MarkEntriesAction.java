@@ -71,7 +71,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         if (bes.length != 0) {
             NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
             for (BibtexEntry be : bes) {
-                Util.markEntry(be, level + 1, false, ce);
+                EntryMarker.markEntry(be, level + 1, false, ce);
             }
             ce.end();
             panel.undoManager.addEdit(ce);

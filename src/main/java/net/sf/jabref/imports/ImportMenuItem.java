@@ -207,7 +207,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // Check if we should unmark entries before adding the new ones:
                         if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
                             for (BibtexEntry entry : toAddTo.getEntries()) {
-                                Util.unmarkEntry(entry, true, toAddTo, ce);
+                                EntryMarker.unmarkEntry(entry, true, toAddTo, ce);
                             }
                         }
 

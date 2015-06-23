@@ -1351,7 +1351,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.addSeparator();
         edit.add(mark);
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
-        for (int i = 0; i < Util.MAX_MARKING_LEVEL; i++) {
+        for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
         }
         edit.add(markSpecific);

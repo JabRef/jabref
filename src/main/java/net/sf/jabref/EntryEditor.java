@@ -456,7 +456,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) // double click
                     {
-                        String date = Util.easyDateFormat();
+                        String date = EasyDateFormat.easyDateFormat();
                         ed.setText(date);
                     }
                 }

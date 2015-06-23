@@ -40,7 +40,7 @@ class MarkedComparator implements Comparator<BibtexEntry> {
             return 0;
         }
 
-        int mrk1 = Util.isMarked(e1), mrk2 = Util.isMarked(e2);
+        int mrk1 = EntryMarker.isMarked(e1), mrk2 = EntryMarker.isMarked(e2);
 
         if (mrk1 == mrk2) {
             return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
