@@ -31,7 +31,7 @@ class StringAddChange extends Change {
 
 
     public StringAddChange(BibtexString string) {
-        name = Globals.lang("Added string") + ": '" + string.getName() + "'";
+        name = Globals.lang("Added string") + ": '" + string.getName() + '\'';
         this.string = string;
 
         tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");

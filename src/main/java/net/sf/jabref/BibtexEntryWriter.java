@@ -85,10 +85,10 @@ public class BibtexEntryWriter {
      */
     private void writeSorted(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName() + "{");
+        out.write('@' + entry.getType().getName() + '{');
 
         String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         // Write required fields first.
@@ -137,7 +137,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
     /**
@@ -149,10 +149,10 @@ public class BibtexEntryWriter {
      */
     private void writeUnsorted(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName().toUpperCase(Locale.US) + "{");
+        out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
         String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
@@ -189,15 +189,15 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
     private void writeUserDefinedOrder(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName() + "{");
+        out.write('@' + entry.getType().getName() + '{');
 
         String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
@@ -237,7 +237,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
 
     }
 
@@ -256,7 +256,7 @@ public class BibtexEntryWriter {
         String o = entry.getField(name);
         if ((o != null) || includeEmptyFields) {
             if (isNotFirst) {
-                out.write("," + Globals.NEWLINE);
+                out.write(',' + Globals.NEWLINE);
             }
             if (isNextGroup) {
                 out.write(Globals.NEWLINE);

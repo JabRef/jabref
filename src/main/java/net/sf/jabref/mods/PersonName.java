@@ -80,7 +80,7 @@ public class PersonName {
             givenName = v.get(0);
             middleName = "";
             for (int i = 1; i < (amountOfNames - 1); i++) {
-                middleName += " " + v.get(i);
+                middleName += ' ' + v.get(i);
             }
             middleName = middleName.trim();
             surname = v.get(amountOfNames - 1);
@@ -93,7 +93,7 @@ public class PersonName {
             result += givenName;
         }
         if (middleName != null) {
-            result += " " + middleName;
+            result += ' ' + middleName;
         }
         return result;
     }
@@ -132,10 +132,10 @@ public class PersonName {
     {
         String fullName = "";
         if ((givenName != null) && !givenName.isEmpty()) {
-            fullName += givenName + " ";
+            fullName += givenName + ' ';
         }
         if ((middleName != null) && !middleName.isEmpty()) {
-            fullName += middleName + " ";
+            fullName += middleName + ' ';
         }
         if ((surname != null) && !surname.isEmpty()) {
             fullName += surname;

@@ -37,7 +37,7 @@ class StringRemoveChange extends Change {
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
         this.tmpString = tmpString;
-        name = Globals.lang("Removed string") + ": '" + string.getName() + "'";
+        name = Globals.lang("Removed string") + ": '" + string.getName() + '\'';
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 

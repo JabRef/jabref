@@ -59,7 +59,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
             addFocusListener(new FieldEditorFocusListener());
         }
         fieldName = fieldName_;
-        label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
+        label = new FieldNameLabel(' ' + Util.nCase(fieldName) + ' ');
         // label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
         // label.setBorder(BorderFactory.createEtchedBorder());
         setBackground(GUIGlobals.validFieldBackgroundColor);

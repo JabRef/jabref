@@ -414,7 +414,7 @@ public class XMPUtil {
             StringBuffer sb = null;
             while (it.hasNext()) {
                 if (sb != null) {
-                    sb.append(",");
+                    sb.append(',');
                 } else {
                     sb = new StringBuffer();
                 }
@@ -869,7 +869,7 @@ public class XMPUtil {
              * relation attribute
              */
             String o = entry.getField(field);
-            dcSchema.addRelation("bibtex/" + field + "/" + o);
+            dcSchema.addRelation("bibtex/" + field + '/' + o);
         }
 
         /**

@@ -77,9 +77,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         memoryStick = new JCheckBox(Globals.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         defSort = new JCheckBox(Globals.lang("Sort Automatically"));
         ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
-        useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
+        useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ':');
         useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
-                + Globals.lang("Date format") + ":");
+                + Globals.lang("Date format") + ':');
         useTimeStamp.addChangeListener(new ChangeListener() {
 
             @Override
@@ -168,7 +168,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(useTimeStamp, 3);
         builder.append(timeStampFormat);
         builder.append(overwriteTimeStamp);
-        builder.append(Globals.lang("Field name") + ":");
+        builder.append(Globals.lang("Field name") + ':');
         builder.append(timeStampField);
 
         hlp = new JButton(timeStampHelp);
@@ -186,11 +186,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(unmarkAllEntriesBeforeImporting, 13);
         builder.nextLine();
         JLabel lab;
-        lab = new JLabel(Globals.lang("Language") + ":");
+        lab = new JLabel(Globals.lang("Language") + ':');
         builder.append(lab, 3);
         builder.append(language);
         builder.nextLine();
-        lab = new JLabel(Globals.lang("Default encoding") + ":");
+        lab = new JLabel(Globals.lang("Default encoding") + ':');
         builder.append(lab, 3);
         builder.append(encodings);
 
@@ -274,7 +274,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
         String owner = defOwnerField.getText().trim();
         _prefs.put("defaultOwner", owner);
-        _prefs.WRAPPED_USERNAME = "[" + owner + "]";
+        _prefs.WRAPPED_USERNAME = '[' + owner + ']';
         _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
         _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());

@@ -67,7 +67,7 @@ class DocumentWrapper {
             for (Bean author : authors) {
                 if (i < authors.size()) {
                     value = value + getNameComplete((Author) author);
-                    value = value + " " + seperator + " ";
+                    value = value + ' ' + seperator + ' ';
                 }
                 else {
                     value = value + getNameComplete((Author) author);
@@ -226,19 +226,19 @@ class DocumentWrapper {
         }
         String result = "";
         if (getSimpleTypeValue(author.getName_First()) != null) {
-            result = result + getSimpleTypeValue(author.getName_First()).trim() + " ";
+            result = result + getSimpleTypeValue(author.getName_First()).trim() + ' ';
         }
         if (getSimpleTypeValue(author.getName_Middle()) != null) {
-            result = result + getSimpleTypeValue(author.getName_Middle()).trim() + " ";
+            result = result + getSimpleTypeValue(author.getName_Middle()).trim() + ' ';
         }
         if (getSimpleTypeValue(author.getName_Last_Prefix()) != null) {
-            result = result + getSimpleTypeValue(author.getName_Last_Prefix()).trim() + " ";
+            result = result + getSimpleTypeValue(author.getName_Last_Prefix()).trim() + ' ';
         }
         if (getSimpleTypeValue(author.getName_Last()) != null) {
-            result = result + getSimpleTypeValue(author.getName_Last()).trim() + " ";
+            result = result + getSimpleTypeValue(author.getName_Last()).trim() + ' ';
         }
         if (getSimpleTypeValue(author.getName_Last_Suffix()) != null) {
-            result = result + getSimpleTypeValue(author.getName_Last_Suffix()).trim() + " ";
+            result = result + getSimpleTypeValue(author.getName_Last_Suffix()).trim() + ' ';
         }
         return result.trim();
     }

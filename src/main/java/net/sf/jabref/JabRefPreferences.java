@@ -609,7 +609,7 @@ public class JabRefPreferences {
 
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
-        WRAPPED_USERNAME = "[" + get("defaultOwner") + "]";
+        WRAPPED_USERNAME = '[' + get("defaultOwner") + ']';
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get("defaultOwner").replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
@@ -623,12 +623,12 @@ public class JabRefPreferences {
 
         defaults.put("userFileDir", GUIGlobals.FILE_FIELD + "Directory");
         try {
-            defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "@" + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner") + "-" + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner") + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+            defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner") + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
             Globals.logger("Hostname not found.");
-            defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
-            defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + "-" + get("defaultOwner"));
+            defaults.put("userFileDirInd_Legacy", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner"));
+            defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner"));
         }
     }
 
@@ -784,7 +784,7 @@ public class JabRefPreferences {
             StringBuilder linked = new StringBuilder();
             for (int i = 0; i < (value.length - 1); i++) {
                 linked.append(makeEscape(value[i]));
-                linked.append(";");
+                linked.append(';');
             }
             linked.append(makeEscape(value[value.length - 1]));
             put(key, linked.toString());
@@ -891,7 +891,7 @@ public class JabRefPreferences {
             if (s == null) {
                 // there isn't even a default value
                 // Output error
-                Globals.logger("Could not get key binding for \"" + bindName + "\"");
+                Globals.logger("Could not get key binding for \"" + bindName + '"');
                 // fall back to a default value
                 s = "Not associated";
             }

@@ -295,7 +295,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             return sb.toString();
         }
         // describe advanced search expression
-        sb.append(Globals.lang("This group contains entries in which")).append(" ");
+        sb.append(Globals.lang("This group contains entries in which")).append(' ');
         sb.append(SearchGroup.describeNode(ast, regExp, false, false, false));
         sb.append(". ");
         sb.append(caseSensitive ? Globals.lang("The search is case sensitive.")
@@ -309,33 +309,33 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:
             if (not) {
-                sb.append(Globals.lang("not")).append(" ");
+                sb.append(Globals.lang("not")).append(' ');
             }
             // if there was an "or" in this subtree so far, braces may be needed
             if (or || not) {
-                sb.append("(");
+                sb.append('(');
             }
             sb.append(SearchGroup.describeNode(node.getFirstChild(), regExp,
-                    false, true, false)).append(" ").append(Globals.lang("and")).append(" ").append(SearchGroup.describeNode(node.getFirstChild()
+                    false, true, false)).append(' ').append(Globals.lang("and")).append(' ').append(SearchGroup.describeNode(node.getFirstChild()
                     .getNextSibling(), regExp, false, true, false));
             if (or || not) {
-                sb.append(")");
+                sb.append(')');
             }
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Or:
             if (not) {
-                sb.append(Globals.lang("not")).append(" ");
+                sb.append(Globals.lang("not")).append(' ');
             }
             // if there was an "and" in this subtree so far, braces may be
             // needed
             if (and || not) {
-                sb.append("(");
+                sb.append('(');
             }
             sb.append(SearchGroup.describeNode(node.getFirstChild(), regExp,
-                    false, false, true)).append(" ").append(Globals.lang("or")).append(" ").append(SearchGroup.describeNode(node.getFirstChild()
+                    false, false, true)).append(' ').append(Globals.lang("or")).append(' ').append(SearchGroup.describeNode(node.getFirstChild()
                     .getNextSibling(), regExp, false, false, true));
             if (and || not) {
-                sb.append(")");
+                sb.append(')');
             }
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Not:

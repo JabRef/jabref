@@ -200,7 +200,7 @@ public class CustomEntryType extends BibtexEntryType {
                 for (int j = 0; j < reqSets[reqSetsPiv].length; j++) {
                     sb.append(reqSets[reqSetsPiv][j]);
                     if (j < (reqSets[reqSetsPiv].length - 1)) {
-                        sb.append("/");
+                        sb.append('/');
                     }
                 }
                 // Skip next n-1 fields:
@@ -210,7 +210,7 @@ public class CustomEntryType extends BibtexEntryType {
                 sb.append(req[i]);
             }
             if (i < (req.length - 1)) {
-                sb.append(";");
+                sb.append(';');
             }
 
         }
@@ -235,7 +235,7 @@ public class CustomEntryType extends BibtexEntryType {
         for (int i = 0; i < opt.length; i++) {
             sb.append(opt[i]);
             if (i < (opt.length - 1)) {
-                sb.append(";");
+                sb.append(';');
             }
         }
         out.write(sb.toString());

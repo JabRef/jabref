@@ -59,7 +59,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
     private String makeProperty(String propertyName) {
-        return XMPSchemaBibtex.KEY + ":" + propertyName;
+        return XMPSchemaBibtex.KEY + ':' + propertyName;
     }
 
     /**

@@ -42,9 +42,9 @@ class CustomExportDialog extends JDialog {
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
     private final JLabel
-            nl = new JLabel(Globals.lang("Export name") + ":");
-    private final JLabel nr = new JLabel(Globals.lang("Main layout file") + ":");
-    private final JLabel nf = new JLabel(Globals.lang("File extension") + ":");
+            nl = new JLabel(Globals.lang("Export name") + ':');
+    private final JLabel nr = new JLabel(Globals.lang("Main layout file") + ':');
+    private final JLabel nf = new JLabel(Globals.lang("File extension") + ':');
     private final JButton
             ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
@@ -233,7 +233,7 @@ class CustomExportDialog extends JDialog {
         } else if (ext.startsWith("*.")) {
             return ext.substring(1);
         } else {
-            return "." + ext;
+            return '.' + ext;
         }
     }
 

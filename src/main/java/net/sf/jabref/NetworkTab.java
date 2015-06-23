@@ -79,12 +79,12 @@ public class NetworkTab extends JPanel implements PrefsTab {
         builder.append(useProxy, 5);
         builder.nextLine();
         builder.append(new JPanel());
-        JLabel lap = new JLabel(Globals.lang("Host") + ":");
+        JLabel lap = new JLabel(Globals.lang("Host") + ':');
         builder.append(lap);
         builder.append(defProxyHostname);
         builder.nextLine();
         builder.append(new JPanel());
-        JLabel lap2 = new JLabel(Globals.lang("Port") + ":");
+        JLabel lap2 = new JLabel(Globals.lang("Port") + ':');
         builder.append(lap2);
         //builder.append(new JPanel());
         builder.append(defProxyPort);

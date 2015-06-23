@@ -188,7 +188,7 @@ public class LayoutHelper {
                     //myStrings.add(buffer.toString());
                     if (option != null)
                     {
-                        tmp = buffer.toString() + "\n" + option;
+                        tmp = buffer.toString() + '\n' + option;
                     }
                     else
                     {
@@ -233,7 +233,7 @@ public class LayoutHelper {
                         String parameter = buffer == null ? " " : buffer.toString();
                         if (option != null)
                         {
-                            tmp = parameter + "\n" + option;
+                            tmp = parameter + '\n' + option;
                         }
                         else
                         {
@@ -375,7 +375,7 @@ public class LayoutHelper {
                     for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6), parsedEntries.size() - 1)) {
                         lastFive.append(entry.s);
                     }
-                    throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") + "\'");
+                    throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
                 //System.out.println("NAME:" + name);

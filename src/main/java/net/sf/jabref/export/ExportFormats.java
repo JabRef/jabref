@@ -246,7 +246,7 @@ public class ExportFormats {
                     file = new File(path);
                     if (file.exists()) {
                         // Warn that the file exists:
-                        if (JOptionPane.showConfirmDialog(frame, "'" + file.getName() + "' "
+                        if (JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' "
                                 + Globals.lang("exists. Overwrite file?"), Globals.lang("Export"),
                                 JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;

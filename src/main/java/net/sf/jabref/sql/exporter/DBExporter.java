@@ -127,10 +127,10 @@ public abstract class DBExporter extends DBImporterExporter {
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, "
                 + fieldStr + ", database_id) VALUES (";
         for (BibtexEntry entry : entries) {
-            query = insert + "'" + entry.getId() + "'"
+            query = insert + '\'' + entry.getId() + '\''
                     + ", (SELECT entry_types_id FROM entry_types WHERE label='"
                     + entry.getType().getName().toLowerCase() + "'), '"
-                    + entry.getCiteKey() + "'";
+                    + entry.getCiteKey() + '\'';
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
@@ -139,7 +139,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     val = val.replace("\"", "\\\"");
                     val = val.replace("\'", "''");
                     val = val.replace("`", "\\`");
-                    query = query + "'" + val + "'";
+                    query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
                 }
@@ -176,14 +176,14 @@ public abstract class DBExporter extends DBImporterExporter {
                         "INSERT INTO entry_group (entries_id, groups_id) "
                                 + "VALUES ("
                                 + "(SELECT entries_id FROM entries WHERE jabref_eid="
-                                + "'"
+                                + '\''
                                 + be.getId()
                                 + "' AND database_id = "
                                 + database_id
                                 + "), "
                                 + "(SELECT groups_id FROM groups WHERE database_id="
-                                + "'" + database_id + "' AND parent_id=" + "'"
-                                + parentID + "' AND label=" + "'"
+                                + '\'' + database_id + "' AND parent_id=" + '\''
+                                + parentID + "' AND label=" + '\''
                                 + grp.getName() + "')" + ");");
             }
         }
@@ -249,9 +249,9 @@ public abstract class DBExporter extends DBImporterExporter {
             if (!existentTypes.contains(val.getName().toLowerCase())) {
                 String insert = "INSERT INTO entry_types (label, " + fieldStr
                         + ") VALUES (";
-                query = insert + "'" + val.getName().toLowerCase() + "'";
+                query = insert + '\'' + val.getName().toLowerCase() + '\'';
                 for (String aFieldRequirement : fieldRequirement) {
-                    query = query + ", '" + aFieldRequirement + "'";
+                    query = query + ", '" + aFieldRequirement + '\'';
                 }
                 query = query + ");";
             } else {
@@ -261,7 +261,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     query += update[i] + "='" + fieldRequirement.get(i) + "',";
                 }
                 query = query.substring(0, query.lastIndexOf(","));
-                query += " WHERE label='" + val.getName().toLowerCase() + "'";
+                query += " WHERE label='" + val.getName().toLowerCase() + '\'';
             }
             SQLUtil.processQuery(out, query);
         }
@@ -318,14 +318,14 @@ public abstract class DBExporter extends DBImporterExporter {
                         + group.getTypeId()
                         + "')"
                         + ", "
-                        + (searchField != null ? "'" + searchField + "'"
+                        + (searchField != null ? '\'' + searchField + '\''
                                 : "NULL")
                         + ", "
-                        + (searchExpr != null ? "'" + searchExpr + "'" : "NULL")
+                        + (searchExpr != null ? '\'' + searchExpr + '\'' : "NULL")
                         + ", "
-                        + (caseSens != null ? "'" + caseSens + "'" : "NULL")
+                        + (caseSens != null ? '\'' + caseSens + '\'' : "NULL")
                         + ", "
-                        + (reg_exp != null ? "'" + reg_exp + "'" : "NULL")
+                        + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL")
                         + ", " + hierContext + ", '" + database_id + "');");
         // recurse on child nodes (depth-first traversal)
         Object response = SQLUtil.processQueryWithResults(out,
@@ -400,16 +400,16 @@ public abstract class DBExporter extends DBImporterExporter {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
-            String dml = insert + "'@PREAMBLE', " + "'"
+            String dml = insert + "'@PREAMBLE', " + '\''
                     + Util.quote(database.getPreamble(), "'", '\\') + "', "
-                    + "'" + database_id + "');";
+                    + '\'' + database_id + "');";
             SQLUtil.processQuery(out, dml);
         }
         for (String key : database.getStringKeySet()) {
             BibtexString string = database.getString(key);
-            String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
-                    + "', " + "'" + Util.quote(string.getContent(), "'", '\\')
-                    + "', " + "'" + database_id + "'" + ");";
+            String dml = insert + '\'' + Util.quote(string.getName(), "'", '\\')
+                    + "', " + '\'' + Util.quote(string.getContent(), "'", '\\')
+                    + "', " + '\'' + database_id + '\'' + ");";
             SQLUtil.processQuery(out, dml);
         }
     }

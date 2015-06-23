@@ -75,7 +75,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     //primer campo Nombre
                     name = author[0].trim();
                     //Segundo y tercer campo Apellido1 Apellido2
-                    surname = author[1].trim().toUpperCase() + " " + author[2].trim().toUpperCase();
+                    surname = author[1].trim().toUpperCase() + ' ' + author[2].trim().toUpperCase();
 
                     //añadimos los campos modificados al string final
                     sb.append(surname);
@@ -84,9 +84,9 @@ public class Iso690NamesAuthors implements LayoutFormatter {
 
                 } else if (author.length == 4) {// Caso 1.3: Nombre SegundoNombre Apellido1 Apellido2
                     //primer y segundo campo Nombre SegundoNombre
-                    name = author[0].trim() + " " + author[1].trim();
+                    name = author[0].trim() + ' ' + author[1].trim();
                     //tercer y cuarto campo Apellido1 Apellido2
-                    surname = author[2].trim().toUpperCase() + " " + author[3].trim().toUpperCase();
+                    surname = author[2].trim().toUpperCase() + ' ' + author[3].trim().toUpperCase();
 
                     //añadimos los campos modificados al string final
                     sb.append(surname);

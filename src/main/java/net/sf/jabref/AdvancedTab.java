@@ -82,7 +82,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
         useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
-        useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port") + ":");
+        useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port") + ':');
         useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
         filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
         useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
@@ -138,7 +138,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             builder.nextLine();
             builder.append(pan);
             JPanel pan2 = new JPanel();
-            lab = new JLabel(Globals.lang("Class name") + ":");
+            lab = new JLabel(Globals.lang("Class name") + ':');
             pan2.add(lab);
             pan2.add(className);
             builder.append(pan2);
@@ -303,14 +303,14 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             } else {
                 JOptionPane.showMessageDialog
                         (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                                Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
+                                Globals.lang("Remote server port") + '\'', Globals.lang("Remote server port"),
                                 JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                            Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
+                            Globals.lang("Remote server port") + '\'', Globals.lang("Remote server port"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }

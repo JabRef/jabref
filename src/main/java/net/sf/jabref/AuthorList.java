@@ -738,7 +738,7 @@ public class AuthorList {
                 i++;
             }
             if ((size() > 2) && oxfordComma) {
-                res.append(",");
+                res.append(',');
             }
             if (size() > 1) {
                 res.append(" and ");
@@ -794,7 +794,7 @@ public class AuthorList {
                 i++;
             }
             if ((size() > 2) && oxfordComma) {
-                res.append(",");
+                res.append(',');
             }
             if (size() > 1) {
                 res.append(" and ");
@@ -909,7 +909,7 @@ public class AuthorList {
                 i++;
             }
             if ((size() > 2) && oxfordComma) {
-                res.append(",");
+                res.append(',');
             }
             if (size() > 1) {
                 res.append(" and ");
@@ -1140,7 +1140,7 @@ public class AuthorList {
                     }
                 }
                 b.append(s);
-                b.append(" ");
+                b.append(' ');
             }
             // delete last
             b.deleteCharAt(b.length() - 1);
@@ -1224,7 +1224,7 @@ public class AuthorList {
             if (von_part == null) {
                 return (last_part == null ? "" : last_part);
             } else {
-                return (last_part == null ? von_part : von_part + " " + last_part);
+                return (last_part == null ? von_part : von_part + ' ' + last_part);
             }
         }
 
@@ -1268,9 +1268,9 @@ public class AuthorList {
         public String getFirstLast(boolean abbr) {
             String res = getLastOnly();
             if (abbr) {
-                res = (first_abbr == null ? "" : first_abbr + " ") + res;
+                res = (first_abbr == null ? "" : first_abbr + ' ') + res;
             } else {
-                res = (first_part == null ? "" : first_part + " ") + res;
+                res = (first_part == null ? "" : first_part + ' ') + res;
             }
             if (jr_part != null) {
                 res += ", " + jr_part;
@@ -1312,10 +1312,10 @@ public class AuthorList {
         AuthorList al = AuthorList.getAuthorList(s);
         for (int i = 0; i < al.size(); i++) {
             Author a = al.getAuthor(i);
-            System.out.println((i + 1) + ": first = '" + a.getFirst() + "'");
-            System.out.println((i + 1) + ": last = '" + a.getLast() + "'");
-            System.out.println((i + 1) + ": jr = '" + a.getJr() + "'");
-            System.out.println((i + 1) + ": von = '" + a.getVon() + "'");
+            System.out.println((i + 1) + ": first = '" + a.getFirst() + '\'');
+            System.out.println((i + 1) + ": last = '" + a.getLast() + '\'');
+            System.out.println((i + 1) + ": jr = '" + a.getJr() + '\'');
+            System.out.println((i + 1) + ": von = '" + a.getVon() + '\'');
         }
 
         System.out.println((new CreateDocBookAuthors()).format(s));

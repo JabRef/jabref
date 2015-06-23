@@ -229,7 +229,7 @@ public class ExternalFilePanel extends JPanel {
             }
         }
 
-        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), "." + fieldName,
+        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
                 JFileChooser.OPEN_DIALOG, false);
 
         if (chosenFile != null) {
@@ -284,7 +284,7 @@ public class ExternalFilePanel extends JPanel {
             public String getPlannedFileName(String res) {
                 String suffix = off.getSuffix(res);
                 if (suffix == null) {
-                    suffix = "." + fieldName.toLowerCase();
+                    suffix = '.' + fieldName.toLowerCase();
                 }
 
                 String plannedName;
@@ -439,10 +439,10 @@ public class ExternalFilePanel extends JPanel {
         if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
             output(Globals.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
-                    + ".");
+                    + '.');
             return null;
         }
-        output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + "."
+        output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
                 + fieldName + "'...");
 
         return new Runnable() {
@@ -474,9 +474,9 @@ public class ExternalFilePanel extends JPanel {
                     if (entryEditor != null) {
                         entryEditor.updateField(editor);
                     }
-                    output(Globals.lang("%0 field set", fieldName.toUpperCase()) + ".");
+                    output(Globals.lang("%0 field set", fieldName.toUpperCase()) + '.');
                 } else {
-                    output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");
+                    output(Globals.lang("No %0 found", fieldName.toUpperCase()) + '.');
                 }
 
             }

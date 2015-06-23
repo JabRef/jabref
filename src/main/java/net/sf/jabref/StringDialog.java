@@ -487,9 +487,9 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = Globals.lang("Really delete the selected") + " " +
+                String msg = Globals.lang("Really delete the selected") + ' ' +
                         ((sel.length > 1) ? sel.length + " " + Globals.lang("entries")
-                                : Globals.lang("entry")) + "?";
+                                : Globals.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Globals.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);

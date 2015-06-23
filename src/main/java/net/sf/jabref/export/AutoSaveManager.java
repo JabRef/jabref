@@ -85,7 +85,7 @@ public class AutoSaveManager {
      */
     public static File getAutoSaveFile(File f) {
         String n = f.getName();
-        return new File(f.getParentFile(), ".$" + n + "$");
+        return new File(f.getParentFile(), ".$" + n + '$');
     }
 
     /**

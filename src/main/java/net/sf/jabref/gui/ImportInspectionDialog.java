@@ -566,7 +566,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 insertNodes(menu, (GroupTreeNode) node.getChildAt(i));
             }
         } else {
-            submenu = new JMenu("[" + node.getGroup().getName() + "]");
+            submenu = new JMenu('[' + node.getGroup().getName() + ']');
             // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled
             submenu.setEnabled(action.isEnabled());

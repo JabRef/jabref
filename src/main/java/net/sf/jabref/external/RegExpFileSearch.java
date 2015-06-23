@@ -85,10 +85,10 @@ public class RegExpFileSearch {
         for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
             sb.append(i.next());
             if (i.hasNext()) {
-                sb.append("|");
+                sb.append('|');
             }
         }
-        String extensionRegExp = "(" + sb.toString() + ")";
+        String extensionRegExp = '(' + sb.toString() + ')';
 
         return RegExpFileSearch.findFile(entry, null, directories, regularExpression, extensionRegExp, true);
     }
@@ -207,7 +207,7 @@ public class RegExpFileSearch {
         Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            m.appendReplacement(s, m.group(1) + "/" + m.group(2));
+            m.appendReplacement(s, m.group(1) + '/' + m.group(2));
         }
         m.appendTail(s);
         file = s.toString();
@@ -225,7 +225,7 @@ public class RegExpFileSearch {
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, database);
 
                 if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                    directory = new File(dirToProcess + "/");
+                    directory = new File(dirToProcess + '/');
                     continue;
                 }
                 if (dirToProcess.equals(".")) { // Stay in current directory
@@ -283,8 +283,8 @@ public class RegExpFileSearch {
         String filePart = fileParts[fileParts.length - 1].replaceAll("\\[extension\\]", RegExpFileSearch.EXT_MARKER);
         String filenameToLookFor = Util.expandBrackets(filePart, entry, database)
                 .replaceAll(RegExpFileSearch.EXT_MARKER, extensionRegExp);
-        final Pattern toMatch = Pattern.compile("^"
-                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$", Pattern.CASE_INSENSITIVE);
+        final Pattern toMatch = Pattern.compile('^'
+                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$', Pattern.CASE_INSENSITIVE);
 
         File[] matches = directory.listFiles(new FilenameFilter() {
 

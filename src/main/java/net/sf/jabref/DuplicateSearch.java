@@ -135,7 +135,7 @@ public class DuplicateSearch implements Runnable {
                     panel.markBaseChanged();
                 }
                 panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + " " + Globals.lang("pairs processed") + ": " + dupliC);
+                        + ' ' + Globals.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);

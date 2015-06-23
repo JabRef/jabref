@@ -181,7 +181,7 @@ public class MODSEntry {
             result += (bibtex.getField("year"));
         }
         if (bibtex.getField("month") != null) {
-            result += "-" + bibtex.getField("month");
+            result += '-' + bibtex.getField("month");
         }
 
         return result;

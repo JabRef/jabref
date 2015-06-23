@@ -63,7 +63,7 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
         //    filename += ".zip";
         file = new File(filename);
         if (file.exists()) {
-            int confirm = JOptionPane.showConfirmDialog(frame, "'" + file.getName() + "' " +
+            int confirm = JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' " +
                     Globals.lang("exists. Overwrite file?"),
                     Globals.lang("Unpack EndNote filter set"), JOptionPane.OK_CANCEL_OPTION);
             if (confirm != JOptionPane.OK_OPTION) {

@@ -135,8 +135,8 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         builder.append(generateOnSave);
         builder.nextLine();
         builder.append(pan);
-        builder.append(Globals.lang("Replace (regular expression)") + ":");
-        builder.append(Globals.lang("by") + ":");
+        builder.append(Globals.lang("Replace (regular expression)") + ':');
+        builder.append(Globals.lang("by") + ':');
 
         builder.nextLine();
         builder.append(pan);

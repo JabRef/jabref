@@ -312,7 +312,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Copy") + " \\cite{" + Globals.lang("BibTeX key") + "}") {
+        add(new AbstractAction(Globals.lang("Copy") + " \\cite{" + Globals.lang("BibTeX key") + '}') {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -507,7 +507,7 @@ public class RightClickMenu extends JPopupMenu
                 insertNodes(menu, (GroupTreeNode) node.getChildAt(i), selection, add, move);
             }
         } else {
-            submenu = new JMenu("[" + node.getGroup().getName() + "]");
+            submenu = new JMenu('[' + node.getGroup().getName() + ']');
             setGroupFontAndIcon(submenu, node.getGroup());
             // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled

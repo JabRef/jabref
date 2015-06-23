@@ -66,7 +66,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter
             }
             if (fieldEntry.charAt(i) == '}')
             {
-                sb.append(",");
+                sb.append(',');
             }
         }
 

@@ -33,7 +33,7 @@ class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter
         this.format = format;
         this.extension = extension;
         this.name = format.getDisplayName() + " (*" + extension
-                + ")";
+                + ')';
     }
 
     public IExportFormat getExportFormat() {

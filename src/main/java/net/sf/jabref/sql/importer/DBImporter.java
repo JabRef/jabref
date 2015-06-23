@@ -101,9 +101,9 @@ public abstract class DBImporter extends DBImporterExporter {
         String jabrefDBs = "(";
         while (itLista.hasNext())
         {
-            jabrefDBs += "'" + itLista.next() + "',";
+            jabrefDBs += '\'' + itLista.next() + "',";
         }
-        jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ")";
+        jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ')';
 
         ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
                 "jabref_database WHERE database_name IN " + jabrefDBs);
@@ -154,7 +154,7 @@ public abstract class DBImporter extends DBImporterExporter {
 
             // Import strings and preamble:
             ResultSet rsStrings = SQLUtil.queryAllFromTable(conn,
-                    "strings WHERE database_id='" + database_id + "'");
+                    "strings WHERE database_id='" + database_id + '\'');
             while (rsStrings.next()) {
                 String label = rsStrings.getString("label"), content = rsStrings
                         .getString("content");

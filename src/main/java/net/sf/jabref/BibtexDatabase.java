@@ -539,7 +539,7 @@ public class BibtexDatabase {
             }
         }
         if (duplicate && issueWarning) {
-            JOptionPane.showMessageDialog(null, Globals.lang("Warning there is a duplicate key") + ":" + newKey,
+            JOptionPane.showMessageDialog(null, Globals.lang("Warning there is a duplicate key") + ':' + newKey,
                     Globals.lang("Duplicate Key Warning"),
                     JOptionPane.WARNING_MESSAGE);//, options);
 

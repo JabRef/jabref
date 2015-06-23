@@ -294,7 +294,7 @@ public class BibtexEntry
             if (year != null)
             {
                 if (month.isValid()) {
-                    return year + "-" + month.twoDigitNumber;
+                    return year + '-' + month.twoDigitNumber;
                 } else {
                     return year;
                 }
@@ -506,7 +506,7 @@ public class BibtexEntry
 
     @Override
     public String toString() {
-        return getType().getName() + ":" + getField(BibtexFields.KEY_FIELD);
+        return getType().getName() + ':' + getField(BibtexFields.KEY_FIELD);
     }
 
     public boolean isSearchHit() {
@@ -541,7 +541,7 @@ public class BibtexEntry
                 s[i] = "N/A";
             }
         }
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ")";
+        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
         }

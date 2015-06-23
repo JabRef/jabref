@@ -45,7 +45,7 @@ public class FileActions {
         if (preamble != null) {
             fw.write("@PREAMBLE{");
             fw.write(preamble);
-            fw.write("}" + Globals.NEWLINE + Globals.NEWLINE);
+            fw.write('}' + Globals.NEWLINE + Globals.NEWLINE);
         }
     }
 
@@ -119,7 +119,7 @@ public class FileActions {
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
-                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n"
+                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
                                 + Globals.lang("Before saving, please edit any strings containing the # character."));
             }
 
@@ -139,7 +139,7 @@ public class FileActions {
     private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
         out.write("% ");
         out.write(GUIGlobals.SIGNATURE);
-        out.write(" " + GUIGlobals.version + "." + Globals.NEWLINE + "% "
+        out.write(' ' + GUIGlobals.version + '.' + Globals.NEWLINE + "% "
                 + GUIGlobals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
     }
 

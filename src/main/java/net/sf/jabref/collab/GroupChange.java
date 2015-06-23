@@ -80,7 +80,7 @@ class GroupChange extends Change {
 
     @Override
     JComponent description() {
-        return new JLabel("<html>" + name + "." + (m_changedGroups != null ? " "
+        return new JLabel("<html>" + name + '.' + (m_changedGroups != null ? ' '
                 + "Accepting the change replaces the complete " +
                 "groups tree with the externally modified groups tree." : "")
                 + "</html>");

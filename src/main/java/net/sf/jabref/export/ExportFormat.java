@@ -137,7 +137,7 @@ public class ExportFormat implements IExportFormat {
             dir = "";
         } else {
             dir = Globals.LAYOUT_PREFIX
-                    + (directory == null ? "" : directory + "/");
+                    + (directory == null ? "" : directory + '/');
         }
         return FileActions.getReader(dir + filename);
     }
@@ -249,7 +249,7 @@ public class ExportFormat implements IExportFormat {
             } else {
                 try {
                     // We try to get a type-specific layout for this entry.
-                    reader = getReader(lfFileName + "." + type + ".layout");
+                    reader = getReader(lfFileName + '.' + type + ".layout");
                     layoutHelper = new LayoutHelper(reader);
                     layout = layoutHelper
                             .getLayoutFromText(Globals.FORMATTER_PACKAGE);

@@ -39,7 +39,7 @@ class StringChange extends Change {
     public StringChange(BibtexString string, BibtexString tmpString, String label,
             String mem, String tmp, String disk) {
         this.tmpString = tmpString;
-        name = Globals.lang("Modified string") + ": '" + label + "'";
+        name = Globals.lang("Modified string") + ": '" + label + '\'';
         this.string = string;
         this.label = label;
         this.mem = mem;

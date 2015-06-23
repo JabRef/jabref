@@ -82,7 +82,7 @@ public class WSITools
     public static boolean tokenize(Vector<String> vcr, String buf, String delimstr)
     {
         vcr.clear();
-        buf = buf + "\n";
+        buf = buf + '\n';
 
         StringTokenizer st = new StringTokenizer(buf, delimstr);
 
@@ -104,9 +104,9 @@ public class WSITools
     public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
             int limit)
     {
-        System.out.println("Warning: tokenize \"" + s + "\"");
+        System.out.println("Warning: tokenize \"" + s + '"');
         vcr.clear();
-        s = s + "\n";
+        s = s + '\n';
 
         int endpos;
         int matched = 0;

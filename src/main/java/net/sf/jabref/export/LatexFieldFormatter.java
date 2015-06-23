@@ -164,8 +164,8 @@ public class LatexFieldFormatter implements FieldFormatter {
                 pos2 = text.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
                     if (!neverFailOnHashes) {
-                        throw new IllegalArgumentException(Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n" +
-                                Globals.lang("In JabRef, use pairs of # characters to indicate a string.") + "\n" +
+                        throw new IllegalArgumentException(Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n' +
+                                Globals.lang("In JabRef, use pairs of # characters to indicate a string.") + '\n' +
                                 Globals.lang("Note that the entry causing the problem has been selected."));
                     } else {
                         pos1 = text.length(); // just write out the rest of the text, and throw no exception

@@ -108,7 +108,7 @@ public class XMLChars implements LayoutFormatter {
 
             // TODO: Check whether > 125 is correct here or whether it should rather be >=  
             if ((code > 125) || forceReplace[code]) {
-                buffer.append("&#").append(code).append(";");
+                buffer.append("&#").append(code).append(';');
             } else {
                 buffer.append((char) code);
             }

@@ -50,12 +50,12 @@ public class RTFChars implements LayoutFormatter {
         for (int i = 0; i < field.length(); i++) {
 
             System.out.println("incommand=" + incommand + ". escaped=" + escaped
-                    + ". currentCommand='" + (currentCommand != null ? currentCommand.toString() : "") + "'");
-            System.out.println("sb: '" + sb.toString() + "'");/**/
+                    + ". currentCommand='" + (currentCommand != null ? currentCommand.toString() : "") + '\'');
+            System.out.println("sb: '" + sb.toString() + '\'');/**/
 
             char c = field.charAt(i);
 
-            System.out.println("Char: '" + c + "'");
+            System.out.println("Char: '" + c + '\'');
 
             if (escaped && (c == '\\')) {
                 sb.append('\\');
@@ -147,11 +147,11 @@ public class RTFChars implements LayoutFormatter {
                         if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
                             IntAndString part = getPart(field, i, (c == '{'));
                             i += part.i;
-                            sb.append("{\\i ").append(part.s).append("}");
+                            sb.append("{\\i ").append(part.s).append('}');
                         } else if (command.equals("textbf")) {
                             IntAndString part = getPart(field, i, (c == '{'));
                             i += part.i;
-                            sb.append("{\\b ").append(part.s).append("}");
+                            sb.append("{\\b ").append(part.s).append('}');
                         } else {
                             RTFChars.logger.fine("Unknown command " + command);
                         }

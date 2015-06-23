@@ -41,7 +41,7 @@ class EntryChange extends Change {
         if (key == null) {
             name = "Modified entry";
         } else {
-            name = "Modified entry: '" + key + "'";
+            name = "Modified entry: '" + key + '\'';
         }
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;
@@ -137,16 +137,16 @@ class EntryChange extends Change {
             text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
             if ((onDisk != null) && !onDisk.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + " ").append(onDisk);
+                text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
             } else {
                 text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
             }
 
             if ((inMem != null) && !inMem.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + " ").append(inMem);
+                text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + ' ').append(inMem);
             }
             if ((onTmp != null) && !onTmp.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + " ").append(onTmp);
+                text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
             } else {
                 // No value in memory.
                 /*if ((onTmp != null) && !onTmp.equals(inMem))

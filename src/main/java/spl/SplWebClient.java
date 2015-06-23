@@ -109,7 +109,7 @@ public class SplWebClient {
                     Document docs = (Document) reader.parse(is);
                     for (Bean author : docs.getAuthors().getCollection()) {
                         Author temp = (Author) author;
-                        System.out.println(((SimpleTypeElementBean) temp.getName_Last()).getValue() + " " + temp.getRank());
+                        System.out.println(((SimpleTypeElementBean) temp.getName_Last()).getValue() + ' ' + temp.getRank());
                     }
                     // XmlDocuments documents = JAXB.unmarshal(is, XmlDocuments.class);
                     SplWebClient.metadata = docs;

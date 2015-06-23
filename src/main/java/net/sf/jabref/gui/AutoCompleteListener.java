@@ -173,7 +173,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             // Thus, there is nothing to replace
             return;
         }
-        AutoCompleteListener.logger.finest("lastBeginning: >" + lastBeginning + "<");
+        AutoCompleteListener.logger.finest("lastBeginning: >" + lastBeginning + '<');
         if (comp.getSelectedText() == null) {
             // if there is no selection
             // the user has typed the complete word, but possibly with a different casing
@@ -225,9 +225,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 currentword.toString().substring(prefix.length()) : currentword.toString();
         if (AutoCompleteListener.logger.isLoggable(Level.FINEST)) {
             AutoCompleteListener.logger.finest("startCompletion");
-            AutoCompleteListener.logger.finest("currentword: >" + currentword + "<");
-            AutoCompleteListener.logger.finest("prefix: >" + prefix + "<");
-            AutoCompleteListener.logger.finest("cword: >" + cWord + "<");
+            AutoCompleteListener.logger.finest("currentword: >" + currentword + '<');
+            AutoCompleteListener.logger.finest("prefix: >" + prefix + '<');
+            AutoCompleteListener.logger.finest("cword: >" + cWord + '<');
         }
         int no = 0; // We use the first word in the array of completions.
         if ((completed != null) && (completed.length > 0)) {
@@ -241,7 +241,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             // BUT we obey the completion
             toSetIn = sno.substring(cWord.length() - 1);
             if (AutoCompleteListener.logger.isLoggable(Level.FINEST)) {
-                AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + "<");
+                AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + '<');
             }
 
             StringBuilder alltext = new StringBuilder(comp.getText());
@@ -253,7 +253,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             e.consume();
             lastCaretPosition = comp.getCaretPosition();
             char ch = e.getKeyChar();
-            AutoCompleteListener.logger.finest("Appending >" + ch + "<");
+            AutoCompleteListener.logger.finest("Appending >" + ch + '<');
             if (cWord.length() <= 1) {
                 lastBeginning = Character.toString(ch);
             } else {
@@ -281,7 +281,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     if (toSetIn == null) {
                         AutoCompleteListener.logger.finest("toSetIn: NULL");
                     } else {
-                        AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + "<");
+                        AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + '<');
                     }
                 }
 
@@ -343,8 +343,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     lastBeginning = lastBeginning + ch;
                     if (AutoCompleteListener.logger.isLoggable(Level.FINEST)) {
                         AutoCompleteListener.logger.finest("discont");
-                        AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + "<");
-                        AutoCompleteListener.logger.finest("lastBeginning: >" + lastBeginning + "<");
+                        AutoCompleteListener.logger.finest("toSetIn: >" + toSetIn + '<');
+                        AutoCompleteListener.logger.finest("lastBeginning: >" + lastBeginning + '<');
                     }
                     String[] completed = findCompletions(lastBeginning, comp);
                     if ((completed != null) && (completed.length > 0)) {

@@ -102,7 +102,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
     void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.size(); i++) {
-            sb.append("<").append(tagName).append(">");
+            sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && (a.getFirst().length() > 0)) {
                 sb.append("<firstname>");
@@ -118,7 +118,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
                 sb.append("<surname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
                 if ((a.getJr() != null) && (a.getJr().length() > 0)) {
-                    sb.append(" ").append(CreateDocBookAuthors.xc.format(a.getJr()));
+                    sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
                 }
                 sb.append("</surname>");
             }
@@ -126,7 +126,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
             if (i < (al.size() - 1)) {
                 sb.append("</").append(tagName).append(">\n       ");
             } else {
-                sb.append("</").append(tagName).append(">");
+                sb.append("</").append(tagName).append('>');
             }
         }
     }

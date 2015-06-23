@@ -208,7 +208,7 @@ public class JabRefCLI {
         String outFormats = ExportFormats.getConsoleExportList(70, 20, "");
         String outFormatsList = String.format("%s: %s%n", Globals.lang("Available export formats"), outFormats);
 
-        String footer = "\n" + importFormatsList + outFormatsList + "\nPlease report issues at http://sourceforge.net/p/jabref/bugs/";
+        String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at http://sourceforge.net/p/jabref/bugs/";
 
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);

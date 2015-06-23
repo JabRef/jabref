@@ -331,11 +331,11 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                 @Override
                 public void run() {
-                    panel.output(Globals.lang("External viewer called") + ".");
+                    panel.output(Globals.lang("External viewer called") + '.');
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
-                        Globals.logger("Error: no link to " + fieldName + ".");
+                        Globals.logger("Error: no link to " + fieldName + '.');
                         return; // There is an icon, but the field is not set.
                     }
 

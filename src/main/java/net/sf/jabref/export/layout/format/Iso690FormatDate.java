@@ -48,11 +48,11 @@ public class Iso690FormatDate implements LayoutFormatter {
             sb.append(date[0].trim());
         } else if (date.length == 2) {//primer campo mes, segundo campo año
             //cambiamos al formato año - mes
-            sb.append(date[1].trim()).append("-").append(date[0].trim());
+            sb.append(date[1].trim()).append('-').append(date[0].trim());
         } else if (date.length == 3) {
             //primer campo día, segundo campo mes y tercer campo año
             // cambiamos al formato año-mes-día
-            sb.append(date[2].trim()).append("-").append(date[1].trim()).append("-").append(date[0].trim());
+            sb.append(date[2].trim()).append('-').append(date[1].trim()).append('-').append(date[0].trim());
         }
         return sb.toString();//retorna el string creado con la fecha.
     }

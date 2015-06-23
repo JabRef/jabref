@@ -34,7 +34,7 @@ public class CheckBoxMessage extends JPanel {
         setLayout(gbl);
         con.gridwidth = GridBagConstraints.REMAINDER;
 
-        JLabel lab = new JLabel(message + "\n");
+        JLabel lab = new JLabel(message + '\n');
         cb.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         add(lab);

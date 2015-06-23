@@ -223,7 +223,7 @@ class MSBibEntry {
             address += city + ", ";
         }
         if (state != null) {
-            address += state + " ";
+            address += state + ' ';
         }
         if (country != null) {
             address += country;
@@ -254,7 +254,7 @@ class MSBibEntry {
         String year = getFromXml(_bcol + "YearAccessed", entry);
         dateAccessed = "";
         if (month != null) {
-            dateAccessed += month + " ";
+            dateAccessed += month + ' ';
         }
         if (day != null) {
             dateAccessed += day + ", ";
@@ -667,7 +667,7 @@ class MSBibEntry {
             result += (bibtex.getField("year"));
         }
         if (bibtex.getField("month") != null) {
-            result += "-" + bibtex.getField("month");
+            result += '-' + bibtex.getField("month");
         }
 
         return result;
@@ -961,7 +961,7 @@ class MSBibEntry {
 
     private void parseSingleStandardNumber(String type, String bibtype, String standardNum, HashMap<String, String> hm) {
         // tested using http://www.javaregex.com/test.html
-        Pattern p = Pattern.compile(":" + type + ":(.[^:]+)");
+        Pattern p = Pattern.compile(':' + type + ":(.[^:]+)");
         Matcher m = p.matcher(standardNum);
         if (m.matches()) {
             hm.put(bibtype, m.group(1));

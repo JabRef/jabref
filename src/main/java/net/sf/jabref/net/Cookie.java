@@ -64,7 +64,7 @@ class Cookie {
                     this.domain = value;
                 } else {
                     if (!value.startsWith(".")) {
-                        value = "." + value;
+                        value = '.' + value;
                     }
                     uriDomain = uriDomain.substring(
                             uriDomain.indexOf('.'));
@@ -130,6 +130,6 @@ class Cookie {
 
     @Override
     public String toString() {
-        return name + "=" + value;
+        return name + '=' + value;
     }
 }

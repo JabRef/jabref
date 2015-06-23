@@ -62,8 +62,8 @@ public class MySQLExporter extends DBExporter {
         Connection conn = DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
         SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `"
-                + dbStrings.getDatabase() + "`");
-        SQLUtil.processQuery(conn, "USE `" + dbStrings.getDatabase() + "`");
+                + dbStrings.getDatabase() + '`');
+        SQLUtil.processQuery(conn, "USE `" + dbStrings.getDatabase() + '`');
         return conn;
     }
 

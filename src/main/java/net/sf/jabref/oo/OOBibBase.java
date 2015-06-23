@@ -280,7 +280,7 @@ class OOBibBase {
             for (int i = 0; i < entries.length; i++) {
                 BibtexEntry entry = entries[i];
                 if (i > 0) {
-                    sb.append(",");
+                    sb.append(',');
                 }
                 sb.append(entry.getCiteKey());
             }
@@ -460,8 +460,8 @@ class OOBibBase {
                         cEntries[j] = OOUtil.createAdaptedEntry(database.getEntryByKey(keys[j]));
                     }
                     if (cEntries[j] == null) {
-                        System.out.println("Bibtex key not found : '" + keys[j] + "'");
-                        System.out.println("Problem with reference mark: '" + names[i] + "'");
+                        System.out.println("Bibtex key not found : '" + keys[j] + '\'');
+                        System.out.println("Problem with reference mark: '" + names[i] + '\'');
                         cEntries[j] = new UndefinedBibtexEntry(keys[j]);
                         //throw new BibtexEntryNotFoundException(keys[j], "");
                     }
@@ -476,7 +476,7 @@ class OOBibBase {
                         normCitMarkers[i][j] = cEntries[j].getCiteKey();
                         sb.append(cEntries[j].getCiteKey());
                         if (j < (keys.length - 1)) {
-                            sb.append(",");
+                            sb.append(',');
                         }
                     }
                     citationMarker = sb.toString();
@@ -839,9 +839,9 @@ class OOBibBase {
                 XReferenceMarksSupplier.class, xCurrentComponent);
         XNameAccess xNamedRefMarks = supplier.getReferenceMarks();
         int i = 0;
-        String name = OOBibBase.BIB_CITATION + "_" + type + "_" + bibtexKey;
+        String name = OOBibBase.BIB_CITATION + '_' + type + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
-            name = OOBibBase.BIB_CITATION + i + "_" + type + "_" + bibtexKey;
+            name = OOBibBase.BIB_CITATION + i + '_' + type + '_' + bibtexKey;
             i++;
         }
         return name;
@@ -1413,7 +1413,7 @@ class OOBibBase {
                 int i = 0;
                 for (BibtexEntry entry : entries) {
                     if (i > 0) {
-                        sb.append(",");
+                        sb.append(',');
                     }
                     sb.append(entry.getCiteKey());
                     i++;

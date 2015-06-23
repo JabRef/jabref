@@ -244,7 +244,7 @@ public class UtilFindFiles {
         Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            m.appendReplacement(s, m.group(1) + "/" + m.group(2));
+            m.appendReplacement(s, m.group(1) + '/' + m.group(2));
         }
         m.appendTail(s);
         file = s.toString();
@@ -263,7 +263,7 @@ public class UtilFindFiles {
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, database);
 
                 if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                    directory = new File(dirToProcess + "/");
+                    directory = new File(dirToProcess + '/');
                     continue;
                 }
                 if (dirToProcess.equals(".")) { // Stay in current directory
@@ -357,8 +357,8 @@ public class UtilFindFiles {
         // Last step check if the given file can be found in this directory
         String filenameToLookFor = Util.expandBrackets(fileParts[fileParts.length - 1], entry, database);
 
-        final Pattern toMatch = Pattern.compile("^"
-                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$");
+        final Pattern toMatch = Pattern.compile('^'
+                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$');
 
         File[] matches = directory.listFiles(new FilenameFilter() {
 
@@ -396,7 +396,7 @@ public class UtilFindFiles {
         for (File curFile : all) {
             if (curFile.isFile()) {
                 String name = curFile.getName();
-                if (name.startsWith(key + ".") && off.accept(name)) {
+                if (name.startsWith(key + '.') && off.accept(name)) {
                     return curFile.getPath();
                 }
 

@@ -227,14 +227,14 @@ public class DBConnectDialog extends JDialog {
             errMsg = null;
             break;
         case 1:
-            errMsg = errMsg + errors[0] + ".";
+            errMsg = errMsg + errors[0] + '.';
             break;
         case 2:
-            errMsg = errMsg + errors[0] + " and " + errors[1] + ".";
+            errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
             break;
         case 3:
             errMsg = errMsg + errors[0] + ", " + errors[1]
-                    + ", and " + errors[2] + ".";
+                    + ", and " + errors[2] + '.';
             break;
         default:
 

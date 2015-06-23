@@ -297,7 +297,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         String lastNamePart = a.getLast();
         String von = a.getVon();
         if ((von != null) && (von.length() > 0)) {
-            lastNamePart = von + " " + lastNamePart;
+            lastNamePart = von + ' ' + lastNamePart;
         }
         String jr = a.getJr();
         if ((jr != null) && (jr.length() > 0)) {

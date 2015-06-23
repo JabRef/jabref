@@ -136,9 +136,9 @@ public class SearchResultsDialog {
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
-                    frame.output(Globals.lang("Copied") + " " + (bes.length > 1 ? bes.length + " "
+                    frame.output(Globals.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
                             + Globals.lang("entries")
-                            : "1 " + Globals.lang("entry") + "."));
+                            : "1 " + Globals.lang("entry") + '.'));
                 }
             }
         });

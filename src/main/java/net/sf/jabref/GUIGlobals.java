@@ -280,7 +280,7 @@ public class GUIGlobals {
             GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(resource, prefix);
         } catch (IOException e) {
             System.err.println(Globals.lang("Unable to read icon theme file") + " '" +
-                    resource.toString() + "'");
+                    resource.toString() + '\'');
             // If we were trying to load a custom theme, try the default one as a fallback:
             if (resource != defaultResource) {
                 try {
@@ -312,7 +312,7 @@ public class GUIGlobals {
                 }
             }
             if (url == null) {
-                System.err.println(Globals.lang("Could not find image file") + " '" + path + "'");
+                System.err.println(Globals.lang("Could not find image file") + " '" + path + '\'');
             }
             return url;
         } else {
@@ -385,7 +385,7 @@ public class GUIGlobals {
     public static String getLocaleHelpPath()
     {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
-        String middle = prefs.get("language") + "/";
+        String middle = prefs.get("language") + '/';
         if (middle.equals("en/"))
          {
             middle = ""; // english in base help dir.

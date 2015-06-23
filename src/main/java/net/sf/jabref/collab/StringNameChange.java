@@ -36,7 +36,7 @@ class StringNameChange extends Change {
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
         this.tmpString = tmpString;
-        name = Globals.lang("Renamed string") + ": '" + tmp + "'";
+        name = Globals.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;

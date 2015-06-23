@@ -115,7 +115,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
          * 
          * Cannot really use %0 to refer to the file type, since this ruins translation.
          */
-        JLabel lab = new JLabel(Globals.lang("Main file directory") + ":");
+        JLabel lab = new JLabel(Globals.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
         browse = BrowseAction.buildForDir(_frame, fileDir);
@@ -169,7 +169,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.nextLine();
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PDF directory") + ":");
+        lab = new JLabel(Globals.lang("Main PDF directory") + ':');
         builder.append(lab);
         builder.append(pdfDir);
         browse = BrowseAction.buildForDir(_frame, pdfDir);
@@ -178,7 +178,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PS directory") + ":");
+        lab = new JLabel(Globals.lang("Main PS directory") + ':');
         builder.append(lab);
         builder.append(psDir);
         browse = BrowseAction.buildForDir(_frame, psDir);

@@ -513,7 +513,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
                     }
 
-                    String chosenFile = FileDialogs.getNewFile(frame, new File(dir), "." + fieldName,
+                    String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
                             JFileChooser.OPEN_DIALOG, false);
 
                     if (chosenFile != null) {
@@ -529,7 +529,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // } else if ((s != null) && s.equals("browsePdf")) {
         } else if ((s != null) && (s.equals("browseDoc") || s.equals("browseDocZip"))) {
 
-            final String ext = "." + fieldName.toLowerCase();
+            final String ext = '.' + fieldName.toLowerCase();
             final OpenFileFilter off;
             if (s.equals("browseDocZip")) {
                 off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
@@ -942,7 +942,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             } else if (emptyWarning && showError) {
                 warnEmptyBibtexkey();
             } else {
-                panel.output(Globals.lang("Stored entry") + ".");
+                panel.output(Globals.lang("Stored entry") + '.');
             }
 
             lastSourceStringAccepted = source.getText();
@@ -1204,7 +1204,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             panel.database.removeEntry(entry.getId());
             panel.markBaseChanged();
             panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
-            panel.output(Globals.lang("Deleted") + " " + Globals.lang("entry"));
+            panel.output(Globals.lang("Deleted") + ' ' + Globals.lang("entry"));
         }
     }
 

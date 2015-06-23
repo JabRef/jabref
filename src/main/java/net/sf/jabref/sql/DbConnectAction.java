@@ -96,7 +96,7 @@ public class DbConnectAction extends BaseAction {
                         Globals.lang(preamble) + "  " + errorMessage);
 
                 JOptionPane.showMessageDialog(panel.frame(),
-                        Globals.lang(preamble) + "\n" + errorMessage,
+                        Globals.lang(preamble) + '\n' + errorMessage,
                         Globals.lang("Connect to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
             } finally {

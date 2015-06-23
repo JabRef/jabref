@@ -139,7 +139,7 @@ public class GenFieldsCustomizer extends JDialog {
                 // Report error and exit.
                 String field = Globals.lang("field");
                 JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form") + " '" +
-                        Globals.lang("Tabname") + ":" + field + "1;" + field + "2;...;" + field + "N'",
+                        Globals.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
                         Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -181,16 +181,16 @@ public class GenFieldsCustomizer extends JDialog {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
             sb.append(tabList.getTabName(i));
-            sb.append(":");
+            sb.append(':');
             for (Iterator<String> j = tabList.getTabFields(i).iterator(); j
                     .hasNext();) {
                 String field = j.next();
                 sb.append(field);
                 if (j.hasNext()) {
-                    sb.append(";");
+                    sb.append(';');
                 }
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         fieldsArea.setText(sb.toString());
@@ -205,9 +205,9 @@ public class GenFieldsCustomizer extends JDialog {
             sb.append(name);
             fields = (String) Globals.prefs.defaults.get
                     (JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i);
-            sb.append(":");
+            sb.append(':');
             sb.append(fields);
-            sb.append("\n");
+            sb.append('\n');
             i++;
         }
         fieldsArea.setText(sb.toString());

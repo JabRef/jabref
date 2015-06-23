@@ -132,7 +132,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
             Globals.lang("Status")
-                    + ":", SwingConstants.LEFT);
+                    + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
 
     private final FileHistory fileHistory = new FileHistory(prefs, this);
@@ -1822,7 +1822,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
                 // This also happens internally at basepanel to ensure consistency
-                title = title + "*";
+                title = title + '*';
             }
         } else {
             title = file.getName();
@@ -1871,7 +1871,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.setNewKeyBindings(d.getNewKeyBindings());
                 JOptionPane.showMessageDialog
                         (JabRefFrame.this,
-                                Globals.lang("Your new key bindings have been stored.") + "\n"
+                                Globals.lang("Your new key bindings have been stored.") + '\n'
                                         + Globals.lang("You must restart JabRef for the new key "
                                                 + "bindings to work properly."),
                                 Globals.lang("Key bindings changed"),
@@ -1970,7 +1970,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             setWindowTitle();
             updateEnabledState(); // Man, this is what I call a bug that this is not called.
-            output(Globals.lang("Closed database") + ".");
+            output(Globals.lang("Closed database") + '.');
             System.gc(); // Test
         }
     }
@@ -2189,9 +2189,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tabbedPane.setSelectedComponent(bp);
             if (filename != null) {
                 output(Globals.lang("Imported database") + " '" + filename + "' " +
-                        Globals.lang("with") + " " +
-                        database.getEntryCount() + " " +
-                        Globals.lang("entries into new database") + ".");
+                        Globals.lang("with") + ' ' +
+                        database.getEntryCount() + ' ' +
+                        Globals.lang("entries into new database") + '.');
             }
         }
         else {
@@ -2244,9 +2244,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 basePanel.markBaseChanged();
                 if (filename != null) {
                     output(Globals.lang("Imported database") + " '" + filename + "' " +
-                            Globals.lang("with") + " " +
-                            (database.getEntryCount() - oldCount) + " " +
-                            Globals.lang("entries into new database") + ".");
+                            Globals.lang("with") + ' ' +
+                            (database.getEntryCount() - oldCount) + ' ' +
+                            Globals.lang("entries into new database") + '.');
                 }
             }
 
@@ -2450,7 +2450,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             if (filenames.size() == 0) {
-                output(Globals.lang("Not saved (empty session)") + ".");
+                output(Globals.lang("Not saved (empty session)") + '.');
             }
             else {
                 String[] names = new String[filenames.size()];
@@ -2458,7 +2458,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     names[i] = filenames.elementAt(i);
                 }
                 prefs.putStringArray("savedSession", names);
-                output(Globals.lang("Saved session") + ".");
+                output(Globals.lang("Saved session") + '.');
             }
 
         }

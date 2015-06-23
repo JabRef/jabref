@@ -63,7 +63,7 @@ public class Layout
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println(blockStart + "\n" + si.s);
+                        System.out.println(blockStart + '\n' + si.s);
                         System.out.println(
                                 "Nested field entries are not implemented !!!");
                         Thread.dumpStack();

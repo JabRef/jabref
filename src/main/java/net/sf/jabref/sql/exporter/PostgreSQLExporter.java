@@ -64,7 +64,7 @@ public class PostgreSQLExporter extends DBExporter {
                 dbstrings.getUsername(), dbstrings.getPassword());
         ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(conn,
                 "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='"
-                        + dbStrings.getDatabase() + "'")).getResultSet();
+                        + dbStrings.getDatabase() + '\'')).getResultSet();
         rs.next();
         if (rs.getInt("alreadyThere") == 0) {
             SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());

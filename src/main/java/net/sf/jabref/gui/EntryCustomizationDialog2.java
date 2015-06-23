@@ -325,7 +325,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                                 + "type will be declared "
                                 + "typeless. Continue?"),
                                 Globals.lang("Delete custom format") +
-                                        " '" + Util.nCase(name) + "'", JOptionPane.YES_NO_OPTION,
+                                        " '" + Util.nCase(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {
                     return;

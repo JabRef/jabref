@@ -186,7 +186,7 @@ public class DbImportAction extends AbstractWorker {
                 errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
                 JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
-                        + "\n" + errorMessage,
+                        + '\n' + errorMessage,
                         Globals.lang("Import from SQL database"),
                         JOptionPane.ERROR_MESSAGE);
                 frame.output(Globals.lang("Error importing from database"));

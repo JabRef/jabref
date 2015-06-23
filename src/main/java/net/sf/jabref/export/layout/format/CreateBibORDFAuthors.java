@@ -72,7 +72,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
             {
                 singleAuthor(sb, names[i], (i + 1));
                 if (i < (names.length - 1)) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
             }
         }

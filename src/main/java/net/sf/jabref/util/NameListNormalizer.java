@@ -206,12 +206,12 @@ public class NameListNormalizer {
                 // Multiple parts. Add all of them, and add a dot if they are single letter parts:
                 for (int i = 0; i < fParts.length; i++) {
                     if (fParts[i].length() == 1) {
-                        sb.append(fParts[i]).append(".");
+                        sb.append(fParts[i]).append('.');
                     } else {
                         sb.append(fParts[i]);
                     }
                     if (i < (fParts.length - 1)) {
-                        sb.append(" ");
+                        sb.append(' ');
                     }
                 }
             } else {
@@ -249,11 +249,11 @@ public class NameListNormalizer {
                 // Change into last name first format:
                 StringBuilder sb = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
-                    sb.append(",");
+                    sb.append(',');
                     for (int i = 0; i < (parts.length - 1); i++) {
-                        sb.append(" ").append(parts[i]);
+                        sb.append(' ').append(parts[i]);
                         if (parts[i].length() == 1) {
-                            sb.append(".");
+                            sb.append('.');
                         }
                     }
                 }

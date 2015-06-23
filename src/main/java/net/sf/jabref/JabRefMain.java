@@ -53,7 +53,7 @@ public class JabRefMain {
         String javaVersion = System.getProperty("java.version", null);
 
         if (javaVersion.compareTo("1.6") < 0) {
-            String javaVersionWarning = "\n" +
+            String javaVersionWarning = '\n' +
                     "WARNING: You are running Java version 1.6 or lower (" + javaVersion + " to be exact).\n" +
                     "         JabRef needs at least a Java Runtime Environment 1.6 or higher.\n" +
                     "         JabRef should not start properly and output an error message\n" +
@@ -65,9 +65,9 @@ public class JabRefMain {
 
         String javaVendor = System.getProperty("java.vendor", null);
         if ((!javaVendor.contains("Sun Microsystems")) && (!javaVendor.contains("Oracle"))) {
-            System.out.println("\n" +
+            System.out.println('\n' +
                     "WARNING: You are not running a Java version from Oracle (or Sun Microsystems).\n" +
-                    "         Your java vendor is: " + javaVendor + "\n" +
+                    "         Your java vendor is: " + javaVendor + '\n' +
                     "         If JabRef crashes please consider switching to an Oracle Java Runtime.\n" +
                     "         See http://jabref.sf.net/faq.php for more information.\n");
         }
@@ -83,7 +83,7 @@ public class JabRefMain {
 
             String errorMessage =
                     "\nERROR while starting or running JabRef:\n\n" +
-                            JabRefMain.exceptionToString(e.getCause()) + "\n" +
+                            JabRefMain.exceptionToString(e.getCause()) + '\n' +
                             "Please first check if this problem and a solution is already known. Find our...\n" +
                             "  * ...FAQ at http://jabref.sf.net/faq.php and our...\n" +
                             "  * ...user mailing-list at http://sf.net/mailarchive/forum.php?forum_name=jabref-users\n\n" +
@@ -93,8 +93,8 @@ public class JabRefMain {
                             "  * If the bug has not been reported yet, then we need the complete error message given above\n" +
                             "    and a description of what you did before the error occured.\n\n" +
                             "We also need the following information (you can copy and paste all this):\n" +
-                            "  * Java Version: " + javaVersion + "\n" +
-                            "  * Java Vendor: " + javaVendor + "\n" +
+                            "  * Java Version: " + javaVersion + '\n' +
+                            "  * Java Vendor: " + javaVendor + '\n' +
                             "  * Operating System: " + System.getProperty("os.name") + " (" + System.getProperty("os.version") + ")\n" +
                             "  * Hardware Architecture: " + System.getProperty("os.arch") + "\n\n" +
                             "We are sorry for the trouble and thanks for reporting problems with JabRef!\n";
@@ -116,7 +116,7 @@ public class JabRefMain {
                             "We also need the following information (you can copy and paste all this):</p>" +
                             "<ul><li>Java Version: " + javaVersion +
                             "<li>Java Vendor: " + javaVendor +
-                            "<li>Operating System: " + System.getProperty("os.name") + " (" + System.getProperty("os.version") + ")" +
+                            "<li>Operating System: " + System.getProperty("os.name") + " (" + System.getProperty("os.version") + ')' +
                             "<li>Hardware Architecture: " + System.getProperty("os.arch") + "</ul>" +
                             "We are sorry for the trouble and thanks for reporting problems with JabRef!</html>");
             pane.setEditable(false);
@@ -157,7 +157,7 @@ public class JabRefMain {
         } catch (UnsupportedClassVersionError e) {
 
             String errorMessage =
-                    JabRefMain.exceptionToString(e) + "\n" +
+                    JabRefMain.exceptionToString(e) + '\n' +
                             "This means that your Java version (" + javaVersion + ") is not high enough to run JabRef.\n" +
                             "Please update your Java Runtime Environment to a version 1.6 or higher.\n";
 

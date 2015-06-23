@@ -135,7 +135,7 @@ public class SQLUtil {
         while (li.hasNext()) {
             field = li.next();
             if (SQLUtil.reservedDBWords.contains(field)) {
-                field = field + "_";
+                field = field + '_';
             }
             str = str + field + datatype;
             if (li.hasNext()) {
@@ -211,7 +211,7 @@ public class SQLUtil {
      */
     public static ResultSet queryAllFromTable(Connection conn, String tableName)
             throws SQLException {
-        String query = "SELECT * FROM " + tableName + ";";
+        String query = "SELECT * FROM " + tableName + ';';
         Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
         return res.getResultSet();
     }
@@ -272,7 +272,7 @@ public class SQLUtil {
         String url;
         url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://"
                 + dbStrings.getServerHostname()
-                + (withDBName ? "/" + dbStrings.getDatabase() : "");
+                + (withDBName ? '/' + dbStrings.getDatabase() : "");
         return url;
     }
 

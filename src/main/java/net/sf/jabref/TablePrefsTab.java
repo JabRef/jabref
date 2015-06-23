@@ -214,7 +214,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(pan);
         builder2 = new DefaultFormBuilder(new FormLayout("left:pref, 8dlu, fill:pref", ""));
-        builder2.append(Globals.lang("Sort the following fields as numeric fields") + ":");
+        builder2.append(Globals.lang("Sort the following fields as numeric fields") + ':');
         builder2.append(numericFields);
         builder.append(builder2.getPanel(), 5);
         builder.nextLine();

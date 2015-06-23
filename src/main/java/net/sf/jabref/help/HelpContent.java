@@ -106,7 +106,7 @@ class HelpContent extends JTextPane {
             reference = "";
         }
 
-        String middle = prefs.get("language") + "/";
+        String middle = prefs.get("language") + '/';
         if (middle.equals("en/"))
          {
             middle = ""; // english in base help dir.
@@ -128,7 +128,7 @@ class HelpContent extends JTextPane {
                 HelpContent.log.error("Could not find html-help for file '" + file + "'.");
                 return;
             }
-            setPageOnly(new URL(resource.toString() + "#" + reference));
+            setPageOnly(new URL(resource.toString() + '#' + reference));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -157,7 +157,7 @@ class HelpContent extends JTextPane {
             if (url == null) {
                 System.out.println("Error: Help file not set");
             } else {
-                System.out.println("Error: Help file not found '" + url.getFile() + "'");
+                System.out.println("Error: Help file not found '" + url.getFile() + '\'');
             }
         }
     }
