@@ -20,7 +20,7 @@ package net.sf.jabref;
  * base frame through runCommand(). runCommand() finds the
  * appropriate BaseAction object, and runs its action() method.
  */
-public abstract class BaseAction {//implements Runnable {
+public interface BaseAction {//implements Runnable {
 
-    public abstract void action() throws Throwable;
+    void action() throws Throwable;
 }

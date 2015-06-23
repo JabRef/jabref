@@ -39,7 +39,7 @@ import net.sf.jabref.undo.UndoableInsertString;
  * Time: 9:49:02 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AppendDatabaseAction extends BaseAction {
+public class AppendDatabaseAction implements BaseAction {
 
     private final JabRefFrame frame;
     private final BasePanel panel;

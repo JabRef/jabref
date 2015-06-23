@@ -180,7 +180,7 @@ public class AccessLinksForEntries {
     }
 
 
-    public static class SaveWithLinkedFiles extends BaseAction {
+    public static class SaveWithLinkedFiles implements BaseAction {
 
         private final BasePanel panel;
 

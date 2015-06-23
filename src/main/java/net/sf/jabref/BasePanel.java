@@ -2906,7 +2906,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    class UndoAction extends BaseAction {
+    class UndoAction implements BaseAction {
 
         @Override
         public void action() {
@@ -2937,7 +2937,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    class RedoAction extends BaseAction {
+    class RedoAction implements BaseAction {
 
         @Override
         public void action() {
@@ -3221,7 +3221,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    private class SaveSelectedAction extends BaseAction {
+    private class SaveSelectedAction implements BaseAction {
 
         private final DatabaseSaveType saveType;
 

@@ -32,7 +32,7 @@ import java.awt.event.ActionEvent;
  * Jan 20th Adjusted to accomodate changes on SQL Exporter module by ifsteinm
  * 
  */
-public class DbConnectAction extends BaseAction {
+public class DbConnectAction implements BaseAction {
 
     private final BasePanel panel;
 

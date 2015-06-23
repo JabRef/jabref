@@ -13,7 +13,7 @@ import net.sf.jabref.undo.UndoableFieldChange;
  * Time: 8:48 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AttachFileAction extends BaseAction {
+public class AttachFileAction implements BaseAction {
 
     private BibtexEntry entry = null;
     private final BasePanel panel;

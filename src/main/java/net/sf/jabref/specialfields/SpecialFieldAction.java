@@ -21,7 +21,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.undo.NamedCompound;
 
-public class SpecialFieldAction extends BaseAction {
+public class SpecialFieldAction implements BaseAction {
 
     private final JabRefFrame frame;
     private final String doneTextPattern;

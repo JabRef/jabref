@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * Time: 6:24 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GroupAddRemoveDialog extends BaseAction {
+public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
     private final boolean add;
