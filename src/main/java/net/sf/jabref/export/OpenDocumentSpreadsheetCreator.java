@@ -15,22 +15,21 @@
 */
 package net.sf.jabref.export;
 
-import java.io.*;
-import java.net.URL;
-import java.util.Set;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
+import java.io.*;
+import java.net.URL;
+import java.util.Set;
+import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author alver
@@ -138,14 +137,12 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         try {
             InputStream in = url.openStream();
             byte[] buffer = new byte[256];
-            synchronized (in) {
-                synchronized (out) {
-                    while (true) {
-                        int bytesRead = in.read(buffer);
-                        if (bytesRead == -1)
-                            break;
-                        out.write(buffer, 0, bytesRead);
-                    }
+            synchronized (out) {
+                while (true) {
+                    int bytesRead = in.read(buffer);
+                    if (bytesRead == -1)
+                        break;
+                    out.write(buffer, 0, bytesRead);
                 }
             }
         } catch (IOException e) {
