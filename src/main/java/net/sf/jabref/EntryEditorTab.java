@@ -28,7 +28,7 @@ import java.util.Map;
 
 import javax.swing.*;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.FileListEditor;
 
@@ -148,7 +148,7 @@ class EntryEditorTab {
             JComponent ex = parent.getExtra(fields[i], ta);
 
             // Add autocompleter listener, if required for this field:
-            AbstractAutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
+            AutoCompleter autoComp = bPanel.getAutoCompleters().get(fields[i]);
             AutoCompleteListener acl = null;
             if (autoComp != null) {
                 acl = new AutoCompleteListener(autoComp);

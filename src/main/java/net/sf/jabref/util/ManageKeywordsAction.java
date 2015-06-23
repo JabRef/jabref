@@ -47,7 +47,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -232,7 +232,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AbstractAutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleter("keywords");
+        AutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);

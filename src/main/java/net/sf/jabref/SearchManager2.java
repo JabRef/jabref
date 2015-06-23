@@ -44,9 +44,6 @@ public class SearchManager2 extends SidePaneComponent
 
     private final JabRefFrame frame;
 
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
-
     private final IncrementalSearcher incSearcher;
     private SearchResultsDialog searchDialog = null;
 
@@ -264,7 +261,9 @@ public class SearchManager2 extends SidePaneComponent
         }
 
         JPanel main = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;

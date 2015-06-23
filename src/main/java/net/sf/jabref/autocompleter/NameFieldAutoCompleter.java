@@ -23,27 +23,26 @@ import net.sf.jabref.JabRefPreferences;
 /**
  * Interprets the given values as names and stores them in different
  * permutations so we can complete by beginning with last name or first name.
- * 
+ *
  * @author kahlert, cordes
- * 
  */
-public class NameFieldAutoCompleter extends AbstractAutoCompleter {
+class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     private final String[] fieldNames;
     private final boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "
-    private String prefix = "";
     private final boolean autoCompFF;
     private final boolean autoCompLF;
     private final boolean autoCompFullFirstOnly;
     private final boolean autoCompShortFirstOnly;
+
+    private String prefix = "";
 
 
     /**
      * @see AutoCompleterFactory
      */
     NameFieldAutoCompleter(String fieldName) {
-        this(new String[] {fieldName}, false);
-
+        this(new String[]{fieldName}, false);
     }
 
     public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace) {
@@ -52,12 +51,10 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         if (Globals.prefs.getBoolean("autoCompFF")) {
             autoCompFF = true;
             autoCompLF = false;
-        }
-        else if (Globals.prefs.getBoolean("autoCompLF")) {
+        } else if (Globals.prefs.getBoolean("autoCompLF")) {
             autoCompFF = false;
             autoCompLF = true;
-        }
-        else {
+        } else {
             autoCompFF = true;
             autoCompLF = true;
         }
@@ -80,37 +77,38 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     @Override
     public void addBibtexEntry(BibtexEntry entry) {
-        if (entry != null) {
-            for (String fieldName : fieldNames) {
-                String fieldValue = entry.getField(fieldName);
-                if (fieldValue != null) {
-                    AuthorList authorList = AuthorList.getAuthorList(fieldValue);
-                    for (int j = 0; j < authorList.size(); j++) {
-                        AuthorList.Author author = authorList.getAuthor(j);
-                        if (lastNameOnlyAndSeparationBySpace) {
-                            addWordToIndex(author.getLastOnly());
-                        } else {
-                            if (autoCompLF) {
-                                if (autoCompShortFirstOnly) {
-                                    addWordToIndex(author.getLastFirst(true));
-                                } else if (autoCompFullFirstOnly) {
-                                    addWordToIndex(author.getLastFirst(false));
-                                } else {
-                                    // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
-                                    addWordToIndex(author.getLastFirst(true));
-                                    addWordToIndex(author.getLastFirst(false));
-                                }
+        if (entry == null) {
+            return;
+        }
+        for (String fieldName : fieldNames) {
+            String fieldValue = entry.getField(fieldName);
+            if (fieldValue != null) {
+                AuthorList authorList = AuthorList.getAuthorList(fieldValue);
+                for (int j = 0; j < authorList.size(); j++) {
+                    AuthorList.Author author = authorList.getAuthor(j);
+                    if (lastNameOnlyAndSeparationBySpace) {
+                        addWordToIndex(author.getLastOnly());
+                    } else {
+                        if (autoCompLF) {
+                            if (autoCompShortFirstOnly) {
+                                addWordToIndex(author.getLastFirst(true));
+                            } else if (autoCompFullFirstOnly) {
+                                addWordToIndex(author.getLastFirst(false));
+                            } else {
+                                // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                                addWordToIndex(author.getLastFirst(true));
+                                addWordToIndex(author.getLastFirst(false));
                             }
-                            if (autoCompFF) {
-                                if (autoCompShortFirstOnly) {
-                                    addWordToIndex(author.getFirstLast(true));
-                                } else if (autoCompFullFirstOnly) {
-                                    addWordToIndex(author.getFirstLast(false));
-                                } else {
-                                    // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
-                                    addWordToIndex(author.getFirstLast(true));
-                                    addWordToIndex(author.getFirstLast(false));
-                                }
+                        }
+                        if (autoCompFF) {
+                            if (autoCompShortFirstOnly) {
+                                addWordToIndex(author.getFirstLast(true));
+                            } else if (autoCompFullFirstOnly) {
+                                addWordToIndex(author.getFirstLast(false));
+                            } else {
+                                // JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH
+                                addWordToIndex(author.getFirstLast(true));
+                                addWordToIndex(author.getFirstLast(false));
                             }
                         }
                     }
@@ -121,32 +119,15 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     /**
      * SIDE EFFECT: sets class variable prefix
-     * Delimiter: " and "
-     * 
+     * Delimiter: " and " or " "
+     *
      * @return String without prefix
      */
-    private String determinePrefixAndReturnRemainder_AND(String str) {
-        int index = str.toLowerCase().lastIndexOf(" and ");
+    private String determinePrefixAndReturnRemainder(String str, String delimiter) {
+        int index = str.toLowerCase().lastIndexOf(delimiter);
         if (index >= 0) {
-            prefix = str.substring(0, index + 5);
-            str = str.substring(index + 5);
-        } else {
-            prefix = "";
-        }
-        return str;
-    }
-
-    /**
-     * SIDE EFFECT: sets class variable prefix
-     * Delimiter: " "
-     * 
-     * @return String without prefix
-     */
-    private String determinePrefixAndReturnRemainder_SPACE(String str) {
-        int index = str.lastIndexOf(" ");
-        if (index >= 0) {
-            prefix = str.substring(0, index + 1);
-            str = str.substring(index + 1);
+            prefix = str.substring(0, index + delimiter.length());
+            str = str.substring(index + delimiter.length());
         } else {
             prefix = "";
         }
@@ -156,11 +137,11 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
     @Override
     public String[] complete(String str) {
         // Normally, one would implement that using 
-        // class inheritance. But this seemed to overengineered
+        // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
-            str = determinePrefixAndReturnRemainder_SPACE(str);
+            str = determinePrefixAndReturnRemainder(str, " ");
         } else {
-            str = determinePrefixAndReturnRemainder_AND(str);
+            str = determinePrefixAndReturnRemainder(str, " and ");
         }
         return super.complete(str);
     }

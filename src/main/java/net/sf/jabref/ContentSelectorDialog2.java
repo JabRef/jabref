@@ -397,7 +397,7 @@ class ContentSelectorDialog2 extends JDialog {
         } else {
             panel.updateAllContentSelectors();
         }
-        panel.addContentSelectorValuesToAutoCompleters();
+        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.metaData);
 
     }
 

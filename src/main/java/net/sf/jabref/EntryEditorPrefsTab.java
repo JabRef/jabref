@@ -22,9 +22,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
-
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -288,7 +287,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             }
         }
         // the autocompleter has to be updated to the new min length to complete 
-        AbstractAutoCompleter.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
+        AutoCompleterFactory.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
     }
 
     @Override

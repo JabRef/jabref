@@ -1,10 +1,6 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.autocompleter;
 
 import net.sf.jabref.*;
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
-import net.sf.jabref.autocompleter.AutoCompleterFactory;
-import net.sf.jabref.autocompleter.DefaultAutoCompleter;
-import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.testutils.TestUtils;
 
@@ -34,7 +30,7 @@ public class AutoCompleterTest {
     @Test
     public void testAutoCompleterFactory() {
         Globals.prefs = JabRefPreferences.getInstance();
-        AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         Assert.assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
 
         autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
@@ -43,7 +39,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testDefaultAutoCompleter() {
-        AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -60,7 +56,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testCrossRefCompleter() {
-        AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -74,7 +70,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testEntireFieldCompleter() {
-        AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.ENTIRE_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -89,7 +85,7 @@ public class AutoCompleterTest {
     @Test
     public void testNameFieldCompleter() {
         Globals.prefs = JabRefPreferences.getInstance();
-        AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.AUTHOR_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -156,7 +152,7 @@ public class AutoCompleterTest {
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AbstractAutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleter("author");
+        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("author");
         Assert.assertTrue(autoCompleter.indexContainsWord("Hans Meiser"));
         Assert.assertTrue(autoCompleter.indexContainsWord("Meiser, Hans"));
 
@@ -175,7 +171,7 @@ public class AutoCompleterTest {
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
         // test content of stored words in autocompleter ...
-        AbstractAutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleter("journal");
+        AutoCompleter autoCompleter = JabRef.jrf.basePanel().getAutoCompleters().get("journal");
         Assert.assertTrue(autoCompleter.indexContainsWord("New Testtext"));
 
         TestUtils.closeJabRef();
@@ -185,7 +181,6 @@ public class AutoCompleterTest {
         Globals.prefs = JabRefPreferences.getInstance();
         File fileToLoad = new File(AutoCompleterTest.PATH_TO_TEST_BIBTEX);
         ParserResult pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-        BibtexDatabase filledDatabase = pr.getDatabase();
-        return filledDatabase;
+        return pr.getDatabase();
     }
 }

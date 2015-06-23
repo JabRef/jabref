@@ -51,7 +51,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
@@ -1357,7 +1357,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         fe.setValidBackgroundColor();
 
                         // See if we need to update an AutoCompleter instance:
-                        AbstractAutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
+                        AutoCompleter aComp = panel.getAutoCompleters().get(fe.getFieldName());
                         if (aComp != null) {
                             aComp.addBibtexEntry(entry);
                         }

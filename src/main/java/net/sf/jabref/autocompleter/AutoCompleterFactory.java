@@ -15,6 +15,9 @@
 */
 package net.sf.jabref.autocompleter;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+
 /**
  * Returns an autocompleter to a given fieldname.
  * 
@@ -22,18 +25,22 @@ package net.sf.jabref.autocompleter;
  */
 public class AutoCompleterFactory {
 
-    public static AbstractAutoCompleter getFor(String fieldName) {
-        AbstractAutoCompleter result;
-        if (fieldName.equals("author") || fieldName.equals("editor")) {
-            result = new NameFieldAutoCompleter(fieldName);
-        } else if (fieldName.equals("crossref")) {
-            result = new CrossrefAutoCompleter(fieldName);
-        } else if (fieldName.equals("journal") || fieldName.equals("publisher")) {
-            result = new EntireFieldAutoCompleter(fieldName);
+    public static int SHORTEST_TO_COMPLETE = Globals.prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE);
+
+    public static AutoCompleter getFor(String fieldName) {
+        if ("author".equals(fieldName) || "editor".equals(fieldName)) {
+            return new NameFieldAutoCompleter(fieldName);
+        } else if ("crossref".equals(fieldName)) {
+            return new CrossrefAutoCompleter();
+        } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
+            return new EntireFieldAutoCompleter(fieldName);
         } else {
-            result = new DefaultAutoCompleter(fieldName);
+            return new DefaultAutoCompleter(fieldName);
         }
-        return result;
+    }
+
+    public static AutoCompleter getFor(String fieldName, String secondFieldName) {
+        return new NameFieldAutoCompleter(new String[]{fieldName, secondFieldName}, true);
     }
 
 }

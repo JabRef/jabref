@@ -422,7 +422,7 @@ class ManageJournalsPanel extends JPanel {
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
         for (int i = 0; i < frame.baseCount(); i++) {
-            frame.baseAt(i).addJournalListToAutoCompleter();
+            frame.baseAt(i).getAutoCompleters().addJournalListToAutoCompleter();
         }
 
     }

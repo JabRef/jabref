@@ -75,7 +75,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
@@ -1315,17 +1315,6 @@ public class Util {
             return new File(newName);
         } else {
             return fileName;
-        }
-    }
-
-    /**
-     * This methods assures all words in the given entry are recorded in their
-     * respective Completers, if any.
-     */
-    public static void updateCompletersForEntry(HashMap<String, AbstractAutoCompleter> autoCompleters, BibtexEntry bibtexEntry) {
-        for (Map.Entry<String, AbstractAutoCompleter> entry : autoCompleters.entrySet()) {
-            AbstractAutoCompleter comp = entry.getValue();
-            comp.addBibtexEntry(bibtexEntry);
         }
     }
 

@@ -50,9 +50,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleterFactory;
-import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
+import net.sf.jabref.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
@@ -153,13 +153,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     // Hashtable indexing the only search auto completer
     // required for the SearchAutoCompleterUpdater
-    private final HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
+    private AutoCompleter searchAutoCompleter;
 
-    private final HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
-    // Hashtable that holds as keys the names of the fields where
-    // autocomplete is active, and references to the autocompleter objects.
-
-    private NameFieldAutoCompleter searchCompleter = null;
     private AutoCompleteListener searchCompleteListener = null;
 
     // The undo manager.
@@ -208,7 +203,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Keeps track of the string dialog if it is open.
 
     private SaveDatabaseAction saveAction;
-    private CleanUpAction cleanUpAction;
 
     /**
      * The group selector component for this database. Instantiated by the
@@ -217,8 +211,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     //GroupSelector groupSelector;
 
-    private boolean
-            showingSearch = false;
+    private boolean showingSearch = false;
     private boolean showingGroup = false;
     public boolean sortingBySearchResults = false;
     public boolean coloringBySearchResults = false;
@@ -231,10 +224,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Potential use in hiding non-hits completely.
 
     // MetaData parses, keeps and writes meta data.
-    MetaData metaData;
+    final MetaData metaData;
 
     private final HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
+
+    public ContentAutoCompleters getAutoCompleters() {
+        return autoCompleters;
+    }
+
+    private ContentAutoCompleters autoCompleters;
 
 
     /**
@@ -250,15 +249,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         setupActions();
         setupMainPanel();
         encoding = Globals.prefs.get("defaultEncoding");
-        //System.out.println("Default: "+encoding);
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
-            MetaData metaData, String encoding) {
-        init(frame, db, file, metaData, encoding);
-    }
-
-    private void init(JabRefFrame frame, BibtexDatabase db, File file,
             MetaData metaData, String encoding) {
         assert (frame != null);
         assert (db != null);
@@ -349,7 +342,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void setupActions() {
         saveAction = new SaveDatabaseAction(this);
-        cleanUpAction = new CleanUpAction(this);
+        CleanUpAction cleanUpAction = new CleanUpAction(this);
 
         actions.put("undo", undoAction);
         actions.put("redo", redoAction);
@@ -1966,7 +1959,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                Util.updateCompletersForEntry(BasePanel.this.searchAutoCompleterHM, e.getEntry());
+                searchAutoCompleter.addBibtexEntry(e.getEntry());
             }
         }
     }
@@ -1980,7 +1973,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                Util.updateCompletersForEntry(BasePanel.this.getAutoCompleters(), e.getEntry());
+                BasePanel.this.autoCompleters.addEntry(e.getEntry());
             }
         }
     }
@@ -2222,7 +2215,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean("autoComplete")) {
-            instantiateAutoCompleters();
+            autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         }
@@ -2236,70 +2229,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
     }
 
-    private HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
-        return autoCompleters;
-    }
-
-    public AbstractAutoCompleter getAutoCompleter(String fieldName) {
-        return autoCompleters.get(fieldName);
-    }
-
     private void instantiateSearchAutoCompleter() {
-        searchCompleter = new NameFieldAutoCompleter(new String[] {"author", "editor"}, true);
-        searchAutoCompleterHM.put("x", searchCompleter);
+        AutoCompleter searchCompleter = AutoCompleterFactory.getFor("author", "editor");
         for (BibtexEntry entry : database.getEntries()) {
-            Util.updateCompletersForEntry(searchAutoCompleterHM, entry);
+            searchCompleter.addBibtexEntry(entry);
         }
         searchCompleteListener = new AutoCompleteListener(searchCompleter);
         searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
-    }
-
-    private void instantiateAutoCompleters() {
-        autoCompleters.clear();
-        String[] completeFields = Globals.prefs.getStringArray("autoCompleteFields");
-        for (String field : completeFields) {
-            AbstractAutoCompleter autoCompleter = AutoCompleterFactory.getFor(field);
-            autoCompleters.put(field, autoCompleter);
-        }
-        for (BibtexEntry entry : database.getEntries()) {
-            Util.updateCompletersForEntry(autoCompleters, entry);
-        }
-
-        addJournalListToAutoCompleter();
-        addContentSelectorValuesToAutoCompleters();
-    }
-
-    /**
-     * For all fields with both autocompletion and content selector, add content selector
-     * values to the autocompleter list:
-     */
-    public void addContentSelectorValuesToAutoCompleters() {
-        for (Map.Entry<String, AbstractAutoCompleter> stringAbstractAutoCompleterEntry : autoCompleters.entrySet()) {
-            AbstractAutoCompleter ac = stringAbstractAutoCompleterEntry.getValue();
-            if (metaData.getData(Globals.SELECTOR_META_PREFIX + stringAbstractAutoCompleterEntry.getKey()) != null) {
-                Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + stringAbstractAutoCompleterEntry.getKey());
-                if (items != null) {
-                    for (String item : items) {
-                        ac.addWordToIndex(item);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * If an autocompleter exists for the "journal" field, add all
-     * journal names in the journal abbreviation list to this autocompleter.
-     */
-    public void addJournalListToAutoCompleter() {
-        if (autoCompleters.containsKey("journal")) {
-            AbstractAutoCompleter ac = autoCompleters.get("journal");
-            Set<String> journals = Globals.journalAbbrev.getJournals().keySet();
-            for (String journal : journals) {
-                ac.addWordToIndex(journal);
-            }
-        }
-
     }
 
     /*

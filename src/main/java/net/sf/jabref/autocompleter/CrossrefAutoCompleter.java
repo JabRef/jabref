@@ -19,21 +19,10 @@ import net.sf.jabref.BibtexEntry;
 
 /**
  * Crossref autocompleter stores info from the key field.
- * 
+ *
  * @author kahlert, cordes
- * 
  */
-public class CrossrefAutoCompleter extends AbstractAutoCompleter {
-
-    private final String _fieldName;
-
-
-    /**
-     * @see AutoCompleterFactory
-     */
-    CrossrefAutoCompleter(String fieldName) {
-        _fieldName = fieldName;
-    }
+class CrossrefAutoCompleter extends AbstractAutoCompleter {
 
     @Override
     public boolean isSingleUnitField() {
@@ -41,17 +30,14 @@ public class CrossrefAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public String[] complete(String s) {
-        return super.complete(s);
-    }
-
-    @Override
     public void addBibtexEntry(BibtexEntry entry) {
-        if (entry != null) {
-            String key = entry.getCiteKey();
-            if (key != null) {
-                addWordToIndex(key.trim());
-            }
+        if (entry == null) {
+            return;
+        }
+
+        String key = entry.getCiteKey();
+        if (key != null) {
+            addWordToIndex(key.trim());
         }
     }
 }
