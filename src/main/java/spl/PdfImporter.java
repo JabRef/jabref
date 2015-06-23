@@ -242,7 +242,7 @@ public class PdfImporter {
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
                         if (selected > -1 /*&& selected < documents.getDocuments().size()*/) {
                             //Document document = documents/*.getDocuments().get(selected)*/;
-                            String id = Util.createNeutralId();
+                            String id = IdGenerator.next();
                             entry = new BibtexEntry(id);
                             if (fieldExists(document.getType())) {
                                 type = BibtexEntryType.getStandardType(document.getType());
@@ -392,7 +392,7 @@ public class PdfImporter {
         BibtexEntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not cancelled.
-            String id = Util.createNeutralId();
+            String id = IdGenerator.next();
             final BibtexEntry be = new BibtexEntry(id, type);
             try {
                 panel.database().insertEntry(be);

@@ -88,7 +88,7 @@ public class BibtexEntry
 
 
     public BibtexEntry() {
-        this(Util.createNeutralId());
+        this(IdGenerator.next());
     }
 
     public BibtexEntry(String id)

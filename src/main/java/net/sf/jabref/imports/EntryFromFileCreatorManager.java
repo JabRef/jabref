@@ -128,7 +128,7 @@ public final class EntryFromFileCreatorManager {
                     entry.setType(entryType);
                 }
                 if (entry.getId() == null) {
-                    entry.setId(Util.createNeutralId());
+                    entry.setId(IdGenerator.next());
                 }
                 /*
                  * TODO: database.insertEntry(BibtexEntry) is not sensible. Why

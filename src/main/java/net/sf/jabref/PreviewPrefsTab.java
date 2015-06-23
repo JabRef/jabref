@@ -210,7 +210,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         if (PreviewPrefsTab.entry != null) {
             return PreviewPrefsTab.entry;
         }
-        PreviewPrefsTab.entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
+        PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
         PreviewPrefsTab.entry.setField(BibtexFields.KEY_FIELD, "conceicao1997");
         PreviewPrefsTab.entry
                 .setField(

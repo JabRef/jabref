@@ -16,7 +16,7 @@
 package net.sf.jabref.oo;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 
 /**
  * Subclass of BibtexEntry for representing entries referenced in a document that can't
@@ -28,7 +28,7 @@ class UndefinedBibtexEntry extends BibtexEntry {
 
 
     public UndefinedBibtexEntry(String key) {
-        super(Util.createNeutralId());
+        super(IdGenerator.next());
         this.key = key;
         setField("author", OOBibStyle.UNDEFINED_CITATION_MARKER);
     }

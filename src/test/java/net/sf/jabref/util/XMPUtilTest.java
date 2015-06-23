@@ -22,8 +22,6 @@ import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.util.*;
 
-import static org.junit.Assert.*;
-
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
  *
@@ -155,7 +153,7 @@ public class XMPUtilTest {
     }
 
     public BibtexEntry t2BibtexEntry() {
-        BibtexEntry e = new BibtexEntry(Util.createNeutralId(),
+        BibtexEntry e = new BibtexEntry(IdGenerator.next(),
                 BibtexEntryType.INCOLLECTION);
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");

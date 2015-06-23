@@ -163,7 +163,7 @@ public class ImportFormatReader {
 
         for (BibtexEntry entry : bibentries) {
             try {
-                entry.setId(Util.createNeutralId());
+                entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
             } catch (KeyCollisionException ex) {
                 System.err.println("KeyCollisionException [ addBibEntries(...) ]");

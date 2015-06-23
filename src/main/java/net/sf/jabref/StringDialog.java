@@ -419,7 +419,7 @@ class StringDialog extends JDialog {
                 return;
             }
             try {
-                String newId = Util.createNeutralId();
+                String newId = IdGenerator.next();
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:

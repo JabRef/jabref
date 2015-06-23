@@ -483,7 +483,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             metaData = new MetaData();
         }
         try {
-            entry.setId(Util.createNeutralId());
+            entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
             database.insertEntry(entry);
         } catch (KeyCollisionException ex) {
@@ -527,7 +527,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         for (BibtexEntry entry : entries) {
             // if (newDatabase) {
             try {
-                entry.setId(Util.createNeutralId());
+                entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
             } catch (KeyCollisionException ex) {
                 ex.printStackTrace();
@@ -762,7 +762,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
 
                     try {
-                        entry.setId(Util.createNeutralId());
+                        entry.setId(IdGenerator.next());
                         panel.database().insertEntry(entry);
                         ce.addEdit(new UndoableInsertEntry(panel.database(), entry, panel));
                     } catch (KeyCollisionException e) {

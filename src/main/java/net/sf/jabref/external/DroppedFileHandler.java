@@ -253,7 +253,7 @@ public class DroppedFileHandler {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    aXmpEntriesInFile.setId(Util.createNeutralId());
+                    aXmpEntriesInFile.setId(IdGenerator.next());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
                     panel.getDatabase().insertEntry(aXmpEntriesInFile);
                     doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
@@ -340,7 +340,7 @@ public class DroppedFileHandler {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
                 try {
-                    aXmpEntriesInFile.setId(Util.createNeutralId());
+                    aXmpEntriesInFile.setId(IdGenerator.next());
                     edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
                     panel.getDatabase().insertEntry(aXmpEntriesInFile);
                     doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);

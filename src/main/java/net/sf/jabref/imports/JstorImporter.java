@@ -20,11 +20,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
-import net.sf.jabref.AuthorList;
+
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -80,7 +77,7 @@ public class JstorImporter extends ImportFormat {
                 break;
             }
             String[] fields = s.split("\t");
-            BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+            BibtexEntry be = new BibtexEntry(IdGenerator.next());
             try {
                 if (fields[0].equals("FLA")) {
                     be.setType(BibtexEntryType

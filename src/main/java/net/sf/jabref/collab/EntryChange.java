@@ -98,7 +98,7 @@ class EntryChange extends Change {
 
         /*panel.database().removeEntry(memEntry.getId());
         try {
-          diskEntry.setId(Util.createNeutralId());
+          diskEntry.setId(Util.next());
         } catch (KeyCollisionException ex) {}
         panel.database().removeEntry(memEntry.getId());*/
 

@@ -604,7 +604,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 // entries must exist
                                 // independently of the copied
                                 // ones.
-                                be.setId(Util.createNeutralId());
+                                be.setId(IdGenerator.next());
                                 database.insertEntry(be);
 
                                 ce.addEdit(new UndoableInsertEntry
@@ -1507,7 +1507,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     return;
                 }
 
-                String id = Util.createNeutralId();
+                String id = IdGenerator.next();
                 BibtexEntry bibEntry = new BibtexEntry(id, tp);
                 TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this,
                         "import", true,
@@ -1876,7 +1876,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             type = etd.getChoice();
         }
         if (type != null) { // Only if the dialog was not cancelled.
-            String id = Util.createNeutralId();
+            String id = IdGenerator.next();
             final BibtexEntry be = new BibtexEntry(id, type);
             try {
                 database.insertEntry(be);

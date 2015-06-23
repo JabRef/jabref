@@ -321,7 +321,7 @@ public class AuxSubGenerator
     private void insertEntry(BibtexDatabase auxDB, BibtexEntry entry) {
         try {
             BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
-            clonedEntry.setId(Util.createNeutralId());
+            clonedEntry.setId(IdGenerator.next());
             auxDB.insertEntry(clonedEntry);
         } catch (KeyCollisionException e) {
             e.printStackTrace();

@@ -495,7 +495,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             						BibtexEntry e = (BibtexEntry) it.next();
 
             						try {
-            							e.setId(Util.createNeutralId());
+            							e.setId(Util.next());
             							database.insertEntry(e);
             							ce.addEdit(new UndoableInsertEntry(database, e, panel));
             						} catch (Exception e2) {

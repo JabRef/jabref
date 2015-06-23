@@ -76,7 +76,7 @@ class StyleSelectDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final BibtexEntry prevEntry = new BibtexEntry(Util.createNeutralId());
+    private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
 
     private boolean okPressed = false;
     private String initSelection;

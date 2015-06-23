@@ -22,7 +22,6 @@ package net.sf.jabref;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -41,7 +40,6 @@ import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -75,7 +73,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
@@ -110,19 +107,13 @@ public class Util {
     private static SimpleDateFormat dateFormatter = null;
 
     /*
-     * Colors are defined here.
-     *  
-     */
-    public static Color fieldsCol = new Color(180, 180, 200);
-
-    /*
      * Integer values for indicating result of duplicate check (for entries):
      * 
      */
     final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
             EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
 
-    private final static NumberFormat idFormat;
+
 
     private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
@@ -131,16 +122,7 @@ public class Util {
     private static final int IMPORT_MARK_LEVEL = Util.MARK_COLOR_LEVELS;
     private static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
-    static {
-        idFormat = NumberFormat.getInstance();
-        Util.idFormat.setMinimumIntegerDigits(8);
-        Util.idFormat.setGroupingUsed(false);
-    }
 
-
-    public static int getMinimumIntegerDigits() {
-        return Util.idFormat.getMinimumIntegerDigits();
-    }
 
     public static void pr(String s) {
         Globals.logger(s);
@@ -157,20 +139,20 @@ public class Util {
 
     }
 
-    public static String checkName(String s) {
-        // Append '.bib' to the string unless it ends with that.
-        if ((s.length() < 4) || !s.substring(s.length() - 4).equalsIgnoreCase(".bib")) {
+    /**
+     * Append '.bib' to the string unless it ends with that.
+     *
+     * makeBibtexExtension("asfd") => "asdf.bib"
+     * makeBibtexExtension("asdf.bib") => "asdf.bib"
+     *
+     * @param s the string
+     * @return s or s + ".bib"
+     */
+    public static String makeBibtexExtension(String s) {
+        if(!s.toLowerCase().endsWith(".bib")) {
             return s + ".bib";
         }
         return s;
-    }
-
-
-    private static int idCounter = 0;
-
-
-    public synchronized static String createNeutralId() {
-        return Util.idFormat.format(Util.idCounter++);
     }
 
     /**
@@ -2547,12 +2529,6 @@ public class Util {
             }
         }
         return al.toArray(new String[al.size()]);
-    }
-
-    public static <T> T[] concat(T[] first, T[] second) {
-        T[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
-        return result;
     }
 
     /**

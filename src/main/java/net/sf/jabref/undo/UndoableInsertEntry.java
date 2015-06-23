@@ -17,10 +17,7 @@ package net.sf.jabref.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -72,7 +69,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
         // Redo the change.
         try {
-            String id = Util.createNeutralId();
+            String id = IdGenerator.next();
             entry.setId(id);
             base.insertEntry(entry);
         } catch (Throwable ex) {

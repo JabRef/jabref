@@ -35,10 +35,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -450,7 +447,7 @@ public class RepecNepImporter extends ImportFormat {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
-                    BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+                    BibtexEntry be = new BibtexEntry(IdGenerator.next());
                     be.setType(BibtexEntryType.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);

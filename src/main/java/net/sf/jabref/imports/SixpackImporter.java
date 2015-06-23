@@ -21,11 +21,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -149,7 +146,7 @@ public class SixpackImporter extends ImportFormat {
                     }
                     typ = BibtexEntryType.getType(type.toLowerCase());
                 }
-                entry = new BibtexEntry(Util.createNeutralId(), typ);
+                entry = new BibtexEntry(IdGenerator.next(), typ);
                 String fld;
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);

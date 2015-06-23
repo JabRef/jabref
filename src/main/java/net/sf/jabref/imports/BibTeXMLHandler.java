@@ -17,10 +17,7 @@ package net.sf.jabref.imports;
 
 import java.util.ArrayList;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -80,7 +77,7 @@ class BibTeXMLHandler extends DefaultHandler {
                     articleID = atts.getValue(i);
                 }
             }
-            b = new BibtexEntry(Util.createNeutralId());
+            b = new BibtexEntry(IdGenerator.next());
             b.setField(BibtexFields.KEY_FIELD, articleID);
         } else if (raw.equals("bibtex:article") ||
                 raw.equals("bibtex:inbook") ||

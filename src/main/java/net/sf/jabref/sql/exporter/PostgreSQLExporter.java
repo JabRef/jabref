@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -123,7 +123,7 @@ public class PostgreSQLExporter extends DBExporter {
                 "SELECT create_table_if_not_exists ('CREATE TABLE entries ( \n"
                         + "entries_id      SERIAL, \n"
                         + "jabref_eid      VARCHAR("
-                        + Util.getMinimumIntegerDigits()
+                        + IdGenerator.getMinimumIntegerDigits()
                         + ")   DEFAULT NULL, \n"
                         + "database_id INTEGER, \n"
                         + "entry_types_id  INTEGER DEFAULT NULL, \n"

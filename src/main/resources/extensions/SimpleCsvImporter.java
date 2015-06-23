@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import net.sf.jabref.*;
+import net.sf.jabref.IdGenerator;
 import net.sf.jabref.imports.ImportFormat;
 import net.sf.jabref.imports.ImportFormatReader;
 
@@ -30,7 +31,7 @@ public boolean isRecognizedFormat(InputStream stream) throws IOException {
     while (line != null) {
       if (!"".equals(line.trim())) {
         String[] fields = line.split(";");
-        BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+        BibtexEntry be = new BibtexEntry(IdGenerator.next());
         be.setType(BibtexEntryType.getType("techreport"));
         be.setField("year", fields[0]);
         be.setField("author", fields[1]);

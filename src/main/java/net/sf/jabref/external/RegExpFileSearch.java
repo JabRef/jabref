@@ -37,7 +37,7 @@ public class RegExpFileSearch {
 
 
     public static void main(String[] args) {
-        BibtexEntry entry = new BibtexEntry(Util.createNeutralId());
+        BibtexEntry entry = new BibtexEntry(IdGenerator.next());
         entry.setField(BibtexFields.KEY_FIELD, "raffel01");
         entry.setField("year", "2001");
         ArrayList<String> extensions = new ArrayList<String>();

@@ -15,8 +15,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 public class UtilTest {
 
     @Test
@@ -51,24 +49,12 @@ public class UtilTest {
     }
 
     @Test
-    public void testCheckName() {
-        Assert.assertEquals("aa.bib", Util.checkName("aa"));
-        Assert.assertEquals(".bib", Util.checkName(""));
-        Assert.assertEquals("a.bib", Util.checkName("a.bib"));
-        Assert.assertEquals("a.bib", Util.checkName("a"));
-        Assert.assertEquals("a.bb.bib", Util.checkName("a.bb"));
-    }
-
-    @Test
-    public void testCreateNeutralId() {
-
-        HashSet<String> set = new HashSet<String>();
-        for (int i = 0; i < 10000; i++) {
-            String string = Util.createNeutralId();
-            Assert.assertFalse(set.contains(string));
-            set.add(string);
-        }
-
+    public void testMakeBibtexExtension() {
+        Assert.assertEquals("aa.bib", Util.makeBibtexExtension("aa"));
+        Assert.assertEquals(".bib", Util.makeBibtexExtension(""));
+        Assert.assertEquals("a.bib", Util.makeBibtexExtension("a.bib"));
+        Assert.assertEquals("a.bib", Util.makeBibtexExtension("a"));
+        Assert.assertEquals("a.bb.bib", Util.makeBibtexExtension("a.bb"));
     }
 
     @Test

@@ -54,7 +54,7 @@ class StringAddChange extends Change {
             Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
         }
         try {
-            secondary.addString(new BibtexString(Util.createNeutralId(), string.getName(),
+            secondary.addString(new BibtexString(IdGenerator.next(), string.getName(),
                     string.getContent()));
         } catch (KeyCollisionException ex) {
             Globals.logger("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());

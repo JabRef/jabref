@@ -2,7 +2,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class OAI2ImportTest {
     public void setUp() throws Exception {
         parserFactory = SAXParserFactory.newInstance();
         saxParser = parserFactory.newSAXParser();
-        be = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
+        be = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
         handler = new OAI2Handler(be);
     }
 

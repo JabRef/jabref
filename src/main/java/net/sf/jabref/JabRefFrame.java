@@ -2168,7 +2168,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             BibtexDatabase database = new BibtexDatabase();
             for (BibtexEntry entry : bibentries) {
                 try {
-                    entry.setId(Util.createNeutralId());
+                    entry.setId(IdGenerator.next());
                     database.insertEntry(entry);
                 } catch (KeyCollisionException ex) {
                     //ignore
@@ -2227,7 +2227,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 if (!dupli) {
                     try {
-                        entry.setId(Util.createNeutralId());
+                        entry.setId(IdGenerator.next());
                         database.insertEntry(entry);
                         ce.addEdit(new UndoableInsertEntry
                                 (database, entry, basePanel));

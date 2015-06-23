@@ -21,13 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.ExplicitGroup;
@@ -135,7 +129,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     "entries WHERE database_id= '" + database_id + "';");
             while (rsEntries.next()) {
                 String id = rsEntries.getString("entries_id");
-                BibtexEntry entry = new BibtexEntry(Util.createNeutralId(),
+                BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
                         types.get(rsEntries.getString("entry_types_id")));
                 entry.setField(BibtexFields.KEY_FIELD,
                         rsEntries.getString("cite_key"));
@@ -162,7 +156,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     database.setPreamble(content);
                 } else {
                     BibtexString string = new BibtexString(
-                            Util.createNeutralId(), label, content);
+                            IdGenerator.next(), label, content);
                     database.addString(string);
                 }
             }

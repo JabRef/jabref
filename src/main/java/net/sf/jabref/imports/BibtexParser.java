@@ -437,7 +437,7 @@ public class BibtexParser {
         // Util.pr("Now I'm going to consume a }");
         consume('}', ')');
         // Util.pr("Finished string parsing.");
-        String id = Util.createNeutralId();
+        String id = IdGenerator.next();
         return new BibtexString(id, name, content);
     }
 
@@ -446,7 +446,7 @@ public class BibtexParser {
     }
 
     private BibtexEntry parseEntry(BibtexEntryType tp) throws IOException {
-        String id = Util.createNeutralId();// createId(tp, _db);
+        String id = IdGenerator.next();// createId(tp, _db);
         BibtexEntry result = new BibtexEntry(id, tp);
         skipWhitespace();
         consume('{', '(');

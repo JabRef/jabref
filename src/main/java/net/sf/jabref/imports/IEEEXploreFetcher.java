@@ -47,12 +47,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -669,7 +664,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 System.err.println(text);
             }
 
-            entry = new BibtexEntry(Util.createNeutralId(), type);
+            entry = new BibtexEntry(IdGenerator.next(), type);
 
             if (typeName.equalsIgnoreCase("IEEE Standards")) {
                 entry.setField("organization", "IEEE");

@@ -99,7 +99,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         } else {
             Util.pr(Action.NAME);
             Util.pr(e.getActionCommand());
-            filesToOpen.add(new File(Util.checkName(e.getActionCommand())));
+            filesToOpen.add(new File(Util.makeBibtexExtension(e.getActionCommand())));
         }
 
         BasePanel toRaise = null;

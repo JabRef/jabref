@@ -77,7 +77,7 @@ class StringChange extends Change {
 
         } else {
             // The string was removed or renamed locally. We guess that it was removed.
-            String newId = Util.createNeutralId();
+            String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, label, disk);
             try {
                 panel.database().addString(bs);
@@ -92,7 +92,7 @@ class StringChange extends Change {
             tmpString.setContent(disk);
         }
         else {
-            BibtexString bs = new BibtexString(Util.createNeutralId(), label, disk);
+            BibtexString bs = new BibtexString(IdGenerator.next(), label, disk);
             secondary.addString(bs);
         }
 

@@ -147,7 +147,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
         if (m.find()) {
-            BibtexEntry entry = new BibtexEntry(Util.createNeutralId());
+            BibtexEntry entry = new BibtexEntry(IdGenerator.next());
             entry.setField("title", m.group(1));
 
             // Find authors:

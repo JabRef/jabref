@@ -46,7 +46,7 @@ public class BasicSearchTest {
     }
 
     public BibtexEntry makeBibtexEntry() {
-        BibtexEntry e = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.INCOLLECTION);
+        BibtexEntry e = new BibtexEntry(IdGenerator.next(), BibtexEntryType.INCOLLECTION);
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");

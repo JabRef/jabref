@@ -129,7 +129,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (String key : fromDatabase.getKeySet()) {
                 originalEntry = fromDatabase.getEntryById(key);
                 BibtexEntry be = (BibtexEntry) (originalEntry.clone());
-                be.setId(Util.createNeutralId());
+                be.setId(IdGenerator.next());
                 Util.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
                 database.insertEntry(be);
                 appendedEntries.add(be);

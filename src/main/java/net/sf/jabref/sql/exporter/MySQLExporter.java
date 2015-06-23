@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -98,7 +98,7 @@ public class MySQLExporter extends DBExporter {
                 "CREATE TABLE IF NOT EXISTS entries ( \n"
                         + "entries_id      INTEGER         NOT NULL AUTO_INCREMENT, \n"
                         + "jabref_eid      VARCHAR("
-                        + Util.getMinimumIntegerDigits()
+                        + IdGenerator.getMinimumIntegerDigits()
                         + ")   DEFAULT NULL, \n"
                         + "database_id INT UNSIGNED, \n"
                         + "entry_types_id  INT UNSIGNED         DEFAULT NULL, \n"
