@@ -176,7 +176,7 @@ public class FileListTableModel extends AbstractTableModel {
         if (sb.length() > 0) {
             thisEntry.add(sb.toString());
         }
-        if (thisEntry.size() > 0) {
+        if (!thisEntry.isEmpty()) {
             if (firstOnly) {
                 return decodeEntry(thisEntry, deduceUnknownTypes);
             } else {

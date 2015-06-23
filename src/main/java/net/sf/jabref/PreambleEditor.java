@@ -149,7 +149,7 @@ class PreambleEditor extends JDialog {
         public void actionPerformed(ActionEvent e) {
             String toSet = null;
             boolean set;
-            if (ed.getText().length() > 0) {
+            if (!ed.getText().isEmpty()) {
                 toSet = ed.getText();
             }
             // We check if the field has changed, since we don't want to mark the
@@ -165,7 +165,7 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if ((toSet != null) && (toSet.length() > 0)) {
+                if ((toSet != null) && (!toSet.isEmpty())) {
                     ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                     ed.setValidBackgroundColor();
                 } else {

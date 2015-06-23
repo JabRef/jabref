@@ -351,7 +351,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                             FileListEntry flEntry = null;
                             // If there are one or more links of the correct type,
                             // open the first one:
-                            if (listOfFileTypes.size() > 0) {
+                            if (!listOfFileTypes.isEmpty()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
                                     flEntry = fileList.getEntry(i);
                                     boolean correctType = false;
@@ -469,7 +469,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 }
 
                 String description = flEntry.getDescription();
-                if ((description == null) || (description.trim().length() == 0)) {
+                if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.getLink();
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
@@ -530,7 +530,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (!previewActive) {
             panel.hideBottomComponent();
         } else {
-            if (table.getSelected().size() > 0) {
+            if (!table.getSelected().isEmpty()) {
                 updatePreview(table.getSelected().get(0), false);
             }
         }
@@ -546,7 +546,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (previewActive) {
             this.preview = previewPanel[activePreview];
 
-            if (table.getSelected().size() > 0) {
+            if (!table.getSelected().isEmpty()) {
                 updatePreview(table.getSelected().get(0), true);
             }
         }

@@ -312,7 +312,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         }
 
         String result = sbOrig.toString().trim();
-        entry.setField(m_searchField, (result.length() > 0 ? result : null));
+        entry.setField(m_searchField, (!result.isEmpty() ? result : null));
     }
 
     @Override

@@ -295,7 +295,7 @@ public class ExportFormat implements IExportFormat {
         // Clear custom name formatters:
         Globals.prefs.customExportNameFormatters = null;
 
-        if (missingFormatters.size() > 0) {
+        if (!missingFormatters.isEmpty()) {
             StringBuilder sb = new StringBuilder("The following formatters could not be found").
                     append(": ");
             for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
@@ -333,7 +333,7 @@ public class ExportFormat implements IExportFormat {
                 for (String line1 : lines) {
                     String line = line1.trim();
                     // Do not deal with empty lines:
-                    if (line.length() == 0) {
+                    if (line.isEmpty()) {
                         continue;
                     }
                     int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?

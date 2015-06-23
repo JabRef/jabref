@@ -317,7 +317,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         String oldVal = _prefs.get("numericFields");
         String newVal = numericFields.getText().trim();
-        if (newVal.length() == 0) {
+        if (newVal.isEmpty()) {
             newVal = null;
         }
         if (((newVal != null) && (oldVal == null))

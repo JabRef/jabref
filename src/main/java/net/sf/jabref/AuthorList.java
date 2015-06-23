@@ -398,7 +398,7 @@ public class AuthorList {
 
         // Second step: split name into parts (here: calculate indices
         // of parts in 'tokens' Vector)
-        if (tokens.size() == 0)
+        if (tokens.isEmpty())
          {
             return null; // no author information
         }

@@ -112,7 +112,7 @@ public class CustomExportList {
 
     public void store() {
 
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             purge(0);
         } else {
             for (int i = 0; i < list.size(); i++) {

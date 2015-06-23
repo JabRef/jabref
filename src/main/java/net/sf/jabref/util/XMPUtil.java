@@ -155,7 +155,7 @@ public class XMPUtil {
                 }
 
                 // If we did not find anything have a look if a Dublin Core exists
-                if (result.size() == 0) {
+                if (result.isEmpty()) {
                     schemas = meta
                             .getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
                     for (XMPSchema schema : schemas) {
@@ -169,7 +169,7 @@ public class XMPUtil {
                     }
                 }
             }
-            if (result.size() == 0) {
+            if (result.isEmpty()) {
                 BibtexEntry entry = XMPUtil.getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
 
@@ -184,7 +184,7 @@ public class XMPUtil {
         }
 
         // return null, if no metadata was found
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             return null;
         }
         return result;
@@ -250,7 +250,7 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return (entry.getAllFields().size() > 0 ? entry : null);
+        return (!entry.getAllFields().isEmpty() ? entry : null);
     }
 
     /**
@@ -318,7 +318,7 @@ public class XMPUtil {
          * Year + Month -> Date
          */
         List<String> dates = dcSchema.getSequenceList("dc:date");
-        if ((dates != null) && (dates.size() > 0)) {
+        if ((dates != null) && (!dates.isEmpty())) {
             String date = dates.get(0).trim();
             Calendar c = null;
             try {
@@ -437,7 +437,7 @@ public class XMPUtil {
          * Type -> Type
          */
         List<String> l = dcSchema.getTypes();
-        if ((l != null) && (l.size() > 0)) {
+        if ((l != null) && (!l.isEmpty())) {
             s = l.get(0);
             if (s != null) {
                 BibtexEntryType type = BibtexEntryType.getStandardType(s);
@@ -447,7 +447,7 @@ public class XMPUtil {
             }
         }
 
-        return (entry.getAllFields().size() > 0 ? entry : null);
+        return (!entry.getAllFields().isEmpty() ? entry : null);
     }
 
     /**
@@ -1235,7 +1235,7 @@ public class XMPUtil {
                 Collection<BibtexEntry> entries = result.getDatabase()
                         .getEntries();
 
-                if (entries.size() == 0) {
+                if (entries.isEmpty()) {
                     System.err.println("Could not find BibtexEntry in "
                             + args[0]);
                 } else {
@@ -1269,7 +1269,7 @@ public class XMPUtil {
                 Collection<BibtexEntry> entries = result.getDatabase()
                         .getEntries();
 
-                if (entries.size() == 0) {
+                if (entries.isEmpty()) {
                     System.err.println("Could not find BibtexEntry in "
                             + args[0]);
                 } else {
@@ -1323,7 +1323,7 @@ public class XMPUtil {
     public static boolean hasMetadata(InputStream is) {
         try {
             List<BibtexEntry> l = XMPUtil.readXMP(is);
-            return l.size() > 0;
+            return !l.isEmpty();
         } catch (Exception e) {
             return false;
         }

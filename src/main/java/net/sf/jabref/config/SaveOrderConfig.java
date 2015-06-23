@@ -44,7 +44,7 @@ public class SaveOrderConfig {
         if (data == null) {
             throw new NullPointerException();
         }
-        if (data.size() == 0) {
+        if (data.isEmpty()) {
             throw new IllegalArgumentException();
         }
 

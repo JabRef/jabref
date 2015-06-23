@@ -221,7 +221,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
         String[] completed = findCompletions(currentword.toString(), comp);
         String prefix = completer.getPrefix();
-        String cWord = (prefix != null) && (prefix.length() > 0) ?
+        String cWord = (prefix != null) && (!prefix.isEmpty()) ?
                 currentword.toString().substring(prefix.length()) : currentword.toString();
         if (AutoCompleteListener.logger.isLoggable(Level.FINEST)) {
             AutoCompleteListener.logger.finest("startCompletion");
@@ -295,7 +295,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     AutoCompleteListener.logger.finest("cont");
 
                     toSetIn = toSetIn.substring(1);
-                    if (toSetIn.length() > 0) {
+                    if (!toSetIn.isEmpty()) {
                         int cp = comp.getCaretPosition();
                         //comp.setCaretPosition(cp+1-toSetIn.);
                         //System.out.println(cp-toSetIn.length()+" - "+cp);

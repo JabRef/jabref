@@ -668,7 +668,7 @@ public class JabRefPreferences {
     public void updateSpecialFieldHandling() {
         putBracesAroundCapitalsFields.clear();
         String fieldString = get("putBracesAroundCapitals");
-        if (fieldString.length() > 0) {
+        if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
                 putBracesAroundCapitalsFields.add(field.trim());
@@ -676,7 +676,7 @@ public class JabRefPreferences {
         }
         nonWrappableFields.clear();
         fieldString = get("nonWrappableFields");
-        if (fieldString.length() > 0) {
+        if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
                 nonWrappableFields.add(field.trim());

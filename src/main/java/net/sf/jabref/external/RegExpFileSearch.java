@@ -165,7 +165,7 @@ public class RegExpFileSearch {
         }
         res = RegExpFileSearch.findFile(entry, database, root, file, extensionRegExp);
 
-        if (res.size() > 0) {
+        if (!res.isEmpty()) {
             for (int i = 0; i < res.size(); i++) {
                 try {
                     /**

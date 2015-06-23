@@ -127,7 +127,7 @@ public class TXMLReader
             String data = node.getAttribute(attrName);
             if (data != null)
             {
-                if (data.length() > 0)
+                if (!data.isEmpty())
                 {
                     try
                     {
@@ -147,7 +147,7 @@ public class TXMLReader
             String data = node.getAttribute(attrName);
             if (data != null)
             {
-                if (data.length() > 0)
+                if (!data.isEmpty())
                 {
                     return data;
                 }
@@ -163,7 +163,7 @@ public class TXMLReader
             String data = node.getAttribute(attrName);
             if (data != null)
             {
-                if (data.length() > 0)
+                if (!data.isEmpty())
                 {
                     return Double.parseDouble(data);
                 }

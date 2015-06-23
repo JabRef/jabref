@@ -213,7 +213,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             entryList = Arrays.asList(entries);
         }
         String toSet = text.getText();
-        if (toSet.length() == 0) {
+        if (toSet.isEmpty()) {
             toSet = null;
         }
         String[] fields = getFieldNames(field.getText().trim().toLowerCase());

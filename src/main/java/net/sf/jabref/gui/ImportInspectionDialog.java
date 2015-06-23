@@ -411,7 +411,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
         entries.getReadWriteLock().writeLock().unlock();
         glTable.clearSelection();
-        if ((row >= 0) && (entries.size() > 0)) {
+        if ((row >= 0) && (!entries.isEmpty())) {
             row = Math.min(entries.size() - 1, row);
             glTable.addRowSelectionInterval(row, row);
         }
@@ -675,7 +675,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             NamedCompound ce = new NamedCompound(undoName);
 
             // See if we should remove any old entries for duplicate resolving:
-            if (entriesToDelete.size() > 0) {
+            if (!entriesToDelete.isEmpty()) {
                 for (BibtexEntry entry : entriesToDelete) {
                     ce.addEdit(new UndoableRemoveEntry(panel.database(), entry, panel));
                     panel.database().removeEntry(entry.getId());
@@ -692,7 +692,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             final List<BibtexEntry> selected = getSelectedEntries();
 
-            if (selected.size() > 0) {
+            if (!selected.isEmpty()) {
 
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
@@ -784,7 +784,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
                     panel.markBaseChanged();
 
-                    if (selected.size() > 0) {
+                    if (!selected.isEmpty()) {
                         frame.output(Globals.lang("Number of entries successfully imported") +
                                 ": " + selected.size());
                     } else {
@@ -1045,7 +1045,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (int i = 0; i < fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
                 String description = flEntry.getDescription();
-                if ((description == null) || (description.trim().length() == 0)) {
+                if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.getLink();
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry

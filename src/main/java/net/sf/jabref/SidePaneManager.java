@@ -273,7 +273,7 @@ public class SidePaneManager {
 
     public void updateView() {
         sidep.setComponents(visible);
-        if (visible.size() > 0) {
+        if (!visible.isEmpty()) {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {

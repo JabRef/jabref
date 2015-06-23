@@ -443,7 +443,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         Vector<String> dir = new Vector<String>(1);
         String text = fileDir.getText().trim();
-        if (text.length() > 0) {
+        if (!text.isEmpty()) {
             dir.add(text);
             metaData.putData(Globals.prefs.get("userFileDir"), dir);
         } else {
@@ -452,7 +452,7 @@ public class DatabasePropertiesDialog extends JDialog {
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         dir = new Vector<String>(1);
         text = fileDirIndv.getText().trim();
-        if (text.length() > 0) {
+        if (!text.isEmpty()) {
             dir.add(text);
             metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
         } else {
@@ -461,7 +461,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         dir = new Vector<String>(1);
         text = pdfDir.getText().trim();
-        if (text.length() > 0) {
+        if (!text.isEmpty()) {
             dir.add(text);
             metaData.putData("pdfDirectory", dir);
         } else {
@@ -470,7 +470,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         dir = new Vector<String>(1);
         text = psDir.getText().trim();
-        if (text.length() > 0) {
+        if (!text.isEmpty()) {
             dir.add(text);
             metaData.putData("psDirectory", dir);
         } else {

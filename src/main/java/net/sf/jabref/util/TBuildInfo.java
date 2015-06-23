@@ -79,7 +79,7 @@ public class TBuildInfo
         {
             while ((buf = input.readLine()) != null)
             {
-                if (buf.length() > 0)
+                if (!buf.isEmpty())
                 { // no empty lines
                     if (buf.charAt(0) != '#')
                     { // data line, comments - first char = #

@@ -111,7 +111,7 @@ class OOBibBase {
     public void selectDocument() throws Exception {
         List<XTextDocument> ls = getTextDocuments();
         XTextDocument selected;
-        if (ls.size() == 0) {
+        if (ls.isEmpty()) {
             // No text documents found.
             throw new Exception("No Writer documents found");
         }
@@ -1376,7 +1376,7 @@ class OOBibBase {
             }
             String text = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if ((text.indexOf('\n') == -1) && (text.trim().length() == 0)) {
+            if ((text.indexOf('\n') == -1) && (text.trim().isEmpty())) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference

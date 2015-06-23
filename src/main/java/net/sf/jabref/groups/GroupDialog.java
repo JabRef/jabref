@@ -410,7 +410,7 @@ class GroupDialog extends JDialog {
 
     private void updateComponents() {
         // all groups need a name
-        boolean okEnabled = m_name.getText().trim().length() > 0;
+        boolean okEnabled = !m_name.getText().trim().isEmpty();
         if (!okEnabled) {
             setDescription(Globals.lang("Please enter a name for the group."));
             m_ok.setEnabled(false);
@@ -421,7 +421,7 @@ class GroupDialog extends JDialog {
             s1 = m_kgSearchField.getText().trim();
             okEnabled = okEnabled && s1.matches("\\w+");
             s2 = m_kgSearchTerm.getText().trim();
-            okEnabled = okEnabled && (s2.length() > 0);
+            okEnabled = okEnabled && (!s2.isEmpty());
             if (!okEnabled) {
                 setDescription(Globals.lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             } else {
@@ -444,7 +444,7 @@ class GroupDialog extends JDialog {
             setNameFontItalic(true);
         } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
-            okEnabled = okEnabled & (s1.length() > 0);
+            okEnabled = okEnabled & (!s1.isEmpty());
             if (!okEnabled) {
                 setDescription(Globals.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
                         + "<tt>smith</tt><p>"
@@ -493,7 +493,7 @@ class GroupDialog extends JDialog {
                 vec.add(entry);
             }
         }
-        if (vec.size() > 0) {
+        if (!vec.isEmpty()) {
             BibtexEntry[] entries = new BibtexEntry[vec.size()];
             vec.toArray(entries);
             if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_resultingGroup},

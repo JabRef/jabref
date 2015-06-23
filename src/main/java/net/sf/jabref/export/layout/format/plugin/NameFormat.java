@@ -139,7 +139,7 @@ public class NameFormat implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if ((parameters == null) || (parameters.length() == 0)) {
+        if ((parameters == null) || (parameters.isEmpty())) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 

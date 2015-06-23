@@ -630,7 +630,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // first element (#) not inside tableRows
             for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
                 String name = panel.mainTable.getColumnName(i);
-                if ((name != null) && (name.length() != 0)) {
+                if ((name != null) && (!name.isEmpty())) {
                     map.put(name.toLowerCase(), i);
                 }
             }

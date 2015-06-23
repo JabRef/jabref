@@ -1035,7 +1035,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     public void updateAllContentSelectors() {
-        if (contentSelectors.size() > 0) {
+        if (!contentSelectors.isEmpty()) {
             for (FieldContentSelector contentSelector : contentSelectors) {
                 contentSelector.rebuildComboBox();
             }
@@ -1322,7 +1322,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // Trim the whitespace off this value
                 String currentText = fe.getText();
                 String trim = currentText.trim();
-                if (trim.length() > 0) {
+                if (!trim.isEmpty()) {
                     toSet = trim;
                 }
 

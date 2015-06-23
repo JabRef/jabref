@@ -306,7 +306,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         }
 
         // Remove those that should be removed:
-        if (toRemove.size() > 0) {
+        if (!toRemove.isEmpty()) {
             for (Object aToRemove : toRemove) {
                 typeDeletion((String) aToRemove);
             }

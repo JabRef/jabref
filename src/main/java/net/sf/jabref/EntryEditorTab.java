@@ -212,7 +212,7 @@ class EntryEditorTab {
     private boolean isFieldModified(FieldEditor f) {
         String text = f.getText().trim();
 
-        if (text.length() == 0) {
+        if (text.isEmpty()) {
             return getEntry().getField(f.getFieldName()) != null;
         } else {
             Object entryValue = getEntry().getField(f.getFieldName());

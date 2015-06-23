@@ -252,7 +252,7 @@ public class DuplicateCheck {
             return s1.equals(s2) ? 1.0 : 0.0;
         }
         else if (minLength == 0) {
-            return (s1.length() == 0) && (s2.length() == 0) ? 1.0 : 0;
+            return (s1.isEmpty()) && (s2.isEmpty()) ? 1.0 : 0;
         }
 
         // Convert strings to numbers and harmonize length in a method dependent on truncate:

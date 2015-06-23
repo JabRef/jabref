@@ -269,7 +269,7 @@ public class BibtexEntry
      */
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
-        if ((fieldValue != null) && (fieldValue.length() > 0)) {
+        if ((fieldValue != null) && (!fieldValue.isEmpty())) {
             return fieldValue;
         }
 
@@ -451,7 +451,7 @@ public class BibtexEntry
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
-            if ((value != null) && (value.length() > 0)) {
+            if ((value != null) && (!value.isEmpty())) {
                 return true;
             }
         }

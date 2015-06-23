@@ -100,7 +100,7 @@ public class ErrorConsole extends Handler {
     private void addTextArea(JTabbedPane tabbed, String title, String output, String ifEmpty) {
         JTextArea ta = new JTextArea(output);
         ta.setEditable(false);
-        if ((ifEmpty != null) && (ta.getText().length() == 0)) {
+        if ((ifEmpty != null) && (ta.getText().isEmpty())) {
             ta.setText(ifEmpty);
         }
         JScrollPane sp = new JScrollPane(ta);

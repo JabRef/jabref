@@ -112,7 +112,7 @@ public class FileHistory extends JMenu implements ActionListener {
     }
 
     public void storeHistory() {
-        if (history.size() > 0) {
+        if (!history.isEmpty()) {
             String[] names = new String[history.size()];
             for (int i = 0; i < names.length; i++) {
                 names[i] = history.get(i);

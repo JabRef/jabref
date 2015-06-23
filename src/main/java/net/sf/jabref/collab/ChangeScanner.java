@@ -244,7 +244,7 @@ public class ChangeScanner implements Runnable {
 
         // Now we've found all exact matches, look through the remaining entries, looking
         // for close matches.
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
 
             for (Iterator<Integer> it = notMatched.iterator(); it.hasNext();) {
 
@@ -416,7 +416,7 @@ public class ChangeScanner implements Runnable {
         }
 
         // See if we can detect a name change for those entries that we couldn't match.
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
             for (Iterator<String> i = notMatched.iterator(); i.hasNext();) {
                 BibtexString tmp = onTmp.getString(i.next());
 
@@ -456,7 +456,7 @@ public class ChangeScanner implements Runnable {
             }
         }
 
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
             // Still one or more non-matched strings. So they must have been removed.
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);

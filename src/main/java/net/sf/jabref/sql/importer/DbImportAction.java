@@ -150,7 +150,7 @@ public class DbImportAction extends AbstractWorker {
                     matrix.add(v);
                 }
 
-                if (matrix.size() > 0) {
+                if (!matrix.isEmpty()) {
                     DBImportExportDialog dialogo = new DBImportExportDialog(
                             frame, matrix,
                             DBImportExportDialog.DialogType.IMPORTER);

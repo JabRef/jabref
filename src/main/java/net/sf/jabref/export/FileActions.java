@@ -236,7 +236,7 @@ public class FileActions {
             }
 
             // Write type definitions, if any:
-            if (types.size() > 0) {
+            if (!types.isEmpty()) {
                 for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                     BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
@@ -413,7 +413,7 @@ public class FileActions {
             }
 
             // Write type definitions, if any:
-            if (types.size() > 0) {
+            if (!types.isEmpty()) {
                 for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
                     CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
                     tp.save(fw);

@@ -222,7 +222,7 @@ public class FileListEntryEditor {
 
     private void checkExtension() {
         if ((types.getSelectedIndex() == -1) &&
-                (link.getText().trim().length() > 0)) {
+                (!link.getText().trim().isEmpty())) {
 
             // Check if this looks like a remote link:
             if (FileListEntryEditor.remoteLinkPattern.matcher(link.getText()).matches()) {
@@ -297,7 +297,7 @@ public class FileListEntryEditor {
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {
             types.setSelectedItem(entry.getType());
-        } else if ((entry.getLink() != null) && (entry.getLink().length() > 0)) {
+        } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {
             checkExtension();
         }
 
@@ -358,7 +358,7 @@ public class FileListEntryEditor {
         @Override
         public void actionPerformed(ActionEvent e) {
             File initial = new File(comp.getText().trim());
-            if (comp.getText().trim().length() == 0) {
+            if (comp.getText().trim().isEmpty()) {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get("fileWorkingDirectory"));
             }

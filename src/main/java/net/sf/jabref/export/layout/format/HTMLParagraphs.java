@@ -38,7 +38,7 @@ public class HTMLParagraphs implements LayoutFormatter {
 
         fieldText = fieldText.trim();
 
-        if (fieldText.length() == 0) {
+        if (fieldText.isEmpty()) {
             return fieldText;
         }
 
@@ -50,7 +50,7 @@ public class HTMLParagraphs implements LayoutFormatter {
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             String middle = m.group(1).trim();
-            if (middle.length() > 0) {
+            if (!middle.isEmpty()) {
                 s.append("<p>\n");
                 m.appendReplacement(s, m.group(1));
                 s.append("\n</p>\n");

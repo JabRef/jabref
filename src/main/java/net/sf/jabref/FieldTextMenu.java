@@ -114,7 +114,7 @@ public class FieldTextMenu implements MouseListener
                 String txt = myFieldName.getSelectedText();
                 boolean cStat = false;
                 if (txt != null) {
-                    if (txt.length() > 0) {
+                    if (!txt.isEmpty()) {
                         cStat = true;
                     }
                 }
@@ -188,7 +188,7 @@ public class FieldTextMenu implements MouseListener
             {
                 String data = ClipBoardManager.clipBoard.getClipboardContents();
                 if (data != null) {
-                    if (data.length() > 0) {
+                    if (!data.isEmpty()) {
                         if (myFieldName != null) {
                             myFieldName.paste(data);
                         }
@@ -219,7 +219,7 @@ public class FieldTextMenu implements MouseListener
                 {
                     String data = myFieldName.getSelectedText();
                     if (data != null) {
-                        if (data.length() > 0) {
+                        if (!data.isEmpty()) {
                             ClipBoardManager.clipBoard.setClipboardContents(data);
                         }
                     }

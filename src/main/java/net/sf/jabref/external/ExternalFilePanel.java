@@ -264,7 +264,7 @@ public class ExternalFilePanel extends JPanel {
         final String res = JOptionPane.showInputDialog(parent,
                 Globals.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().length() == 0)) {
+        if ((res == null) || (res.trim().isEmpty())) {
             return;
         }
 

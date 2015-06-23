@@ -225,15 +225,15 @@ public class Authors extends AbstractParamLayoutFormatter {
             else if (comp(key, "Amp")) {
                 lastSeparator = Authors.AMP;
             }
-            else if (comp(key, "Sep") && (value.length() > 0)) {
+            else if (comp(key, "Sep") && (!value.isEmpty())) {
                 separator = value;
                 setSep = true;
             }
-            else if (comp(key, "LastSep") && (value.length() > 0)) {
+            else if (comp(key, "LastSep") && (!value.isEmpty())) {
                 lastSeparator = value;
             }
         }
-        else if (key.trim().toLowerCase().equals("etal") && (value.length() > 0)) {
+        else if (key.trim().toLowerCase().equals("etal") && (!value.isEmpty())) {
             etAlString = value;
         }
         else if (Authors.numberPattern.matcher(key.trim()).matches()) {
@@ -296,11 +296,11 @@ public class Authors extends AbstractParamLayoutFormatter {
         String firstNamePart = a.getFirst();
         String lastNamePart = a.getLast();
         String von = a.getVon();
-        if ((von != null) && (von.length() > 0)) {
+        if ((von != null) && (!von.isEmpty())) {
             lastNamePart = von + ' ' + lastNamePart;
         }
         String jr = a.getJr();
-        if ((jr != null) && (jr.length() > 0)) {
+        if ((jr != null) && (!jr.isEmpty())) {
             lastNamePart = lastNamePart + jrSeparator + jr;
         }
 

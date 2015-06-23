@@ -288,7 +288,7 @@ public class BibtexEntryWriter {
      * @return The display version of the field name.
      */
     private String getFieldDisplayName(String field) {
-        if (field.length() == 0) {
+        if (field.isEmpty()) {
             // hard coded "UNKNOWN" is assigned to a field without any name
             field = "UNKNOWN";
         }

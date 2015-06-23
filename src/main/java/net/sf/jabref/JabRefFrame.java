@@ -804,7 +804,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored file name.
-            if (filenames.size() == 0) {
+            if (filenames.isEmpty()) {
                 prefs.remove("lastEdited");
             }
             else {
@@ -2148,7 +2148,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     private int addBibEntries(List<BibtexEntry> bibentries, String filename,
                               boolean intoNew) {
-        if ((bibentries == null) || (bibentries.size() == 0)) {
+        if ((bibentries == null) || (bibentries.isEmpty())) {
 
             // No entries found. We need a message for this.
             JOptionPane.showMessageDialog(JabRefFrame.this, Globals.lang("No entries found. Please make sure you are "
@@ -2273,7 +2273,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
         }
 
-        if (customImporters.size() > 0) {
+        if (!customImporters.isEmpty()) {
             submenu.addSeparator();
         }
 
@@ -2449,7 +2449,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
 
-            if (filenames.size() == 0) {
+            if (filenames.isEmpty()) {
                 output(Globals.lang("Not saved (empty session)") + '.');
             }
             else {

@@ -127,7 +127,7 @@ public class DuplicateSearch implements Runnable {
             @Override
             public void run() {
                 // Now, do the actual removal:
-                if (toRemove.size() > 0) {
+                if (!toRemove.isEmpty()) {
                     for (BibtexEntry entry : toRemove) {
                         panel.database.removeEntry(entry.getId());
                         ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));

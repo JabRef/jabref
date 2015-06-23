@@ -128,7 +128,7 @@ public class SearchResultsDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (selectionModel.getSelected().size() > 0) {
+                if (!selectionModel.getSelected().isEmpty()) {
                     BibtexEntry[] bes = selectionModel.getSelected().toArray
                             (new BibtexEntry[selectionModel.getSelected().size()]);
                     TransferableBibtexEntry trbe
@@ -378,7 +378,7 @@ public class SearchResultsDialog {
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
                     String description = flEntry.getDescription();
-                    if ((description == null) || (description.trim().length() == 0)) {
+                    if ((description == null) || (description.trim().isEmpty())) {
                         description = flEntry.getLink();
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,

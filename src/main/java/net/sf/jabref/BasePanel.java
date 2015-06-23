@@ -857,7 +857,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 //rows = entryTable.getSelectedRows() ;
                 numSelected = entries.size();
 
-                if (entries.size() == 0) { // None selected. Inform the user to select entries first.
+                if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
                     JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
                             Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
                     return;
@@ -1024,7 +1024,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             keys.add(be.getField(BibtexFields.KEY_FIELD));
                         }
                     }
-                    if (keys.size() == 0) {
+                    if (keys.isEmpty()) {
                         output("None of the selected entries have BibTeX keys.");
                         return;
                     }
@@ -1067,7 +1067,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             keys.add(be.getField(BibtexFields.KEY_FIELD));
                         }
                     }
-                    if (keys.size() == 0) {
+                    if (keys.isEmpty()) {
                         output("None of the selected entries have BibTeX keys.");
                         return;
                     }
@@ -1224,7 +1224,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     }
                                     if (result.get(bes[0]) != null) {
                                         List<File> res = result.get(bes[0]);
-                                        if (res.size() > 0) {
+                                        if (!res.isEmpty()) {
                                             filepath = res.get(0).getPath();
                                             int index = filepath.lastIndexOf('.');
                                             if ((index >= 0) && (index < (filepath.length() - 1))) {
@@ -3188,7 +3188,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * the Back and Forward commands.
      */
     private void back() {
-        if (previousEntries.size() > 0) {
+        if (!previousEntries.isEmpty()) {
             BibtexEntry toShow = previousEntries.get(previousEntries.size() - 1);
             previousEntries.remove(previousEntries.size() - 1);
             // Add the entry we are going back from to the Forward history:
@@ -3202,7 +3202,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void forward() {
-        if (nextEntries.size() > 0) {
+        if (!nextEntries.isEmpty()) {
             BibtexEntry toShow = nextEntries.get(nextEntries.size() - 1);
             nextEntries.remove(nextEntries.size() - 1);
             // Add the entry we are going forward from to the Back history:
@@ -3216,8 +3216,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void setBackAndForwardEnabledState() {
-        frame.back.setEnabled(previousEntries.size() > 0);
-        frame.forward.setEnabled(nextEntries.size() > 0);
+        frame.back.setEnabled(!previousEntries.isEmpty());
+        frame.forward.setEnabled(!nextEntries.isEmpty());
     }
 
 

@@ -303,10 +303,10 @@ if ((c == '&') && !escape &&
         }
 
         // Then we throw an exception if the error criteria are met.
-        if ((right.size() > 0) && (left.size() == 0)) {
+        if ((!right.isEmpty()) && (left.isEmpty())) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
-        if ((right.size() > 0) && (right.elementAt(0)
+        if ((!right.isEmpty()) && (right.elementAt(0)
                 < left.elementAt(0))) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }

@@ -49,7 +49,7 @@ public class GoogleUrlCleaner {
 
     // clean Google URL
     public static String cleanUrl(String dirty) {
-        if ((dirty == null) || (dirty.length() == 0)) {
+        if ((dirty == null) || (dirty.isEmpty())) {
             return dirty;
         }
         try {

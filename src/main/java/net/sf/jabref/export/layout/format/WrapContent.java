@@ -46,7 +46,7 @@ public class WrapContent extends AbstractParamLayoutFormatter {
         if (before == null) {
             return "";
         }
-        if (fieldText.length() == 0) {
+        if (fieldText.isEmpty()) {
             return "";
         } else {
             return before + fieldText + after;

@@ -49,13 +49,13 @@ public class CustomEntryType extends BibtexEntryType {
 
     private CustomEntryType(String name_, String reqStr, String optStr) {
         name = name_;
-        if (reqStr.length() == 0) {
+        if (reqStr.isEmpty()) {
             req = new String[0];
         } else {
             parseRequiredFields(reqStr);
 
         }
-        if (optStr.length() == 0) {
+        if (optStr.isEmpty()) {
             opt = new String[0];
         } else {
             opt = optStr.split(";");
@@ -79,7 +79,7 @@ public class CustomEntryType extends BibtexEntryType {
             }
         }
         req = fields.toArray(new String[fields.size()]);
-        if (sets.size() > 0) {
+        if (!sets.isEmpty()) {
             reqSets = sets.toArray(new String[sets.size()][]);
         }
     }

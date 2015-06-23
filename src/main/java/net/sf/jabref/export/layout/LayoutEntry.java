@@ -235,7 +235,7 @@ class LayoutEntry {
 
                     if (fieldText == null) {
                         if ((i + 1) < layoutEntries.length) {
-                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().length() == 0) {
+                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
                                 continue;
@@ -419,7 +419,7 @@ class LayoutEntry {
     private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
             throws Exception {
 
-        if (className.length() > 0) {
+        if (!className.isEmpty()) {
             try {
                 try {
                     return (LayoutFormatter) Class.forName(classPrefix + className).newInstance();

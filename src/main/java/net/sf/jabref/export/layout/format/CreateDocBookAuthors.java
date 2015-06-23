@@ -104,20 +104,20 @@ public class CreateDocBookAuthors implements LayoutFormatter
         for (int i = 0; i < al.size(); i++) {
             sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
-            if ((a.getFirst() != null) && (a.getFirst().length() > 0)) {
+            if ((a.getFirst() != null) && (!a.getFirst().isEmpty())) {
                 sb.append("<firstname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getFirst()));
                 sb.append("</firstname>");
             }
-            if ((a.getVon() != null) && (a.getVon().length() > 0)) {
+            if ((a.getVon() != null) && (!a.getVon().isEmpty())) {
                 sb.append("<othername>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getVon()));
                 sb.append("</othername>");
             }
-            if ((a.getLast() != null) && (a.getLast().length() > 0)) {
+            if ((a.getLast() != null) && (!a.getLast().isEmpty())) {
                 sb.append("<surname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
-                if ((a.getJr() != null) && (a.getJr().length() > 0)) {
+                if ((a.getJr() != null) && (!a.getJr().isEmpty())) {
                     sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
                 }
                 sb.append("</surname>");
