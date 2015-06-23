@@ -268,7 +268,8 @@ class OOUtil {
         String[] values = new String[list.size()];
         int ii = 0;
         for (XTextDocument doc : list) {
-            values[ii++] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            ii++;
         }
         JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

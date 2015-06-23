@@ -777,7 +777,8 @@ class OOBibBase {
         int i = 0;
         for (ComparableMark mark : set) {
             //System.out.println(mark.getPosition().X+" -- "+mark.getPosition().Y+" : "+mark.getName());
-            names[i++] = mark.getName();
+            names[i] = mark.getName();
+            i++;
         }
         tvc.gotoRange(initialPos, false);
         //xFrame.dispose();

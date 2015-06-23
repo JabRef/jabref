@@ -185,7 +185,8 @@ public class SidePaneManager {
         int index = 0;
         for (SidePaneComponent comp : visible) {
             String componentName = getComponentName(comp);
-            preferredPositions.put(componentName, index++);
+            preferredPositions.put(componentName, index);
+            index++;
         }
 
         // Split the map into a pair of parallel String arrays suitable for storage

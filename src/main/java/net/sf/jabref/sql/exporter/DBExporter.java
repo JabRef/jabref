@@ -194,7 +194,8 @@ public abstract class DBExporter extends DBImporterExporter {
                         + database_id + "' AND parent_id='" + parentID + "';");
         // setting values to ID and myID to be used in case of textual SQL
         // export
-        int myID = ++currentID;
+        ++currentID;
+        int myID = currentID;
         if (response instanceof Statement) {
             ResultSet rs = ((Statement) response).getResultSet();
             rs.next();
@@ -342,7 +343,8 @@ public abstract class DBExporter extends DBImporterExporter {
         }
         for (Enumeration<GroupTreeNode> e = cursor.children(); e
                 .hasMoreElements();) {
-            currentID = populateGroupsTable(e.nextElement(), myID, ++currentID,
+            ++currentID;
+            currentID = populateGroupsTable(e.nextElement(), myID, currentID,
                     out, database_id);
         }
         return currentID;

@@ -66,7 +66,8 @@ public class FileHistory extends JMenu implements ActionListener {
         int i = 0;
         while (i < history.size()) {
             if (history.get(i).equals(filename)) {
-                history.remove(i--);
+                history.remove(i);
+                i--;
             }
             i++;
         }
@@ -85,7 +86,8 @@ public class FileHistory extends JMenu implements ActionListener {
         Iterator<String> i = history.iterator();
         int count = 1;
         while (i.hasNext()) {
-            addItem(i.next(), count++);
+            addItem(i.next(), count);
+            count++;
         }
     }
 

@@ -574,7 +574,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             // Add the new char to the search array:
             int c = e.getKeyChar();
             if (lastPressedCount < lastPressed.length) {
-                lastPressed[lastPressedCount++] = c;
+                lastPressed[lastPressedCount] = c;
+                lastPressedCount++;
             }
 
             int sortingColumn = table.getSortingColumn(0);

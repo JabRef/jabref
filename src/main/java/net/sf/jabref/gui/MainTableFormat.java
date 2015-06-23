@@ -403,48 +403,60 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // Add special Icon Columns
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                iconCols.put(coln++, MainTableFormat.RANKING);
+                iconCols.put(coln, MainTableFormat.RANKING);
+                coln++;
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
-                iconCols.put(coln++, MainTableFormat.RELEVANCE);
+                iconCols.put(coln, MainTableFormat.RELEVANCE);
+                coln++;
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
-                iconCols.put(coln++, MainTableFormat.QUALITY);
+                iconCols.put(coln, MainTableFormat.QUALITY);
+                coln++;
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                iconCols.put(coln++, MainTableFormat.PRIORITY);
+                iconCols.put(coln, MainTableFormat.PRIORITY);
+                coln++;
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
-                iconCols.put(coln++, MainTableFormat.PRINTED);
+                iconCols.put(coln, MainTableFormat.PRINTED);
+                coln++;
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                iconCols.put(coln++, MainTableFormat.READ);
+                iconCols.put(coln, MainTableFormat.READ);
+                coln++;
             }
         }
 
         if (Globals.prefs.getBoolean("fileColumn")) {
-            iconCols.put(coln++, MainTableFormat.FILE);
+            iconCols.put(coln, MainTableFormat.FILE);
+            coln++;
         }
         if (Globals.prefs.getBoolean("pdfColumn")) {
-            iconCols.put(coln++, MainTableFormat.PDF);
+            iconCols.put(coln, MainTableFormat.PDF);
+            coln++;
         }
         if (Globals.prefs.getBoolean("urlColumn")) {
             if (Globals.prefs.getBoolean("preferUrlDoi")) {
-                iconCols.put(coln++, MainTableFormat.DOI_FIRST);
+                iconCols.put(coln, MainTableFormat.DOI_FIRST);
+                coln++;
             } else {
-                iconCols.put(coln++, MainTableFormat.URL_FIRST);
+                iconCols.put(coln, MainTableFormat.URL_FIRST);
+                coln++;
             }
 
         }
 
         if (Globals.prefs.getBoolean("arxivColumn")) {
-            iconCols.put(coln++, MainTableFormat.ARXIV);
+            iconCols.put(coln, MainTableFormat.ARXIV);
+            coln++;
         }
 
         if (Globals.prefs.getBoolean("extraFileColumns")) {
             String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
             for (String desiredColumn : desiredColumns) {
-                iconCols.put(coln++, new String[] {GUIGlobals.FILE_FIELD, desiredColumn});
+                iconCols.put(coln, new String[] {GUIGlobals.FILE_FIELD, desiredColumn});
+                coln++;
             }
         }
 
