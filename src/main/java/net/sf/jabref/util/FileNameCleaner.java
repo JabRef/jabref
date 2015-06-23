@@ -59,7 +59,6 @@ public class FileNameCleaner {
     }
 
     private static boolean isCharLegal(char c) {
-        int intValueOfChar = c;
-        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, intValueOfChar) < 0;
+        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, (int) c) < 0;
     }
 }
