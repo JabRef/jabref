@@ -71,11 +71,11 @@ public class EntryChange extends Change {
                     // Modified externally.
                     add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
                 }
-            } else if ((tmp == null) && (disk != null) && !disk.equals("")) {
+            } else if ((tmp == null) && (disk != null) && !disk.isEmpty()) {
                 // Added externally.
                 add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
-            } else if ((disk == null) && (tmp != null) && !tmp.equals("")
-                    && (mem != null) && !mem.equals("")) {
+            } else if ((disk == null) && (tmp != null) && !tmp.isEmpty()
+                    && (mem != null) && !mem.isEmpty()) {
                 // Deleted externally and not locally.
                 add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
             }
@@ -139,16 +139,16 @@ public class EntryChange extends Change {
             text.append("<FONT SIZE=10>");
             text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
-            if ((onDisk != null) && !onDisk.equals("")) {
+            if ((onDisk != null) && !onDisk.isEmpty()) {
                 text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + " ").append(onDisk);
             } else {
                 text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
             }
 
-            if ((inMem != null) && !inMem.equals("")) {
+            if ((inMem != null) && !inMem.isEmpty()) {
                 text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + " ").append(inMem);
             }
-            if ((onTmp != null) && !onTmp.equals("")) {
+            if ((onTmp != null) && !onTmp.isEmpty()) {
                 text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + " ").append(onTmp);
             } else {
                 // No value in memory.

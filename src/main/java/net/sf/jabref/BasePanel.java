@@ -2860,7 +2860,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             for (BibtexEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
-                if ((oldKey == null) || (oldKey.equals(""))) {
+                if ((oldKey == null) || (oldKey.isEmpty())) {
                     LabelPatternUtil.makeLabel(metaData, database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
                             bes.getField(BibtexFields.KEY_FIELD)));
@@ -3094,7 +3094,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry bes : mainTable.getSelected()) {
             citeKey = bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
-            if ((citeKey == null) || citeKey.equals("")) {
+            if ((citeKey == null) || citeKey.isEmpty()) {
                 continue;
             }
             if (first) {

@@ -47,8 +47,8 @@ public class PluginBasedExportFormat extends ExportFormat {
         String layoutFilename = extension.getLayoutFilename();
         String fileExtension = extension.getExtension();
         String encoding = extension.getEncoding();
-        if ("".equals(fileExtension) || "".equals(displayName)
-                || "".equals(consoleName) || "".equals(layoutFilename)) {
+        if (fileExtension != null && fileExtension.isEmpty() || displayName != null && displayName.isEmpty()
+                || consoleName != null && consoleName.isEmpty() || layoutFilename != null && layoutFilename.isEmpty()) {
             Globals.logger("Could not load extension " + extension.getId());
             return null;
         }

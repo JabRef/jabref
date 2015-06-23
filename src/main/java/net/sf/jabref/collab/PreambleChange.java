@@ -43,13 +43,13 @@ public class PreambleChange extends Change {
         text.append("<FONT SIZE=3>");
         text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
 
-        if ((disk != null) && !disk.equals("")) {
+        if ((disk != null) && !disk.isEmpty()) {
             text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
         } else {
             text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
         }
 
-        if ((mem != null) && !mem.equals("")) {
+        if ((mem != null) && !mem.isEmpty()) {
             text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
         }
 

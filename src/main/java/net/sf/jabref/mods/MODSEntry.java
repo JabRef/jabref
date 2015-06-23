@@ -331,7 +331,7 @@ public class MODSEntry {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if ((in == null) || ("".equals(in)))
+        if ((in == null) || (in != null && in.isEmpty()))
          {
             return ""; // vacancy test.
         }

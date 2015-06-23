@@ -229,7 +229,7 @@ public class MSBibEntry {
             address += country;
         }
         address = address.trim();
-        if (address.equals("") || address.equals(",")) {
+        if (address.isEmpty() || address.equals(",")) {
             address = null;
         }
 
@@ -263,7 +263,7 @@ public class MSBibEntry {
             dateAccessed += year;
         }
         dateAccessed = dateAccessed.trim();
-        if (dateAccessed.equals("") || dateAccessed.equals(",")) {
+        if (dateAccessed.isEmpty() || dateAccessed.equals(",")) {
             dateAccessed = null;
         }
 
@@ -368,7 +368,7 @@ public class MSBibEntry {
             standardNumber += " DOI: " + bibtex.getField("doi");
         }
         /* SM: 2010.10 end DOI support */
-        if (standardNumber.equals("")) {
+        if (standardNumber.isEmpty()) {
             standardNumber = null;
         }
 
@@ -1345,7 +1345,7 @@ public class MSBibEntry {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if ((in == null) || ("".equals(in)))
+        if ((in == null) || (in != null && in.isEmpty()))
          {
             return ""; // vacancy test.
         }

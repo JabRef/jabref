@@ -211,7 +211,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         Set<String> sortedKeys = new TreeSet<String>();
         for (BibtexEntry m_entry : m_entries) {
             s = m_entry.getCiteKey();
-            if ((s != null) && !s.equals("")) {
+            if ((s != null) && !s.isEmpty()) {
                 sortedKeys.add(s);
             }
         }

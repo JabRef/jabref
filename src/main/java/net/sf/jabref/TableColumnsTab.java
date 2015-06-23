@@ -798,7 +798,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.equals("")) {
+                if (tableRows.elementAt(i).name.isEmpty()) {
                     tableRows.removeElementAt(i);
                 } else {
                     i++;

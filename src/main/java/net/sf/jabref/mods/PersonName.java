@@ -131,13 +131,13 @@ public class PersonName {
     public String getFullname()
     {
         String fullName = "";
-        if ((givenName != null) && !givenName.equals("")) {
+        if ((givenName != null) && !givenName.isEmpty()) {
             fullName += givenName + " ";
         }
-        if ((middleName != null) && !middleName.equals("")) {
+        if ((middleName != null) && !middleName.isEmpty()) {
             fullName += middleName + " ";
         }
-        if ((surname != null) && !surname.equals("")) {
+        if ((surname != null) && !surname.isEmpty()) {
             fullName += surname;
         }
 

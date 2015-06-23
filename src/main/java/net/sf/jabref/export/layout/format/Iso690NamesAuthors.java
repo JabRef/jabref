@@ -38,7 +38,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
     @Override
     public String format(String s) {
 
-        if ((s == null) || s.trim().equals("")) {
+        if ((s == null) || s.trim().isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();

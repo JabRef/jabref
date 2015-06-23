@@ -78,9 +78,9 @@ class CustomExportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
 
                 // Check that there are no empty strings.
-                if ((layoutFile.getText().equals("")) ||
-                        (name.getText().equals("")) ||
-                        (extension.getText().equals("")) ||
+                if ((layoutFile.getText().isEmpty()) ||
+                        (name.getText().isEmpty()) ||
+                        (extension.getText().isEmpty()) ||
                         (!layoutFile.getText().endsWith(".layout"))) {
                     //JOptionPane.showMessageDialog
                     //    (parent, Globals.lang("You must provide a name, a search "

@@ -366,7 +366,7 @@ public class ChangeScanner implements Runnable {
                 changes.add(new PreambleChange(tmp, mem, disk));
             }
         }
-        else if ((disk != null) && !disk.equals("")) {
+        else if ((disk != null) && !disk.isEmpty()) {
             changes.add(new PreambleChange(tmp, mem, disk));
         }
     }

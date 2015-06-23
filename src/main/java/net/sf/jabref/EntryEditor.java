@@ -524,7 +524,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 public void actionPerformed(ActionEvent e) {
                     String dir = ed.getText();
 
-                    if (dir.equals("")) {
+                    if (dir.isEmpty()) {
                         dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
                     }
 
@@ -898,7 +898,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             boolean anyChanged = false;
             boolean changedType = false;
             boolean duplicateWarning = false;
-            boolean emptyWarning = (newKey == null) || newKey.equals("");
+            boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
             if (panel.database.setCiteKeyForEntry(id, newKey)) {
                 duplicateWarning = true;
@@ -1280,7 +1280,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String oldValue = entry.getCiteKey();
                 String newValue = fe.getText();
 
-                if (newValue.equals("")) {
+                if (newValue.isEmpty()) {
                     newValue = null;
                 }
 
@@ -1670,7 +1670,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (evt.getClickCount() == 2) {
                 FieldTextArea tf = (FieldTextArea) evt.getSource();
 
-                if (tf.getText().equals("")) {
+                if (tf.getText().isEmpty()) {
                     return;
                 }
 

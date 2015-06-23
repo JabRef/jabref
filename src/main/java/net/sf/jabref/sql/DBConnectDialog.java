@@ -217,17 +217,17 @@ public class DBConnectDialog extends JDialog {
         String[] errors = new String[fields.length];
         int cnt = 0;
 
-        if (txtServerHostname.getText().trim().equals("")) {
+        if (txtServerHostname.getText().trim().isEmpty()) {
             errors[cnt] = fields[0];
             cnt++;
         }
 
-        if (txtDatabase.getText().trim().equals("")) {
+        if (txtDatabase.getText().trim().isEmpty()) {
             errors[cnt] = fields[1];
             cnt++;
         }
 
-        if (txtUsername.getText().trim().equals("")) {
+        if (txtUsername.getText().trim().isEmpty()) {
             errors[cnt] = fields[2];
             cnt++;
         }

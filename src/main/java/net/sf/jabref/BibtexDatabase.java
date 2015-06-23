@@ -565,7 +565,7 @@ public class BibtexDatabase {
     //========================================================
     private boolean addKeyToSet(String key) {
         boolean exists = false;
-        if ((key == null) || key.equals(""))
+        if ((key == null) || key.isEmpty())
          {
             return false;//don't put empty key
         }
@@ -584,7 +584,7 @@ public class BibtexDatabase {
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key) {
-        if ((key == null) || key.equals("")) {
+        if ((key == null) || key.isEmpty()) {
             return;
         }
         if (allKeys.containsKey(key)) {

@@ -151,7 +151,7 @@ public class PreventDraggingJTableHeader extends JTableHeader {
 
     private static boolean isUnnamed(TableColumn column) {
         return (column.getHeaderValue() == null)
-                || "".equals(column.getHeaderValue().toString());
+                || column.getHeaderValue().toString() != null && column.getHeaderValue().toString().isEmpty();
     }
 
     /**

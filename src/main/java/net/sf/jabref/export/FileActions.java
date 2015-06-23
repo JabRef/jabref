@@ -121,7 +121,7 @@ public class FileActions {
         }
 
         fw.write("@String { " + bs.getName() + suffix + " = ");
-        if (!bs.getContent().equals("")) {
+        if (!bs.getContent().isEmpty()) {
             try {
                 String formatted = (new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING);
                 fw.write(formatted);

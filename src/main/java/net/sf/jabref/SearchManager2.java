@@ -518,7 +518,7 @@ public class SearchManager2 extends SidePaneComponent
                 && (panel != null)) {
 
             updatePrefs(); // Make sure the user's choices are recorded.
-            if (searchField.getText().equals("")) {
+            if (searchField.getText().isEmpty()) {
                 // An empty search field should cause the search to be cleared.
                 clearSearchLater();
                 return;
@@ -762,7 +762,7 @@ public class SearchManager2 extends SidePaneComponent
                     return;
                 }
 
-                if (searchField.getText().equals("")) {
+                if (searchField.getText().isEmpty()) {
                     return;
                 }
                 if (incSearchPos < 0) {

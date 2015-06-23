@@ -173,7 +173,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 String text = keyword.getText().trim();
-                if (text.equals("")) {
+                if (text.isEmpty()) {
                     // no text to add, do nothing
                     return;
                 }

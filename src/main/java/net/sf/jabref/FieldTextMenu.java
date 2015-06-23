@@ -238,7 +238,7 @@ public class FieldTextMenu implements MouseListener
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            if (myFieldName.getText().equals("")) {
+            if (myFieldName.getText().isEmpty()) {
                 return;
             }
             //myFieldName.selectAll();
@@ -257,7 +257,7 @@ public class FieldTextMenu implements MouseListener
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            if (myFieldName.getText().equals("")) {
+            if (myFieldName.getText().isEmpty()) {
                 return;
             }
             String input = myFieldName.getText();

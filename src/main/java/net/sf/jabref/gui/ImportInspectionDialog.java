@@ -1188,7 +1188,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     Globals.lang("Enter URL"), entry.getField("url"));
             entries.getReadWriteLock().writeLock().lock();
             if (result != null) {
-                if (result.equals("")) {
+                if (result.isEmpty()) {
                     entry.clearField("url");
                 } else {
                     entry.setField("url", result);

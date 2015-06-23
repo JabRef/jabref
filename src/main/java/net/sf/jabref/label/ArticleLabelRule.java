@@ -48,7 +48,7 @@ public class ArticleLabelRule extends DefaultLabelRule {
 
         // use the year token
         try {
-            if (!newLabel.equals("")) {
+            if (!newLabel.isEmpty()) {
                 if (oldEntry.getField("year") != null) {
                     newLabel += String.valueOf(oldEntry.getField("year"));
                 }
