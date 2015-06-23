@@ -47,7 +47,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
@@ -58,8 +57,6 @@ public class BibtexDatabase {
     private String _preamble = null;
 
     private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
-
-    Vector<String> _strings_ = new Vector<String>();
 
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
