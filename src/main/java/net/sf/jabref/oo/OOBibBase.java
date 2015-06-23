@@ -407,8 +407,8 @@ class OOBibBase {
             // entries:
             SortedMap<BibtexEntry, BibtexDatabase> newMap =
                     new TreeMap<BibtexEntry, BibtexDatabase>(entryComparator);
-            for (BibtexEntry entry : entries.keySet()) {
-                newMap.put(entry, entries.get(entry));
+            for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
+                newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
             entries = newMap;
             // Rebuild the list of cited keys according to the sort order:
@@ -583,8 +583,8 @@ class OOBibBase {
                 }
             }
             // Go through the collected lists and see where we need to uniquefy:
-            for (String marker : refKeys.keySet()) {
-                List<String> keys = refKeys.get(marker);
+            for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
+                List<String> keys = stringListEntry.getValue();
                 if (keys.size() > 1) {
                     // This marker appears for more than one unique entry:
                     int uniq = 'a';
@@ -825,8 +825,8 @@ class OOBibBase {
         else {
             SortedMap<BibtexEntry, BibtexDatabase> newMap =
                     new TreeMap<BibtexEntry, BibtexDatabase>(entryComparator);
-            for (BibtexEntry entry : entries.keySet()) {
-                newMap.put(entry, entries.get(entry));
+            for (Map.Entry<BibtexEntry, BibtexDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
+                newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
             }
             entries = newMap;
         }

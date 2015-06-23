@@ -1037,13 +1037,13 @@ public class JabRefPreferences {
             Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
         }
 
-        for (String s : pattern.keySet()) {
-            ArrayList<String> value = pattern.get(s);
+        for (Map.Entry<String, ArrayList<String>> stringArrayListEntry : pattern.entrySet()) {
+            ArrayList<String> value = stringArrayListEntry.getValue();
             if (value != null) {
                 // no default value
                 // the first entry in the array is the full pattern
                 // see net.sf.jabref.labelPattern.LabelPatternUtil.split(String)
-                pre.put(s, value.get(0));
+                pre.put(stringArrayListEntry.getKey(), value.get(0));
             }
         }
     }

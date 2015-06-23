@@ -19,13 +19,7 @@ package net.sf.jabref.sql.importer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -250,13 +244,13 @@ public abstract class DBImporter extends DBImporterExporter {
             // Ok, we have collected a map of all groups and their parent IDs,
             // and another map of all group IDs and their group nodes.
             // Now we need to build the groups tree:
-            for (GroupTreeNode node : parentIds.keySet()) {
-                String parentId = parentIds.get(node);
+            for (Map.Entry<GroupTreeNode, String> groupTreeNodeStringEntry : parentIds.entrySet()) {
+                String parentId = groupTreeNodeStringEntry.getValue();
                 GroupTreeNode parent = groups.get(parentId);
                 if (parent == null) {
                     // TODO: missing parent
                 } else {
-                    parent.add(node);
+                    parent.add(groupTreeNodeStringEntry.getKey());
                 }
             }
             ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn,

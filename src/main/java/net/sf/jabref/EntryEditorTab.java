@@ -24,6 +24,7 @@ import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.*;
 
@@ -297,8 +298,8 @@ class EntryEditorTab {
     }
 
     public void validateAllFields() {
-        for (String field : editors.keySet()) {
-            FieldEditor ed = editors.get(field);
+        for (Map.Entry<String, FieldEditor> stringFieldEditorEntry : editors.entrySet()) {
+            FieldEditor ed = stringFieldEditorEntry.getValue();
             ed.updateFontColor();
             ed.setEnabled(true);
             if (((Component) ed).hasFocus()) {

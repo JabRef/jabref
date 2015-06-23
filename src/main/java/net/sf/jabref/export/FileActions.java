@@ -23,15 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -245,8 +237,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (String s : types.keySet()) {
-                    BibtexEntryType type = types.get(s);
+                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         tp.save(fw);
@@ -422,8 +414,8 @@ public class FileActions {
 
             // Write type definitions, if any:
             if (types.size() > 0) {
-                for (String s : types.keySet()) {
-                    CustomEntryType tp = (CustomEntryType) types.get(s);
+                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
                     tp.save(fw);
                     fw.write(Globals.NEWLINE);
                 }

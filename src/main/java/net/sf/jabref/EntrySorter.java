@@ -32,8 +32,8 @@ public class EntrySorter implements DatabaseChangeListener {
         set = new ArrayList<BibtexEntry>();
         this.comp = comp;
         Set<String> keySet = entries.keySet();
-        for (String aKeySet : keySet) {
-            set.add(entries.get(aKeySet));
+        for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {
+            set.add(stringBibtexEntryEntry.getValue());
         }
         //Collections.sort(set, comp);
         changed = true;

@@ -239,14 +239,14 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         // Iterate over our map of required fields, and list those types if necessary:
 
         List<String> types = typeComp.getFields();
-        for (String typeName : reqLists.keySet()) {
-            if (!types.contains(typeName)) {
+        for (Map.Entry<String, List<String>> stringListEntry : reqLists.entrySet()) {
+            if (!types.contains(stringListEntry.getKey())) {
                 continue;
             }
 
-            List<String> reqFields = reqLists.get(typeName);
-            List<String> optFields = optLists.get(typeName);
-            List<String> opt2Fields = opt2Lists.get(typeName);
+            List<String> reqFields = stringListEntry.getValue();
+            List<String> optFields = optLists.get(stringListEntry.getKey());
+            List<String> opt2Fields = opt2Lists.get(stringListEntry.getKey());
             String[] reqStr = new String[reqFields.size()];
             reqStr = reqFields.toArray(reqStr);
             String[] optStr = new String[optFields.size()];
@@ -262,17 +262,17 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             // been made
             boolean changesMade = true;
 
-            if (defaulted.contains(typeName)) {
+            if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
                 //System.out.println("Defaulting: "+typeName);
-                String nm = Util.nCase(typeName);
+                String nm = Util.nCase(stringListEntry.getKey());
                 BibtexEntryType.removeType(nm);
 
                 updateTypesForEntries(nm);
                 continue;
             }
 
-            BibtexEntryType oldType = BibtexEntryType.getType(typeName);
+            BibtexEntryType oldType = BibtexEntryType.getType(stringListEntry.getKey());
             if (oldType != null) {
                 String[] oldReq = oldType.getRequiredFields(), oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
@@ -290,10 +290,10 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (changesMade) {
                 //System.out.println("Updating: "+typeName);
                 CustomEntryType typ = biblatexMode ?
-                        new CustomEntryType(Util.nCase(typeName), reqStr, optStr, opt2Str) :
-                        new CustomEntryType(Util.nCase(typeName), reqStr, optStr);
+                        new CustomEntryType(Util.nCase(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(Util.nCase(stringListEntry.getKey()), reqStr, optStr);
 
-                BibtexEntryType.ALL_TYPES.put(typeName.toLowerCase(), typ);
+                BibtexEntryType.ALL_TYPES.put(stringListEntry.getKey().toLowerCase(), typ);
                 updateTypesForEntries(typ.getName());
             }
         }

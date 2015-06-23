@@ -2274,10 +2274,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * values to the autocompleter list:
      */
     public void addContentSelectorValuesToAutoCompleters() {
-        for (String field : autoCompleters.keySet()) {
-            AbstractAutoCompleter ac = autoCompleters.get(field);
-            if (metaData.getData(Globals.SELECTOR_META_PREFIX + field) != null) {
-                Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + field);
+        for (Map.Entry<String, AbstractAutoCompleter> stringAbstractAutoCompleterEntry : autoCompleters.entrySet()) {
+            AbstractAutoCompleter ac = stringAbstractAutoCompleterEntry.getValue();
+            if (metaData.getData(Globals.SELECTOR_META_PREFIX + stringAbstractAutoCompleterEntry.getKey()) != null) {
+                Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + stringAbstractAutoCompleterEntry.getKey());
                 if (items != null) {
                     for (String item : items) {
                         ac.addWordToIndex(item);
@@ -2634,15 +2634,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * the Manage dialog.
      */
     public void updateAllContentSelectors() {
-        for (String s : entryEditors.keySet()) {
-            EntryEditor ed = entryEditors.get(s);
+        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
+            EntryEditor ed = stringEntryEditorEntry.getValue();
             ed.updateAllContentSelectors();
         }
     }
 
     public void rebuildAllEntryEditors() {
-        for (String s : entryEditors.keySet()) {
-            EntryEditor ed = entryEditors.get(s);
+        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
+            EntryEditor ed = stringEntryEditorEntry.getValue();
             ed.rebuildPanels();
         }
 

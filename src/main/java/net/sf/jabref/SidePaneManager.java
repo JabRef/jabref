@@ -266,8 +266,8 @@ public class SidePaneManager {
      * @param panel
      */
     private void setActiveBasePanel(BasePanel panel) {
-        for (String key : components.keySet()) {
-            components.get(key).setActiveBasePanel(panel);
+        for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
+            stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
         }
     }
 
