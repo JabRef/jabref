@@ -40,7 +40,7 @@ class Cookie {
      * @param header Set of attributes in header
      */
     public Cookie(URI uri, String header) {
-        String attributes[] = header.split(";");
+        String[] attributes = header.split(";");
         String nameValue = attributes[0].trim();
         this.uri = uri;
         this.name =

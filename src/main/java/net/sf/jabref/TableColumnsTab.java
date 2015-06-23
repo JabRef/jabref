@@ -554,12 +554,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int selected[] = colSetup.getSelectedRows();
+            int[] selected = colSetup.getSelectedRows();
             Arrays.sort(selected);
             // first element (#) not inside tableRows
             // don't move if a selected element is at bounce
             if ((selected.length > 0) && (selected[0] > 1)) {
-                boolean newSelected[] = new boolean[colSetup.getRowCount()];
+                boolean[] newSelected = new boolean[colSetup.getRowCount()];
                 for (int i : selected) {
                     swap(i - 1, i - 2);
                     newSelected[i - 1] = true;
@@ -587,10 +587,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int selected[] = colSetup.getSelectedRows();
+            int[] selected = colSetup.getSelectedRows();
             Arrays.sort(selected);
             final int last = selected.length - 1;
-            boolean newSelected[] = new boolean[colSetup.getRowCount()];
+            boolean[] newSelected = new boolean[colSetup.getRowCount()];
             // don't move if a selected element is at bounce
             if ((selected.length > 0) && (selected[last] < tableRows.size())) {
                 for (int i = last; i >= 0; i--) {

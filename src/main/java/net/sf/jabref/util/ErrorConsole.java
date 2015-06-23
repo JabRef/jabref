@@ -157,7 +157,7 @@ public class ErrorConsole extends Handler {
         }
 
         @Override
-        public void write(byte buf[], int off, int len) {
+        public void write(byte[] buf, int off, int len) {
             try {
                 super.write(buf, off, len);
                 out.write(buf, off, len);
