@@ -1048,38 +1048,14 @@ class MSBibEntry {
             bibtex = BibtexEntryType.BOOK;
         } else if (msbib.equals("BookSection")) {
             bibtex = BibtexEntryType.INBOOK;
-        } else if (msbib.equals("JournalArticle")) {
-            bibtex = BibtexEntryType.ARTICLE;
-        } else if (msbib.equals("ArticleInAPeriodical")) {
+        } else if (msbib.equals("JournalArticle") || msbib.equals("ArticleInAPeriodical")) {
             bibtex = BibtexEntryType.ARTICLE;
         } else if (msbib.equals("ConferenceProceedings")) {
             bibtex = BibtexEntryType.CONFERENCE;
         } else if (msbib.equals("Report")) {
             bibtex = BibtexEntryType.TECHREPORT;
-        } else if (msbib.equals("InternetSite")) {
+        } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
             bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("DocumentFromInternetSite")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("DocumentFromInternetSite")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("ElectronicSource")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Art")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("SoundRecording")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Performance")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Film")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Interview")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Patent")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Case")) {
-            bibtex = BibtexEntryType.OTHER;
-        } else if (msbib.equals("Misc")) {
-            bibtex = BibtexEntryType.MISC;
         } else {
             bibtex = BibtexEntryType.MISC;
         }

@@ -286,9 +286,7 @@ public class AutoDetectPaths extends AbstractWorker {
             }
         });
         for (File dir : dirs) {
-            if (dir.getName().toLowerCase().equals("program files")) {
-                dirList.add(dir);
-            } else if (dir.getName().toLowerCase().equals("program files (x86)")) {
+            if (dir.getName().toLowerCase().equals("program files") || dir.getName().toLowerCase().equals("program files (x86)")) {
                 dirList.add(dir);
             }
         }

@@ -71,12 +71,9 @@ class EntryChange extends Change {
                     // Modified externally.
                     add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
                 }
-            } else if ((tmp == null) && (disk != null) && !disk.isEmpty()) {
-                // Added externally.
-                add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
-            } else if ((disk == null) && (tmp != null) && !tmp.isEmpty()
+            } else if ((tmp == null) && (disk != null) && !disk.isEmpty() || (disk == null) && (tmp != null) && !tmp.isEmpty()
                     && (mem != null) && !mem.isEmpty()) {
-                // Deleted externally and not locally.
+                // Added externally.
                 add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
             }
 

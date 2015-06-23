@@ -67,8 +67,7 @@ class LayoutEntry {
             text = si.s;
         } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if (si.i == LayoutHelper.IS_FIELD_START) {
-        } else if (si.i == LayoutHelper.IS_FIELD_END) {
+        } else if (si.i == LayoutHelper.IS_FIELD_START || si.i == LayoutHelper.IS_FIELD_END) {
         } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<String>();
             WSITools.tokenize(v, si.s, "\n");
@@ -119,8 +118,7 @@ class LayoutEntry {
             si = parsedEntries.get(i);
 
             // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
-            } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if ((si.i == LayoutHelper.IS_FIELD_START)
                     || (si.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<StringInt>();

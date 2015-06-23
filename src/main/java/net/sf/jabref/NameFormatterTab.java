@@ -142,11 +142,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public Class<String> getColumnClass(int column) {
-                if (column == 0) {
-                    return String.class;
-                } else {
-                    return String.class;
-                }
+                return String.class;
             }
 
             @Override

@@ -51,10 +51,7 @@ public class SaveOrderConfig {
         String choice = data.elementAt(0);
         if ("original".equals(choice)) {
             setSaveInOriginalOrder();
-        } else if ("specified".equals(choice)) {
-            setSaveInSpecifiedOrder();
         } else {
-            // fallback
             setSaveInSpecifiedOrder();
         }
 

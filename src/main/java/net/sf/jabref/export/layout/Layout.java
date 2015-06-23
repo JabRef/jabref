@@ -51,8 +51,7 @@ public class Layout
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
 
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
-            } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if (si.i == LayoutHelper.IS_FIELD_START) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;

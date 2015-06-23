@@ -186,9 +186,7 @@ public class DuplicateCheck {
         int score = 0;
         for (String field : allFields) {
             Object en = one.getField(field), to = two.getField(field);
-            if ((en != null) && (to != null) && (en.equals(to))) {
-                score++;
-            } else if ((en == null) && (to == null)) {
+            if ((en != null) && (to != null) && (en.equals(to)) || (en == null) && (to == null)) {
                 score++;
             }
         }

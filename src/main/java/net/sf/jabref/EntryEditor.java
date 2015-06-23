@@ -1325,13 +1325,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     panel.undoManager.addEdit(undoableKeyChange);
                 }
 
-                if ((newValue != null) && (newValue.length() > 0)) {
-                    // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
-                    fe.setValidBackgroundColor();
-                } else {
-                    // fe.setLabelColor(GUIGlobals.nullFieldColor);
-                    fe.setValidBackgroundColor();
-                }
+                fe.setValidBackgroundColor();
 
                 if (fe.getTextComponent().hasFocus()) {
                     fe.setActiveBackgroundColor();
@@ -1378,13 +1372,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                             entry.clearField(fe.getFieldName());
                         }
 
-                        if ((toSet != null) && (toSet.length() > 0)) {
-                            // fe.setLabelColor(GUIGlobals.entryEditorLabelColor);
-                            fe.setValidBackgroundColor();
-                        } else {
-                            // fe.setLabelColor(GUIGlobals.nullFieldColor);
-                            fe.setValidBackgroundColor();
-                        }
+                        fe.setValidBackgroundColor();
 
                         // See if we need to update an AutoCompleter instance:
                         AbstractAutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
