@@ -32,12 +32,12 @@ import java.util.regex.Pattern;
 
 public class ScienceDirectFetcher implements EntryFetcher {
 
-    protected static final int MAX_PAGES_TO_LOAD = 8;
-    protected static final String WEBSITE_URL = "http://www.sciencedirect.com";
-    protected static final String SEARCH_URL = ScienceDirectFetcher.WEBSITE_URL + "/science/quicksearch?query=";
+    private static final int MAX_PAGES_TO_LOAD = 8;
+    private static final String WEBSITE_URL = "http://www.sciencedirect.com";
+    private static final String SEARCH_URL = ScienceDirectFetcher.WEBSITE_URL + "/science/quicksearch?query=";
 
-    protected static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
-    protected static final Pattern linkPattern = Pattern.compile(
+    private static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
+    private static final Pattern linkPattern = Pattern.compile(
             "<a href=\"" +
                     ScienceDirectFetcher.linkPrefix.replaceAll("\\?", "\\\\?") +
                     "([^\"]+)\"\"");
@@ -45,8 +45,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
     protected static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next &gt;");
 
-    protected boolean stopFetching = false;
-    protected boolean noAccessFound = false;
+    private boolean stopFetching = false;
+    private boolean noAccessFound = false;
 
 
     @Override
@@ -119,7 +119,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    protected List<String> getCitations(String query) throws IOException {
+    private List<String> getCitations(String query) throws IOException {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
@@ -137,7 +137,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
         }
     }
 
-    protected String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
+    private String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //String entirePage = cont;

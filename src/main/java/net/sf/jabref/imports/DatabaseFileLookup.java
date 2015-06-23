@@ -25,7 +25,7 @@ import net.sf.jabref.gui.FileListTableModel;
  * @version 09.11.2008 | 21:21:41
  * 
  */
-public class DatabaseFileLookup {
+class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
@@ -99,7 +99,7 @@ public class DatabaseFileLookup {
      * @return <code>true</code>, if the bibtex entry stores the file in its
      *         <i>file</i>-field, otherwise <code>false</code>.
      */
-    public boolean lookupEntry(File aFile, BibtexEntry anEntry) {
+    private boolean lookupEntry(File aFile, BibtexEntry anEntry) {
 
         if ((aFile == null) || (anEntry == null)) {
             return false;

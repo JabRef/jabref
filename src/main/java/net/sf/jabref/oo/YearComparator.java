@@ -24,11 +24,11 @@ import java.util.Comparator;
  * Comparator for sorting bibliography entries according to publication year. This is used to
  * sort entries in multiple citations where the oldest publication should appear first.
  */
-public class YearComparator implements Comparator<BibtexEntry> {
+class YearComparator implements Comparator<BibtexEntry> {
 
-    final FieldComparator authComp = new FieldComparator("author");
-    final FieldComparator editorComp = new FieldComparator("editor");
-    final FieldComparator yearComp = new FieldComparator("year");
+    private final FieldComparator authComp = new FieldComparator("author");
+    private final FieldComparator editorComp = new FieldComparator("editor");
+    private final FieldComparator yearComp = new FieldComparator("year");
 
 
     public YearComparator() {

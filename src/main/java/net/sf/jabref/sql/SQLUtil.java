@@ -52,7 +52,7 @@ public class SQLUtil {
      * loop through entry types to get required, optional, general and utility
      * fields for this type.
      */
-    public static void refreshFields() {
+    private static void refreshFields() {
         if (SQLUtil.allFields == null) {
             SQLUtil.allFields = new ArrayList<String>();
         } else {
@@ -306,7 +306,7 @@ public class SQLUtil {
      * @param qry
      *            The DML statements to be executed
      */
-    public static void executeQuery(Connection conn, String qry)
+    private static void executeQuery(Connection conn, String qry)
             throws SQLException {
         Statement stmnt = conn.createStatement();
         stmnt.execute(qry);
@@ -325,7 +325,7 @@ public class SQLUtil {
      * @param qry
      *            The DML statements to be executed
      */
-    public static Statement executeQueryWithResults(Connection conn, String qry)
+    private static Statement executeQueryWithResults(Connection conn, String qry)
             throws SQLException {
         Statement stmnt = conn.createStatement();
         stmnt.executeQuery(qry);

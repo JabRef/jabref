@@ -34,13 +34,13 @@ import java.net.URL;
  * @version 1.0
  */
 
-public class SplashScreen extends Window {
+class SplashScreen extends Window {
 
     private final Image splashImage;
     private boolean paintCalled = false;
 
 
-    public SplashScreen(Frame owner) {
+    private SplashScreen(Frame owner) {
         super(owner);
         URL imageURL = SplashScreen.class.getResource("/images/splash.png");
         splashImage = Toolkit.getDefaultToolkit().createImage(imageURL);

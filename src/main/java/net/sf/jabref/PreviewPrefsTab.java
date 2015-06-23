@@ -29,33 +29,33 @@ import net.sf.jabref.help.HelpAction;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
     JabRefFrame _frame;
 
     JPanel pan = new JPanel();
 
-    final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagLayout gbl = new GridBagLayout();
 
-    final GridBagConstraints con = new GridBagConstraints();
+    private final GridBagConstraints con = new GridBagConstraints();
 
-    final JTextArea layout1 = new JTextArea("", 1, 1);
-    final JTextArea layout2 = new JTextArea("", 1, 1);
+    private final JTextArea layout1 = new JTextArea("", 1, 1);
+    private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    final JButton def1 = new JButton(Globals.lang("Default"));
-    final JButton def2 = new JButton(Globals.lang("Default"));
-    final JButton test1 = new JButton(Globals.lang("Test"));
-    final JButton test2 = new JButton(Globals.lang("Test"));
+    private final JButton def1 = new JButton(Globals.lang("Default"));
+    private final JButton def2 = new JButton(Globals.lang("Default"));
+    private final JButton test1 = new JButton(Globals.lang("Test"));
+    private final JButton test2 = new JButton(Globals.lang("Test"));
     JButton help;
 
-    final JPanel p1 = new JPanel();
-    final JPanel p2 = new JPanel();
-    final JPanel p3 = new JPanel(new BorderLayout());
+    private final JPanel p1 = new JPanel();
+    private final JPanel p2 = new JPanel();
+    private final JPanel p3 = new JPanel(new BorderLayout());
 
-    final JScrollPane sp1 = new JScrollPane(layout1);
-    final JScrollPane sp2 = new JScrollPane(layout2);
+    private final JScrollPane sp1 = new JScrollPane(layout1);
+    private final JScrollPane sp2 = new JScrollPane(layout2);
 
-    final JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
+    private final JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
 
     private static BibtexEntry entry;
 
@@ -206,7 +206,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
     }
 
-    public static BibtexEntry getTestEntry() {
+    private static BibtexEntry getTestEntry() {
         if (PreviewPrefsTab.entry != null) {
             return PreviewPrefsTab.entry;
         }

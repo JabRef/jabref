@@ -37,15 +37,15 @@ import net.sf.jabref.net.URLDownload;
  */
 public class FindFullText {
 
-    public final static int
-            FOUND_PDF = 0,
-            WRONG_MIME_TYPE = 1,
-            UNKNOWN_DOMAIN = 2,
-            LINK_NOT_FOUND = 3,
-            IO_EXCEPTION = 4,
-            NO_URLS_DEFINED = 5;
+    private final static int
+            FOUND_PDF = 0;
+    public final static int WRONG_MIME_TYPE = 1;
+    public final static int UNKNOWN_DOMAIN = 2;
+    public final static int LINK_NOT_FOUND = 3;
+    public final static int IO_EXCEPTION = 4;
+    public final static int NO_URLS_DEFINED = 5;
 
-    final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
+    private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
 
 
     public FindFullText() {

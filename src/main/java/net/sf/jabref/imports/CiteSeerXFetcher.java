@@ -31,14 +31,14 @@ import java.util.regex.Pattern;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
-    protected static final int MAX_PAGES_TO_LOAD = 8;
-    final static String QUERY_MARKER = "___QUERY___";
-    final static String URL_START = "http://citeseer.ist.psu.edu";
-    final static String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
+    private static final int MAX_PAGES_TO_LOAD = 8;
+    private final static String QUERY_MARKER = "___QUERY___";
+    private final static String URL_START = "http://citeseer.ist.psu.edu";
+    private final static String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
             + "&submit=Search&sort=rlv&t=doc";
-    final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
+    private final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
-    protected boolean stopFetching = false;
+    private boolean stopFetching = false;
 
 
     @Override
@@ -98,7 +98,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    protected List<String> getCitations(String query) throws IOException {
+    private List<String> getCitations(String query) throws IOException {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
@@ -119,7 +119,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         }
     }
 
-    protected String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
+    private String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //System.out.println(cont);
@@ -132,14 +132,14 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
 
-    final static String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
-    final static Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
-    final static Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
-    final static Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
-    final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
+    private final static String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
+    private final static Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
+    private final static Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
+    private final static Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
+    private final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
-    protected BibtexEntry getSingleCitation(String urlString) throws IOException {
+    private BibtexEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
         String cont = new URLDownload(url).downloadToString("UTF8");

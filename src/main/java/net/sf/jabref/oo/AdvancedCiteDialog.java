@@ -30,16 +30,16 @@ import java.awt.event.ActionEvent;
 /**
  * Dialog for adding citation with page number info.
  */
-public class AdvancedCiteDialog {
+class AdvancedCiteDialog {
 
-    static boolean defaultInPar = true;
-    boolean okPressed = false;
-    final JDialog diag;
-    final JRadioButton inPar = new JRadioButton(Globals.lang("Cite selected entries"));
-    final JRadioButton inText = new JRadioButton(Globals.lang("Cite selected entries with in-text citation"));
-    final JTextField pageInfo = new JTextField(15);
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private static boolean defaultInPar = true;
+    private boolean okPressed = false;
+    private final JDialog diag;
+    private final JRadioButton inPar = new JRadioButton(Globals.lang("Cite selected entries"));
+    private final JRadioButton inText = new JRadioButton(Globals.lang("Cite selected entries with in-text citation"));
+    private final JTextField pageInfo = new JTextField(15);
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public AdvancedCiteDialog(JabRefFrame parent) {

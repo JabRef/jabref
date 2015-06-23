@@ -39,17 +39,17 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AttachFileDialog extends JDialog {
 
-    final AttachFileDialog ths = this;
-    final FieldEditor editor;
-    final String fieldName;
-    JPanel main;
-    final JButton browse = new JButton(Globals.lang("Browse"));
-    final JButton download = new JButton(Globals.lang("Download"));
-    final JButton auto = new JButton(Globals.lang("Auto"));
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final BibtexEntry entry;
-    final MetaData metaData;
+    private final AttachFileDialog ths = this;
+    private final FieldEditor editor;
+    private final String fieldName;
+    private JPanel main;
+    private final JButton browse = new JButton(Globals.lang("Browse"));
+    private final JButton download = new JButton(Globals.lang("Download"));
+    private final JButton auto = new JButton(Globals.lang("Auto"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final BibtexEntry entry;
+    private final MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
 
 

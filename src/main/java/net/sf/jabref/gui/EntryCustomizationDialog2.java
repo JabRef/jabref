@@ -32,21 +32,29 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
-    protected final JabRefFrame frame;
+    private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
-    protected FieldSetComponent reqComp, optComp, optComp2;
-    protected EntryTypeList typeComp;
-    protected JButton ok, cancel, apply, helpButton, delete, importTypes, exportTypes;
-    protected final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
-    protected String lastSelected = null;
-    protected final Map<String, List<String>> reqLists = new HashMap<String, List<String>>();
-    protected final Map<String, List<String>> optLists = new HashMap<String, List<String>>();
-    protected final Map<String, List<String>> opt2Lists = new HashMap<String, List<String>>();
-    protected final Set<String> defaulted = new HashSet<String>();
-    protected final Set<String> changed = new HashSet<String>();
+    private FieldSetComponent reqComp;
+    private FieldSetComponent optComp;
+    private FieldSetComponent optComp2;
+    private EntryTypeList typeComp;
+    private JButton ok;
+    private JButton cancel;
+    private JButton apply;
+    protected JButton helpButton;
+    protected JButton delete;
+    protected JButton importTypes;
+    protected JButton exportTypes;
+    private final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
+    private String lastSelected = null;
+    private final Map<String, List<String>> reqLists = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> optLists = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> opt2Lists = new HashMap<String, List<String>>();
+    private final Set<String> defaulted = new HashSet<String>();
+    private final Set<String> changed = new HashSet<String>();
 
-    boolean biblatexMode;
+    private boolean biblatexMode;
 
 
     /** Creates a new instance of EntryCustomizationDialog2 */
@@ -57,7 +65,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         initGui();
     }
 
-    protected final void initGui() {
+    private void initGui() {
         Container pane = getContentPane();
         pane.setLayout(new BorderLayout());
 
@@ -226,7 +234,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         typeComp.enable(s, changed.contains(lastSelected) && !defaulted.contains(lastSelected));
     }
 
-    protected void applyChanges() {
+    private void applyChanges() {
         valueChanged(new ListSelectionEvent(new JList(), 0, 0, false));
         // Iterate over our map of required fields, and list those types if necessary:
 
@@ -307,7 +315,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         updateTables();
     }
 
-    protected void typeDeletion(String name) {
+    private void typeDeletion(String name) {
         BibtexEntryType type = BibtexEntryType.getType(name);
 
         if (type instanceof CustomEntryType) {
@@ -337,7 +345,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
     }
 
-    protected boolean equalArrays(String[] one, String[] two) {
+    private boolean equalArrays(String[] one, String[] two) {
         if ((one == null) && (two == null))
          {
             return true; // Both null.
@@ -411,7 +419,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
     // DEFAULT button pressed. Remember that this entry should be reset to default,
     // unless changes are made later.
-    class DefaultListener implements ActionListener {
+    private class DefaultListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {

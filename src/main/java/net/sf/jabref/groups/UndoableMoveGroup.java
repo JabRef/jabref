@@ -25,7 +25,7 @@ import net.sf.jabref.Globals;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-public class UndoableMoveGroup extends AbstractUndoableEdit {
+class UndoableMoveGroup extends AbstractUndoableEdit {
 
     private final GroupSelector m_groupSelector;
     private final GroupTreeNode m_groupsRootHandle;

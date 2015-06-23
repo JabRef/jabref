@@ -32,24 +32,24 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
     private final boolean clearKeys = true; // Should we clear the keys so new ones can be generated?
-    protected static final int MAX_ENTRIES_TO_LOAD = 50;
-    final static String QUERY_MARKER = "___QUERY___";
-    final static String URL_START = "http://scholar.google.com";
-    final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
-    final static String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
-    final static String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
+    private static final int MAX_ENTRIES_TO_LOAD = 50;
+    private final static String QUERY_MARKER = "___QUERY___";
+    private final static String URL_START = "http://scholar.google.com";
+    private final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
+    private final static String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
+    private final static String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
             + "&amp;hl=en&amp;btnG=Search";
 
-    final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
-    final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
-    final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
-    final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
+    private final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
+    private final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
+    private final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
+    private final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    protected final HashMap<String, String> entryLinks = new HashMap<String, String>();
+    private final HashMap<String, String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
-    protected boolean stopFetching = false;
+    private boolean stopFetching = false;
 
 
     @Override
@@ -152,7 +152,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         out.close();
     }
 
-    protected void runConfig() throws IOException {
+    private void runConfig() throws IOException {
         try {
             new URLDownload(new URL("http://scholar.google.com")).downloadToString();
             //save("setting.html", ud.getStringContent());
@@ -185,7 +185,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    protected Map<String, JLabel> getCitations(String query) throws IOException {
+    private Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
         LinkedHashMap<String, JLabel> res = new LinkedHashMap<String, JLabel>();
         try {
@@ -206,7 +206,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         }
     }
 
-    protected String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
+    private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //save("query.html", cont);
@@ -256,7 +256,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         return null;
     }
 
-    protected BibtexEntry downloadEntry(String link) throws IOException {
+    private BibtexEntry downloadEntry(String link) throws IOException {
         try {
             URL url = new URL(GoogleScholarFetcher.URL_START + link);
             String s = new URLDownload(url).downloadToString();
@@ -309,10 +309,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
 
-    static final Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
+    private static final Pattern inputPattern = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
 
-    public static HashMap<String, String> getFormElements(String page) {
+    private static HashMap<String, String> getFormElements(String page) {
         Matcher m = GoogleScholarFetcher.inputPattern.matcher(page);
         HashMap<String, String> items = new HashMap<String, String>();
         while (m.find()) {

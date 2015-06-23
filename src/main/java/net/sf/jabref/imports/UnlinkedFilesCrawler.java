@@ -23,7 +23,7 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directorys only.
      */
-    public final FileFilter directoryFilter = new FileFilter() {
+    private final FileFilter directoryFilter = new FileFilter() {
 
         @Override
         public boolean accept(File pathname) {

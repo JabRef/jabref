@@ -31,9 +31,9 @@ import java.io.Reader;
  * TODO: Fix grammar in bibtex entries -- it ma return invalid bibkeys (with space)
  * 
  */
-public class SPIRESBibtexFilterReader extends FilterReader {
+class SPIRESBibtexFilterReader extends FilterReader {
 
-    protected final BufferedReader in;
+    private final BufferedReader in;
 
     private String line;
     private int pos;

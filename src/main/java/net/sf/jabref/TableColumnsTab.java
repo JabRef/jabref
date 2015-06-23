@@ -55,7 +55,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
     private boolean tableChanged = false;
     private final JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
@@ -546,7 +546,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             super(string, image);
         }
 
-        protected void swap(int i, int j) {
+        void swap(int i, int j) {
             if ((i < 0) || (i >= tableRows.size())) {
                 return;
             }

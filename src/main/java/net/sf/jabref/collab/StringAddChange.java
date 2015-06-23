@@ -22,12 +22,12 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 
-public class StringAddChange extends Change {
+class StringAddChange extends Change {
 
-    final BibtexString string;
+    private final BibtexString string;
 
-    final InfoPane tp = new InfoPane();
-    final JScrollPane sp = new JScrollPane(tp);
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
 
 
     public StringAddChange(BibtexString string) {

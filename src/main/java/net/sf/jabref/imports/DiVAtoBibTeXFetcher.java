@@ -34,9 +34,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
     private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s";
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
-    final HTMLConverter htmlConverter = new HTMLConverter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final HTMLConverter htmlConverter = new HTMLConverter();
 
 
     @Override

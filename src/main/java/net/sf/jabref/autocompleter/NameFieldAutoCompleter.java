@@ -41,7 +41,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
     /**
      * @see AutoCompleterFactory
      */
-    protected NameFieldAutoCompleter(String fieldName) {
+    NameFieldAutoCompleter(String fieldName) {
         this(new String[] {fieldName}, false);
 
     }

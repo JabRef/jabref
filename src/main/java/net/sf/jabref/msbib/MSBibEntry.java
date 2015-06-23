@@ -61,89 +61,89 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
  * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
  */
-public class MSBibEntry {
+class MSBibEntry {
 
-    protected String sourceType = "Misc";
-    protected String bibTexEntry = null;
+    private String sourceType = "Misc";
+    private String bibTexEntry = null;
 
-    protected String tag = null;
-    protected final String GUID = null;
-    protected int LCID = -1;
+    private String tag = null;
+    private final String GUID = null;
+    private int LCID = -1;
 
-    protected List<PersonName> authors = null;
-    protected List<PersonName> bookAuthors = null;
-    protected List<PersonName> editors = null;
-    protected List<PersonName> translators = null;
-    protected List<PersonName> producerNames = null;
-    protected List<PersonName> composers = null;
-    protected List<PersonName> conductors = null;
-    protected List<PersonName> performers = null;
-    protected List<PersonName> writers = null;
-    protected List<PersonName> directors = null;
-    protected List<PersonName> compilers = null;
-    protected List<PersonName> interviewers = null;
-    protected List<PersonName> interviewees = null;
-    protected List<PersonName> inventors = null;
-    protected List<PersonName> counsels = null;
+    private List<PersonName> authors = null;
+    private List<PersonName> bookAuthors = null;
+    private List<PersonName> editors = null;
+    private List<PersonName> translators = null;
+    private List<PersonName> producerNames = null;
+    private List<PersonName> composers = null;
+    private List<PersonName> conductors = null;
+    private List<PersonName> performers = null;
+    private List<PersonName> writers = null;
+    private List<PersonName> directors = null;
+    private List<PersonName> compilers = null;
+    private List<PersonName> interviewers = null;
+    private List<PersonName> interviewees = null;
+    private List<PersonName> inventors = null;
+    private List<PersonName> counsels = null;
 
-    protected String title = null;
-    protected String year = null;
-    protected String month = null;
-    protected String day = null;
+    private String title = null;
+    private String year = null;
+    private String month = null;
+    private String day = null;
 
-    protected String shortTitle = null;
-    protected String comments = null;
+    private String shortTitle = null;
+    private String comments = null;
 
-    protected PageNumbers pages = null;
-    protected String volume = null;
-    protected String numberOfVolumes = null;
-    protected String edition = null;
-    protected String standardNumber = null;
-    protected String publisher = null;
+    private PageNumbers pages = null;
+    private String volume = null;
+    private String numberOfVolumes = null;
+    private String edition = null;
+    private String standardNumber = null;
+    private String publisher = null;
 
-    protected String address = null;
-    protected String bookTitle = null;
-    protected String chapterNumber = null;
-    protected String journalName = null;
-    protected String issue = null;
-    protected String periodicalTitle = null;
-    protected String conferenceName = null;
-    protected String department = null;
-    protected String institution = null;
-    protected String thesisType = null;
-    protected String internetSiteTitle = null;
-    protected String dateAccessed = null;
-    protected String url = null;
-    protected String productionCompany = null;
-    protected String publicationTitle = null;
-    protected String medium = null;
-    protected String albumTitle = null;
-    protected String recordingNumber = null;
-    protected String theater = null;
-    protected String distributor = null;
-    protected String broadcastTitle = null;
-    protected String broadcaster = null;
-    protected String station = null;
-    protected String type = null;
-    protected String patentNumber = null;
-    protected String court = null;
-    protected String reporter = null;
-    protected String caseNumber = null;
-    protected String abbreviatedCaseNumber = null;
-    protected String bibTex_Series = null;
-    protected String bibTex_Abstract = null;
-    protected String bibTex_KeyWords = null;
-    protected String bibTex_CrossRef = null;
-    protected String bibTex_HowPublished = null;
-    protected String bibTex_Affiliation = null;
-    protected String bibTex_Contents = null;
-    protected String bibTex_Copyright = null;
-    protected String bibTex_Price = null;
-    protected String bibTex_Size = null;
+    private String address = null;
+    private String bookTitle = null;
+    private String chapterNumber = null;
+    private String journalName = null;
+    private String issue = null;
+    private String periodicalTitle = null;
+    private String conferenceName = null;
+    private String department = null;
+    private String institution = null;
+    private String thesisType = null;
+    private String internetSiteTitle = null;
+    private String dateAccessed = null;
+    private String url = null;
+    private String productionCompany = null;
+    private String publicationTitle = null;
+    private String medium = null;
+    private String albumTitle = null;
+    private String recordingNumber = null;
+    private String theater = null;
+    private String distributor = null;
+    private String broadcastTitle = null;
+    private String broadcaster = null;
+    private String station = null;
+    private String type = null;
+    private String patentNumber = null;
+    private String court = null;
+    private String reporter = null;
+    private String caseNumber = null;
+    private String abbreviatedCaseNumber = null;
+    private String bibTex_Series = null;
+    private String bibTex_Abstract = null;
+    private String bibTex_KeyWords = null;
+    private String bibTex_CrossRef = null;
+    private String bibTex_HowPublished = null;
+    private String bibTex_Affiliation = null;
+    private String bibTex_Contents = null;
+    private String bibTex_Copyright = null;
+    private String bibTex_Price = null;
+    private String bibTex_Size = null;
 
     /* SM 2010.10 intype, paper support */
-    protected String bibTex_InType = null;
-    protected String bibTex_Paper = null;
+    private String bibTex_InType = null;
+    private String bibTex_Paper = null;
 
     private final String BIBTEX = "BIBTEX_";
     private final String MSBIB = "msbib-";
@@ -153,7 +153,7 @@ public class MSBibEntry {
     private final boolean FORMATXML = false;
 
 
-    public MSBibEntry() {
+    private MSBibEntry() {
     }
 
     public MSBibEntry(BibtexEntry bibtex) {
@@ -166,7 +166,7 @@ public class MSBibEntry {
         populateFromXml(entry, _bcol);
     }
 
-    protected String getFromXml(String name, Element entry) {
+    private String getFromXml(String name, Element entry) {
         String value = null;
         NodeList nodeLst = entry.getElementsByTagName(name);
         if (nodeLst.getLength() > 0) {
@@ -175,7 +175,7 @@ public class MSBibEntry {
         return value;
     }
 
-    protected void populateFromXml(Element entry, String _bcol) {
+    private void populateFromXml(Element entry, String _bcol) {
         String temp = null;
 
         sourceType = getFromXml(_bcol + "SourceType", entry);
@@ -302,7 +302,7 @@ public class MSBibEntry {
         }
     }
 
-    protected void populateFromBibtex(BibtexEntry bibtex) {
+    private void populateFromBibtex(BibtexEntry bibtex) {
         // date = getDate(bibtex);	
         sourceType = getMSBibSourceType(bibtex);
 
@@ -573,7 +573,7 @@ public class MSBibEntry {
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    protected int getLCID(String language)
+    private int getLCID(String language)
     {
         // TODO: add lanaguage to LCID mapping
 
@@ -581,14 +581,14 @@ public class MSBibEntry {
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    protected String getLanguage(int LCID)
+    private String getLanguage(int LCID)
     {
         // TODO: add lanaguage to LCID mapping
 
         return "english";
     }
 
-    protected List<PersonName> getSpecificAuthors(String type, Element authors, String _bcol) {
+    private List<PersonName> getSpecificAuthors(String type, Element authors, String _bcol) {
         List<PersonName> result = null;
         NodeList nodeLst = authors.getElementsByTagName(_bcol + type);
         if (nodeLst.getLength() <= 0) {
@@ -625,7 +625,7 @@ public class MSBibEntry {
         return result;
     }
 
-    protected void getAuthors(Element authorsElem, String _bcol) {
+    private void getAuthors(Element authorsElem, String _bcol) {
         authors = getSpecificAuthors("Author", authorsElem, _bcol);
         bookAuthors = getSpecificAuthors("BookAuthor", authorsElem, _bcol);
         editors = getSpecificAuthors("Editor", authorsElem, _bcol);
@@ -643,7 +643,7 @@ public class MSBibEntry {
         counsels = getSpecificAuthors("Counsel", authorsElem, _bcol);
     }
 
-    protected List<PersonName> getAuthors(String authors) {
+    private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<PersonName>();
 
         if (!authors.contains(" and "))
@@ -673,7 +673,7 @@ public class MSBibEntry {
         return result;
     }
 
-    protected String getMSBibSourceType(BibtexEntry bibtex) {
+    private String getMSBibSourceType(BibtexEntry bibtex) {
         String bibtexType = bibtex.getType().getName();
 
         String result = "Misc";
@@ -757,7 +757,7 @@ public class MSBibEntry {
         return result;
     }
 
-    public Node getDOMrepresentation() {
+    private Node getDOMrepresentation() {
         Node result = null;
         try {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -770,7 +770,7 @@ public class MSBibEntry {
         return result;
     }
 
-    public void addField(Document d, Element parent, String name, String value) {
+    private void addField(Document d, Element parent, String name, String value) {
         if (value == null) {
             return;
         }
@@ -785,7 +785,7 @@ public class MSBibEntry {
         parent.appendChild(elem);
     }
 
-    public void addAuthor(Document d, Element allAuthors, String entryName, List<PersonName> authorsLst) {
+    private void addAuthor(Document d, Element allAuthors, String entryName, List<PersonName> authorsLst) {
         if (authorsLst == null) {
             return;
         }
@@ -803,7 +803,7 @@ public class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    public void addAdrress(Document d, Element parent, String address) {
+    private void addAdrress(Document d, Element parent, String address) {
         if (address == null) {
             return;
         }
@@ -830,7 +830,7 @@ public class MSBibEntry {
         }
     }
 
-    public void addDate(Document d, Element parent, String date, String extra) {
+    private void addDate(Document d, Element parent, String date, String extra) {
         if (date == null) {
             return;
         }
@@ -959,7 +959,7 @@ public class MSBibEntry {
         // return null;
     }
 
-    protected void parseSingleStandardNumber(String type, String bibtype, String standardNum, HashMap<String, String> hm) {
+    private void parseSingleStandardNumber(String type, String bibtype, String standardNum, HashMap<String, String> hm) {
         // tested using http://www.javaregex.com/test.html
         Pattern p = Pattern.compile(":" + type + ":(.[^:]+)");
         Matcher m = p.matcher(standardNum);
@@ -968,7 +968,7 @@ public class MSBibEntry {
         }
     }
 
-    protected void parseStandardNumber(String standardNum, HashMap<String, String> hm) {
+    private void parseStandardNumber(String standardNum, HashMap<String, String> hm) {
         if (standardNumber == null) {
             return;
         }
@@ -981,7 +981,7 @@ public class MSBibEntry {
         /* SM: 2010.10 end DOI support */
     }
 
-    public void addAuthor(HashMap<String, String> hm, String type, List<PersonName> authorsLst) {
+    private void addAuthor(HashMap<String, String> hm, String type, List<PersonName> authorsLst) {
         if (authorsLst == null) {
             return;
         }
@@ -1041,7 +1041,7 @@ public class MSBibEntry {
     //		return bibtex;
     //	}
 
-    public BibtexEntryType mapMSBibToBibtexType(String msbib)
+    private BibtexEntryType mapMSBibToBibtexType(String msbib)
     {
         BibtexEntryType bibtex = BibtexEntryType.OTHER;
         if (msbib.equals("Book")) {
@@ -1341,7 +1341,7 @@ public class MSBibEntry {
      * @param in The String whose non-valid characters we want to remove.
      * @return The in String, stripped of non-valid characters.
      */
-    public String stripNonValidXMLCharacters(String in) {
+    private String stripNonValidXMLCharacters(String in) {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 

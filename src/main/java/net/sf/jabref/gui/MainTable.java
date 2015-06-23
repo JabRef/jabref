@@ -73,13 +73,14 @@ public class MainTable extends JTable {
     private final PersistenceTableColumnListener tableColumnListener;
 
     // Constants used to define how a cell should be rendered.
-    public static final int REQUIRED = 1, OPTIONAL = 2,
-            REQ_STRING = 1,
-            REQ_NUMBER = 2,
-            OPT_STRING = 3,
-            OTHER = 3,
-            BOOLEAN = 4,
-            ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
+    private static final int REQUIRED = 1;
+    private static final int OPTIONAL = 2;
+    public static final int REQ_STRING = 1;
+    public static final int REQ_NUMBER = 2;
+    public static final int OPT_STRING = 3;
+    private static final int OTHER = 3;
+    private static final int BOOLEAN = 4;
+    public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
 
     static {
         MainTable.updateRenderers();
@@ -301,7 +302,7 @@ public class MainTable extends JTable {
 
     }
 
-    public void setWidths() {
+    private void setWidths() {
         // Setting column widths:
         int ncWidth = Globals.prefs.getInt("numberColWidth");
         String[] widths = Globals.prefs.getStringArray("columnWidths");
@@ -348,7 +349,7 @@ public class MainTable extends JTable {
         return getSelected().toArray(BE_ARRAY);
     }
 
-    public List<Boolean> getCurrentSortOrder() {
+    private List<Boolean> getCurrentSortOrder() {
         List<Boolean> order = new ArrayList<Boolean>();
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         for (Integer i : sortCols) {
@@ -357,7 +358,7 @@ public class MainTable extends JTable {
         return order;
     }
 
-    public List<String> getCurrentSortFields() {
+    private List<String> getCurrentSortFields() {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         List<String> fields = new ArrayList<String>();
         for (Integer i : sortCols) {
@@ -470,7 +471,7 @@ public class MainTable extends JTable {
 
     }
 
-    public int getCellStatus(int row, int col) {
+    private int getCellStatus(int row, int col) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
@@ -669,7 +670,7 @@ public class MainTable extends JTable {
             super.setToolTipText(Globals.lang("This entry is incomplete"));
         }
 
-        protected void setNumber(int number) {
+        void setNumber(int number) {
             super.setValue(String.valueOf(number + 1));
         }
 
@@ -685,7 +686,7 @@ public class MainTable extends JTable {
             super(color);
         }
 
-        protected void setNumber(int number) {
+        void setNumber(int number) {
             super.setValue(String.valueOf(number + 1));
         }
 
@@ -696,8 +697,8 @@ public class MainTable extends JTable {
     }
 
 
-    public TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
-            Object sortingStrategy) {
+    private TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
+                                                                             Object sortingStrategy) {
         final TableComparatorChooser<BibtexEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
         result.addSortActionListener(new ActionListener() {
 

@@ -32,9 +32,9 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 public class SimpleSearchRule implements SearchRule {
 
-    final boolean m_caseSensitiveSearch;
+    private final boolean m_caseSensitiveSearch;
     //static RemoveBrackets removeBrackets = new RemoveBrackets();
-    static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
 
     public SimpleSearchRule(boolean caseSensitive) {

@@ -30,9 +30,9 @@ import net.sf.jabref.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
 
-    protected GroupTreeNode m_node;
-    protected final boolean m_move;
-    protected BasePanel m_panel;
+    private GroupTreeNode m_node;
+    private final boolean m_move;
+    private BasePanel m_panel;
 
 
     /**

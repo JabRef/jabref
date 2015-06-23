@@ -52,30 +52,30 @@ public class JSTORFetcher implements EntryFetcher {
     /**
      * cookies can't save more than 200 citations
      */
-    protected static final int MAX_CITATIONS = 200;
+    private static final int MAX_CITATIONS = 200;
 
     /**
      * Cookie key for Jstor ticket (authentication)
      */
-    protected static final String COOKIE_TICKET = "Jstor_Ticket";
+    private static final String COOKIE_TICKET = "Jstor_Ticket";
 
     /**
      * location where the ticket is obtained
      * 
      */
-    protected static final String URL_TICKET = "http://www.jstor.org/search";
+    private static final String URL_TICKET = "http://www.jstor.org/search";
 
     /**
      * Cookie key for citations to be fetched
      * 
      */
-    protected static final String COOKIE_CITATIONS = "Jstor_citations0";
+    private static final String COOKIE_CITATIONS = "Jstor_citations0";
 
     /**
      * location where to obtain the citations cookie
      * 
      */
-    protected static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
+    private static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
 
 
     @Override
@@ -146,7 +146,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @throws IOException
      *             Most probably related to a problem connecting to JStor.
      */
-    protected Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
+    private Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
             throws IOException {
         try {
             URL url = new URL(JSTORFetcher.URL_BIBTEX);
@@ -168,7 +168,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @return a Jstor ticket ID
      * @throws IOException
      */
-    protected String openTicket() throws IOException {
+    private String openTicket() throws IOException {
         URL url = new URL(JSTORFetcher.URL_TICKET);
         URLConnection conn = url.openConnection();
         return JSTORFetcher.getCookie(JSTORFetcher.COOKIE_TICKET, conn);
@@ -185,7 +185,7 @@ public class JSTORFetcher implements EntryFetcher {
      *         search is empty or ticket is invalid
      * @throws IOException
      */
-    protected String getCitations(String ticket, String query) throws IOException {
+    private String getCitations(String ticket, String query) throws IOException {
         String urlQuery;
         try {
             urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
@@ -211,7 +211,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @return cookie value referenced by the key. null if key not found
      * @throws IOException
      */
-    public static String getCookie(String name, URLConnection conn) {
+    private static String getCookie(String name, URLConnection conn) {
 
         for (int i = 0;; i++) {
             String headerName = conn.getHeaderFieldKey(i);

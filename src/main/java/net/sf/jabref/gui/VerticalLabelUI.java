@@ -46,10 +46,10 @@ public class VerticalLabelUI extends BasicLabelUI {
 
     private boolean clockwise = false;
     // see comment in BasicLabelUI
-    Rectangle verticalViewR = new Rectangle();
-    Rectangle verticalIconR = new Rectangle();
-    Rectangle verticalTextR = new Rectangle();
-    protected static final VerticalLabelUI verticalLabelUI =
+    private Rectangle verticalViewR = new Rectangle();
+    private Rectangle verticalIconR = new Rectangle();
+    private Rectangle verticalTextR = new Rectangle();
+    private static final VerticalLabelUI verticalLabelUI =
             new VerticalLabelUI();
     private final static VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
             new VerticalLabelUI();
@@ -59,7 +59,7 @@ public class VerticalLabelUI extends BasicLabelUI {
      * Constructs a <code>VerticalLabelUI</code> with the default anticlockwise
      * rotation
      */
-    public VerticalLabelUI() {
+    private VerticalLabelUI() {
     }
 
     /**

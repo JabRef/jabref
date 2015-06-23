@@ -35,9 +35,9 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
-    boolean foundPaths = false;
-    boolean fileSearchCancelled = false;
-    JDialog prog;
+    private boolean foundPaths = false;
+    private boolean fileSearchCancelled = false;
+    private JDialog prog;
     private final JDialog parent;
 
 
@@ -84,7 +84,7 @@ public class AutoDetectPaths extends AbstractWorker {
         prog.dispose();
     }
 
-    public boolean autoDetectPaths() {
+    private boolean autoDetectPaths() {
 
         if (Globals.ON_WIN) {
             List<File> progFiles = AutoDetectPaths.findProgramFilesDir();
@@ -295,7 +295,7 @@ public class AutoDetectPaths extends AbstractWorker {
         return dirList;
     }
 
-    public static boolean checkAutoDetectedPaths() {
+    private static boolean checkAutoDetectedPaths() {
 
         if (Globals.prefs.hasKey("ooUnoilPath") && Globals.prefs.hasKey("ooJurtPath")
                 && Globals.prefs.hasKey("ooExecutablePath")) {
@@ -313,7 +313,7 @@ public class AutoDetectPaths extends AbstractWorker {
      * @param filename The name of the file to search for.
      * @return The directory where the file was first found, or null if not found.
      */
-    public File findFileDir(File startDir, String filename) {
+    private File findFileDir(File startDir, String filename) {
         if (fileSearchCancelled) {
             return null;
         }

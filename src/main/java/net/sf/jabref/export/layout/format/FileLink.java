@@ -31,7 +31,7 @@ import java.io.IOException;
  */
 public class FileLink implements ParamLayoutFormatter {
 
-    String fileType = null;
+    private String fileType = null;
 
 
     @Override

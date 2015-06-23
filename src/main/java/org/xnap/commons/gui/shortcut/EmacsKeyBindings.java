@@ -74,29 +74,29 @@ import org.apache.commons.logging.LogFactory;
 public class EmacsKeyBindings
 {
 
-    public static final String killLineAction = "emacs-kill-line";
+    private static final String killLineAction = "emacs-kill-line";
 
-    public static final String killRingSaveAction = "emacs-kill-ring-save";
+    private static final String killRingSaveAction = "emacs-kill-ring-save";
 
-    public static final String killRegionAction = "emacs-kill-region";
+    private static final String killRegionAction = "emacs-kill-region";
 
-    public static final String backwardKillWordAction = "emacs-backward-kill-word";
+    private static final String backwardKillWordAction = "emacs-backward-kill-word";
 
-    public static final String capitalizeWordAction = "emacs-capitalize-word";
+    private static final String capitalizeWordAction = "emacs-capitalize-word";
 
-    public static final String downcaseWordAction = "emacs-downcase-word";
+    private static final String downcaseWordAction = "emacs-downcase-word";
 
-    public static final String killWordAction = "emacs-kill-word";
+    private static final String killWordAction = "emacs-kill-word";
 
-    public static final String setMarkCommandAction = "emacs-set-mark-command";
+    private static final String setMarkCommandAction = "emacs-set-mark-command";
 
-    public static final String yankAction = "emacs-yank";
+    private static final String yankAction = "emacs-yank";
 
-    public static final String yankPopAction = "emacs-yank-pop";
+    private static final String yankPopAction = "emacs-yank-pop";
 
-    public static final String upcaseWordAction = "emacs-upcase-word";
+    private static final String upcaseWordAction = "emacs-upcase-word";
 
-    public static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS_BASE = {
+    private static final JTextComponent.KeyBinding[] EMACS_KEY_BINDINGS_BASE = {
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E,
                     InputEvent.CTRL_MASK),
@@ -201,7 +201,7 @@ public class EmacsKeyBindings
                     EmacsKeyBindings.upcaseWordAction),
     };
 
-    public static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_A = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+    private static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_A = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
             InputEvent.CTRL_MASK),
             DefaultEditorKit.beginLineAction);
 

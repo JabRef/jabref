@@ -17,9 +17,9 @@ package net.sf.jabref;
 
 import java.util.Set;
 
-public class IncrementalSearcher {
+class IncrementalSearcher {
 
-    final JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
     private String hitInField;
 
 
@@ -36,8 +36,8 @@ public class IncrementalSearcher {
         return searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
     }
 
-    protected boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry,
-            String searchString) {
+    private boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry,
+                                 String searchString) {
         boolean found = false;
         if (fields != null) {
 

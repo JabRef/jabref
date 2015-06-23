@@ -23,7 +23,7 @@ import net.sf.jabref.export.layout.ParamLayoutFormatter;
  */
 public class Default implements ParamLayoutFormatter {
 
-    String defValue = "";
+    private String defValue = "";
 
 
     @Override

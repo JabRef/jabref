@@ -35,7 +35,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtensio
  * @author $author$
  * @version $Revision$
  */
-public class LayoutEntry {
+class LayoutEntry {
 
     // ~ Instance fields
     // ////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ public class LayoutEntry {
         this.postFormatter = formatter;
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    private String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
         return doLayout(bibtex, database, null);
     }
 
@@ -382,10 +382,10 @@ public class LayoutEntry {
 
     // added section - end (arudert)
 
-    static Map<String, LayoutFormatter> pluginLayoutFormatter;
+    private static Map<String, LayoutFormatter> pluginLayoutFormatter;
 
 
-    public static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName) {
+    private static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName) {
         if (LayoutEntry.pluginLayoutFormatter == null) {
             LayoutEntry.pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
             JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
@@ -418,7 +418,7 @@ public class LayoutEntry {
         }
     }
 
-    public static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
+    private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
             throws Exception {
 
         if (className.length() > 0) {
@@ -444,8 +444,8 @@ public class LayoutEntry {
      * string (in order of appearance).
      * 
      */
-    public static LayoutFormatter[] getOptionalLayout(String formatterName,
-            String classPrefix) {
+    private static LayoutFormatter[] getOptionalLayout(String formatterName,
+                                                       String classPrefix) {
 
         ArrayList<String[]> formatterStrings = Util
                 .parseMethodsCalls(formatterName);

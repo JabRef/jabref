@@ -26,13 +26,13 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
-public class EntryChange extends Change {
+class EntryChange extends Change {
 
-    final BibtexEntry memEntry;
-    final BibtexEntry tmpEntry;
-    final BibtexEntry diskEntry;
-    final boolean isModifiedLocally;
-    final boolean modificationsAgree;
+    private final BibtexEntry memEntry;
+    private final BibtexEntry tmpEntry;
+    private final BibtexEntry diskEntry;
+    private final boolean isModifiedLocally;
+    private final boolean modificationsAgree;
 
 
     public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {

@@ -25,7 +25,7 @@ import net.sf.jabref.OutputPrinter;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
-    final List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
+    private final List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
 
 
     @Override
@@ -40,7 +40,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
     }
 
 
-    final OutputPrinter status = new OutputPrinter() {
+    private final OutputPrinter status = new OutputPrinter() {
 
         @Override
         public void setStatus(String s) {

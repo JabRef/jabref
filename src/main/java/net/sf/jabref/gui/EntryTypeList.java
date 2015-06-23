@@ -37,7 +37,7 @@ import net.sf.jabref.Util;
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener, ActionListener {
 
-    protected final JButton def = new JButton(Globals.lang("Default"));
+    private final JButton def = new JButton(Globals.lang("Default"));
 
 
     /** Creates a new instance of EntryTypeList */

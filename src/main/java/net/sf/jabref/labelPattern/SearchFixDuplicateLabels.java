@@ -30,7 +30,7 @@ import java.util.List;
 public class SearchFixDuplicateLabels extends AbstractWorker {
 
     private final BasePanel panel;
-    HashMap<String, List<BibtexEntry>> dupes = null;
+    private HashMap<String, List<BibtexEntry>> dupes = null;
 
 
     public SearchFixDuplicateLabels(BasePanel panel) {

@@ -22,22 +22,22 @@ import javax.swing.*;
 
 import net.sf.jabref.undo.UndoablePreambleChange;
 
-public class PreambleEditor extends JDialog {
+class PreambleEditor extends JDialog {
 
     // A reference to the entry this object works on.
-    final BibtexDatabase base;
-    final BasePanel panel;
-    final JabRefFrame baseFrame;
-    final JabRefPreferences prefs;
+    private final BibtexDatabase base;
+    private final BasePanel panel;
+    private final JabRefFrame baseFrame;
+    private final JabRefPreferences prefs;
 
     // Layout objects.
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    final Container conPane = getContentPane();
+    private final Container conPane = getContentPane();
     //JToolBar tlb = new JToolBar();
-    final JPanel pan = new JPanel();
-    FieldEditor ed;
+    private final JPanel pan = new JPanel();
+    private FieldEditor ed;
 
 
     public PreambleEditor(JabRefFrame baseFrame,
@@ -119,7 +119,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    class FieldListener extends FocusAdapter {
+    private class FieldListener extends FocusAdapter {
 
         /*
         * Focus listener that fires the storeFieldAction when a FieldTextArea
@@ -135,7 +135,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    final StoreFieldAction storeFieldAction = new StoreFieldAction();
+    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
 
 
     class StoreFieldAction extends AbstractAction {
@@ -182,7 +182,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    final UndoAction undoAction = new UndoAction();
+    private final UndoAction undoAction = new UndoAction();
 
 
     class UndoAction extends AbstractAction {
@@ -202,7 +202,7 @@ public class PreambleEditor extends JDialog {
     }
 
 
-    final RedoAction redoAction = new RedoAction();
+    private final RedoAction redoAction = new RedoAction();
 
 
     class RedoAction extends AbstractAction {
@@ -223,7 +223,7 @@ public class PreambleEditor extends JDialog {
 
 
     // The action concerned with closing the window.
-    final CloseAction closeAction = new CloseAction();
+    private final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {

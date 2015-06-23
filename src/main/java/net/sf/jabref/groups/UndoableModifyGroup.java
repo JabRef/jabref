@@ -19,7 +19,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.Globals;
 
-public class UndoableModifyGroup extends AbstractUndoableEdit {
+class UndoableModifyGroup extends AbstractUndoableEdit {
 
     private final GroupSelector m_groupSelector;
     private final AbstractGroup m_oldGroupBackup;

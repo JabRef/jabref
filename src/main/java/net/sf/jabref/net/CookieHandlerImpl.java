@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * 
  */
-public class CookieHandlerImpl extends CookieHandler {
+class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance

@@ -22,9 +22,9 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
 
-public class TextAnalyzer {
+class TextAnalyzer {
 
-    final BibtexEntry be = null;
+    private final BibtexEntry be = null;
 
 
     public TextAnalyzer(String text) {
@@ -35,7 +35,7 @@ public class TextAnalyzer {
         return be;
     }
 
-    public void guessBibtexFields(String text) {
+    private void guessBibtexFields(String text) {
 
         TreeSet<Substring> usedParts = new TreeSet<Substring>();
 
@@ -164,7 +164,7 @@ public class TextAnalyzer {
         }
     }
 
-    public String[] getMatches(String text, String regexp) {
+    private String[] getMatches(String text, String regexp) {
         int piv = 0;
         String[] test = text.split(regexp);
         if (test.length < 2) {

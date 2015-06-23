@@ -27,7 +27,7 @@ import java.awt.event.FocusListener;
  * Time: 18:20:14
  * To change this template use File | Settings | File Templates.
  */
-public class FieldEditorFocusListener implements FocusListener {
+class FieldEditorFocusListener implements FocusListener {
 
     public FieldEditorFocusListener() {
     }

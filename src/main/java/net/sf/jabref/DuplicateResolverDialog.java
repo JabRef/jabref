@@ -32,39 +32,41 @@ import net.sf.jabref.export.LatexFieldFormatter;
 
 public class DuplicateResolverDialog extends JDialog {
 
-    public static final int
-            NOT_CHOSEN = -1,
-            KEEP_BOTH = 0,
-            KEEP_UPPER = 1,
-            KEEP_LOWER = 2,
-            AUTOREMOVE_EXACT = 3,
-            BREAK = 5, // close
-            IMPORT_AND_DELETE_OLD = 1,
-            IMPORT_AND_KEEP_OLD = 0,
-            DO_NOT_IMPORT = 2,
-            DUPLICATE_SEARCH = 1,
-            IMPORT_CHECK = 2,
-            INSPECTION = 3,
-            DUPLICATE_SEARCH_WITH_EXACT = 4;
+    private static final int
+            NOT_CHOSEN = -1;
+    public static final int KEEP_BOTH = 0;
+    public static final int KEEP_UPPER = 1;
+    public static final int KEEP_LOWER = 2;
+    public static final int AUTOREMOVE_EXACT = 3;
+    public static final int BREAK = 5; // close
+            public static final int IMPORT_AND_DELETE_OLD = 1;
+    public static final int IMPORT_AND_KEEP_OLD = 0;
+    public static final int DO_NOT_IMPORT = 2;
+    public static final int DUPLICATE_SEARCH = 1;
+    public static final int IMPORT_CHECK = 2;
+    public static final int INSPECTION = 3;
+    public static final int DUPLICATE_SEARCH_WITH_EXACT = 4;
 
-    final Dimension DIM = new Dimension(650, 600);
+    private final Dimension DIM = new Dimension(650, 600);
 
-    PreviewPanel p1, p2;
-    JTextArea ta1, ta2;
-    final JTabbedPane tabbed = new JTabbedPane();
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
-    JButton first;
-    JButton second;
-    JButton both;
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    JButton removeExact = null;
-    final JPanel options = new JPanel();
-    final JPanel main = new JPanel();
-    final JPanel source = new JPanel();
-    int status = DuplicateResolverDialog.NOT_CHOSEN;
-    boolean block = true;
-    TitleLabel lab;
+    private PreviewPanel p1;
+    private PreviewPanel p2;
+    private JTextArea ta1;
+    private JTextArea ta2;
+    private final JTabbedPane tabbed = new JTabbedPane();
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
+    private JButton first;
+    private JButton second;
+    private JButton both;
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private JButton removeExact = null;
+    private final JPanel options = new JPanel();
+    private final JPanel main = new JPanel();
+    private final JPanel source = new JPanel();
+    private int status = DuplicateResolverDialog.NOT_CHOSEN;
+    private boolean block = true;
+    private TitleLabel lab;
 
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {

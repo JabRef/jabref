@@ -22,7 +22,7 @@ import java.io.File;
  * File filter that lets the user choose export format while choosing file to
  * export to. Contains a reference to the ExportFormat in question.
  */
-public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
+class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
 
     private final IExportFormat format;
     private final String extension;

@@ -178,7 +178,7 @@ public final class EntryFromFileCreatorManager {
      * @return A {@link FileFilter} that accepts all files for which creators
      *         exist.
      */
-    public FileFilter getFileFilter() {
+    private FileFilter getFileFilter() {
         return new FileFilter() {
 
             /**

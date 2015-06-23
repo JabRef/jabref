@@ -44,7 +44,7 @@ import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
  *
  * @author alver
  */
-public class ManagePluginsDialog {
+class ManagePluginsDialog {
 
     private final JabRefFrame frame;
     private final JDialog diag;
@@ -209,7 +209,7 @@ public class ManagePluginsDialog {
         diag.setVisible(visible);
     }
 
-    public void installPlugin() {
+    private void installPlugin() {
         String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
                 ".jar", JFileChooser.OPEN_DIALOG, false);
         if (filename == null) {
@@ -225,7 +225,7 @@ public class ManagePluginsDialog {
 
     }
 
-    public void downloadPlugin() {
+    private void downloadPlugin() {
         String url = JOptionPane.showInputDialog(Globals.lang("Enter download URL"));
         if (url == null) {
             return;
@@ -238,7 +238,7 @@ public class ManagePluginsDialog {
         }
     }
 
-    public void installFromURL(URL url) {
+    private void installFromURL(URL url) {
         try {
             File tmpFile = File.createTempFile("jabref-plugin", ".jar");
             tmpFile.deleteOnExit();
@@ -258,13 +258,13 @@ public class ManagePluginsDialog {
 
     }
 
-    public void installFromFile(File file) {
+    private void installFromFile(File file) {
         PluginInstaller.installPlugin(frame, file, null);
         buildList();
     }
 
 
-    class PluginTableFormat implements TableFormat<NameAndVersion> {
+    private class PluginTableFormat implements TableFormat<NameAndVersion> {
 
         @Override
         public int getColumnCount() {

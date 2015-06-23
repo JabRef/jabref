@@ -161,8 +161,8 @@ public class UtilFindFiles {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    public static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
-            String file, boolean relative) {
+    private static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
+                                   String file, boolean relative) {
 
         for (String aDirectory : directory) {
             String result = UtilFindFiles.findFile(entry, database, aDirectory, file, relative);
@@ -232,8 +232,8 @@ public class UtilFindFiles {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    protected static String findFile(BibtexEntry entry, BibtexDatabase database, File directory,
-            String file) {
+    private static String findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+                                   String file) {
 
         if (file.startsWith("/")) {
             directory = new File(".");

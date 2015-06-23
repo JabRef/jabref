@@ -22,12 +22,12 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 
-public class EntryAddChange extends Change {
+class EntryAddChange extends Change {
 
-    final BibtexEntry diskEntry;
+    private final BibtexEntry diskEntry;
     //  boolean isModifiedLocally, modificationsAgree;[[[[[[
-    final PreviewPanel pp;
-    final JScrollPane sp;
+    private final PreviewPanel pp;
+    private final JScrollPane sp;
 
 
     public EntryAddChange(BibtexEntry diskEntry) {

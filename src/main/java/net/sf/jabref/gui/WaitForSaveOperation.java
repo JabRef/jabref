@@ -29,12 +29,12 @@ import java.awt.event.ActionListener;
  */
 public class WaitForSaveOperation implements ActionListener {
 
-    final JabRefFrame frame;
-    final JDialog diag;
-    final JProgressBar prog;
-    final JButton cancel;
-    final Timer t = new Timer(500, this);
-    boolean cancelled = false;
+    private final JabRefFrame frame;
+    private final JDialog diag;
+    private final JProgressBar prog;
+    private final JButton cancel;
+    private final Timer t = new Timer(500, this);
+    private boolean cancelled = false;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {

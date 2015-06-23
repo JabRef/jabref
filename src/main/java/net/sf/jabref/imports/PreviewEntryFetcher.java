@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  *
  */
-public interface PreviewEntryFetcher extends EntryFetcher {
+interface PreviewEntryFetcher extends EntryFetcher {
 
     boolean processQueryGetPreview(String query, FetcherPreviewDialog preview,
                                    OutputPrinter status);

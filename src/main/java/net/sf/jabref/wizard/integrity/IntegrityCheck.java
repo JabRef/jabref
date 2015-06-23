@@ -69,7 +69,7 @@ public class IntegrityCheck
         return new Vector<IntegrityMessage>(messages);
     }
 
-    public void checkSingleEntry(BibtexEntry entry)
+    private void checkSingleEntry(BibtexEntry entry)
     {
         if (entry == null) {
             return;

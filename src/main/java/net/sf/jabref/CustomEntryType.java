@@ -47,7 +47,7 @@ public class CustomEntryType extends BibtexEntryType {
         this(name_, req_, opt_, new String[0]);
     }
 
-    public CustomEntryType(String name_, String reqStr, String optStr) {
+    private CustomEntryType(String name_, String reqStr, String optStr) {
         name = name_;
         if (reqStr.length() == 0) {
             req = new String[0];
@@ -62,12 +62,12 @@ public class CustomEntryType extends BibtexEntryType {
         }
     }
 
-    protected void parseRequiredFields(String reqStr) {
+    private void parseRequiredFields(String reqStr) {
         String[] parts = reqStr.split(";");
         parseRequiredFields(parts);
     }
 
-    protected void parseRequiredFields(String[] parts) {
+    private void parseRequiredFields(String[] parts) {
         ArrayList<String> fields = new ArrayList<String>();
         ArrayList<String[]> sets = new ArrayList<String[]>();
         for (String part : parts) {
@@ -162,7 +162,7 @@ public class CustomEntryType extends BibtexEntryType {
         return true;
     }
 
-    protected boolean isCoupledFieldSet(String field, BibtexEntry entry, BibtexDatabase database) {
+    private boolean isCoupledFieldSet(String field, BibtexEntry entry, BibtexDatabase database) {
         if (reqSets == null) {
             return false;
         }

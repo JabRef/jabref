@@ -40,16 +40,16 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
 
-    boolean tableChanged = false;
+    private boolean tableChanged = false;
 
-    int rowCount;
+    private int rowCount;
 
-    final JTable table;
+    private final JTable table;
 
-    final JCheckBox privacyFilterCheckBox = new JCheckBox(
+    private final JCheckBox privacyFilterCheckBox = new JCheckBox(
             Globals.lang("Do not write the following fields to XMP Metadata:"));
 
-    final Vector<Object> tableRows = new Vector<Object>(10);
+    private final Vector<Object> tableRows = new Vector<Object>(10);
 
 
     /**

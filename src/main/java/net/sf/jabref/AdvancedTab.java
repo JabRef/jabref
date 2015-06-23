@@ -41,29 +41,32 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
     JabRefFrame _frame;
     HelpDialog helpDiag;
-    final HelpAction remoteHelp;
+    private final HelpAction remoteHelp;
     JPanel pan = new JPanel(),
             lnf = new JPanel();
     JLabel lab;
-    final JCheckBox useDefault;
-    final JCheckBox useRemoteServer;
-    final JCheckBox useNativeFileDialogOnMac;
-    final JCheckBox filechooserDisableRename;
-    final JCheckBox useIEEEAbrv;
-    final JCheckBox biblatexMode;
-    final JComboBox className;
-    final JTextField remoteServerPort;
+    private final JCheckBox useDefault;
+    private final JCheckBox useRemoteServer;
+    private final JCheckBox useNativeFileDialogOnMac;
+    private final JCheckBox filechooserDisableRename;
+    private final JCheckBox useIEEEAbrv;
+    private final JCheckBox biblatexMode;
+    private final JComboBox className;
+    private final JTextField remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
             def2 = new JButton(Globals.lang("Default"));
     JPanel p1 = new JPanel(),
             p2 = new JPanel();
-    String oldLnf = "";
-    boolean oldUseDef, oldBiblMode = false, oldConvertToEquation,
-            oldCaseKeeperOnSearch, oldUnitFormatterOnSearch;
-    int oldPort = -1;
+    private String oldLnf = "";
+    private boolean oldUseDef;
+    private boolean oldBiblMode = false;
+    private boolean oldConvertToEquation;
+    private boolean oldCaseKeeperOnSearch;
+    private boolean oldUnitFormatterOnSearch;
+    private int oldPort = -1;
 
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation";
     public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";

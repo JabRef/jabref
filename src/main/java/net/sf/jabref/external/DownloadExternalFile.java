@@ -269,7 +269,7 @@ public class DownloadExternalFile {
     /**
      * This is called by the download thread when download is completed.
      */
-    public void downloadFinished() {
+    private void downloadFinished() {
         downloadFinished = true;
         editor.getProgressBar().setVisible(false);
         editor.getProgressBarLabel().setVisible(false);
@@ -277,7 +277,7 @@ public class DownloadExternalFile {
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
 
-    public String getSuggestedFileName(String suffix) {
+    private String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
         if (suffix.length() > 0) {
@@ -307,7 +307,7 @@ public class DownloadExternalFile {
      * @param link The link
      * @return The suffix, excluding the dot (e.g. "pdf")
      */
-    public String getSuffix(final String link) {
+    private String getSuffix(final String link) {
         String strippedLink = link;
         try {
             // Try to strip the query string, if any, to get the correct suffix:
@@ -356,7 +356,7 @@ public class DownloadExternalFile {
 
     }
 
-    public String[] getFileDirectory(String link) {
+    private String[] getFileDirectory(String link) {
         return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
     }
 

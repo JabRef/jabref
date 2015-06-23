@@ -48,14 +48,14 @@ public class BibtexFields
 
     // some internal fields
     public static final String
-            SEARCH = "__search",
-            GROUPSEARCH = "__groupsearch",
-            MARKED = "__markedentry",
-            OWNER = "owner",
-            TIMESTAMP = "timestamp", // it's also definied at the JabRefPreferences class
-            ENTRYTYPE = "entrytype",
+            SEARCH = "__search";
+    public static final String GROUPSEARCH = "__groupsearch";
+    public static final String MARKED = "__markedentry";
+    public static final String OWNER = "owner";
+    public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
+            private static final String ENTRYTYPE = "entrytype";
 
-            // Using this when I have no database open or when I read
+    public static final String// Using this when I have no database open or when I read
             // non bibtex file formats (used by the ImportFormatReader.java)
             DEFAULT_BIBTEXENTRY_ID = "__ID";
 

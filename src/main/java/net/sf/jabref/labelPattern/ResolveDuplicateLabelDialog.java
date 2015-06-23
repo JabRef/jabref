@@ -30,15 +30,15 @@ import java.util.List;
 /**
  * Dialog box for resolving duplicate bibte keys
  */
-public class ResolveDuplicateLabelDialog {
+class ResolveDuplicateLabelDialog {
 
-    final JDialog diag;
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
+    private final JDialog diag;
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
     private boolean okPressed = false;
 
-    final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
+    private final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
             "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +
             "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n" +
             "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n" +

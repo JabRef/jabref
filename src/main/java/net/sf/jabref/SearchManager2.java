@@ -44,13 +44,13 @@ public class SearchManager2 extends SidePaneComponent
 
     private final JabRefFrame frame;
 
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
 
-    final IncrementalSearcher incSearcher;
-    SearchResultsDialog searchDialog = null;
+    private final IncrementalSearcher incSearcher;
+    private SearchResultsDialog searchDialog = null;
 
-    AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener = null;
 
     /**
      * subscribed Objects
@@ -340,7 +340,7 @@ public class SearchManager2 extends SidePaneComponent
      * and autocomplete listener has been set and whether incremental search
      * is selected.
      */
-    protected void updateKeyListeners() {
+    private void updateKeyListeners() {
         KeyListener[] listeners = searchField.getKeyListeners();
         for (KeyListener listener : listeners) {
             searchField.removeKeyListener(listener);
@@ -428,7 +428,7 @@ public class SearchManager2 extends SidePaneComponent
     /**
      * Instantiate the search dialog, unless it has already been instantiated:
      */
-    protected void instantiateSearchDialog() {
+    private void instantiateSearchDialog() {
         if (searchDialog == null) {
             searchDialog = new SearchResultsDialog(frame, Globals.lang("Search results"));
         }
@@ -681,7 +681,7 @@ public class SearchManager2 extends SidePaneComponent
     }
 
 
-    public void clearSearch() {
+    private void clearSearch() {
 
         if (panel.isShowingFloatSearch()) {
             startedFloatSearch = false;

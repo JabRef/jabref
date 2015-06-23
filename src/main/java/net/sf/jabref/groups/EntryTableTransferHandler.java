@@ -50,17 +50,17 @@ import spl.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
-    protected final MainTable entryTable;
+    private final MainTable entryTable;
 
-    protected final JabRefFrame frame;
+    private final JabRefFrame frame;
 
     private final BasePanel panel;
 
-    protected DataFlavor urlFlavor;
+    private DataFlavor urlFlavor;
 
-    protected final DataFlavor stringFlavor;
+    private final DataFlavor stringFlavor;
 
-    protected static final boolean DROP_ALLOWED = true;
+    private static final boolean DROP_ALLOWED = true;
 
 
     /**
@@ -231,7 +231,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
 
-    boolean draggingFile = false;
+    private boolean draggingFile = false;
 
 
     @Override
@@ -268,7 +268,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     // add-ons -----------------------
 
-    protected boolean handleDropTransfer(String dropStr, final int dropRow) throws IOException {
+    private boolean handleDropTransfer(String dropStr, final int dropRow) throws IOException {
         if (dropStr.startsWith("file:")) {
             // This appears to be a dragged file link and not a reference
             // format. Check if we can map this to a set of files:
@@ -525,7 +525,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
     }
 
-    protected boolean handleDropTransfer(URL dropLink, int dropRow) throws IOException {
+    private boolean handleDropTransfer(URL dropLink, int dropRow) throws IOException {
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 

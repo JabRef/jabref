@@ -52,12 +52,12 @@ import org.java.plugin.util.ExtendedProperties;
  */
 public class PluginCore {
 
-    static PluginManager singleton;
+    private static PluginManager singleton;
 
     static final File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 
 
-    static PluginLocation getLocationInsideJar(String context, String manifest) {
+    private static PluginLocation getLocationInsideJar(String context, String manifest) {
         URL jar = PluginCore.class
                 .getResource(Util.joinPath(context, manifest));
 
@@ -81,7 +81,7 @@ public class PluginCore {
         return null;
     }
 
-    static PluginManager initialize() {
+    private static PluginManager initialize() {
         // We do not want info messages from JPF.
         Logger.getLogger("org.java.plugin").setLevel(Level.WARNING);
 

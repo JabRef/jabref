@@ -20,7 +20,7 @@ import net.sf.jabref.Util;
 
 import java.util.Comparator;
 
-public class IsMarkedComparator implements Comparator<BibtexEntry> {
+class IsMarkedComparator implements Comparator<BibtexEntry> {
 
     @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {

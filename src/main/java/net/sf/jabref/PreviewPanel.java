@@ -47,24 +47,24 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      */
     BibtexEntry entry;
 
-    MetaData metaData;
+    private MetaData metaData;
 
     /**
      * If a database is set, the preview will attempt to resolve strings in the
      * previewed entry using that database.
      */
-    BibtexDatabase database;
+    private BibtexDatabase database;
 
-    Layout layout;
+    private Layout layout;
 
-    String layoutFile;
+    private String layoutFile;
 
-    public final JEditorPane previewPane;
+    private final JEditorPane previewPane;
 
-    final JScrollPane scrollPane;
-    final PdfPreviewPanel pdfPreviewPanel;
+    private final JScrollPane scrollPane;
+    private final PdfPreviewPanel pdfPreviewPanel;
 
-    final BasePanel panel;
+    private final BasePanel panel;
 
 
     /**
@@ -229,10 +229,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
 
-    Action printAction;
+    private Action printAction;
 
 
-    public Action getPrintAction() {
+    private Action getPrintAction() {
         if (printAction == null) {
             printAction = new PrintAction();
         }
@@ -254,19 +254,19 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
 
-    Action closeAction;
+    private Action closeAction;
 
     private ArrayList<String> wordsToHighlight = null;
 
 
-    public Action getCloseAction() {
+    private Action getCloseAction() {
         if (closeAction == null) {
             closeAction = new CloseAction();
         }
         return closeAction;
     }
 
-    JPopupMenu createPopupMenu() {
+    private JPopupMenu createPopupMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(getPrintAction());
         if (panel != null) {
@@ -275,7 +275,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         return menu;
     }
 
-    JToolBar createToolBar() {
+    private JToolBar createToolBar() {
 
         JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
@@ -313,7 +313,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         return tlb;
     }
 
-    JEditorPane createPreviewPane() {
+    private JEditorPane createPreviewPane() {
         JEditorPane previewPane = new JEditorPane() {
 
             @Override
@@ -361,7 +361,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         readLayout();
     }
 
-    public void readLayout() throws Exception {
+    private void readLayout() throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__",
                 "\n"));
         layout = new LayoutHelper(sr)

@@ -34,20 +34,20 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     private static final Logger logger = Logger.getLogger(AutoCompleteListener.class.getName());
 
-    final AbstractAutoCompleter completer;
+    private final AbstractAutoCompleter completer;
 
     // These variables keep track of the situation from time to time.
-    protected String toSetIn = null; // null indicates that there are no completions available
-    protected String lastBeginning = null; // the letters, the user has typed until know
-    protected int lastCaretPosition = -1;
-    protected String[] lastCompletions = null;
-    protected int lastShownCompletion = 0;
-    protected boolean consumeEnterKey = true;
+    private String toSetIn = null; // null indicates that there are no completions available
+    private String lastBeginning = null; // the letters, the user has typed until know
+    private int lastCaretPosition = -1;
+    private String[] lastCompletions = null;
+    private int lastShownCompletion = 0;
+    private boolean consumeEnterKey = true;
 
     // This field is set if the focus listener should call another focus listener
     // after finishing. This is needed because the autocomplete listener must
     // run before the focus listener responsible for storing the current edit.
-    protected FocusListener nextFocusListener = null;
+    private FocusListener nextFocusListener = null;
 
 
     public AutoCompleteListener(AbstractAutoCompleter completer) {
@@ -425,11 +425,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         lastBeginning = null;
     }
 
-    protected String[] findCompletions(String beginning, JTextComponent comp) {
+    private String[] findCompletions(String beginning, JTextComponent comp) {
         return completer.complete(beginning);
     }
 
-    protected StringBuffer getCurrentWord(JTextComponent comp) {
+    private StringBuffer getCurrentWord(JTextComponent comp) {
         StringBuffer res = new StringBuffer();
         String upToCaret;
 
@@ -466,7 +466,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
 
-    final static int ANY_NAME = 0, FIRST_NAME = 1, LAST_NAME = 2;
+    private final static int ANY_NAME = 0;
+    private final static int FIRST_NAME = 1;
+    final static int LAST_NAME = 2;
 
 
     protected int findNamePositionStatus(JTextComponent comp) {

@@ -41,7 +41,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
     private static final Logger logger = Logger.getLogger(SendAsEMailAction.class.getName());
 
-    String message = null;
+    private String message = null;
     private final JabRefFrame frame;
 
 

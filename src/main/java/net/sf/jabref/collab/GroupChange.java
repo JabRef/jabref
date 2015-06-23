@@ -26,7 +26,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableModifySubtree;
 import net.sf.jabref.undo.NamedCompound;
 
-public class GroupChange extends Change {
+class GroupChange extends Change {
 
     private final GroupTreeNode m_changedGroups;
     private final GroupTreeNode tmpGroupRoot;

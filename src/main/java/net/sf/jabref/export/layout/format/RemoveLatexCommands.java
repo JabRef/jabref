@@ -20,7 +20,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class RemoveLatexCommands implements LayoutFormatter {
 
-    int i;
+    private int i;
 
 
     @Override

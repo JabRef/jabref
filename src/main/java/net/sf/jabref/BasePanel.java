@@ -119,7 +119,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private static final Logger logger = Logger.getLogger(BasePanel.class.getName());
 
-    public final static int SHOWING_NOTHING = 0, SHOWING_PREVIEW = 1, SHOWING_EDITOR = 2, WILL_SHOW_EDITOR = 3;
+    public final static int SHOWING_NOTHING = 0;
+    private final static int SHOWING_PREVIEW = 1;
+    public final static int SHOWING_EDITOR = 2;
+    public final static int WILL_SHOW_EDITOR = 3;
 
     /* 
      * The database shown in this panel.
@@ -136,12 +139,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private ListEventListener<BibtexEntry> groupsHighlightListener;
     UIFSplitPane contentPane = new UIFSplitPane();
 
-    JSplitPane splitPane;
+    private JSplitPane splitPane;
 
     JabRefFrame frame;
 
-    String fileMonitorHandle = null;
-    boolean saving = false, updatedExternally = false;
+    private String fileMonitorHandle = null;
+    private boolean saving = false;
+    private boolean updatedExternally = false;
     private String encoding;
 
     GridBagLayout gbl = new GridBagLayout();
@@ -149,19 +153,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     // Hashtable indexing the only search auto completer
     // required for the SearchAutoCompleterUpdater
-    final HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
+    private final HashMap<String, AbstractAutoCompleter> searchAutoCompleterHM = new HashMap<String, AbstractAutoCompleter>();
 
-    final HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
+    private final HashMap<String, AbstractAutoCompleter> autoCompleters = new HashMap<String, AbstractAutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
-    NameFieldAutoCompleter searchCompleter = null;
-    AutoCompleteListener searchCompleteListener = null;
+    private NameFieldAutoCompleter searchCompleter = null;
+    private AutoCompleteListener searchCompleteListener = null;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
-    final UndoAction undoAction = new UndoAction();
-    final RedoAction redoAction = new RedoAction();
+    private final UndoAction undoAction = new UndoAction();
+    private final RedoAction redoAction = new RedoAction();
 
     private final List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>();
     private final List<BibtexEntry> nextEntries = new ArrayList<BibtexEntry>();
@@ -177,11 +181,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //public EntryTable entryTable = null;
     public MainTable mainTable = null;
     public MainTableFormat tableFormat = null;
-    public FilterList<BibtexEntry> searchFilterList = null, groupFilterList = null;
+    private FilterList<BibtexEntry> searchFilterList = null;
+    private FilterList<BibtexEntry> groupFilterList = null;
 
     public RightClickMenu rcm;
 
-    BibtexEntry showing = null;
+    private BibtexEntry showing = null;
 
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
@@ -196,14 +201,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Hashmap to keep track of which entries currently have open
     // EntryTypeForm dialogs.
 
-    PreambleEditor preambleEditor = null;
+    private PreambleEditor preambleEditor = null;
     // Keeps track of the preamble dialog if it is open.
 
-    StringDialog stringDialog = null;
+    private StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
 
-    SaveDatabaseAction saveAction;
-    CleanUpAction cleanUpAction;
+    private SaveDatabaseAction saveAction;
+    private CleanUpAction cleanUpAction;
 
     /**
      * The group selector component for this database. Instantiated by the
@@ -212,15 +217,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     //GroupSelector groupSelector;
 
-    public boolean
-            showingSearch = false,
-            showingGroup = false,
-            sortingBySearchResults = false,
-            coloringBySearchResults = false,
-            hidingNonHits = false,
-            sortingByGroup = false,
-            sortingByCiteSeerResults = false,
-            coloringByGroup = false;
+    private boolean
+            showingSearch = false;
+    private boolean showingGroup = false;
+    public boolean sortingBySearchResults = false;
+    public boolean coloringBySearchResults = false;
+    public boolean hidingNonHits = false;
+    public boolean sortingByGroup = false;
+    public boolean sortingByCiteSeerResults = false;
+    public boolean coloringByGroup = false;
 
     int lastSearchHits = -1; // The number of hits in the latest search.
     // Potential use in hiding non-hits completely.
@@ -236,7 +241,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Create a new BasePanel with an empty database.
      * @param frame The application window.
      */
-    public BasePanel(JabRefFrame frame) {
+    private BasePanel(JabRefFrame frame) {
         this.sidePaneManager = Globals.sidePaneManager;
         database = new BibtexDatabase();
         metaData = new MetaData();
@@ -2019,7 +2024,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.updateFont();
     }
 
-    public void createMainTable() {
+    private void createMainTable() {
         //Comparator comp = new FieldComparator("author");
 
         GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap());
@@ -2231,7 +2236,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
     }
 
-    public HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
+    private HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
         return autoCompleters;
     }
 
@@ -2370,7 +2375,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public boolean isShowingEditor() {
+    private boolean isShowingEditor() {
         return ((splitPane.getBottomComponent() != null)
         && (splitPane.getBottomComponent() instanceof EntryEditor));
     }
@@ -2667,7 +2672,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         markBaseChanged();
     }
 
-    public synchronized void markChangedOrUnChanged() {
+    private synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             if (!baseChanged) {
                 markBaseChanged();
@@ -2788,7 +2793,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         changeType(bes, type);
     }
 
-    public void changeType(BibtexEntry[] bes, BibtexEntryType type) {
+    private void changeType(BibtexEntry[] bes, BibtexEntryType type) {
 
         if ((bes == null) || (bes.length == 0)) {
             output("First select the entries you wish to change type " +
@@ -2965,7 +2970,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
     }
 
-    public void setEntryEditorEnabled(boolean enabled) {
+    private void setEntryEditorEnabled(boolean enabled) {
         if ((getShowing() != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
             EntryEditor ed = (EntryEditor) splitPane.getBottomComponent();
             if (ed.isEnabled() != enabled) {
@@ -3143,7 +3148,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return saving;
     }
 
-    public BibtexEntry getShowing() {
+    private BibtexEntry getShowing() {
         return showing;
     }
 

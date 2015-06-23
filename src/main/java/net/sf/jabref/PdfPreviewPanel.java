@@ -34,7 +34,7 @@ import net.sf.jabref.gui.FileListTableModel;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
-public class PdfPreviewPanel extends JPanel {
+class PdfPreviewPanel extends JPanel {
 
     private final JLabel picLabel;
     private final MetaData metaData;

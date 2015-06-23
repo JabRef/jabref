@@ -38,18 +38,18 @@ import net.sf.jabref.Util;
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    public static final int MAX_DISPLAYED_LETTERS = 35;
+    private static final int MAX_DISPLAYED_LETTERS = 35;
 
     /** The cell over which the user is currently dragging */
-    protected Object highlight1Cell = null;
-    protected Object[] highlight2Cells = null;
-    protected Object[] highlight3Cells = null;
-    protected Object highlightBorderCell = null;
+    private Object highlight1Cell = null;
+    private Object[] highlight2Cells = null;
+    private Object[] highlight3Cells = null;
+    private Object highlightBorderCell = null;
 
-    public static final ImageIcon
+    private static final ImageIcon
             groupRefiningIcon = GUIGlobals.getImage("groupRefining");
-    public static final ImageIcon groupIncludingIcon = GUIGlobals.getImage("groupIncluding");
-    public static final ImageIcon groupRegularIcon = null;
+    private static final ImageIcon groupIncludingIcon = GUIGlobals.getImage("groupIncluding");
+    private static final ImageIcon groupRegularIcon = null;
 
 
     @Override

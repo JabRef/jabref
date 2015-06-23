@@ -43,8 +43,8 @@ import net.sf.jabref.imports.UnitFormatter;
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
     private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s";
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
 
 
     @Override

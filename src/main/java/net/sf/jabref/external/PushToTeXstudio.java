@@ -52,7 +52,7 @@ public class PushToTeXstudio implements PushToApplication {
         return "Push to TeXstudio";
     }
 
-    protected String defaultProgramPath() {
+    private String defaultProgramPath() {
         if (Globals.ON_WIN) {
             String progFiles = System.getenv("ProgramFiles(x86)");
             if (progFiles == null) {

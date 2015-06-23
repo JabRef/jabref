@@ -28,18 +28,18 @@ import java.util.ArrayList;
 /**
  * 
  */
-public class MetaDataChange extends Change {
+class MetaDataChange extends Change {
 
-    static final int
-            ADD = 1,
-            REMOVE = 2,
-            MODIFY = 3;
+    private static final int
+            ADD = 1;
+    private static final int REMOVE = 2;
+    private static final int MODIFY = 3;
 
-    final InfoPane tp = new InfoPane();
-    final JScrollPane sp = new JScrollPane(tp);
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
     private final MetaData md;
     private final MetaData mdSecondary;
-    final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
+    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {

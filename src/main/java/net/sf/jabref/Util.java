@@ -122,14 +122,14 @@ public class Util {
     final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
             EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
 
-    final static NumberFormat idFormat;
+    private final static NumberFormat idFormat;
 
-    public static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
     public static final int MARK_COLOR_LEVELS = 6;
     public static final int MAX_MARKING_LEVEL = Util.MARK_COLOR_LEVELS - 1;
-    public static final int IMPORT_MARK_LEVEL = Util.MARK_COLOR_LEVELS;
-    public static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
+    private static final int IMPORT_MARK_LEVEL = Util.MARK_COLOR_LEVELS;
+    private static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
     static {
         idFormat = NumberFormat.getInstance();
@@ -706,7 +706,7 @@ public class Util {
      *            true if it is a local file, not an URL.
      * @throws IOException
      */
-    public static void openFileOnWindows(String link, boolean localFile) throws IOException {
+    private static void openFileOnWindows(String link, boolean localFile) throws IOException {
         /*
          * if (localFile) { String[] spl = link.split("\\\\"); StringBuffer sb =
          * new StringBuffer(); for (int i = 0; i < spl.length; i++) { if (i > 0)
@@ -734,7 +734,7 @@ public class Util {
      * @param application Link to the app that opens the file.
      * @throws IOException
      */
-    public static void openFileWithApplicationOnWindows(String link, String application)
+    private static void openFileWithApplicationOnWindows(String link, String application)
             throws IOException {
 
         link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
@@ -1083,7 +1083,7 @@ public class Util {
     }
 
 
-    static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
+    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
 
 
     /**
@@ -1288,7 +1288,7 @@ public class Util {
         return fileName;
     }
 
-    public static File shortenFileName(File fileName, String dir) {
+    private static File shortenFileName(File fileName, String dir) {
         if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
         }
@@ -1592,7 +1592,7 @@ public class Util {
      * @return A String with every special character (including the quoting
      *         character itself) quoted.
      */
-    public static String quote(String s, String specials, char quoteChar, int linewrap) {
+    private static String quote(String s, String specials, char quoteChar, int linewrap) {
         StringBuffer sb = new StringBuffer();
         char c;
         int linelength = 0;
@@ -1840,7 +1840,7 @@ public class Util {
     }
 
 
-    static final Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
+    private static final Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
 
 
     /**
@@ -1869,7 +1869,7 @@ public class Util {
      *            The String to analyze.
      * @return A new String with braces removed.
      */
-    public static String removeSingleBracesAroundCapitals(String s) {
+    private static String removeSingleBracesAroundCapitals(String s) {
         Matcher mcr = Util.bracedTitleCapitalPattern.matcher(s);
         StringBuffer buf = new StringBuffer();
         while (mcr.find()) {
@@ -2336,7 +2336,7 @@ public class Util {
      * @param entry The String array.
      * @return The encoded String.
      */
-    public static String encodeStringArray(String[] entry) {
+    private static String encodeStringArray(String[] entry) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.length; i++) {
             sb.append(Util.encodeString(entry[i]));

@@ -27,7 +27,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class CompositeFormat implements LayoutFormatter {
 
-    LayoutFormatter[] formatters;
+    private LayoutFormatter[] formatters;
 
 
     /**

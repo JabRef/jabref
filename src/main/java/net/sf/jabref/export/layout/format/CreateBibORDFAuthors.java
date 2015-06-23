@@ -87,7 +87,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
      * @param author
      * @param position
      */
-    protected void singleAuthor(StringBuffer sb, String author, int position) {
+    private void singleAuthor(StringBuffer sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");
         sb.append("    <bibo:role rdf:resource=\"http://purl.org/ontology/bibo/roles/author\" />\n");

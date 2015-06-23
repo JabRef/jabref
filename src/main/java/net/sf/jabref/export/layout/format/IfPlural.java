@@ -33,7 +33,8 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  */
 public class IfPlural extends AbstractParamLayoutFormatter {
 
-    protected String pluralText, singularText;
+    private String pluralText;
+    private String singularText;
 
 
     @Override

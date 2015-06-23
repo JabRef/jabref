@@ -56,7 +56,7 @@ import org.antlr.runtime.tree.Tree;
 
 public class VM implements Warn {
 
-    final PrintStream out = System.out;
+    private final PrintStream out = System.out;
 
 
     public class Identifier {
@@ -99,7 +99,7 @@ public class VM implements Warn {
 
     private final HashMap<String, BstFunction> buildInFunctions;
 
-    public File file;
+    private File file;
 
 
     public VM(File f) throws RecognitionException, IOException {
@@ -111,7 +111,7 @@ public class VM implements Warn {
         this(new ANTLRStringStream(s));
     }
 
-    public static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
+    private static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
         BstLexer lex = new BstLexer(bst);
         CommonTokenStream tokens = new CommonTokenStream(lex);
         BstParser parser = new BstParser(tokens);
@@ -119,11 +119,11 @@ public class VM implements Warn {
         return (CommonTree) r.getTree();
     }
 
-    public VM(CharStream bst) throws RecognitionException {
+    private VM(CharStream bst) throws RecognitionException {
         this(VM.charStream2CommonTree(bst));
     }
 
-    public VM(CommonTree tree) {
+    private VM(CommonTree tree) {
         this.tree = tree;
 
         this.buildInFunctions = new HashMap<String, BstFunction>(37);
@@ -943,7 +943,7 @@ public class VM implements Warn {
 
     }
 
-    protected boolean assign(BstEntry context, Object o1, Object o2) {
+    private boolean assign(BstEntry context, Object o1, Object o2) {
 
         if (!(o1 instanceof Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
             throw new VMException("Invalid parameters");
@@ -979,11 +979,11 @@ public class VM implements Warn {
     }
 
 
-    final CommonTree tree;
+    private final CommonTree tree;
 
     private StringBuffer bbl;
 
-    String preamble;
+    private String preamble;
 
 
     public String run(BibtexDatabase db) {
@@ -1209,7 +1209,7 @@ public class VM implements Warn {
         });
     }
 
-    public void executeInContext(Object o, BstEntry context) {
+    private void executeInContext(Object o, BstEntry context) {
         if (o instanceof Tree) {
             Tree t = (Tree) o;
             new StackFunction(t).execute(context);
@@ -1218,7 +1218,7 @@ public class VM implements Warn {
         }
     }
 
-    public void execute(Tree child) {
+    private void execute(Tree child) {
         execute(child.getChild(0).getText(), null);
     }
 
@@ -1282,7 +1282,7 @@ public class VM implements Warn {
         stack.push(t);
     }
 
-    public void execute(String name, BstEntry context) {
+    private void execute(String name, BstEntry context) {
 
         if (context != null) {
 
@@ -1386,26 +1386,26 @@ public class VM implements Warn {
     }
 
 
-    Vector<BstEntry> entries;
+    private Vector<BstEntry> entries;
 
-    Map<String, String> strings = new HashMap<String, String>();
+    private Map<String, String> strings = new HashMap<String, String>();
 
-    Map<String, Integer> integers = new HashMap<String, Integer>();
+    private Map<String, Integer> integers = new HashMap<String, Integer>();
 
-    Map<String, BstFunction> functions = new HashMap<String, BstFunction>();
+    private Map<String, BstFunction> functions = new HashMap<String, BstFunction>();
 
-    Stack<Object> stack = new Stack<Object>();
+    private Stack<Object> stack = new Stack<Object>();
 
 
-    public void push(Integer integer) {
+    private void push(Integer integer) {
         stack.push(integer);
     }
 
-    public void push(String string) {
+    private void push(String string) {
         stack.push(string);
     }
 
-    public void push(Identifier identifier) {
+    private void push(Identifier identifier) {
         stack.push(identifier);
     }
 

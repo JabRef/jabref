@@ -27,7 +27,7 @@ public class Printed extends SpecialField {
     private static Printed INSTANCE;
 
 
-    public Printed() {
+    private Printed() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Globals.lang("Toogle print status"), GUIGlobals.getImage("printed"), Globals.lang("Toogle print status")));
         this.setValues(values);

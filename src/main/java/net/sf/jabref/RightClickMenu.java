@@ -40,19 +40,19 @@ public class RightClickMenu extends JPopupMenu
 
     private static final Logger logger = Logger.getLogger(RightClickMenu.class.getName());
 
-    final BasePanel panel;
-    final MetaData metaData;
-    final JMenu groupAddMenu = new JMenu(Globals.lang("Add to group"));
-    final JMenu groupRemoveMenu = new JMenu(Globals.lang("Remove from group"));
-    final JMenu groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")); // JZTODO lyrics
-            final JMenu rankingMenu = new JMenu();
-    final JMenu priorityMenu = new JMenu();
-    final JMenu readStatusMenu = new JMenu();
-    final JMenu typeMenu = new JMenu(Globals.lang("Change entry type"));
-    final JMenuItem groupAdd;
-    final JMenuItem groupRemove;
-    final JMenuItem groupMoveTo;
-    final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
+    private final BasePanel panel;
+    private final MetaData metaData;
+    private final JMenu groupAddMenu = new JMenu(Globals.lang("Add to group"));
+    private final JMenu groupRemoveMenu = new JMenu(Globals.lang("Remove from group"));
+    private final JMenu groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")); // JZTODO lyrics
+            private final JMenu rankingMenu = new JMenu();
+    private final JMenu priorityMenu = new JMenu();
+    private final JMenu readStatusMenu = new JMenu();
+    private final JMenu typeMenu = new JMenu(Globals.lang("Change entry type"));
+    private final JMenuItem groupAdd;
+    private final JMenuItem groupRemove;
+    private final JMenuItem groupMoveTo;
+    private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
             Globals.prefs.getBoolean("floatMarkedEntries"));
 
 
@@ -405,7 +405,7 @@ public class RightClickMenu extends JPopupMenu
      * Remove all types from the menu. Then cycle through all available
      * types, and add them.
      */
-    public void populateTypeMenu() {
+    private void populateTypeMenu() {
         typeMenu.removeAll();
         for (String key : BibtexEntryType.ALL_TYPES.keySet()) {
             typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(key), panel));
@@ -487,8 +487,8 @@ public class RightClickMenu extends JPopupMenu
     /**
      * @param move For add: if true, remove from previous groups
      */
-    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection,
-            boolean add, boolean move) {
+    private void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection,
+                             boolean add, boolean move) {
         final AbstractAction action = getAction(node, selection, add, move);
 
         if (node.getChildCount() == 0) {

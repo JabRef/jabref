@@ -43,13 +43,13 @@ import net.sf.jabref.Globals;
  */
 public class ErrorConsole extends Handler {
 
-    final ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
 
-    final ArrayList<String> logOutput = new ArrayList<String>();
-    String logOutputCache = "";
-    boolean logOutputCacheRefreshNeeded = true;
-    final SimpleFormatter fmt = new SimpleFormatter();
+    private final ArrayList<String> logOutput = new ArrayList<String>();
+    private String logOutputCache = "";
+    private boolean logOutputCacheRefreshNeeded = true;
+    private final SimpleFormatter fmt = new SimpleFormatter();
     private static final int MAXLOGLINES = 500;
 
     private static ErrorConsole instance = null;
@@ -107,7 +107,7 @@ public class ErrorConsole extends Handler {
         tabbed.addTab(title, sp);
     }
 
-    public void displayErrorConsole(JFrame parent) {
+    private void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
 
         addTextArea(tabbed, Globals.lang("Output"), getOutput(), null);

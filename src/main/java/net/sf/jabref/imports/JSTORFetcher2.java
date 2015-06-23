@@ -31,14 +31,14 @@ import java.util.regex.Pattern;
 
 public class JSTORFetcher2 implements EntryFetcher {
 
-    protected static final String CANCELLED = "__CANCELLED__";
-    protected static final int MAX_PAGES_TO_LOAD = 8;
+    private static final String CANCELLED = "__CANCELLED__";
+    private static final int MAX_PAGES_TO_LOAD = 8;
     protected static int MAX_REFS = 7 * 25;
-    protected static final int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
-    protected static final String JSTOR_URL = "http://www.jstor.org";
-    protected static final String SEARCH_URL = JSTORFetcher2.JSTOR_URL + "/action/doBasicSearch?Query=";
-    protected static final String SEARCH_URL_END = "&x=0&y=0&wc=on";
-    protected static final String SINGLE_CIT_ENC =
+    private static final int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
+    private static final String JSTOR_URL = "http://www.jstor.org";
+    private static final String SEARCH_URL = JSTORFetcher2.JSTOR_URL + "/action/doBasicSearch?Query=";
+    private static final String SEARCH_URL_END = "&x=0&y=0&wc=on";
+    private static final String SINGLE_CIT_ENC =
             //"http://www.jstor.org/action/exportSingleCitation?singleCitation=true&suffix=";
             "http://www.jstor.org/action/exportSingleCitation?singleCitation=true&doi=10.2307/";
     // suffix doesn't work anymore (March 2013), changed to doi=10.2307/citations but only if it a doi
@@ -46,15 +46,15 @@ public class JSTORFetcher2 implements EntryFetcher {
 
     //"http%3A%2F%2Fwww.jstor.org%2Faction%2FexportSingleCitation%3FsingleCitation"
     //+"%3Dtrue%26suffix%3D";
-    protected static final Pattern idPattern = Pattern.compile(
+    private static final Pattern idPattern = Pattern.compile(
             "<a class=\"title\" href=\"/stable/(\\d+)\\?");
-    protected static final Pattern numberofhits = Pattern.compile(
+    private static final Pattern numberofhits = Pattern.compile(
             "<span id=\"NumberOfHits\" name=\"(\\d+)\"");
-    protected static final Pattern nextPagePattern = Pattern.compile(
+    private static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next&nbsp;&raquo;");
-    protected static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
-    protected boolean stopFetching = false;
-    protected boolean noAccessFound = false;
+    private static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
+    private boolean stopFetching = false;
+    private boolean noAccessFound = false;
 
 
     @Override
@@ -135,7 +135,7 @@ public class JSTORFetcher2 implements EntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    protected List<String> getCitations(String query, ImportInspector dialog, OutputPrinter status) throws IOException {
+    private List<String> getCitations(String query, ImportInspector dialog, OutputPrinter status) throws IOException {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
@@ -168,8 +168,8 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
     }
 
-    protected String getCitationsFromUrl(String urlQuery, List<String> ids, int count,
-            String[] numberOfRefs, ImportInspector dialog, OutputPrinter status) throws IOException {
+    private String getCitationsFromUrl(String urlQuery, List<String> ids, int count,
+                                       String[] numberOfRefs, ImportInspector dialog, OutputPrinter status) throws IOException {
         URL url = new URL(urlQuery);
         URLDownload ud = new URLDownload(url);
 
@@ -236,7 +236,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         }
     }
 
-    protected BibtexEntry getSingleCitation(String cit) {
+    private BibtexEntry getSingleCitation(String cit) {
         return BibsonomyScraper.getEntry(JSTORFetcher2.SINGLE_CIT_ENC + cit);
     }
 }

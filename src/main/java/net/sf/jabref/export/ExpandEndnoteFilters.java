@@ -36,9 +36,9 @@ import spin.Spin;
  */
 public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker {
 
-    final JabRefFrame frame;
-    File file = null;
-    final String FILENAME = "/EndNote.zip";
+    private final JabRefFrame frame;
+    private File file = null;
+    private final String FILENAME = "/EndNote.zip";
 
 
     /** Creates a new instance of ExpandEndnoteFilters */

@@ -30,7 +30,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class HTMLParagraphs implements LayoutFormatter {
 
-    static Pattern beforeNewLines;
+    private static Pattern beforeNewLines;
 
 
     @Override

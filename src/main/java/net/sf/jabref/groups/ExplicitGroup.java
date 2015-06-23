@@ -71,7 +71,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     /** Called only when created fromString */
-    protected void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
+    private void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
         BibtexEntry[] entries;
         while (tok.hasMoreTokens()) {
             entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),

@@ -56,13 +56,13 @@ public class ExternalFileTypeEditor extends JDialog {
     private final EditListener editListener = new EditListener();
 
 
-    public ExternalFileTypeEditor(JFrame frame) {
+    private ExternalFileTypeEditor(JFrame frame) {
         super(frame, Globals.lang("Manage external file types"), true);
         this.frame = frame;
         init();
     }
 
-    public ExternalFileTypeEditor(JDialog dialog) {
+    private ExternalFileTypeEditor(JDialog dialog) {
         super(dialog, Globals.lang("Manage external file types"), true);
         this.dialog = dialog;
         init();
@@ -71,7 +71,7 @@ public class ExternalFileTypeEditor extends JDialog {
     /**
      * Update the editor to show the current settings in Preferences.
      */
-    public void setValues() {
+    private void setValues() {
         fileTypes.clear();
         ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         for (ExternalFileType type : types) {
@@ -84,7 +84,7 @@ public class ExternalFileTypeEditor extends JDialog {
     /**
      * Store the list of external entry types to Preferences.
      */
-    public void storeSettings() {
+    private void storeSettings() {
         Globals.prefs.setExternalFileTypes(fileTypes);
     }
 
@@ -215,7 +215,7 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
 
-    class AddListener implements ActionListener {
+    private class AddListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -231,7 +231,7 @@ public class ExternalFileTypeEditor extends JDialog {
         }
     }
 
-    class RemoveListener implements ActionListener {
+    private class RemoveListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -278,7 +278,7 @@ public class ExternalFileTypeEditor extends JDialog {
         }
     }
 
-    class FileTypeTableModel extends AbstractTableModel {
+    private class FileTypeTableModel extends AbstractTableModel {
 
         @Override
         public int getColumnCount() {

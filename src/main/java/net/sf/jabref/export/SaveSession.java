@@ -48,12 +48,13 @@ public class SaveSession {
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
 
-    final File file;
-    File tmp;
+    private final File file;
+    private File tmp;
     File backupFile;
-    String encoding;
-    boolean backup, useLockFile;
-    VerifyingWriter writer;
+    private String encoding;
+    private boolean backup;
+    private boolean useLockFile;
+    private VerifyingWriter writer;
 
 
     public SaveSession(File file, String encoding, boolean backup) throws IOException,

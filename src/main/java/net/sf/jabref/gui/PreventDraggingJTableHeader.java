@@ -37,7 +37,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * @author Fabian Bieker
  * @since 12/2008
  */
-public class PreventDraggingJTableHeader extends JTableHeader {
+class PreventDraggingJTableHeader extends JTableHeader {
 
     public PreventDraggingJTableHeader(TableColumnModel cm) {
         super(cm);

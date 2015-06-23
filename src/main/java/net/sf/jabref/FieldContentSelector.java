@@ -45,20 +45,20 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
-    final JComboBox comboBox;
+    private final JComboBox comboBox;
 
-    final FieldEditor editor;
+    private final FieldEditor editor;
 
-    final MetaData metaData;
+    private final MetaData metaData;
 
-    final JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    final Window owner;
+    private final Window owner;
 
-    final BasePanel panel;
+    private final BasePanel panel;
 
     private final AbstractAction action;
-    final String delimiter;
+    private final String delimiter;
 
 
     /**

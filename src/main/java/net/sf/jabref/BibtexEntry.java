@@ -48,7 +48,7 @@ import net.sf.jabref.export.FieldFormatter;
 public class BibtexEntry
 {
 
-    public final static String ID_FIELD = "id";
+    private final static String ID_FIELD = "id";
     public static final Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
     public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 
@@ -81,7 +81,7 @@ public class BibtexEntry
     private String _id;
     private BibtexEntryType _type;
     private Map<String, String> _fields = new HashMap<String, String>();
-    final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
+    private final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;
@@ -438,7 +438,7 @@ public class BibtexEntry
      *  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    protected boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
+    boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             if (BibtexDatabase.getResolvedField(field, this, database) == null) {
                 return false;
@@ -448,7 +448,7 @@ public class BibtexEntry
         return true;
     }
 
-    protected boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
+    boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
             if ((value != null) && (value.length() > 0)) {

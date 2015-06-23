@@ -49,7 +49,7 @@ package net.sf.jabref.export.layout;
  * @author     wegnerj
  * @version    $Revision$, $Date$
  */
-public class StringInt implements java.io.Serializable
+class StringInt implements java.io.Serializable
 {
 
     //~ Instance fields ////////////////////////////////////////////////////////

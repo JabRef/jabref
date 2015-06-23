@@ -26,10 +26,10 @@ import java.net.URL;
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
  * from an URL pointing to an entry.
  */
-public class BibsonomyScraper {
+class BibsonomyScraper {
 
-    protected static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
-    protected static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
+    private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
+    private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
 
 
     /**

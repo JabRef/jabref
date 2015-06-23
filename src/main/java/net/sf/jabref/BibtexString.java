@@ -85,8 +85,10 @@ public class BibtexString {
     }
 
 
-    String _name, _content, _id;
-    Type _type;
+    private String _name;
+    private String _content;
+    private String _id;
+    private Type _type;
 
 
     public BibtexString(String id, String name, String content) {

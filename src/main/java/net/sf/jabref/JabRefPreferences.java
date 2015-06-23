@@ -48,72 +48,72 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class JabRefPreferences {
 
-    public final static String CUSTOM_TYPE_NAME = "customTypeName_",
-            CUSTOM_TYPE_REQ = "customTypeReq_",
-            CUSTOM_TYPE_OPT = "customTypeOpt_",
-            CUSTOM_TYPE_PRIOPT = "customTypePriOpt_",
-            CUSTOM_TAB_NAME = "customTabName_",
-            CUSTOM_TAB_FIELDS = "customTabFields_",
-            EMACS_PATH = "emacsPath",
-            EMACS_ADDITIONAL_PARAMETERS = "emacsParameters",
-            EMACS_23 = "emacsUseV23InsertString",
-            EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode",
-            PDF_PREVIEW = "pdfPreview",
-            SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS = "showOneLetterHeadingForIconColumns",
-            EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings",
-            EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA",
-            SHORTEST_TO_COMPLETE = "shortestToComplete",
-            AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode",
-            // here are the possible values for _MODE:
-            AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both",
-            AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly",
-            AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly",
-            WRITEFIELD_ADDSPACES = "writeFieldAddSpaces",
-            WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase",
-            UPDATE_TIMESTAMP = "updateTimestamp",
-            PRIMARY_SORT_FIELD = "priSort",
-            PRIMARY_SORT_DESCENDING = "priDescending",
-            SECONDARY_SORT_FIELD = "secSort",
-            SECONDARY_SORT_DESCENDING = "secDescending",
-            TERTIARY_SORT_FIELD = "terSort",
-            TERTIARY_SORT_DESCENDING = "terDescending",
-            SAVE_IN_ORIGINAL_ORDER = "saveInOriginalOrder",
-            SAVE_IN_SPECIFIED_ORDER = "saveInSpecifiedOrder",
-            SAVE_PRIMARY_SORT_FIELD = "savePriSort",
-            SAVE_PRIMARY_SORT_DESCENDING = "savePriDescending",
-            SAVE_SECONDARY_SORT_FIELD = "saveSecSort",
-            SAVE_SECONDARY_SORT_DESCENDING = "saveSecDescending",
-            SAVE_TERTIARY_SORT_FIELD = "saveTerSort",
-            SAVE_TERTIARY_SORT_DESCENDING = "saveTerDescending",
-            EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder",
-            EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder",
-            EXPORT_PRIMARY_SORT_FIELD = "exportPriSort",
-            EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending",
-            EXPORT_SECONDARY_SORT_FIELD = "exportSecSort",
-            EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending",
-            EXPORT_TERTIARY_SORT_FIELD = "exportTerSort",
-            EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending",
-            WRITEFIELD_SORTSTYLE = "writefieldSortStyle",
-            WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder",
-            WRITEFIELD_WRAPFIELD = "wrapFieldLine";
+    private final static String CUSTOM_TYPE_NAME = "customTypeName_";
+    private final static String CUSTOM_TYPE_REQ = "customTypeReq_";
+    private final static String CUSTOM_TYPE_OPT = "customTypeOpt_";
+    private final static String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
+    public final static String CUSTOM_TAB_NAME = "customTabName_";
+    public final static String CUSTOM_TAB_FIELDS = "customTabFields_";
+    public final static String EMACS_PATH = "emacsPath";
+    public final static String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    public final static String EMACS_23 = "emacsUseV23InsertString";
+    public final static String EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
+    public final static String PDF_PREVIEW = "pdfPreview";
+    public final static String SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS = "showOneLetterHeadingForIconColumns";
+    public final static String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
+    public final static String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
+    public final static String SHORTEST_TO_COMPLETE = "shortestToComplete";
+    public final static String AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode";
+    public final static String// here are the possible values for _MODE:
+            AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both";
+    public final static String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly";
+    public final static String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
+    public final static String WRITEFIELD_ADDSPACES = "writeFieldAddSpaces";
+    public final static String WRITEFIELD_CAMELCASENAME = "writeFieldCamelCase";
+    public final static String UPDATE_TIMESTAMP = "updateTimestamp";
+    public final static String PRIMARY_SORT_FIELD = "priSort";
+    public final static String PRIMARY_SORT_DESCENDING = "priDescending";
+    public final static String SECONDARY_SORT_FIELD = "secSort";
+    public final static String SECONDARY_SORT_DESCENDING = "secDescending";
+    public final static String TERTIARY_SORT_FIELD = "terSort";
+    public final static String TERTIARY_SORT_DESCENDING = "terDescending";
+    public final static String SAVE_IN_ORIGINAL_ORDER = "saveInOriginalOrder";
+    public final static String SAVE_IN_SPECIFIED_ORDER = "saveInSpecifiedOrder";
+    public final static String SAVE_PRIMARY_SORT_FIELD = "savePriSort";
+    public final static String SAVE_PRIMARY_SORT_DESCENDING = "savePriDescending";
+    public final static String SAVE_SECONDARY_SORT_FIELD = "saveSecSort";
+    public final static String SAVE_SECONDARY_SORT_DESCENDING = "saveSecDescending";
+    public final static String SAVE_TERTIARY_SORT_FIELD = "saveTerSort";
+    public final static String SAVE_TERTIARY_SORT_DESCENDING = "saveTerDescending";
+    public final static String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
+    public final static String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
+    public final static String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
+    public final static String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
+    public final static String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
+    public final static String EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending";
+    public final static String EXPORT_TERTIARY_SORT_FIELD = "exportTerSort";
+    public final static String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
+    public final static String WRITEFIELD_SORTSTYLE = "writefieldSortStyle";
+    public final static String WRITEFIELD_USERDEFINEDORDER = "writefieldUserdefinedOrder";
+    public final static String WRITEFIELD_WRAPFIELD = "wrapFieldLine";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
-    public static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
+    private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
     private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
-    public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
+    private static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
     public static final String NEWLINE = "newline";
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
 
-    final Preferences prefs;
+    private final Preferences prefs;
     public final HashMap<String, Object> defaults = new HashMap<String, Object>();
-    public HashMap<String, String> keyBinds = new HashMap<String, String>();
-    public final HashMap<String, String> defKeyBinds = new HashMap<String, String>();
+    private HashMap<String, String> keyBinds = new HashMap<String, String>();
+    private final HashMap<String, String> defKeyBinds = new HashMap<String, String>();
     private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
     private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
     private static LabelPattern keyPattern;
@@ -131,7 +131,7 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
-    public final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
+    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
 
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
@@ -688,7 +688,7 @@ public class JabRefPreferences {
         return getValueDelimiters()[index];
     }
 
-    public char[] getValueDelimiters() {
+    private char[] getValueDelimiters() {
         return JabRefPreferences.VALUE_DELIMITERS[getInt("valueDelimiters")];
     }
 
@@ -715,7 +715,7 @@ public class JabRefPreferences {
         return prefs.getBoolean(key, getBooleanDefault(key));
     }
 
-    public boolean getBooleanDefault(String key) {
+    private boolean getBooleanDefault(String key) {
         return (Boolean) defaults.get(key);
     }
 
@@ -723,7 +723,7 @@ public class JabRefPreferences {
         return prefs.getDouble(key, getDoubleDefault(key));
     }
 
-    public double getDoubleDefault(String key) {
+    private double getDoubleDefault(String key) {
         return (Double) defaults.get(key);
     }
 
@@ -739,7 +739,7 @@ public class JabRefPreferences {
         return prefs.getByteArray(key, getByteArrayDefault(key));
     }
 
-    public byte[] getByteArrayDefault(String key) {
+    private byte[] getByteArrayDefault(String key) {
         return (byte[]) defaults.get(key);
     }
 
@@ -865,7 +865,7 @@ public class JabRefPreferences {
      * @param value The key for this setting.
      * @return The RGB values corresponding to this color setting.
      */
-    public int[] getRgb(String value) {
+    private int[] getRgb(String value) {
         String[] elements = value.split(":");
         int[] values = new int[3];
         values[0] = Integer.parseInt(elements[0]);

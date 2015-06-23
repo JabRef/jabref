@@ -44,9 +44,9 @@ import com.sun.star.uno.UnoRuntime;
 /**
  * Utility methods for processing OO Writer documents.
  */
-public class OOUtil {
+class OOUtil {
 
-    static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
+    private static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
 
     static final OOPreFormatter postformatter = new OOPreFormatter();
 

@@ -12,7 +12,7 @@ public class RankCompact extends Rank {
     private static RankCompact INSTANCE = null;
 
 
-    public RankCompact() {
+    private RankCompact() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         //lab.setName("i");
         values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));

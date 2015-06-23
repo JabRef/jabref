@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  */
 public class MODSDatabase {
 
-    protected Set<MODSEntry> entries;
+    private Set<MODSEntry> entries;
 
 
     public MODSDatabase() {

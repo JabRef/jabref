@@ -43,7 +43,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     private static final Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
 
-    final boolean showDialog;
+    private final boolean showDialog;
     private final JabRefFrame frame;
 
     // List of actions that may need to be called after opening the file. Such as

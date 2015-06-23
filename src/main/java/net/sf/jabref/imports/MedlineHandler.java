@@ -26,48 +26,75 @@ import net.sf.jabref.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class MedlineHandler extends DefaultHandler
+class MedlineHandler extends DefaultHandler
 {
 
-    static final HTMLConverter htmlConverter = new HTMLConverter();
-    final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-    boolean inTitle = false;
-    boolean inYear = false;
-    boolean inJournal = false;
-    boolean inMonth = false;
-    boolean inVolume = false;
-    boolean inAuthorList = false;
-    boolean inAuthor = false;
-    boolean inLastName = false;
-    boolean inSuffix = false;
-    boolean inInitials = false;
-    boolean inMedlinePgn = false;
-    final boolean inMedlineID = false;
-    final boolean inURL = false;
-    boolean inIssue = false;
-    boolean inPubDate = false;
-    boolean inUrl = false;
-    boolean inForename = false;
-    boolean inAbstractText = false;
-    boolean inMedlineDate = false;
-    boolean inPubMedID = false;
-    boolean inDescriptorName = false;
-    boolean inDoi = false;
-    boolean inPii = false;
-    boolean inPmc = false;
-    boolean inAffiliation = false;
-    boolean inMeshHeader = false;
-    boolean inQualifierName = false;
-    boolean inLanguage = false;
-    boolean inPst = false;
-    String title = "", journal = "", keywords = "", author = "",
-            lastName = "", suffix = "", year = "", forename = "", abstractText = "", affiliation = "";
-    String month = "", volume = "", lastname = "", initials = "", number = "", page = "", medlineID = "", url = "",
-            MedlineDate = "";
-    String series = "", editor = "", booktitle = "", type = "article", key = "", address = "",
-            pubmedid = "", doi = "", pii = "", pmc = "", majorTopic = "", minorTopics = "", language = "", pst = "";
-    final ArrayList<String> authors = new ArrayList<String>();
-    final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
+    private static final HTMLConverter htmlConverter = new HTMLConverter();
+    private final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+    private boolean inTitle = false;
+    private boolean inYear = false;
+    private boolean inJournal = false;
+    private boolean inMonth = false;
+    private boolean inVolume = false;
+    private boolean inAuthorList = false;
+    private boolean inAuthor = false;
+    private boolean inLastName = false;
+    private boolean inSuffix = false;
+    private boolean inInitials = false;
+    private boolean inMedlinePgn = false;
+    private final boolean inMedlineID = false;
+    private final boolean inURL = false;
+    private boolean inIssue = false;
+    private boolean inPubDate = false;
+    private boolean inUrl = false;
+    private boolean inForename = false;
+    private boolean inAbstractText = false;
+    private boolean inMedlineDate = false;
+    private boolean inPubMedID = false;
+    private boolean inDescriptorName = false;
+    private boolean inDoi = false;
+    private boolean inPii = false;
+    private boolean inPmc = false;
+    private boolean inAffiliation = false;
+    private boolean inMeshHeader = false;
+    private boolean inQualifierName = false;
+    private boolean inLanguage = false;
+    private boolean inPst = false;
+    private String title = "";
+    private String journal = "";
+    private String keywords = "";
+    private String author = "";
+    private String lastName = "";
+    private String suffix = "";
+    private String year = "";
+    private String forename = "";
+    private String abstractText = "";
+    private String affiliation = "";
+    private String month = "";
+    private String volume = "";
+    private String lastname = "";
+    private String initials = "";
+    private String number = "";
+    private String page = "";
+    private String medlineID = "";
+    private String url = "";
+    private String MedlineDate = "";
+    String series = "";
+    String editor = "";
+    String booktitle = "";
+    String type = "article";
+    String key = "";
+    String address = "";
+    private String pubmedid = "";
+    private String doi = "";
+    private String pii = "";
+    private String pmc = "";
+    private String majorTopic = "";
+    private String minorTopics = "";
+    private String language = "";
+    private String pst = "";
+    private final ArrayList<String> authors = new ArrayList<String>();
+    private final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum = 0;
 
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -195,7 +222,7 @@ public class MedlineHandler extends DefaultHandler
 
     }
 
-    String join(Object[] sa, String delim) {
+    private String join(Object[] sa, String delim) {
         StringBuffer sb = new StringBuffer();
         sb.append(sa[0].toString());
         for (int i = 1; i < sa.length; i++)
@@ -545,7 +572,7 @@ public class MedlineHandler extends DefaultHandler
     //   The last page is reported using only the digits which
     //   differ from the first page. 
     //      i.e. 12345-51 refers to the actual range 12345-12351
-    public String fixPageRange(String pageRange) {
+    private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
         if (minusPos < 0) {
             return pageRange;

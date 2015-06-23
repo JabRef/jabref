@@ -40,9 +40,9 @@ import ca.odell.glazedlists.SortedList;
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
  */
-public class OpenDocumentRepresentation {
+class OpenDocumentRepresentation {
 
-    protected final Collection<BibtexEntry> entries;
+    private final Collection<BibtexEntry> entries;
     private final BibtexDatabase database;
 
 
@@ -211,12 +211,12 @@ public class OpenDocumentRepresentation {
         return result;
     }
 
-    protected String getField(BibtexEntry e, String field) {
+    private String getField(BibtexEntry e, String field) {
         String s = BibtexDatabase.getResolvedField(field, e, database);
         return s == null ? "" : s;
     }
 
-    protected void addTableCell(Document doc, Element parent, String content) {
+    private void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);

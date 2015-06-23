@@ -836,7 +836,7 @@ public class LabelPatternUtil {
         }
     }
 
-    static String getTitleWords(int number, BibtexEntry _entry) {
+    private static String getTitleWords(int number, BibtexEntry _entry) {
         String ss = (new RemoveLatexCommands()).format(_entry.getField("title"));
         StringBuffer _sbvalue = new StringBuffer(), current;
         int piv = 0, words = 0;
@@ -875,7 +875,7 @@ public class LabelPatternUtil {
         return LabelPatternUtil.keepLettersAndDigitsOnly(_sbvalue.toString());
     }
 
-    static String keepLettersAndDigitsOnly(String in) {
+    private static String keepLettersAndDigitsOnly(String in) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < in.length(); i++) {
             if (Character.isLetterOrDigit(in.charAt(i))) {
@@ -951,7 +951,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    public static String firstAuthorForenameInitials(String authorField) {
+    private static String firstAuthorForenameInitials(String authorField) {
         AuthorList al = AuthorList.getAuthorList(authorField);
         if (al.size() == 0) {
             return "";
@@ -1016,7 +1016,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    public static String lastAuthorForenameInitials(String authorField) {
+    private static String lastAuthorForenameInitials(String authorField) {
         AuthorList al = AuthorList.getAuthorList(authorField);
         if (al.size() == 0) {
             return "";
@@ -1391,7 +1391,7 @@ public class LabelPatternUtil {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    public static String[] parseFieldMarker(String arg) {
+    private static String[] parseFieldMarker(String arg) {
         List<String> parts = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;

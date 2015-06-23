@@ -91,7 +91,7 @@ public class NameFormat implements LayoutFormatter {
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
 
-    public String format(String toFormat, AuthorList al, String[] formats) {
+    private String format(String toFormat, AuthorList al, String[] formats) {
 
         StringBuffer sb = new StringBuffer();
 
@@ -169,7 +169,7 @@ public class NameFormat implements LayoutFormatter {
     }
 
 
-    String parameter = NameFormat.DEFAULT_FORMAT;
+    private String parameter = NameFormat.DEFAULT_FORMAT;
 
 
     public void setParameter(String parameter) {

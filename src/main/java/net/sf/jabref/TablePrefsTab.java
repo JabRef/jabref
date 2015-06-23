@@ -39,7 +39,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
     private final JCheckBox autoResizeMode;
     private final JCheckBox priDesc;

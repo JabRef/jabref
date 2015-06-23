@@ -42,7 +42,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-public class EntryEditorTab {
+class EntryEditorTab {
 
     private final JPanel panel = new JPanel();
 
@@ -80,8 +80,8 @@ public class EntryEditorTab {
         scrollPane.setFocusCycleRoot(true);
     }
 
-    void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
-            boolean compressed, String title) {
+    private void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
+                            boolean compressed, String title) {
 
         InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap am = panel.getActionMap();
@@ -206,14 +206,14 @@ public class EntryEditorTab {
     }
 
 
-    BibtexEntry entry;
+    private BibtexEntry entry;
 
 
-    public BibtexEntry getEntry() {
+    private BibtexEntry getEntry() {
         return entry;
     }
 
-    boolean isFieldModified(FieldEditor f) {
+    private boolean isFieldModified(FieldEditor f) {
         String text = f.getText().trim();
 
         if (text.length() == 0) {
@@ -232,7 +232,7 @@ public class EntryEditorTab {
         }
     }
 
-    void markBaseChanged() {
+    private void markBaseChanged() {
         parent.panel.markBaseChanged();
     }
 
@@ -273,7 +273,7 @@ public class EntryEditorTab {
     }
 
 
-    protected boolean updating = false;
+    private boolean updating = false;
 
 
     public void setEntry(BibtexEntry entry) {
@@ -333,7 +333,7 @@ public class EntryEditorTab {
      * 
      * @param component
      */
-    public void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
+    private void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
 
         // Here we add focus listeners to the component. The funny code is because we need
         // to guarantee that the AutoCompleteListener - if used - is called before fieldListener
@@ -394,6 +394,6 @@ public class EntryEditorTab {
     }
 
 
-    final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
+    private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
 }

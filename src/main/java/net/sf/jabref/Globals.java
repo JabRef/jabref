@@ -117,7 +117,9 @@ public class Globals {
      */
     public static final String additionalFields = "/resource/fields/fields.xml";
 
-    public static ResourceBundle messages, menuTitles, intMessages;
+    private static ResourceBundle messages;
+    private static ResourceBundle menuTitles;
+    private static ResourceBundle intMessages;
 
     public static FileUpdateMonitor fileUpdateMonitor;
 
@@ -126,8 +128,8 @@ public class Globals {
     public static ErrorConsole errorConsole;
 
     public static final String VERSION;
-    public static final String BUILD;
-    public static final String BUILD_DATE;
+    private static final String BUILD;
+    private static final String BUILD_DATE;
 
     static {
         TBuildInfo bi = new TBuildInfo(Globals.buildInfos);
@@ -137,7 +139,7 @@ public class Globals {
 
     }
 
-    public static Locale locale;
+    private static Locale locale;
 
     public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
             PROTECTED_FLAG_META = "protectedFlag",
@@ -147,7 +149,7 @@ public class Globals {
             FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
     public static final String[] ENCODINGS;
-    public static final String[] ALL_ENCODINGS = // (String[])
+    private static final String[] ALL_ENCODINGS = // (String[])
             // Charset.availableCharsets().keySet().toArray(new
             // String[]{});
             new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
@@ -451,7 +453,7 @@ public class Globals {
     public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> RTFCHARS = new HashMap<String, String>();
-    public static final HashMap<String, String> URL_CHARS = new HashMap<String, String>();
+    private static final HashMap<String, String> URL_CHARS = new HashMap<String, String>();
 
 
     public static int getShortcutMask() {

@@ -37,12 +37,12 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
-public class FileListEditorTransferHandler extends TransferHandler {
+class FileListEditorTransferHandler extends TransferHandler {
 
-    protected DataFlavor urlFlavor;
-    protected final DataFlavor stringFlavor;
-    protected final JabRefFrame frame;
-    protected final EntryContainer entryContainer;
+    private DataFlavor urlFlavor;
+    private final DataFlavor stringFlavor;
+    private final JabRefFrame frame;
+    private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
     private DroppedFileHandler dfh = null;
 

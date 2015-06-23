@@ -29,19 +29,19 @@ import net.sf.jabref.SearchRule;
 public abstract class AbstractGroup {
 
     /** The group's name (every type of group has one). */
-    protected String m_name;
+    String m_name;
 
     /**
      * The hierarchical context of the group (INDEPENDENT, REFINING, or
      * INCLUDING). Defaults to INDEPENDENT, which will be used if and
      * only if the context specified in the constructor is invalid.
      */
-    protected int m_context = AbstractGroup.INDEPENDENT;
+    int m_context = AbstractGroup.INDEPENDENT;
 
 
     public abstract String getTypeId();
 
-    public AbstractGroup(String name, int context) {
+    AbstractGroup(String name, int context) {
         m_name = name;
         setHierarchicalContext(context);
     }
@@ -61,13 +61,13 @@ public abstract class AbstractGroup {
     public static final int INCLUDING = 2;
 
     /** Character used for quoting in the string representation. */
-    protected static final char QUOTE_CHAR = '\\';
+    static final char QUOTE_CHAR = '\\';
 
     /**
      * For separating units (e.g. name, which every group has) in the string
      * representation
      */
-    protected static final String SEPARATOR = ";";
+    static final String SEPARATOR = ";";
 
 
     /**

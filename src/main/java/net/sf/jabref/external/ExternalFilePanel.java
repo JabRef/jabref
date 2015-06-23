@@ -143,25 +143,25 @@ public class ExternalFilePanel extends JPanel {
         this.database = database;
     }
 
-    public BibtexDatabase getDatabase() {
+    private BibtexDatabase getDatabase() {
         return (database != null ? database : entryEditor.getDatabase());
     }
 
-    public BibtexEntry getEntry() {
+    private BibtexEntry getEntry() {
         return (entry != null ? entry : entryEditor.getEntry());
     }
 
-    protected Object getKey() {
+    private Object getKey() {
         return getEntry().getField(BibtexFields.KEY_FIELD);
     }
 
-    protected void output(String s) {
+    private void output(String s) {
         if (frame != null) {
             frame.output(s);
         }
     }
 
-    public void pushXMP(final String fieldName, final FieldEditor editor) {
+    private void pushXMP(final String fieldName, final FieldEditor editor) {
 
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 

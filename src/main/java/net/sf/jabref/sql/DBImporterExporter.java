@@ -41,7 +41,7 @@ public class DBImporterExporter {
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
-    public int getDatabaseIDByName(MetaData metaData, Object out, String dbName)
+    protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName)
             throws SQLException {
 
         if (out instanceof Connection) {
@@ -63,7 +63,7 @@ public class DBImporterExporter {
         }
     }
 
-    public void removeAGivenDB(Object out, int database_id) throws SQLException {
+    private void removeAGivenDB(Object out, int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
         SQLUtil.processQuery(out,
                 "DELETE FROM jabref_database WHERE database_id='" + database_id
@@ -81,7 +81,7 @@ public class DBImporterExporter {
      *            Id of the database being exported.
      * @throws SQLException
      */
-    public void removeAllRecordsForAGivenDB(Object out, int database_id)
+    protected void removeAllRecordsForAGivenDB(Object out, int database_id)
             throws SQLException {
         SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='"
                 + database_id + "';");

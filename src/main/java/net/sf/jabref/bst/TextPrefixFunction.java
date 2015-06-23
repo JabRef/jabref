@@ -40,7 +40,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class TextPrefixFunction implements BstFunction {
 
-    final VM vm;
+    private final VM vm;
 
 
     public TextPrefixFunction(VM vm) {

@@ -48,12 +48,12 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    PreviewPanel[] previewPanel = null;
-    int activePreview = Globals.prefs.getInt("activePreview");
-    PreviewPanel preview;
-    final MainTable table;
-    final BasePanel panel;
-    final EventList<BibtexEntry> tableRows;
+    private PreviewPanel[] previewPanel = null;
+    private int activePreview = Globals.prefs.getInt("activePreview");
+    private PreviewPanel preview;
+    private final MainTable table;
+    private final BasePanel panel;
+    private final EventList<BibtexEntry> tableRows;
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
 
@@ -418,7 +418,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      * @param e The mouse event defining the popup trigger.
      * @param row The row where the event occured.
      */
-    protected void processPopupTrigger(MouseEvent e, int row) {
+    private void processPopupTrigger(MouseEvent e, int row) {
         int selRow = table.getSelectedRow();
         if ((selRow == -1) || // (getSelectedRowCount() == 0))
         !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {

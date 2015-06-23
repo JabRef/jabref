@@ -49,26 +49,26 @@ import com.jgoodies.forms.layout.FormLayout;
 public class DBConnectDialog extends JDialog {
 
     // labels
-    final JLabel lblServerType = new JLabel();
-    final JLabel lblServerHostname = new JLabel();
-    final JLabel lblDatabase = new JLabel();
-    final JLabel lblUsername = new JLabel();
-    final JLabel lblPassword = new JLabel();
+    private final JLabel lblServerType = new JLabel();
+    private final JLabel lblServerHostname = new JLabel();
+    private final JLabel lblDatabase = new JLabel();
+    private final JLabel lblUsername = new JLabel();
+    private final JLabel lblPassword = new JLabel();
 
     // input fields
-    final JComboBox cmbServerType = new JComboBox();
-    final JTextField txtServerHostname = new JTextField(40);
-    final JTextField txtDatabase = new JTextField(40);
-    final JTextField txtUsername = new JTextField(40);
-    final JPasswordField pwdPassword = new JPasswordField(40);
-    final JButton btnConnect = new JButton();
-    final JButton btnCancel = new JButton();
+    private final JComboBox cmbServerType = new JComboBox();
+    private final JTextField txtServerHostname = new JTextField(40);
+    private final JTextField txtDatabase = new JTextField(40);
+    private final JTextField txtUsername = new JTextField(40);
+    private final JPasswordField pwdPassword = new JPasswordField(40);
+    private final JButton btnConnect = new JButton();
+    private final JButton btnCancel = new JButton();
 
     // array for holding components on left-hand and right-hand sides
-    final ArrayList<JLabel> lhs = new ArrayList<JLabel>();
-    final ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+    private final ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+    private final ArrayList<JComponent> rhs = new ArrayList<JComponent>();
 
-    DBStrings dbStrings = new DBStrings();
+    private DBStrings dbStrings = new DBStrings();
 
     private boolean connectToDB = false;
 
@@ -289,7 +289,7 @@ public class DBConnectDialog extends JDialog {
         return connectToDB;
     }
 
-    public void setConnectToDB(boolean connectToDB) {
+    private void setConnectToDB(boolean connectToDB) {
         this.connectToDB = connectToDB;
     }
 

@@ -11,7 +11,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 
 @SuppressWarnings("serial")
-public class MyEditorKit extends LargeHTMLEditorKit {
+class MyEditorKit extends LargeHTMLEditorKit {
 
     public static class MyNextVisualPositionAction extends TextAction {
 

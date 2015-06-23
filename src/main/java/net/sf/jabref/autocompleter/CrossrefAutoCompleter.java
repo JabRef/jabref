@@ -25,13 +25,13 @@ import net.sf.jabref.BibtexEntry;
  */
 public class CrossrefAutoCompleter extends AbstractAutoCompleter {
 
-    public final String _fieldName;
+    private final String _fieldName;
 
 
     /**
      * @see AutoCompleterFactory
      */
-    protected CrossrefAutoCompleter(String fieldName) {
+    CrossrefAutoCompleter(String fieldName) {
         _fieldName = fieldName;
     }
 

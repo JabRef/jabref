@@ -33,9 +33,9 @@ public class BasicSearch implements SearchRule {
 
     private final boolean caseSensitive;
     private final boolean regExp;
-    Pattern[] pattern;
+    private Pattern[] pattern;
     //static RemoveBrackets removeLatexCommands = new RemoveBrackets();
-    static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
 
     public BasicSearch(boolean caseSensitive, boolean regExp) {

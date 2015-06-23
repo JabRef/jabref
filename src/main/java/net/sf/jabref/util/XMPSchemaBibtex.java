@@ -36,7 +36,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      */
     public static final String NAMESPACE = "http://jabref.sourceforge.net/bibteXMP/";
 
-    public static final String KEY = "bibtex";
+    private static final String KEY = "bibtex";
 
 
     /**
@@ -58,7 +58,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         super(e, XMPSchemaBibtex.KEY);
     }
 
-    protected String makeProperty(String propertyName) {
+    private String makeProperty(String propertyName) {
         return XMPSchemaBibtex.KEY + ":" + propertyName;
     }
 
@@ -144,7 +144,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         super.addSequenceDateValue(makeProperty(field), date);
     }
 
-    public static String getContents(NodeList seqList) {
+    private static String getContents(NodeList seqList) {
 
         Element seqNode = (Element) seqList.item(0);
         StringBuffer seq = null;
@@ -258,7 +258,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    public static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
+    private static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
     static {
         XMPSchemaBibtex.preserveWhiteSpace.add("abstract");
         XMPSchemaBibtex.preserveWhiteSpace.add("note");

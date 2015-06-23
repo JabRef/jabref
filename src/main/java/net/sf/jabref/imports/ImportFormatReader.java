@@ -95,7 +95,7 @@ public class ImportFormatReader {
      * @param cliId  CLI-Id
      * @return  Import Format or <code>null</code> if none matches
      */
-    public ImportFormat getByCliId(String cliId) {
+    private ImportFormat getByCliId(String cliId) {
         for (ImportFormat format : formats) {
             if (format.getCLIId().equals(cliId)) {
                 return format;
@@ -295,7 +295,7 @@ public class ImportFormatReader {
 
     //------------------------------------------------------------------------------
 
-    public static String expandAll(String s) {
+    private static String expandAll(String s) {
         //System.out.println("'"+s+"'");
         // Avoid arrayindexoutof.... :
         if (s.length() == 0) {
@@ -375,7 +375,7 @@ public class ImportFormatReader {
      * removes all entries that have no fields set. This is useful for rooting out
      * an unsucessful import (wrong format) that returns a number of empty entries.
      */
-    public static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
+    private static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
         for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
             BibtexEntry entry = i.next();
 

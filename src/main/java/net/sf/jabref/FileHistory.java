@@ -27,9 +27,9 @@ import javax.swing.JOptionPane;
 
 public class FileHistory extends JMenu implements ActionListener {
 
-    final JabRefPreferences prefs;
-    final LinkedList<String> history = new LinkedList<String>();
-    final JabRefFrame frame;
+    private final JabRefPreferences prefs;
+    private final LinkedList<String> history = new LinkedList<String>();
+    private final JabRefFrame frame;
 
 
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {

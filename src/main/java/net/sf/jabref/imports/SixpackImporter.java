@@ -35,7 +35,7 @@ import net.sf.jabref.Util;
  */
 public class SixpackImporter extends ImportFormat {
 
-    final String SEPARATOR = new String(new char[] {0, 48});
+    private final String SEPARATOR = new String(new char[] {0, 48});
 
 
     /**

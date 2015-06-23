@@ -19,7 +19,7 @@ import org.sciplore.formatter.SimpleTypeElementBean;
  */
 public class DocumentsWrapper {
 
-    Document xmlDocuments;
+    private Document xmlDocuments;
 
 
     public DocumentsWrapper(Document documents) {
@@ -114,7 +114,7 @@ public class DocumentsWrapper {
         return simpleTypeElementBean.getValue();
     }
 
-    protected static List<Bean> sortAuthors(List<Bean> authors) {
+    static List<Bean> sortAuthors(List<Bean> authors) {
         boolean unsorted = true;
         Bean temp;
 

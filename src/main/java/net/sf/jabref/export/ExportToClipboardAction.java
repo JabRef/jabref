@@ -49,7 +49,7 @@ import net.sf.jabref.JabRefFrame;
  */
 public class ExportToClipboardAction extends AbstractWorker {
 
-    String message = null;
+    private String message = null;
     private final JabRefFrame frame;
     private final BibtexDatabase database;
 

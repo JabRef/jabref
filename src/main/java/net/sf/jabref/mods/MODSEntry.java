@@ -41,36 +41,36 @@ import org.w3c.dom.Node;
  */
 public class MODSEntry {
 
-    protected String entryType = "mods"; // could also be relatedItem
-    protected String id;
-    protected List<PersonName> authors = null;
+    private String entryType = "mods"; // could also be relatedItem
+    private String id;
+    private List<PersonName> authors = null;
 
     // should really be handled with an enum
-    protected String issuance = "monographic";
-    protected PageNumbers pages = null;
+    private String issuance = "monographic";
+    private PageNumbers pages = null;
 
-    protected String publisher = null;
-    protected String date = null;
-    protected String place = null;
+    private String publisher = null;
+    private String date = null;
+    private String place = null;
 
-    protected String title = null;
+    private String title = null;
     // should really be handled with an enum
-    protected final String type = "text";
+    private final String type = "text";
 
-    protected String number;
-    protected String volume;
-    protected String genre = null;
-    protected final Set<String> handledExtensions;
+    private String number;
+    private String volume;
+    private String genre = null;
+    private final Set<String> handledExtensions;
 
-    protected MODSEntry host;
-    final Map<String, String> extensionFields;
+    private MODSEntry host;
+    private final Map<String, String> extensionFields;
 
-    public static final String BIBTEX = "bibtex_";
+    private static final String BIBTEX = "bibtex_";
 
     private final boolean CHARFORMAT = false;
 
 
-    public MODSEntry() {
+    private MODSEntry() {
         extensionFields = new HashMap<String, String>();
         handledExtensions = new HashSet<String>();
 
@@ -85,7 +85,7 @@ public class MODSEntry {
         populateFromBibtex(bibtex);
     }
 
-    protected void populateFromBibtex(BibtexEntry bibtex) {
+    private void populateFromBibtex(BibtexEntry bibtex) {
         LayoutFormatter chars = new XMLChars();
         if (bibtex.getField("title") != null) {
             if (CHARFORMAT) {
@@ -140,7 +140,7 @@ public class MODSEntry {
 
     }
 
-    protected void populateExtensionFields(BibtexEntry e) {
+    private void populateExtensionFields(BibtexEntry e) {
 
         for (String field : e.getAllFields()) {
             String value = e.getField(field);
@@ -149,7 +149,7 @@ public class MODSEntry {
         }
     }
 
-    protected List<PersonName> getAuthors(String authors) {
+    private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<PersonName>();
         LayoutFormatter chars = new XMLChars();
 
@@ -175,7 +175,7 @@ public class MODSEntry {
     }
 
     /* construct a MODS date object */
-    protected String getDate(BibtexEntry bibtex) {
+    private String getDate(BibtexEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
             result += (bibtex.getField("year"));
@@ -188,7 +188,7 @@ public class MODSEntry {
     }
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
-    protected String getMODSgenre(BibtexEntry bibtex) {
+    private String getMODSgenre(BibtexEntry bibtex) {
         /**
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>
@@ -196,7 +196,7 @@ public class MODSEntry {
         return bibtex.getType().getName();
     }
 
-    public Node getDOMrepresentation() {
+    private Node getDOMrepresentation() {
         Node result = null;
         try {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -327,7 +327,7 @@ public class MODSEntry {
      * @param in The String whose non-valid characters we want to remove.
      * @return The in String, stripped of non-valid characters.
      */
-    public String stripNonValidXMLCharacters(String in) {
+    private String stripNonValidXMLCharacters(String in) {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 

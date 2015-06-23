@@ -36,9 +36,9 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 public class RegExpRule implements SearchRule {
 
-    final boolean m_caseSensitiveSearch;
+    private final boolean m_caseSensitiveSearch;
     //static RemoveBrackets removeBrackets = new RemoveBrackets();
-    static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
 
     public RegExpRule(boolean caseSensitive) {
@@ -82,8 +82,8 @@ public class RegExpRule implements SearchRule {
         return score;
     }
 
-    protected int searchFields(Set<String> fields, BibtexEntry bibtexEntry,
-            Pattern pattern) {
+    private int searchFields(Set<String> fields, BibtexEntry bibtexEntry,
+                             Pattern pattern) {
         int score = 0;
         if (fields != null) {
             for (String field : fields) {

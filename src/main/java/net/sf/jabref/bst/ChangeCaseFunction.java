@@ -46,7 +46,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class ChangeCaseFunction implements BstFunction {
 
-    final VM vm;
+    private final VM vm;
 
 
     public ChangeCaseFunction(VM vm) {

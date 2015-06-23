@@ -299,7 +299,7 @@ public class MetaDataListDialog extends JDialog {
     }
 
 
-    public static class MyTableModel extends DefaultTableModel {
+    private static class MyTableModel extends DefaultTableModel {
 
         @Override
         public boolean isCellEditable(int row, int column) {

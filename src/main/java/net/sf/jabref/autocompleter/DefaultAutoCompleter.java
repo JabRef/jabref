@@ -29,13 +29,13 @@ import net.sf.jabref.Globals;
  */
 public class DefaultAutoCompleter extends AbstractAutoCompleter {
 
-    public final String _fieldName;
+    private final String _fieldName;
 
 
     /**
      * @see AutoCompleterFactory
      */
-    protected DefaultAutoCompleter(String fieldName) {
+    DefaultAutoCompleter(String fieldName) {
         _fieldName = fieldName;
     }
 

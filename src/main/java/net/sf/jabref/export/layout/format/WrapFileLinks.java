@@ -207,7 +207,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         return sb.toString();
     }
 
-    protected String replaceStrings(String text) {
+    private String replaceStrings(String text) {
         for (String from : replacements.keySet()) {
             String to = replacements.get(from);
             text = text.replaceAll(from, to);
@@ -218,11 +218,16 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
 
     // Define codes for the various escape sequences that can be inserted:
-    public static final int STRING = 0, ITERATION_COUNT = 1, FILE_PATH = 2, FILE_TYPE = 3,
-            FILE_EXTENSION = 4, FILE_DESCRIPTION = 5, RELATIVE_FILE_PATH = 6;
+    private static final int STRING = 0;
+    private static final int ITERATION_COUNT = 1;
+    private static final int FILE_PATH = 2;
+    private static final int FILE_TYPE = 3;
+    private static final int FILE_EXTENSION = 4;
+    private static final int FILE_DESCRIPTION = 5;
+    private static final int RELATIVE_FILE_PATH = 6;
 
     // Define which escape sequences give what results:
-    final static Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
+    private final static Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -243,7 +248,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      * @param format The marked-up string.
      * @return the resulting format entries.
      */
-    public List<FormatEntry> parseFormatString(String format) {
+    private List<FormatEntry> parseFormatString(String format) {
         List<FormatEntry> l = new ArrayList<FormatEntry>();
         StringBuilder sb = new StringBuilder();
         boolean escaped = false;
@@ -296,7 +301,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      * only a type code is provided, and the subclass needs to fill in the proper information
      * based on the file link to be exported or the iteration status.
      */
-    protected static class FormatEntry {
+    static class FormatEntry {
 
         private final int type;
         private String string = null;

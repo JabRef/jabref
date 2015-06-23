@@ -17,7 +17,7 @@ package net.sf.jabref.gui.components;
 
 import java.awt.Dimension;
 
-public class JPanelYBoxPreferredWidth extends JPanelYBox {
+class JPanelYBoxPreferredWidth extends JPanelYBox {
 
     @Override
     public Dimension getMaximumSize() {

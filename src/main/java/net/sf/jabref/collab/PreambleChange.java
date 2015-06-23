@@ -24,13 +24,13 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoablePreambleChange;
 
-public class PreambleChange extends Change {
+class PreambleChange extends Change {
 
-    final String tmp;
-    final String mem;
-    final String disk;
-    final InfoPane tp = new InfoPane();
-    final JScrollPane sp = new JScrollPane(tp);
+    private final String tmp;
+    private final String mem;
+    private final String disk;
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
 
 
     public PreambleChange(String tmp, String mem, String disk) {

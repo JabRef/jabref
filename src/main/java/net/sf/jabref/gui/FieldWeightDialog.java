@@ -41,17 +41,17 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FieldWeightDialog extends JDialog {
 
-    final JabRefFrame frame;
-    final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JabRefFrame frame;
+    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public static void main(String[] args) {
         new FieldWeightDialog(null).setVisible(true);
     }
 
-    public FieldWeightDialog(JabRefFrame frame) {
+    private FieldWeightDialog(JabRefFrame frame) {
         this.frame = frame;
         JPanel main = buildMainPanel();
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -60,7 +60,7 @@ public class FieldWeightDialog extends JDialog {
         pack();
     }
 
-    public JPanel buildMainPanel() {
+    private JPanel buildMainPanel() {
         FormLayout layout = new FormLayout
                 ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                 "");
@@ -95,7 +95,7 @@ public class FieldWeightDialog extends JDialog {
 
     }
 
-    public JPanel buildButtonPanel() {
+    private JPanel buildButtonPanel() {
 
         ok.addActionListener(new ActionListener() {
 
@@ -121,7 +121,7 @@ public class FieldWeightDialog extends JDialog {
         return builder.getPanel();
     }
 
-    public void storeSettings() {
+    private void storeSettings() {
         for (JSlider slider : sliders.keySet()) {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:

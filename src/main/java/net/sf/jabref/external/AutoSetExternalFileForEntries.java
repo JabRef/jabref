@@ -44,7 +44,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
 
-    final Object[] brokenLinkOptions =
+    private final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
             Globals.lang("Quit synchronization")};
 

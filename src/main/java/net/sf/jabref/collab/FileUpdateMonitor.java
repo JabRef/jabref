@@ -32,11 +32,11 @@ public class FileUpdateMonitor implements Runnable {
 
     private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
-    final int WAIT = 4000;
+    private final int WAIT = 4000;
     static int tmpNum = 0;
-    int no = 0;
-    final HashMap<String, Entry> entries = new HashMap<String, Entry>();
-    volatile boolean running;
+    private int no = 0;
+    private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
+    private volatile boolean running;
 
     @Override
     public void run() {
@@ -263,7 +263,7 @@ public class FileUpdateMonitor implements Runnable {
     }
 
 
-    static synchronized File getTempFile() {
+    private static synchronized File getTempFile() {
         File f = null;
         // Globals.prefs.get("tempDir")
         //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());

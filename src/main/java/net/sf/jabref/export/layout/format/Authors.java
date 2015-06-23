@@ -37,14 +37,14 @@ public class Authors extends AbstractParamLayoutFormatter {
     EtAlString = [ et al. | EtAl=<string>]
     */
 
-    static final ArrayList<String>
+    private static final ArrayList<String>
             authorOrder = new ArrayList<String>();
-    static final ArrayList<String> authorAbbr = new ArrayList<String>();
-    static final ArrayList<String> authorPunc = new ArrayList<String>();
-    static final ArrayList<String> separators = new ArrayList<String>();
-    static final ArrayList<String> lastSeparators = new ArrayList<String>();
+    private static final ArrayList<String> authorAbbr = new ArrayList<String>();
+    private static final ArrayList<String> authorPunc = new ArrayList<String>();
+    private static final ArrayList<String> separators = new ArrayList<String>();
+    private static final ArrayList<String> lastSeparators = new ArrayList<String>();
 
-    static final Pattern numberPattern = Pattern.compile("[0-9]+");
+    private static final Pattern numberPattern = Pattern.compile("[0-9]+");
 
     static {
         Authors.authorOrder.add("firstfirst");
@@ -78,41 +78,41 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     }
 
-    final static int
-            FIRST_FIRST = 0,
-            LAST_FIRST = 1,
-            LF_FF = 2;
+    private final static int
+            FIRST_FIRST = 0;
+    private final static int LAST_FIRST = 1;
+    private final static int LF_FF = 2;
 
-    final static String
-            COMMA = ", ",
-            AMP = " & ",
-            COLON = ": ",
-            SEMICOLON = "; ",
-            AND = " and ",
-            OXFORD = ", and ";
+    private final static String
+            COMMA = ", ";
+    private final static String AMP = " & ";
+    private final static String COLON = ": ";
+    private final static String SEMICOLON = "; ";
+    private final static String AND = " and ";
+    private final static String OXFORD = ", and ";
 
-    int flMode = Authors.FIRST_FIRST;
+    private int flMode = Authors.FIRST_FIRST;
 
-    boolean
-            abbreviate = true,
-            firstInitialOnly = false,
-            middleInitial = false,
-            lastNameOnly = false,
-            abbrDots = true,
-            abbrSpaces = true;
+    private boolean
+            abbreviate = true;
+    private boolean firstInitialOnly = false;
+    private boolean middleInitial = false;
+    private boolean lastNameOnly = false;
+    private boolean abbrDots = true;
+    private boolean abbrSpaces = true;
 
-    boolean setSep = false;
-    boolean setMaxAuthors = false;
-    int maxAuthors = -1;
-    int authorNumberEtAl = 1;
+    private boolean setSep = false;
+    private boolean setMaxAuthors = false;
+    private int maxAuthors = -1;
+    private int authorNumberEtAl = 1;
 
-    final String
+    private final String
             firstFirstSeparator = " ";
-    String lastFirstSeparator = ", ";
-    String separator = Authors.COMMA;
-    String lastSeparator = Authors.AND;
-    String etAlString = " et al.";
-    final String jrSeparator = " ";
+    private String lastFirstSeparator = ", ";
+    private String separator = Authors.COMMA;
+    private String lastSeparator = Authors.AND;
+    private String etAlString = " et al.";
+    private final String jrSeparator = " ";
 
 
     @Override
@@ -256,7 +256,7 @@ public class Authors extends AbstractParamLayoutFormatter {
      * @param two The second string
      * @return true if the strings are deemed equal
      */
-    public boolean comp(String one, String two) {
+    private boolean comp(String one, String two) {
         return one.trim().equalsIgnoreCase(two);
     }
 

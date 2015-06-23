@@ -105,7 +105,7 @@ public class ADSFetcher implements EntryFetcher {
     public void stopFetching() {
     }
 
-    public BibtexDatabase importADSEntries(String key, OutputPrinter status) {
+    private BibtexDatabase importADSEntries(String key, OutputPrinter status) {
         String url = constructUrl(key);
         try {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
@@ -127,11 +127,11 @@ public class ADSFetcher implements EntryFetcher {
         return null;
     }
 
-    public String constructUrl(String key) {
+    private String constructUrl(String key) {
         return "http://adsabs.harvard.edu/doi/" + key;
     }
 
-    public void importADSAbstract(String key, BibtexEntry entry, OutputPrinter status) {
+    private void importADSAbstract(String key, BibtexEntry entry, OutputPrinter status) {
         /* TODO: construct ADSUrl from BibtexEntry */
         String url = constructUrl(key);
         try {

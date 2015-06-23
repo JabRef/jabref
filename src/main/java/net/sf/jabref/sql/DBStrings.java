@@ -103,7 +103,7 @@ public class DBStrings {
         return serverTypes;
     }
 
-    public void setServerTypes(String[] serverTypes) {
+    private void setServerTypes(String[] serverTypes) {
         this.serverTypes = serverTypes;
     }
 
@@ -111,7 +111,7 @@ public class DBStrings {
         return isInitialized;
     }
 
-    public void isInitialized(boolean isInitialized) {
+    private void isInitialized(boolean isInitialized) {
         this.isInitialized = isInitialized;
     }
 

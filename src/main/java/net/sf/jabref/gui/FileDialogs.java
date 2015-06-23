@@ -97,9 +97,9 @@ public class FileDialogs {
                 updateWorkingDirectory, true, null);
     }
 
-    public static String getNewFile(JFrame owner, File directory, String extension,
-            String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
-            JComponent accessory) {
+    private static String getNewFile(JFrame owner, File directory, String extension,
+                                     String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
+                                     JComponent accessory) {
 
         OpenFileFilter off = null;
 
@@ -113,9 +113,9 @@ public class FileDialogs {
                 updateWorkingDirectory, dirOnly, false, accessory);
     }
 
-    public static Object getNewFileImpl(JFrame owner, File directory, String extension,
-            String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
-            boolean dirOnly, boolean multipleSelection, JComponent accessory) {
+    private static Object getNewFileImpl(JFrame owner, File directory, String extension,
+                                         String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
+                                         boolean dirOnly, boolean multipleSelection, JComponent accessory) {
 
         // Added the !dirOnly condition below as a workaround to the native file dialog
         // not supporting directory selection:
@@ -197,8 +197,8 @@ public class FileDialogs {
         }
     }
 
-    public static String getNewFileForMac(JFrame owner, File directory, String extensions,
-            int dialogType, boolean updateWorkingDirectory, boolean dirOnly, FilenameFilter filter) {
+    private static String getNewFileForMac(JFrame owner, File directory, String extensions,
+                                           int dialogType, boolean updateWorkingDirectory, boolean dirOnly, FilenameFilter filter) {
 
         java.awt.FileDialog fc = new java.awt.FileDialog(owner);
 

@@ -223,7 +223,7 @@ public class FieldContentParser {
     }
 
 
-    static class Indents {
+    private static class Indents {
         //int hyp
     }
 }

@@ -508,11 +508,11 @@ class GroupDialog extends JDialog {
         }
     }
 
-    protected void setDescription(String description) {
+    private void setDescription(String description) {
         m_description.setText("<html>" + description + "</html>");
     }
 
-    protected String formatRegExException(String regExp, Exception e) {
+    private String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < sa.length; ++i) {
@@ -548,7 +548,7 @@ class GroupDialog extends JDialog {
     }
 
     /** Sets the font of the name entry field. */
-    protected void setNameFontItalic(boolean italic) {
+    private void setNameFontItalic(boolean italic) {
         Font f = m_name.getFont();
         if (f.isItalic() != italic) {
             f = f.deriveFont(italic ? Font.ITALIC : Font.PLAIN);
@@ -559,7 +559,7 @@ class GroupDialog extends JDialog {
     /**
      * Returns the int representing the selected hierarchical group context.
      */
-    protected int getContext() {
+    private int getContext() {
         if (m_independentButton.isSelected()) {
             return AbstractGroup.INDEPENDENT;
         }
@@ -572,7 +572,7 @@ class GroupDialog extends JDialog {
         return AbstractGroup.INDEPENDENT; // default
     }
 
-    protected void setContext(int context) {
+    private void setContext(int context) {
         switch (context) {
         case AbstractGroup.REFINING:
             m_intersectionButton.setSelected(true);

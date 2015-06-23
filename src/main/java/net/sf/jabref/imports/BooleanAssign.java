@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.imports;
 
-public class BooleanAssign {
+class BooleanAssign {
 
-    boolean value;
+    private boolean value;
 
 
     /**
@@ -27,7 +27,7 @@ public class BooleanAssign {
         setValue(b);
     }
 
-    public void setValue(boolean value) {
+    private void setValue(boolean value) {
         this.value = value;
     }
 

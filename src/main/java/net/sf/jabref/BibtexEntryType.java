@@ -120,7 +120,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType BOOKLET =
+    private static final BibtexEntryType BOOKLET =
             new BibtexEntryType()
             {
 
@@ -411,7 +411,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType PROCEEDINGS =
+    private static final BibtexEntryType PROCEEDINGS =
             new BibtexEntryType()
             {
 
@@ -456,7 +456,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType MANUAL =
+    private static final BibtexEntryType MANUAL =
             new BibtexEntryType()
             {
 
@@ -546,7 +546,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType MASTERSTHESIS =
+    private static final BibtexEntryType MASTERSTHESIS =
             new BibtexEntryType()
             {
 
@@ -590,7 +590,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType PHDTHESIS =
+    private static final BibtexEntryType PHDTHESIS =
             new BibtexEntryType()
             {
 
@@ -634,7 +634,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType UNPUBLISHED =
+    private static final BibtexEntryType UNPUBLISHED =
             new BibtexEntryType()
             {
 
@@ -678,7 +678,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType PERIODICAL =
+    private static final BibtexEntryType PERIODICAL =
             new BibtexEntryType()
             {
 
@@ -722,7 +722,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType PATENT =
+    private static final BibtexEntryType PATENT =
             new BibtexEntryType()
             {
 
@@ -768,7 +768,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType STANDARD =
+    private static final BibtexEntryType STANDARD =
             new BibtexEntryType()
             {
 
@@ -819,7 +819,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 }
             };
 
-    public static final BibtexEntryType ELECTRONIC =
+    private static final BibtexEntryType ELECTRONIC =
             new BibtexEntryType()
             {
 
@@ -905,7 +905,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
      * This type is used for IEEEtran.bst to control various 
      * be repeated or not. Not a very elegant solution, but it works...
      */
-    public static final BibtexEntryType IEEETRANBSTCTL =
+    private static final BibtexEntryType IEEETRANBSTCTL =
             new BibtexEntryType()
             {
 
@@ -1045,7 +1045,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 
 
     public static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
-    public static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
+    private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
     static {
         // Put the standard entry types into the type map.
         if (!Globals.prefs.getBoolean("biblatexMode")) {

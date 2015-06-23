@@ -59,7 +59,7 @@ public class CopacImporter extends ImportFormat {
     }
 
 
-    static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
+    private static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
 
 
     /**
@@ -174,7 +174,7 @@ public class CopacImporter extends ImportFormat {
         return results;
     }
 
-    void setOrAppend(BibtexEntry b, String field, String value, String separator) {
+    private void setOrAppend(BibtexEntry b, String field, String value, String separator) {
         String o = b.getField(field);
         if (o != null) {
             b.setField(field, o + separator + value);

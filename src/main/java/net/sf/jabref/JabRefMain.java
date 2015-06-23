@@ -41,7 +41,7 @@ import javax.swing.JScrollPane;
  */
 public class JabRefMain {
 
-    public static String exceptionToString(Throwable t) {
+    private static String exceptionToString(Throwable t) {
         StringWriter stackTraceWriter = new StringWriter();
         t.printStackTrace(new PrintWriter(stackTraceWriter));
         return stackTraceWriter.toString();

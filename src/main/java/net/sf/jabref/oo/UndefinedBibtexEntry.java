@@ -22,7 +22,7 @@ import net.sf.jabref.Util;
  * Subclass of BibtexEntry for representing entries referenced in a document that can't
  * be found in JabRef's current database.
  */
-public class UndefinedBibtexEntry extends BibtexEntry {
+class UndefinedBibtexEntry extends BibtexEntry {
 
     private final String key;
 

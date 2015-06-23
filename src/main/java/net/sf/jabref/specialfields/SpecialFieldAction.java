@@ -26,7 +26,7 @@ public class SpecialFieldAction extends BaseAction {
     private final JabRefFrame frame;
     private final String doneTextPattern;
     private final SpecialField c;
-    final String value;
+    private final String value;
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
 

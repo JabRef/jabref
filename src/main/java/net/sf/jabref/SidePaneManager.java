@@ -30,16 +30,16 @@ import javax.swing.event.ChangeListener;
  */
 public class SidePaneManager {
 
-    final JabRefFrame frame;
+    private final JabRefFrame frame;
 
     BasePanel panel;
 
-    final SidePane sidep;
+    private final SidePane sidep;
 
-    final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
-    final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
+    private final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
+    private final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
 
-    final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
+    private final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
 
 
     public SidePaneManager(JabRefFrame frame) {
@@ -137,7 +137,7 @@ public class SidePaneManager {
         return components.get(name);
     }
 
-    public String getComponentName(SidePaneComponent comp) {
+    private String getComponentName(SidePaneComponent comp) {
         return componentNames.get(comp);
     }
 
@@ -265,7 +265,7 @@ public class SidePaneManager {
      * 
      * @param panel
      */
-    public void setActiveBasePanel(BasePanel panel) {
+    private void setActiveBasePanel(BasePanel panel) {
         for (String key : components.keySet()) {
             components.get(key).setActiveBasePanel(panel);
         }

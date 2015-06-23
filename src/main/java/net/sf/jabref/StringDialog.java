@@ -52,25 +52,25 @@ import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableRemoveString;
 import net.sf.jabref.undo.UndoableStringChange;
 
-public class StringDialog extends JDialog {
+class StringDialog extends JDialog {
 
     // A reference to the entry this object works on.
-    final BibtexDatabase base;
-    final JabRefFrame frame;
-    final BasePanel panel;
-    final JabRefPreferences prefs;
-    TreeSet<BibtexString> stringsSet; // Our locally sorted set of strings.
-    Object[] strings;
+    private final BibtexDatabase base;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefPreferences prefs;
+    private TreeSet<BibtexString> stringsSet; // Our locally sorted set of strings.
+    private Object[] strings;
 
     // Layout objects.
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    final Container conPane = getContentPane();
-    final JToolBar tlb = new JToolBar();
-    final JPanel pan = new JPanel();
-    final StringTable table;
-    final HelpAction helpAction;
+    private final Container conPane = getContentPane();
+    private final JToolBar tlb = new JToolBar();
+    private final JPanel pan = new JPanel();
+    private final StringTable table;
+    private final HelpAction helpAction;
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel,
@@ -321,7 +321,7 @@ public class StringDialog extends JDialog {
     }
 
 
-    protected boolean isNumber(String name) {
+    private boolean isNumber(String name) {
         // A pure integer number can not be used as a string label,
         // since Bibtex will read it as a number.
         try {
@@ -333,7 +333,7 @@ public class StringDialog extends JDialog {
 
     }
 
-    protected void assureNotEditing() {
+    void assureNotEditing() {
         if (table.isEditing()) {
             int col = table.getEditingColumn(), row = table.getEditingRow();
             table.getCellEditor(row, col).stopCellEditing();
@@ -342,7 +342,7 @@ public class StringDialog extends JDialog {
 
 
     // The action concerned with closing the window.
-    final CloseAction closeAction = new CloseAction(this);
+    private final CloseAction closeAction = new CloseAction(this);
 
 
     class CloseAction extends AbstractAction {
@@ -371,7 +371,7 @@ public class StringDialog extends JDialog {
     }
 
 
-    final NewStringAction newStringAction = new NewStringAction(this);
+    private final NewStringAction newStringAction = new NewStringAction(this);
 
 
     class NewStringAction extends AbstractAction {
@@ -463,7 +463,7 @@ public class StringDialog extends JDialog {
     }
 
 
-    final RemoveStringAction removeStringAction = new RemoveStringAction(this);
+    private final RemoveStringAction removeStringAction = new RemoveStringAction(this);
 
 
     class RemoveStringAction extends AbstractAction {
@@ -590,7 +590,7 @@ public class StringDialog extends JDialog {
     }
     }*/
 
-    final UndoAction undoAction = new UndoAction();
+    private final UndoAction undoAction = new UndoAction();
 
 
     class UndoAction extends AbstractAction {
@@ -610,7 +610,7 @@ public class StringDialog extends JDialog {
     }
 
 
-    final RedoAction redoAction = new RedoAction();
+    private final RedoAction redoAction = new RedoAction();
 
 
     class RedoAction extends AbstractAction {

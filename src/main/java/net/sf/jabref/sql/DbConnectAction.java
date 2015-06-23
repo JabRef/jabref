@@ -46,7 +46,7 @@ public class DbConnectAction extends BaseAction {
     }
 
 
-    class DbImpAction extends AbstractAction {
+    private class DbImpAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {

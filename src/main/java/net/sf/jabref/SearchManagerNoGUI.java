@@ -28,12 +28,12 @@ import net.sf.jabref.imports.*;
  *
  * @author Silberer, Zirn
  */
-public class SearchManagerNoGUI {
+class SearchManagerNoGUI {
 
     private String searchTerm;
     private final BibtexDatabase database;
     private BibtexDatabase base = null;
-    final Hashtable<String, String> searchOptions = new Hashtable<String, String>();
+    private final Hashtable<String, String> searchOptions = new Hashtable<String, String>();
 
 
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {

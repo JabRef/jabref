@@ -36,18 +36,18 @@ import net.sf.jabref.imports.ParserResult;
 
 public class ChangeScanner implements Runnable {
 
-    final double MATCH_THRESHOLD = 0.4;
-    final String[] sortBy = new String[] {"year", "author", "title"};
+    private final double MATCH_THRESHOLD = 0.4;
+    private final String[] sortBy = new String[] {"year", "author", "title"};
 
-    final File f;
+    private final File f;
 
-    final BibtexDatabase inMem;
-    final MetaData mdInMem;
-    final BasePanel panel;
-    final JabRefFrame frame;
+    private final BibtexDatabase inMem;
+    private final MetaData mdInMem;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
 
-    BibtexDatabase inTemp = null;
-    MetaData mdInTemp;
+    private BibtexDatabase inTemp = null;
+    private MetaData mdInTemp;
 
 
     /**
@@ -56,7 +56,7 @@ public class ChangeScanner implements Runnable {
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
     //ArrayList changes = new ArrayList();
-    final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
 
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
@@ -498,7 +498,7 @@ public class ChangeScanner implements Runnable {
      * determine the type of change. This would be possible, but difficult to do
      * properly, so I rather only report the change.
      */
-    public void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
+    private void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if ((groupsTmp == null) && (groupsDisk == null)) {

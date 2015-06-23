@@ -54,7 +54,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    static final XMLChars xc = new XMLChars();
+    private static final XMLChars xc = new XMLChars();
 
 
     @Override
@@ -100,7 +100,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
         return fieldText;*/
     }
 
-    public void addBody(StringBuilder sb, AuthorList al, String tagName) {
+    void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.size(); i++) {
             sb.append("<").append(tagName).append(">");
             AuthorList.Author a = al.getAuthor(i);

@@ -33,15 +33,15 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Handler extends DefaultHandler {
 
-    final BibtexEntry entry;
+    private final BibtexEntry entry;
 
-    StringBuffer authors;
+    private StringBuffer authors;
 
-    String keyname;
+    private String keyname;
 
-    String forenames;
+    private String forenames;
 
-    StringBuffer characters;
+    private StringBuffer characters;
 
 
     public OAI2Handler(BibtexEntry be) {

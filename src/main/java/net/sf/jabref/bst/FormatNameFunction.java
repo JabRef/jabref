@@ -40,7 +40,7 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class FormatNameFunction implements BstFunction {
 
-    final VM vm;
+    private final VM vm;
 
 
     public FormatNameFunction(VM vm) {

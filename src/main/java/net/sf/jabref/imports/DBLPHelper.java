@@ -20,7 +20,7 @@ import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
 
-public class DBLPHelper {
+class DBLPHelper {
 
     private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
 

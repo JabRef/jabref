@@ -45,31 +45,36 @@ import java.util.regex.Pattern;
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
-    String name = null;
-    final SortedSet<String> journals = new TreeSet<String>();
+    private String name = null;
+    private final SortedSet<String> journals = new TreeSet<String>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
-    final LayoutFormatter fieldFormatter = new OOPreFormatter();
+    private final LayoutFormatter fieldFormatter = new OOPreFormatter();
 
-    Layout defaultBibLayout;
+    private Layout defaultBibLayout;
 
     // reference layout mapped from entry type number:
-    final HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
+    private final HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
 
-    final HashMap<String, Object> properties = new HashMap<String, Object>();
-    final HashMap<String, Object> citProperties = new HashMap<String, Object>();
+    private final HashMap<String, Object> properties = new HashMap<String, Object>();
+    private final HashMap<String, Object> citProperties = new HashMap<String, Object>();
 
-    final Pattern numPattern = Pattern.compile("-?\\d+");
+    private final Pattern numPattern = Pattern.compile("-?\\d+");
 
-    boolean valid = false;
+    private boolean valid = false;
 
-    final static int NONE = 0, LAYOUT = 1, PROPERTIES = 2, CITATION = 3, NAME = 4, JOURNALS = 5;
-    final static String LAYOUT_MRK = "LAYOUT",
-            PROPERTIES_MARK = "PROPERTIES",
-            CITATION_MARK = "CITATION",
-            NAME_MARK = "NAME",
-            JOURNALS_MARK = "JOURNALS",
-            DEFAULT_MARK = "default";
+    private final static int NONE = 0;
+    private final static int LAYOUT = 1;
+    private final static int PROPERTIES = 2;
+    private final static int CITATION = 3;
+    private final static int NAME = 4;
+    private final static int JOURNALS = 5;
+    private final static String LAYOUT_MRK = "LAYOUT";
+    private final static String PROPERTIES_MARK = "PROPERTIES";
+    private final static String CITATION_MARK = "CITATION";
+    private final static String NAME_MARK = "NAME";
+    private final static String JOURNALS_MARK = "JOURNALS";
+    private final static String DEFAULT_MARK = "default";
     private File styleFile = null;
     private static long styleFileModificationTime = Long.MIN_VALUE;
     private final String COMBINED_ENTRIES_SEPARATOR = "-";
@@ -160,7 +165,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * information.
      * @throws Exception
      */
-    public void reload() throws Exception {
+    private void reload() throws Exception {
         if (styleFile != null) {
             OOBibStyle.styleFileModificationTime = (styleFile).lastModified();
             initialize(new FileReader(styleFile));
@@ -172,7 +177,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * is unmodified since initialization.
      * @return true if the file has not been modified, false otherwise.
      */
-    public boolean isUpToDate() {
+    private boolean isUpToDate() {
         if (styleFile != null) {
             return styleFile.lastModified() == OOBibStyle.styleFileModificationTime;
         } else {
@@ -594,12 +599,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param uniquifiers Optional parameter to separate similar citations. Elements can be null if not needed.
      * @return The formatted citation.
      */
-    public String getAuthorYearParenthesisMarker(BibtexEntry[] entries, BibtexDatabase database,
-            String authorField, String yearField,
-            int maxA, String authorSep,
-            String andString, String etAlString, String yearSep,
-            String startBrace, String endBrace, String citationSeparator,
-            String[] uniquifiers, int[] unlimAuthors) {
+    private String getAuthorYearParenthesisMarker(BibtexEntry[] entries, BibtexDatabase database,
+                                                  String authorField, String yearField,
+                                                  int maxA, String authorSep,
+                                                  String andString, String etAlString, String yearSep,
+                                                  String startBrace, String endBrace, String citationSeparator,
+                                                  String[] uniquifiers, int[] unlimAuthors) {
 
         StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
@@ -668,11 +673,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param uniquefiers Optional parameters to separate similar citations. Can be null if not needed.
      * @return The formatted citation.
      */
-    public String getAuthorYearInTextMarker(BibtexEntry[] entries, BibtexDatabase database, String authorField,
-            String yearField, int maxA, String authorSep,
-            String andString, String etAlString, String yearSep,
-            String startBrace, String endBrace, String citationSeparator,
-            String[] uniquefiers, int[] unlimAuthors) {
+    private String getAuthorYearInTextMarker(BibtexEntry[] entries, BibtexDatabase database, String authorField,
+                                             String yearField, int maxA, String authorSep,
+                                             String andString, String etAlString, String yearSep,
+                                             String startBrace, String endBrace, String citationSeparator,
+                                             String[] uniquefiers, int[] unlimAuthors) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < entries.length; i++) {
 
@@ -730,7 +735,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *   field names by /. E.g. to use "author" with "editor" as backup, specify "author/editor".
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
-    public String getCitationMarkerField(BibtexEntry entry, BibtexDatabase database, String field) {
+    private String getCitationMarkerField(BibtexEntry entry, BibtexDatabase database, String field) {
         String[] fields = field.split("/");
         for (String s : fields) {
             String content = BibtexDatabase.getResolvedField(s, entry, database);
@@ -751,7 +756,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param number The number of the author to return.
      * @return The author name, or an empty String if inapplicable.
      */
-    public String getAuthorLastName(AuthorList al, int number) {
+    private String getAuthorLastName(AuthorList al, int number) {
         StringBuilder sb = new StringBuilder();
 
         if (al.size() > number) {

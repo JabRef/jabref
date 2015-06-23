@@ -49,7 +49,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
-    public static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
+    private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
         try {
@@ -90,7 +90,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    public static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
+    private static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
@@ -104,7 +104,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    public static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
+    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {

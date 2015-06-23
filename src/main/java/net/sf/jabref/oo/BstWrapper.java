@@ -35,10 +35,10 @@ import java.util.regex.Pattern;
  *
  * Wrapper for using JabRef's bst engine for formatting OO bibliography.
  */
-public class BstWrapper {
+class BstWrapper {
 
-    final LayoutFormatter formatter = new FormatChars();
-    VM vm = null;
+    private final LayoutFormatter formatter = new FormatChars();
+    private VM vm = null;
 
 
     public BstWrapper() {
@@ -71,7 +71,7 @@ public class BstWrapper {
     }
 
 
-    static final Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
+    private static final Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
 
 
     private Map<String, String> parseResult(String result) {

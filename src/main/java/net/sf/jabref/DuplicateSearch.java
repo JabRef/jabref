@@ -32,10 +32,10 @@ import spin.Spin;
 
 public class DuplicateSearch implements Runnable {
 
-    final BasePanel panel;
-    BibtexEntry[] bes;
-    final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
-    boolean autoRemoveExactDuplicates = false;
+    private final BasePanel panel;
+    private BibtexEntry[] bes;
+    private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
+    private boolean autoRemoveExactDuplicates = false;
 
 
     public DuplicateSearch(BasePanel bp) {

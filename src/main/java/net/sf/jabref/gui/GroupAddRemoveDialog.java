@@ -32,8 +32,8 @@ public class GroupAddRemoveDialog extends BaseAction {
     private final boolean add;
     private boolean move = false;
     private BibtexEntry[] selection = null;
-    JTree tree;
-    JButton ok;
+    private JTree tree;
+    private JButton ok;
 
 
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
@@ -142,7 +142,7 @@ public class GroupAddRemoveDialog extends BaseAction {
 
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
-    public void expandAll(final JTree tree, final boolean expand) {
+    private void expandAll(final JTree tree, final boolean expand) {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -174,7 +174,7 @@ public class GroupAddRemoveDialog extends BaseAction {
     }
 
 
-    class SelectionListener implements TreeSelectionListener {
+    private class SelectionListener implements TreeSelectionListener {
 
         @Override
         public void valueChanged(TreeSelectionEvent e) {
@@ -185,7 +185,7 @@ public class GroupAddRemoveDialog extends BaseAction {
     }
 
 
-    protected boolean doAddOrRemove() {
+    private boolean doAddOrRemove() {
         GroupTreeNode node = (GroupTreeNode) tree.getSelectionPath().getLastPathComponent();
         AbstractGroup group = node.getGroup();
         if (checkGroupEnable(group)) {

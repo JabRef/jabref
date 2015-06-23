@@ -62,16 +62,16 @@ public class MedlineFetcher implements EntryFetcher {
     /**
      * How many entries to query in one request
      */
-    public static final int PACING = 20;
+    private static final int PACING = 20;
 
-    boolean shouldContinue;
+    private boolean shouldContinue;
 
     OutputPrinter frame;
 
     ImportInspector dialog;
 
 
-    public String toSearchTerm(String in) {
+    private String toSearchTerm(String in) {
         Pattern part1 = Pattern.compile(", ");
         Pattern part2 = Pattern.compile(",");
         Pattern part3 = Pattern.compile(" ");
@@ -89,7 +89,7 @@ public class MedlineFetcher implements EntryFetcher {
     /**
      * Gets the initial list of ids
      */
-    public SearchResult getIds(String term, int start, int pacing) {
+    private SearchResult getIds(String term, int start, int pacing) {
 
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils";
         String medlineUrl = baseUrl + "/esearch.fcgi?db=pubmed&retmax=" + Integer.toString(pacing) +

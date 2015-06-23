@@ -53,15 +53,15 @@ import javax.swing.JOptionPane;
 
 public class BibtexDatabase {
 
-    final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
+    private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
 
-    String _preamble = null;
+    private String _preamble = null;
 
-    final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
+    private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 
     Vector<String> _strings_ = new Vector<String>();
 
-    final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
     private boolean followCrossrefs = true;
 
@@ -515,7 +515,7 @@ public class BibtexDatabase {
     //############################################
     // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
-    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
+    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
         // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
         boolean duplicate;
@@ -598,7 +598,7 @@ public class BibtexDatabase {
         }
     }
 
-    public void fireDatabaseChanged(DatabaseChangeEvent e) {
+    private void fireDatabaseChanged(DatabaseChangeEvent e) {
         for (DatabaseChangeListener listener : changeListeners) {
             listener.databaseChanged(e);
         }

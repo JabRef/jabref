@@ -31,7 +31,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
     /**
      * The parent of this LabelPattern.
      */
-    protected LabelPattern parent = null;
+    private LabelPattern parent = null;
 
 
     public LabelPattern() {

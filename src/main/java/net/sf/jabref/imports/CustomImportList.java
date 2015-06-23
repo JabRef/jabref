@@ -166,7 +166,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
         }
     }
 
-    public void addImporter(Importer customImporter) {
+    private void addImporter(Importer customImporter) {
         super.add(customImporter);
     }
 

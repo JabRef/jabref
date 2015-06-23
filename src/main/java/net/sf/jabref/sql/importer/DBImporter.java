@@ -195,16 +195,16 @@ public abstract class DBImporter extends DBImporterExporter {
      * @return The name (JabRef type id) of the group type.
      * @throws SQLException
      */
-    public String findGroupTypeName(String groupId, Connection conn)
+    private String findGroupTypeName(String groupId, Connection conn)
             throws SQLException {
         return SQLUtil.processQueryWithSingleResult(conn,
                 "SELECT label FROM group_types WHERE group_types_id='"
                         + groupId + "';");
     }
 
-    public void importGroupsTree(MetaData metaData,
-            HashMap<String, BibtexEntry> entries, Connection conn,
-            String database_id) throws SQLException {
+    private void importGroupsTree(MetaData metaData,
+                                  HashMap<String, BibtexEntry> entries, Connection conn,
+                                  String database_id) throws SQLException {
         HashMap<String, GroupTreeNode> groups = new HashMap<String, GroupTreeNode>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<GroupTreeNode, String>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());

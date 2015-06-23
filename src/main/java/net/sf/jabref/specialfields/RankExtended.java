@@ -12,7 +12,7 @@ public class RankExtended extends Rank {
     private static RankExtended INSTANCE = null;
 
 
-    public RankExtended() {
+    private RankExtended() {
         super();
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));

@@ -28,7 +28,7 @@ import java.util.HashMap;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    public static final HashMap<String, String> CHARS = new HashMap<String, String>();
+    private static final HashMap<String, String> CHARS = new HashMap<String, String>();
 
     static {
         // Following character definitions contributed by Ervin Kolenovic:

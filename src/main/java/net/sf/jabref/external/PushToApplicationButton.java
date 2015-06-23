@@ -299,7 +299,7 @@ public class PushToApplicationButton implements ActionListener {
         }
     }
 
-    class MenuButtonActionListener implements ActionListener {
+    private class MenuButtonActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -365,7 +365,7 @@ public class PushToApplicationButton implements ActionListener {
     /**
      * Comparator for sorting the selection according to name.
      */
-    static class PushToApplicationComparator implements Comparator<PushToApplication> {
+    private static class PushToApplicationComparator implements Comparator<PushToApplication> {
 
         @Override
         public int compare(PushToApplication one, PushToApplication two) {

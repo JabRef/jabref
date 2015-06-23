@@ -53,11 +53,11 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * With this design, it should be very easy to add new tabs later.
  * 
  */
-public class PrefsDialog3 extends JDialog {
+class PrefsDialog3 extends JDialog {
 
-    final JPanel main;
+    private final JPanel main;
 
-    final JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public PrefsDialog3(JabRefFrame parent) {

@@ -19,7 +19,7 @@ package net.sf.jabref;
  * This class defines entry types for BibLatex support.
  */
 
-public class BibLatexEntryTypes {
+class BibLatexEntryTypes {
 
     /*
         "rare" fields?

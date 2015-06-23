@@ -23,14 +23,14 @@ import java.util.Map;
  */
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
-    protected final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
+    private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
-    protected final JTable glTable;
-    protected final JButton ok = new JButton(Globals.lang("Ok"));
-    protected final JButton cancel = new JButton(Globals.lang("Cancel"));
-    protected final JButton selectAll = new JButton(Globals.lang("Select all"));
-    protected final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
-    protected boolean okPressed = false;
+    private final JTable glTable;
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton selectAll = new JButton(Globals.lang("Select all"));
+    private final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    private boolean okPressed = false;
     private final JabRefFrame frame;
     private final int warningLimit;
 
@@ -123,7 +123,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
      * to go on.
      * @return true if we should go on
      */
-    public boolean verifySelection() {
+    private boolean verifySelection() {
         int selected = 0;
         for (TableEntry entry : entries) {
             if (entry.isWanted()) {
@@ -161,7 +161,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         glTable.repaint();
     }
 
-    public void setSelectionAll(boolean select) {
+    private void setSelectionAll(boolean select) {
         for (int i = 0; i < glTable.getRowCount(); i++) {
             glTable.setValueAt(select, i, 0);
         }
@@ -255,7 +255,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         }
     }
 
-    static class EntryTableFormat implements TableFormat<TableEntry> {
+    private static class EntryTableFormat implements TableFormat<TableEntry> {
 
         @Override
         public int getColumnCount() {

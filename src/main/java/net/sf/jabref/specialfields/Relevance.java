@@ -27,7 +27,7 @@ public class Relevance extends SpecialField {
     private static Relevance INSTANCE;
 
 
-    public Relevance() {
+    private Relevance() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         // action directly set by JabRefFrame
         values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Globals.lang("Toggle relevance"), GUIGlobals.getImage("relevant"), Globals.lang("Toggle relevance")));

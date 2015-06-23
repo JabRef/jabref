@@ -28,7 +28,7 @@ import java.awt.event.ActionListener;
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 
     private final JabRefFrame frame;
-    final int level;
+    private final int level;
     private final JMenuItem menuItem;
     private int besLength = 0;
 

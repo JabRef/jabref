@@ -15,7 +15,7 @@ import net.sf.jabref.undo.NamedCompound;
  * This Action may only be used in a menu or button.
  * Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
  */
-public class AutoLinkFilesAction extends AbstractAction {
+class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
         putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));

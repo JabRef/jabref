@@ -44,13 +44,13 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 /**
  * Dialog box for choosing an icon for an external file type.
  */
-public class IconSelection extends JDialog {
+class IconSelection extends JDialog {
 
-    JList icons;
-    List<String> iconKeys;
-    DefaultListModel listModel;
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private JList icons;
+    private List<String> iconKeys;
+    private DefaultListModel listModel;
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private boolean okPressed = false;
     private int selected = -1;
     private final JDialog parent;

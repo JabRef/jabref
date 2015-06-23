@@ -48,33 +48,33 @@ import com.jgoodies.forms.layout.FormLayout;
  * Time: 7:57:29 PM
  * To browseOld this template use File | Settings | File Templates.
  */
-public class ManageJournalsPanel extends JPanel {
+class ManageJournalsPanel extends JPanel {
 
-    final JabRefFrame frame;
-    final JTextField personalFile = new JTextField();
-    final AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
-    JTable userTable; // builtInTable
-    final JPanel userPanel = new JPanel();
-    final JPanel journalEditPanel;
-    final JPanel externalFilesPanel = new JPanel();
-    final JPanel addExtPan = new JPanel();
-    final JTextField nameTf = new JTextField();
-    final JTextField newNameTf = new JTextField();
-    final JTextField abbrTf = new JTextField();
-    final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
-    final JDialog dialog;
-    final JRadioButton newFile = new JRadioButton(Globals.lang("New file"));
-    final JRadioButton oldFile = new JRadioButton(Globals.lang("Existing file"));
+    private final JabRefFrame frame;
+    private final JTextField personalFile = new JTextField();
+    private final AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
+    private JTable userTable; // builtInTable
+    private final JPanel userPanel = new JPanel();
+    private final JPanel journalEditPanel;
+    private final JPanel externalFilesPanel = new JPanel();
+    private final JPanel addExtPan = new JPanel();
+    private final JTextField nameTf = new JTextField();
+    private final JTextField newNameTf = new JTextField();
+    private final JTextField abbrTf = new JTextField();
+    private final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    private final JDialog dialog;
+    private final JRadioButton newFile = new JRadioButton(Globals.lang("New file"));
+    private final JRadioButton oldFile = new JRadioButton(Globals.lang("Existing file"));
 
-    final JButton add = new JButton(GUIGlobals.getImage("add"));
-    final JButton remove = new JButton(GUIGlobals.getImage("remove"));
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final JButton help = new JButton(Globals.lang("Help"));
-    final JButton browseOld = new JButton(Globals.lang("Browse"));
-    final JButton browseNew = new JButton(Globals.lang("Browse"));
-    final JButton addExt = new JButton(GUIGlobals.getImage("add"));
-    final JButton viewBuiltin = new JButton(Globals.lang("View"));
+    private final JButton add = new JButton(GUIGlobals.getImage("add"));
+    private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton help = new JButton(Globals.lang("Help"));
+    private final JButton browseOld = new JButton(Globals.lang("Browse"));
+    private final JButton browseNew = new JButton(Globals.lang("Browse"));
+    private final JButton addExt = new JButton(GUIGlobals.getImage("add"));
+    private final JButton viewBuiltin = new JButton(Globals.lang("View"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -317,7 +317,7 @@ public class ManageJournalsPanel extends JPanel {
 
     }
 
-    public void setupUserTable() {
+    private void setupUserTable() {
         JournalAbbreviations userAbbr = new JournalAbbreviations();
         String filename = personalFile.getText();
         if (!filename.equals("") && (new File(filename)).exists()) {
@@ -334,7 +334,7 @@ public class ManageJournalsPanel extends JPanel {
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
 
-    public boolean readyToClose() {
+    private boolean readyToClose() {
         File f;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
@@ -357,7 +357,7 @@ public class ManageJournalsPanel extends JPanel {
         return true;
     }
 
-    public void storeSettings() throws FileNotFoundException {
+    private void storeSettings() throws FileNotFoundException {
         File f = null;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {

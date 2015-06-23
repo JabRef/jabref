@@ -49,7 +49,7 @@ import java.util.regex.Matcher;
  */
 public class CaseChangers {
 
-    public static final String SPACE_SEPARATOR = " ";
+    private static final String SPACE_SEPARATOR = " ";
 
 
     public interface CaseChanger {

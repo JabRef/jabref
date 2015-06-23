@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class FieldComparatorStack<T> implements Comparator<T> {
 
-    final List<? extends Comparator<? super T>> comparators;
+    private final List<? extends Comparator<? super T>> comparators;
 
 
     public FieldComparatorStack(List<? extends Comparator<? super T>> comparators) {

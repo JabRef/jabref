@@ -26,8 +26,8 @@ import net.sf.jabref.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
-    protected GroupTreeNode m_node;
-    protected BasePanel m_panel;
+    private GroupTreeNode m_node;
+    private BasePanel m_panel;
 
 
     public RemoveFromGroupAction(GroupTreeNode node, BasePanel panel) {

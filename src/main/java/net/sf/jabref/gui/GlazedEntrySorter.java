@@ -28,7 +28,7 @@ import ca.odell.glazedlists.EventList;
 
 public class GlazedEntrySorter implements DatabaseChangeListener {
 
-    final EventList<BibtexEntry> list;
+    private final EventList<BibtexEntry> list;
 
     String[] idArray;
     BibtexEntry[] entryArray;

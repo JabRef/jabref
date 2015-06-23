@@ -7,7 +7,7 @@ import javax.swing.text.html.ParagraphView;
 
 class HTMLParagraphView extends ParagraphView {
 
-    public static final int MAX_VIEW_SIZE = 100;
+    private static final int MAX_VIEW_SIZE = 100;
 
 
     public HTMLParagraphView(Element elem) {
@@ -16,7 +16,7 @@ class HTMLParagraphView extends ParagraphView {
     }
 
 
-    public static class HTMLFlowStrategy extends FlowStrategy {
+    private static class HTMLFlowStrategy extends FlowStrategy {
 
         @Override
         protected View createView(FlowView fv, int startOffset, int spanLeft, int rowIndex) {

@@ -40,13 +40,13 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 public class JournalAbbreviations {
 
-    static final String TOOLTIPTEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
+    private static final String TOOLTIPTEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
             + "if the journal name is known.")
             + "<BR>" + Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
-    final TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
-    final HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
-    final HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
-    final TreeMap<String, String> all = new TreeMap<String, String>();
+    private final TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
+    private final HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
+    private final HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
+    private final TreeMap<String, String> all = new TreeMap<String, String>();
 
 
     public JournalAbbreviations() {
@@ -65,21 +65,21 @@ public class JournalAbbreviations {
      * Get an iterator for the known journals in alphabetical order.
      * @return Iterator for journal full names
      */
-    public Iterator<String> fullNameIterator() {
+    private Iterator<String> fullNameIterator() {
         return fullNameKeyed.keySet().iterator();
     }
 
-    public boolean isKnownName(String journalName) {
+    private boolean isKnownName(String journalName) {
         String s = journalName.toLowerCase();
         return ((fullNameKeyed.get(s) != null) || (abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
-    public boolean isAbbreviatedName(String journalName) {
+    private boolean isAbbreviatedName(String journalName) {
         String s = journalName.toLowerCase();
         return ((abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
-    public String dotsToNodots(String name) {
+    private String dotsToNodots(String name) {
         return name.replaceAll("\\.", " ").replaceAll("  ", " ").trim();
     }
 
@@ -119,7 +119,7 @@ public class JournalAbbreviations {
      * @param journalName The abbreviation to resolve.
      * @return The full name, or null if it couldn't be found.
      */
-    public String getFullName(String journalName) {
+    private String getFullName(String journalName) {
         // Normalize name first:
         String s = getAbbreviatedName(journalName, true);
         if (s != null) {
@@ -159,7 +159,7 @@ public class JournalAbbreviations {
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
      * @param in
      */
-    public void readJournalList(Reader in) {
+    private void readJournalList(Reader in) {
         BufferedReader reader = new BufferedReader(in);
         try {
             String line;

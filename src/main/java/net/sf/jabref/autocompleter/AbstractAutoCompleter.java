@@ -38,7 +38,7 @@ import net.sf.jabref.JabRefPreferences;
 public abstract class AbstractAutoCompleter {
 
     public static int SHORTEST_TO_COMPLETE = Globals.prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE);
-    public static final int SHORTEST_WORD = 4;
+    private static final int SHORTEST_WORD = 4;
 
     // stores the strings as is
     private final TreeSet<String> _index_casesensitive = new TreeSet<String>();

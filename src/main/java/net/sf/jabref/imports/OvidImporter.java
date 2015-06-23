@@ -34,19 +34,19 @@ import net.sf.jabref.AuthorList;
  */
 public class OvidImporter extends ImportFormat {
 
-    public static final Pattern ovid_src_pat = Pattern
+    private static final Pattern ovid_src_pat = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
-    public static final Pattern ovid_src_pat_no_issue = Pattern
+    private static final Pattern ovid_src_pat_no_issue = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
-    public static final Pattern ovid_src_pat_2 = Pattern.compile(
+    private static final Pattern ovid_src_pat_2 = Pattern.compile(
             "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)");
 
-    public static final Pattern incollection_pat = Pattern.compile(
+    private static final Pattern incollection_pat = Pattern.compile(
             "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. "
                     + "([\\w, ]+): ([\\w, ]+)");
-    public static final Pattern book_pat = Pattern.compile(
+    private static final Pattern book_pat = Pattern.compile(
             "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
 
 
@@ -71,7 +71,7 @@ public class OvidImporter extends ImportFormat {
     }
 
 
-    static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
+    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
 
 
     /**

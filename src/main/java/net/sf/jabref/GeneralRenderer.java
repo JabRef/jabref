@@ -25,7 +25,8 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/extends DefaultTableCellRenderer {
 
-    Color background, selBackground = null;
+    private Color background;
+    private Color selBackground = null;
 
 
     public GeneralRenderer(Color c) {

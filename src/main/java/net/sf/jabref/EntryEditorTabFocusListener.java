@@ -29,9 +29,9 @@ import java.awt.event.FocusListener;
  */
 class EntryEditorTabFocusListener implements FocusListener {
 
-    JTextComponent c;
+    private JTextComponent c;
 
-    DocumentListener d;
+    private DocumentListener d;
     private final EntryEditorTab entryEditorTab;
 
 

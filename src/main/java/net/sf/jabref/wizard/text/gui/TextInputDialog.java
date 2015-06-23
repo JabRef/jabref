@@ -144,7 +144,7 @@ public class TextInputDialog
 
     private final BibtexEntry entry;
 
-    public final JPopupMenu inputMenu = new JPopupMenu();
+    private final JPopupMenu inputMenu = new JPopupMenu();
     private StyledDocument doc; // content from inputPane
     private JTextPane textPane;
     private JTextArea preview;
@@ -442,7 +442,7 @@ public class TextInputDialog
 
     // ---------------------------------------------------------------------------
     // ---------------------------------------------------------------------------
-    protected void addStylesToDocument(StyledDocument doc)
+    private void addStylesToDocument(StyledDocument doc)
     {
         //Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().
@@ -828,7 +828,7 @@ public class TextInputDialog
 
     //---------------------------------------------------------------
 
-    class FieldListMouseListener
+    private class FieldListMouseListener
             extends MouseAdapter
     {
 

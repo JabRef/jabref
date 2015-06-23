@@ -23,16 +23,16 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableStringChange;
 
-public class StringChange extends Change {
+class StringChange extends Change {
 
-    final BibtexString string;
-    final String mem;
-    final String tmp;
-    final String disk;
-    final String label;
+    private final BibtexString string;
+    private final String mem;
+    private final String tmp;
+    private final String disk;
+    private final String label;
 
-    final InfoPane tp = new InfoPane();
-    final JScrollPane sp = new JScrollPane(tp);
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
 
 

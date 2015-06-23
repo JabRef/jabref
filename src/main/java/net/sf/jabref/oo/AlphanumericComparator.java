@@ -25,12 +25,12 @@ import java.util.Comparator;
  *
  * TODO: is it sufficient with a hardcoded sort algorithm for the bibliography?
  */
-public class AlphanumericComparator implements Comparator<BibtexEntry> {
+class AlphanumericComparator implements Comparator<BibtexEntry> {
 
-    final FieldComparator authComp = new FieldComparator("author");
-    final FieldComparator editorComp = new FieldComparator("editor");
-    final FieldComparator yearComp = new FieldComparator("year");
-    final FieldComparator titleComp = new FieldComparator("title");
+    private final FieldComparator authComp = new FieldComparator("author");
+    private final FieldComparator editorComp = new FieldComparator("editor");
+    private final FieldComparator yearComp = new FieldComparator("year");
+    private final FieldComparator titleComp = new FieldComparator("title");
 
 
     public AlphanumericComparator() {

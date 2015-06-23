@@ -45,13 +45,15 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final JRadioButton autoCompFirstNameMode_Full;
     private final JRadioButton autoCompFirstNameMode_Abbr;
     private final JRadioButton autoCompFirstNameMode_Both;
-    boolean oldAutoCompFF, oldAutoCompLF,
-            oldAutoCompFModeAbbr, oldAutoCompFModeFull;
+    private boolean oldAutoCompFF;
+    private boolean oldAutoCompLF;
+    private boolean oldAutoCompFModeAbbr;
+    private boolean oldAutoCompFModeFull;
     private final JSpinner shortestToComplete;
 
     private final JTextField autoCompFields;
-    final JabRefPreferences _prefs;
-    final JabRefFrame _frame;
+    private final JabRefPreferences _prefs;
+    private final JabRefFrame _frame;
 
 
     private void setAutoCompleteElementsEnabled(boolean enabled) {

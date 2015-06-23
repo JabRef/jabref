@@ -34,7 +34,7 @@ import java.util.ArrayList;
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    final List<File> fileList = new ArrayList<File>();
+    private final List<File> fileList = new ArrayList<File>();
 
 
     public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {

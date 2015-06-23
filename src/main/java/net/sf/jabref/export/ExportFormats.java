@@ -328,7 +328,7 @@ public class ExportFormats {
         return new ExportAction(frame, selectedOnly);
     }
 
-    public static JFileChooser createExportFileChooser(String currentDir) {
+    private static JFileChooser createExportFileChooser(String currentDir) {
         String lastUsedFormat = Globals.prefs.get("lastUsedExport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);

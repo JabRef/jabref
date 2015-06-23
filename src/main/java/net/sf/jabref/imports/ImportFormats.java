@@ -39,7 +39,7 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class ImportFormats {
 
-    public static JFileChooser createImportFileChooser(String currentDir) {
+    private static JFileChooser createImportFileChooser(String currentDir) {
 
         SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
 

@@ -58,28 +58,34 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    public static final String[]
-            PDF = {"pdf", "ps"},
-            URL_FIRST = {"url", "doi"},
-            DOI_FIRST = {"doi", "url"},
-            CITESEER = {"citeseerurl"},
-            ARXIV = {"eprint"},
-            RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING},
-            PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY},
-            RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE},
-            QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY},
-            PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED},
-            READ = {SpecialFieldsUtils.FIELDNAME_READ},
-            FILE = {GUIGlobals.FILE_FIELD};
+    private static final String[]
+            PDF = {"pdf", "ps"};
+    private static final String[] URL_FIRST = {"url", "doi"};
+    private static final String[] DOI_FIRST = {"doi", "url"};
+    public static final String[] CITESEER = {"citeseerurl"};
+    private static final String[] ARXIV = {"eprint"};
+    private static final String[] RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING};
+    private static final String[] PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY};
+    private static final String[] RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE};
+    private static final String[] QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY};
+    private static final String[] PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED};
+    private static final String[] READ = {SpecialFieldsUtils.FIELDNAME_READ};
+    public static final String[] FILE = {GUIGlobals.FILE_FIELD};
 
-    final BasePanel panel;
+    private final BasePanel panel;
 
     private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
     private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
-    int[][] nameCols = null;
-    boolean namesAsIs, abbr_names, namesNatbib, namesFf, namesLf, namesLastOnly, showShort;
+    private int[][] nameCols = null;
+    private boolean namesAsIs;
+    private boolean abbr_names;
+    private boolean namesNatbib;
+    private boolean namesFf;
+    private boolean namesLf;
+    private boolean namesLastOnly;
+    private boolean showShort;
 
 
     public MainTableFormat(BasePanel panel) {
@@ -318,13 +324,13 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return o;
     }
 
-    public boolean hasField(BibtexEntry be, String field) {
+    private boolean hasField(BibtexEntry be, String field) {
         // Returns true iff the entry has a nonzero value in its
         // 'search' field.
         return ((be != null) && (be.getFieldOrAlias(field) != null));
     }
 
-    public int[] hasField(BibtexEntry be, String[] field) {
+    private int[] hasField(BibtexEntry be, String[] field) {
         // If the entry has a nonzero value in any of the
         // 'search' fields, returns the smallest index for which it does. 
         // Otherwise returns -1. When field indicates one or more file types,
@@ -470,7 +476,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     }
 
 
-    static class NoSearchMatcher implements Matcher<BibtexEntry> {
+    private static class NoSearchMatcher implements Matcher<BibtexEntry> {
 
         @Override
         public boolean matches(BibtexEntry object) {

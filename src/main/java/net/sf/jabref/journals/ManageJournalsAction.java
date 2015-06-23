@@ -33,7 +33,7 @@ import javax.swing.Action;
  */
 public class ManageJournalsAction extends MnemonicAwareAction {
 
-    final JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public ManageJournalsAction(JabRefFrame frame) {

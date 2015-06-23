@@ -35,8 +35,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
      * Returns null if cancelled.
      */
 
-    BibtexEntryType type = null;
-    final CancelAction cancelAction = new CancelAction();
+    private BibtexEntryType type = null;
+    private final CancelAction cancelAction = new CancelAction();
     private static final int COLNUM = 3;
 
 

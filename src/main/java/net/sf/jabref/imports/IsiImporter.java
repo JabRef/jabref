@@ -71,7 +71,7 @@ public class IsiImporter extends ImportFormat {
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
-    static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
+    private static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
     /**
@@ -104,7 +104,7 @@ public class IsiImporter extends ImportFormat {
     }
 
 
-    static final Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
+    private static final Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
 
     static public void processSubSup(HashMap<String, String> map) {
@@ -138,7 +138,7 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    static public void processCapitalization(HashMap<String, String> map) {
+    private static void processCapitalization(HashMap<String, String> map) {
 
         String[] subsup = {"title", "journal", "publisher"};
 
@@ -361,7 +361,7 @@ public class IsiImporter extends ImportFormat {
         return bibitems;
     }
 
-    public static String parsePages(String value) {
+    private static String parsePages(String value) {
         int lastDash = value.lastIndexOf("-");
         return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
     }
@@ -439,7 +439,7 @@ public class IsiImporter extends ImportFormat {
 
     }
 
-    public static String[] isiAuthorsConvert(String[] authors) {
+    private static String[] isiAuthorsConvert(String[] authors) {
 
         String[] result = new String[authors.length];
         for (int i = 0; i < result.length; i++) {

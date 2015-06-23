@@ -52,22 +52,22 @@ import net.sf.jabref.Util;
  */
 public class FieldSetComponent extends JPanel implements ActionListener {
 
-    protected final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
-    protected final JList list;
-    protected JScrollPane sp = null;
-    protected DefaultListModel listModel;
-    protected JComboBox sel;
-    protected JTextField input;
-    protected JLabel title = null;
-    protected final JButton add;
-    protected final JButton remove;
-    protected JButton up = null;
-    protected JButton down = null;
-    protected final GridBagLayout gbl = new GridBagLayout();
-    protected final GridBagConstraints con = new GridBagConstraints();
-    protected final boolean forceLowerCase;
-    protected boolean changesMade = false;
-    protected final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
+    private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
+    final JList list;
+    private JScrollPane sp = null;
+    DefaultListModel listModel;
+    private JComboBox sel;
+    private JTextField input;
+    private JLabel title = null;
+    private final JButton add;
+    final JButton remove;
+    private JButton up = null;
+    private JButton down = null;
+    final GridBagLayout gbl = new GridBagLayout();
+    final GridBagConstraints con = new GridBagConstraints();
+    final boolean forceLowerCase;
+    boolean changesMade = false;
+    private final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
 
 
     /** 
@@ -82,12 +82,12 @@ public class FieldSetComponent extends JPanel implements ActionListener {
      * Creates a new instance of FieldSetComponent without preset selection
      * values. Replaces the JComboBox with a JTextField.
      */
-    public FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
+    FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
         this(title, fields, null, "Add", "Remove", arrows, forceLowerCase);
     }
 
-    public FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
-            boolean arrows, boolean forceLowerCase) {
+    private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
+                              boolean arrows, boolean forceLowerCase) {
         this.forceLowerCase = forceLowerCase;
         add = new JButton(Globals.lang(addText));
         remove = new JButton(Globals.lang(removeText));
@@ -231,7 +231,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
      * This method is called when a new field should be added to the list. Performs validation of the 
      * field.
      */
-    protected void addField(String s) {
+    void addField(String s) {
         s = s.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
@@ -256,7 +256,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
      * This method adds a new field to the list, without any regard to validation. This method can be
      * useful for classes that overrides addField(s) to provide different validation.
      */
-    protected void addFieldUncritically(String s) {
+    void addFieldUncritically(String s) {
         listModel.addElement(s);
         changesMade = true;
         for (ActionListener additionListener : additionListeners) {
@@ -265,7 +265,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
 
     }
 
-    protected void removeSelected() {
+    void removeSelected() {
         int[] selected = list.getSelectedIndices();
         if (selected.length > 0) {
             changesMade = true;
@@ -327,7 +327,7 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     /**
      * If a field is selected in the list, move it dy positions.
      */
-    public void move(int dy) {
+    private void move(int dy) {
         int oldIdx = list.getSelectedIndex();
         if (oldIdx < 0) {
             return;

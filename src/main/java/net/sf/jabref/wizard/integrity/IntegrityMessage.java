@@ -92,7 +92,7 @@ public class IntegrityMessage implements Cloneable
         msg = getMessage();
     }
 
-    public String getMessage()
+    private String getMessage()
     {
         String back = Globals.getIntegrityMessage("ITEXT_" + type);
         if ((back != null) && (fieldName != null))

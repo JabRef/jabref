@@ -41,7 +41,7 @@ public class RemoteListener implements Runnable {
     private volatile boolean active = true;
     private volatile boolean toStop = false;
 
-    public RemoteListener(JabRef jabref, ServerSocket socket) {
+    private RemoteListener(JabRef jabref, ServerSocket socket) {
         this.jabref = jabref;
         this.socket = socket;
     }

@@ -92,48 +92,48 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
 
-    protected JabRefFrame frame;
-    protected BibtexDatabase database;
+    private JabRefFrame frame;
+    private BibtexDatabase database;
     private EntryFromFileCreatorManager creatorManager;
     private UnlinkedFilesCrawler crawler;
 
-    protected File lastSelectedDirectory;
+    private File lastSelectedDirectory;
     private TreeModel treeModel;
 
     /* PANELS */
-    protected JPanel panelDirectory;
-    protected JPanel panelSearchArea;
-    protected JPanel panelFiles;
-    protected JPanel panelOptions;
-    protected JPanel panelButtons;
-    protected JPanel panelEntryTypesSelection;
-    protected JPanel panelImportArea;
-    protected JPanel mainArea;
+    private JPanel panelDirectory;
+    private JPanel panelSearchArea;
+    private JPanel panelFiles;
+    private JPanel panelOptions;
+    private JPanel panelButtons;
+    private JPanel panelEntryTypesSelection;
+    private JPanel panelImportArea;
+    private JPanel mainArea;
 
-    protected JButton buttonBrowse;
-    protected JButton buttonScan;
-    protected JButton buttonApply;
-    protected JButton buttonClose;
+    private JButton buttonBrowse;
+    private JButton buttonScan;
+    private JButton buttonApply;
+    private JButton buttonClose;
 
     /* Options for the TreeView */
-    protected JButton buttonOptionSelectAll;
-    protected JButton buttonOptionUnselectAll;
-    protected JButton buttonOptionExpandAll;
-    protected JButton buttonOptionCollapseAll;
-    protected JCheckBox checkboxCreateKeywords;
+    private JButton buttonOptionSelectAll;
+    private JButton buttonOptionUnselectAll;
+    private JButton buttonOptionExpandAll;
+    private JButton buttonOptionCollapseAll;
+    private JCheckBox checkboxCreateKeywords;
 
-    protected JTextField textfieldDirectoryPath;
-    protected JLabel labelDirectoryDescription;
-    protected JLabel labelFileTypesDescription;
-    protected JLabel labelFilesDescription;
-    protected JLabel labelEntryTypeDescription;
-    protected JLabel labelSearchingDirectoryInfo;
-    protected JLabel labelImportingInfo;
+    private JTextField textfieldDirectoryPath;
+    private JLabel labelDirectoryDescription;
+    private JLabel labelFileTypesDescription;
+    private JLabel labelFilesDescription;
+    private JLabel labelEntryTypeDescription;
+    private JLabel labelSearchingDirectoryInfo;
+    private JLabel labelImportingInfo;
 
-    protected JTree tree;
-    protected JScrollPane scrollpaneTree;
-    protected JComboBox comboBoxFileTypeSelection;
-    protected JComboBox comboBoxEntryTypeSelection;
+    private JTree tree;
+    private JScrollPane scrollpaneTree;
+    private JComboBox comboBoxFileTypeSelection;
+    private JComboBox comboBoxEntryTypeSelection;
 
     private JProgressBar progressBarSearching;
     private JProgressBar progressBarImporting;
@@ -229,7 +229,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Initializes the components, the layout, the data structure and the
      * actions in this dialog.
      */
-    protected void initialize() {
+    private void initialize() {
 
         initializeActions();
 
@@ -249,7 +249,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Initializes action objects. <br>
      * Does not assign actions to components yet!
      */
-    protected void initializeActions() {
+    private void initializeActions() {
 
         actionSelectAll = new AbstractAction(Globals.lang("Select all")) {
 
@@ -484,7 +484,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * {@link #searchFinishedHandler(CheckableTreeNode)} handler method is
      * invoked.
      */
-    protected void startSearch() {
+    private void startSearch() {
 
         final File directory = new File(textfieldDirectoryPath.getText());
 
@@ -539,7 +539,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * When the import has finished, the {@link #importFinishedHandler(int, java.util.List)} is
      * invoked.
      */
-    protected void startImport() {
+    private void startImport() {
 
         if (treeModel == null) {
             return;
@@ -598,7 +598,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * 
      * @param errors
      */
-    protected void importFinishedHandler(int count, List<String> errors) {
+    private void importFinishedHandler(int count, List<String> errors) {
 
         if ((errors != null) && (errors.size() > 0)) {
 
@@ -624,7 +624,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * @param rootNode
      *            The root of the file structure as the result of the search.
      */
-    protected void searchFinishedHandler(CheckableTreeNode rootNode) {
+    private void searchFinishedHandler(CheckableTreeNode rootNode) {
 
         treeModel = new DefaultTreeModel(rootNode);
         tree.setModel(treeModel);
@@ -1175,7 +1175,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         private static final long serialVersionUID = 3737245079578074387L;
 
-        protected final FileSystemView fsv = FileSystemView.getFileSystemView();
+        final FileSystemView fsv = FileSystemView.getFileSystemView();
 
 
         @Override

@@ -30,9 +30,9 @@ import javax.swing.undo.UndoManager;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
-    protected final String fieldName;
-    protected final JLabel label;
-    protected UndoManager undo;
+    private final String fieldName;
+    private final JLabel label;
+    private UndoManager undo;
     private AutoCompleteListener autoCompleteListener = null;
 
 
@@ -76,7 +76,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
         label.addMouseListener(popMenu);
     }
 
-    protected void setupUndoRedo() {
+    private void setupUndoRedo() {
         undo = new UndoManager();
         Document doc = getDocument();
 

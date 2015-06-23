@@ -15,9 +15,9 @@ import org.sciplore.formatter.SimpleTypeElementBean;
  * Time: 20:02:51
  * To change this template use File | Settings | File Templates.
  */
-public class DocumentWrapper {
+class DocumentWrapper {
 
-    Document xmlDocument;
+    private Document xmlDocument;
 
 
     public DocumentWrapper(Document xmlDocument) {
@@ -41,7 +41,7 @@ public class DocumentWrapper {
         }
     }
 
-    public boolean hasTitle() {
+    private boolean hasTitle() {
         return ((xmlDocument.getTitle() != null) && (xmlDocument.getTitle().getValue() != null) && !xmlDocument.getTitle().getValue().isEmpty());
     }
 
@@ -54,7 +54,7 @@ public class DocumentWrapper {
         }
     }
 
-    public boolean hasAbstract() {
+    private boolean hasAbstract() {
         return ((xmlDocument.getAbstract() != null) && (((Abstract) xmlDocument.getAbstract()).getValue() != null) && !((Abstract) xmlDocument.getAbstract()).getValue().isEmpty());
     }
 
@@ -81,7 +81,7 @@ public class DocumentWrapper {
         }
     }
 
-    public boolean hasAuthors() {
+    private boolean hasAuthors() {
         return ((xmlDocument.getAuthors() != null) && (xmlDocument.getAuthors().getCollection() != null) && !xmlDocument.getAuthors().getCollection().isEmpty());
     }
 
@@ -121,7 +121,7 @@ public class DocumentWrapper {
         }
     }
 
-    public boolean hasDoi() {
+    private boolean hasDoi() {
         return ((xmlDocument.getDoi() != null) && (this.getSimpleTypeValue(xmlDocument.getDoi()) != null) && !this.getSimpleTypeValue(xmlDocument.getDoi()).isEmpty());
     }
 
@@ -175,7 +175,7 @@ public class DocumentWrapper {
         }
     }
 
-    public boolean hasYear() {
+    private boolean hasYear() {
         return ((this.getSimpleTypeValue(xmlDocument.getYear()) != null) && !this.getSimpleTypeValue(xmlDocument.getYear()).isEmpty() && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
     }
 

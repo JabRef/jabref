@@ -44,7 +44,7 @@ public class AccessLinksForEntries {
      * @param entries The set of entries.
      * @return A list of FileListEntry objects pointing to the external files.
      */
-    public static List<FileListEntry> getExternalLinksForEntries(List<BibtexEntry> entries) {
+    private static List<FileListEntry> getExternalLinksForEntries(List<BibtexEntry> entries) {
         List<FileListEntry> files = new ArrayList<FileListEntry>();
         FileListTableModel model = new FileListTableModel();
         for (BibtexEntry entry : entries) {
@@ -77,10 +77,10 @@ public class AccessLinksForEntries {
      * @param callback An ActionListener which should be notified when the process is finished.
      *  This parameter can be null if no callback is needed.
      */
-    public static void copyExternalLinksToDirectory(final List<FileListEntry> files, File toDir,
-            MetaData metaData, final JProgressBar prog,
-            boolean deleteOriginalFiles,
-            final ActionListener callback) {
+    private static void copyExternalLinksToDirectory(final List<FileListEntry> files, File toDir,
+                                                     MetaData metaData, final JProgressBar prog,
+                                                     boolean deleteOriginalFiles,
+                                                     final ActionListener callback) {
 
         if (prog != null) {
             SwingUtilities.invokeLater(new Runnable() {

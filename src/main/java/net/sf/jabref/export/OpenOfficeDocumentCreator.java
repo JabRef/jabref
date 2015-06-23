@@ -48,7 +48,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, keySet);
     }
 
-    public static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
+    private static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
         try {
             ZipEntry zipEntry = new ZipEntry("content.xml");
@@ -72,8 +72,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
     }
 
-    public static void exportOpenOfficeCalc(File file, BibtexDatabase database,
-            Set<String> keySet) throws Exception {
+    private static void exportOpenOfficeCalc(File file, BibtexDatabase database,
+                                             Set<String> keySet) throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
@@ -87,7 +87,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    public static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
+    private static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
         OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
         try {

@@ -63,7 +63,7 @@ public class URLDownload {
         URLDownload.setCookieHandler();
     }
 
-    public URL getSource() {
+    URL getSource() {
         return source;
     }
 
@@ -93,7 +93,7 @@ public class URLDownload {
         }
     }
 
-    protected URLConnection openConnection() throws IOException {
+    private URLConnection openConnection() throws IOException {
         URLConnection connection = source.openConnection();
         connection.setRequestProperty("User-Agent", "JabRef");
         // this does network i/o: GET + read returned headers

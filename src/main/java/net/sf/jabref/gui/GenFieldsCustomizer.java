@@ -39,24 +39,24 @@ import com.jgoodies.forms.layout.Sizes;
 
 public class GenFieldsCustomizer extends JDialog {
 
-    final JPanel buttons = new JPanel();
-    final JButton ok = new JButton();
-    final JButton cancel = new JButton();
-    JButton helpBut = new JButton();
+    private final JPanel buttons = new JPanel();
+    private final JButton ok = new JButton();
+    private final JButton cancel = new JButton();
+    private JButton helpBut = new JButton();
     TitledBorder titledBorder1;
     TitledBorder titledBorder2;
-    final JLabel jLabel1 = new JLabel();
-    final JPanel jPanel3 = new JPanel();
-    final JPanel jPanel4 = new JPanel();
-    final GridBagLayout gridBagLayout1 = new GridBagLayout();
-    final JScrollPane jScrollPane1 = new JScrollPane();
-    final JLabel jLabel2 = new JLabel();
-    final JTextArea fieldsArea = new JTextArea();
-    final GridBagLayout gridBagLayout2 = new GridBagLayout();
-    final JabRefFrame parent;
-    final JButton revert = new JButton();
+    private final JLabel jLabel1 = new JLabel();
+    private final JPanel jPanel3 = new JPanel();
+    private final JPanel jPanel4 = new JPanel();
+    private final GridBagLayout gridBagLayout1 = new GridBagLayout();
+    private final JScrollPane jScrollPane1 = new JScrollPane();
+    private final JLabel jLabel2 = new JLabel();
+    private final JTextArea fieldsArea = new JTextArea();
+    private final GridBagLayout gridBagLayout2 = new GridBagLayout();
+    private final JabRefFrame parent;
+    private final JButton revert = new JButton();
     //EntryCustomizationDialog diag;
-    final HelpAction help;
+    private final HelpAction help;
 
 
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
@@ -175,7 +175,7 @@ public class GenFieldsCustomizer extends JDialog {
         //diag.requestFocus();
     }
 
-    void setFieldsText() {
+    private void setFieldsText() {
         StringBuffer sb = new StringBuffer();
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
@@ -217,7 +217,7 @@ public class GenFieldsCustomizer extends JDialog {
 
 class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListener {
 
-    final GenFieldsCustomizer adaptee;
+    private final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_ok_actionAdapter(GenFieldsCustomizer adaptee) {
@@ -232,7 +232,7 @@ class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListe
 
 class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionListener {
 
-    final GenFieldsCustomizer adaptee;
+    private final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_cancel_actionAdapter(GenFieldsCustomizer adaptee) {
@@ -247,7 +247,7 @@ class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionL
 
 class GenFieldsCustomizer_revert_actionAdapter implements java.awt.event.ActionListener {
 
-    final GenFieldsCustomizer adaptee;
+    private final GenFieldsCustomizer adaptee;
 
 
     GenFieldsCustomizer_revert_actionAdapter(GenFieldsCustomizer adaptee) {

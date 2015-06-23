@@ -38,19 +38,19 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ExternalFileTypeEntryEditor {
 
-    JFrame fParent = null;
-    JDialog dParent = null;
-    JDialog diag;
-    final JTextField extension = new JTextField();
-    final JTextField name = new JTextField();
-    final JTextField mimeType = new JTextField();
-    final JTextField application = new JTextField();
-    String selectedIcon = null;
-    final JButton icon = new JButton(GUIGlobals.getImage("picture"));
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final JRadioButton useDefault = new JRadioButton(Globals.lang("Default"));
-    final JRadioButton other = new JRadioButton("");
+    private JFrame fParent = null;
+    private JDialog dParent = null;
+    private JDialog diag;
+    private final JTextField extension = new JTextField();
+    private final JTextField name = new JTextField();
+    private final JTextField mimeType = new JTextField();
+    private final JTextField application = new JTextField();
+    private String selectedIcon = null;
+    private final JButton icon = new JButton(GUIGlobals.getImage("picture"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JRadioButton useDefault = new JRadioButton(Globals.lang("Default"));
+    private final JRadioButton other = new JRadioButton("");
     final String emptyMessage = "<" + Globals.lang("Use default viewer") + ">";
     boolean applicationFieldEmpty = false;
 
@@ -216,7 +216,7 @@ public class ExternalFileTypeEntryEditor {
         diag.setVisible(visible);
     }
 
-    public void setValues(ExternalFileType entry) {
+    private void setValues(ExternalFileType entry) {
         name.setText(entry.getName());
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
@@ -230,7 +230,7 @@ public class ExternalFileTypeEntryEditor {
         selectedIcon = null;
     }
 
-    public void storeSettings(ExternalFileType entry) {
+    private void storeSettings(ExternalFileType entry) {
         entry.setName(name.getText().trim());
         entry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:

@@ -51,7 +51,7 @@ public class AutoSaveManager {
     }
 
 
-    class AutoSaveTask extends TimerTask {
+    private class AutoSaveTask extends TimerTask {
 
         @Override
         public void run() {
@@ -93,7 +93,7 @@ public class AutoSaveManager {
      * @param panel The BasePanel to autosave for.
      * @return true if successful, false otherwise.
      */
-    public static boolean autoSave(BasePanel panel) {
+    private static boolean autoSave(BasePanel panel) {
         File backupFile = AutoSaveManager.getAutoSaveFile(panel.getFile());
         try {
             SaveSession ss = FileActions.saveDatabase(panel.database(), panel.metaData(),

@@ -303,8 +303,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         return sb.toString();
     }
 
-    protected static String describeNode(AST node, boolean regExp,
-            boolean not, boolean and, boolean or) {
+    private static String describeNode(AST node, boolean regExp,
+                                       boolean not, boolean and, boolean or) {
         StringBuffer sb = new StringBuffer();
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:

@@ -45,7 +45,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         setupUndoRedo();
     }
 
-    public JTextAreaWithHighlighting(String text) {
+    JTextAreaWithHighlighting(String text) {
         super(text);
         setupUndoRedo();
     }
@@ -71,7 +71,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         setupUndoRedo();
     }
 
-    protected void setupUndoRedo() {
+    private void setupUndoRedo() {
         undo = new UndoManager();
         Document doc = getDocument();
 

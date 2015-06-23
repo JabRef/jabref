@@ -31,20 +31,20 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 
-public class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
+class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
     private BibtexDatabase secondary;
-    final DefaultMutableTreeNode root;
-    final JTree tree;
-    final JPanel infoPanel = new JPanel();
-    final JPanel buttonPanel = new JPanel();
-    final JPanel infoBorder = new JPanel();
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final JCheckBox cb = new JCheckBox(Globals.lang("Accept change"));
-    final JLabel rootInfo = new JLabel(Globals.lang("Select the tree nodes to view and accept or reject changes") + ".");
-    Change selected = null;
-    JComponent infoShown = null;
+    private final DefaultMutableTreeNode root;
+    private final JTree tree;
+    private final JPanel infoPanel = new JPanel();
+    private final JPanel buttonPanel = new JPanel();
+    private final JPanel infoBorder = new JPanel();
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JCheckBox cb = new JCheckBox(Globals.lang("Accept change"));
+    private final JLabel rootInfo = new JLabel(Globals.lang("Select the tree nodes to view and accept or reject changes") + ".");
+    private Change selected = null;
+    private JComponent infoShown = null;
     private boolean okPressed = false;
 
 

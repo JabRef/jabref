@@ -29,7 +29,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class PluginBasedExportFormat extends ExportFormat {
 
-    public final ExportFormatTemplateExtension extension;
+    private final ExportFormatTemplateExtension extension;
 
 
     /**
@@ -57,9 +57,9 @@ public class PluginBasedExportFormat extends ExportFormat {
                 layoutFilename, fileExtension, encoding, extension);
     }
 
-    public PluginBasedExportFormat(String displayName, String consoleName,
-            String layoutFileName, String fileExtension, String encoding,
-            ExportFormatTemplateExtension extension) {
+    private PluginBasedExportFormat(String displayName, String consoleName,
+                                    String layoutFileName, String fileExtension, String encoding,
+                                    ExportFormatTemplateExtension extension) {
         super(displayName, consoleName, layoutFileName, null, fileExtension);
         // Set the overriding encoding, if the plugin supplied one:
         if (encoding != null) {

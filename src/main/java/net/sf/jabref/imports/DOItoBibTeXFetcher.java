@@ -33,8 +33,8 @@ import net.sf.jabref.Util;
 public class DOItoBibTeXFetcher implements EntryFetcher {
 
     private static final String URL_PATTERN = "http://dx.doi.org/%s";
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
 
 
     @Override
@@ -77,7 +77,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    public BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
+    private BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
         String q;
         try {
             q = URLEncoder.encode(doi, "UTF-8");

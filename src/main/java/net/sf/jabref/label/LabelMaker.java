@@ -60,7 +60,7 @@ public class LabelMaker {
         defaultRule = newRule;
     }
 
-    public String applyDefaultRule(BibtexEntry newEntry) {
+    private String applyDefaultRule(BibtexEntry newEntry) {
         return defaultRule.applyRule(newEntry);
     }
 
@@ -70,7 +70,7 @@ public class LabelMaker {
     }
 
 
-    protected LabelRule defaultRule = new ArticleLabelRule();
-    protected final Hashtable<String, LabelRule> ruleTable = new Hashtable<String, LabelRule>();
+    private LabelRule defaultRule = new ArticleLabelRule();
+    private final Hashtable<String, LabelRule> ruleTable = new Hashtable<String, LabelRule>();
 
 }

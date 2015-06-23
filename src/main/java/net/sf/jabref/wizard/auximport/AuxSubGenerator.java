@@ -84,7 +84,7 @@ public class AuxSubGenerator
         db = refDBase;
     }
 
-    public final void setReferenceDatabase(BibtexDatabase newRefDB)
+    private void setReferenceDatabase(BibtexDatabase newRefDB)
     {
         db = newRefDB;
     }
@@ -126,8 +126,7 @@ public class AuxSubGenerator
     //
     // \\bibcite{x}{y}
     //   x is a label for an item and y is the index in bibliography
-
-    public final boolean parseAuxFile(String filename)
+    private boolean parseAuxFile(String filename)
     {
         // regular expressions
         Pattern pattern;
@@ -268,7 +267,7 @@ public class AuxSubGenerator
      * Try to find an equivalent bibtex entry into reference database for all keys
      * (found in aux file). This methode will fill up some intern data structures.....
      */
-    public final void resolveTags()
+    private void resolveTags()
     {
         auxDB = new BibtexDatabase();
         notFoundList.clear();

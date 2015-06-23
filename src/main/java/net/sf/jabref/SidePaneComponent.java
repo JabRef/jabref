@@ -31,12 +31,12 @@ import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     protected final JButton close = new JButton(GUIGlobals.getImage("close"));
-    protected final JButton up = new JButton(GUIGlobals.getImage("up"));
-    protected final JButton down = new JButton(GUIGlobals.getImage("down"));
+    private final JButton up = new JButton(GUIGlobals.getImage("up"));
+    private final JButton down = new JButton(GUIGlobals.getImage("down"));
 
-    protected boolean visible = false;
+    private boolean visible = false;
 
-    protected final SidePaneManager manager;
+    private final SidePaneManager manager;
 
     protected BasePanel panel = null;
 
@@ -69,15 +69,15 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         // Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
     }
 
-    public void hideAway() {
+    void hideAway() {
         manager.hideComponent(this);
     }
 
-    public void moveUp() {
+    private void moveUp() {
         manager.moveUp(this);
     }
 
-    public void moveDown() {
+    private void moveDown() {
         manager.moveDown(this);
     }
 
@@ -127,7 +127,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
     }
 
 
-    class CloseButtonListener implements ActionListener {
+    private class CloseButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -135,7 +135,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         }
     }
 
-    class UpButtonListener implements ActionListener {
+    private class UpButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -143,7 +143,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         }
     }
 
-    class DownButtonListener implements ActionListener {
+    private class DownButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {

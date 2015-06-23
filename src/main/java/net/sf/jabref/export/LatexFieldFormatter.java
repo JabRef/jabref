@@ -26,9 +26,9 @@ public class LatexFieldFormatter implements FieldFormatter {
     }
 
 
-    StringBuffer sb;
-    int col; // First line usually starts about so much further to the right.
-    final int STARTCOL = 4;
+    private StringBuffer sb;
+    private int col; // First line usually starts about so much further to the right.
+    private final int STARTCOL = 4;
 
     private final boolean neverFailOnHashes;
 

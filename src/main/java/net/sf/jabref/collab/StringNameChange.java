@@ -23,13 +23,13 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableStringChange;
 
-public class StringNameChange extends Change {
+class StringNameChange extends Change {
 
-    final BibtexString string;
-    final String mem;
-    final String tmp;
-    final String disk;
-    final String content;
+    private final BibtexString string;
+    private final String mem;
+    private final String tmp;
+    private final String disk;
+    private final String content;
     private final BibtexString tmpString;
 
 

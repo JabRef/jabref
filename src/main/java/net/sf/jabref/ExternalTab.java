@@ -34,27 +34,27 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
-    final JabRefFrame _frame;
+    private final JabRefFrame _frame;
 
-    final JTextField pdfDir;
-    final JTextField regExpTextField;
-    final JTextField fileDir;
-    final JTextField psDir;
-    final JTextField emailSubject;
+    private final JTextField pdfDir;
+    private final JTextField regExpTextField;
+    private final JTextField fileDir;
+    private final JTextField psDir;
+    private final JTextField emailSubject;
 
-    final JCheckBox bibLocationAsFileDir;
-    final JCheckBox bibLocAsPrimaryDir;
-    final JCheckBox runAutoFileSearch;
-    final JCheckBox allowFileAutoOpenBrowse;
-    final JCheckBox openFoldersOfAttachedFiles;
-    final JButton editFileTypes;
-    final ItemListener regExpListener;
+    private final JCheckBox bibLocationAsFileDir;
+    private final JCheckBox bibLocAsPrimaryDir;
+    private final JCheckBox runAutoFileSearch;
+    private final JCheckBox allowFileAutoOpenBrowse;
+    private final JCheckBox openFoldersOfAttachedFiles;
+    private final JButton editFileTypes;
+    private final ItemListener regExpListener;
 
-    final JRadioButton useRegExpComboBox;
-    final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
-    final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
+    private final JRadioButton useRegExpComboBox;
+    private final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
+    private final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
 
     public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs,

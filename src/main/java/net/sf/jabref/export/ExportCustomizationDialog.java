@@ -42,16 +42,16 @@ import ca.odell.glazedlists.swing.EventTableModel;
 
 public class ExportCustomizationDialog extends JDialog {
 
-    final JabRefFrame frame;
-    final JButton addExport = new JButton(Globals.lang("Add new"));
-    final JButton modify = new JButton(Globals.lang("Modify"));
-    final JButton remove = new JButton(Globals.lang("Remove"));
-    final JButton close = new JButton(Globals.lang("Close"));
-    final JButton help = new JButton(Globals.lang("Help"));
+    private final JabRefFrame frame;
+    private final JButton addExport = new JButton(Globals.lang("Add new"));
+    private final JButton modify = new JButton(Globals.lang("Modify"));
+    private final JButton remove = new JButton(Globals.lang("Remove"));
+    private final JButton close = new JButton(Globals.lang("Close"));
+    private final JButton help = new JButton(Globals.lang("Help"));
 
-    final JPanel buttons = new JPanel();
-    final JPanel main = new JPanel();
-    JTable table;
+    private final JPanel buttons = new JPanel();
+    private final JPanel main = new JPanel();
+    private JTable table;
 
 
     public ExportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
@@ -171,7 +171,7 @@ public class ExportCustomizationDialog extends JDialog {
     }
 
 
-    static class ExportTableFormat implements TableFormat<String[]> {
+    private static class ExportTableFormat implements TableFormat<String[]> {
 
         @Override
         public Object getColumnValue(String[] strings, int i) {

@@ -30,9 +30,9 @@ import net.sf.jabref.undo.NamedCompound;
  */
 public class AbbreviateAction extends AbstractWorker {
 
-    final BasePanel panel;
-    String message = "";
-    final boolean iso;
+    private final BasePanel panel;
+    private String message = "";
+    private final boolean iso;
 
 
     public AbbreviateAction(BasePanel panel, boolean iso) {

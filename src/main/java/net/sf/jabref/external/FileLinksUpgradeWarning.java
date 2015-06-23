@@ -154,7 +154,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    public boolean linksFound(BibtexDatabase database, String[] fields) {
+    private boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()) {
             for (String field : fields) {
                 if (entry.getField(field) != null) {
@@ -171,8 +171,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param pr
      * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
-    public void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
-            boolean upgradeDatabase, String fileDir) {
+    private void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
+                             boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
             // Update file links links in the database:

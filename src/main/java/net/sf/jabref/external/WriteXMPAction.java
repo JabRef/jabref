@@ -45,17 +45,19 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 public class WriteXMPAction extends AbstractWorker {
 
-    final BasePanel panel;
+    private final BasePanel panel;
 
-    BibtexEntry[] entries;
+    private BibtexEntry[] entries;
 
-    BibtexDatabase database;
+    private BibtexDatabase database;
 
-    OptionsDialog optDiag;
+    private OptionsDialog optDiag;
 
-    boolean goOn = true;
+    private boolean goOn = true;
 
-    int skipped, entriesChanged, errors;
+    private int skipped;
+    private int entriesChanged;
+    private int errors;
 
 
     public WriteXMPAction(BasePanel panel) {

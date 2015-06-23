@@ -126,10 +126,10 @@ class FontSelector extends JButton {
 
     private static final long serialVersionUID = 7745223550102664896L;
 
-    static final String PLAIN = "plain";
-    static final String BOLD = "bold";
-    static final String BOLD_ITALIC = "bold-italic";
-    static final String ITALIC = "italic";
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+    private static final String ITALIC = "italic";
 
 
     /** init with a default font */
@@ -138,7 +138,7 @@ class FontSelector extends JButton {
     }
 
     /** init with the given font */
-    public FontSelector(Font font) {
+    private FontSelector(Font font) {
         setFont(font);
         setRequestFocusEnabled(false);
         addActionListener(new ActionHandler());
@@ -181,7 +181,7 @@ class FontSelector extends JButton {
     /**
      * button's action-listener ; open a FontSelectorDialog
      */
-    class ActionHandler implements ActionListener {
+    private class ActionHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent evt) {
@@ -200,10 +200,10 @@ public class FontSelectorDialog extends JDialog {
 
     private static final long serialVersionUID = -8670346696048738055L;
 
-    static final String PLAIN = "plain";
-    static final String BOLD = "bold";
-    static final String BOLD_ITALIC = "bold-italic";
-    static final String ITALIC = "italic";
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+    private static final String ITALIC = "italic";
 
 
     public FontSelectorDialog(Component comp, Font font) {
@@ -310,12 +310,12 @@ public class FontSelectorDialog extends JDialog {
         setVisible(true); // show(); -> deprecated since 1.5
     }
 
-    public void ok() {
+    private void ok() {
         isOK = true;
         dispose();
     }
 
-    public void cancel() {
+    private void cancel() {
         dispose();
     }
 
@@ -435,7 +435,7 @@ public class FontSelectorDialog extends JDialog {
     }
 
 
-    class ActionHandler implements ActionListener {
+    private class ActionHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent evt) {
@@ -447,7 +447,7 @@ public class FontSelectorDialog extends JDialog {
         }
     }
 
-    class ListHandler implements ListSelectionListener {
+    private class ListHandler implements ListSelectionListener {
 
         @Override
         public void valueChanged(ListSelectionEvent evt)

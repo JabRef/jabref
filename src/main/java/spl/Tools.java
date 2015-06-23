@@ -14,7 +14,7 @@ import java.util.zip.GZIPOutputStream;
  * Time: 10:43:01
  * To change this template use File | Settings | File Templates.
  */
-public class Tools {
+class Tools {
 
     public static final int WEBSERVICE_APP_ID = 9;
     public static String WEBSERVICE_VERSION_SHORT = "0.1";
@@ -110,7 +110,7 @@ public class Tools {
         return link;
     }
 
-    public static boolean isAbsolutePath(String path) {
+    private static boolean isAbsolutePath(String path) {
         // On Windows, we cannot just ask if the file name starts with file
         // separator.
         // If path contains ":" at the second position, then it is not relative,

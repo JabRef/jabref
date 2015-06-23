@@ -47,17 +47,17 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Fetcher implements EntryFetcher {
 
-    public static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
+    private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
-    public static final String OAI2_ARXIV_HOST = "export.arxiv.org";
+    private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
 
-    public static final String OAI2_ARXIV_SCRIPT = "oai2";
+    private static final String OAI2_ARXIV_SCRIPT = "oai2";
 
-    public static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
+    private static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
 
-    public static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
+    private static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
 
-    public static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
+    private static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
 
     private SAXParser saxParser;
 

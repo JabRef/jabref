@@ -35,11 +35,11 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     Dimension PREFERRED_SIZE;
 
-    final JScrollPane sp;
+    private final JScrollPane sp;
 
-    final FieldNameLabel label;
+    private final FieldNameLabel label;
 
-    String fieldName;
+    private String fieldName;
 
     final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
 

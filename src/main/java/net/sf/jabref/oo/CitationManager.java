@@ -36,15 +36,15 @@ import java.util.List;
 /**
  * Dialog for modifying existing citations.
  */
-public class CitationManager {
+class CitationManager {
 
-    final OOBibBase ooBase;
-    final JDialog diag;
-    final EventList<CitEntry> list;
-    JTable table;
-    EventTableModel<CitEntry> tableModel;
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final OOBibBase ooBase;
+    private final JDialog diag;
+    private final EventList<CitEntry> list;
+    private JTable table;
+    private EventTableModel<CitEntry> tableModel;
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
@@ -167,7 +167,7 @@ public class CitationManager {
         }
     }
 
-    class CitEntryFormat implements TableFormat<CitEntry> {
+    private class CitEntryFormat implements TableFormat<CitEntry> {
 
         @Override
         public int getColumnCount() {
@@ -197,7 +197,7 @@ public class CitationManager {
         }
     }
 
-    class TableClickListener extends MouseAdapter {
+    private class TableClickListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(MouseEvent e) {

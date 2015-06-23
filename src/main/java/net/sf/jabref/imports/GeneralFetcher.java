@@ -53,26 +53,26 @@ import net.sf.jabref.help.HelpAction;
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
-    final JTextField tf = new JTextField();
-    final JPanel pan = new JPanel();
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
-    final JButton go = new JButton(Globals.lang("Fetch"));
-    final JButton helpBut = new JButton(
+    private final JTextField tf = new JTextField();
+    private final JPanel pan = new JPanel();
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
+    private final JButton go = new JButton(Globals.lang("Fetch"));
+    private final JButton helpBut = new JButton(
             GUIGlobals.getImage("helpSmall"));
-    final JButton reset = new JButton(
+    private final JButton reset = new JButton(
             Globals.lang("Reset"));
-    final JComboBox fetcherChoice;
-    final CardLayout optionsCards = new CardLayout();
-    final JPanel optionsPanel = new JPanel(optionsCards);
-    final JPanel optPanel = new JPanel(new BorderLayout());
-    HelpAction help;
+    private final JComboBox fetcherChoice;
+    private final CardLayout optionsCards = new CardLayout();
+    private final JPanel optionsPanel = new JPanel(optionsCards);
+    private final JPanel optPanel = new JPanel(new BorderLayout());
+    private HelpAction help;
 
-    final SidePaneManager sidePaneManager;
-    final Action action;
-    final JabRefFrame frame;
-    EntryFetcher activeFetcher;
-    final EntryFetcher[] fetcherArray;
+    private final SidePaneManager sidePaneManager;
+    private final Action action;
+    private final JabRefFrame frame;
+    private EntryFetcher activeFetcher;
+    private final EntryFetcher[] fetcherArray;
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame, final List<EntryFetcher> fetchers) {
@@ -209,7 +209,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         help.setResourceOwner(c);
     }
 
-    public JTextField getTextField() {
+    private JTextField getTextField() {
         return tf;
     }
 
@@ -337,7 +337,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     }
 
 
-    static class EntryFetcherComparator implements Comparator<EntryFetcher> {
+    private static class EntryFetcherComparator implements Comparator<EntryFetcher> {
 
         @Override
         public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {

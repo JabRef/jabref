@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class RegExpFileSearch {
 
-    final static String EXT_MARKER = "__EXTENSION__";
+    private final static String EXT_MARKER = "__EXTENSION__";
 
 
     public static void main(String[] args) {
@@ -78,8 +78,8 @@ public class RegExpFileSearch {
      * @param regularExpression The expression deciding which names are acceptable.
      * @return A list of files paths matching the given criteria.
      */
-    public static List<File> findFiles(BibtexEntry entry, Collection<String> extensions,
-            Collection<File> directories, String regularExpression) {
+    private static List<File> findFiles(BibtexEntry entry, Collection<String> extensions,
+                                        Collection<File> directories, String regularExpression) {
 
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
@@ -133,8 +133,8 @@ public class RegExpFileSearch {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    public static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
-            String file, String extensionRegExp, boolean relative) {
+    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
+                                       String file, String extensionRegExp, boolean relative) {
         ArrayList<File> res = new ArrayList<File>();
         for (File directory : dirs) {
             List<File> tmp = RegExpFileSearch.findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
@@ -150,8 +150,8 @@ public class RegExpFileSearch {
      * base the search on.
      *
      */
-    public static List<File> findFile(BibtexEntry entry, BibtexDatabase database, String directory,
-            String file, String extensionRegExp, boolean relative) {
+    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, String directory,
+                                       String file, String extensionRegExp, boolean relative) {
 
         List<File> res;
         File root;
@@ -193,8 +193,8 @@ public class RegExpFileSearch {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    protected static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
-            String file, String extensionRegExp) {
+    private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+                                       String file, String extensionRegExp) {
 
         ArrayList<File> res = new ArrayList<File>();
 

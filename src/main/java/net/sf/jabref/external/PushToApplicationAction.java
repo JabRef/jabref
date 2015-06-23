@@ -27,7 +27,7 @@ import net.sf.jabref.*;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationAction extends AbstractAction implements Runnable {
+class PushToApplicationAction extends AbstractAction implements Runnable {
 
     private final PushToApplication operation;
     private final JabRefFrame frame;
@@ -93,7 +93,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         });
     }
 
-    protected String getKeyString(BibtexEntry[] entries) {
+    private String getKeyString(BibtexEntry[] entries) {
         StringBuffer result = new StringBuffer();
         String citeKey;//, message = "";
         boolean first = true;

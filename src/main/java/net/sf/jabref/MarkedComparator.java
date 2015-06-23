@@ -24,9 +24,9 @@ import java.util.Comparator;
  * Time: 11:35:02 PM
  * To change this template use File | Settings | File Templates.
  */
-public class MarkedComparator implements Comparator<BibtexEntry> {
+class MarkedComparator implements Comparator<BibtexEntry> {
 
-    final Comparator<BibtexEntry> next;
+    private final Comparator<BibtexEntry> next;
 
 
     public MarkedComparator(Comparator<BibtexEntry> next) {

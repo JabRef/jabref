@@ -31,7 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Egon Willighagen
  */
-public class BibTeXMLHandler extends DefaultHandler {
+class BibTeXMLHandler extends DefaultHandler {
 
     private ArrayList<BibtexEntry> bibitems;
 

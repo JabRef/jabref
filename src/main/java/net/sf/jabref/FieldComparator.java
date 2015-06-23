@@ -56,13 +56,13 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     private final String[] field;
     private final String fieldName;
 
-    final boolean isNameField;
-    final boolean isTypeHeader;
-    final boolean isYearField;
-    final boolean isMonthField;
-    final boolean isNumeric;
+    private final boolean isNameField;
+    private final boolean isTypeHeader;
+    private final boolean isYearField;
+    private final boolean isMonthField;
+    private final boolean isNumeric;
 
-    final int multiplier;
+    private final int multiplier;
 
 
     public FieldComparator(String field) {

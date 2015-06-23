@@ -23,15 +23,15 @@ import java.io.IOException;
 
 import net.sf.jabref.BibtexEntry;
 
-public class TransferableEntrySelection implements Transferable {
+class TransferableEntrySelection implements Transferable {
 
     public static final DataFlavor flavorInternal;
-    public static final DataFlavor flavorExternal;
-    public static final DataFlavor[] flavors;
-    public final BibtexEntry[] selectedEntries;
-    public final String selectedEntriesCiteKeys;
+    private static final DataFlavor flavorExternal;
+    private static final DataFlavor[] flavors;
+    private final BibtexEntry[] selectedEntries;
+    private final String selectedEntriesCiteKeys;
 
-    protected boolean includeCiteKeyword = false;
+    private boolean includeCiteKeyword = false;
 
     static {
         DataFlavor df1 = null;

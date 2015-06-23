@@ -102,16 +102,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // A reference to the entry this object works on.
     private BibtexEntry entry;
 
-    final BibtexEntryType type;
+    private final BibtexEntryType type;
 
     // The action concerned with closing the window.
-    final CloseAction closeAction;
+    private final CloseAction closeAction;
 
     // The action that deletes the current entry, and closes the editor.
-    final DeleteAction deleteAction = new DeleteAction();
+    private final DeleteAction deleteAction = new DeleteAction();
 
     // The action concerned with copying the BibTeX key to the clipboard.
-    final CopyKeyAction copyKeyAction;
+    private final CopyKeyAction copyKeyAction;
 
     // The action concerned with copying the BibTeX key to the clipboard.
     final AbstractAction nextEntryAction = new NextEntryAction();
@@ -134,69 +134,72 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private FileListEditor fileListEditor = null;
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
-    public final AbstractAction writeXmp;
+    private final AbstractAction writeXmp;
 
     final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     JPanel mainPanel = new JPanel();
 
-    final JPanel srcPanel = new JPanel();
+    private final JPanel srcPanel = new JPanel();
 
-    EntryEditorTab genPan, optPan, reqPan, absPan;
+    EntryEditorTab genPan;
+    private EntryEditorTab optPan;
+    private EntryEditorTab reqPan;
+    EntryEditorTab absPan;
 
     JTextField bibtexKey;
 
     FieldTextField tf;
 
-    JTextArea source;
+    private JTextArea source;
 
-    JToolBar tlb;
+    private JToolBar tlb;
 
-    final JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
+    private final JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
 
     JLabel lab;
 
-    TypeButton typeButton;
+    private TypeButton typeButton;
 
     final JabRefFrame frame;
 
     final BasePanel panel;
 
-    final EntryEditor ths = this;
+    private final EntryEditor ths = this;
 
-    final HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
+    private final HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
 
-    final Logger logger = Logger.getLogger(EntryEditor.class.getName());
+    private final Logger logger = Logger.getLogger(EntryEditor.class.getName());
 
-    boolean updateSource = true; // This can be set to false to stop the source
-    boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
+    private boolean updateSource = true; // This can be set to false to stop the source
+    private boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
 
-    final List<Object> tabs = new ArrayList<Object>();
+    private final List<Object> tabs = new ArrayList<Object>();
 
     // text area from gettin updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
-    boolean lastSourceAccepted = true; // This indicates whether the last
+    private boolean lastSourceAccepted = true; // This indicates whether the last
 
     // attempt
     // at parsing the source was successful. It is used to determine whether the
     // dialog should close; it should stay open if the user received an error
     // message about the source, whatever he or she chose to do about it.
-    String lastSourceStringAccepted = null; // This is used to prevent double
+    private String lastSourceStringAccepted = null; // This is used to prevent double
 
     // fields.
     // These values can be used to calculate the preferred height for the form.
     // reqW starts at 1 because it needs room for the bibtex key field.
     private int sourceIndex = -1; // The index the source panel has in tabbed.
 
-    final JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
 
     final HelpAction helpAction;
 
-    final UndoAction undoAction = new UndoAction();
+    private final UndoAction undoAction = new UndoAction();
 
-    final RedoAction redoAction = new RedoAction();
+    private final RedoAction redoAction = new RedoAction();
 
-    final TabListener tabListener = new TabListener();
+    private final TabListener tabListener = new TabListener();
 
 
     public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_) {
@@ -670,7 +673,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * other tabs. Look at EntryEditorTab for the setup of text components
      * in the other tabs.
      */
-    public void setupJTextComponent(JTextComponent ta) {
+    private void setupJTextComponent(JTextComponent ta) {
 
         // Set up key bindings and focus listener for the FieldEditor.
         InputMap im = ta.getInputMap(JComponent.WHEN_FOCUSED);
@@ -868,7 +871,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * public boolean storeSourceIfNeeded() { if (tabbed.getSelectedIndex() ==
      * sourceIndex) return storeSource(); else return true; }
      */
-    public boolean storeSource(boolean showError) {
+    private boolean storeSource(boolean showError) {
         // Store edited bibtex code.
         BibtexParser bp = new BibtexParser(new java.io.StringReader(source.getText()));
 
@@ -1017,7 +1020,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    public void setField(String fieldName, String newFieldData) {
+    private void setField(String fieldName, String newFieldData) {
 
         for (Object o : tabs) {
             if (o instanceof EntryEditorTab) {
@@ -1148,7 +1151,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    class FieldListener extends FocusAdapter {
+    private class FieldListener extends FocusAdapter {
 
         /*
          * Focus listener that fires the storeFieldAction when a FieldTextArea
@@ -1663,7 +1666,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    class ExternalViewerListener extends MouseAdapter {
+    private class ExternalViewerListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(MouseEvent evt) {

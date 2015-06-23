@@ -57,12 +57,12 @@ import net.sf.jabref.Util;
 public class IEEEXploreFetcher implements EntryFetcher {
 
     final CaseKeeperList caseKeeperList = new CaseKeeperList();
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
 
-    ImportInspector dialog = null;
-    OutputPrinter status;
-    final HTMLConverter htmlConverter = new HTMLConverter();
+    private ImportInspector dialog = null;
+    private OutputPrinter status;
+    private final HTMLConverter htmlConverter = new HTMLConverter();
 
     private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
     private final JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
@@ -92,17 +92,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
     Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>"
             + "\\s+(.+)");
 
-    final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    private final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    private final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
-    final String abrvPattern = ".*[^,] '?\\d+\\)?";
+    private final String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
-    final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
-    public static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
-    public static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
+    private final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
+    private static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
+    private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
 
     // Common words in IEEE Xplore that should always be 
@@ -777,7 +777,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
      * @return
      * @throws IOException
      */
-    public String getResults(URL source) throws IOException {
+    private String getResults(URL source) throws IOException {
 
         InputStream in = source.openStream();
         StringBuffer sb = new StringBuffer();

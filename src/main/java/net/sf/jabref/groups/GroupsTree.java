@@ -334,7 +334,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     /** Returns the first selected node, or null if nothing is selected. */
-    public GroupTreeNode getSelectedNode() {
+    private GroupTreeNode getSelectedNode() {
         TreePath selectionPath = getSelectionPath();
         return selectionPath != null ? (GroupTreeNode) selectionPath
                 .getLastPathComponent() : null;
@@ -378,7 +378,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     /** Highlights the specified cell or disables highlight if cell == null */
-    public void setHighlight1Cell(Object cell) {
+    private void setHighlight1Cell(Object cell) {
         cellRenderer.setHighlight1Cell(cell);
         repaint();
     }
@@ -408,7 +408,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     /** This sorts without revalidation of groups */
-    protected void sortWithoutRevalidate(GroupTreeNode node, boolean recursive) {
+    private void sortWithoutRevalidate(GroupTreeNode node, boolean recursive) {
         if (node.isLeaf())
          {
             return; // nothing to sort

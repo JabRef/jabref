@@ -188,11 +188,11 @@ public class AuthorList {
     // the following are indices in 'tokens' vector created during parsing of
     // author name
     // and later used to properly split author name into parts
-    int von_start, // first lower-case token (-1 if all tokens upper-case)
-            last_start, // first upper-case token after first lower-case token (-1
-            // if does not exist)
-            comma_first, // token after first comma (-1 if no commas)
-            comma_second; // token after second comma (-1 if no commas or only one
+    private int von_start; // first lower-case token (-1 if all tokens upper-case)
+            private int last_start; // first upper-case token after first lower-case token (-1
+            private int// if does not exist)
+            comma_first; // token after first comma (-1 if no commas)
+            private int comma_second; // token after second comma (-1 if no commas or only one
 
     // comma)
 
@@ -223,7 +223,7 @@ public class AuthorList {
         AuthorList.tex_names.add("j");
     }
 
-    static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
+    private static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
 
 
     /**
@@ -236,7 +236,7 @@ public class AuthorList {
      *            contents of either <CODE>author</CODE> or <CODE>editor</CODE>
      *            bibtex field.
      */
-    protected AuthorList(String bibtex_authors) {
+    private AuthorList(String bibtex_authors) {
         authors = new Vector<Author>(5); // 5 seems to be reasonable initial size
         orig = bibtex_authors; // initialization
         token_start = 0;

@@ -25,13 +25,13 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveString;
 
-public class StringRemoveChange extends Change {
+class StringRemoveChange extends Change {
 
-    final BibtexString string;
-    final BibtexString inMem;
+    private final BibtexString string;
+    private final BibtexString inMem;
 
-    final InfoPane tp = new InfoPane();
-    final JScrollPane sp = new JScrollPane(tp);
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
 
 

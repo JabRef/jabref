@@ -68,24 +68,24 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileListEntryEditor {
 
-    JDialog diag;
-    final JTextField link = new JTextField();
-    final JTextField description = new JTextField();
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final JButton open = new JButton(Globals.lang("Open"));
+    private JDialog diag;
+    private final JTextField link = new JTextField();
+    private final JTextField description = new JTextField();
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton open = new JButton(Globals.lang("Open"));
 
-    final JComboBox types;
-    final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
-    final JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
-    ConfirmCloseFileListEntryEditor externalConfirm = null;
+    private final JComboBox types;
+    private final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
+    private final JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
+    private ConfirmCloseFileListEntryEditor externalConfirm = null;
 
     private FileListEntry entry;
     private final MetaData metaData;
     private boolean okPressed = false, okDisabledExternally = false,
             openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
 
-    public static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
@@ -256,7 +256,7 @@ public class FileListEntryEditor {
         }
     }
 
-    public void openFile() {
+    private void openFile() {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null) {
             try {
@@ -301,7 +301,7 @@ public class FileListEntryEditor {
         return (diag != null) && diag.isVisible();
     }
 
-    public void setValues(FileListEntry entry) {
+    private void setValues(FileListEntry entry) {
         description.setText(entry.getDescription());
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
@@ -317,7 +317,7 @@ public class FileListEntryEditor {
 
     }
 
-    public void storeSettings(FileListEntry entry) {
+    private void storeSettings(FileListEntry entry) {
         entry.setDescription(description.getText().trim());
         // See if we should trim the file link to be relative to the file directory:
         try {

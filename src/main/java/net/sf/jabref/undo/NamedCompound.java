@@ -22,8 +22,8 @@ import net.sf.jabref.Globals;
 
 public class NamedCompound extends CompoundEdit {
 
-    final String name;
-    boolean hasEdits = false;
+    private final String name;
+    private boolean hasEdits = false;
 
 
     public NamedCompound(String name) {

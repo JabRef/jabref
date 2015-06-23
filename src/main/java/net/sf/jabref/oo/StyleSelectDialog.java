@@ -48,9 +48,9 @@ import java.util.Set;
 /**
  * This class produces a dialog box for choosing a style file.
  */
-public class StyleSelectDialog {
+class StyleSelectDialog {
 
-    public static final String STYLE_FILE_EXTENSION = ".jstyle";
+    private static final String STYLE_FILE_EXTENSION = ".jstyle";
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
     private JDialog diag;
@@ -71,7 +71,7 @@ public class StyleSelectDialog {
     private final JButton showDefaultAuthoryearStyle = new JButton(Globals.lang("View"));
     private final JButton showDefaultNumericalStyle = new JButton(Globals.lang("View"));
 
-    PreviewPanel preview;
+    private PreviewPanel preview;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Globals.lang("Ok"));
@@ -429,7 +429,7 @@ public class StyleSelectDialog {
         }
     }
 
-    public void storeSettings() {
+    private void storeSettings() {
         OOBibStyle selected = getSelectedStyle();
         Globals.prefs.putBoolean("ooUseDefaultAuthoryearStyle", useDefaultAuthoryear.isSelected());
         Globals.prefs.putBoolean("ooUseDefaultNumericalStyle", useDefaultNumerical.isSelected());
@@ -449,7 +449,7 @@ public class StyleSelectDialog {
      * Get the currently selected style.
      * @return the selected style, or null if no style is selected.
      */
-    public OOBibStyle getSelectedStyle() {
+    private OOBibStyle getSelectedStyle() {
         if (selectionModel.getSelected().size() > 0) {
             return selectionModel.getSelected().get(0);
         } else {
@@ -522,11 +522,11 @@ public class StyleSelectDialog {
         return okPressed;
     }
 
-    protected void tablePopup(MouseEvent e) {
+    private void tablePopup(MouseEvent e) {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
-    protected void displayDefaultStyle(boolean authoryear) {
+    private void displayDefaultStyle(boolean authoryear) {
         try {
             // Read the contents of the default style file:
             URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath) :
@@ -580,7 +580,7 @@ public class StyleSelectDialog {
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
      */
-    class EntrySelectionListener implements ListEventListener<OOBibStyle> {
+    private class EntrySelectionListener implements ListEventListener<OOBibStyle> {
 
         @Override
         public void listChanged(ListEvent<OOBibStyle> listEvent) {

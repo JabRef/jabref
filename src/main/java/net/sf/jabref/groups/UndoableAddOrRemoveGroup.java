@@ -83,7 +83,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         return Globals.lang("Undo") + ": " + getName();
     }
 
-    public String getName() {
+    private String getName() {
         switch (m_editType) {
         case ADD_NODE:
             return Globals.lang("add group");

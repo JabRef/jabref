@@ -41,11 +41,11 @@ import net.sf.jabref.undo.UndoableRemoveEntry;
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
-    final JabRefFrame frame;
-    final boolean openInNew;
-    MyWorker worker = null;
-    final ImportFormat importer;
-    IOException importError = null;
+    private final JabRefFrame frame;
+    private final boolean openInNew;
+    private MyWorker worker = null;
+    private final ImportFormat importer;
+    private IOException importError = null;
 
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
@@ -280,7 +280,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     }
 
 
-    public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
+    private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibtexDatabase database = new BibtexDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;

@@ -59,17 +59,20 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class DatabasePropertiesDialog extends JDialog {
 
-    MetaData metaData;
-    BasePanel panel = null;
-    final JComboBox encoding;
-    final JButton ok;
-    final JButton cancel;
-    final JTextField fileDir = new JTextField(40);
-    final JTextField fileDirIndv = new JTextField(40);
-    final JTextField pdfDir = new JTextField(40);
-    final JTextField psDir = new JTextField(40);
-    String oldFileVal = "", oldFileIndvVal = "", oldPdfVal = "", oldPsVal = ""; // Remember old values to see if they are changed.
-    SaveOrderConfig oldSaveOrderConfig;
+    private MetaData metaData;
+    private BasePanel panel = null;
+    private final JComboBox encoding;
+    private final JButton ok;
+    private final JButton cancel;
+    private final JTextField fileDir = new JTextField(40);
+    private final JTextField fileDirIndv = new JTextField(40);
+    private final JTextField pdfDir = new JTextField(40);
+    private final JTextField psDir = new JTextField(40);
+    private String oldFileVal = "";
+    private String oldFileIndvVal = "";
+    private String oldPdfVal = "";
+    private String oldPsVal = ""; // Remember old values to see if they are changed.
+    private SaveOrderConfig oldSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
 
@@ -81,8 +84,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    final JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
-    boolean oldProtectVal = false;
+    private final JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
+    private boolean oldProtectVal = false;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
@@ -98,7 +101,7 @@ public class DatabasePropertiesDialog extends JDialog {
         this.metaData = panel.metaData();
     }
 
-    public final void init(JFrame parent) {
+    private void init(JFrame parent) {
 
         JButton browseFile = new JButton(Globals.lang("Browse"));
         JButton browseFileIndv = new JButton(Globals.lang("Browse"));
@@ -305,7 +308,7 @@ public class DatabasePropertiesDialog extends JDialog {
         super.setVisible(visible);
     }
 
-    public void setValues() {
+    private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
         Vector<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
@@ -410,7 +413,7 @@ public class DatabasePropertiesDialog extends JDialog {
         oldProtectVal = protect.isSelected();
     }
 
-    public void storeSettings() {
+    private void storeSettings() {
         SaveOrderConfig newSaveOrderConfig;
         if (saveAsConfiguredGlobally.isSelected()) {
             metaData.remove(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);

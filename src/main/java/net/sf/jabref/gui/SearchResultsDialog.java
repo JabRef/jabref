@@ -65,12 +65,13 @@ public class SearchResultsDialog {
     private final String[] fields = new String[] {
             "author", "title", "year", "journal"
     };
-    protected final int FILE_COL = 0, URL_COL = 1,
-            PAD = 2;
+    private final int FILE_COL = 0;
+    private final int URL_COL = 1;
+    private final int PAD = 2;
     private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
     private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
-    protected final Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
     private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
@@ -78,8 +79,8 @@ public class SearchResultsDialog {
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    protected final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
-    PreviewPanel preview;
+    private final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    private PreviewPanel preview;
 
 
     public SearchResultsDialog(JabRefFrame frame, String title) {
@@ -201,7 +202,7 @@ public class SearchResultsDialog {
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
     @SuppressWarnings("unchecked")
-    protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
+    private void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
                 .getComparatorsForColumn(0);
@@ -238,7 +239,7 @@ public class SearchResultsDialog {
      * Set column widths according to which field is shown, and lock icon columns
      * to a suitable width.
      */
-    protected void setWidths() {
+    private void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
             // Check if the Column is a RankingColumn
@@ -406,7 +407,7 @@ public class SearchResultsDialog {
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
      */
-    class EntrySelectionListener implements ListEventListener<BibtexEntry> {
+    private class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
         @Override
         public void listChanged(ListEvent<BibtexEntry> listEvent) {
@@ -434,7 +435,7 @@ public class SearchResultsDialog {
      * TableFormat for the table shown in the dialog. Handles the display of entry
      * fields and icons for linked files and urls.
      */
-    public class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
+    private class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
 
         @Override
         public int getColumnCount() {

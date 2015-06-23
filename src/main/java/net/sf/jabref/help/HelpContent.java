@@ -30,16 +30,16 @@ import net.sf.jabref.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HelpContent extends JTextPane {
+class HelpContent extends JTextPane {
 
-    static final Log log = LogFactory.getLog(HelpContent.class);
+    private static final Log log = LogFactory.getLog(HelpContent.class);
 
-    final JScrollPane pane;
+    private final JScrollPane pane;
 
     private final Stack<URL> history;
     private final Stack<URL> forw;
 
-    final JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
 
 
     public HelpContent(JabRefPreferences prefs_) {

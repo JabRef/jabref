@@ -32,7 +32,7 @@ import javax.swing.plaf.metal.MetalFileChooserUI;
 public class JabRefFileChooser extends JFileChooser
 {
 
-    public JabRefFileChooser()
+    private JabRefFileChooser()
     {
         super();
     }
@@ -94,7 +94,7 @@ class JabRefUI extends MetalFileChooserUI {
     }
 
 
-    protected class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
+    class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
 
         final JList list;
 

@@ -46,8 +46,8 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileTab extends JPanel implements PrefsTab {
 
-    final JabRefPreferences _prefs;
-    final JabRefFrame _frame;
+    private final JabRefPreferences _prefs;
+    private final JabRefFrame _frame;
 
     private final JCheckBox backup;
     private final JCheckBox openLast;

@@ -70,7 +70,7 @@ public class XMLChars implements LayoutFormatter {
     }
 
 
-    boolean[] forceReplace;
+    private boolean[] forceReplace;
 
 
     private String restFormat(String toFormat) {

@@ -20,7 +20,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-public class InfoPane extends JEditorPane {
+class InfoPane extends JEditorPane {
 
     public InfoPane() {
         setEditable(false);

@@ -41,10 +41,10 @@ public class BibtexWidth {
      * only for relative comparisons, the units have no meaning.
      */
 
-    static int[] widths;
+    private static int[] widths;
 
 
-    static int getSpecialCharWidth(char[] c, int pos) {
+    private static int getSpecialCharWidth(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return 778;

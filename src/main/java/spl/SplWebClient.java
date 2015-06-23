@@ -129,7 +129,7 @@ public class SplWebClient {
         return WebServiceStatus.NO_METADATA;
     }
 
-    public static boolean isWebServiceOutDated() {
+    private static boolean isWebServiceOutDated() {
         try {
             ClientResponse response = SplWebClient.WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
             if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
@@ -151,7 +151,7 @@ public class SplWebClient {
         return false;
     }
 
-    public static boolean isMetaDataServiceAvailable() {
+    private static boolean isMetaDataServiceAvailable() {
         try {
             ClientResponse response = SplWebClient.WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
             if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
@@ -166,7 +166,7 @@ public class SplWebClient {
         return true;
     }
 
-    public static boolean isWebServiceAvailable() {
+    private static boolean isWebServiceAvailable() {
         try {
             ClientResponse response = SplWebClient.WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class SplWebClient {
         return true;
     }
 
-    public static boolean isInternetAvailable() {
+    private static boolean isInternetAvailable() {
         try {
             ClientResponse response = SplWebClient.INTERNETRESOURCE.get(ClientResponse.class);
         } catch (Exception e) {

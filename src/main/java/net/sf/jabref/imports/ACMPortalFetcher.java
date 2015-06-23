@@ -35,8 +35,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private final ImportInspector dialog = null;
     private final HTMLConverter htmlConverter = new HTMLConverter();
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
     private String terms;
 
     private static final String startUrl = "http://portal.acm.org/";
@@ -418,7 +418,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      * @return
      * @throws IOException
      */
-    public String getResults(URL source) throws IOException {
+    private String getResults(URL source) throws IOException {
 
         InputStream in = source.openStream();
         StringBuilder sb = new StringBuilder();

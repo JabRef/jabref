@@ -57,10 +57,10 @@ public class GUIGlobals {
     public static final String NUMBER_COL = "#";
     public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
-    public static Font CURRENTFONT,
-            typeNameFont,
-            jabRefFont,
-            fieldNameFont;
+    public static Font CURRENTFONT;
+    public static Font typeNameFont;
+    public static Font jabRefFont;
+    private static Font fieldNameFont;
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =
@@ -88,19 +88,19 @@ public class GUIGlobals {
     backupExt = ".bak";
 
     // Image paths.
-    public static final String
+    private static final String
             imageSize = "24";
-    public static final String extension = ".gif";
+    private static final String extension = ".gif";
     public static String ex = GUIGlobals.imageSize + GUIGlobals.extension;
     public static String pre = "/images/";
     public static final String helpPre = "/help/";
     public static String fontPath = "/images/font/";
 
-    static final HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
+    private static final HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
 
-    static HashMap<String, String> iconMap;
+    private static HashMap<String, String> iconMap;
 
 
     public static JLabel getTableIcon(String fieldType) {
@@ -182,7 +182,7 @@ public class GUIGlobals {
 
     public static final String FILE_FIELD = "file";
 
-    public static final String FOLDER_FIELD = "folder";
+    private static final String FOLDER_FIELD = "folder";
 
     public static final double
             SMALL_W = 0.30,

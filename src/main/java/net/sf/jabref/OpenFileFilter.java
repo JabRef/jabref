@@ -21,8 +21,8 @@ import java.util.HashSet;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-    final HashSet<String> extSet = new HashSet<String>();
-    final String desc;
+    private final HashSet<String> extSet = new HashSet<String>();
+    private final String desc;
 
 
     public OpenFileFilter(String[] extensions) {

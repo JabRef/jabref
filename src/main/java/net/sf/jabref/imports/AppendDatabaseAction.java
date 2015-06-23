@@ -86,8 +86,8 @@ public class AppendDatabaseAction extends BaseAction {
 
     }
 
-    void openIt(boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords) {
+    private void openIt(boolean importEntries, boolean importStrings,
+                        boolean importGroups, boolean importSelectorWords) {
         if (filesToOpen.size() == 0) {
             return;
         }
@@ -109,9 +109,9 @@ public class AppendDatabaseAction extends BaseAction {
         }
     }
 
-    public static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
-            boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords)
+    private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
+                                        boolean importEntries, boolean importStrings,
+                                        boolean importGroups, boolean importSelectorWords)
             throws KeyCollisionException {
 
         BibtexDatabase fromDatabase = pr.getDatabase();

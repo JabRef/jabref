@@ -39,24 +39,24 @@ import org.java.plugin.registry.ManifestInfo;
  */
 public class PluginInstaller {
 
-    public static final String PLUGIN_XML_FILE = "plugin.xml";
-    public static final int
-            SUCCESS = 0,
-            UNABLE_TO_CREATE_DIR = 1,
-            UNABLE_TO_COPY_FILE = 2;
+    private static final String PLUGIN_XML_FILE = "plugin.xml";
+    private static final int
+            SUCCESS = 0;
+    private static final int UNABLE_TO_CREATE_DIR = 1;
+    private static final int UNABLE_TO_COPY_FILE = 2;
+
+    private static final int
+            NO_VERSIONS_INSTALLED = 0;
+    private static final int NEWER_VERSION_INSTALLED = 1;
+    private static final int SAME_VERSION_INSTALLED = 2;
+    private static final int OLDER_VERSION_INSTALLED = 3;
+    public static final int UNCONVENTIONAL_FILENAME = 4;
+    private static final int UNKNOWN_VERSION = 5;
 
     public static final int
-            NO_VERSIONS_INSTALLED = 0,
-            NEWER_VERSION_INSTALLED = 1,
-            SAME_VERSION_INSTALLED = 2,
-            OLDER_VERSION_INSTALLED = 3,
-            UNCONVENTIONAL_FILENAME = 4,
-            UNKNOWN_VERSION = 5;
-
-    public static final int
-            NOT_LOADED = 0,
-            LOADED = 1,
-            BAD = 2;
+            NOT_LOADED = 0;
+    private static final int LOADED = 1;
+    private static final int BAD = 2;
 
 
     public static void installPlugin(JabRefFrame frame, File file, String targetFileName) {
@@ -166,7 +166,7 @@ public class PluginInstaller {
      * @param f The plugin file.
      * @return an integer indicating the status
      */
-    public static int checkInstalledVersion(File f) {
+    private static int checkInstalledVersion(File f) {
         String[] nav = PluginInstaller.getNameAndVersion(f);
         if (nav == null) {
             return PluginInstaller.UNKNOWN_VERSION;
@@ -203,7 +203,7 @@ public class PluginInstaller {
         return PluginInstaller.deletePluginFile(plugin.file);
     }
 
-    public static boolean deleteOlderVersions(File f) {
+    private static boolean deleteOlderVersions(File f) {
         String[] nav = PluginInstaller.getNameAndVersion(f);
         if (nav == null) {
             return false;
@@ -229,7 +229,7 @@ public class PluginInstaller {
      * @param f The file to delete.
      * @return true if deletion was successful, false if scheduled for later.
      */
-    public static boolean deletePluginFile(File f) {
+    private static boolean deletePluginFile(File f) {
         boolean success = f.delete();
         if (success) {
             return true;
@@ -267,7 +267,7 @@ public class PluginInstaller {
         }
     }
 
-    public static int copyPlugin(JFrame frame, File source, String destFileName) {
+    private static int copyPlugin(JFrame frame, File source, String destFileName) {
         if (destFileName == null) {
             destFileName = source.getName();
         }
@@ -317,7 +317,7 @@ public class PluginInstaller {
      * @param pluginName The name of the plugin.
      * @return A map of versions already present, linking to the file containing each.
      */
-    public static Map<VersionNumber, File> getInstalledVersions(final String pluginName) {
+    private static Map<VersionNumber, File> getInstalledVersions(final String pluginName) {
 
         String[] files = PluginCore.userPluginDir.list(new FilenameFilter() {
 
@@ -348,7 +348,7 @@ public class PluginInstaller {
      *
      * @param filename The path to the file to delete.
      */
-    public static void schedulePluginForDeletion(String filename) {
+    private static void schedulePluginForDeletion(String filename) {
         String[] oldValues = Globals.prefs.getStringArray("deletePlugins");
         String[] newValues = oldValues == null ? new String[1] : new String[oldValues.length + 1];
         if (oldValues != null) {
@@ -390,7 +390,7 @@ public class PluginInstaller {
      *   interpreted.
      *
      */
-    public static String[] getNameAndVersion(File f) {
+    private static String[] getNameAndVersion(File f) {
 
         try {
             File temp = PluginInstaller.unpackPluginXML(f);
@@ -417,7 +417,7 @@ public class PluginInstaller {
      * @param f The jar file to extract from.
      * @return a temporary file to which the plugin.xml file has been copied.
      */
-    public static File unpackPluginXML(File f) {
+    private static File unpackPluginXML(File f) {
         InputStream in = null;
         OutputStream out = null;
 

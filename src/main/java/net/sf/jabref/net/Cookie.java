@@ -19,14 +19,14 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 
-public class Cookie {
+class Cookie {
 
-    final String name;
-    final String value;
-    final URI uri;
+    private final String name;
+    private final String value;
+    private final URI uri;
     String domain;
-    Date expires;
-    String path;
+    private Date expires;
+    private String path;
 
     private static final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
 

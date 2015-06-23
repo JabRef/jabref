@@ -31,13 +31,13 @@ import javax.swing.JScrollPane;
  */
 public class SidePane extends JPanel {
 
-    final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
+    private final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
 
-    final GridBagLayout gridBagLayout = new GridBagLayout();
+    private final GridBagLayout gridBagLayout = new GridBagLayout();
 
-    final GridBagConstraints constraint = new GridBagConstraints();
+    private final GridBagConstraints constraint = new GridBagConstraints();
 
-    final JPanel mainPanel = new JPanel();
+    private final JPanel mainPanel = new JPanel();
 
 
     public SidePane() {

@@ -65,11 +65,11 @@ public class JabRef {
     public static JabRef singleton;
     public static RemoteListener remoteListener = null;
     public static JabRefFrame jrf;
-    public static Frame splashScreen = null;
+    private static Frame splashScreen = null;
 
-    boolean graphicFailure = false;
+    private boolean graphicFailure = false;
 
-    public static final int MAX_DIALOG_WARNINGS = 10;
+    private static final int MAX_DIALOG_WARNINGS = 10;
     private JabRefCLI cli;
 
 
@@ -216,7 +216,7 @@ public class JabRef {
         return "N/A";
     }
 
-    public static void setCurrentProcessExplicitAppUserModelID(final String appID)
+    private static void setCurrentProcessExplicitAppUserModelID(final String appID)
     {
         if (JabRef.SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0) {
             throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
@@ -580,7 +580,7 @@ public class JabRef {
      * @return A parser result containing the entries fetched or null if an
      *         error occurred.
      */
-    protected ParserResult fetch(String fetchCommand) {
+    private ParserResult fetch(String fetchCommand) {
 
         if ((fetchCommand == null) || !fetchCommand.contains(":") ||
                 (fetchCommand.split(":").length != 2)) {
@@ -685,7 +685,7 @@ public class JabRef {
         }
     }
 
-    public void openWindow(Vector<ParserResult> loaded) {
+    private void openWindow(Vector<ParserResult> loaded) {
         // Call the method performCompatibilityUpdate(), which does any
         // necessary changes for users with a preference set from an older
         // Jabref version.
@@ -962,7 +962,7 @@ public class JabRef {
 
     }
 
-    public static ParserResult importFile(String argument) {
+    private static ParserResult importFile(String argument) {
         String[] data = argument.split(",");
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
@@ -1017,7 +1017,7 @@ public class JabRef {
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    public static ParserResult importToOpenBase(String argument) {
+    private static ParserResult importToOpenBase(String argument) {
         ParserResult result = JabRef.importFile(argument);
 
         if (result != null) {

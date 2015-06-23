@@ -101,7 +101,7 @@ public class TXMLReader
     }
 
     /** collect all "plain" data of a xml node */
-    public String getSimpleElementText(Element node)
+    private String getSimpleElementText(Element node)
     {
         StringBuffer sb = new StringBuffer();
         NodeList children = node.getChildNodes();

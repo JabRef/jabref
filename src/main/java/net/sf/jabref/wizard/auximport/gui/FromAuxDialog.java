@@ -342,7 +342,7 @@ public class FromAuxDialog
 class FromAuxDialog_generate_actionAdapter
         implements java.awt.event.ActionListener {
 
-    final FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_generate_actionAdapter(FromAuxDialog adaptee) {
@@ -358,7 +358,7 @@ class FromAuxDialog_generate_actionAdapter
 class FromAuxDialog_Cancel_actionAdapter
         implements java.awt.event.ActionListener {
 
-    final FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_Cancel_actionAdapter(FromAuxDialog adaptee) {
@@ -374,7 +374,7 @@ class FromAuxDialog_Cancel_actionAdapter
 class FromAuxDialog_parse_actionAdapter
         implements java.awt.event.ActionListener {
 
-    final FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_parse_actionAdapter(FromAuxDialog adaptee) {

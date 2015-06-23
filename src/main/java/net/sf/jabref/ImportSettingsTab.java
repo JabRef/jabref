@@ -33,7 +33,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     public final static int DEFAULT_STYLE = ImportDialog.CONTENT;
 
     public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
-    public final static String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
+    private final static String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
             "bibtexkey",
             "bibtexkey - title",
     };

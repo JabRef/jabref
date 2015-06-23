@@ -43,20 +43,20 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class AutoGroupDialog extends JDialog implements CaretListener {
 
-    final JTextField remove = new JTextField(60);
-    final JTextField field = new JTextField(60);
-    final JTextField deliminator = new JTextField(60);
+    private final JTextField remove = new JTextField(60);
+    private final JTextField field = new JTextField(60);
+    private final JTextField deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
-    final JRadioButton
+    private final JRadioButton
             keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field"));
-    final JRadioButton authors = new JRadioButton(Globals.lang("Generate groups for author last names"));
-    final JRadioButton editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
-    final JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
-    final JButton ok = new JButton(Globals.lang("Ok"));
-    final JButton cancel = new JButton(Globals.lang("Cancel"));
-    final JPanel main = new JPanel();
-    final JPanel opt = new JPanel();
+    private final JRadioButton authors = new JRadioButton(Globals.lang("Generate groups for author last names"));
+    private final JRadioButton editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
+    private final JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JPanel main = new JPanel();
+    private final JPanel opt = new JPanel();
     private boolean ok_pressed = false;
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
@@ -261,11 +261,11 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         return oldRemove;
     }
 
-    public String field() {
+    private String field() {
         return field.getText();
     }
 
-    public String remove() {
+    private String remove() {
         return remove.getText();
     }
 
@@ -274,7 +274,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         updateComponents();
     }
 
-    protected void updateComponents() {
+    private void updateComponents() {
         String groupField = field.getText().trim();
         ok.setEnabled(groupField.matches("\\w+"));
     }

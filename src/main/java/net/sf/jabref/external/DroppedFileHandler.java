@@ -357,8 +357,8 @@ public class DroppedFileHandler {
     //
     // @return true if user pushed "Ok", false otherwise
     //
-    public boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
-            BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
+    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
+                                                 BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
         String citeKey = entry.getCiteKey();
 
         String dialogTitle = Globals.lang("Link to file %0", linkFileName);

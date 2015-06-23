@@ -39,7 +39,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         Transferable {
 
     public static final DataFlavor flavor;
-    public static final DataFlavor[] flavors;
+    private static final DataFlavor[] flavors;
 
     static {
         DataFlavor df = null;
@@ -179,7 +179,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         return getSearchRule(getGroup().getHierarchicalContext());
     }
 
-    protected SearchRule getSearchRule(int originalContext) {
+    private SearchRule getSearchRule(int originalContext) {
         final int context = getGroup().getHierarchicalContext();
         if (context == AbstractGroup.INDEPENDENT) {
             return getGroup().getSearchRule();

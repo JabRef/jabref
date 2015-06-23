@@ -59,7 +59,7 @@ public class SPIRESFetcher implements EntryFetcher {
      * 
      * @return a String denoting the query URL
      */
-    public String constructUrl(String key) {
+    private String constructUrl(String key) {
         String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");

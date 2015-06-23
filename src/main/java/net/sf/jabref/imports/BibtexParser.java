@@ -421,7 +421,7 @@ public class BibtexParser {
         _in.unread(c);
     }
 
-    public BibtexString parseString() throws IOException {
+    private BibtexString parseString() throws IOException {
         // Util.pr("Parsing string");
         skipWhitespace();
         consume('{', '(');
@@ -441,11 +441,11 @@ public class BibtexParser {
         return new BibtexString(id, name, content);
     }
 
-    public String parsePreamble() throws IOException {
+    private String parsePreamble() throws IOException {
         return parseBracketedText().toString();
     }
 
-    public BibtexEntry parseEntry(BibtexEntryType tp) throws IOException {
+    private BibtexEntry parseEntry(BibtexEntryType tp) throws IOException {
         String id = Util.createNeutralId();// createId(tp, _db);
         BibtexEntry result = new BibtexEntry(id, tp);
         skipWhitespace();
@@ -996,7 +996,7 @@ public class BibtexParser {
 
     }
 
-    public void checkEntryTypes(ParserResult _pr) {
+    private void checkEntryTypes(ParserResult _pr) {
 
         for (BibtexEntry be : _db.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {

@@ -46,22 +46,22 @@ public class CleanUpAction extends AbstractWorker {
 
     private final Logger logger = Logger.getLogger(CleanUpAction.class.getName());
 
-    public final static String
-            AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain",
-            CLEANUP_DOI = "CleanUpDOI",
-            CLEANUP_MONTH = "CleanUpMonth",
-            CLEANUP_PAGENUMBERS = "CleanUpPageNumbers",
-            CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative",
-            CLEANUP_RENAMEPDF = "CleanUpRenamePDF",
-            CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths",
-            CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks",
-            CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts",
-            CLEANUP_HTML = "CleanUpHTML",
-            CLEANUP_CASE = "CleanUpCase",
-            CLEANUP_LATEX = "CleanUpLaTeX",
-            CLEANUP_UNITS = "CleanUpUnits",
-            CLEANUP_UNICODE = "CleanUpUnicode",
-            CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
+    private final static String
+            AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
+    private final static String CLEANUP_DOI = "CleanUpDOI";
+    private final static String CLEANUP_MONTH = "CleanUpMonth";
+    private final static String CLEANUP_PAGENUMBERS = "CleanUpPageNumbers";
+    private final static String CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative";
+    private final static String CLEANUP_RENAMEPDF = "CleanUpRenamePDF";
+    private final static String CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
+    private final static String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
+    private final static String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
+    private final static String CLEANUP_HTML = "CleanUpHTML";
+    private final static String CLEANUP_CASE = "CleanUpCase";
+    private final static String CLEANUP_LATEX = "CleanUpLaTeX";
+    private final static String CLEANUP_UNITS = "CleanUpUnits";
+    private final static String CLEANUP_UNICODE = "CleanUpUnicode";
+    private final static String CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
 
 
     public static void putDefaults(HashMap<String, Object> defaults) {
@@ -104,7 +104,7 @@ public class CleanUpAction extends AbstractWorker {
     private final JabRefFrame frame;
 
     // global variable to count unsuccessful renames
-    int unsuccesfullRenames = 0;
+    private int unsuccesfullRenames = 0;
 
 
     public CleanUpAction(BasePanel panel) {
@@ -204,8 +204,8 @@ public class CleanUpAction extends AbstractWorker {
     }
 
 
-    boolean cancelled;
-    int modifiedEntriesCount;
+    private boolean cancelled;
+    private int modifiedEntriesCount;
     int numSelected;
 
 

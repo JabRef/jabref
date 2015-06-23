@@ -20,10 +20,10 @@ import java.util.*;
 public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
-    final ArrayList<BibtexEntry> set;
-    final Comparator<BibtexEntry> comp;
-    String[] idArray;
-    BibtexEntry[] entryArray;
+    private final ArrayList<BibtexEntry> set;
+    private final Comparator<BibtexEntry> comp;
+    private String[] idArray;
+    private BibtexEntry[] entryArray;
     private boolean changed = false;
 
 
@@ -40,7 +40,7 @@ public class EntrySorter implements DatabaseChangeListener {
         index();
     }
 
-    public void index() {
+    private void index() {
 
         /*  Old version, from when set was a TreeSet.
 

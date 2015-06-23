@@ -22,15 +22,15 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 
-public class EntryDeleteChange extends Change {
+class EntryDeleteChange extends Change {
 
-    final BibtexEntry memEntry;
-    final BibtexEntry tmpEntry;
+    private final BibtexEntry memEntry;
+    private final BibtexEntry tmpEntry;
     BibtexEntry diskEntry;
-    final boolean isModifiedLocally;
-    final double matchWithTmp;
-    final PreviewPanel pp;
-    final JScrollPane sp;
+    private final boolean isModifiedLocally;
+    private final double matchWithTmp;
+    private final PreviewPanel pp;
+    private final JScrollPane sp;
 
 
     public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {

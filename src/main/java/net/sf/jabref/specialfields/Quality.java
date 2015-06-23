@@ -27,7 +27,7 @@ public class Quality extends SpecialField {
     private static Quality INSTANCE;
 
 
-    public Quality() {
+    private Quality() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Globals.lang("Toogle quality assured"), GUIGlobals.getImage("qualityAssured"), Globals.lang("Toogle quality assured")));
         this.setValues(values);

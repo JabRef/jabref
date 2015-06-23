@@ -17,18 +17,18 @@ package net.sf.jabref.bst;
 
 public class BibtexCaseChanger {
 
-    final String s;
+    private final String s;
 
-    final char format;
+    private final char format;
 
-    boolean prevColon = true;
+    private boolean prevColon = true;
 
-    final int n;
+    private final int n;
 
-    final Warn warn;
+    private final Warn warn;
 
 
-    BibtexCaseChanger(String s, char format, Warn warn) {
+    private BibtexCaseChanger(String s, char format, Warn warn) {
         this.s = s;
         this.format = format;
         this.n = s.length();
@@ -83,10 +83,10 @@ public class BibtexCaseChanger {
     }
 
 
-    int braceLevel = 0;
+    private int braceLevel = 0;
 
 
-    int decrBraceLevel(String string, int braceLevel) {
+    private int decrBraceLevel(String string, int braceLevel) {
         if (braceLevel == 0) {
             BibtexCaseChanger.complain(string);
         } else {
@@ -120,7 +120,7 @@ public class BibtexCaseChanger {
      * @param format
      * @return
      */
-    public int convertSpecialChar(StringBuffer sb, char[] c, int i, char format) {
+    private int convertSpecialChar(StringBuffer sb, char[] c, int i, char format) {
 
         sb.append(c[i]);
         i++; // skip over open brace
@@ -159,7 +159,7 @@ public class BibtexCaseChanger {
      * @param format
      * @return
      */
-    int convertAccented(char[] c, int pos, String s, StringBuffer sb, char format) {
+    private int convertAccented(char[] c, int pos, String s, StringBuffer sb, char format) {
         pos += s.length();
 
         switch (format) {
@@ -189,7 +189,7 @@ public class BibtexCaseChanger {
         return pos;
     }
 
-    int convertNonControl(char[] c, int pos, StringBuffer sb, char format) {
+    private int convertNonControl(char[] c, int pos, StringBuffer sb, char format) {
         switch (format) {
         case TITLE_LOWERS:
         case ALL_LOWERS:
@@ -205,14 +205,14 @@ public class BibtexCaseChanger {
     }
 
 
-    public final static char TITLE_LOWERS = 't';
+    private final static char TITLE_LOWERS = 't';
 
-    public final static char ALL_LOWERS = 'l';
+    private final static char ALL_LOWERS = 'l';
 
-    public final static char ALL_UPPERS = 'u';
+    private final static char ALL_UPPERS = 'u';
 
 
-    int convertChar0(char[] c, int i, StringBuffer sb, char format) {
+    private int convertChar0(char[] c, int i, StringBuffer sb, char format) {
         switch (format) {
         case TITLE_LOWERS:
             if (i == 0) {

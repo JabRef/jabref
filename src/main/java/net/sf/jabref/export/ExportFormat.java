@@ -35,16 +35,16 @@ import java.util.*;
  */
 public class ExportFormat implements IExportFormat {
 
-    String displayName;
-    String consoleName;
-    String lfFileName;
-    String directory;
-    String extension;
+    private String displayName;
+    private String consoleName;
+    private String lfFileName;
+    private String directory;
+    private String extension;
     String encoding = null; // If this value is set, it will be used to override
     // the default encoding for the basePanel.
 
-    FileFilter fileFilter;
-    boolean customExport = false;
+    private FileFilter fileFilter;
+    private boolean customExport = false;
 
 
     /**
@@ -72,7 +72,7 @@ public class ExportFormat implements IExportFormat {
     }
 
     /** Empty default constructor for subclasses */
-    protected ExportFormat() {
+    ExportFormat() {
         // intentionally empty
     }
 
@@ -109,7 +109,7 @@ public class ExportFormat implements IExportFormat {
      * obtained from the basepanel.
      * @param encoding The name of the encoding to use.
      */
-    protected void setEncoding(String encoding) {
+    void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
@@ -130,7 +130,7 @@ public class ExportFormat implements IExportFormat {
      * 
      * @return a newly created reader
      */
-    protected Reader getReader(String filename) throws IOException {
+    Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given file name:
         String dir;
         if (customExport) {
@@ -362,8 +362,8 @@ public class ExportFormat implements IExportFormat {
         return formatters;
     }
 
-    protected SaveSession getSaveSession(final String encoding,
-            final File outFile) throws IOException {
+    SaveSession getSaveSession(final String encoding,
+                               final File outFile) throws IOException {
         return new SaveSession(outFile, encoding, false);
     }
 
@@ -378,7 +378,7 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss) throws Exception {
+    void finalizeSaveSession(final SaveSession ss) throws Exception {
         ss.getWriter().flush();
         ss.getWriter().close();
 

@@ -43,7 +43,7 @@ import org.w3c.dom.NodeList;
  */
 public class MSBibDatabase {
 
-    protected Set<MSBibEntry> entries;
+    private Set<MSBibEntry> entries;
 
 
     public MSBibDatabase() {

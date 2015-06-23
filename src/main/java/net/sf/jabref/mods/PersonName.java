@@ -33,9 +33,9 @@ import net.sf.jabref.AuthorList;
  */
 public class PersonName {
 
-    protected String givenName = null;
-    protected String surname = null;
-    protected String middleName = null;
+    private String givenName = null;
+    private String surname = null;
+    private String middleName = null;
 
 
     public PersonName() {
@@ -51,7 +51,7 @@ public class PersonName {
         surname = lastName;
     }
 
-    protected void parseName(String author) {
+    private void parseName(String author) {
         Vector<String> v = new Vector<String>();
         String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 

@@ -65,26 +65,27 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     }
 
-    OOPanel comp;
-    JDialog diag;
-    static JButton
+    private OOPanel comp;
+    private JDialog diag;
+    private static JButton
             connect;
-    static JButton manualConnect;
-    static JButton selectDocument;
-    static final JButton setStyleFile = new JButton(Globals.lang("Select style"));
-    static final JButton pushEntries = new JButton(Globals.lang("Cite"));
-    static final JButton pushEntriesInt = new JButton(Globals.lang("Cite in-text"));
-    static final JButton pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation"));
-    static final JButton pushEntriesAdvanced = new JButton(Globals.lang("Cite special"));
-    static final JButton focus = new JButton("Focus OO document");
-    static JButton update;
-    static final JButton insertFullRef = new JButton("Insert reference text");
-    static final JButton merge = new JButton(Globals.lang("Merge citations"));
-    static final JButton manageCitations = new JButton(Globals.lang("Manage citations"));
-    static final JButton settingsB = new JButton(Globals.lang("Settings"));
-    static final JButton help = new JButton(GUIGlobals.getImage("help"));
-    static final JButton test = new JButton("Test");
-    JRadioButton inPar, inText;
+    private static JButton manualConnect;
+    private static JButton selectDocument;
+    private static final JButton setStyleFile = new JButton(Globals.lang("Select style"));
+    private static final JButton pushEntries = new JButton(Globals.lang("Cite"));
+    private static final JButton pushEntriesInt = new JButton(Globals.lang("Cite in-text"));
+    private static final JButton pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation"));
+    private static final JButton pushEntriesAdvanced = new JButton(Globals.lang("Cite special"));
+    private static final JButton focus = new JButton("Focus OO document");
+    private static JButton update;
+    private static final JButton insertFullRef = new JButton("Insert reference text");
+    private static final JButton merge = new JButton(Globals.lang("Merge citations"));
+    private static final JButton manageCitations = new JButton(Globals.lang("Manage citations"));
+    private static final JButton settingsB = new JButton(Globals.lang("Settings"));
+    private static final JButton help = new JButton(GUIGlobals.getImage("help"));
+    private static final JButton test = new JButton("Test");
+    private JRadioButton inPar;
+    private JRadioButton inText;
     private JPanel settings = null;
     private static String styleFile = null;
     private static OOBibBase ooBase;
@@ -465,7 +466,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         //diag.setVisible(true);
     }
 
-    public java.util.List<BibtexDatabase> getBaseList() {
+    private java.util.List<BibtexDatabase> getBaseList() {
         java.util.List<BibtexDatabase> databases = new ArrayList<BibtexDatabase>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
             for (int i = 0; i < OpenOfficePanel.frame.baseCount(); i++) {
@@ -478,7 +479,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         return databases;
     }
 
-    public void connect(boolean auto) {
+    private void connect(boolean auto) {
         /*if (ooBase != null) {
             try {
                 java.util.List<XTextDocument> list = ooBase.getTextDocuments();
@@ -630,7 +631,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
      * Read the style file. Record the last modified time of the file.
      * @throws Exception
      */
-    public void readStyleFile() throws Exception {
+    private void readStyleFile() throws Exception {
         if (OpenOfficePanel.useDefaultAuthoryearStyle) {
             URL defPath = JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath);
             Reader r = new InputStreamReader(defPath.openStream());
@@ -652,7 +653,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private static final Class[] parameters = new Class[] {URL.class};
 
 
-    public static void addURL(URL[] u) throws IOException {
+    private static void addURL(URL[] u) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
 
@@ -668,14 +669,14 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         }//end try catch
     }//end method
 
-    public void updateConnectionParams(String ooPath, String ooExec, String ooJars, boolean oo3) {
+    private void updateConnectionParams(String ooPath, String ooExec, String ooJars, boolean oo3) {
         Globals.prefs.put("ooPath", ooPath);
         Globals.prefs.put("ooExecutablePath", ooExec);
         Globals.prefs.put("ooJarsPath", ooJars);
         Globals.prefs.putBoolean("connectToOO3", oo3);
     }
 
-    public void showConnectDialog() {
+    private void showConnectDialog() {
         dialogOkPressed = false;
         final JDialog diag = new JDialog(OpenOfficePanel.frame, Globals.lang("Set connection parameters"), true);
         final JTextField ooPath = new JTextField(30);
@@ -757,7 +758,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     }
 
-    public void pushEntries(boolean inParenthesis, boolean withText, boolean addPageInfo) {
+    private void pushEntries(boolean inParenthesis, boolean withText, boolean addPageInfo) {
         if (!OpenOfficePanel.ooBase.isConnectedToDocument()) {
             JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Not connected to any Writer document. Please"
                     + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
@@ -808,13 +809,13 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
 
     }
 
-    public void showConnectionLostErrorMessage() {
+    private void showConnectionLostErrorMessage() {
         JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Connection to OpenOffice has been lost. "
                 + "Please make sure OpenOffice is running, and try to reconnect."),
                 Globals.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
     }
 
-    public void insertFullRefs() {
+    private void insertFullRefs() {
         try {
             // Create or clear bibliography:
             /*boolean hadBib = ooBase.createBibTextSection(true);
@@ -882,7 +883,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         }
     }
 
-    public void showSettingsPopup() {
+    private void showSettingsPopup() {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Globals.lang("Automatically sync bibliography when inserting citations"),
@@ -946,7 +947,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         menu.show(OpenOfficePanel.settingsB, 0, OpenOfficePanel.settingsB.getHeight());
     }
 
-    public void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
+    private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
 
         final BibtexDatabase database = OpenOfficePanel.frame.basePanel().database();
         if (entries.length > 0) {

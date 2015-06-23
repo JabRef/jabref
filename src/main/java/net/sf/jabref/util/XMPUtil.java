@@ -501,8 +501,8 @@ public class XMPUtil {
      * @see #toXMP(java.util.Collection, net.sf.jabref.BibtexDatabase) if you don't need strings to be
      *      resolved.
      */
-    public static void toXMP(Collection<BibtexEntry> bibtexEntries,
-            BibtexDatabase database, OutputStream outputStream)
+    private static void toXMP(Collection<BibtexEntry> bibtexEntries,
+                              BibtexDatabase database, OutputStream outputStream)
             throws IOException, TransformerException {
 
         if (database != null) {
@@ -559,7 +559,7 @@ public class XMPUtil {
      *         found.
      * @throws IOException
      */
-    public static XMPMetadata readRawXMP(InputStream inputStream)
+    private static XMPMetadata readRawXMP(InputStream inputStream)
             throws IOException {
         PDDocument document = null;
 
@@ -579,7 +579,7 @@ public class XMPUtil {
         }
     }
 
-    static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
+    private static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
 
@@ -612,8 +612,8 @@ public class XMPUtil {
         }
     }
 
-    static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
-            BibtexEntry entry, BibtexDatabase database) {
+    private static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
+                                        BibtexEntry entry, BibtexDatabase database) {
 
         if (database != null) {
             entry = database.resolveForStrings(entry, false);
@@ -945,8 +945,8 @@ public class XMPUtil {
      * @throws TransformerException
      */
     @SuppressWarnings("unchecked")
-    public static void writeDublinCore(PDDocument document,
-            Collection<BibtexEntry> entries, BibtexDatabase database)
+    private static void writeDublinCore(PDDocument document,
+                                        Collection<BibtexEntry> entries, BibtexDatabase database)
             throws IOException, TransformerException {
 
         if (database != null) {
@@ -1000,8 +1000,8 @@ public class XMPUtil {
      *            belong to, which will be used to resolve strings. If the
      *            database is null the strings will not be resolved.
      */
-    public static void writeDocumentInformation(PDDocument document,
-            BibtexEntry entry, BibtexDatabase database) {
+    private static void writeDocumentInformation(PDDocument document,
+                                                 BibtexEntry entry, BibtexDatabase database) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
@@ -1159,7 +1159,7 @@ public class XMPUtil {
      * 
      * @see XMPUtil#main(String[])
      */
-    protected static void usage() {
+    private static void usage() {
         System.out.println("Read or write XMP-metadata from or to pdf file.");
         System.out.println("");
         System.out.println("Usage:");

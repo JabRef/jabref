@@ -26,9 +26,13 @@ import net.sf.jabref.GUIGlobals;
  */
 public class ExternalFileType implements Comparable<ExternalFileType> {
 
-    protected String name, extension, openWith, iconName, mimeType;
-    protected ImageIcon icon;
-    protected final JLabel label = new JLabel();
+    private String name;
+    String extension;
+    private String openWith;
+    private String iconName;
+    private String mimeType;
+    private ImageIcon icon;
+    private final JLabel label = new JLabel();
 
 
     public ExternalFileType(String name, String extension, String mimeType,

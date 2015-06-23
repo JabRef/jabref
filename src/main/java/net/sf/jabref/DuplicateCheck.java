@@ -26,12 +26,12 @@ public class DuplicateCheck {
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
-    public static final double doubtRange = 0.05;
+    private static final double doubtRange = 0.05;
 
-    final static double reqWeight = 3; // Weighting of all required fields
+    private final static double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
-    static final HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
+    private static final HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
 
     static {
         DuplicateCheck.fieldWeights.put("author", 2.5);
@@ -229,7 +229,7 @@ public class DuplicateCheck {
      *   harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
-    public static double correlateByWords(String s1, String s2, boolean truncate) {
+    private static double correlateByWords(String s1, String s2, boolean truncate) {
         String[] w1 = s1.split("\\s"), w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
@@ -245,7 +245,7 @@ public class DuplicateCheck {
         return 1 - missRate;
     }
 
-    public static double correlateStrings(String s1, String s2, boolean truncate) {
+    private static double correlateStrings(String s1, String s2, boolean truncate) {
         int minLength = Math.min(s1.length(), s2.length());
         if (truncate && (minLength == 1)) {
             return s1.charAt(0) == s2.charAt(0) ? 1.0 : 0.0;

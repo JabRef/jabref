@@ -45,7 +45,7 @@ public class SynchronizeFileField extends AbstractWorker {
     private BibtexEntry[] sel = null;
     private SynchronizeFileField.OptionsDialog optDiag = null;
 
-    final Object[] brokenLinkOptions =
+    private final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
             Globals.lang("Remove all broken links"),
             Globals.lang("Quit synchronization")};
