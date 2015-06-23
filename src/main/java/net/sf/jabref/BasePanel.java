@@ -2361,7 +2361,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public boolean entryEditorAllowsChange() {
         Component c = splitPane.getBottomComponent();
-        if ((c != null) && (c instanceof EntryEditor)) {
+        if ((c instanceof EntryEditor)) {
             return ((EntryEditor) c).lastSourceAccepted();
         } else {
             return true;
@@ -2370,7 +2370,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void moveFocusToEntryEditor() {
         Component c = splitPane.getBottomComponent();
-        if ((c != null) && (c instanceof EntryEditor)) {
+        if ((c instanceof EntryEditor)) {
             new FocusRequester(c);
         }
     }

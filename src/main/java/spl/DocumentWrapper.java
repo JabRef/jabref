@@ -244,7 +244,7 @@ class DocumentWrapper {
     }
 
     private String getSimpleTypeValue(Bean bean) {
-        if ((bean == null) || !(bean instanceof SimpleTypeElementBean)) {
+        if (!(bean instanceof SimpleTypeElementBean)) {
             return null;
         }
         SimpleTypeElementBean simpleTypeElementBean = (SimpleTypeElementBean) bean;
