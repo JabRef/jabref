@@ -127,7 +127,7 @@ public class FieldTextMenu implements MouseListener
 
 
     // ---------------------------------------------------------------------------
-    abstract class BasicAction extends AbstractAction
+    abstract static class BasicAction extends AbstractAction
     {
 
         public BasicAction(String text, String description, URL icon)

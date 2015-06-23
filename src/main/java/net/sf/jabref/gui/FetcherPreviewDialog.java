@@ -169,7 +169,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     }
 
 
-    class TableEntry {
+    static class TableEntry {
 
         private final String id;
         private final JLabel preview;
@@ -195,7 +195,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     }
 
-    class PreviewRenderer implements TableCellRenderer {
+    static class PreviewRenderer implements TableCellRenderer {
 
         final JLabel label = new JLabel();
 
@@ -255,7 +255,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         }
     }
 
-    class EntryTableFormat implements TableFormat<TableEntry> {
+    static class EntryTableFormat implements TableFormat<TableEntry> {
 
         @Override
         public int getColumnCount() {

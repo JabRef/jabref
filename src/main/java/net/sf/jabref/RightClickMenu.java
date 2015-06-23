@@ -408,8 +408,7 @@ public class RightClickMenu extends JPopupMenu
     public void populateTypeMenu() {
         typeMenu.removeAll();
         for (String key : BibtexEntryType.ALL_TYPES.keySet()) {
-            typeMenu.add(new ChangeTypeAction
-                    (BibtexEntryType.getType(key), panel));
+            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(key), panel));
         }
     }
 
@@ -578,7 +577,7 @@ public class RightClickMenu extends JPopupMenu
     }
 
 
-    class ChangeTypeAction extends AbstractAction {
+    static class ChangeTypeAction extends AbstractAction {
 
         final BibtexEntryType type;
         final BasePanel panel;

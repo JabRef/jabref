@@ -296,7 +296,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      * only a type code is provided, and the subclass needs to fill in the proper information
      * based on the file link to be exported or the iteration status.
      */
-    protected class FormatEntry {
+    protected static class FormatEntry {
 
         private final int type;
         private String string = null;

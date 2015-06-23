@@ -2776,7 +2776,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }       */
 
-    private class MyGlassPane extends JPanel {
+    private static class MyGlassPane extends JPanel {
 
         //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
         public MyGlassPane() {

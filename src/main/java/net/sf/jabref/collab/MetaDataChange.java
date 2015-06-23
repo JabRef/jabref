@@ -111,7 +111,7 @@ public class MetaDataChange extends Change {
     }
 
 
-    class MetaDataChangeUnit {
+    static class MetaDataChangeUnit {
 
         final int type;
         final String key;

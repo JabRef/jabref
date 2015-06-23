@@ -76,7 +76,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
 
 
-    class TableRow {
+    static class TableRow {
 
         String name;
 

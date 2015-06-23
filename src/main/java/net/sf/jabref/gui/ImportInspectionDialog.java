@@ -887,7 +887,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class MyTable extends JTable {
+    static class MyTable extends JTable {
 
         public MyTable(TableModel model) {
             super(model);
@@ -900,7 +900,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class MyTableModel extends DefaultTableModel {
+    static class MyTableModel extends DefaultTableModel {
 
         @Override
         public Class<?> getColumnClass(int i) {

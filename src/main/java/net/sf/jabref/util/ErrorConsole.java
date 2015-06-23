@@ -146,7 +146,7 @@ public class ErrorConsole extends Handler {
 
 
     // All writes to this print stream are copied to two print streams
-    public class TeeStream extends PrintStream {
+    public static class TeeStream extends PrintStream {
 
         final PrintStream out;
 

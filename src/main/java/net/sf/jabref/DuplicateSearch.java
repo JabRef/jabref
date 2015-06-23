@@ -185,7 +185,7 @@ public class DuplicateSearch implements Runnable {
         }
     }
 
-    class DuplicateCallBack implements CallBack {
+    static class DuplicateCallBack implements CallBack {
 
         private int reply = -1;
         DuplicateResolverDialog diag;

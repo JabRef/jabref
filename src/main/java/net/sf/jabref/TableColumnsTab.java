@@ -92,7 +92,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     /*** end: special fields ***/
 
-    class TableRow {
+    static class TableRow {
 
         String name;
         int length;

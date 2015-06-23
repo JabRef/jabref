@@ -114,7 +114,7 @@ public class EntryChange extends Change {
     }
 
 
-    class FieldChange extends Change {
+    static class FieldChange extends Change {
 
         final BibtexEntry entry;
         final BibtexEntry tmpEntry;

@@ -40,7 +40,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private static final int COLNUM = 3;
 
 
-    class TypeButton extends JButton implements Comparable<TypeButton> {
+    static class TypeButton extends JButton implements Comparable<TypeButton> {
 
         final BibtexEntryType type;
 

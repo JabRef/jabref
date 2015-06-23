@@ -13,7 +13,7 @@ import javax.swing.text.TextAction;
 @SuppressWarnings("serial")
 public class MyEditorKit extends LargeHTMLEditorKit {
 
-    public class MyNextVisualPositionAction extends TextAction {
+    public static class MyNextVisualPositionAction extends TextAction {
 
         private final Action textActn;
 

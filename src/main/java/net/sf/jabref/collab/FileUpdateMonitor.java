@@ -179,7 +179,7 @@ public class FileUpdateMonitor implements Runnable {
     /**
      * A class containing the File, the FileUpdateListener and the current time stamp for one file.
      */
-    class Entry {
+    static class Entry {
 
         final FileUpdateListener listener;
         File file;

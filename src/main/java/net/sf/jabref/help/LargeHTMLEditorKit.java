@@ -73,7 +73,7 @@ public class LargeHTMLEditorKit extends HTMLEditorKit {
 
     }
 
-    private class HTMLBlockView extends BlockView {
+    private static class HTMLBlockView extends BlockView {
 
         public HTMLBlockView(Element elem) {
             super(elem, View.Y_AXIS);

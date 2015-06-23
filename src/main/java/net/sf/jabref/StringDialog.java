@@ -445,7 +445,7 @@ public class StringDialog extends JDialog {
     StoreContentAction storeContentAction = new StoreContentAction(this);
 
 
-    class StoreContentAction extends AbstractAction {
+    static class StoreContentAction extends AbstractAction {
 
         final StringDialog parent;
 

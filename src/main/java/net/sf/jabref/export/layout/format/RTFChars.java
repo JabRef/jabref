@@ -218,7 +218,7 @@ public class RTFChars implements LayoutFormatter {
     }
 
 
-    private class IntAndString {
+    private static class IntAndString {
 
         public final int i;
 
